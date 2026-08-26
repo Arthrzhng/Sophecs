@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #e9e9e3;
+  --color-surface: #fafaf8;
+  --color-ink: #191917;
+  --color-ink-mid: #54544c;
+  --color-ink-soft: #8a8a80;
+  --color-rule: rgba(25, 25, 23, 0.13);
+  --color-stoic: #3e5c4b;
+  --color-util: #8a6320;
+  --color-virtue: #7a3540;
+
+  --font-serif: var(--font-spectral), Georgia, serif;
+  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --radius-btn: 6px;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* Small uppercase label set in mono. The one typographic device that marks
+   metadata, section breaks, and school allegiance across the whole site. */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.eyebrow-sm {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Reading measure for anything that is an argument. */
+.prose-reading {
+  font-family: var(--font-serif);
+  font-size: 18.5px;
+  line-height: 1.7;
+  max-width: 63ch;
+}
+
+.prose-reading p + p {
+  margin-top: 1.25em;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
