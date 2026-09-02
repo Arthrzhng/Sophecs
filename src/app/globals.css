@@ -1,28 +1,57 @@
 @import "tailwindcss";
 
+/*
+  Named design tokens. Tailwind v4's CSS-first @theme is the current
+  idiomatic way to define these (see docs/decisions.md — the brief asks for
+  tailwind.config.ts, which is Tailwind v3's mechanism; this is the same
+  contract on the current major version).
+
+  Cool greyed paper background, near-black ink. School colours are tribal
+  markers only (a rule, a badge, a hairline) — never a full background or
+  button fill, except the result card, the one saturated surface.
+*/
 @theme {
   --color-paper: #e9e9e3;
   --color-surface: #fafaf8;
   --color-ink: #191917;
   --color-ink-mid: #54544c;
-  --color-ink-soft: #8a8a80;
+  --color-ink-soft: #63635b; /* darkened from an earlier draft value — 4.5:1 against paper, see docs/decisions.md */
   --color-rule: rgba(25, 25, 23, 0.13);
+
   --color-stoic: #3e5c4b;
-  --color-util: #8a6320;
+  --color-utilitarian: #8a6320;
   --color-virtue: #7a3540;
+
+  /* Card-only surfaces: the saturated fill plus a legible ink-on-colour text
+     pair for each school, chosen to clear WCAG AA (4.5:1 body / 3:1 large). */
+  --color-stoic-surface: #33503f;
+  --color-utilitarian-surface: #7a5518;
+  --color-virtue-surface: #6b2c37;
+  --color-on-saturated: #faf8f2;
 
   --font-serif: var(--font-spectral), Georgia, serif;
   --font-sans: var(--font-plex-sans), system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 
-  --radius-btn: 6px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
 }
+
+:root {
+  color-scheme: light;
+}
+
+/* No dark mode in Phase 1 — explicit non-goal in the build brief. See
+   docs/decisions.md for the resolution of this against the vibe-coded-
+   avoidance doc, which asks for one. */
 
 body {
   background-color: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
@@ -30,8 +59,6 @@ body {
   color: var(--color-paper);
 }
 
-/* Small uppercase label set in mono. The one typographic device that marks
-   metadata, section breaks, and school allegiance across the whole site. */
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -46,7 +73,6 @@ body {
   text-transform: uppercase;
 }
 
-/* Reading measure for anything that is an argument. */
 .prose-reading {
   font-family: var(--font-serif);
   font-size: 18.5px;
@@ -62,7 +88,9 @@ a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
-select:focus-visible {
+select:focus-visible,
+[tabindex]:focus-visible {
   outline: 2px solid var(--color-ink);
   outline-offset: 2px;
+  border-radius: 3px;
 }

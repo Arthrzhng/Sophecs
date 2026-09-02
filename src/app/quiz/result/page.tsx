@@ -1,20 +1,10 @@
-import { getAllModules } from "@/lib/content";
-import { ResultView } from "@/components/result-view";
-import type { SchoolId } from "@/lib/types";
+import { QuizResultClient } from "@/components/quiz/QuizResultClient";
+import { getAllSchools } from "@/lib/schools";
 
-export const metadata = { title: "Your school · Sophecs" };
-
+// Server wrapper only exists to hand the (fs-backed) school content down to
+// the client component as plain props — everything else on this transient
+// page runs client-side against sessionStorage.
 export default function QuizResultPage() {
-  // The micro-lesson on the result card is the module's quiz_excerpt,
-  // resolved server-side for all three schools since the outcome lives in
-  // the visitor's browser.
-  const excerpts = Object.fromEntries(
-    getAllModules().map((mod) => [mod.school_id, mod.quiz_excerpt])
-  ) as Record<SchoolId, string>;
-
-  return (
-    <div className="mx-auto max-w-3xl px-5 pt-14">
-      <ResultView excerpts={excerpts} />
-    </div>
-  );
+  const schools = getAllSchools();
+  return <QuizResultClient schools={schools} />;
 }

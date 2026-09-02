@@ -1,18 +1,18 @@
-import { getQuizOptions, getQuizQuestions } from "@/lib/data";
-import { QuizFlow } from "@/components/quiz-flow";
+import { Suspense } from "react";
+import { QuizShell } from "@/components/quiz/QuizShell";
 
-export const metadata = { title: "Quiz · Sophecs" };
+export const metadata = { title: "The quiz · Sophecs" };
 
-// The quiz is fully anonymous: no auth gate anywhere in this flow.
-export default async function QuizPage() {
-  const [questions, options] = await Promise.all([
-    getQuizQuestions(),
-    getQuizOptions(),
-  ]);
-
+// Client component, questions bundled at build time, no fetch before the
+// final server action on /quiz/result.
+export default function QuizPage() {
   return (
-    <div className="mx-auto max-w-3xl px-5 pt-14">
-      <QuizFlow questions={questions} options={options} />
-    </div>
+    <main className="flex-1">
+      <div className="mx-auto max-w-2xl px-6 pt-14 pb-20">
+        <Suspense fallback={null}>
+          <QuizShell />
+        </Suspense>
+      </div>
+    </main>
   );
 }

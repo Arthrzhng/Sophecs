@@ -1,118 +1,104 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { getCurrentProfile } from "@/lib/data";
-import {
-  FIXTURE_POSTS,
-  FIXTURE_SUBMISSIONS,
-  FIXTURE_THREADS,
-} from "@/lib/data/fixtures";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import { SUBMISSION_MAX_CHARS, type ForumChannel } from "@/lib/types";
+import { cookies } from "next/headers";
+import { newId } from "@/lib/ids";
+import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
+import type { SchoolId, SchoolVector } from "@/lib/types";
 
-// Mutations write to Supabase when configured. Without credentials they write
-// to the in-memory fixture arrays instead, which keeps the forum and debate
-// flows demonstrable end-to-end in local development (state resets with the
-// dev server; that's the point of a fixture).
+export interface SubmitQuizResultInput {
+  primary: SchoolId;
+  secondary: SchoolId;
+  vector: SchoolVector;
+  answers: { q: number; opt: string }[];
+  challengeId?: string | null;
+  referrer?: string;
+}
 
-export async function createThread(formData: FormData) {
-  const profile = await getCurrentProfile();
-  if (!profile) redirect("/auth");
+export type SubmitQuizResultOutput =
+  | { ok: true; id: string; challengerSchool?: SchoolId }
+  | { ok: false; error: string };
 
-  const channel = String(formData.get("channel") ?? "") as ForumChannel;
-  const title = String(formData.get("title") ?? "").trim();
-  const body = String(formData.get("body") ?? "").trim();
-  if (!title || !body) return;
+// Called from /quiz/result. Generates the id, reads the anon_id cookie
+// (bootstrapped by middleware on every request, so it always exists by the
+// time the quiz finishes), and inserts via the admin client — RLS's insert
+// policy is deliberately permissive (`with check (true)`) and trusts this
+// server action, not the caller, to set anon_id correctly; RLS is what
+// isolates *reads* between anonymous users, tested separately.
+export async function submitQuizResult(
+  input: SubmitQuizResultInput
+): Promise<SubmitQuizResultOutput> {
+  if (!isAdminConfigured()) {
+    return { ok: false, error: "Supabase is not configured in this environment." };
+  }
 
-  let threadId: string;
-  if (isSupabaseConfigured()) {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("threads")
-      .insert({ channel, profile_id: profile.id, title })
-      .select("id")
+  const cookieStore = await cookies();
+  const anonId = cookieStore.get("anon_id")?.value;
+  if (!anonId) {
+    return { ok: false, error: "Missing anonymous identity." };
+  }
+
+  const id = newId();
+  const admin = createAdminClient();
+
+  const { error } = await admin.from("quiz_results").insert({
+    id,
+    anon_id: anonId,
+    school: input.primary,
+    secondary: input.secondary,
+    vector: input.vector,
+    answers: input.answers,
+    challenge_from: input.challengeId ?? null,
+    referrer: input.referrer ?? null,
+  });
+
+  if (error) {
+    return { ok: false, error: error.message };
+  }
+
+  let challengerSchool: SchoolId | undefined;
+
+  if (input.challengeId) {
+    const { data: challenge } = await admin
+      .from("challenges")
+      .select("challenger_result_id")
+      .eq("id", input.challengeId)
       .single();
-    if (error || !data) throw new Error(error?.message ?? "thread insert failed");
-    threadId = data.id;
-    await supabase
-      .from("posts")
-      .insert({ thread_id: threadId, profile_id: profile.id, body });
-  } else {
-    threadId = `t-${Date.now()}`;
-    const created_at = new Date().toISOString();
-    FIXTURE_THREADS.push({
-      id: threadId,
-      channel,
-      profile_id: profile.id,
-      title,
-      created_at,
-    });
-    FIXTURE_POSTS.push({
-      id: `post-${Date.now()}`,
-      thread_id: threadId,
-      profile_id: profile.id,
-      body,
-      created_at,
-    });
+
+    if (challenge) {
+      const { data: challengerResult } = await admin
+        .from("quiz_results")
+        .select("school")
+        .eq("id", challenge.challenger_result_id)
+        .single();
+      challengerSchool = challengerResult?.school as SchoolId | undefined;
+
+      await admin
+        .from("challenges")
+        .update({ challengee_result_id: id, status: "accepted" })
+        .eq("id", input.challengeId);
+    }
   }
 
-  revalidatePath("/forum");
-  redirect(`/forum/${threadId}`);
+  return { ok: true, id, challengerSchool };
 }
 
-export async function createPost(formData: FormData) {
-  const profile = await getCurrentProfile();
-  if (!profile) redirect("/auth");
-
-  const threadId = String(formData.get("thread_id") ?? "");
-  const body = String(formData.get("body") ?? "").trim();
-  if (!threadId || !body) return;
-
-  if (isSupabaseConfigured()) {
-    const supabase = await createClient();
-    await supabase
-      .from("posts")
-      .insert({ thread_id: threadId, profile_id: profile.id, body });
-  } else {
-    FIXTURE_POSTS.push({
-      id: `post-${Date.now()}`,
-      thread_id: threadId,
-      profile_id: profile.id,
-      body,
-      created_at: new Date().toISOString(),
-    });
-  }
-
-  revalidatePath(`/forum/${threadId}`);
+export interface CreateChallengeOutput {
+  ok: boolean;
+  id?: string;
+  error?: string;
 }
 
-export async function submitArgument(formData: FormData) {
-  const profile = await getCurrentProfile();
-  if (!profile) redirect("/auth");
-
-  const motionId = String(formData.get("motion_id") ?? "");
-  const side = formData.get("side") === "against" ? "against" : "for";
-  const body = String(formData.get("body") ?? "")
-    .trim()
-    .slice(0, SUBMISSION_MAX_CHARS);
-  if (!motionId || !body) return;
-
-  if (isSupabaseConfigured()) {
-    const supabase = await createClient();
-    await supabase
-      .from("submissions")
-      .insert({ motion_id: motionId, profile_id: profile.id, side, body });
-  } else {
-    FIXTURE_SUBMISSIONS.push({
-      id: `s-${Date.now()}`,
-      motion_id: motionId,
-      profile_id: profile.id,
-      side,
-      body,
-      created_at: new Date().toISOString(),
-    });
+// Called from ChallengeButton on /r/[id]. The row is created with only
+// challenger_result_id in Phase 1 — see docs/decisions.md.
+export async function createChallenge(resultId: string): Promise<CreateChallengeOutput> {
+  if (!isAdminConfigured()) {
+    return { ok: false, error: "Supabase is not configured in this environment." };
   }
-
-  revalidatePath("/debate");
+  const admin = createAdminClient();
+  const id = newId();
+  const { error } = await admin
+    .from("challenges")
+    .insert({ id, challenger_result_id: resultId, status: "open" });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, id };
 }
