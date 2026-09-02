@@ -59,181 +59,240 @@ export const FIXTURE_PROFILES: Profile[] = [
   },
 ];
 
-// PLACEHOLDER: 3 questions wired end-to-end. The real quiz has 10; adding the
-// other 7 is seed data, not code.
+// The full ten-question diagnostic. Every question forks on the same three
+// axes: Stoicism checks what's within your control, Utilitarianism checks
+// aggregate outcome, Virtue Ethics checks what the choice makes of your
+// character. The repetition across scenarios is what turns the result into
+// a signal instead of noise from any one question.
 export const FIXTURE_QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: "q1",
     prompt:
-      "A model refuses a harmful request because it was trained to. Is the refusal creditable to the model?",
+      "A colleague takes credit for your work in a meeting. Before you say anything, what do you check first?",
     position: 1,
   },
   {
     id: "q2",
     prompt:
-      "You can deploy a system that helps millions slightly and harms a few people badly. What settles whether you should?",
+      "An algorithm denies you something — a loan, a job screen — and you suspect it's wrong. What matters most?",
     position: 2,
   },
   {
     id: "q3",
-    prompt:
-      "What would it take for you to say an AI acted well, rather than merely correctly?",
+    prompt: "A friend asks for harsh, honest feedback on work they're proud of.",
     position: 3,
+  },
+  {
+    id: "q4",
+    prompt: "You find a wallet with cash on the street.",
+    position: 4,
+  },
+  {
+    id: "q5",
+    prompt: "An AI tool could finish your assignment for you, undetected.",
+    position: 5,
+  },
+  {
+    id: "q6",
+    prompt: "A family member is seriously ill.",
+    position: 6,
+  },
+  {
+    id: "q7",
+    prompt: "You're asked to review a friend's business plan you think will fail.",
+    position: 7,
+  },
+  {
+    id: "q8",
+    prompt:
+      "You're a passenger in a self-driving car; its software will decide in an unavoidable crash.",
+    position: 8,
+  },
+  {
+    id: "q9",
+    prompt: "You receive an award you don't think you fully earned.",
+    position: 9,
+  },
+  {
+    id: "q10",
+    prompt: "A small ethical compromise at work has become a habit.",
+    position: 10,
   },
 ];
 
 export const FIXTURE_QUIZ_OPTIONS: QuizOption[] = [
-  {
-    id: "q1a",
-    question_id: "q1",
-    label:
-      "Credit is beside the point. What matters is whether the refusal flowed from the system's own settled constitution.",
-    school_id: "stoicism",
-  },
-  {
-    id: "q1b",
-    question_id: "q1",
-    label:
-      "Yes, if the refusal prevented harm. Outcomes earn credit; the training story is just causal bookkeeping.",
-    school_id: "utilitarianism",
-  },
-  {
-    id: "q1c",
-    question_id: "q1",
-    label:
-      "No. Credit belongs to agents with character, and one refusal tells you nothing about a stable disposition.",
-    school_id: "virtue-ethics",
-  },
-  {
-    id: "q2a",
-    question_id: "q2",
-    label:
-      "Whether the harms fall within what was ever in your control to prevent, and whether you accepted them with open eyes.",
-    school_id: "stoicism",
-  },
-  {
-    id: "q2b",
-    question_id: "q2",
-    label: "The arithmetic. Sum the benefits, sum the harms, and let the totals decide.",
-    school_id: "utilitarianism",
-  },
-  {
-    id: "q2c",
-    question_id: "q2",
-    label:
-      "What a person of good judgment would do here, in this case, knowing these people. No formula survives contact with the particulars.",
-    school_id: "virtue-ethics",
-  },
-  {
-    id: "q3a",
-    question_id: "q3",
-    label:
-      "Nothing more than acting in accord with its nature and role. Acting well just is correct function, rightly understood.",
-    school_id: "stoicism",
-  },
-  {
-    id: "q3b",
-    question_id: "q3",
-    label: "Show me it reliably makes lives better. That is the whole content of 'well'.",
-    school_id: "utilitarianism",
-  },
-  {
-    id: "q3c",
-    question_id: "q3",
-    label:
-      "It would need to act from the right state of character, for the right reasons, the way a practically wise person would.",
-    school_id: "virtue-ethics",
-  },
+  { id: "q1a", question_id: "q1", school_id: "stoicism", label: "Whether the outcome is even within my control." },
+  { id: "q1b", question_id: "q1", school_id: "utilitarianism", label: "Which response leaves the whole team best off." },
+  { id: "q1c", question_id: "q1", school_id: "virtue-ethics", label: "What kind of person I want to be in this room." },
+
+  { id: "q2a", question_id: "q2", school_id: "stoicism", label: "How I respond, since whether the system was fair isn't up to me." },
+  { id: "q2b", question_id: "q2", school_id: "utilitarianism", label: "Pushing for an appeals process that minimizes wrongful denials overall." },
+  { id: "q2c", question_id: "q2", school_id: "virtue-ethics", label: "What a person of good character does when facing an unjust system." },
+
+  { id: "q3a", question_id: "q3", school_id: "stoicism", label: "Give it calmly regardless of their reaction — that reaction isn't mine to control." },
+  { id: "q3b", question_id: "q3", school_id: "utilitarianism", label: "Weigh how the feedback affects them against the value of them improving." },
+  { id: "q3c", question_id: "q3", school_id: "virtue-ethics", label: "Ask what an honest friend would actually say, and say that." },
+
+  { id: "q4a", question_id: "q4", school_id: "stoicism", label: "Recognize that what I do says something about my judgment, not my luck." },
+  { id: "q4b", question_id: "q4", school_id: "utilitarianism", label: "Consider who needs it most and act for the best overall outcome." },
+  { id: "q4c", question_id: "q4", school_id: "virtue-ethics", label: "Return it, because that's simply what an honest person does." },
+
+  { id: "q5a", question_id: "q5", school_id: "stoicism", label: "My obligation is about what I assent to, not whether I'd get caught." },
+  { id: "q5b", question_id: "q5", school_id: "utilitarianism", label: "Consider whether using it produces better learning outcomes than not." },
+  { id: "q5c", question_id: "q5", school_id: "virtue-ethics", label: "Ask what kind of person I'm training myself to become by using it." },
+
+  { id: "q6a", question_id: "q6", school_id: "stoicism", label: "Separate what I can actually change from what I can't, and act only on the former." },
+  { id: "q6b", question_id: "q6", school_id: "utilitarianism", label: "Focus resources and attention where they'll do the most good." },
+  { id: "q6c", question_id: "q6", school_id: "virtue-ethics", label: "Show up the way a loving, present person would, regardless of outcome." },
+
+  { id: "q7a", question_id: "q7", school_id: "stoicism", label: "Give my honest judgment — their reaction to it isn't something I control." },
+  { id: "q7b", question_id: "q7", school_id: "utilitarianism", label: "Consider whether honesty here does more good than a kind lie would." },
+  { id: "q7c", question_id: "q7", school_id: "virtue-ethics", label: "Trust that a good friend tells the truth, and let that guide me." },
+
+  { id: "q8a", question_id: "q8", school_id: "stoicism", label: "What matters is whether I assented to the risk, not what the algorithm computes." },
+  { id: "q8b", question_id: "q8", school_id: "utilitarianism", label: "The car should minimize total harm across everyone involved." },
+  { id: "q8c", question_id: "q8", school_id: "virtue-ethics", label: "The real test is whether the people who built it acted with integrity, not just correct math." },
+
+  { id: "q9a", question_id: "q9", school_id: "stoicism", label: "My standing rests on my own judgment of the work, not on external recognition." },
+  { id: "q9b", question_id: "q9", school_id: "utilitarianism", label: "Consider whether accepting it does more good (funding, visibility) than declining." },
+  { id: "q9c", question_id: "q9", school_id: "virtue-ethics", label: "Ask whether accepting it honestly reflects who I am." },
+
+  { id: "q10a", question_id: "q10", school_id: "stoicism", label: "Whether I'd get caught is irrelevant; only my own judgment about the act matters." },
+  { id: "q10b", question_id: "q10", school_id: "utilitarianism", label: "Weigh the actual harm caused against what it would cost me to stop." },
+  { id: "q10c", question_id: "q10", school_id: "virtue-ethics", label: "Ask whether this is shaping who I'm becoming, and whether I want that." },
 ];
 
+// Motions carry only an id (matching a debate_topics[].id in the owning
+// module), the module, and a scheduling window. The motion's text is never
+// duplicated here — src/lib/content.ts#getDebateTopic resolves it from the
+// module's frontmatter. Windows rotate roughly weekly; category-error is the
+// one currently open.
 export const FIXTURE_MOTIONS: Motion[] = [
   {
-    id: "m-determinism-1",
-    module_id: "stoicism-determinism",
-    text: "This house believes a deterministic system can still be responsible for its outputs.",
-    opens_at: "2026-08-25T09:00:00Z",
-    closes_at: "2026-08-27T09:00:00Z",
+    id: "gradient-descent",
+    module_id: "virtue-ethics-rlhf-habituation",
+    opens_at: "2026-08-10T09:00:00Z",
+    closes_at: "2026-08-11T09:00:00Z",
   },
   {
-    id: "m-alignment-1",
-    module_id: "utilitarianism-alignment",
-    text: "This house believes an AI trained to maximise stated preferences is a utilitarian.",
-    opens_at: "2026-08-23T09:00:00Z",
-    closes_at: "2026-08-24T09:00:00Z",
+    id: "harman-attack",
+    module_id: "virtue-ethics-rlhf-habituation",
+    opens_at: "2026-08-13T09:00:00Z",
+    closes_at: "2026-08-14T09:00:00Z",
+  },
+  {
+    id: "williams-blame",
+    module_id: "stoicism-determinism",
+    opens_at: "2026-08-17T09:00:00Z",
+    closes_at: "2026-08-18T09:00:00Z",
+  },
+  {
+    id: "german-ban",
+    module_id: "utilitarianism-self-driving-cars",
+    opens_at: "2026-08-20T09:00:00Z",
+    closes_at: "2026-08-21T09:00:00Z",
+  },
+  {
+    id: "passenger-sacrifice",
+    module_id: "utilitarianism-self-driving-cars",
+    opens_at: "2026-08-25T09:00:00Z",
+    closes_at: "2026-08-26T09:00:00Z",
+  },
+  {
+    id: "category-error",
+    module_id: "stoicism-determinism",
+    opens_at: "2026-08-31T09:00:00Z",
+    closes_at: "2026-09-04T09:00:00Z",
   },
 ];
 
-// Standalone condensed teaching per motion, shown on the verdict screen.
+// Standalone condensed teaching shown after a verdict, keyed by motion id.
 // Not a teaser and not linked to /lessons.
 export const FIXTURE_MICRO_LESSONS: MicroLesson[] = [
   {
-    id: "ml-determinism-1",
-    motion_id: "m-determinism-1",
-    body: "The Stoics never thought determinism excused anyone. Chrysippus split causes in two: the push that sets a cylinder moving comes from outside, but its rolling comes from its shape. On that view a system's outputs can be fully caused and still genuinely its own, because they flow through its constitution. The cost of the move is that it works for machines exactly as well as it works for us.",
+    id: "ml-category-error",
+    motion_id: "category-error",
+    body: `Bernard Williams gave the strongest version of "harmless shorthand" in 1976, though he wasn't writing about machines. A lorry driver kills a child who steps into the road, blamelessly — but he feels something a driver who braked in time never will. Williams calls it agent-regret, and his point is that outcomes carry moral weight the antecedent judgment can't fully absorb. Applied here: if a deployed system causes harm, people assign responsibility by what happened, not by whether anything inside the system resembled an act of assent. Whoever argues "category error" has to answer that before the assent framework holds.`,
   },
   {
-    id: "ml-alignment-1",
-    motion_id: "m-alignment-1",
-    body: "Bentham wanted an arithmetic of welfare; a reward function is one, minus the arguments. Sidgwick saw the trap a century early: maximising what people say they want is not the same as maximising their good, and the gap between the two is where both utilitarian ethics and preference-learning systems do their hardest work.",
+    id: "ml-williams-blame",
+    motion_id: "williams-blame",
+    body: `Chrysippus's cylinder-and-top image, preserved by Cicero in De Fato 42-43, is the Stoic answer available here: a push starts an object moving, but its own nature determines how it moves after. Applied to blame, this says a builder's responsibility tracks their judgment at the point of assent, not the accident of what happened downstream. Williams would reply that this proves too much — it would excuse the blameless lorry driver from agent-regret he plainly still feels. The strongest version of "it matters" has to explain why felt responsibility should track anything other than outcome.`,
+  },
+  {
+    id: "ml-passenger-sacrifice",
+    motion_id: "passenger-sacrifice",
+    body: `Rawls's objection in A Theory of Justice is the sharpest tool here: utilitarianism, he argues, treats society's welfare the way one person nets gains against losses across their own life — but a passenger sacrificed for five pedestrians isn't compensated by their survival the way a person delaying pleasure for later gain is compensated by their own future self. Whoever argues for minimizing total casualties has to answer why the passenger's death is properly netted against strangers' survival at all, not just show the arithmetic favors five over one.`,
+  },
+  {
+    id: "ml-german-ban",
+    motion_id: "german-ban",
+    body: `Germany's 2017 Ethics Commission report doesn't just discourage weighing victims against each other — Rule 9 prohibits it outright, and forbids any distinction based on age, gender, or physical condition. The strongest challenge to calling this an advance: refusing to calculate doesn't remove the tradeoff, it just moves it upstream, into whatever default behavior engineers build in before any crash occurs. The strongest challenge to calling it avoidance: a rule against comparing named individuals' worth might be exactly what a just framework has to refuse to do, calculation or not.`,
+  },
+  {
+    id: "ml-gradient-descent",
+    motion_id: "gradient-descent",
+    body: `Groff and Symons's 2024 answer is the one to know here: a model shaped by rounds of human feedback might reach what they call "nice teenager level morality" — reliably acceptable behavior in familiar situations — without phronesis, the capacity to judge correctly in a genuinely novel case no training example covers. Their claim is that phronesis isn't reducible to a probability distribution over past examples, however large, because it isn't a regularity at all. Whoever argues "it doesn't matter how it got there" needs an answer for novel cases specifically, not just cases the training data already resembles.`,
+  },
+  {
+    id: "ml-harman-attack",
+    motion_id: "harman-attack",
+    body: `Gilbert Harman's 1999 argument is blunter than people expect: drawing on the Milgram experiments, he claims there's no real empirical basis for stable character traits in humans at all — behavior tracks situational pressure far more than anything like Aristotelian hexis. If Harman is right, the debate about whether AI training can replicate habituation is aimed at something that was never real even for humans. Either the AI question is premature, or Aristotle's whole framework needs its own defense against Harman first, independent of any machine.`,
   },
 ];
 
 export const FIXTURE_SUBMISSIONS: Submission[] = [
+  // category-error is the currently open motion: one submission in, awaiting
+  // an opponent.
   {
-    id: "s-halcyon-det",
-    motion_id: "m-determinism-1",
+    id: "s-halcyon-category-error",
+    motion_id: "category-error",
     profile_id: "p-halcyon",
     side: "for",
-    body: "Chrysippus answers this directly: the cylinder is pushed, yet rolls by its own shape. A model's outputs are caused by training, but they pass through a constitution that is the model's own. Responsibility never required an uncaused cause. It requires that the action flow from the agent's character, and that condition is met. Cicero, De Fato 43.",
-    created_at: "2026-08-25T12:04:00Z",
+    body: `Epictetus's whole doctrine rests on one act: assent, giving or withholding judgment about an impression. A model has no impression to assent to and no self to withhold agreement with — it computes a distribution and samples from it. Calling that output a "decision" borrows the one word Epictetus reserved for what's actually ours and hands it to a process with no candidate for that act anywhere in the pipeline. That isn't shorthand. It's the confusion the Enchiridion opens by correcting, now aimed at a machine.`,
+    created_at: "2026-09-01T15:20:00Z",
   },
+  // passenger-sacrifice is judged: a human submission against the stubbed
+  // system opponent, demonstrating the fallback-matching path.
   {
-    id: "s-benthamite-det",
-    motion_id: "m-determinism-1",
+    id: "s-benthamite-passenger",
+    motion_id: "passenger-sacrifice",
     profile_id: "p-benthamite",
-    side: "against",
-    body: "Responsibility is a practice we keep because it changes behaviour. Praise and blame are levers, and levers need a hand that can feel them. A deterministic pipeline with no capacity for expectation or regret gives punishment nothing to grip. Call its outputs its own if you like; the word does no work the loss function was not already doing.",
-    created_at: "2026-08-25T13:41:00Z",
+    side: "for",
+    body: `Bentham's calculus doesn't stop counting at the windshield. Extent, his word for how many people a choice touches, makes no exception for whoever's inside the car. Awad et al.'s Moral Machine data — forty million decisions, 233 countries — found broad, if not universal, preference for minimizing deaths regardless of who they are. A car that refuses to minimize harm doesn't dodge the tradeoff, it just lets whoever's in its path absorb it by accident instead of design. Refusing to choose is still a choice, and a worse one.`,
+    created_at: "2026-08-25T11:10:00Z",
   },
   {
-    id: "s-system-align",
-    motion_id: "m-alignment-1",
+    id: "s-system-passenger",
+    motion_id: "passenger-sacrifice",
     profile_id: "system",
     side: "against",
-    body: "A utilitarian counts welfare wherever it occurs. A preference-maximiser counts responses to prompts. Mill's whole second chapter is a warning that these come apart: people state preferences against their own good constantly. Optimising the statement is not optimising the person. The resemblance to utilitarianism is clerical, not moral.",
-    created_at: "2026-08-23T10:00:00Z",
-  },
-  {
-    id: "s-turncoat-align",
-    motion_id: "m-alignment-1",
-    profile_id: "p-turncoat",
-    side: "for",
-    body: "Strip the caricature and the motion stands. Bentham asked for a common measure of welfare and took expressed pleasure and pain as evidence for it. Preference learning does the same with better instruments. Yes, stated preference misfires; Bentham's calculus misfired too, and nobody said he was therefore no utilitarian. Imperfect counting is still counting.",
-    created_at: "2026-08-23T16:22:00Z",
+    body: `Rawls's charge against utilitarianism is exact here: it treats the passenger's death as compensated by five strangers' survival, the way a person nets a cost today against their own gain tomorrow. But the passenger isn't the five pedestrians' future self. Summing welfare across different people erases a distinction utilitarianism has no principled way to notice. A rule that minimizes the count still can't say why that particular passenger was the one available to be spent.`,
+    created_at: "2026-08-25T11:45:00Z",
   },
 ];
 
 export const FIXTURE_MATCHES: Match[] = [
   {
-    id: "match-align-1",
-    motion_id: "m-alignment-1",
-    submission_a: "s-turncoat-align",
-    submission_b: "s-system-align",
+    id: "match-passenger-sacrifice",
+    motion_id: "passenger-sacrifice",
+    submission_a: "s-benthamite-passenger",
+    submission_b: "s-system-passenger",
     status: "judged",
   },
 ];
 
 export const FIXTURE_VERDICTS: Verdict[] = [
   {
-    id: "v-align-1",
-    match_id: "match-align-1",
-    winner_submission_id: "s-turncoat-align",
+    id: "v-passenger-sacrifice",
+    match_id: "match-passenger-sacrifice",
+    winner_submission_id: "s-benthamite-passenger",
     scores: {
-      a: { logic: 8, sources: 7, answers_opponent: 8, clarity: 7 },
-      b: { logic: 7, sources: 8, answers_opponent: 5, clarity: 8 },
+      a: { logic: 8, sources: 8, answers_opponent: 7, clarity: 8 },
+      b: { logic: 7, sources: 7, answers_opponent: 5, clarity: 7 },
     },
     rationale:
-      "The affirmative meets the strongest objection head-on: it concedes that stated preference misfires and turns the concession into its own argument from Bentham's practice. The negative reads Mill well but argues past the motion, which asked about the maximiser's classification, not its success.",
+      "The affirmative anticipates the Rawlsian reply before it arrives, reframing inaction itself as a choice with a body count, which blunts the force of 'the calculus shouldn't net people together.' The negative states Rawls's objection precisely but never engages the affirmative's actual claim that refusing to calculate doesn't remove the tradeoff, only relocates it.",
   },
 ];
 
@@ -244,7 +303,7 @@ export const FIXTURE_DEFECTIONS: Defection[] = [
     from_school_id: "utilitarianism",
     to_school_id: "stoicism",
     reason:
-      "Lost three debates defending aggregate welfare against the control objection and realised I believed my opponents.",
+      "Lost three debates arguing the utilitarian case on the self-driving car passenger question, and every time the reply built on Rawls landed harder than my arithmetic did.",
     created_at: "2026-08-14T20:10:00Z",
   },
 ];
@@ -258,10 +317,11 @@ export const FIXTURE_THREADS: Thread[] = [
     created_at: "2026-08-20T11:15:00Z",
   },
   {
-    id: "t-repugnant",
+    id: "t-rawls-mm",
     channel: "utilitarianism",
     profile_id: "p-benthamite",
-    title: "Does the repugnant conclusion apply to training data mixtures?",
+    title:
+      "Rawls says the passenger isn't compensated by the five who survive. Does the Moral Machine data undercut that, or just describe preference?",
     created_at: "2026-08-21T09:40:00Z",
   },
   {
@@ -275,7 +335,7 @@ export const FIXTURE_THREADS: Thread[] = [
     id: "t-defection",
     channel: "defections",
     profile_id: "p-turncoat",
-    title: "Why I left utilitarianism after the control debates",
+    title: "Why I left utilitarianism arguing the passenger question",
     created_at: "2026-08-14T20:12:00Z",
   },
 ];
@@ -285,7 +345,7 @@ export const FIXTURE_POSTS: Post[] = [
     id: "post-1",
     thread_id: "t-cylinder",
     profile_id: "p-halcyon",
-    body: "Everyone reads De Fato 43 as a physics claim about shape. I think it's a claim about ownership: the rolling is the cylinder's because nothing else's shape explains it. On that reading, weights are shape.",
+    body: "Everyone reads De Fato 42-43 as a physics claim about shape. I think it's a claim about ownership: the rolling is the cylinder's because nothing else's shape explains it. On that reading, weights are shape.",
     created_at: "2026-08-20T11:15:00Z",
   },
   {
@@ -299,21 +359,56 @@ export const FIXTURE_POSTS: Post[] = [
     id: "post-3",
     thread_id: "t-cylinder",
     profile_id: "p-benthamite",
-    body: "You are both doing metaphysics where an empirical question sits. Does treating models as responsible produce better outcomes than treating them as pipes? That's answerable, and neither of you has touched it.",
+    body: "You're both doing metaphysics where an empirical question sits. Does treating models as responsible produce better outcomes than treating them as pipes? That's answerable, and neither of you has touched it.",
     created_at: "2026-08-20T19:47:00Z",
   },
   {
     id: "post-4",
-    thread_id: "t-defection",
-    profile_id: "p-turncoat",
-    body: "Three debates in a row I wrote the utilitarian case for holding systems responsible, and three times the Stoic reply was better than mine. At some point defending a position you keep losing with, against arguments you find convincing, has a name: it's called changing your mind.",
-    created_at: "2026-08-14T20:12:00Z",
+    thread_id: "t-rawls-mm",
+    profile_id: "p-benthamite",
+    body: "40 million Moral Machine decisions and the preference for minimizing deaths shows up almost everywhere it was tested. If that many people converge on the same tradeoff independently, at what point does Rawls's objection stop being a knockdown argument and start being a minority taste?",
+    created_at: "2026-08-21T09:40:00Z",
   },
   {
     id: "post-5",
+    thread_id: "t-rawls-mm",
+    profile_id: "p-turncoat",
+    body: "Convergence tells you what people prefer, not whether the preference survives being asked to justify itself to the one person it costs. Rawls's point was never that the arithmetic is unpopular. It's that the passenger has no stake in the five strangers' survival the way your own future self has a stake in your own future pleasure.",
+    created_at: "2026-08-21T13:12:00Z",
+  },
+  {
+    id: "post-6",
+    thread_id: "t-rawls-mm",
+    profile_id: "p-mesotes",
+    body: "You're both arguing about the math and skipping the part that actually gets built: some engineer picks the default before any crash happens. I'd rather ask what kind of judgment went into that choice than whether the outcome column adds up correctly after the fact.",
+    created_at: "2026-08-21T18:03:00Z",
+  },
+  {
+    id: "post-7",
+    thread_id: "t-phronesis",
+    profile_id: "p-mesotes",
+    body: "Groff and Symons's line that keeps bothering me: phronesis isn't reducible to a distribution over past examples because it isn't a regularity at all. If that's right, no amount of RLHF closes the gap, not because the model isn't good enough yet, but because the target was never the kind of thing more data gets you closer to.",
+    created_at: "2026-08-22T17:05:00Z",
+  },
+  {
+    id: "post-8",
+    thread_id: "t-phronesis",
+    profile_id: "p-benthamite",
+    body: "\"Isn't a regularity at all\" is doing a lot of work for a claim with no test attached. Show me a novel case a fine-tuned model handles badly that a person with practical wisdom would handle well, reliably, and I'll take the distinction seriously. Until then it reads like a definition built to be unfalsifiable.",
+    created_at: "2026-08-23T08:30:00Z",
+  },
+  {
+    id: "post-9",
+    thread_id: "t-defection",
+    profile_id: "p-turncoat",
+    body: "Three debates running the utilitarian side of the passenger question, and three times the reply built on Rawls landed harder than my own arithmetic. At some point defending a calculus you keep losing with, against an objection you find convincing, has a name. It's called changing your mind.",
+    created_at: "2026-08-14T20:12:00Z",
+  },
+  {
+    id: "post-10",
     thread_id: "t-defection",
     profile_id: "p-halcyon",
-    body: "Welcome. For what it's worth, the calculus was never wrong about what to count, only about who does the counting.",
+    body: "Welcome. For what it's worth, the calculus was never wrong about the arithmetic, only about who's allowed to be summed with whom.",
     created_at: "2026-08-15T07:58:00Z",
   },
 ];

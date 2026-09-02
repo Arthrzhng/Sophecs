@@ -8,12 +8,17 @@ import type { SchoolId } from "./types";
 // is fixed; real modules already exist to this shape and drop in with zero
 // code changes. Parsed at build time (all consumers are server components).
 
+export interface DebateTopic {
+  id: string;
+  text: string;
+}
+
 export interface ModuleFrontmatter {
   id: string;
   school: string; // display name, e.g. "Stoicism"
   title: string;
   quiz_excerpt: string;
-  debate_topics: string[];
+  debate_topics: DebateTopic[];
   sources: { name: string }[];
 }
 
@@ -55,6 +60,17 @@ function assertFrontmatter(
   if (!(data.school as string in SCHOOL_NAME_TO_ID)) {
     throw new Error(
       `Module ${file} names unknown school "${data.school}". Known: ${Object.keys(SCHOOL_NAME_TO_ID).join(", ")}`
+    );
+  }
+  const topics = data.debate_topics as unknown;
+  const malformed =
+    !Array.isArray(topics) ||
+    topics.some(
+      (t) => typeof t !== "object" || t === null || !("id" in t) || !("text" in t)
+    );
+  if (malformed) {
+    throw new Error(
+      `Module ${file} debate_topics must be a list of {id, text} pairs`
     );
   }
 }
@@ -118,4 +134,17 @@ export function getModule(slug: string): ContentModule | undefined {
 
 export function getModuleBySchool(schoolId: SchoolId): ContentModule | undefined {
   return getAllModules().find((mod) => mod.school_id === schoolId);
+}
+
+// A motion's text lives only in its module's debate_topics; the data layer
+// stores just the id and the scheduling window, so this is the one place
+// that resolves a motion id back to what it actually says.
+export function getDebateTopic(
+  topicId: string
+): { module: ContentModule; topic: DebateTopic } | undefined {
+  for (const mod of getAllModules()) {
+    const topic = mod.debate_topics.find((t) => t.id === topicId);
+    if (topic) return { module: mod, topic };
+  }
+  return undefined;
 }

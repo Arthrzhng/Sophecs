@@ -44,10 +44,12 @@ export interface QuizResult {
   created_at: string;
 }
 
+// Motion text lives in the owning module's debate_topics (content.ts resolves
+// it via getDebateTopic); id matches a debate_topics[].id exactly, so there's
+// no second copy of the motion wording to keep in sync.
 export interface Motion {
   id: string;
   module_id: string;
-  text: string;
   opens_at: string;
   closes_at: string;
 }

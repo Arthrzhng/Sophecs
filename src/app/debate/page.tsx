@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ClosesIn } from "@/components/closes-in";
 import { SchoolEyebrow } from "@/components/school-mark";
 import { SubmissionBox } from "@/components/submission-box";
-import { getModule } from "@/lib/content";
+import { getDebateTopic, getModule } from "@/lib/content";
 import {
   getCurrentProfile,
   getLatestJudgedMatch,
@@ -60,6 +60,7 @@ export default async function DebatePage() {
   }
 
   const module = getModule(motion.module_id);
+  const motionText = getDebateTopic(motion.id)?.topic.text ?? "";
   // Your school's module authored the motion: you argue for it. Otherwise you
   // take the opposition bench.
   const side = profile.school_id === module?.school_id ? "for" : "against";
@@ -100,7 +101,7 @@ export default async function DebatePage() {
       <div className="mt-10 max-w-[63ch]">
         {module && <SchoolEyebrow school={module.school_id} />}
         <h1 className="font-serif text-2xl sm:text-3xl font-medium leading-snug mt-3">
-          {motion.text}
+          {motionText}
         </h1>
       </div>
 

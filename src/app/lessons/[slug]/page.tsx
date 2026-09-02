@@ -95,8 +95,8 @@ export default async function LessonPage({
             <p className="eyebrow text-ink-soft">Argue this</p>
             <ul className="mt-4 space-y-4">
               {mod.debate_topics.map((topic) => (
-                <li key={topic}>
-                  <p className="font-serif text-[18px] leading-snug">{topic}</p>
+                <li key={topic.id}>
+                  <p className="font-serif text-[18px] leading-snug">{topic.text}</p>
                 </li>
               ))}
             </ul>

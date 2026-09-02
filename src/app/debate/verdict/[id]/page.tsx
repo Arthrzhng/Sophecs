@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SchoolEyebrow } from "@/components/school-mark";
-import { getModule } from "@/lib/content";
+import { getDebateTopic, getModule } from "@/lib/content";
 import {
   getMatch,
   getMicroLessonForMotion,
@@ -89,6 +89,7 @@ export default async function VerdictPage({
 
   const motion = motions.find((m) => m.id === match.motion_id);
   const module = motion ? getModule(motion.module_id) : undefined;
+  const motionText = motion ? getDebateTopic(motion.id)?.topic.text : undefined;
   const microLesson = motion
     ? await getMicroLessonForMotion(motion.id)
     : undefined;
@@ -114,7 +115,7 @@ export default async function VerdictPage({
         <div className="mt-3 max-w-[63ch]">
           {module && <SchoolEyebrow school={module.school_id} />}
           <h1 className="font-serif text-2xl sm:text-3xl font-medium leading-snug mt-2">
-            {motion.text}
+            {motionText}
           </h1>
         </div>
       )}

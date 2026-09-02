@@ -41,10 +41,11 @@ create table quiz_results (
   created_at timestamptz not null default now()
 );
 
+-- id matches a debate_topics[].id in the module named by module_id; the
+-- motion's text lives only in that frontmatter, never duplicated here.
 create table motions (
   id text primary key,
   module_id text not null,           -- frontmatter id of a content module
-  text text not null,
   opens_at timestamptz not null,
   closes_at timestamptz not null
 );

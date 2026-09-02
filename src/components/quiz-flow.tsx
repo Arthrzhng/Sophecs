@@ -78,10 +78,6 @@ export function QuizFlow({
           </li>
         ))}
       </ul>
-
-      <p className="mt-12 font-mono text-xs text-ink-soft">
-        3 placeholder questions in the skeleton; the full diagnostic runs 10.
-      </p>
     </div>
   );
 }

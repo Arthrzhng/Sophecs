@@ -5,9 +5,10 @@ one of three schools (Stoicism, Utilitarianism, Virtue Ethics), an async
 arena makes you defend that school on AI-related motions, and a lessons
 library teaches each school from its primary sources.
 
-This repository is the skeleton: full routing, data model, components, and
-design system, with content stubbed. The three real modules drop into
-`content/modules/` later with zero code changes.
+This repository holds the full routing, data model, components, and design
+system, plus the three real content modules (Stoicism on determinism,
+Utilitarianism on self-driving cars, Virtue Ethics on RLHF habituation) and
+the full ten-question diagnostic.
 
 ## Running it
 
@@ -28,8 +29,11 @@ fills it with the same rows the fixtures serve.
 - `content/modules/` — one markdown file per module, YAML frontmatter with a
   fixed schema (`id`, `school`, `title`, `quiz_excerpt`, `debate_topics`,
   `sources`), parsed at build time by `src/lib/content.ts`. Content is files,
-  not database rows. The three files here are schema-valid placeholders with
-  bodies marked PLACEHOLDER.
+  not database rows. `debate_topics` entries are `{id, text}` pairs; a
+  motion's id matches one of these, and `content.ts#getDebateTopic` is the
+  only place that resolves a motion back to its wording, so the text is never
+  duplicated into the data layer. Swapping a module file for a new one, or
+  adding a fourth, needs no code change as long as the shape holds.
 - `src/lib/data/` — the single data access layer. Supabase when configured,
   fixtures otherwise; pages never know which.
 - `src/lib/judge.ts` — `judge(submissionA, submissionB, motion)`, currently a
@@ -51,7 +55,7 @@ Mono carries anything measured. Tokens are defined once in
 
 ## Stubbed on purpose
 
-AI judging, share-card image export (button ships disabled), 7 of the 10
-quiz questions, and all module bodies. Real-time features, notifications,
+AI judging (`judge()` returns a hardcoded verdict) and share-card image
+export (button ships disabled). Real-time features, notifications,
 moderation, and payments are out of scope entirely. A fourth school is a
 data change, not a code change: everything is keyed by `school_id`.
