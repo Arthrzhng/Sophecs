@@ -1,18 +1,24 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { CardLayout } from "@/components/card/CardLayout";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { SCHOOL_ONE_LINES } from "@/lib/school-quotes";
 import type { SchoolId, SchoolVector } from "@/lib/types";
 
-export const runtime = "edge";
-
+// Node.js runtime, not edge: the three embedded TTF fonts (~500KB) push this
+// route's bundle over Vercel's 1MB Edge Function size limit on the Hobby
+// plan (hit in production — see docs/decisions.md). Node functions don't
+// have that ceiling; the cold-start cost is a worthwhile trade for actually
+// deploying.
 const SIZE = { width: 1080, height: 1350 };
 
-// TTF, not WOFF2 — see opengraph-image.tsx and docs/decisions.md.
+// TTF, not WOFF2 — see opengraph-image.tsx and docs/decisions.md. Node
+// runtime reads from disk (fetch+import.meta.url is an edge-only pattern).
 const fontData = Promise.all([
-  fetch(new URL("../../../../assets/og-fonts/spectral-500.ttf", import.meta.url)).then((r) => r.arrayBuffer()),
-  fetch(new URL("../../../../assets/og-fonts/plex-sans-400.ttf", import.meta.url)).then((r) => r.arrayBuffer()),
-  fetch(new URL("../../../../assets/og-fonts/plex-mono-500.ttf", import.meta.url)).then((r) => r.arrayBuffer()),
+  readFile(join(process.cwd(), "src/assets/og-fonts/spectral-500.ttf")),
+  readFile(join(process.cwd(), "src/assets/og-fonts/plex-sans-400.ttf")),
+  readFile(join(process.cwd(), "src/assets/og-fonts/plex-mono-500.ttf")),
 ]);
 
 // Portrait variant of the same card for Instagram's download-and-post flow.

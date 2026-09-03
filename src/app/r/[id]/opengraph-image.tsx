@@ -1,10 +1,14 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { CardLayout } from "@/components/card/CardLayout";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { SCHOOL_ONE_LINES } from "@/lib/school-quotes";
 import type { SchoolId, SchoolVector } from "@/lib/types";
 
-export const runtime = "edge";
+// Node.js runtime, not edge: see docs/decisions.md and card.png/route.tsx —
+// the embedded fonts push the edge bundle over Vercel's Hobby-plan 1MB
+// Edge Function limit.
 export const alt = "Sophecs result card";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -12,11 +16,12 @@ export const contentType = "image/png";
 // Loaded once at module scope, not per request. TTF, not WOFF2 — Satori
 // (the engine behind ImageResponse) can't parse WOFF2, only TTF/OTF/WOFF;
 // see docs/decisions.md. These are separate files from the WOFF2 set
-// next/font/local uses for the live site.
+// next/font/local uses for the live site. Node runtime reads them from
+// disk (fetch+import.meta.url is an edge-only pattern).
 const fontData = Promise.all([
-  fetch(new URL("../../../assets/og-fonts/spectral-500.ttf", import.meta.url)).then((r) => r.arrayBuffer()),
-  fetch(new URL("../../../assets/og-fonts/plex-sans-400.ttf", import.meta.url)).then((r) => r.arrayBuffer()),
-  fetch(new URL("../../../assets/og-fonts/plex-mono-500.ttf", import.meta.url)).then((r) => r.arrayBuffer()),
+  readFile(join(process.cwd(), "src/assets/og-fonts/spectral-500.ttf")),
+  readFile(join(process.cwd(), "src/assets/og-fonts/plex-sans-400.ttf")),
+  readFile(join(process.cwd(), "src/assets/og-fonts/plex-mono-500.ttf")),
 ]);
 
 export default async function OGImage({ params }: { params: Promise<{ id: string }> }) {
