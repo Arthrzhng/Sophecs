@@ -87,3 +87,50 @@ No Vercel production deployment exists yet — an attempt to create one via the 
 Arthur's live deployment (`sophecs1.vercel.app`, then a retry) showed zero Supabase rows and zero PostHog events despite confirmed use of the site. Root cause, confirmed by reading the deployment's own build logs: the Vercel project was not building from `Arthrzhng/Sophecs` on `claude/sophecs-skeleton-0zvs5m` (where every commit in this build actually lands — confirmed via `git ls-remote --heads origin`, which lists only that one branch). The first attempt built from a `main` branch that doesn't exist on that repo at all, serving a stale snapshot matching the very first commit of this session. The second attempt built from a different, separate repo (`Arthrzhng/sophecs2`, a single "Initial commit" on `main`) — current in content, but discononnected from future pushes here.
 
 **Resolution:** not a code fix — flagged to Arthur with exact steps to re-import `Arthrzhng/Sophecs` (the real repo) on branch `claude/sophecs-skeleton-0zvs5m` via Vercel's "Import Git Repository" flow, explicitly avoiding any "create new repo" / template-deploy path that snapshots local files into a fresh, disconnected repo.
+
+---
+
+# Phase 2
+
+The Phase 2 brief is saved in full at `docs/phase2-brief.md` (pasted 2026-09-04), the same way this file has referenced the Phase 1 brief throughout. Confirmations below are answers to that document's own "Confirm before writing code" section.
+
+## Confirmations (Phase 2 "confirm before writing code")
+
+- **Debate topics & micro-lessons:** Arthur is writing these himself. `/debate` stays a plain "still developing" page — same discipline as Phase 1's unfinished lesson modules — until `content/topics/*.md` and `content/micro/*.md` exist. 2a does not depend on this content at all.
+- **Judge rubric:** Arthur asked me to draft the school-fidelity criteria. Not yet written — comes with 2b, alongside `content/prompts/judge.v1.md`. The judge stays behind `KILL_SWITCH_JUDGE` regardless until Arthur has reviewed 20 real verdicts, per the brief.
+- **Judge model:** `claude-sonnet-5`, not the brief's assumed `claude-sonnet-4-6` — same reasoning as the Phase 1 debate-judge-model note above (newer, cheaper at $2/$10 per 1M vs $3/$15, stronger). Arthur confirmed.
+- **`AI_MONTHLY_BUDGET_USD`:** set to **50**. At sonnet-5 pricing and the brief's own token estimate (1600 in / 500 out per judge call ≈ $0.0082/call), $50 covers roughly 6,000 judged debates a month — comfortably above what an early-launch retention test needs, while still being a real ceiling `lib/budget.ts` enforces (2b). Arthur said "something reasonable"; this is the number and the math behind it.
+- **Google OAuth:** client ID provided (`542875988819-...apps.googleusercontent.com`). The client **secret** is still needed, and — separately — enabling the Google provider itself (pasting both into Supabase Dashboard → Authentication → Providers → Google) is a manual step: no tool in this environment can configure Supabase Auth providers, only the database. Magic link works today; Google will work once both are done.
+- **Public arguments, streak timezone, opponent steelman:** proceeding on the brief's own stated defaults (private-by-default with per-debate opt-in; UTC, stated in the UI; no steelman this phase) — nothing surfaced that argues against them.
+
+## profiles migration bundles every Phase 2 column in one pass
+
+The brief names exactly three new Phase 2 migration files (`0002_profiles`, `0003_debates`, `0004_ai_calls`) and gives no second profiles migration. `elo`, `streak`, and `streak_updated_on` aren't used until 2c, but there's nowhere else in the brief's plan for them to land, so `0002_profiles.sql` adds them now alongside `school` (needed immediately by 2a's claim flow), `argument_default_public`, `school_history`, and `tz`.
+
+## profiles RLS tightened to match the brief's own design
+
+Phase 1's `profiles` had a `"public read"` policy (`using (true)`) — harmless when the only columns were `handle`/`display_name`, but this migration adds `tz`, `argument_default_public`, and `school_history`, which the brief doesn't intend as public. The brief's own migration comment says it directly: "expose only handle, display_name, school, elo, streak via a view `profiles_public`; the table policy exists so `/me` can read own full row." That sentence only makes sense if the table policy is owner-only, so `"public read"` was dropped and replaced with `"profiles read own"` (`auth.uid() = id`); `profiles_public` was added as a view, read only through the admin client server-side — the exact pattern Phase 1 established for `quiz_results`/`public_results` (see "Infrastructure" above).
+
+Supabase's security advisor flags both `public_results` and the new `profiles_public` as `SECURITY DEFINER` views (ERROR level). Not a new issue introduced here — it's the same accepted Phase 1 pattern on a second view: both are only ever queried through the admin client (service-role key), which bypasses RLS regardless of the view's definer, and neither is exposed to `anon`/`authenticated` PostgREST access directly. Flagged here for visibility rather than "fixed" by adding `security_invoker`, which hasn't been tested against the existing admin-client read path.
+
+## Nav placement: not in the root layout
+
+The brief says `layout.tsx` gains "Debate" and "Me," "rendered server-side from the session." Taken literally, that means a `cookies()`/session read in `layout.tsx` — but that file wraps every route, including `/`, `/quiz`, `/r/[id]`, `/c/[id]`, and the same brief states elsewhere: "Nothing in Phase 2 may add a network request, a script, or a byte of client JS to `/`, `/quiz`, `/r/[id]` or `/c/[id]`" and "Phase 1 Lighthouse numbers unchanged." A session read in the root layout would force those routes from static (`○`) to dynamic (`ƒ`) rendering — a real regression the brief itself forbids elsewhere, more strongly worded than the nav-placement instruction.
+
+**Resolution:** `SiteNav` (`src/components/nav/SiteNav.tsx`) is a session-aware server component, but it's only rendered from `src/app/me/layout.tsx` and `src/app/debate/layout.tsx` — new Phase 2 routes that are already dynamic. `layout.tsx` (root) is untouched. Verified via `next build` output: `/`, `/quiz`, `/s/[school]` still render `○`/`●` (static/SSG), unchanged from before this phase; `/me`, `/me/settings`, `/debate`, `/login` render `ƒ` (dynamic), as they must to read the session.
+
+## New design token: oxblood
+
+The brief names "oxblood" for the debate editor's word-count-limit warning (2b) without a hex value. Added `--color-oxblood: #6b1414` to `globals.css`'s `@theme` block (9.9:1 contrast on paper) — deliberately not reused from `--color-virtue` (a similar but more purple maroon) so a warning state never visually reads as the virtue-ethics tribal marker. Also used now for the one destructive action 2a ships: "Delete account" on `/me/settings`.
+
+## Claiming: what 2a covers, what's deferred to 2c
+
+`lib/claim.ts` covers both directions the brief describes: sign in after taking the quiz (`claimAnonymousResults`, run from `/auth/callback` — attaches every anon-cookie-matched `quiz_results` row, creates the profile with its school) and sign in before taking the quiz (`submitQuizResult` in `src/app/actions.ts` now checks for a session and, if present, sets `user_id` on the insert directly and backfills the profile's school via the same shared `ensureProfileSchool` helper — no separate claim step needed).
+
+Not built in 2a, deferred to 2c: **"retaking the quiz while signed in updates `profiles.school` and fires `school_changed`."** `ensureProfileSchool` intentionally never overwrites an existing school. This is coupled to "ELO does not reset" and to `school_history`, both of which only mean something once ELO exists (2c) — building the write path now without the ELO context to test it against would be guessing at behavior the brief specifies precisely. `/quiz` and `submitQuizResult` already carry a `next` param end to end (stored, unused) so 2c can wire the redirect without re-threading it.
+
+The `?next=` redirect after quiz completion (brief: "no result exists → `/quiz?next=/debate`") also isn't acted on post-submission yet: `/debate` is a "still developing" stub, and sending a first-time quiz-taker straight to a stub page is worse than showing them their result card as normal. The banner ("Take the quiz first. Your school is your side.") and the parameter threading are both live; the terminal redirect activates once `/debate` is real.
+
+## Verification limits in this sandbox
+
+Same limitation as Phase 1's live-insert testing: this sandbox's network egress doesn't reach the Supabase or Vercel hosts directly (see "Infrastructure" above), and there's no way to drive a real magic-link email click-through or Google OAuth consent screen from here regardless. What was verified: the migration applied cleanly to the live project (columns, RLS policies, and the `profiles_public` view all confirmed via direct SQL through the Supabase MCP connection); the app builds with no type errors; `/me` and `/me/settings` correctly redirect signed-out visitors to `/login?next=...`; `/login` renders the new copy; Phase 1 route rendering (static vs. dynamic) is unchanged. Arthur should take the quiz anonymously, sign in for real, and confirm `/me` shows the claimed school once this is deployed — that's the one step this sandbox can't do for him.

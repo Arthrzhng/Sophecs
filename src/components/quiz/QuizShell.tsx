@@ -55,6 +55,11 @@ export function QuizShell() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const challengeId = searchParams.get("c");
+  // Set by /auth/callback when a signed-in user has no result to claim yet
+  // (Phase 2: "Take the quiz first. Your school is your side."). Threaded
+  // into the stored pending result for whichever surface reads it once
+  // /debate exists — see docs/decisions.md.
+  const next = searchParams.get("next");
 
   const [state, dispatch] = useReducer(reducer, { index: 0, chosenIds: Array(QUIZ_QUESTIONS.length).fill(null) });
   const startedAtRef = useRef<number>(0);
@@ -129,6 +134,7 @@ export function QuizShell() {
             answers,
             durationMs,
             challengeId,
+            next,
             referrer: referrerRef.current,
           })
         );
@@ -137,7 +143,7 @@ export function QuizShell() {
       }
       router.push("/quiz/result");
     },
-    [router, challengeId]
+    [router, challengeId, next]
   );
 
   function choose(optionId: string) {
@@ -165,6 +171,11 @@ export function QuizShell() {
 
   return (
     <div>
+      {next && state.index === 0 && (
+        <p className="font-mono text-xs text-ink-mid mb-6">
+          Take the quiz first. Your school is your side.
+        </p>
+      )}
       <div className="flex items-center justify-between mb-3">
         {state.index > 0 ? (
           <button

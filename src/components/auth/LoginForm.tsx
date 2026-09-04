@@ -7,9 +7,15 @@ const configured = Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-export function LoginForm() {
+export function LoginForm({ next }: { next?: string }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<string | null>(null);
+
+  function callbackUrl() {
+    const url = new URL("/auth/callback", window.location.origin);
+    if (next) url.searchParams.set("next", next);
+    return url.toString();
+  }
 
   async function sendMagicLink(event: React.FormEvent) {
     event.preventDefault();
@@ -20,7 +26,7 @@ export function LoginForm() {
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      options: { emailRedirectTo: callbackUrl() },
     });
     setStatus(error ? error.message : `Check ${email} for a link.`);
   }
@@ -33,7 +39,7 @@ export function LoginForm() {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: callbackUrl() },
     });
   }
 

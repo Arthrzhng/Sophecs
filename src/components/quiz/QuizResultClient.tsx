@@ -17,6 +17,11 @@ interface PendingResult {
   answers: { q: number; opt: string }[];
   durationMs: number;
   challengeId: string | null;
+  // Carried from /auth/callback's /quiz?next= redirect. Not yet consumed —
+  // /debate doesn't exist until 2b/2c, and redirecting a first-time quiz
+  // taker to a "still developing" stub would be worse than showing the
+  // normal result card. See docs/decisions.md.
+  next: string | null;
   referrer: string;
 }
 

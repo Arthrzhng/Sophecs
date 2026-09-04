@@ -22,6 +22,12 @@
   --color-utilitarian: #8a6320;
   --color-virtue: #7a3540;
 
+  /* Phase 2: warning/destructive accent — the debate editor's word-count
+     limit and destructive account actions. Deliberately not reused from a
+     school colour so a warning never reads as a tribal marker. 9.9:1 on
+     paper. See docs/decisions.md. */
+  --color-oxblood: #6b1414;
+
   /* Card-only surfaces: the saturated fill plus a legible ink-on-colour text
      pair for each school, chosen to clear WCAG AA (4.5:1 body / 3:1 large). */
   --color-stoic-surface: #33503f;

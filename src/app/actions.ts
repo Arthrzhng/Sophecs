@@ -3,6 +3,8 @@
 import { cookies } from "next/headers";
 import { newId } from "@/lib/ids";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
+import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
+import { ensureProfileSchool } from "@/lib/claim";
 import type { SchoolId, SchoolVector } from "@/lib/types";
 
 export interface SubmitQuizResultInput {
@@ -40,9 +42,19 @@ export async function submitQuizResult(
   const id = newId();
   const admin = createAdminClient();
 
+  // Phase 2: someone who signed in before ever taking the quiz (the
+  // /quiz?next= path from /auth/callback) gets this result attached
+  // directly, rather than waiting on a future claim. Doesn't touch the
+  // Phase 1 anonymous path — anonId/RLS behavior is unchanged either way.
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { error } = await admin.from("quiz_results").insert({
     id,
     anon_id: anonId,
+    user_id: user?.id ?? null,
     school: input.primary,
     secondary: input.secondary,
     vector: input.vector,
@@ -53,6 +65,10 @@ export async function submitQuizResult(
 
   if (error) {
     return { ok: false, error: error.message };
+  }
+
+  if (user) {
+    await ensureProfileSchool(admin, user.id, input.primary);
   }
 
   let challengerSchool: SchoolId | undefined;

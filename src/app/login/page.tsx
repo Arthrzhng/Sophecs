@@ -2,19 +2,25 @@ import { LoginForm } from "@/components/auth/LoginForm";
 
 export const metadata = { title: "Sign in · Sophecs" };
 
-// Reachable only by going here directly — nothing on the quiz/card/share
-// path links into it. Optional identity, not a gate. See docs/decisions.md.
-export default function LoginPage() {
+// Reached only from the debate CTA ("Debate this" / "Debate them") per the
+// Phase 2 brief — sign-in is prompted at exactly that one moment, never on
+// the quiz/card/share path. See docs/decisions.md.
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
+
   return (
     <main className="flex-1">
       <div className="mx-auto max-w-sm px-6 pt-20 pb-24">
-        <h1 className="font-serif text-2xl font-medium">Sign in</h1>
+        <h1 className="font-serif text-2xl font-medium">Sign in to defend your school.</h1>
         <p className="mt-3 text-ink-mid text-sm leading-relaxed">
-          Not required to take the quiz or share a card — this is for later,
-          if you want to keep a result attached to you.
+          No password. A link to your email, or Google.
         </p>
         <div className="mt-8">
-          <LoginForm />
+          <LoginForm next={next} />
         </div>
       </div>
     </main>
