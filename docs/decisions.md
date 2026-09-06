@@ -201,3 +201,43 @@ The three funnels the brief asks for, built as saved insights (empty until real 
 ## 2b: /debate/[slug] client JS budget
 
 The brief caps the editor's own JS at 60KB gzipped, the one route allowed meaningful client code. Measured from the production build: `/debate/[slug]`'s route-specific bundle (`DebateFlow` + `ArgumentEditor`) is ~2.3KB gzip on top of the 103KB shared framework baseline — nowhere near the ceiling.
+
+---
+
+# Phase 2c: rating and return
+
+Scope restated and started on Arthur's "start 2c": the pairwise ELO formula (already built and tested in 2b) wired into the challenge handoff, streaks, retaking the quiz while signed in, and `/me` finally showing real data instead of placeholders. Migrations: `0005_challenges_debate_handoff.sql` (the `topic_slug`/`challenger_debate_id`/`challengee_debate_id` columns Phase 1's `challenges` table deferred) and `0006_elo_percentile.sql` (the `elo_percentile()` db function `/me` uses).
+
+## Streak computed opportunistically, not on a schedule
+
+The brief defines a streak day as "a UTC date with at least one judged debate scoring 40 or more," but doesn't specify a mechanism for detecting a day that *lapses* — no scheduled job exists anywhere in this phase's scope. `lib/streak.ts`'s `applyStreakDay` is a pure function, called only from `/api/judge` on a qualifying judged debate; it compares today's UTC date to `streak_updated_on` and extends, resets, or leaves the streak unchanged accordingly.
+
+**Trade-off:** a user who stops debating doesn't see their streak visually reset to 0 the day after they miss — it stays frozen at its last value until their *next* qualifying submission, at which point the gap is detected and it resets to 1. A cron job that walks all profiles daily and zeroes lapsed streaks would fix the display lag, but nothing in the brief asks for one, and building scheduled infrastructure un-asked is exactly the kind of scope creep the brief warns against elsewhere. Flagging the lag rather than silently shipping a technically-inaccurate "your streak is still N" display without disclosure.
+
+## Retake-while-signed-in: a second function, not a flag on the first
+
+2a's `ensureProfileSchool` was deliberately built to never overwrite an existing school (used by `claimAnonymousResults` — a mere sign-in should never silently reassign someone's school). The brief's "retaking the quiz while signed in updates `profiles.school`" needs the opposite behavior for a different caller. Rather than add a `force: boolean` flag that makes the shared function's contract ambiguous at each call site, added a second function, `retakeQuizSchool` (`lib/claim.ts`), used only by `submitQuizResult`. It overwrites, appends to `school_history`, and reports whether a change happened so the client can fire `school_changed`. ELO and streak are untouched by a school change, per the brief.
+
+## Challenge handoff: resolving "which side is the user" without exposing it
+
+`challenges` rows reference `quiz_results` ids, not user ids — there's no direct column saying who the challenger or challengee *is* as an account. `lib/challenge.ts`'s `resolveChallengeSide` looks up both `quiz_results.user_id` values and matches against the current session, computed fresh per request rather than cached or denormalized onto the row. Same file's `pickChallengeTopic` picks "the active topic with the lowest sort that neither participant has debated in the last seven days," but degrades gracefully when one participant hasn't signed in yet (and so has no debate history to exclude on) — it just checks whichever participant ids are actually resolvable.
+
+## par_elo-style exact recompute, applied to pairwise ELO too
+
+Following 2b's precedent (par_elo recomputed by direct query, not maintained incrementally), `recordChallengeDebate` recomputes both sides' `elo_after` directly from their stored `elo_before` values once both debates exist, rather than trying to patch a running total. `elo_before` on each debate row stays each side's real pre-debate rating (set by the solo path when they first submitted); only `elo_after` and `elo_recomputed_at` change when the pairing completes. This means the first submitter's ELO visibly moves once (via the solo formula) and then moves again once the second side judges theirs — both changes are real and both get their own `elo_changed` event, which is the brief's own described behavior ("computed only when both debates are judged; until then the first submitter's ELO moves on the solo rule and is recomputed pairwise when the second arrives").
+
+## Fixed a real bug: elo_changed was firing on every verdict-page revisit
+
+While wiring `elo_changed` for the pairwise case, noticed `Verdict.tsx` fired it unconditionally in a mount effect — meaning every time an owner reloaded or revisited their own verdict page, it re-fired as if their ELO had changed again. Moved the event to fire exactly once, from `ArgumentEditor` immediately after a successful judge response, using the `eloDelta`/`eloAfter` the route now returns directly. `Verdict.tsx` still displays the ELO delta on every view (that's just rendering stored data); it just no longer tracks it as an event repeatedly.
+
+## /r/[id]'s Phase 2 additions vs. the "no changes" rule
+
+The brief states elsewhere that Phase 2 may not add a request, script, or byte of client JS to `/`, `/quiz`, `/r/[id]`, or `/c/[id]` — and separately, under "Changes to Phase 1 routes, and only these," describes exactly two required additions to `/r/[id]` ("Debate them," "Saved to your profile"). Same shape of internal tension as 2a's nav-placement conflict, resolved the same way: the general no-JS rule protects the acquisition path from *unbounded* Phase 2 creep; the explicitly-named exception is not creep, it's the spec. `/c/[id]` and `/quiz` got zero changes this phase, matching "nothing else changes." Measured cost of the one addition: `/r/[id]`'s route bundle grew from 2.18KB to 2.58KB gzip (`DebateThemButton`) — small, and scoped to exactly the one button and one line the brief names, not a general debate-arena surface bolted onto the acquisition page.
+
+## logAiCall never checked its own insert for errors
+
+Running the golden set against the real Supabase project from this sandbox showed `ai_calls` staying at 0 rows despite six real, billed model calls. Root cause: this sandbox's network egress doesn't reach `*.supabase.co` (the same restriction documented throughout this project — Anthropic's API is reachable here, Supabase's isn't), so every `logAiCall` insert failed with `Host not in allowlist`. Not a real bug — in the actual Vercel deployment both hosts are reachable — but it exposed a real one: `logAiCall` never checked the insert's `error` at all, so the exact same silent loss would happen for any real (if rarer) Supabase failure in production, quietly breaking "every call is logged, no exceptions." Fixed to `console.error` on a failed log write. Not retried or queued — that's more infrastructure than a rare logging failure justifies — but no longer invisible.
+
+## Verification limits in this sandbox (2c)
+
+Same restrictions as 2a/2b: no way to drive a real two-account challenge flow, click "Debate them," or watch both sides' ELO move from here — that requires two real signed-in sessions on the deployed site. What was verified: migrations applied cleanly to the live project (confirmed via direct SQL — `challenges` has the three new columns, `elo_percentile()` exists); the full build compiles with no type errors and Phase 1 route rendering is unchanged; all 15 unit tests pass (8 ELO, 7 streak); `/me` and `/debate/[slug]` still correctly redirect signed-out visitors; `/r/[id]` renders for both a plain result and a 404 on an unknown id. The Phase 2c checklist item "two accounts complete a challenge; both ELOs move by the pairwise rule" needs Arthur to actually run that flow once topics exist (still pending his content) — the pairwise formula itself is unit-tested and the wiring is code-complete, but a real two-account run through the deployed site is the one thing this sandbox can't do.

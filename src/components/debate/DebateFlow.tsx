@@ -26,12 +26,27 @@ export function DebateFlow({
 }) {
   const [began, setBegan] = useState(!microBefore);
 
+  function begin() {
+    track({
+      name: "debate_started",
+      props: { topic_slug: topicSlug, from_challenge: Boolean(challengeId) },
+    });
+    if (challengeId) {
+      track({ name: "challenge_debate_started", props: { challenge_id: challengeId } });
+    }
+  }
+
   useEffect(() => {
     if (microBefore) {
       track({
         name: "micro_lesson_viewed",
         props: { slug: microBefore.slug, position: "before" },
       });
+    } else {
+      // No lesson to click through (content not seeded yet) — this is the
+      // start of the debate regardless, so fire it here instead of losing
+      // it entirely.
+      begin();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -44,10 +59,7 @@ export function DebateFlow({
           <button
             type="button"
             onClick={() => {
-              track({
-                name: "debate_started",
-                props: { topic_slug: topicSlug, from_challenge: Boolean(challengeId) },
-              });
+              begin();
               setBegan(true);
             }}
             className="inline-block bg-ink text-surface rounded-md px-6 py-3 text-base font-medium hover:opacity-85"

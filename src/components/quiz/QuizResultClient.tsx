@@ -80,6 +80,9 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
           },
         });
       }
+      if (result.schoolChanged) {
+        track({ name: "school_changed", props: result.schoolChanged });
+      }
       try {
         sessionStorage.removeItem(PENDING_RESULT_KEY);
       } catch {

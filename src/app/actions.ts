@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { newId } from "@/lib/ids";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
-import { ensureProfileSchool } from "@/lib/claim";
+import { retakeQuizSchool } from "@/lib/claim";
 import type { SchoolId, SchoolVector } from "@/lib/types";
 
 export interface SubmitQuizResultInput {
@@ -17,7 +17,12 @@ export interface SubmitQuizResultInput {
 }
 
 export type SubmitQuizResultOutput =
-  | { ok: true; id: string; challengerSchool?: SchoolId }
+  | {
+      ok: true;
+      id: string;
+      challengerSchool?: SchoolId;
+      schoolChanged?: { from: SchoolId; to: SchoolId };
+    }
   | { ok: false; error: string };
 
 // Called from /quiz/result. Generates the id, reads the anon_id cookie
@@ -67,8 +72,12 @@ export async function submitQuizResult(
     return { ok: false, error: error.message };
   }
 
+  let schoolChanged: { from: SchoolId; to: SchoolId } | undefined;
   if (user) {
-    await ensureProfileSchool(admin, user.id, input.primary);
+    const result = await retakeQuizSchool(admin, user.id, input.primary);
+    if (result.changed && result.from) {
+      schoolChanged = { from: result.from, to: result.to };
+    }
   }
 
   let challengerSchool: SchoolId | undefined;
@@ -95,7 +104,7 @@ export async function submitQuizResult(
     }
   }
 
-  return { ok: true, id, challengerSchool };
+  return { ok: true, id, challengerSchool, schoolChanged };
 }
 
 export interface CreateChallengeOutput {

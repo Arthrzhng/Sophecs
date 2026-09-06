@@ -35,6 +35,49 @@ export async function ensureProfileSchool(
   return existing.school ?? null;
 }
 
+export interface SchoolChangeResult {
+  changed: boolean;
+  from: SchoolId | null;
+  to: SchoolId;
+}
+
+// Called from submitQuizResult when the submitter is signed in — this is
+// the "retake while signed in" path 2a deferred: unlike ensureProfileSchool,
+// this one *does* overwrite an existing school, appends the change to
+// school_history, and reports it so the caller can fire school_changed.
+// ELO/streak are untouched here — switching schools doesn't reset them,
+// per the brief.
+export async function retakeQuizSchool(
+  admin: SupabaseClient,
+  userId: string,
+  newSchool: SchoolId
+): Promise<SchoolChangeResult> {
+  const { data: existing } = await admin
+    .from("profiles")
+    .select("school, school_history")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (!existing) {
+    await admin.from("profiles").insert({ id: userId, school: newSchool });
+    return { changed: false, from: null, to: newSchool };
+  }
+
+  const currentSchool = (existing.school as SchoolId | null) ?? null;
+  if (currentSchool === newSchool) {
+    return { changed: false, from: currentSchool, to: newSchool };
+  }
+
+  const history = Array.isArray(existing.school_history) ? existing.school_history : [];
+  const entry = { from: currentSchool, to: newSchool, at: new Date().toISOString() };
+  await admin
+    .from("profiles")
+    .update({ school: newSchool, school_history: [...history, entry] })
+    .eq("id", userId);
+
+  return { changed: Boolean(currentSchool), from: currentSchool, to: newSchool };
+}
+
 // Runs once on /auth/callback, after the session exists. Attaches every
 // anonymous quiz_results row matching the anon_id cookie to the signed-in
 // user, then creates the profile if this is a first sign-in, or backfills

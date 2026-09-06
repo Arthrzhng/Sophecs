@@ -70,14 +70,14 @@ export function Verdict({
 }) {
   const [showAfter, setShowAfter] = useState(showAfterLessonInitially);
 
+  // elo_changed fires once, from ArgumentEditor right after judging — not
+  // here, since this component also renders on every later revisit of the
+  // same verdict page and would otherwise re-fire it on each view.
   useEffect(() => {
     track({
       name: "verdict_viewed",
       props: { debate_id: debateId, score: verdict.score ?? 0, is_owner: isOwner, rejected: verdict.rejected },
     });
-    if (isOwner && eloDelta != null && eloAfter != null) {
-      track({ name: "elo_changed", props: { delta: eloDelta, elo_after: eloAfter, mode: "solo" } });
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

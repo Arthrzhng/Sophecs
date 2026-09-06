@@ -4,8 +4,10 @@ import { cookies, headers } from "next/headers";
 import { ResultCard } from "@/components/card/ResultCard";
 import { ShareRow } from "@/components/share/ShareRow";
 import { ChallengeButton } from "@/components/share/ChallengeButton";
+import { DebateThemButton } from "@/components/share/DebateThemButton";
 import { CardViewTracker } from "@/components/card/CardViewTracker";
 import { getSchool, pickShareLine } from "@/lib/schools";
+import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { QuizResultRow, SchoolId } from "@/lib/types";
@@ -34,6 +36,40 @@ async function getOwnerAnonId(id: string): Promise<string | null> {
   return (data?.anon_id as string | undefined) ?? null;
 }
 
+// True once a signed-in user has claimed this exact result — separate from
+// isOwner (an anon_id cookie match), which stays true even after claiming.
+async function getOwnerUserId(id: string): Promise<string | null> {
+  if (!isAdminConfigured()) return null;
+  const admin = createAdminClient();
+  const { data } = await admin.from("quiz_results").select("user_id").eq("id", id).maybeSingle();
+  return (data?.user_id as string | undefined) ?? null;
+}
+
+interface ChallengeInfo {
+  challengeId: string;
+  otherResultId: string;
+  status: string;
+}
+
+// Checks both directions — this result may be the original challenger's or
+// the person who accepted it — and only returns a challenge once both
+// sides exist ("with both sides present," per the brief).
+async function getChallengeInfo(id: string): Promise<ChallengeInfo | null> {
+  if (!isAdminConfigured()) return null;
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("challenges")
+    .select("id, challenger_result_id, challengee_result_id, status")
+    .or(`challenger_result_id.eq.${id},challengee_result_id.eq.${id}`)
+    .not("challengee_result_id", "is", null)
+    .limit(1)
+    .maybeSingle();
+  if (!data) return null;
+  const otherResultId = data.challenger_result_id === id ? data.challengee_result_id : data.challenger_result_id;
+  if (!otherResultId) return null;
+  return { challengeId: data.id, otherResultId, status: data.status };
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const result = await getResult(id);
@@ -56,17 +92,30 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
   const result = await getResult(id);
   if (!result) notFound();
 
-  const [cookieStore, headerList, ownerAnonId] = await Promise.all([
+  const [cookieStore, headerList, ownerAnonId, ownerUserId, challengeInfo] = await Promise.all([
     cookies(),
     headers(),
     getOwnerAnonId(id),
+    getOwnerUserId(id),
+    getChallengeInfo(id),
   ]);
   const viewerAnonId = cookieStore.get("anon_id")?.value;
   const isOwner = Boolean(viewerAnonId && ownerAnonId && viewerAnonId === ownerAnonId);
   const referrer = headerList.get("referer") ?? "";
 
+  // Phase 2c: the only two additions this route gets, per the brief —
+  // "Debate them" once a challenge has both sides, and a claimed-by-you
+  // indicator. Everything above is untouched Phase 1 behavior.
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const isSavedToProfile = Boolean(user && ownerUserId && user.id === ownerUserId);
+
   const school = getSchool(result.school);
-  const challenger = result.challenge_from ? await getResult(result.challenge_from) : null;
+  const challengerFromLink = result.challenge_from ? await getResult(result.challenge_from) : null;
+  const otherResult =
+    challengerFromLink ?? (challengeInfo ? await getResult(challengeInfo.otherResultId) : null);
   const { text: shareLine, index: shareLineIndex } = pickShareLine(result.school, result.id);
 
   return (
@@ -75,6 +124,7 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
       <div className="mx-auto max-w-2xl px-6 pt-14 pb-20">
         <p className="eyebrow text-ink-soft mb-5">
           {isOwner ? "Your result" : "Someone shared this result"}
+          {isSavedToProfile && <span className="text-ink-soft"> · Saved to your profile</span>}
         </p>
 
         <ResultCard
@@ -84,10 +134,10 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
           vector={result.vector}
         />
 
-        {challenger && (
+        {otherResult && (
           <div className="mt-8 grid grid-cols-2 gap-6 border-t border-rule pt-6">
             <VectorColumn label="This result" vector={result.vector} />
-            <VectorColumn label="Whoever sent it" vector={challenger.vector} />
+            <VectorColumn label="Whoever sent it" vector={otherResult.vector} />
           </div>
         )}
 
@@ -97,6 +147,13 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
 
         <div className="mt-6 flex flex-wrap items-center gap-4">
           <ChallengeButton resultId={id} school={result.school} />
+          {challengeInfo && challengeInfo.status !== "complete" && (
+            <DebateThemButton
+              challengeId={challengeInfo.challengeId}
+              resultId={id}
+              isSignedIn={Boolean(user)}
+            />
+          )}
           <Link
             href={`/s/${result.school}`}
             className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"

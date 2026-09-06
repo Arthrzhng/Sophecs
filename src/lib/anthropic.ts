@@ -113,7 +113,7 @@ export async function logAiCall(params: {
   latencyMs: number;
 }): Promise<void> {
   const admin = createAdminClient();
-  await admin.from("ai_calls").insert({
+  const { error } = await admin.from("ai_calls").insert({
     id: newId(),
     user_id: params.userId,
     kind: params.kind,
@@ -122,6 +122,14 @@ export async function logAiCall(params: {
     latency_ms: params.latencyMs,
     debate_id: params.debateId,
   });
+  // "Every call is logged, no exceptions" only holds if a failed log write
+  // is at least visible. Found by the golden set silently showing 0 rows
+  // in this sandbox (a network-egress restriction, not a real bug) — with
+  // no error check, the same silent loss would happen for a real, tricky
+  // Supabase failure in production. Not retried here; surfaced instead.
+  if (error) {
+    console.error(`[ai_calls] failed to log ${params.kind} call:`, error.message);
+  }
 }
 
 // Used by /api/judge: calls the model and logs the call as kind "judge" in

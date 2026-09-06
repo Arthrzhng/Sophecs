@@ -5,6 +5,8 @@ import { newId } from "@/lib/ids";
 import { judgeDebate, JudgeValidationError, PROMPT_VERSION } from "@/lib/anthropic";
 import { isBudgetExceeded } from "@/lib/budget";
 import { soloElo } from "@/lib/elo";
+import { applyStreakDay, isStreakEligible } from "@/lib/streak";
+import { recordChallengeDebate, resolveChallengeSide } from "@/lib/challenge";
 import { MIN_ARGUMENT_WORDS, MAX_ARGUMENT_WORDS, wordCount } from "@/lib/debate-limits";
 import type { SchoolId } from "@/lib/types";
 
@@ -50,7 +52,7 @@ export async function POST(request: Request) {
 
   const { data: profile } = await admin
     .from("profiles")
-    .select("school, elo")
+    .select("school, elo, streak, streak_updated_on")
     .eq("id", user.id)
     .maybeSingle();
   if (!profile?.school) {
@@ -168,7 +170,43 @@ export async function POST(request: Request) {
     })
     .eq("id", debateId);
 
-  await admin.from("profiles").update({ elo: eloAfter }).eq("id", user.id);
+  // Streak: only a qualifying (score >= 40) judged debate counts as a day.
+  // Computed opportunistically here, not via a scheduled job — see
+  // docs/decisions.md.
+  let streakResult = null;
+  if (isStreakEligible(verdict.score)) {
+    streakResult = applyStreakDay({
+      streak: profile.streak ?? 0,
+      streakUpdatedOn: profile.streak_updated_on,
+    });
+  }
+
+  await admin
+    .from("profiles")
+    .update({
+      elo: eloAfter,
+      ...(streakResult
+        ? { streak: streakResult.streak, streak_updated_on: streakResult.streakUpdatedOn }
+        : {}),
+    })
+    .eq("id", user.id);
+
+  // Challenge pairing: record this side's debate, and if the other side
+  // has already judged theirs, recompute both with the pairwise rule.
+  let challengeCompletion: { completed: boolean; winnerSchool?: string } | null = null;
+  if (body.challengeId) {
+    const { data: challenge } = await admin
+      .from("challenges")
+      .select("challenger_result_id, challengee_result_id")
+      .eq("id", body.challengeId)
+      .maybeSingle();
+    if (challenge) {
+      const side = await resolveChallengeSide(admin, challenge, user.id);
+      if (side) {
+        challengeCompletion = await recordChallengeDebate(admin, body.challengeId, side, debateId);
+      }
+    }
+  }
 
   // par_elo is the true rolling mean of the last 50 participants'
   // elo_before, recomputed directly rather than maintained incrementally —
@@ -189,5 +227,12 @@ export async function POST(request: Request) {
       .eq("slug", topic.slug);
   }
 
-  return NextResponse.json({ ok: true, debateId });
+  return NextResponse.json({
+    ok: true,
+    debateId,
+    eloDelta: eloAfter - eloBefore,
+    eloAfter,
+    streak: streakResult ? { value: streakResult.streak, change: streakResult.change } : null,
+    challenge: challengeCompletion,
+  });
 }

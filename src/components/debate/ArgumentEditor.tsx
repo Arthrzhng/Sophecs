@@ -19,6 +19,10 @@ interface JudgeResponse {
   paused?: boolean;
   reason?: string;
   error?: string;
+  eloDelta?: number;
+  eloAfter?: number;
+  streak?: { value: number; change: "extended" | "reset" | "unchanged" } | null;
+  challenge?: { completed: boolean; winnerSchool?: string } | null;
 }
 
 export function ArgumentEditor({
@@ -103,6 +107,29 @@ export function ArgumentEditor({
     if (!response.ok || !response.debateId) {
       setStatus({ kind: "error", message: response.error ?? "Judging failed. Your argument is saved. Try again." });
       return;
+    }
+
+    if (response.eloDelta != null && response.eloAfter != null) {
+      track({
+        name: "elo_changed",
+        props: { delta: response.eloDelta, elo_after: response.eloAfter, mode: challengeId ? "pair" : "solo" },
+      });
+    }
+    if (response.streak && response.streak.change !== "unchanged") {
+      track(
+        response.streak.change === "extended"
+          ? { name: "streak_extended", props: { streak: response.streak.value } }
+          : { name: "streak_reset", props: { previous: response.streak.value } }
+      );
+    }
+    if (challengeId && response.challenge?.completed) {
+      track({
+        name: "challenge_completed",
+        props: {
+          challenge_id: challengeId,
+          winner_school: (response.challenge.winnerSchool ?? "draw") as never,
+        },
+      });
     }
 
     try {
