@@ -46,4 +46,7 @@ share_lines:
     Nine questions about AI and I kept landing on the same answer: count
     everyone it touches, not just the person in front of you. Sophecs
     says that's Utilitarianism.
+verdict_share_line: >-
+  Scored {score} defending the utilitarian line on {topic}. The judge's
+  note: {verdict_line}. sophecs.com/debate/{slug}/{id}
 ---

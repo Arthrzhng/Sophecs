@@ -1,0 +1,8 @@
+{
+  "name": "util-wrong-school",
+  "motion": "A company should be allowed to use an AI system to screen job applicants, even though no one can fully explain why it rejects any given candidate.",
+  "school": "utilitarianism",
+  "argument": "A good hiring manager, someone of real practical wisdom, wouldn't outsource judgment about another person's future to a black box. Allowing this system is wrong because it's not what a virtuous employer would choose — hiring is a moral relationship between an organization and the people who might join it, and a company that lets an opaque tool make that call is failing to exercise the courage and honesty a decent employer owes its applicants. The utilitarian calculus about efficiency misses the point entirely: what matters isn't the sum of outcomes but what kind of institution the company is choosing to become. A firm of good character explains its decisions because that's what integrity requires, not because it maximizes some total.",
+  "expected_score_band": [5, 35],
+  "expected_fidelity_band": [0, 4]
+}

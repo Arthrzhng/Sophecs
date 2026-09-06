@@ -1,0 +1,8 @@
+{
+  "name": "virtue-strong",
+  "motion": "A company should be allowed to use an AI system to screen job applicants, even though no one can fully explain why it rejects any given candidate.",
+  "school": "virtue-ethics",
+  "argument": "A hiring manager with practical wisdom doesn't need to personally narrate every micro-judgment to act well — what matters is whether the overall practice she participates in is one a person of good character could stand behind. Using an AI screener is compatible with virtue if it's deployed the way a virtuous person would deploy any tool: with the courage to still take responsibility for its outputs, the honesty to disclose that it's being used, and the temperance to build in a human review for edge cases rather than treating the tool's verdict as beyond question. The vice here isn't opacity itself — plenty of good judgment is intuitive and hard to fully articulate, the way a master craftsman can't always explain why one joint is sound and another isn't. The vice would be cowardice: hiding behind the tool to avoid owning a decision, or negligence: never checking whether it's systematically failing some group. Practical wisdom is the mean between two failures — refusing any tool that isn't perfectly transparent, a kind of rigid, rule-bound excess, and blind deference to whatever the algorithm says, a deficiency of judgment. The virtuous employer sits between those, using the tool while remaining accountable for what it does.",
+  "expected_score_band": [70, 95],
+  "expected_fidelity_band": [8, 10]
+}

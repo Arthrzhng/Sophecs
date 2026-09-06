@@ -1,0 +1,8 @@
+{
+  "name": "util-strong",
+  "motion": "A company should be allowed to use an AI system to screen job applicants, even though no one can fully explain why it rejects any given candidate.",
+  "school": "utilitarianism",
+  "argument": "The right question is: does allowing opaque AI screening produce more net welfare than banning it? Consider the actual numbers at stake. A large employer using an AI screener processes tens of thousands of applications; a human-only process at the same volume takes weeks longer, systematically favors applicants with more time and money to navigate a slow process, and introduces its own well-documented biases that are just as unexplainable in practice, since no interviewer can fully articulate why one candidate 'felt right.' Banning the AI doesn't remove opacity, it just moves it into a harder-to-audit human process while adding real costs: longer unemployment spells for the pool of applicants as a whole, higher hiring costs passed on to consumers, and fewer roles funded because hiring is more expensive. Against that, the harm to a rejected applicant who doesn't get an explanation is real but bounded — frustration and a lost opportunity, not a catastrophic loss, and one that a right to reapply or a human appeal channel could mitigate directly rather than banning the tool outright. Summed across every applicant and every employer, permitting the system with an appeal safety valve produces more aggregate welfare than a ban that mostly just relocates the same opacity.",
+  "expected_score_band": [70, 95],
+  "expected_fidelity_band": [8, 10]
+}

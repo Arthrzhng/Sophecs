@@ -131,6 +131,52 @@ Not built in 2a, deferred to 2c: **"retaking the quiz while signed in updates `p
 
 The `?next=` redirect after quiz completion (brief: "no result exists → `/quiz?next=/debate`") also isn't acted on post-submission yet: `/debate` is a "still developing" stub, and sending a first-time quiz-taker straight to a stub page is worse than showing them their result card as normal. The banner ("Take the quiz first. Your school is your side.") and the parameter threading are both live; the terminal redirect activates once `/debate` is real.
 
-## Verification limits in this sandbox
+## Verification limits in this sandbox (2a)
 
 Same limitation as Phase 1's live-insert testing: this sandbox's network egress doesn't reach the Supabase or Vercel hosts directly (see "Infrastructure" above), and there's no way to drive a real magic-link email click-through or Google OAuth consent screen from here regardless. What was verified: the migration applied cleanly to the live project (columns, RLS policies, and the `profiles_public` view all confirmed via direct SQL through the Supabase MCP connection); the app builds with no type errors; `/me` and `/me/settings` correctly redirect signed-out visitors to `/login?next=...`; `/login` renders the new copy; Phase 1 route rendering (static vs. dynamic) is unchanged. Arthur should take the quiz anonymously, sign in for real, and confirm `/me` shows the claimed school once this is deployed — that's the one step this sandbox can't do for him.
+
+(Since this was written, Arthur did that live test — Google OAuth needed the client ID re-entered correctly, the redirect URI added on the Google Cloud side, and the Supabase Site URL/Redirect URLs corrected from their `localhost:3000` defaults. All three fixed; the claim flow is confirmed working end to end.)
+
+## 2b: retrying a failed judge call reuses the row, not a new attempt
+
+The brief's per-topic lock is "one submission per user per topic per seven days," and separately, a route error is supposed to "keep the draft" and let the user "Try again." Read literally as two independent rules, retrying after a failure would either violate the lock (a second row within seven days) or require a special exception. Resolved by making the lock check specifically for a **judged** row (`verdict is not null`) within the window — an unverdicted row from a prior failed attempt doesn't count against it. `/api/judge` looks for such a row first; if one exists, it updates and rejudges that row instead of inserting a new one. This is what "your argument is saved, try again" actually means in the schema: the same debate id, not a fresh one.
+
+## 2b: every judge call is logged, including failed validation
+
+Initial implementation logged to `ai_calls` only on a successful, schema-valid response — a malformed-JSON or schema-mismatch response from the model threw before reaching the log call. That's wrong: Anthropic bills for the tokens whether or not the response parsed, and both the brief's "every call is logged, no exceptions" rule and the daily-cap check (`counted from ai_calls where kind='judge'`) depend on failed calls still counting. Fixed by computing cost from `response.usage` before attempting to parse/validate, and having `JudgeValidationError` carry that cost/latency so `judgeDebate` logs it in a catch block. Caught in review before ever running against a real key — no live calls have happened yet to have been mis-logged.
+
+## 2b: par_elo recomputed by direct query, not maintained incrementally
+
+The brief specifies "a rolling mean of participants' `elo_before` over the last 50." An incremental running average (`(old_mean * n + new_value) / (n + 1)`) approximates this but drifts once past 50 entries, since it never evicts the oldest value. Instead, `/api/judge` re-reads the last 50 `elo_before` values for the topic (one indexed query, `order by created_at desc limit 50`) and averages them directly after every judged debate. Exact, and not meaningfully more expensive than the incremental version.
+
+## 2b: debates has no owner-update RLS policy
+
+The brief's RLS block for `debates` (see `0003_debates.sql`) lists only insert and select policies, both scoped to the row's own `user_id`. There's no update policy — matching the comment that "challenges are written only by server actions with the admin client," the same trust model applies to `debates`. So `setArgumentPublic` (the "Publish my argument" toggle on the verdict page) goes through the admin client with an explicit `getUser()` + `.eq("user_id", user.id)` check in `src/app/debate/actions.ts`, rather than relying on RLS to enforce ownership — RLS enforces read/insert boundaries here, not this one write path.
+
+## 2b: quiz_results has no owner-read policy for signed-in users
+
+A gap noticed while wiring `result_claimed`'s analytics event: `quiz_results`' Phase 1 "read own" RLS policy matches on the `x-anon-id` header, not `auth.uid()`. A signed-in user reading their own claimed row via the session-respecting client (rather than the admin client) is blocked by RLS — there's simply no policy for that access pattern yet. Not a Phase 2 blocker (every read of a signed-in user's own results so far goes through the admin client, which bypasses RLS by design), but worth an explicit RLS policy in a later pass if `/me`'s future debate history needs to read `quiz_results` more than this one-off case did.
+
+## 2b: signup_completed/result_claimed only fire on the claim-first path
+
+`WelcomeTracker` fires these once, right after `/auth/callback` redirects with `?welcome=1` — but that param is only added on the "a result was claimed" branch. The "sign in before ever taking the quiz" branch redirects to `/quiz?next=...` instead, and firing a genuine one-time signup event correctly from a page as stateless as the anonymous quiz flow would need is more plumbing than this analytics gap currently justifies. Tracked here rather than silently accepted: the quiz-first-then-signup path (the more common one) fires correctly; the signup-first-then-quiz path currently doesn't fire `signup_completed` at all.
+
+## 2b: verdict page and its OG image use the Node runtime, not edge
+
+Same reasoning as `/r/[id]`'s `opengraph-image.tsx`/`card.png` (see above): embedded TTF fonts push an edge bundle over Vercel Hobby's 1MB Edge Function limit. Built directly on the Node runtime from the start rather than repeating the edge-then-fix cycle.
+
+## 2b: the judge model call itself is untested in this sandbox
+
+`api.anthropic.com` is reachable from this sandbox (unlike Supabase/PostHog/Vercel), but there's no `ANTHROPIC_API_KEY` for the app itself here — the session's own Anthropic access is scoped to running this session, not to the product being built, and reusing it for the app's own billed calls would be a credential misuse regardless of reachability. So `/api/judge` and `tests/judge/run-golden.ts` are code-complete, type-checked, and structurally verified (the route's check sequence, the golden fixtures' shape, `lib/elo.ts`'s tested formulas), but the golden set has not actually been run against the real model. Needs a real `ANTHROPIC_API_KEY` from Arthur, `KILL_SWITCH_JUDGE=false`, and `npm run judge:golden` — the checklist's "golden set run pasted with all six results inside their bands" is the one Phase 2 checklist item still open pending that key.
+
+## 2b: PostHog retention funnels
+
+The three funnels the brief asks for, built as saved insights (empty until real usage accumulates, same as everything else in this phase pending a live judge key):
+
+- [Quiz completed → signed in](https://eu.posthog.com/project/264751/insights/JjmlD04I)
+- [Signed in → first debate submitted](https://eu.posthog.com/project/264751/insights/nfb6DqEz)
+- [Second debate within 7 days](https://eu.posthog.com/project/264751/insights/7dG4OHVK)
+
+## 2b: /debate/[slug] client JS budget
+
+The brief caps the editor's own JS at 60KB gzipped, the one route allowed meaningful client code. Measured from the production build: `/debate/[slug]`'s route-specific bundle (`DebateFlow` + `ArgumentEditor`) is ~2.3KB gzip on top of the 103KB shared framework baseline — nowhere near the ceiling.

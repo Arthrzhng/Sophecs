@@ -1,0 +1,8 @@
+{
+  "name": "virtue-wrong-school",
+  "motion": "A company should be allowed to use an AI system to screen job applicants, even though no one can fully explain why it rejects any given candidate.",
+  "school": "virtue-ethics",
+  "argument": "Whether a hiring algorithm can explain itself is an external circumstance, and externals are not where virtue lives — so the question of transparency is beside the point. What actually matters is a person's own judgment about their situation, not the character of the institution doing the screening. An applicant rejected by an opaque tool loses nothing that was ever truly theirs, since the job itself, like health or reputation, was always an indifferent — preferred, but not a genuine good. The company should be allowed to use whatever tool it wants because the moral weight of the decision falls entirely on how the applicant chooses to respond to rejection, not on the mechanism doing the rejecting. Demanding explicability treats an indifferent as though it mattered intrinsically, which is exactly the confusion a clear-headed person should resist.",
+  "expected_score_band": [5, 35],
+  "expected_fidelity_band": [0, 4]
+}

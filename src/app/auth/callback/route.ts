@@ -31,5 +31,12 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/quiz?next=${encodeURIComponent(quizNext)}`);
   }
 
-  return NextResponse.redirect(`${origin}${next ?? "/me"}`);
+  // welcome=1 tells /me to fire signup_completed/result_claimed exactly
+  // once (it strips the param immediately after) — a server redirect can't
+  // reach posthog-js directly, and firing on every /me visit would be
+  // wrong. Only added on the claimed path: the quiz-first-then-signup
+  // detour doesn't yet fire these — see docs/decisions.md.
+  const target = new URL(next ?? "/me", origin);
+  target.searchParams.set("welcome", "1");
+  return NextResponse.redirect(target);
 }

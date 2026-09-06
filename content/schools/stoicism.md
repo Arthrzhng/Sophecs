@@ -40,4 +40,7 @@ share_lines:
   - >-
     My whole ethics, per this quiz: control what's mine, let the rest go,
     including the algorithm's verdict. Sophecs says that's Stoicism.
+verdict_share_line: >-
+  Scored {score} defending the Stoic line on {topic}. The judge's note:
+  {verdict_line}. sophecs.com/debate/{slug}/{id}
 ---

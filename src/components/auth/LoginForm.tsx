@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { track } from "@/lib/analytics/client";
 
 const configured = Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -23,6 +24,7 @@ export function LoginForm({ next }: { next?: string }) {
       setStatus("Sign-in isn't connected in this environment yet.");
       return;
     }
+    track({ name: "signup_started", props: { method: "magic", next: next ?? "" } });
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -36,6 +38,7 @@ export function LoginForm({ next }: { next?: string }) {
       setStatus("Sign-in isn't connected in this environment yet.");
       return;
     }
+    track({ name: "signup_started", props: { method: "google", next: next ?? "" } });
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",

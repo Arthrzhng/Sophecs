@@ -13,6 +13,7 @@ export interface SchoolContent {
   read: string;
   gets_wrong: string;
   share_lines: string[];
+  verdict_share_line: string;
 }
 
 const SCHOOLS_DIR = path.join(process.cwd(), "content", "schools");

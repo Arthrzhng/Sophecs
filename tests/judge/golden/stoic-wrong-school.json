@@ -1,0 +1,8 @@
+{
+  "name": "stoic-wrong-school",
+  "motion": "A company should be allowed to use an AI system to screen job applicants, even though no one can fully explain why it rejects any given candidate.",
+  "school": "stoicism",
+  "argument": "Stoicism teaches us to focus on what's up to us, and what's up to us here is building the system that helps the most people. An opaque hiring AI should be allowed because, on balance, it screens more candidates faster and gets more of them into jobs that make them better off, and a few rejected candidates who don't get an explanation is a small cost against the large aggregate benefit of a more efficient labor market. Yes, the Stoics would say don't worry about what you can't control — and what you can't control is the total number of jobs available, so the right move is to maximize placements across the whole population of applicants, weighing the modest frustration of unexplained rejection against the substantial gain of faster, cheaper hiring for everyone else. On net, the outcome-maximizing choice is also the wise one.",
+  "expected_score_band": [10, 45],
+  "expected_fidelity_band": [0, 4]
+}

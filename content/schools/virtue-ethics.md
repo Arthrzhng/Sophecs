@@ -43,4 +43,7 @@ share_lines:
     My answer to almost everything was some version of: ask what a good
     person would do here, then do that. Sophecs says that's Virtue
     Ethics.
+verdict_share_line: >-
+  Scored {score} defending the virtue-ethics line on {topic}. The judge's
+  note: {verdict_line}. sophecs.com/debate/{slug}/{id}
 ---
