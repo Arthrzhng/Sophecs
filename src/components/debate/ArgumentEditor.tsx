@@ -31,12 +31,14 @@ export function ArgumentEditor({
   school,
   userId,
   challengeId,
+  isAllowlisted,
 }: {
   topicSlug: string;
   motion: string;
   school: SchoolId;
   userId: string;
   challengeId?: string;
+  isAllowlisted?: boolean;
 }) {
   const router = useRouter();
   const draftKey = `draft:${topicSlug}:${userId}`;
@@ -80,10 +82,14 @@ export function ArgumentEditor({
 
   async function submit() {
     setStatus({ kind: "submitting" });
-    track({
-      name: "debate_submitted",
-      props: { topic_slug: topicSlug, word_count: words, from_challenge: Boolean(challengeId) },
-    });
+    // No analytics for an allowlisted reviewer's own judge calls — the
+    // pre-launch review pass shouldn't pollute the real usage funnels.
+    if (!isAllowlisted) {
+      track({
+        name: "debate_submitted",
+        props: { topic_slug: topicSlug, word_count: words, from_challenge: Boolean(challengeId) },
+      });
+    }
 
     let response: JudgeResponse;
     try {
@@ -99,7 +105,9 @@ export function ArgumentEditor({
     }
 
     if (response.paused) {
-      track({ name: "judge_paused", props: { reason: response.reason as never } });
+      if (!isAllowlisted) {
+        track({ name: "judge_paused", props: { reason: response.reason as never } });
+      }
       setStatus({ kind: "paused", reason: response.reason ?? "unknown" });
       return;
     }
@@ -109,27 +117,29 @@ export function ArgumentEditor({
       return;
     }
 
-    if (response.eloDelta != null && response.eloAfter != null) {
-      track({
-        name: "elo_changed",
-        props: { delta: response.eloDelta, elo_after: response.eloAfter, mode: challengeId ? "pair" : "solo" },
-      });
-    }
-    if (response.streak && response.streak.change !== "unchanged") {
-      track(
-        response.streak.change === "extended"
-          ? { name: "streak_extended", props: { streak: response.streak.value } }
-          : { name: "streak_reset", props: { previous: response.streak.value } }
-      );
-    }
-    if (challengeId && response.challenge?.completed) {
-      track({
-        name: "challenge_completed",
-        props: {
-          challenge_id: challengeId,
-          winner_school: (response.challenge.winnerSchool ?? "draw") as never,
-        },
-      });
+    if (!isAllowlisted) {
+      if (response.eloDelta != null && response.eloAfter != null) {
+        track({
+          name: "elo_changed",
+          props: { delta: response.eloDelta, elo_after: response.eloAfter, mode: challengeId ? "pair" : "solo" },
+        });
+      }
+      if (response.streak && response.streak.change !== "unchanged") {
+        track(
+          response.streak.change === "extended"
+            ? { name: "streak_extended", props: { streak: response.streak.value } }
+            : { name: "streak_reset", props: { previous: response.streak.value } }
+        );
+      }
+      if (challengeId && response.challenge?.completed) {
+        track({
+          name: "challenge_completed",
+          props: {
+            challenge_id: challengeId,
+            winner_school: (response.challenge.winnerSchool ?? "draw") as never,
+          },
+        });
+      }
     }
 
     try {

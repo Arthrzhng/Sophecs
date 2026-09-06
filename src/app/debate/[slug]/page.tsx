@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getMicroLesson } from "@/lib/micro-lessons";
+import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
 import { DebateFlow } from "@/components/debate/DebateFlow";
 import type { SchoolId } from "@/lib/types";
 
@@ -60,6 +61,7 @@ export default async function DebateTopicPage({
           microBefore={microBefore}
           userId={user.id}
           challengeId={challenge}
+          isAllowlisted={isJudgeAllowlisted(user.id)}
         />
       </div>
     </main>

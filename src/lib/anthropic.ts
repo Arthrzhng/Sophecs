@@ -108,7 +108,7 @@ export async function callJudgeModel(
 export async function logAiCall(params: {
   userId: string | null;
   debateId: string | null;
-  kind: "judge" | "golden";
+  kind: "judge" | "golden" | "judge_allowlist";
   costUsd: number;
   latencyMs: number;
 }): Promise<void> {
@@ -132,21 +132,24 @@ export async function logAiCall(params: {
   }
 }
 
-// Used by /api/judge: calls the model and logs the call as kind "judge" in
-// one step, tied to the debate/user it's for.
+// Used by /api/judge: calls the model and logs the call in one step, tied
+// to the debate/user it's for. kind defaults to "judge"; the allowlist path
+// passes "judge_allowlist" so those calls are distinguishable in ai_calls.
 export async function judgeDebate(params: {
   motion: string;
   school: SchoolId;
   argument: string;
   userId: string;
   debateId: string;
+  kind?: "judge" | "judge_allowlist";
 }): Promise<JudgeCallResult> {
+  const kind = params.kind ?? "judge";
   try {
     const result = await callJudgeModel(params.motion, params.school, params.argument);
     await logAiCall({
       userId: params.userId,
       debateId: params.debateId,
-      kind: "judge",
+      kind,
       costUsd: result.costUsd,
       latencyMs: result.latencyMs,
     });
@@ -159,7 +162,7 @@ export async function judgeDebate(params: {
       await logAiCall({
         userId: params.userId,
         debateId: params.debateId,
-        kind: "judge",
+        kind,
         costUsd: err.costUsd,
         latencyMs: err.latencyMs,
       });

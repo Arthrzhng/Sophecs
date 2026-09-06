@@ -16,6 +16,7 @@ export function DebateFlow({
   microBefore,
   userId,
   challengeId,
+  isAllowlisted,
 }: {
   topicSlug: string;
   motion: string;
@@ -23,6 +24,7 @@ export function DebateFlow({
   microBefore: MicroLessonContent | null;
   userId: string;
   challengeId?: string;
+  isAllowlisted?: boolean;
 }) {
   const [began, setBegan] = useState(!microBefore);
 
@@ -78,6 +80,7 @@ export function DebateFlow({
       school={school}
       userId={userId}
       challengeId={challengeId}
+      isAllowlisted={isAllowlisted}
     />
   );
 }

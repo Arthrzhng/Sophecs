@@ -7,6 +7,7 @@ import { isBudgetExceeded } from "@/lib/budget";
 import { soloElo } from "@/lib/elo";
 import { applyStreakDay, isStreakEligible } from "@/lib/streak";
 import { recordChallengeDebate, resolveChallengeSide } from "@/lib/challenge";
+import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
 import { MIN_ARGUMENT_WORDS, MAX_ARGUMENT_WORDS, wordCount } from "@/lib/debate-limits";
 import type { SchoolId } from "@/lib/types";
 
@@ -41,7 +42,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Not signed in." }, { status: 401 });
   }
 
-  if (process.env.KILL_SWITCH_JUDGE === "true") {
+  // Allowlisted reviewers (JUDGE_ALLOWLIST_USER_IDS) bypass the kill switch
+  // and the daily cap only — budget, length, and the topic lock still
+  // apply. Checked here, right after the session check and before the
+  // kill switch, per how this was asked for.
+  const isAllowlisted = isJudgeAllowlisted(user.id);
+
+  if (!isAllowlisted && process.env.KILL_SWITCH_JUDGE === "true") {
     return paused("kill_switch");
   }
   if (await isBudgetExceeded()) {
@@ -68,15 +75,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Unknown topic." }, { status: 404 });
   }
 
-  const sinceDaily = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const { count: dailyCount } = await admin
-    .from("ai_calls")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", user.id)
-    .eq("kind", "judge")
-    .gte("created_at", sinceDaily);
-  if ((dailyCount ?? 0) >= DAILY_CAP) {
-    return paused("daily_cap");
+  if (!isAllowlisted) {
+    const sinceDaily = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { count: dailyCount } = await admin
+      .from("ai_calls")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("kind", "judge")
+      .gte("created_at", sinceDaily);
+    if ((dailyCount ?? 0) >= DAILY_CAP) {
+      return paused("daily_cap");
+    }
   }
 
   const sinceLock = new Date(Date.now() - TOPIC_LOCK_DAYS * 24 * 60 * 60 * 1000).toISOString();
@@ -129,6 +138,7 @@ export async function POST(request: Request) {
       argument: body.argument,
       userId: user.id,
       debateId,
+      kind: isAllowlisted ? "judge_allowlist" : "judge",
     });
   } catch (err) {
     const detail = err instanceof JudgeValidationError ? err.message : String(err);
