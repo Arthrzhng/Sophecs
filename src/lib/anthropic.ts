@@ -54,11 +54,19 @@ export async function callJudgeModel(
   const system = promptTemplate.replace("{{RUBRIC}}", FIDELITY_CRITERIA[school]);
   const userTurn = `Motion: ${motion}\nSchool: ${school}\n\n<argument>\n${argument}\n</argument>\n\nRespond with JSON only, matching the schema in your instructions.`;
 
+  // No temperature: claude-sonnet-5 rejects it outright ("temperature is
+  // deprecated for this model", confirmed against the real API) — the
+  // brief's temperature: 0.2 was written against claude-sonnet-4-6.
+  // Thinking explicitly disabled: sonnet-5 defaults to extended thinking,
+  // which otherwise consumes the entire max_tokens budget on hidden
+  // reasoning before producing any visible output (confirmed against the
+  // real API — a live call came back with stop_reason "max_tokens" and
+  // zero text). See docs/decisions.md.
   const start = Date.now();
   const response = await getClient().messages.create({
     model: MODEL,
     max_tokens: 700,
-    temperature: 0.2,
+    thinking: { type: "disabled" },
     system,
     messages: [{ role: "user", content: userTurn }],
   });
@@ -71,7 +79,12 @@ export async function callJudgeModel(
     response.usage.output_tokens * OUTPUT_COST_PER_TOKEN;
 
   const textBlock = response.content.find((b) => b.type === "text");
-  const raw = textBlock && "text" in textBlock ? textBlock.text : "";
+  const rawText = textBlock && "text" in textBlock ? textBlock.text : "";
+  // The model wraps JSON in a ```json fence sometimes despite being told
+  // not to (confirmed against the real API) — stripped defensively rather
+  // than fighting the prompt further for a formatting quirk that doesn't
+  // affect judgment quality.
+  const raw = rawText.trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "");
 
   let parsed: unknown;
   try {

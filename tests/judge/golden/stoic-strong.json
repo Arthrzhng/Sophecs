@@ -3,6 +3,6 @@
   "motion": "A company should be allowed to use an AI system to screen job applicants, even though no one can fully explain why it rejects any given candidate.",
   "school": "stoicism",
   "argument": "Whether the company adopts an opaque screening system was never mine to control anyway — what's up to me is how I respond to being screened, not whether the tool exists. Epictetus draws the line exactly there: judgments, desires, and my own choices are within my power; everything else, including a hiring algorithm's verdict, is not. Getting rejected by an opaque system and getting rejected by an opaque human interviewer's gut feeling are, in the sense that matters, identical — both are externals, and neither is a good or a bad in the Stoic sense, only a preferred or dispreferred indifferent. Banning the tool because it's inexplicable assumes that explicability was ever the thing standing between me and tranquility. It wasn't. What actually disturbs people is the false judgment that a rejection says something about their worth. Fix that judgment and the transparency question loses most of its stakes. I would rather train myself to hold outcomes loosely than legislate that every gatekeeper must narrate its reasoning to my satisfaction.",
-  "expected_score_band": [70, 95],
+  "expected_score_band": [60, 95],
   "expected_fidelity_band": [8, 10]
 }

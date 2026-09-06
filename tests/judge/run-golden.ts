@@ -10,7 +10,7 @@
 // /api/judge.
 import fs from "node:fs";
 import path from "node:path";
-import { callJudgeModel, logAiCall } from "../../src/lib/anthropic";
+import { callJudgeModel, logAiCall, JudgeValidationError } from "../../src/lib/anthropic";
 import type { SchoolId } from "../../src/lib/types";
 
 interface GoldenCase {
@@ -49,7 +49,35 @@ async function main() {
   let anyFail = false;
 
   for (const c of cases) {
-    const { verdict, costUsd, latencyMs } = await callJudgeModel(c.motion, c.school, c.argument);
+    // One case failing (a validation error, a network blip) must not abort
+    // the rest of the run — each case gets its own row, pass or fail.
+    let result: Awaited<ReturnType<typeof callJudgeModel>>;
+    try {
+      result = await callJudgeModel(c.motion, c.school, c.argument);
+    } catch (err) {
+      if (err instanceof JudgeValidationError) {
+        await logAiCall({
+          userId: null,
+          debateId: null,
+          kind: "golden",
+          costUsd: err.costUsd,
+          latencyMs: err.latencyMs,
+        });
+      }
+      rows.push({
+        name: c.name,
+        scoreBand: c.expected_score_band.join("-"),
+        score: "error",
+        scorePass: false,
+        fidelityBand: c.expected_fidelity_band.join("-"),
+        fidelity: err instanceof Error ? err.message.slice(0, 40) : "error",
+        fidelityPass: false,
+      });
+      anyFail = true;
+      continue;
+    }
+
+    const { verdict, costUsd, latencyMs } = result;
     await logAiCall({ userId: null, debateId: null, kind: "golden", costUsd, latencyMs });
 
     if (verdict.rejected) {
