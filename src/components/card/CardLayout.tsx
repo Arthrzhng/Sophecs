@@ -76,6 +76,8 @@ export function CardLayout({
           fontWeight: 500,
           marginTop: Math.round(width * 0.02),
           lineHeight: 1,
+          maxWidth: "100%",
+          wordBreak: "break-word",
         }}
       >
         {colors.name}
