@@ -15,6 +15,10 @@ export interface CardLayoutProps {
   width: number;
   height: number;
   fonts: CardFonts;
+  // "cqw" expresses every size as a fraction of the nearest container's inline
+  // size, so the web card scales to whatever column it lands in. Satori has no
+  // container queries, so the image routes keep raw pixels (the default).
+  unit?: "px" | "cqw";
 }
 
 const LABELS: Record<SchoolId, string> = {
@@ -25,7 +29,7 @@ const LABELS: Record<SchoolId, string> = {
 
 const ORDER: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
 
-// Pure — no hooks, inline styles only, all sizes derived from `width` — so
+// Pure — no hooks, inline styles only, every size derived from `width` — so
 // this exact tree renders identically on /r/[id] and inside next/og's
 // ImageResponse (Satori). The only fully saturated surface in the product;
 // no user name, no illustration, no decoration beyond a hairline and the
@@ -38,8 +42,17 @@ export function CardLayout({
   width,
   height,
   fonts,
+  unit = "px",
 }: CardLayoutProps) {
   const colors = SCHOOL_COLORS[school];
+  // Sizes are authored against `width` and converted once, here. Scaling the
+  // whole tree with a transform is not an option in pure CSS: scale() needs a
+  // unitless number and calc(100cqw / <n>) is a length, so such a declaration
+  // is invalid and silently dropped, leaving the card unscaled.
+  const u =
+    unit === "cqw"
+      ? (n: number): string | number => `${((n / width) * 100).toFixed(4)}cqw`
+      : (n: number): string | number => n;
   const pad = Math.round(width * 0.075);
 
   return (
@@ -49,9 +62,9 @@ export function CardLayout({
         flexDirection: "column",
         justifyContent: "center",
         boxSizing: "border-box",
-        width,
-        height,
-        padding: pad,
+        width: u(width),
+        height: u(height),
+        padding: u(pad),
         backgroundColor: colors.surface,
         color: colors.ink,
         fontFamily: fonts.sans,
@@ -60,8 +73,8 @@ export function CardLayout({
       <div
         style={{
           fontFamily: fonts.mono,
-          fontSize: Math.round(width * 0.0165),
-          letterSpacing: 2,
+          fontSize: u(Math.round(width * 0.0165)),
+          letterSpacing: u(2),
           textTransform: "uppercase",
           opacity: 0.85,
         }}
@@ -72,9 +85,9 @@ export function CardLayout({
       <div
         style={{
           fontFamily: fonts.serif,
-          fontSize: Math.round(width * 0.078),
+          fontSize: u(Math.round(width * 0.078)),
           fontWeight: 500,
-          marginTop: Math.round(width * 0.02),
+          marginTop: u(Math.round(width * 0.02)),
           lineHeight: 1,
           maxWidth: "100%",
           wordBreak: "break-word",
@@ -86,14 +99,14 @@ export function CardLayout({
       <div
         style={{
           display: "flex",
-          gap: Math.round(width * 0.045),
-          marginTop: Math.round(width * 0.045),
+          gap: u(Math.round(width * 0.045)),
+          marginTop: u(Math.round(width * 0.045)),
           fontFamily: fonts.mono,
-          fontSize: Math.round(width * 0.019),
+          fontSize: u(Math.round(width * 0.019)),
         }}
       >
         {ORDER.map((id) => (
-          <div key={id} style={{ display: "flex", gap: 6 }}>
+          <div key={id} style={{ display: "flex", gap: u(6) }}>
             <span style={{ opacity: 0.85 }}>{LABELS[id]}</span>
             <span style={{ fontWeight: 500 }}>{Math.round(vector[id] * 100)}%</span>
           </div>
@@ -104,13 +117,13 @@ export function CardLayout({
         style={{
           display: "flex",
           flexDirection: "column",
-          marginTop: Math.round(width * 0.05),
-          paddingTop: Math.round(width * 0.045),
+          marginTop: u(Math.round(width * 0.05)),
+          paddingTop: u(Math.round(width * 0.045)),
           borderTop: `1px solid rgba(250,248,242,0.25)`,
           fontFamily: fonts.serif,
-          fontSize: Math.round(width * 0.026),
+          fontSize: u(Math.round(width * 0.026)),
           lineHeight: 1.5,
-          maxWidth: Math.round(width * 0.78),
+          maxWidth: u(Math.round(width * 0.78)),
         }}
       >
         <div style={{ display: "flex", fontStyle: "italic" }}>{`“${oneLine}”`}</div>
@@ -118,8 +131,8 @@ export function CardLayout({
           style={{
             display: "flex",
             fontFamily: fonts.mono,
-            fontSize: Math.round(width * 0.014),
-            marginTop: Math.round(width * 0.018),
+            fontSize: u(Math.round(width * 0.014)),
+            marginTop: u(Math.round(width * 0.018)),
             opacity: 0.85,
           }}
         >
@@ -132,8 +145,8 @@ export function CardLayout({
           display: "flex",
           fontFamily: fonts.serif,
           fontWeight: 600,
-          fontSize: Math.round(width * 0.018),
-          marginTop: Math.round(width * 0.06),
+          fontSize: u(Math.round(width * 0.018)),
+          marginTop: u(Math.round(width * 0.06)),
           opacity: 0.85,
         }}
       >

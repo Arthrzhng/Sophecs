@@ -1,8 +1,7 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { CardLayout } from "@/components/card/CardLayout";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
+import { loadOgFonts } from "@/lib/og-fonts";
 import { SCHOOL_ONE_LINES } from "@/lib/school-quotes";
 import type { SchoolId, SchoolVector } from "@/lib/types";
 
@@ -13,18 +12,10 @@ import type { SchoolId, SchoolVector } from "@/lib/types";
 // deploying.
 const SIZE = { width: 1080, height: 1350 };
 
-// TTF, not WOFF2 — see opengraph-image.tsx and docs/decisions.md. Node
-// runtime reads from disk (fetch+import.meta.url is an edge-only pattern).
-const fontData = Promise.all([
-  readFile(join(process.cwd(), "src/assets/og-fonts/spectral-500.ttf")),
-  readFile(join(process.cwd(), "src/assets/og-fonts/plex-sans-400.ttf")),
-  readFile(join(process.cwd(), "src/assets/og-fonts/plex-mono-500.ttf")),
-]);
-
 // Portrait variant of the same card for Instagram's download-and-post flow.
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [spectral, plexSans, plexMono] = await fontData;
+  const [spectral, plexSans, plexMono] = await loadOgFonts();
 
   let school: SchoolId = "stoicism";
   let vector: SchoolVector = { stoicism: 1, utilitarianism: 0, "virtue-ethics": 0 };

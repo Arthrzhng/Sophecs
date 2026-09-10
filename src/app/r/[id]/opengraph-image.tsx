@@ -1,8 +1,7 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { CardLayout } from "@/components/card/CardLayout";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
+import { loadOgFonts } from "@/lib/og-fonts";
 import { SCHOOL_ONE_LINES } from "@/lib/school-quotes";
 import type { SchoolId, SchoolVector } from "@/lib/types";
 
@@ -13,20 +12,9 @@ export const alt = "Sophecs result card";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Loaded once at module scope, not per request. TTF, not WOFF2 — Satori
-// (the engine behind ImageResponse) can't parse WOFF2, only TTF/OTF/WOFF;
-// see docs/decisions.md. These are separate files from the WOFF2 set
-// next/font/local uses for the live site. Node runtime reads them from
-// disk (fetch+import.meta.url is an edge-only pattern).
-const fontData = Promise.all([
-  readFile(join(process.cwd(), "src/assets/og-fonts/spectral-500.ttf")),
-  readFile(join(process.cwd(), "src/assets/og-fonts/plex-sans-400.ttf")),
-  readFile(join(process.cwd(), "src/assets/og-fonts/plex-mono-500.ttf")),
-]);
-
 export default async function OGImage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [spectral, plexSans, plexMono] = await fontData;
+  const [spectral, plexSans, plexMono] = await loadOgFonts();
 
   let school: SchoolId = "stoicism";
   let vector: SchoolVector = { stoicism: 1, utilitarianism: 0, "virtue-ethics": 0 };

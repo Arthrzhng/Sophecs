@@ -1,8 +1,7 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { VerdictCard } from "@/components/debate/VerdictCard";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
+import { loadOgFonts } from "@/lib/og-fonts";
 import type { SchoolId } from "@/lib/types";
 
 // Node runtime (not edge) — see docs/decisions.md and r/[id]/opengraph-image.tsx:
@@ -11,19 +10,13 @@ export const alt = "Sophecs debate verdict";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const fontData = Promise.all([
-  readFile(join(process.cwd(), "src/assets/og-fonts/spectral-500.ttf")),
-  readFile(join(process.cwd(), "src/assets/og-fonts/plex-sans-400.ttf")),
-  readFile(join(process.cwd(), "src/assets/og-fonts/plex-mono-500.ttf")),
-]);
-
 export default async function VerdictOGImage({
   params,
 }: {
   params: Promise<{ slug: string; debateId: string }>;
 }) {
   const { debateId } = await params;
-  const [spectral, plexSans, plexMono] = await fontData;
+  const [spectral, plexSans, plexMono] = await loadOgFonts();
 
   let school: SchoolId = "stoicism";
   let motion = "Sophecs";
