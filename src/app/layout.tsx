@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { spectral, plexSans, plexMono } from "@/lib/fonts";
 import { AnalyticsProvider } from "@/components/analytics-provider";
+import { SiteHeader } from "@/components/nav/SiteHeader";
+import { SiteFooter } from "@/components/nav/SiteFooter";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +17,8 @@ export const metadata: Metadata = {
 // layout would force every page, including the static landing page, into
 // dynamic rendering. AnalyticsProvider reads anon_id/anon_since from
 // document.cookie client-side instead (bootstrapped by middleware on every
-// request regardless of whether the page itself is static).
+// request regardless of whether the page itself is static). SiteHeader and
+// SiteFooter are session-free for exactly the same reason — see SiteHeader.
 export default function RootLayout({
   children,
 }: {
@@ -30,7 +33,9 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <AnalyticsProvider />
         </Suspense>
+        <SiteHeader />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );

@@ -22,9 +22,22 @@ export function TopicList({
 }) {
   if (topics.length === 0) {
     return (
-      <p className="text-ink-mid text-sm max-w-[50ch]">
-        Still developing — topics are being written. Check back soon.
-      </p>
+      <div>
+        <p className="text-ink-mid text-sm max-w-[50ch]">
+          Still developing — the motions are being written. Check back soon.
+        </p>
+        <div className="mt-6 flex flex-wrap items-center gap-6 text-sm">
+          <Link
+            href={school ? `/s/${school}` : "/quiz"}
+            className="text-ink-mid hover:text-ink underline underline-offset-4"
+          >
+            {school ? `Read the case for ${SCHOOL_COLORS[school].name}` : "Take the quiz"}
+          </Link>
+          <Link href="/lessons" className="text-ink-mid hover:text-ink underline underline-offset-4">
+            Read the lessons
+          </Link>
+        </div>
+      </div>
     );
   }
 

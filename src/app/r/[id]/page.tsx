@@ -166,6 +166,32 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
             Read the case for {schoolDisplayName(result.school)}
           </Link>
         </div>
+
+        {/* The card is where most people land, so it needs a way into the
+            rest of the product. "Debate them" above only appears once a
+            challenge has both sides; this is the unconditional route in. */}
+        <div className="mt-10 border-t border-rule pt-8">
+          <p className="eyebrow text-ink-soft mb-3">Next</p>
+          <p className="text-ink-mid text-sm max-w-[52ch]">
+            A result is a starting position, not a verdict. Take a motion and
+            defend it — you get scored on how faithfully you argue from{" "}
+            {schoolDisplayName(result.school)}, not on whether we agree.
+          </p>
+          <div className="mt-5 flex flex-wrap items-center gap-6">
+            <Link
+              href="/debate"
+              className="inline-block bg-ink text-surface rounded-md px-6 py-3 text-base font-medium hover:opacity-85"
+            >
+              Debate a motion
+            </Link>
+            <Link
+              href="/lessons"
+              className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"
+            >
+              Read the lessons
+            </Link>
+          </div>
+        </div>
       </div>
     </main>
   );

@@ -35,3 +35,14 @@ function loadAll(): Record<string, MicroLessonContent> {
 export function getMicroLesson(slug: string): MicroLessonContent | null {
   return loadAll()[slug] ?? null;
 }
+
+// Backs /lessons, so a reader can find an excerpt again after meeting it
+// once inside a debate. Grouped by topic, "before" ahead of "after", which
+// is the order they're encountered in.
+export function getAllMicroLessons(): MicroLessonContent[] {
+  return Object.values(loadAll()).sort(
+    (a, b) =>
+      a.topic.localeCompare(b.topic) ||
+      (a.position === b.position ? 0 : a.position === "before" ? -1 : 1)
+  );
+}

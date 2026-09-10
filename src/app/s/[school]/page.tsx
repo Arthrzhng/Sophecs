@@ -46,13 +46,34 @@ export default async function SchoolPage({ params }: { params: Promise<{ school:
           </div>
         </div>
 
-        <div className="mt-12">
+        <div className="mt-12 flex flex-wrap items-center gap-6">
           <Link
             href="/quiz"
             className="inline-block bg-ink text-surface rounded-md px-6 py-3 text-base font-medium hover:opacity-85 transition-opacity"
           >
             Take the quiz
           </Link>
+          <Link
+            href="/debate"
+            className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"
+          >
+            Argue a motion from it
+          </Link>
+        </div>
+
+        <div className="mt-12 border-t border-rule pt-8">
+          <p className="eyebrow text-ink-soft mb-3">The other two</p>
+          <div className="flex flex-wrap gap-6 text-sm">
+            {VALID_SCHOOLS.filter((id) => id !== school).map((id) => (
+              <Link
+                key={id}
+                href={`/s/${id}`}
+                className="text-ink-mid hover:text-ink underline underline-offset-4"
+              >
+                {getSchool(id).name}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </main>
