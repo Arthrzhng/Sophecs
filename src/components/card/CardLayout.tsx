@@ -48,6 +48,7 @@ export function CardLayout({
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
+        boxSizing: "border-box",
         width,
         height,
         padding: pad,

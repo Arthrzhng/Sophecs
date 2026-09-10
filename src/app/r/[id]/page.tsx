@@ -89,27 +89,32 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function ResultPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const result = await getResult(id);
-  if (!result) notFound();
-
-  const [cookieStore, headerList, ownerAnonId, ownerUserId, challengeInfo] = await Promise.all([
-    cookies(),
-    headers(),
-    getOwnerAnonId(id),
-    getOwnerUserId(id),
-    getChallengeInfo(id),
-  ]);
-  const viewerAnonId = cookieStore.get("anon_id")?.value;
-  const isOwner = Boolean(viewerAnonId && ownerAnonId && viewerAnonId === ownerAnonId);
-  const referrer = headerList.get("referer") ?? "";
 
   // Phase 2c: the only two additions this route gets, per the brief —
   // "Debate them" once a challenge has both sides, and a claimed-by-you
   // indicator. Everything above is untouched Phase 1 behavior.
+  //
+  // All of these are independent lookups (none depends on another's
+  // result), so they run as one parallel batch rather than a waterfall of
+  // sequential round trips — this route can't be cached (it reads
+  // cookies), so every load used to pay for three round trips in series.
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [result, cookieStore, headerList, ownerAnonId, ownerUserId, challengeInfo, userResult] =
+    await Promise.all([
+      getResult(id),
+      cookies(),
+      headers(),
+      getOwnerAnonId(id),
+      getOwnerUserId(id),
+      getChallengeInfo(id),
+      supabase.auth.getUser(),
+    ]);
+  if (!result) notFound();
+
+  const viewerAnonId = cookieStore.get("anon_id")?.value;
+  const isOwner = Boolean(viewerAnonId && ownerAnonId && viewerAnonId === ownerAnonId);
+  const referrer = headerList.get("referer") ?? "";
+  const user = userResult.data.user;
   const isSavedToProfile = Boolean(user && ownerUserId && user.id === ownerUserId);
 
   const school = getSchool(result.school);
