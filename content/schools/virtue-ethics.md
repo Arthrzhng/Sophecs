@@ -33,7 +33,7 @@ gets_wrong: |-
   audience, is actually yours.
 share_lines:
   - >-
-    Nine questions about AI and my answers all came down to the same
+    Ten questions about AI and my answers all came down to the same
     thing: what does this make of me. Sophecs says that's Virtue Ethics.
   - >-
     Apparently I judge an algorithm the same way I judge a person — not by

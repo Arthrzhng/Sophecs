@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { CardLayout } from "@/components/card/CardLayout";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { loadOgFonts } from "@/lib/og-fonts";
-import { SCHOOL_ONE_LINES } from "@/lib/school-quotes";
+import { getSchool } from "@/lib/schools";
 import type { SchoolId, SchoolVector } from "@/lib/types";
 
 // Node.js runtime, not edge: see docs/decisions.md and card.png/route.tsx —
@@ -32,14 +32,14 @@ export default async function OGImage({ params }: { params: Promise<{ id: string
     }
   }
 
-  const oneLine = SCHOOL_ONE_LINES[school];
+  const content = getSchool(school);
 
   return new ImageResponse(
     (
       <CardLayout
         school={school}
-        oneLine={oneLine.text}
-        oneLineAttribution={oneLine.attribution}
+        oneLine={content.one_line}
+        oneLineAttribution={content.one_line_attribution}
         vector={vector}
         width={1200}
         height={630}

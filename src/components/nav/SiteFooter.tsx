@@ -52,7 +52,7 @@ export function SiteFooter() {
         </div>
 
         <p className="mt-12 font-mono text-xs text-ink-soft">
-          Sophecs — nine questions, three schools, one argument at a time.
+          Sophecs — ten questions, three schools, one argument at a time.
         </p>
       </div>
     </footer>

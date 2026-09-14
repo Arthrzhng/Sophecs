@@ -293,3 +293,31 @@ The fix is to drop the one dynamic thing the nav needed. `SiteHeader`/`SiteFoote
 ## Empty states point somewhere
 
 Everything here is live but contentless until the topic and micro-lesson files exist, so each empty state now offers a real onward link instead of terminating: `/debate` with no topics points at your school's page and the lessons; `/lessons` with no excerpts points at the three schools, which *are* written. The point is that a visitor arriving today can still traverse the whole site rather than hitting "check back soon" and stopping.
+
+---
+
+# Launch content and site furniture
+
+Arthur supplied the six motions and twelve micro-lessons, plus a spec for the furniture items and the two fixes flagged in the content audit. The smoke-test motion that stood in for real content has been retired — files deleted, `debate_topics` row removed — now that there is something real to debate.
+
+## The micro-lessons arrived in the wrong shape
+
+All twelve put the lesson text *below* the frontmatter as markdown. The schema (`content/micro/README.md`, and the loader itself) requires `body` to be a frontmatter **field**: `src/lib/micro-lessons.ts` reads `matter(raw).data` and never touches `.content`. Installed as delivered, every lesson would have had `body === undefined` and `MicroLesson` would have thrown on `lesson.body.split("\n\n")` — the debate flow would have crashed at the first micro-lesson, for every topic.
+
+The prose was fine; only the container was wrong, so this was converted rather than sent back: each file re-emitted with `body` as a frontmatter field via `js-yaml` (block scalars and escaping handled by the dumper rather than by hand). All twelve land between 226 and 250 words, inside the 150–250 band. Validated through the real loaders rather than by eye — every topic resolves both its lessons, every lesson's `position` matches its slug suffix and its `topic` back-reference matches its parent, all three stances present on all six motions, no duplicate `sort`, no orphan lessons.
+
+## Furniture
+
+`icon.tsx` and `apple-icon.tsx` render the Spectral "S" through `ImageResponse`, so there is no raster tooling in the repo and no manifest (the spec asked for neither). The 192/512 sizes in the original spec are deliberately absent: they are only consumed via a web app manifest, and adding one was explicitly out of scope. `opengraph-image.tsx` gives the bare domain a card of its own — paper rather than a school surface, because it belongs to the site and not to any one school, with the three-segment hairline as the single place all three school colours appear together. Plus `not-found.tsx`, `robots.ts`, and `sitemap.ts`.
+
+The sitemap also lists `/lessons` and the twelve lesson pages, which the spec didn't mention — it predates those routes existing. They are public static content pages and excluding them would leave real content unindexed. `/r/[id]` stays out, per the spec's reasoning: those are shared by link, not found by search.
+
+**The tracing config is now `"/**"` rather than named routes.** Six routes read the TTFs from disk, and three of them are new. The keys are globs, so a route path containing `[id]` or `[slug]` cannot be written literally — brackets are character-class syntax — and a near-miss produces no build error, just an ENOENT that kills the Lambda at request time. That failure already cost a production incident once; ~500KB per function is a cheap price for not repeating it. Verified per-route against the emitted `.nft.json` files, and every image route was then rendered against a local production server: all return `200 image/png` with correct signatures and dimensions (32×32, 180×180, 1200×630, 1080×1350).
+
+## "Nine" was in seven places, not three
+
+The spec named three. A case-insensitive grep found four more that mattered: the site footer, and — the ones worth catching — the `share_lines` in all three school files, which begin "Nine questions about AI…" and are the text that gets posted to X when someone shares a result. Those are now "Ten". The one remaining occurrence is a comment in `content/quiz/questions.ts` explaining that ten were kept "rather than cut to nine"; that is the rationale for the current state, so changing it would delete the explanation rather than fix an error.
+
+## `school-quotes.ts` is gone
+
+Its stated justification — that the image routes run on the edge and cannot use `fs` — stopped being true when those routes moved to the Node runtime to get under Vercel Hobby's Edge bundle limit. Both consumers now call `getSchool()`, so `content/schools/*.md` is the single source of truth for a school's quote and attribution, and editing a quote can no longer leave the cards silently showing the old one.

@@ -43,7 +43,7 @@ share_lines:
     My verdict on the self-driving car problem: minimize total harm, even
     if that means the car chooses you. Sophecs called that Utilitarian.
   - >-
-    Nine questions about AI and I kept landing on the same answer: count
+    Ten questions about AI and I kept landing on the same answer: count
     everyone it touches, not just the person in front of you. Sophecs
     says that's Utilitarianism.
 verdict_share_line: >-

@@ -6,11 +6,23 @@ import { SiteHeader } from "@/components/nav/SiteHeader";
 import { SiteFooter } from "@/components/nav/SiteFooter";
 import "./globals.css";
 
+const DESCRIPTION =
+  "Ten questions on how AI should decide things. Find out which school of ethics you actually argue from.";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://sophecs.com"),
   title: "Sophecs",
-  description:
-    "Nine questions on how AI should decide things. Find out which school of ethics you actually argue from.",
+  description: DESCRIPTION,
+  // opengraph-image.tsx supplies the image itself; these carry the rest of
+  // the card so sophecs.com previews properly when the bare domain is shared.
+  openGraph: {
+    title: "Sophecs",
+    description: DESCRIPTION,
+    url: "https://sophecs.com",
+    siteName: "Sophecs",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image", title: "Sophecs", description: DESCRIPTION },
 };
 
 // No cookies() call here on purpose — reading request cookies in the root

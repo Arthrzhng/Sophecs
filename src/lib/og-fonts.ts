@@ -20,3 +20,12 @@ export function loadOgFonts(): Promise<Buffer[]> {
   );
   return cached;
 }
+
+let serifCached: Promise<Buffer> | undefined;
+
+// The icon routes draw one letter, so they load Spectral alone rather than
+// all three faces. Lazy for the same reason as above.
+export function loadSerifFont(): Promise<Buffer> {
+  serifCached ??= readFile(join(process.cwd(), "src/assets/og-fonts", "spectral-500.ttf"));
+  return serifCached;
+}
