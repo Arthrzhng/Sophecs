@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { MicroLesson } from "./MicroLesson";
 import { PublishToggle } from "./PublishToggle";
 import { ShareRow } from "./ShareRow";
@@ -20,7 +21,20 @@ export interface VerdictData {
   weakest_move?: string;
   a_stronger_version_would?: string;
   verdict_line?: string;
+  // v2 onwards. Absent on verdicts judged under v1, which exist in
+  // production — every read of this is guarded.
+  unanswered_objection?: {
+    school: SchoolId;
+    claim: string;
+    why_it_stands: string;
+  } | null;
 }
+
+const SCHOOL_LABEL: Record<SchoolId, string> = {
+  stoicism: "Stoicism",
+  utilitarianism: "Utilitarianism",
+  "virtue-ethics": "Virtue Ethics",
+};
 
 function Bar({ label, value }: { label: string; value: number }) {
   return (
@@ -53,6 +67,7 @@ export function Verdict({
   afterLesson,
   showAfterLessonInitially,
   shareLine,
+  hasRevision,
 }: {
   debateId: string;
   topicSlug: string;
@@ -67,8 +82,10 @@ export function Verdict({
   afterLesson: MicroLessonContent | null;
   showAfterLessonInitially: boolean;
   shareLine: string;
+  hasRevision?: string | null;
 }) {
   const [showAfter, setShowAfter] = useState(showAfterLessonInitially);
+  const objection = verdict.rejected ? null : verdict.unanswered_objection ?? null;
 
   // elo_changed fires once, from ArgumentEditor right after judging — not
   // here, since this component also renders on every later revisit of the
@@ -78,6 +95,16 @@ export function Verdict({
       name: "verdict_viewed",
       props: { debate_id: debateId, score: verdict.score ?? 0, is_owner: isOwner, rejected: verdict.rejected },
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (objection) {
+      track({
+        name: "objection_viewed",
+        props: { debate_id: debateId, rival_school: objection.school, is_owner: isOwner },
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -114,7 +141,54 @@ export function Verdict({
         <Bar label="Fidelity" value={verdict.fidelity ?? 0} />
         <Bar label="Rigor" value={verdict.rigor ?? 0} />
         <Bar label="Engagement" value={verdict.engagement ?? 0} />
+        <Link
+          href="/debate/rubric"
+          className="inline-block font-sans text-xs text-ink-soft hover:text-ink underline underline-offset-4"
+        >
+          How this was judged
+        </Link>
       </div>
+
+      {objection && (
+        <div className="mt-10 border-t border-rule pt-8 max-w-[55ch]">
+          <p className={`eyebrow mb-2 ${SCHOOL_TEXT_CLASS[objection.school]}`}>
+            Objection · {SCHOOL_LABEL[objection.school]}
+          </p>
+          <p className="font-sans text-xs text-ink-mid mb-3">The objection you left standing</p>
+          <p className="font-serif text-lg leading-relaxed">{objection.claim}</p>
+          <p className="mt-3 font-sans text-sm text-ink-mid leading-relaxed">
+            {objection.why_it_stands}
+          </p>
+
+          {isOwner && (
+            <div className="mt-6 flex flex-wrap items-center gap-6">
+              {hasRevision ? (
+                <Link
+                  href={`/debate/${topicSlug}/${hasRevision}`}
+                  className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"
+                >
+                  Answered — read the revision
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href={`/debate/${topicSlug}/${debateId}/revise`}
+                    onClick={() =>
+                      track({ name: "objection_answer_started", props: { debate_id: debateId } })
+                    }
+                    className="inline-block bg-ink text-surface rounded-md px-6 py-3 text-base font-medium hover:opacity-85"
+                  >
+                    Answer it
+                  </Link>
+                  <span className="text-sm text-ink-soft">
+                    Later — it will wait on your profile
+                  </span>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <p className="mt-8 font-serif text-xl leading-snug max-w-[40ch]">{verdict.verdict_line}</p>
 

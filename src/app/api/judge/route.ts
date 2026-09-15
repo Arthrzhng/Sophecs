@@ -166,6 +166,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, debateId });
   }
 
+  // The objection has to come from a rival school: zod can see the shape but
+  // not the school this argument was assigned, so the check lives here. An
+  // objection in the arguer's own voice can't be revised against, which is
+  // the entire point of naming one. Treated as a validation failure — same
+  // path as a malformed response, so the argument survives and is retryable
+  // rather than the user getting an unusable verdict. Observed in the golden
+  // set on arguments that reason from a different school than the one
+  // assigned; see docs/decisions.md.
+  if (verdict.unanswered_objection.school === school) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error(
+        `[judge] objection drawn from the argued school (${school}); rejecting verdict`
+      );
+    }
+    return NextResponse.json(
+      { ok: false, error: "Judging failed. Your argument is saved. Try again." },
+      { status: 502 }
+    );
+  }
+
   const eloBefore = Number(profile.elo ?? 1200);
   const { eloAfter } = soloElo(eloBefore, Number(topic.par_elo), verdict.score);
 

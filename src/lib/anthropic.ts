@@ -8,8 +8,8 @@ import { VerdictSchema, PROMPT_VERSION, type ModelVerdict } from "@/lib/judge/sc
 import { FIDELITY_CRITERIA } from "@/lib/judge/rubric";
 import type { SchoolId } from "@/lib/types";
 
-// COST: model=claude-sonnet-5 | trigger=debate submission | est_in=1600 est_out=500
-// est_usd_per_call=0.0082 | cap=5/user/day | kill_switch=KILL_SWITCH_JUDGE | logged_to=ai_calls
+// COST: model=claude-sonnet-5 | trigger=debate submission | est_in=1700 est_out=650
+// est_usd_per_call=0.0098 | cap=5/user/day | kill_switch=KILL_SWITCH_JUDGE | logged_to=ai_calls
 export const MODEL = "claude-sonnet-5";
 const INPUT_COST_PER_TOKEN = 2 / 1_000_000;
 const OUTPUT_COST_PER_TOKEN = 10 / 1_000_000;
@@ -21,7 +21,10 @@ function getClient(): Anthropic {
 }
 
 // Read once at module scope, not per call.
-const promptTemplate = readFileSync(join(process.cwd(), "content/prompts/judge.v1.md"), "utf-8");
+const promptTemplate = readFileSync(
+  join(process.cwd(), `content/prompts/judge.${PROMPT_VERSION}.md`),
+  "utf-8"
+);
 
 // Carries cost/latency even on failure — the tokens were still billed by
 // Anthropic even if the response didn't parse, and "every call is logged,
@@ -65,7 +68,7 @@ export async function callJudgeModel(
   const start = Date.now();
   const response = await getClient().messages.create({
     model: MODEL,
-    max_tokens: 700,
+    max_tokens: 850,
     thinking: { type: "disabled" },
     system,
     messages: [{ role: "user", content: userTurn }],
@@ -99,7 +102,14 @@ export async function callJudgeModel(
 
   const result = VerdictSchema.safeParse(parsed);
   if (!result.success) {
-    throw new JudgeValidationError(result.error.message, costUsd, latencyMs);
+    // Name the offending field rather than dumping the whole zod issue
+    // array. Word-cap breaches are the common failure here, and the raw
+    // message is a multi-line JSON blob that tells neither the golden-set
+    // table nor a production log which cap was missed.
+    const summary = result.error.issues
+      .map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`)
+      .join("; ");
+    throw new JudgeValidationError(summary, costUsd, latencyMs);
   }
 
   return { verdict: result.data, latencyMs, costUsd };
@@ -121,6 +131,7 @@ export async function logAiCall(params: {
     cost_usd: params.costUsd,
     latency_ms: params.latencyMs,
     debate_id: params.debateId,
+    prompt_version: PROMPT_VERSION,
   });
   // "Every call is logged, no exceptions" only holds if a failed log write
   // is at least visible. Found by the golden set silently showing 0 rows

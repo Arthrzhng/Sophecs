@@ -103,6 +103,14 @@ export type AnalyticsEvent =
   | {
       name: "challenge_completed";
       props: { challenge_id: string; winner_school: SchoolId | "draw" };
-    };
+    }
+
+  // --- Phase 3 Task 1: the objection left standing ---
+  | {
+      name: "objection_viewed";
+      props: { debate_id: string; rival_school: SchoolId; is_owner: boolean };
+    }
+  | { name: "objection_answer_started"; props: { debate_id: string } }
+  | { name: "rubric_viewed"; props: Record<string, never> };
 
 export type AnalyticsEventName = AnalyticsEvent["name"];

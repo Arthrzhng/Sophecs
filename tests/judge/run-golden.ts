@@ -20,6 +20,11 @@ interface GoldenCase {
   argument: string;
   expected_score_band: [number, number];
   expected_fidelity_band: [number, number];
+  // v2: the schools whose objection would be a legitimate one to raise
+  // against this argument — always the two the argument was not written
+  // from. A set rather than a single value on purpose: either rival is a
+  // defensible pick, so pinning one would fail the run on a coin flip.
+  expected_objection_school: SchoolId[];
 }
 
 function loadCases(): GoldenCase[] {
@@ -44,6 +49,9 @@ async function main() {
     fidelityBand: string;
     fidelity: number | string;
     fidelityPass: boolean;
+    objection: string;
+    objectionPass: boolean;
+    note: string;
   }[] = [];
 
   let anyFail = false;
@@ -70,8 +78,11 @@ async function main() {
         score: "error",
         scorePass: false,
         fidelityBand: c.expected_fidelity_band.join("-"),
-        fidelity: err instanceof Error ? err.message.slice(0, 40) : "error",
+        fidelity: "-",
         fidelityPass: false,
+        objection: "-",
+        objectionPass: false,
+        note: err instanceof Error ? err.message : "error",
       });
       anyFail = true;
       continue;
@@ -89,6 +100,9 @@ async function main() {
         fidelityBand: c.expected_fidelity_band.join("-"),
         fidelity: "rejected",
         fidelityPass: false,
+        objection: "-",
+        objectionPass: false,
+        note: "model rejected the submission",
       });
       anyFail = true;
       continue;
@@ -96,7 +110,15 @@ async function main() {
 
     const scorePass = inBand(verdict.score, c.expected_score_band);
     const fidelityPass = inBand(verdict.fidelity, c.expected_fidelity_band);
-    if (!scorePass || !fidelityPass) anyFail = true;
+
+    // The objection must come from a rival school. Drawing it from the
+    // school the argument was written from would make it unanswerable by
+    // revision, which is the whole point of naming it.
+    const objectionSchool = verdict.unanswered_objection.school;
+    const objectionPass =
+      objectionSchool !== c.school && c.expected_objection_school.includes(objectionSchool);
+
+    if (!scorePass || !fidelityPass || !objectionPass) anyFail = true;
 
     rows.push({
       name: c.name,
@@ -106,6 +128,9 @@ async function main() {
       fidelityBand: c.expected_fidelity_band.join("-"),
       fidelity: verdict.fidelity,
       fidelityPass,
+      objection: objectionSchool,
+      objectionPass,
+      note: objectionPass ? "" : `objection drawn from ${objectionSchool} (argued: ${c.school})`,
     });
   }
 
@@ -116,8 +141,16 @@ async function main() {
       score_ok: r.scorePass ? "✓" : "✗",
       "fidelity (band)": `${r.fidelity} (${r.fidelityBand})`,
       fidelity_ok: r.fidelityPass ? "✓" : "✗",
+      objection: r.objection,
+      obj_ok: r.objectionPass ? "✓" : "✗",
     }))
   );
+
+  // Outside the table: console.table truncates, and a validation failure's
+  // whole value is in knowing which field breached its cap.
+  for (const r of rows.filter((row) => row.note)) {
+    console.log(`  ${r.name}: ${r.note}`);
+  }
 
   if (anyFail) {
     console.error("One or more golden cases fell outside its expected band.");

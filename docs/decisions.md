@@ -321,3 +321,31 @@ The spec named three. A case-insensitive grep found four more that mattered: the
 ## `school-quotes.ts` is gone
 
 Its stated justification — that the image routes run on the edge and cannot use `fs` — stopped being true when those routes moved to the Node runtime to get under Vercel Hobby's Edge bundle limit. Both consumers now call `getSchool()`, so `content/schools/*.md` is the single source of truth for a school's quote and attribution, and editing a quote can no longer leave the cards silently showing the old one.
+
+---
+
+# Phase 3
+
+Brief pasted by Arthur on 2026-09-15 (nine tasks). Same rules as Phase 2: restate each task, log every deviation here.
+
+## Task 1: judge v2 — the objection left standing
+
+### `prompt_version` went on `ai_calls`, and the migrations renumbered
+
+The brief's acceptance asks that "`ai_calls` rows show `prompt_version = 'v2'`", but `ai_calls` had no such column — the stamp lived on `debates.prompt_version`. Verifying against `debates` would have needed no migration; instead `0008_ai_calls_prompt_version.sql` adds it to the ledger, because the ledger is the only place that records calls whose response *failed validation* and so never produced a verdict row to stamp. Those are exactly the calls worth slicing by version when a prompt bump raises `max_tokens`. Nullable with no default: rows written before the migration have no known version, and backfilling `'v1'` would assert something never recorded.
+
+This takes `0008`, so the brief's later migrations each shift up one — revisions become `0009`, `reading_responses` `0010`, counterpart `0011`, classes `0012`. Numbers are a sequence, not a contract.
+
+### Two real prompt bugs the golden set caught
+
+The v1 baseline, run before touching anything, was **4/6** — `util-wrong-school` and `virtue-wrong-school` both failed zod. The harness reported this as a truncated JSON blob stuffed into the fidelity column, which named neither the case's problem nor the field. Fixed first: `callJudgeModel` now summarises zod issues as `path: message`, and the runner prints failures beneath the table instead of inside it. That one change is what made the next two findings visible at all.
+
+**Bug 1 — wrong-school arguments were being rejected.** On the second v2 run, `util-wrong-school` came back `rejected` rather than scored. A wrong-school argument *is* a genuine attempt to defend the motion; it is unfaithful, which is precisely what the fidelity score measures. Rejecting it discards the fidelity signal and leaves the user with no verdict at all. v2 now says so explicitly: rejection is for text that is not an attempt to argue the motion, and "when in doubt, score it rather than reject it — a score with a low fidelity mark tells the student something; a rejection tells them nothing." The case has scored normally on every run since.
+
+**Bug 2 — the objection was drawn from the argued school.** `util-wrong-school` twice named *utilitarianism* as the rival, which is the school it was assigned. The model is not being stupid here: that fixture is assigned utilitarianism but reasons like a Stoic, so the genuinely strongest objection really is utilitarianism's ("you never weighed consequences"). It is the product rule that is awkward on that case, because an objection in your own school's voice cannot be revised against — and revising against it is the entire point of naming it. Strengthening the prompt twice did not fix it, so per the brief's own instruction ("validate in the route") `/api/judge` now rejects such a verdict as a validation failure: the argument survives, the row stays `verdict null`, the user retries. This concentrates in the deliberately adversarial `*-wrong-school` fixtures; across every run the four normal cases drew from a rival every time.
+
+### The determinism criterion cannot be met as written
+
+The brief requires two consecutive v2 runs with no case changing band. Five runs say that is not achievable, and the reason is structural rather than fixable by prompt work: `claude-sonnet-5` rejects `temperature`, so sampling cannot be pinned, and two fixtures sit on band edges. `stoic-strong` returned fidelity 7, 8, 8 and scores 62, 72, 68 across runs — its band is 8-10, so it fails roughly half the time on noise alone. Its score band was already widened once (70-95 → 60-95) for exactly this reason.
+
+Not resolved unilaterally, because widening a band to make a test pass is the kind of change that should be visible: the options are to widen `stoic-strong`'s fidelity band to 7-10 (keeps the harness meaningful — a drop to 5 still fails — at the cost of tolerating one point of drift), or to sample each case several times and compare medians (costs 3× per run, ~18p, and actually measures the distribution). Recommendation is the second; flagged to Arthur rather than chosen here.
