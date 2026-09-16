@@ -49,13 +49,24 @@ export interface JudgeCallResult {
 // (via judgeDebate below) and tests/judge/run-golden.ts, which calls this
 // function directly rather than going through HTTP — see the Phase 2
 // checklist's `grep -rn "anthropic"` requirement.
+export interface RevisionContext {
+  originalArgument: string;
+  objectionClaim: string;
+}
+
 export async function callJudgeModel(
   motion: string,
   school: SchoolId,
-  argument: string
+  argument: string,
+  revisionOf?: RevisionContext
 ): Promise<JudgeCallResult> {
   const system = promptTemplate.replace("{{RUBRIC}}", FIDELITY_CRITERIA[school]);
-  const userTurn = `Motion: ${motion}\nSchool: ${school}\n\n<argument>\n${argument}\n</argument>\n\nRespond with JSON only, matching the schema in your instructions.`;
+  // The v2 prompt keys its revision instructions off the presence of these
+  // two tags, so they are only emitted for an actual revision.
+  const revisionBlock = revisionOf
+    ? `\n<original_argument>\n${revisionOf.originalArgument}\n</original_argument>\n\n<objection>\n${revisionOf.objectionClaim}\n</objection>\n`
+    : "";
+  const userTurn = `Motion: ${motion}\nSchool: ${school}\n${revisionBlock}\n<argument>\n${argument}\n</argument>\n\nRespond with JSON only, matching the schema in your instructions.`;
 
   // No temperature: claude-sonnet-5 rejects it outright ("temperature is
   // deprecated for this model", confirmed against the real API) — the
@@ -153,10 +164,16 @@ export async function judgeDebate(params: {
   userId: string;
   debateId: string;
   kind?: "judge" | "judge_allowlist";
+  revisionOf?: RevisionContext;
 }): Promise<JudgeCallResult> {
   const kind = params.kind ?? "judge";
   try {
-    const result = await callJudgeModel(params.motion, params.school, params.argument);
+    const result = await callJudgeModel(
+      params.motion,
+      params.school,
+      params.argument,
+      params.revisionOf
+    );
     await logAiCall({
       userId: params.userId,
       debateId: params.debateId,

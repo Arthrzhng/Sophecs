@@ -360,3 +360,49 @@ Two behaviours are now quantified rather than binary, which is the other thing m
 ### The route degrades rather than discards
 
 That last measurement changed the route guard. Hard-failing the whole judgement costs the user their score, all three criteria and every written note, in exchange for removing one unusable field. `/api/judge` now drops `unanswered_objection` when it names the argued school and stores the rest. The user gets their verdict and simply has no objection to revise against — which is the right outcome anyway for an argument whose actual problem is that it never argued its own school. The golden runner matches: a minority occurrence is reported but no longer fails the run, since production handles it; a majority still fails, because that would mean the prompt had stopped producing rival objections at all.
+
+## Task 2: the revision loop
+
+### A revision moves nothing
+
+No ELO, no streak, no `par_elo`, no topic lock. The brief only asked for the first two; the other two follow from the same reasoning and were caught while reading the route.
+
+- **ELO and streak.** A revision is the second half of one attempt. Paying rating for it would make "write one good argument, then rewrite it" strictly better than arguing a second motion, which is the opposite of what the loop is for. `elo_before` and `elo_after` are both pinned to the parent's `elo_after`, so the verdict page shows a delta of zero rather than a null.
+- **`par_elo`.** The rolling mean now filters `kind = 'original'`, and the recompute is skipped entirely on a revision. A revision's `elo_before` is a copy of its parent's `elo_after`, so counting it would weight one participant twice in the window that decides how hard every future attempt on that motion is scored.
+- **The seven-day topic lock.** Asked for, and it needed a second change to work: the lock query now also filters `kind = 'original'`. Without it a revision would take out a seven-day lock on its own topic the moment it landed, so the revision would block the retry the lock exists to pace.
+
+### Openness is computed, never stored
+
+An open objection is: a judged, non-rejected original, whose verdict names an `unanswered_objection`, with no revision row. A denormalised `objection_open` column would need writing from three places (the judge, the revision, any deletion) and would be wrong the moment one of them changed. Two indexed queries per `/me` render is the cheaper mistake.
+
+The v1 verdicts already in production carry no `unanswered_objection`, so they simply never become open objections. No backfill, no migration guard, no special case in the UI.
+
+### `already_revised` is enforced by the index, not the check
+
+`/api/judge` reads for an existing child before inserting, but two concurrent submissions both pass that read. The partial unique index from `0009` (`where parent_debate_id is not null`) is what actually holds, and the loser surfaces as an insert error mapped to `paused("already_revised")` — the same state the user would have seen from the read. The read is there to save a model call in the common case, not to guarantee anything.
+
+The insert path also had to be forced: `/api/judge` reuses an existing unjudged row when one is found within the lock window. `recent` is now always null on a revision, so a revision can never overwrite an abandoned unjudged original that happened to share the topic.
+
+### A revision cannot itself be revised
+
+The judge still returns an `unanswered_objection` for the revision — that is the prompt's instruction and it is the right one, since the student should know what is still standing. But `/revise` requires `kind = 'original'`, so the verdict page shows that objection without an "Answer it" button and says so in a line: one revision per argument, take this one into your next motion. Rendering the button would have produced a live 404.
+
+### The revision share line is built in code
+
+The three `verdict_share_line` values live in the school frontmatter, one per school. A revision line is the same sentence whatever school you argued — the interesting part is the movement and the rival school's name, both of which come from the verdict — so adding a fourth per-school field would have been three more strings to write for no variation. It falls back to the ordinary verdict line when the objection is still standing, or when the parent is a v1 verdict with no objection at all.
+
+### The events fire from the client, not the verdict page
+
+`revision_judged` and `objection_resolved` are once-per-judgement facts, and the verdict page re-renders on every later visit of the same URL. They fire from `ArgumentEditor` off the judge response, exactly where `elo_changed` already fires, and are suppressed for allowlisted reviewers along with it. `objection_resolved` fires only when `objection_answered` is true: a revision that failed to answer leaves the objection standing, and counting it as resolved would make the metric measure attempts rather than outcomes.
+
+### Debate history nests rather than lists
+
+`/me` now queries the last five **originals** and looks their revisions up separately, rendering each under its parent. Listed flat, a revision ate one of the five slots and appeared as a second row with the same topic slug and a different score, with nothing to say which came first.
+
+### The retention funnel was duplicated, not edited
+
+A revision is a genuine return, but it is not a second debate, so overwriting funnel #3 would have silently changed what the Phase 2 number meant. The original stands; the variant sits beside it, with step two backed by a new PostHog **action** (`Argument submitted (debate or revision)`, id 158532) that ORs `debate_submitted` and `revision_submitted` — a funnel step takes one series, so the union has to be an action rather than two events.
+
+- [Second debate within 7 days](https://eu.posthog.com/project/264751/insights/7dG4OHVK) — unchanged
+- [Second debate or revision within 7 days](https://eu.posthog.com/project/264751/insights/4Hv7YA9T) — new
+- [Argument submitted (debate or revision)](https://eu.posthog.com/project/264751/data-management/actions/158532) — the action behind step two

@@ -17,6 +17,10 @@ export interface TopicFile {
 
 const TOPICS_DIR = path.join(process.cwd(), "content", "topics");
 
+// getWeeklyMotion lives in ./weekly-motion — pure, and importable by a unit
+// test, which this module's `server-only` import would otherwise prevent.
+export { getWeeklyMotion, isoWeekNumber } from "./weekly-motion";
+
 // Used only by scripts/seed-topics.ts — the running app reads debate_topics
 // from the database, not markdown directly, so content edits don't need a
 // deploy. Tolerates a missing/empty directory since Arthur hasn't written

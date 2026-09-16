@@ -4,6 +4,9 @@ import { createClient as createSupabaseServerClient } from "@/lib/supabase/serve
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getEloPercentile } from "@/lib/percentile";
 import { getPendingChallenges } from "@/lib/challenge";
+import { getOpenObjections, type OpenObjection } from "@/lib/objections";
+import { getWeeklyMotion } from "@/lib/weekly-motion";
+import { OpenObjections } from "@/components/me/OpenObjections";
 import { DisplayNameForm } from "@/components/me/DisplayNameForm";
 import { WelcomeTracker } from "@/components/me/WelcomeTracker";
 import { MeViewTracker } from "@/components/me/MeViewTracker";
@@ -28,6 +31,8 @@ interface DebateHistoryRow {
   score: number | null;
   rejected: boolean;
   created_at: string;
+  kind: "original" | "revision";
+  parent_debate_id: string | null;
 }
 
 export default async function MePage({
@@ -64,6 +69,10 @@ export default async function MePage({
   let percentile = 0;
   let pendingChallenges: Awaited<ReturnType<typeof getPendingChallenges>> = [];
   let debateHistory: DebateHistoryRow[] = [];
+  let revisionByParent = new Map<string, DebateHistoryRow>();
+  let openObjections: OpenObjection[] = [];
+  let weeklyMotion: { slug: string; title: string; sort: number } | null = null;
+  let hasAnyDebate = false;
 
   if (isAdminConfigured()) {
     const admin = createAdminClient();
@@ -79,25 +88,59 @@ export default async function MePage({
       claimedResultId = latest?.id ?? "";
     }
 
-    const [percentileValue, pending, history] = await Promise.all([
+    const [percentileValue, pending, history, objectionRows, activeTopics] = await Promise.all([
       getEloPercentile(user.id, elo),
       getPendingChallenges(admin, user.id),
+      // Originals only: each revision is looked up separately and rendered
+      // underneath its parent, so a revision never eats one of the five
+      // slots and never appears detached from the argument it answers.
       admin
         .from("debates")
-        .select("id, topic_slug, score, rejected, created_at")
+        .select("id, topic_slug, score, rejected, created_at, kind, parent_debate_id")
         .eq("user_id", user.id)
+        .eq("kind", "original")
         .order("created_at", { ascending: false })
         .limit(5),
+      getOpenObjections(admin, user.id),
+      admin
+        .from("debate_topics")
+        .select("slug, title, sort")
+        .eq("active", true)
+        .order("sort", { ascending: true }),
     ]);
     percentile = percentileValue;
     pendingChallenges = pending;
     debateHistory = (history.data as DebateHistoryRow[] | null) ?? [];
+    openObjections = objectionRows;
+    hasAnyDebate = debateHistory.length > 0;
+
+    if (debateHistory.length > 0) {
+      const { data: revisions } = await admin
+        .from("debates")
+        .select("id, topic_slug, score, rejected, created_at, kind, parent_debate_id")
+        .eq("user_id", user.id)
+        .eq("kind", "revision")
+        .in(
+          "parent_debate_id",
+          debateHistory.map((d) => d.id)
+        );
+      revisionByParent = new Map(
+        ((revisions as DebateHistoryRow[] | null) ?? []).map((r) => [r.parent_debate_id!, r])
+      );
+    }
+    weeklyMotion = getWeeklyMotion(
+      (activeTopics.data ?? []).map((t) => ({
+        slug: t.slug as string,
+        title: t.title as string,
+        sort: Number(t.sort),
+      }))
+    );
   }
 
   return (
     <main className="flex-1">
       <div className="mx-auto max-w-2xl px-6 pt-14 pb-24">
-        <MeViewTracker />
+        <MeViewTracker openObjections={openObjections.length} />
         <WelcomeTracker
           active={welcome === "1"}
           userId={user.id}
@@ -127,8 +170,21 @@ export default async function MePage({
           </p>
         )}
 
+        {/* Leads the page: the open objection is the reason to come back,
+            so it sits above the rating and the streak. */}
         {school && (
-          <div className="mt-8 grid grid-cols-2 gap-6">
+          <div className="mt-10 border-t border-rule pt-8">
+            <OpenObjections
+              objections={openObjections}
+              weeklyMotion={weeklyMotion}
+              hasAnyDebate={hasAnyDebate}
+              school={school}
+            />
+          </div>
+        )}
+
+        {school && (
+          <div className="mt-10 border-t border-rule pt-8 grid grid-cols-2 gap-6">
             <EloBlock elo={elo} percentile={percentile} />
             <StreakBlock streak={streak} />
           </div>
@@ -142,20 +198,40 @@ export default async function MePage({
         {debateHistory.length > 0 && (
           <div className="mt-10 border-t border-rule pt-8">
             <p className="eyebrow text-ink-soft mb-4">Debate history</p>
-            <ul className="space-y-2">
-              {debateHistory.map((d) => (
-                <li key={d.id} className="flex items-center justify-between text-sm">
-                  <Link
-                    href={`/debate/${d.topic_slug}/${d.id}`}
-                    className="text-ink hover:underline underline-offset-4"
-                  >
-                    {d.topic_slug}
-                  </Link>
-                  <span className="font-mono text-xs text-ink-soft">
-                    {d.rejected ? "not judged" : d.score}
-                  </span>
-                </li>
-              ))}
+            <ul className="space-y-3">
+              {debateHistory.map((d) => {
+                const revision = revisionByParent.get(d.id);
+                return (
+                  <li key={d.id}>
+                    <div className="flex items-center justify-between text-sm">
+                      <Link
+                        href={`/debate/${d.topic_slug}/${d.id}`}
+                        className="text-ink hover:underline underline-offset-4"
+                      >
+                        {d.topic_slug}
+                      </Link>
+                      <span className="font-mono text-xs text-ink-soft">
+                        {d.rejected ? "not judged" : d.score}
+                      </span>
+                    </div>
+                    {/* Nested, not listed alongside: a revision is the second
+                        half of one attempt, and reads as nonsense on its own. */}
+                    {revision && (
+                      <div className="mt-1 ml-4 border-l border-rule pl-3 flex items-center justify-between text-sm">
+                        <Link
+                          href={`/debate/${revision.topic_slug}/${revision.id}`}
+                          className="text-ink-mid hover:text-ink hover:underline underline-offset-4"
+                        >
+                          Revision
+                        </Link>
+                        <span className="font-mono text-xs text-ink-soft">
+                          {revision.rejected ? "not judged" : revision.score}
+                        </span>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}

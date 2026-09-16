@@ -23,6 +23,13 @@ interface JudgeResponse {
   eloAfter?: number;
   streak?: { value: number; change: "extended" | "reset" | "unchanged" } | null;
   challenge?: { completed: boolean; winnerSchool?: string } | null;
+  revision?: {
+    parentDebateId: string;
+    objectionAnswered: boolean;
+    scoreDelta: number;
+    fidelityDelta: number;
+    daysOpen: number;
+  } | null;
 }
 
 export function ArgumentEditor({
@@ -32,6 +39,9 @@ export function ArgumentEditor({
   userId,
   challengeId,
   isAllowlisted,
+  mode = "original",
+  parentDebateId,
+  initialArgument,
 }: {
   topicSlug: string;
   motion: string;
@@ -39,10 +49,16 @@ export function ArgumentEditor({
   userId: string;
   challengeId?: string;
   isAllowlisted?: boolean;
+  mode?: "original" | "revision";
+  parentDebateId?: string;
+  initialArgument?: string;
 }) {
   const router = useRouter();
-  const draftKey = `draft:${topicSlug}:${userId}`;
-  const [argument, setArgument] = useState("");
+  const isRevision = mode === "revision";
+  const draftKey = isRevision
+    ? `draft:revision:${parentDebateId}:${userId}`
+    : `draft:${topicSlug}:${userId}`;
+  const [argument, setArgument] = useState(isRevision ? initialArgument ?? "" : "");
   const [status, setStatus] = useState<Status>({ kind: "editing" });
   const restoredRef = useRef(false);
 
@@ -85,10 +101,21 @@ export function ArgumentEditor({
     // No analytics for an allowlisted reviewer's own judge calls — the
     // pre-launch review pass shouldn't pollute the real usage funnels.
     if (!isAllowlisted) {
-      track({
-        name: "debate_submitted",
-        props: { topic_slug: topicSlug, word_count: words, from_challenge: Boolean(challengeId) },
-      });
+      if (isRevision) {
+        track({
+          name: "revision_submitted",
+          props: {
+            debate_id: parentDebateId ?? "",
+            parent_debate_id: parentDebateId ?? "",
+            word_count: words,
+          },
+        });
+      } else {
+        track({
+          name: "debate_submitted",
+          props: { topic_slug: topicSlug, word_count: words, from_challenge: Boolean(challengeId) },
+        });
+      }
     }
 
     let response: JudgeResponse;
@@ -96,7 +123,12 @@ export function ArgumentEditor({
       const res = await fetch("/api/judge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topicSlug, argument, challengeId }),
+        body: JSON.stringify({
+          topicSlug,
+          argument,
+          challengeId: isRevision ? undefined : challengeId,
+          parentDebateId: isRevision ? parentDebateId : undefined,
+        }),
       });
       response = await res.json();
     } catch {
@@ -131,6 +163,28 @@ export function ArgumentEditor({
             : { name: "streak_reset", props: { previous: response.streak.value } }
         );
       }
+      if (response.revision) {
+        track({
+          name: "revision_judged",
+          props: {
+            debate_id: response.debateId,
+            objection_answered: response.revision.objectionAnswered,
+            score_delta: response.revision.scoreDelta,
+            fidelity_delta: response.revision.fidelityDelta,
+          },
+        });
+        // Resolved means the objection no longer stands — a revision that
+        // failed to answer it leaves it open, so no event.
+        if (response.revision.objectionAnswered) {
+          track({
+            name: "objection_resolved",
+            props: {
+              parent_debate_id: response.revision.parentDebateId,
+              days_open: response.revision.daysOpen,
+            },
+          });
+        }
+      }
       if (challengeId && response.challenge?.completed) {
         track({
           name: "challenge_completed",
@@ -162,7 +216,9 @@ export function ArgumentEditor({
     <div>
       <p className="font-serif text-xl font-medium">{motion}</p>
       <p className="mt-2 font-sans text-sm text-ink-mid">
-        Defend the {SCHOOL_COLORS[school].name} position.
+        {isRevision
+          ? "Answer the objection inside your argument. Cut what no longer earns its place."
+          : `Defend the ${SCHOOL_COLORS[school].name} position.`}
       </p>
 
       <textarea
@@ -184,7 +240,9 @@ export function ArgumentEditor({
         )}
         {status.kind === "paused" && (
           <span className="font-mono text-xs text-ink-mid">
-            Judging is paused. Your argument is saved and will be judged when it resumes.
+            {status.reason === "already_revised"
+              ? "You've already revised this argument. Start a new motion instead."
+              : "Judging is paused. Your argument is saved and will be judged when it resumes."}
           </span>
         )}
       </div>
@@ -196,7 +254,7 @@ export function ArgumentEditor({
           disabled={!canSubmit}
           className="min-h-11 px-6 bg-ink text-surface rounded-md text-base font-medium hover:opacity-85 disabled:opacity-40"
         >
-          Submit for judgment
+          {isRevision ? "Submit revision" : "Submit for judgment"}
         </button>
       </div>
     </div>

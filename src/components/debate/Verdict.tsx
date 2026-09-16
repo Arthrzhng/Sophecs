@@ -28,6 +28,21 @@ export interface VerdictData {
     claim: string;
     why_it_stands: string;
   } | null;
+  // Only ever set on a revision — the judge is shown the original and the
+  // objection, and says whether the objection was actually engaged.
+  objection_answered?: boolean;
+  improvement_note?: string;
+}
+
+// The parent's four marks, so a revision can be read against its original.
+export interface RevisionComparison {
+  parentDebateId: string;
+  first: {
+    score: number | null;
+    fidelity: number | null;
+    rigor: number | null;
+    engagement: number | null;
+  };
 }
 
 const SCHOOL_LABEL: Record<SchoolId, string> = {
@@ -53,6 +68,35 @@ function Bar({ label, value }: { label: string; value: number }) {
   );
 }
 
+// One row of the revision comparison. Deliberately monospaced and
+// uncoloured: a delta is a number to read, not a verdict to feel.
+function DeltaRow({
+  label,
+  before,
+  after,
+}: {
+  label: string;
+  before: number | null;
+  after: number | null;
+}) {
+  const delta = before != null && after != null ? after - before : null;
+  const fmt = (n: number | null) => (n == null ? "—" : Number.isInteger(n) ? String(n) : n.toFixed(1));
+  return (
+    <div className="flex items-baseline justify-between gap-4">
+      <span className="font-sans text-xs text-ink-mid">{label}</span>
+      <span className="font-mono text-xs text-ink-soft tabular-nums">
+        {fmt(before)} → <span className="text-ink">{fmt(after)}</span>
+        {delta != null && (
+          <span className="ml-3 text-ink-mid">
+            {delta > 0 ? "+" : delta < 0 ? "−" : "±"}
+            {Math.abs(Number(delta.toFixed(1)))}
+          </span>
+        )}
+      </span>
+    </div>
+  );
+}
+
 export function Verdict({
   debateId,
   topicSlug,
@@ -68,6 +112,7 @@ export function Verdict({
   showAfterLessonInitially,
   shareLine,
   hasRevision,
+  comparison,
 }: {
   debateId: string;
   topicSlug: string;
@@ -83,6 +128,7 @@ export function Verdict({
   showAfterLessonInitially: boolean;
   shareLine: string;
   hasRevision?: string | null;
+  comparison?: RevisionComparison | null;
 }) {
   const [showAfter, setShowAfter] = useState(showAfterLessonInitially);
   const objection = verdict.rejected ? null : verdict.unanswered_objection ?? null;
@@ -160,7 +206,16 @@ export function Verdict({
             {objection.why_it_stands}
           </p>
 
-          {isOwner && (
+          {/* A revision can't itself be revised — one attempt per objection,
+              so the judge's new objection here is something to carry into the
+              next motion rather than a button. */}
+          {isOwner && comparison && (
+            <p className="mt-6 text-sm text-ink-soft max-w-[50ch]">
+              One revision per argument. Take this objection into your next motion.
+            </p>
+          )}
+
+          {isOwner && !comparison && (
             <div className="mt-6 flex flex-wrap items-center gap-6">
               {hasRevision ? (
                 <Link
@@ -231,6 +286,40 @@ export function Verdict({
               Read the objection again
             </button>
           )}
+        </div>
+      )}
+
+      {comparison && (
+        <div className="mt-10 border-t border-rule pt-8 max-w-sm">
+          <p className="eyebrow text-ink-soft mb-4">Compared with your first attempt</p>
+          <div className="space-y-2">
+            <DeltaRow label="Score" before={comparison.first.score} after={verdict.score} />
+            <DeltaRow label="Fidelity" before={comparison.first.fidelity} after={verdict.fidelity} />
+            <DeltaRow label="Rigor" before={comparison.first.rigor} after={verdict.rigor} />
+            <DeltaRow
+              label="Engagement"
+              before={comparison.first.engagement}
+              after={verdict.engagement}
+            />
+          </div>
+
+          {verdict.objection_answered != null && (
+            <p className="mt-6 font-sans text-sm text-ink">
+              {verdict.objection_answered ? "Objection answered" : "Objection still standing"}
+            </p>
+          )}
+          {verdict.improvement_note && (
+            <p className="mt-2 font-serif text-base leading-relaxed text-ink-mid max-w-[55ch]">
+              {verdict.improvement_note}
+            </p>
+          )}
+
+          <Link
+            href={`/debate/${topicSlug}/${comparison.parentDebateId}`}
+            className="mt-6 inline-block font-mono text-xs text-ink-mid hover:text-ink underline underline-offset-4"
+          >
+            Read the first attempt
+          </Link>
         </div>
       )}
 

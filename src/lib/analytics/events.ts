@@ -70,7 +70,7 @@ export type AnalyticsEvent =
   | { name: "signup_completed"; props: { method: "magic" | "google" } }
   | { name: "result_claimed"; props: { result_id: string; school: SchoolId } }
   | { name: "school_changed"; props: { from: SchoolId; to: SchoolId } } // wired in 2c
-  | { name: "me_viewed"; props: { pending_challenges: number } }
+  | { name: "me_viewed"; props: { pending_challenges: number; open_objections: number } }
 
   // --- Phase 2b: the debate ---
   | { name: "debate_list_viewed"; props: Record<string, never> }
@@ -83,7 +83,9 @@ export type AnalyticsEvent =
     }
   | {
       name: "judge_paused";
-      props: { reason: "kill_switch" | "budget" | "daily_cap" | "topic_lock" };
+      props: {
+        reason: "kill_switch" | "budget" | "daily_cap" | "topic_lock" | "already_revised";
+      };
     }
   | {
       name: "verdict_viewed";
@@ -111,6 +113,22 @@ export type AnalyticsEvent =
       props: { debate_id: string; rival_school: SchoolId; is_owner: boolean };
     }
   | { name: "objection_answer_started"; props: { debate_id: string } }
-  | { name: "rubric_viewed"; props: Record<string, never> };
+  | { name: "rubric_viewed"; props: Record<string, never> }
+
+  // --- Phase 3 Task 2: the revision loop ---
+  | {
+      name: "revision_submitted";
+      props: { debate_id: string; parent_debate_id: string; word_count: number };
+    }
+  | {
+      name: "revision_judged";
+      props: {
+        debate_id: string;
+        objection_answered: boolean;
+        score_delta: number;
+        fidelity_delta: number;
+      };
+    }
+  | { name: "objection_resolved"; props: { parent_debate_id: string; days_open: number } };
 
 export type AnalyticsEventName = AnalyticsEvent["name"];
