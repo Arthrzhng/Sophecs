@@ -174,16 +174,20 @@ export async function POST(request: Request) {
   // rather than the user getting an unusable verdict. Observed in the golden
   // set on arguments that reason from a different school than the one
   // assigned; see docs/decisions.md.
+  // Measured at roughly one sample in three on the deliberately
+  // wrong-school golden fixtures, and near zero on arguments that actually
+  // reason from their assigned school. Dropping the objection is better
+  // than discarding the judgement: the user keeps their score, the three
+  // criteria and every written note, and simply gets no objection to
+  // revise against — which is the right outcome anyway for an argument
+  // whose real problem is that it never argued its own school.
+  let storedVerdict: typeof verdict = verdict;
   if (verdict.unanswered_objection.school === school) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error(
-        `[judge] objection drawn from the argued school (${school}); rejecting verdict`
-      );
-    }
-    return NextResponse.json(
-      { ok: false, error: "Judging failed. Your argument is saved. Try again." },
-      { status: 502 }
+    console.warn(
+      `[judge] objection drawn from the argued school (${school}) on debate ${debateId}; dropping it`
     );
+    const { unanswered_objection: _dropped, ...rest } = verdict;
+    storedVerdict = rest as typeof verdict;
   }
 
   const eloBefore = Number(profile.elo ?? 1200);
@@ -192,7 +196,7 @@ export async function POST(request: Request) {
   await admin
     .from("debates")
     .update({
-      verdict: { ...verdict, prompt_version: PROMPT_VERSION },
+      verdict: { ...storedVerdict, prompt_version: PROMPT_VERSION },
       score: verdict.score,
       prompt_version: PROMPT_VERSION,
       elo_before: eloBefore,
