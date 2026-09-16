@@ -186,6 +186,7 @@ export default async function CounterpartPage({
             <TurnComposer
               exchangeId={id}
               seq={nextSeq}
+              userId={user.id}
               sourceLabel={sourceLabel}
               sourceText={sourceText}
             />

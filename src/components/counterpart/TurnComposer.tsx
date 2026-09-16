@@ -26,16 +26,20 @@ type Status =
 export function TurnComposer({
   exchangeId,
   seq,
+  userId,
   sourceLabel,
   sourceText,
 }: {
   exchangeId: string;
   seq: number;
+  userId: string;
   sourceLabel: string;
   sourceText: string;
 }) {
   const router = useRouter();
-  const draftKey = `draft:turn:${exchangeId}:${seq}`;
+  // Same rule as the other two editors: a draft belongs to one account on
+  // one device, never to whoever opens the browser next.
+  const draftKey = `draft:turn:${exchangeId}:${seq}:${userId}`;
   const [quote, setQuote] = useState("");
   const [body, setBody] = useState("");
   const [status, setStatus] = useState<Status>({ kind: "editing" });

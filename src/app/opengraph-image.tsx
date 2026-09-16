@@ -10,7 +10,7 @@ export const contentType = "image/png";
 // site rather than to any one school. The hairline below is the only place
 // on the site where all three school colours appear together — the muted
 // tokens, not the card surfaces, since these sit on paper.
-const SCHOOL_HAIRLINE = ["#3e5c4b", "#8a6320", "#7a3540"];
+const SCHOOL_HAIRLINE = ["#3e5c4b", "#87611f", "#7a3540"];
 
 export default async function SiteOgImage() {
   const [spectral, plexSans] = await loadOgFonts();
@@ -31,7 +31,7 @@ export default async function SiteOgImage() {
           fontFamily: "IBM Plex Sans",
         }}
       >
-        <div style={{ display: "flex", fontFamily: "Spectral", fontSize: 30, fontWeight: 600 }}>
+        <div style={{ display: "flex", fontFamily: "Spectral", fontSize: 30, fontWeight: 500 }}>
           Sophecs
         </div>
 

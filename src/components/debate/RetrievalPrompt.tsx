@@ -13,16 +13,21 @@ export function RetrievalPrompt({
   topicSlug,
   chunkIndex,
   prompt,
+  userId,
   initialValue,
   onSaved,
 }: {
   topicSlug: string;
   chunkIndex: number;
   prompt: string;
+  userId: string;
   initialValue?: string;
   onSaved: (value: string) => void;
 }) {
-  const draftKey = `draft:reading:${topicSlug}:${chunkIndex}`;
+  // Scoped by user, not just by topic and prompt: these are school
+  // computers, and two students answering the same prompt on the same
+  // browser must not see each other's notes come back.
+  const draftKey = `draft:reading:${topicSlug}:${chunkIndex}:${userId}`;
   const [value, setValue] = useState(initialValue ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);

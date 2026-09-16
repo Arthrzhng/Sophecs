@@ -658,3 +658,71 @@ Grepped the route for `score`, `elo`, `streak`, `argument`, `percentile` and `pa
 ### The N+1 the brief warned about, partly
 
 The brief asks for one query per class instead of 6 × N. `getCaseStates` is already batched across topics — two queries for all six motions — so a class is 2 × N, not 6 × N, and the N runs concurrently through `Promise.all`. Going further would mean rewriting `getCaseStates` to take a list of users, and its `read` rule needs per-user retrieval-response counts either way. At a class size of 30 that is 60 concurrent indexed lookups on a page a teacher opens occasionally. Left as is, and noted here rather than silently: if a class ever gets big enough for this to matter, the fix is a single grouped query per table.
+
+## Task 6: accessibility and performance
+
+Run last, deliberately: it audits what the other eight tasks built rather than being a task of its own.
+
+### Three real defects, found by measuring rather than by reading
+
+**1. `--color-utilitarian` missed AA by a hair.** `#8a6320` on `--color-paper` measures **4.43:1**; body text needs 4.5:1, and the school eyebrows it colours are 12px uppercase, so the large-text 3:1 allowance does not apply. Darkened to `#87611f` — **4.58:1** on paper, 5.34:1 on surface. The other two schools already cleared it (stoic 6.07, virtue 7.15 on paper). Computed, not eyeballed:
+
+| token | on paper | on surface |
+| --- | --- | --- |
+| ink | 14.45:1 | 16.85:1 |
+| ink-mid | 6.27:1 | 7.31:1 |
+| ink-soft | 4.97:1 | 5.80:1 |
+| stoic | 6.07:1 | 7.08:1 |
+| utilitarian | **4.58:1** (was 4.43) | 5.34:1 |
+| virtue | 7.15:1 | 8.34:1 |
+| oxblood | 9.93:1 | 11.58:1 |
+
+Card surfaces, which the brief asks for separately: stoicism **8.38:1**, utilitarianism **6.30:1**, virtue-ethics **9.69:1**, all ink `#faf8f2`. Two of the three are AAA.
+
+**2. `/quiz` shipped an empty `<main>`.** `QuizShell` called `useSearchParams()` during render, which opts the calling subtree out of the static prerender. The page was static in the build output and still painted nothing but the header until JS hydrated: FCP 0.8 s, **LCP 2.8 s, CLS 0.1** — the gap between the two, plus the shift when the question finally arrived.
+
+Neither value it read has anything to do with what renders: `c` is a challenge id for analytics and the pending result, `next` is set by `/auth/callback` and threaded through the same payload. Both now come from `window.location.search` in the mount effect. The first question is in the static HTML — `curl /quiz | main innerText` returns `1 / 10 A colleague takes credit for your work…`, 250 characters where there were none.
+
+Measured before and after, three runs each, Lighthouse mobile:
+
+| | perf | LCP | CLS |
+| --- | --- | --- | --- |
+| before | 92, 92, 92 | 2.7, 2.8, 2.8 s | 0.1 |
+| after | 97, 95, 98 | 2.5, 2.8, 2.0 s | **0** |
+
+CLS is gone outright. LCP improved but still sits around the 2.5 s line under Lighthouse's simulated slow-4G on a sandbox CPU; a real measurement against Vercel's CDN is the one that counts, and is listed below as not yet taken.
+
+**3. Two draft keys were not scoped by user.** `draft:reading:${topicSlug}:${chunkIndex}` and `draft:turn:${exchangeId}:${seq}` — on a shared school computer, the next student to open the same prompt would have been handed the previous one's notes. Both now carry the user id, matching the rule `ArgumentEditor` already followed. This is the kind of thing that only shows up when you list all three editors side by side and compare their keys, which is what an audit pass is for.
+
+### `prefers-reduced-motion` is now a blanket rule
+
+The reveal animation respected it; the `transition-colors` and `transition-opacity` scattered across buttons did not. Rather than chase them one at a time — and re-chase every one added later — the media query zeroes animation and transition durations globally. Forgetting one is a preference the user explicitly set being quietly ignored, which is the wrong default to leave lying around.
+
+### Fonts: one weight was dead, one was silently falling back
+
+`spectral-600.woff2` was declared and shipped, and nothing used it — `font-semibold` and `font-bold` have zero occurrences across the codebase. It became dead in Task 3, when the card wordmark moved from Spectral 600 to Plex Sans. Declaration and file both removed.
+
+The one remaining `fontWeight: 600` was in the site OG image, which registers only a 500 Spectral face with Satori — so it was silently falling back to 500 anyway. Now it asks for 500, which is what it was always getting. All faces remain Latin-subset with `display: swap`.
+
+### Numbers, and what is missing from them
+
+Lighthouse mobile, local production build, Chromium headless:
+
+| route | perf | a11y | LCP | CLS |
+| --- | --- | --- | --- | --- |
+| `/` | 98 | 100 | 2.3 s | 0 |
+| `/quiz` | 95–98 | 100 | 2.0–2.8 s | 0 |
+| `/lessons` | 95 | 100 | 2.7 s | 0 |
+| `/s/stoicism` | 95 | 100 | 2.7 s | 0 |
+| `/login` | 97 | 100 | 2.4 s | 0 |
+| `/debate/rubric` | 96 | 100 | 1.6 s | 0.03 |
+
+No failing accessibility audit on any measured route. No horizontal scroll at 375 px on `/`, `/quiz`, `/lessons`, `/lessons/[slug]`, `/debate/rubric`, `/s/[school]`, `/login` or the 404.
+
+**`/r/[id]`, `/debate/[slug]`, the verdict page, `/counterpart/[id]` and `/class/[code]` are not in that table**, and the brief asks for three of them. They need a signed-in session and a reachable Supabase, and this sandbox's proxy does not allow the app's own server to reach Supabase — the constraint recorded in Phase 1. Those five have to be measured against the deployed site. Everything measurable without a session is above.
+
+### Touch targets and focus
+
+Every control carries `min-h-11` (44 px) or `py-3`/`py-2.5`, well past the 24 × 24 minimum; a grep for interactive elements without one returns nothing. Focus is a single global `:focus-visible` rule — 2 px ink outline, 2 px offset — on links, buttons, inputs, textareas, selects and anything with `tabindex`, so a control added later inherits it rather than needing to remember.
+
+Nothing conveys information by colour alone. The case ticks are fill-vs-hairline with a full `aria-label` naming each of the four states; every school-coloured eyebrow names its school in text (`Objection · Utilitarianism`, `You · Stoicism`); the vector columns are a `<dl>` with school names as terms. The school-coloured left stripes on `/debate` and `/me` are the same colour for every row — they are the reader's own school, not per-row data — so there is no information in them to lose.

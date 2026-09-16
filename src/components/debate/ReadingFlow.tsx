@@ -15,12 +15,14 @@ import { chunkLesson, type MicroLessonContent } from "@/lib/lesson-chunks";
 export function ReadingFlow({
   lesson,
   topicSlug,
+  userId,
   responses,
   onResponse,
   action,
 }: {
   lesson: MicroLessonContent;
   topicSlug: string;
+  userId: string;
   // Held by DebateFlow, because the editor on the next screen quotes these
   // back and a note written on this screen has to survive the transition.
   responses: Record<number, string>;
@@ -56,6 +58,7 @@ export function ReadingFlow({
               <RetrievalPrompt
                 topicSlug={topicSlug}
                 chunkIndex={i}
+                userId={userId}
                 prompt={chunk.prompt.prompt}
                 onSaved={(value) => {
                   onResponse(i, value);

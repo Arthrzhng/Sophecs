@@ -19,7 +19,11 @@
   --color-rule: rgba(25, 25, 23, 0.13);
 
   --color-stoic: #3e5c4b;
-  --color-utilitarian: #8a6320;
+  /* Darkened from #8a6320, which measured 4.43:1 against --color-paper and
+     so missed WCAG AA body text by a hair. Eyebrows are 12px uppercase, so
+     the 4.5:1 threshold applies rather than the large-text 3:1. The other
+     two school colours already cleared it. */
+  --color-utilitarian: #87611f;
   --color-virtue: #7a3540;
 
   /* Phase 2: warning/destructive accent — the debate editor's word-count
@@ -88,6 +92,21 @@ body {
 
 .prose-reading p + p {
   margin-top: 1.25em;
+}
+
+/* Everything that moves, off. Broader than disabling the named animations
+   one at a time, and it stays correct for whatever gets added later: the
+   failure mode of forgetting a `transition-colors` somewhere is that a
+   preference the user has explicitly set is quietly ignored. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* The next stretch of a lesson appearing after a retrieval prompt. Opt-in

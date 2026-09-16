@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useReducer, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Question } from "./Question";
 import { QUIZ_QUESTIONS, type QuizOption } from "../../../content/quiz/questions";
 import { scoreQuiz } from "@/lib/scoring";
@@ -53,13 +53,17 @@ function detectSource(challengeId: string | null): Source {
 
 export function QuizShell() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const challengeId = searchParams.get("c");
-  // Set by /auth/callback when a signed-in user has no result to claim yet
-  // (Phase 2: "Take the quiz first. Your school is your side."). Threaded
-  // into the stored pending result for whichever surface reads it once
-  // /debate exists — see docs/decisions.md.
-  const next = searchParams.get("next");
+
+  // Read from window.location after mount, not from useSearchParams during
+  // render. useSearchParams opts the calling subtree out of the static
+  // prerender, which meant /quiz shipped an empty <main> and the first
+  // question only appeared once JS had hydrated: FCP 0.8 s, LCP 2.8 s, CLS
+  // 0.1, all of it the gap between the two. Neither value affects what is
+  // rendered — `c` is the challenge id for analytics and the pending
+  // result, `next` is set by /auth/callback and threaded through the same
+  // payload — so neither has any business blocking first paint.
+  const [challengeId, setChallengeId] = useState<string | null>(null);
+  const [next, setNext] = useState<string | null>(null);
 
   const [state, dispatch] = useReducer(reducer, { index: 0, chosenIds: Array(QUIZ_QUESTIONS.length).fill(null) });
   const startedAtRef = useRef<number>(0);
@@ -79,12 +83,21 @@ export function QuizShell() {
     } catch {
       // Ignore malformed/blocked storage — start fresh.
     }
+    const params = new URLSearchParams(window.location.search);
+    const c = params.get("c");
+    const n = params.get("next");
+    setChallengeId(c);
+    setNext(n);
+
     referrerRef.current = typeof document !== "undefined" ? document.referrer : "";
     startedAtRef.current = Date.now();
     questionStartedAtRef.current = Date.now();
+    // `c` from the parsed params rather than the state just set: state
+    // updates are not visible until the next render, and this event has to
+    // carry the challenge id it was started from.
     track({
       name: "quiz_started",
-      props: { source: detectSource(challengeId), challenge_id: challengeId ?? undefined },
+      props: { source: detectSource(c), challenge_id: c ?? undefined },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

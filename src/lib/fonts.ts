@@ -14,7 +14,6 @@ export const spectral = localFont({
     { path: "../../public/fonts/spectral-400.woff2", weight: "400", style: "normal" },
     { path: "../../public/fonts/spectral-400-italic.woff2", weight: "400", style: "italic" },
     { path: "../../public/fonts/spectral-500.woff2", weight: "500", style: "normal" },
-    { path: "../../public/fonts/spectral-600.woff2", weight: "600", style: "normal" },
   ],
   variable: "--font-spectral",
   display: "swap",

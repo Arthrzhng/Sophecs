@@ -65,6 +65,7 @@ export function DebateFlow({
       <ReadingFlow
         lesson={microBefore}
         topicSlug={topicSlug}
+        userId={userId}
         responses={responses}
         onResponse={(index, value) => setResponses((prev) => ({ ...prev, [index]: value }))}
         action={
