@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MIN_ARGUMENT_WORDS, MAX_ARGUMENT_WORDS, WORD_COUNT_WARNING_AT, wordCount } from "@/lib/debate-limits";
 import { track } from "@/lib/analytics/client";
-import { SCHOOL_COLORS } from "@/lib/school-colors";
+import { SCHOOL_ADHERENT, SCHOOL_COLORS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
 
 type Status =
@@ -42,6 +42,7 @@ export function ArgumentEditor({
   mode = "original",
   parentDebateId,
   initialArgument,
+  isFirstArgument,
 }: {
   topicSlug: string;
   motion: string;
@@ -52,9 +53,13 @@ export function ArgumentEditor({
   mode?: "original" | "revision";
   parentDebateId?: string;
   initialArgument?: string;
+  isFirstArgument?: boolean;
 }) {
   const router = useRouter();
   const isRevision = mode === "revision";
+  // A revision is never anyone's first argument — its parent is judged by
+  // definition — so the scaffold is gated on both.
+  const showScaffold = Boolean(isFirstArgument) && !isRevision;
   const draftKey = isRevision
     ? `draft:revision:${parentDebateId}:${userId}`
     : `draft:${topicSlug}:${userId}`;
@@ -77,6 +82,13 @@ export function ArgumentEditor({
       }
     } catch {
       // Best-effort only.
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (showScaffold) {
+      track({ name: "first_argument_scaffold_shown", props: { topic_slug: topicSlug } });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -221,11 +233,30 @@ export function ArgumentEditor({
           : `Defend the ${SCHOOL_COLORS[school].name} position.`}
       </p>
 
+      {/* Shown once, on the first argument a user ever writes. The step from
+          an 80-second quiz to a written defence is the steepest in the
+          product; three lines is the smallest thing that makes it a task
+          rather than a blank page. The word limits are unchanged — this is
+          scaffolding, not a different exercise. */}
+      {showScaffold && (
+        <ol className="mt-6 space-y-2 font-sans text-sm text-ink-mid max-w-[55ch] list-decimal pl-5">
+          <li>State what a {SCHOOL_ADHERENT[school]} would say about this motion.</li>
+          <li>
+            Give the reason your school gives — the excerpt you just read is the one to use.
+          </li>
+          <li>Name the strongest objection and say why it doesn&apos;t win.</li>
+        </ol>
+      )}
+
       <textarea
         value={argument}
         onChange={(e) => setArgument(e.target.value)}
         rows={12}
-        placeholder={`At least ${MIN_ARGUMENT_WORDS} words — enough room to actually argue the case, not just assert it.`}
+        placeholder={
+          showScaffold
+            ? "Eighty words is enough for all three. Most first arguments take about ten minutes."
+            : `At least ${MIN_ARGUMENT_WORDS} words — enough room to actually argue the case, not just assert it.`
+        }
         className="mt-6 w-full bg-surface border border-rule rounded-md p-4 font-serif text-base leading-relaxed placeholder:text-ink-soft placeholder:font-sans placeholder:text-sm resize-y"
       />
 

@@ -2,6 +2,7 @@ import { createClient as createSupabaseServerClient } from "@/lib/supabase/serve
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { TopicList, type TopicListItem } from "@/components/debate/TopicList";
 import { DebateListViewTracker } from "@/components/debate/DebateListViewTracker";
+import { getWeeklyMotion } from "@/lib/weekly-motion";
 import type { SchoolId } from "@/lib/types";
 
 export const metadata = { title: "Debate · Sophecs" };
@@ -26,13 +27,23 @@ export default async function DebatePage() {
   }
 
   let topics: TopicListItem[] = [];
+  let weeklySlug: string | null = null;
   if (isAdminConfigured()) {
     const admin = createAdminClient();
     const { data: rows } = await admin
       .from("debate_topics")
-      .select("slug, title, motion, stances, par_elo")
+      .select("slug, title, motion, stances, par_elo, sort")
       .eq("active", true)
       .order("sort", { ascending: true });
+
+    weeklySlug =
+      getWeeklyMotion(
+        (rows ?? []).map((r) => ({
+          slug: r.slug as string,
+          title: r.title as string,
+          sort: Number(r.sort),
+        }))
+      )?.slug ?? null;
 
     topics = await Promise.all(
       (rows ?? []).map(async (row) => {
@@ -66,7 +77,7 @@ export default async function DebatePage() {
       <div className="mx-auto max-w-2xl px-6 pt-14 pb-24">
         <DebateListViewTracker />
         <p className="eyebrow text-ink-soft mb-4">Debate</p>
-        <TopicList topics={topics} school={school} />
+        <TopicList topics={topics} school={school} weeklySlug={weeklySlug} />
       </div>
     </main>
   );

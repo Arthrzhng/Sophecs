@@ -442,3 +442,29 @@ The pre-id state is one line of text, `Saving your result…`, and not a spinner
 `share_clicked { channel: "download" }` already existed and answers "which control did they press". `card_downloaded { result_id }` answers "did the PNG actually leave the site", which is the number that matters for the card and which the Instagram path produces too — that path writes the file and copies a caption, and was previously indistinguishable from a link share. Both fire on both paths.
 
 The download control needed no change: it has been present and enabled since Phase 1 (desktop row), and the mobile row reaches the same PNG through `Instagram`.
+
+## Task 4: first-run escalation and the weekly motion
+
+### `getWeeklyMotion` shipped early, in Task 2
+
+Task 2's empty states need a motion to point at (`Every objection answered.` plus this week's), so the function and its tests landed there rather than here. It lives in `src/lib/weekly-motion.ts`, not in `topics.ts` as the brief has it, for one reason: `topics.ts` carries `server-only`, which makes it unimportable from a vitest file. `topics.ts` re-exports it, so the brief's `topics.ts#getWeeklyMotion` path still resolves.
+
+The ISO week number is the part worth getting right. "Days since Jan 1, divided by 7" is wrong across a year boundary — 2027-01-01 is a Friday and belongs to week 53 of 2026 — so the rotation would stutter or repeat every New Year. `isoWeekNumber` shifts to the week's Thursday first, and there is a test for exactly that date.
+
+### The scaffold is gated on a count, not a flag
+
+`isFirstArgument` is `(judged debates for this user) === 0`, computed per request. No `has_argued` column, nothing to backfill, and it becomes false the moment the first verdict lands. A user who opens the editor twice before submitting anything sees it twice — which is right: they still have not written a first argument, and the brief's own condition is "zero judged debates", not "never shown".
+
+The count is in the same `Promise.all` as the profile and topic lookups, so `/debate/[slug]` makes the same number of round trips it made before — the regression the brief specifically warned about. The profile-missing redirect and the topic 404 now run after the batch rather than between queries; the only cost is one wasted count in the rare case where a user reaches this route with no school.
+
+A revision is never a first argument (its parent is judged by definition), so the scaffold is gated on `!isRevision` too rather than relying on the count alone.
+
+### `SCHOOL_ADHERENT`
+
+The first scaffold line is "State what a [school] would say". Lowercasing the school name gives "what a stoicism would say" — wrong for all three schools, not just an awkward one. A separate map (`Stoic`, `Utilitarian`, `Virtue Ethicist`) sits next to `SCHOOL_COLORS`, which already holds the display names.
+
+### The weekly motion takes the whole top of `/debate`
+
+Six motions listed at once is a menu, and a menu is a decision to make before the real one. The week's motion gets the eyebrow, the stance line, and the only filled button on the page; the other five follow under `All motions` in the existing row style, and the weekly one is removed from that list rather than repeated. When `weeklySlug` is null — no active topics, or the admin client is unconfigured — the list renders exactly as it did before, so nothing depends on the rotation existing.
+
+`weekly_motion_clicked` needs an `onClick`, which would have made the whole list a client component. Only the button is one (`WeeklyMotionLink`); `TopicList` stays on the server.

@@ -33,20 +33,26 @@ export default async function DebateTopicPage({
   if (!isAdminConfigured()) notFound();
   const admin = createAdminClient();
 
-  const { data: profile } = await admin
-    .from("profiles")
-    .select("school")
-    .eq("id", user.id)
-    .maybeSingle();
+  // One batch, not a waterfall: the judged-debate count is only needed to
+  // decide whether to show the first-argument scaffold, and it must not cost
+  // this route an extra round trip.
+  const [{ data: profile }, { data: topic }, { count: judgedCount }] = await Promise.all([
+    admin.from("profiles").select("school").eq("id", user.id).maybeSingle(),
+    admin
+      .from("debate_topics")
+      .select("slug, motion, active, micro_before")
+      .eq("slug", slug)
+      .maybeSingle(),
+    admin
+      .from("debates")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .not("verdict", "is", null),
+  ]);
+
   if (!profile?.school) {
     redirect(`/quiz?next=${encodeURIComponent(nextPath)}`);
   }
-
-  const { data: topic } = await admin
-    .from("debate_topics")
-    .select("slug, motion, active, micro_before")
-    .eq("slug", slug)
-    .maybeSingle();
   if (!topic || !topic.active) notFound();
 
   const microBefore = getMicroLesson(topic.micro_before);
@@ -62,6 +68,7 @@ export default async function DebateTopicPage({
           userId={user.id}
           challengeId={challenge}
           isAllowlisted={isJudgeAllowlisted(user.id)}
+          isFirstArgument={(judgedCount ?? 0) === 0}
         />
       </div>
     </main>

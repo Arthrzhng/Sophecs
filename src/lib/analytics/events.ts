@@ -130,6 +130,10 @@ export type AnalyticsEvent =
         fidelity_delta: number;
       };
     }
-  | { name: "objection_resolved"; props: { parent_debate_id: string; days_open: number } };
+  | { name: "objection_resolved"; props: { parent_debate_id: string; days_open: number } }
+
+  // --- Phase 3 Task 4: first-run escalation and the weekly motion ---
+  | { name: "first_argument_scaffold_shown"; props: { topic_slug: string } }
+  | { name: "weekly_motion_clicked"; props: { topic_slug: string } };
 
 export type AnalyticsEventName = AnalyticsEvent["name"];

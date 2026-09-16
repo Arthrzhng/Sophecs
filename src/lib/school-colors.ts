@@ -14,6 +14,16 @@ export const SCHOOL_COLORS: Record<
   "virtue-ethics": { surface: "#6b2c37", ink: "#faf8f2", name: "Virtue Ethics" },
 };
 
+// What you call a person who argues from a school, as opposed to the
+// school's own name. "What a Stoic would say" reads; "what a Stoicism would
+// say" does not, and a naive lowercase of the name gets it wrong for all
+// three.
+export const SCHOOL_ADHERENT: Record<SchoolId, string> = {
+  stoicism: "Stoic",
+  utilitarianism: "Utilitarian",
+  "virtue-ethics": "Virtue Ethicist",
+};
+
 // The muted --color-stoic/utilitarian/virtue tokens (globals.css), meant
 // for text/hairlines on paper — not the saturated card-only surfaces
 // above. Phase 2's verdict page is the first thing to use them as a

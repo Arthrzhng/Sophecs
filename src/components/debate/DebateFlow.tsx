@@ -17,6 +17,7 @@ export function DebateFlow({
   userId,
   challengeId,
   isAllowlisted,
+  isFirstArgument,
 }: {
   topicSlug: string;
   motion: string;
@@ -25,6 +26,7 @@ export function DebateFlow({
   userId: string;
   challengeId?: string;
   isAllowlisted?: boolean;
+  isFirstArgument?: boolean;
 }) {
   const [began, setBegan] = useState(!microBefore);
 
@@ -81,6 +83,7 @@ export function DebateFlow({
       userId={userId}
       challengeId={challengeId}
       isAllowlisted={isAllowlisted}
+      isFirstArgument={isFirstArgument}
     />
   );
 }
