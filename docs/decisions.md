@@ -533,3 +533,15 @@ Every caller wants all six topics at once — `TopicList`, `/me`, and Task 9's `
 `read` is satisfied when a lesson's prompts are all answered **or the lesson has none**, which matters: without that clause a topic whose before-lesson has no prompts could never be read, and so never closed.
 
 While adding case states to `/debate` I collapsed its per-topic best-score lookup into a single query. It was six round trips on a six-motion list and adding states per topic would have made it twelve.
+
+## Task 7: keep-alive cron
+
+Built rather than taking the brief's alternative of upgrading Supabase to Pro. The reasoning is the cost line: Pro is $25/month against an AI budget of $50/month, and it would be bought to solve one problem — a project pausing after seven idle days — that a once-daily request solves for nothing. The choice is worth revisiting the moment Pro is wanted for anything else (backups, no-pause guarantees, connection pooling); until then this is the cheaper half of the same outcome.
+
+Scheduled at `17 4 * * *` rather than midnight. Vercel Hobby allows one cron a day, and an off-the-hour minute keeps it out of the queue every other Hobby project's `0 0 * * *` job is sitting in.
+
+The query is `select ... head: true` against `debate_topics` — six rows, already indexed. Any read counts as activity, and choosing a table the product actually uses means the cron also fails if the service-role key is rotated out from under the deployment, which a `select 1` would not catch.
+
+Verified locally against a production build: no header → `401 {"ok":false}`, wrong secret → `401`, correct secret → the route authenticates and reaches the Supabase call (500 here only because this sandbox's proxy can't reach Supabase, the same constraint recorded in Phase 1). The local test secret was added to `.env.local` for the run and removed afterwards.
+
+**`CRON_SECRET` has to be set in Vercel** for this to do anything — without it the route returns 401 to Vercel's own scheduler and the project pauses anyway. Vercel generates and injects it automatically for projects with a `crons` entry, but it is worth confirming in the dashboard after the first deploy rather than assuming.
