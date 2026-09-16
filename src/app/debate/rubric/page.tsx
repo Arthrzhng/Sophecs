@@ -85,6 +85,23 @@ export default function RubricPage() {
         </div>
 
         <div className="mt-14 border-t border-rule pt-8">
+          <p className="eyebrow text-ink-soft mb-4">Counterpart rules</p>
+          <p className="text-ink-mid leading-relaxed max-w-[54ch]">
+            A counterpart exchange is private between the two of you. Nobody
+            else can post in it, and nobody can read it unless you both say so
+            afterwards.
+          </p>
+          <ul className="mt-6 space-y-3 text-ink-mid leading-relaxed max-w-[54ch] list-disc pl-5">
+            <li>Quote the sentence you&apos;re answering.</li>
+            <li>Between 150 and 1,200 characters a reply.</li>
+            <li>Two replies each, then it closes. Neither of you has to concede.</li>
+            <li>No names, schools, locations or links — yours or theirs.</li>
+            <li>Replies are checked before they are delivered.</li>
+            <li>Report or block from any reply.</li>
+          </ul>
+        </div>
+
+        <div className="mt-14 border-t border-rule pt-8">
           <Link
             href="/debate"
             className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"

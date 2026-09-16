@@ -97,6 +97,25 @@ export default async function VerdictPage({
     }
   }
 
+  // Counterpart state, owner only and originals only — a revision can't be
+  // paired, and this is the one extra pair of reads this page takes.
+  let counterpart: { seeking: boolean; exchangeId: string | null } | null = null;
+  if (isOwner && !isRevision) {
+    const [{ data: own }, { data: existingExchange }] = await Promise.all([
+      admin.from("debates").select("seeking_counterpart_at").eq("id", debateId).maybeSingle(),
+      admin
+        .from("exchanges")
+        .select("id")
+        .or(`debate_a.eq.${debateId},debate_b.eq.${debateId}`)
+        .limit(1)
+        .maybeSingle(),
+    ]);
+    counterpart = {
+      seeking: Boolean(own?.seeking_counterpart_at),
+      exchangeId: (existingExchange?.id as string | undefined) ?? null,
+    };
+  }
+
   const school = publicRow.school as SchoolId;
   const afterLesson = getMicroLesson(topic.micro_after);
   const verdict = publicRow.verdict as VerdictData;
@@ -147,6 +166,7 @@ export default async function VerdictPage({
           shareLine={shareLine}
           hasRevision={revisionId}
           comparison={comparison}
+          counterpart={counterpart}
         />
       </div>
     </main>

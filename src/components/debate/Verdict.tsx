@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MicroLesson } from "./MicroLesson";
 import { PublishToggle } from "./PublishToggle";
 import { ShareRow } from "./ShareRow";
+import { FindCounterpartButton } from "./FindCounterpartButton";
 import { track } from "@/lib/analytics/client";
 import { SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
@@ -113,6 +114,7 @@ export function Verdict({
   shareLine,
   hasRevision,
   comparison,
+  counterpart,
 }: {
   debateId: string;
   topicSlug: string;
@@ -129,6 +131,8 @@ export function Verdict({
   shareLine: string;
   hasRevision?: string | null;
   comparison?: RevisionComparison | null;
+  // Absent on a revision and on someone else's verdict.
+  counterpart?: { seeking: boolean; exchangeId: string | null } | null;
 }) {
   const [showAfter, setShowAfter] = useState(showAfterLessonInitially);
   const objection = verdict.rejected ? null : verdict.unanswered_objection ?? null;
@@ -261,6 +265,21 @@ export function Verdict({
           <p className="font-serif text-base leading-relaxed">{verdict.a_stronger_version_would}</p>
         </div>
       </div>
+
+      {/* Below the objection block, not beside it: "Answer it" stays the
+          primary move off a verdict, and this is the other thing you can do
+          with the same argument. */}
+      {isOwner && counterpart && !comparison && (
+        <div className="mt-10 border-t border-rule pt-8">
+          <p className="eyebrow text-ink-soft mb-3">Counterpart</p>
+          <FindCounterpartButton
+            debateId={debateId}
+            topicSlug={topicSlug}
+            initialSeeking={counterpart.seeking}
+            existingExchangeId={counterpart.exchangeId}
+          />
+        </div>
+      )}
 
       <div className="mt-10 border-t border-rule pt-8">
         {argument ? (

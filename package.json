@@ -10,7 +10,9 @@
     "test": "vitest run",
     "judge:golden": "tsx --require ./scripts/preload-server-only-shim.cjs --env-file=.env.local tests/judge/run-golden.ts",
     "seed:topics": "tsx --require ./scripts/preload-server-only-shim.cjs --env-file=.env.local scripts/seed-topics.ts",
-    "review:verdicts": "tsx --env-file=.env.local scripts/review-verdicts.ts"
+    "review:verdicts": "tsx --env-file=.env.local scripts/review-verdicts.ts",
+    "review:turns": "tsx --env-file=.env.local scripts/review-turns.ts",
+    "screen:check": "tsx --require ./scripts/preload-server-only-shim.cjs --env-file=.env.local tests/screen/run-screen.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",

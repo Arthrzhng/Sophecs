@@ -7,8 +7,10 @@ import { getPendingChallenges } from "@/lib/challenge";
 import { getOpenObjections, type OpenObjection } from "@/lib/objections";
 import { getWeeklyMotion } from "@/lib/weekly-motion";
 import { getCaseStates, type CaseState } from "@/lib/cases";
+import { isLapsed } from "@/lib/counterpart";
 import { CaseTicks } from "@/components/debate/CaseTicks";
 import { OpenObjections } from "@/components/me/OpenObjections";
+import { OpenExchanges, type ExchangeRow } from "@/components/me/OpenExchanges";
 import { DisplayNameForm } from "@/components/me/DisplayNameForm";
 import { WelcomeTracker } from "@/components/me/WelcomeTracker";
 import { MeViewTracker } from "@/components/me/MeViewTracker";
@@ -74,6 +76,7 @@ export default async function MePage({
   let revisionByParent = new Map<string, DebateHistoryRow>();
   let caseStates: Record<string, CaseState> = {};
   let allClosed = false;
+  let exchanges: ExchangeRow[] = [];
   let openObjections: OpenObjection[] = [];
   let weeklyMotion: { slug: string; title: string; sort: number } | null = null;
   let hasAnyDebate = false;
@@ -137,6 +140,27 @@ export default async function MePage({
       slug: t.slug as string,
       microBefore: (t.micro_before as string | null) ?? null,
     }));
+    // Open exchanges, with lapsed ones filtered out rather than closed
+    // here: closing is the exchange page's job, on view, and /me should not
+    // be writing rows as a side effect of rendering.
+    const { data: exchangeRows } = await admin
+      .from("exchanges")
+      .select("id, topic_slug, user_a, school_a, school_b, next_turn, last_turn_at")
+      .eq("status", "open")
+      .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
+      .order("last_turn_at", { ascending: false });
+    const titleBySlug = new Map(
+      (activeTopics.data ?? []).map((t) => [t.slug as string, t.title as string])
+    );
+    exchanges = (exchangeRows ?? [])
+      .filter((row) => !isLapsed(row.last_turn_at as string))
+      .map((row) => ({
+        id: row.id as string,
+        topicTitle: titleBySlug.get(row.topic_slug as string) ?? (row.topic_slug as string),
+        theirSchool: (row.user_a === user.id ? row.school_b : row.school_a) as SchoolId,
+        myTurn: row.next_turn === user.id,
+      }));
+
     caseStates = await getCaseStates(admin, user.id, activeRows);
     // Six of six closed is the only completion signal in the product: one
     // line, no badge, no certificate, and it says what to do next rather
@@ -205,6 +229,12 @@ export default async function MePage({
               hasAnyDebate={hasAnyDebate}
               school={school}
             />
+          </div>
+        )}
+
+        {exchanges.length > 0 && (
+          <div className="mt-10 border-t border-rule pt-8">
+            <OpenExchanges exchanges={exchanges} />
           </div>
         )}
 

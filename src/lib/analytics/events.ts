@@ -141,6 +141,22 @@ export type AnalyticsEvent =
       name: "retrieval_prompt_answered";
       props: { topic_slug: string; chunk_index: number; chars: number };
     }
-  | { name: "case_closed"; props: { topic_slug: string } };
+  | { name: "case_closed"; props: { topic_slug: string } }
+
+  // --- Phase 3 Task 8: Counterpart ---
+  | { name: "counterpart_sought"; props: { debate_id: string } }
+  | { name: "counterpart_paired"; props: { exchange_id: string; topic_slug: string } }
+  | { name: "turn_submitted"; props: { exchange_id: string; seq: number; chars: number } }
+  | { name: "turn_held"; props: { exchange_id: string; reason: string } }
+  | { name: "exchange_completed"; props: { exchange_id: string } }
+  | { name: "exchange_published"; props: { exchange_id: string } }
+  | { name: "exchange_blocked"; props: { exchange_id: string } }
+  | {
+      name: "turn_reported";
+      props: {
+        turn_id: string;
+        reason: "harassment" | "personal_info" | "off_topic" | "spam" | "other";
+      };
+    };
 
 export type AnalyticsEventName = AnalyticsEvent["name"];

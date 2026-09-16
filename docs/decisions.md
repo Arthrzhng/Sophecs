@@ -545,3 +545,78 @@ The query is `select ... head: true` against `debate_topics` — six rows, alrea
 Verified locally against a production build: no header → `401 {"ok":false}`, wrong secret → `401`, correct secret → the route authenticates and reaches the Supabase call (500 here only because this sandbox's proxy can't reach Supabase, the same constraint recorded in Phase 1). The local test secret was added to `.env.local` for the run and removed afterwards.
 
 **`CRON_SECRET` has to be set in Vercel** for this to do anything — without it the route returns 401 to Vercel's own scheduler and the project pauses anyway. Vercel generates and injects it automatically for projects with a `crons` entry, but it is worth confirming in the dashboard after the first deploy rather than assuming.
+
+## Task 8: Counterpart
+
+### The screen is the whole feature
+
+Everything else here is plumbing around one rule: **no turn is ever delivered unscreened.** The row is written first, as `pending`, and `pending` is invisible to the counterpart because the RLS policy requires `screen_result = 'ok'`. Then the model is called. Every way that call can fail — kill switch, over budget, over the daily cap, a network error, unparseable JSON — lands in the same place: the row stays `pending`, nothing is delivered, and the author is told their reply is saved and will go out once it has been checked. There is no branch in which an unscreened turn reaches the other person.
+
+Writing before screening is deliberate and is the opposite of the obvious order. Screening first and writing on success would mean a failed model call costs someone the paragraph they just wrote, and this is a product for 15-year-olds writing 1,200 characters on a phone.
+
+### The screen prompt is tuned against false positives, not false negatives
+
+A held reply costs a student one of only four turns in an exchange, and they cannot post again in it until a human reviews the hold. A mildly rude sentence getting through costs much less. So `screen.v1.md` spends more words on what is **not** a violation than on what is: forceful disagreement, calling an argument stupid (as opposed to the person), and naming philosophers, works, schools of thought, countries and institutions *as the subject of the argument*. That last one is the trap — `personal_info` is about identifying the two students, and a screen that flags "Bentham" or "Germany's Ethics Commission" would make the feature unusable for the thing it is for.
+
+`tests/screen/run-screen.ts` (`npm run screen:check`) exercises six fixtures against the real model. Three are the traps, three are real violations:
+
+```
+case                      expected        got             pass
+ok-plain                  ok              ok              yes
+ok-forceful               ok              ok              yes
+ok-names-philosophers     ok              ok              yes
+personal-info-phone       personal_info   personal_info   yes
+harassment                harassment      harassment      yes
+off-topic                 off_topic       off_topic       yes
+6/6 · $0.00592
+```
+
+Under a tenth of a penny for the whole suite, and about $0.0006 a turn against the estimate in the `// COST:` comment.
+
+### Pairing has no queue, and re-pairing is allowed once an exchange is finished
+
+Opting in marks the debate and then immediately looks for someone already waiting on the same motion, different school, not blocked in either direction. Whoever arrives second completes the pair. No cron, no queue table, no notification — the only thing a queue would buy is a number to display, and the brief rules out showing one.
+
+The brief's disqualifier is "no open exchange between the pair". I kept it at exactly that rather than widening it to "never paired before", which was my first instinct. Two *live* exchanges between one pair would just be one exchange with eight turns, which is what the four-turn cap exists to prevent — but refusing to ever re-pair would starve pairing completely in a school-sized cohort with six motions.
+
+### Two accounts deleting, and what a party sees
+
+Every FK to `auth.users` here is `on delete set null`, not cascade. If it cascaded, one person deleting their account would delete the exchange out from under the other, who would land on a 404 with no explanation. Instead the row survives, `user_a`/`user_b` goes null, and the page says `Your counterpart has left.`
+
+### Lapse is closed on view
+
+An exchange that goes 14 days without a reply is shown as lapsed and closed the next time someone opens it. No job, and `/me` deliberately filters lapsed exchanges out rather than closing them: a page should not write rows as a side effect of rendering.
+
+### RLS, verified three ways
+
+An outsider (a third account, party to nothing):
+
+```
+set local request.jwt.claims = '{"sub":"3333...","role":"authenticated"}';
+select (select count(*) from exchanges), (select count(*) from turns);
+-- [{"exchanges_visible_to_outsider":0,"turns_visible_to_outsider":0}]
+```
+
+Party A, who did not write the held turn — sees the exchange and the screened reply, not the held one:
+
+```
+-- [{"who":"party A","exchanges":1,"turns":1,"turn_ids":"cptestturn"}]
+```
+
+Party B, who authored both — sees their own held turn, which is how they find out it was held:
+
+```
+-- [{"who":"party B (author)","turns":2,"detail":"cptesthold:flagged, cptestturn:ok"}]
+```
+
+That last case is why there are two select policies on `turns` rather than one. Postgres ORs them: `turn read party` delivers screened turns to both sides, `turn read own` lets an author see their own work in any state.
+
+Test rows and test users deleted afterwards.
+
+### `next_turn` is authoritative, and checked twice
+
+The route refuses unless `next_turn` is the caller **and** the seq-derived author matches. They should never disagree; if they do, something wrote `next_turn` wrongly, and letting the wrong person consume one of four slots is not recoverable. The unique index on `(exchange_id, seq)` is the real guard against two concurrent submissions taking the same slot — the read-then-insert above it only saves a model call in the common case.
+
+### What is not verified
+
+The four-turn end-to-end run with two real accounts, and `KILL_SWITCH_SCREEN=true` stopping delivery, could not be exercised here: this sandbox's proxy does not allow the app's own server to reach Supabase (the constraint recorded in Phase 1), so authenticated flows can only be run against the deployed site. The pieces they depend on are each verified separately — RLS by direct SQL, the screen by the fixture suite, the turn and quote rules by unit tests (`tests/counterpart.test.ts`, 30 tests passing) — but the assembled path is untested until it runs on Vercel.
