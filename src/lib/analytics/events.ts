@@ -157,6 +157,12 @@ export type AnalyticsEvent =
         turn_id: string;
         reason: "harassment" | "personal_info" | "off_topic" | "spam" | "other";
       };
-    };
+    }
+
+  // --- Phase 3 Task 9: the teacher class link ---
+  | { name: "class_created"; props: Record<string, never> }
+  | { name: "class_joined"; props: { class_id: string } }
+  | { name: "class_left"; props: { class_id: string } }
+  | { name: "class_viewed"; props: { class_id: string; members: number } };
 
 export type AnalyticsEventName = AnalyticsEvent["name"];

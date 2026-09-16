@@ -1,5 +1,14 @@
 import { redirect } from "next/navigation";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
+import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
+import { ClassesSection } from "@/components/me/ClassesSection";
+import {
+  getJoinedClasses,
+  getOwnedClasses,
+  normaliseClassCode,
+  type ClassSummary,
+  type JoinedClass,
+} from "@/lib/classes";
 import { DisplayNameForm } from "@/components/me/DisplayNameForm";
 import { ArgumentVisibilityToggle } from "@/components/me/ArgumentVisibilityToggle";
 import { SignOutButton } from "@/components/me/SignOutButton";
@@ -12,7 +21,12 @@ interface SettingsProfileRow {
   argument_default_public: boolean;
 }
 
-export default async function MeSettingsPage() {
+export default async function MeSettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ join?: string }>;
+}) {
+  const { join } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -28,6 +42,19 @@ export default async function MeSettingsPage() {
     .eq("id", user.id)
     .maybeSingle<SettingsProfileRow>();
 
+  // A shared class link lands here with ?join=CODE, which pre-fills the
+  // field rather than joining on a GET — a link that changes state when
+  // someone merely opens it is a link a browser prefetcher can fire.
+  let owned: ClassSummary[] = [];
+  let joined: JoinedClass[] = [];
+  if (isAdminConfigured()) {
+    const admin = createAdminClient();
+    [owned, joined] = await Promise.all([
+      getOwnedClasses(admin, user.id),
+      getJoinedClasses(admin, user.id),
+    ]);
+  }
+
   return (
     <main className="flex-1">
       <div className="mx-auto max-w-2xl px-6 pt-14 pb-24">
@@ -40,6 +67,15 @@ export default async function MeSettingsPage() {
 
         <div className="mt-10 border-t border-rule pt-8">
           <ArgumentVisibilityToggle initial={profile?.argument_default_public ?? false} />
+        </div>
+
+        <div className="mt-10 border-t border-rule pt-8">
+          <p className="eyebrow text-ink-soft mb-4">Classes</p>
+          <ClassesSection
+            owned={owned}
+            joined={joined}
+            prefillCode={join ? normaliseClassCode(join) : undefined}
+          />
         </div>
 
         <div className="mt-10 border-t border-rule pt-8">

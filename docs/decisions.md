@@ -620,3 +620,41 @@ The route refuses unless `next_turn` is the caller **and** the seq-derived autho
 ### What is not verified
 
 The four-turn end-to-end run with two real accounts, and `KILL_SWITCH_SCREEN=true` stopping delivery, could not be exercised here: this sandbox's proxy does not allow the app's own server to reach Supabase (the constraint recorded in Phase 1), so authenticated flows can only be run against the deployed site. The pieces they depend on are each verified separately — RLS by direct SQL, the screen by the fixture suite, the turn and quote rules by unit tests (`tests/counterpart.test.ts`, 30 tests passing) — but the assembled path is untested until it runs on Vercel.
+
+## Task 9: the teacher class link
+
+### The brief's class RLS does not work
+
+The two policies as drafted reference each other's table: `classes` select reads `class_members`, and `class_members` select reads `classes`. Postgres refuses the first query either of them touches:
+
+```
+ERROR:  42P17: infinite recursion detected in policy for relation "classes"
+```
+
+Found by running the brief's SQL as written and then querying as a member. Fixed with two `security definer` helpers, `is_class_member` and `is_class_owner`: RLS is not applied inside a definer function, so each policy can ask its question about the other table without re-entering that table's policy. Both are `stable`, so they evaluate once per query rather than once per row, and both pin `search_path = public` so the body cannot be redirected by a caller's schema.
+
+Verified for all four roles afterwards:
+
+| as | classes visible | class_members visible |
+| --- | --- | --- |
+| owner (teacher) | 1 | 1 |
+| member (student) | 1 | 1 (their own row only) |
+| outsider | 0 | 0 |
+
+The member's single visible row is their own; the teacher sees the roster. Test rows and users deleted afterwards.
+
+### `?join=CODE` pre-fills, it does not join
+
+A shared class link lands on `/me/settings?join=CODE` and fills the code field. It does not join on arrival. A GET that changes state is a GET a browser prefetcher, a link scanner or a chat client's unfurler can fire on the student's behalf, and joining a class is a consent step — the copy under the field is the thing they are supposed to read before pressing the button.
+
+### A wrong code and a real one give the same error
+
+`joinClass` returns `That code doesn't look right.` both when no class matches and when the code is malformed. A distinguishable error would turn the form into an oracle for walking the code space, and unguessability is the only access control a class link has. Codes are eight characters from nanoid's CSPRNG over `[a-z0-9]`, ~2.8 × 10¹² of them, generated server-side and never derived from the name, owner or time.
+
+### What `/class/[code]` cannot show
+
+Grepped the route for `score`, `elo`, `streak`, `argument`, `percentile` and `par_elo`: the only matches are the comment saying they are absent and the copy telling the teacher so. The page selects `id, name, owner_id` from classes, `user_id, joined_at` from members, `slug, title, sort, micro_before` from topics, and `id, display_name, school` from profiles. `CaseState` is four booleans. There is no column in scope that could leak a number even by accident, and members are ordered by join date with no sort control.
+
+### The N+1 the brief warned about, partly
+
+The brief asks for one query per class instead of 6 × N. `getCaseStates` is already batched across topics — two queries for all six motions — so a class is 2 × N, not 6 × N, and the N runs concurrently through `Promise.all`. Going further would mean rewriting `getCaseStates` to take a list of users, and its `read` rule needs per-user retrieval-response counts either way. At a class size of 30 that is 60 concurrent indexed lookups on a page a teacher opens occasionally. Left as is, and noted here rather than silently: if a class ever gets big enough for this to matter, the fix is a single grouped query per table.
