@@ -3,6 +3,7 @@ import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { TopicList, type TopicListItem } from "@/components/debate/TopicList";
 import { DebateListViewTracker } from "@/components/debate/DebateListViewTracker";
 import { getWeeklyMotion } from "@/lib/weekly-motion";
+import { getCaseStates, type CaseState } from "@/lib/cases";
 import type { SchoolId } from "@/lib/types";
 
 export const metadata = { title: "Debate · Sophecs" };
@@ -32,7 +33,7 @@ export default async function DebatePage() {
     const admin = createAdminClient();
     const { data: rows } = await admin
       .from("debate_topics")
-      .select("slug, title, motion, stances, par_elo, sort")
+      .select("slug, title, motion, stances, par_elo, sort, micro_before")
       .eq("active", true)
       .order("sort", { ascending: true });
 
@@ -45,31 +46,44 @@ export default async function DebatePage() {
         }))
       )?.slug ?? null;
 
-    topics = await Promise.all(
-      (rows ?? []).map(async (row) => {
-        let bestScore: number | null = null;
-        if (user) {
-          const { data: best } = await admin
-            .from("debates")
-            .select("score")
-            .eq("user_id", user.id)
-            .eq("topic_slug", row.slug)
-            .not("score", "is", null)
-            .order("score", { ascending: false })
-            .limit(1)
-            .maybeSingle();
-          bestScore = best?.score != null ? Number(best.score) : null;
-        }
-        return {
-          slug: row.slug,
-          title: row.title,
-          motion: row.motion,
-          stances: row.stances as Record<SchoolId, string>,
-          parElo: Number(row.par_elo),
-          bestScore,
-        };
-      })
-    );
+    // Best score per topic in one query rather than one per topic: this was
+    // six round trips on a six-motion list, and adding case states would
+    // have made it twelve.
+    const bestByTopic = new Map<string, number>();
+    let caseStates: Record<string, CaseState> = {};
+    if (user) {
+      const [{ data: scored }, states] = await Promise.all([
+        admin
+          .from("debates")
+          .select("topic_slug, score")
+          .eq("user_id", user.id)
+          .not("score", "is", null),
+        getCaseStates(
+          admin,
+          user.id,
+          (rows ?? []).map((r) => ({
+            slug: r.slug as string,
+            microBefore: r.micro_before as string | null,
+          }))
+        ),
+      ]);
+      for (const row of scored ?? []) {
+        const slug = row.topic_slug as string;
+        const score = Number(row.score);
+        if (score > (bestByTopic.get(slug) ?? -Infinity)) bestByTopic.set(slug, score);
+      }
+      caseStates = states;
+    }
+
+    topics = (rows ?? []).map((row) => ({
+      slug: row.slug,
+      title: row.title,
+      motion: row.motion,
+      stances: row.stances as Record<SchoolId, string>,
+      parElo: Number(row.par_elo),
+      bestScore: bestByTopic.get(row.slug) ?? null,
+      caseState: caseStates[row.slug],
+    }));
   }
 
   return (

@@ -2,14 +2,62 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import {
+  chunkLesson,
+  MAX_RETRIEVAL_PROMPTS,
+  type MicroLessonContent,
+} from "./lesson-chunks";
 
-export interface MicroLessonContent {
-  slug: string;
-  topic: string;
-  position: "before" | "after";
-  title: string;
-  source: { author: string; work: string; section: string };
-  body: string; // 150-250 words, frontmatter field — same convention as content/schools' `read`
+// The shape and the chunking rule live in `lesson-chunks`, which the client
+// components import directly; this module adds the filesystem loading and
+// the validation that has to fail the build.
+export {
+  chunkLesson,
+  MAX_RETRIEVAL_PROMPTS,
+  MAX_RETRIEVAL_RESPONSE_CHARS,
+} from "./lesson-chunks";
+export type { MicroLessonContent, RetrievalPrompt, LessonChunk } from "./lesson-chunks";
+
+// Thrown at module load, which in practice means during `next build` (every
+// route that renders a lesson imports this). A prompt pointing at a
+// paragraph that doesn't exist would otherwise silently swallow the rest of
+// the lesson at request time.
+function validate(lesson: MicroLessonContent): void {
+  const prompts = lesson.retrieval_prompts;
+  if (!prompts) return;
+
+  const where = `content/micro/${lesson.slug}.md`;
+  if (!Array.isArray(prompts)) {
+    throw new Error(`${where}: retrieval_prompts must be a list`);
+  }
+  if (prompts.length > MAX_RETRIEVAL_PROMPTS) {
+    throw new Error(
+      `${where}: ${prompts.length} retrieval_prompts, maximum is ${MAX_RETRIEVAL_PROMPTS}`
+    );
+  }
+  const paragraphCount = lesson.body.split("\n\n").length;
+  const seen = new Set<number>();
+  for (const { after_paragraph: index, prompt } of prompts) {
+    if (!Number.isInteger(index) || index < 0 || index >= paragraphCount) {
+      throw new Error(
+        `${where}: after_paragraph ${index} is out of range (lesson has ${paragraphCount} paragraphs, so 0-${paragraphCount - 1})`
+      );
+    }
+    // The last paragraph of a "before" lesson states the motion, and a
+    // prompt after it would sit between the motion and the Begin button.
+    if (index === paragraphCount - 1) {
+      throw new Error(
+        `${where}: after_paragraph ${index} is the last paragraph — a prompt there would follow the motion rather than the reading`
+      );
+    }
+    if (seen.has(index)) {
+      throw new Error(`${where}: two retrieval_prompts both follow paragraph ${index}`);
+    }
+    seen.add(index);
+    if (typeof prompt !== "string" || prompt.trim().length === 0) {
+      throw new Error(`${where}: retrieval prompt after paragraph ${index} is empty`);
+    }
+  }
 }
 
 const MICRO_DIR = path.join(process.cwd(), "content", "micro");
@@ -25,7 +73,9 @@ function loadAll(): Record<string, MicroLessonContent> {
       .filter((f) => f.endsWith(".md") && f.toLowerCase() !== "readme.md")) {
       const raw = fs.readFileSync(path.join(MICRO_DIR, file), "utf8");
       const { data } = matter(raw);
-      result[data.slug as string] = data as MicroLessonContent;
+      const lesson = data as MicroLessonContent;
+      validate(lesson);
+      result[lesson.slug] = lesson;
     }
   }
   cache = result;

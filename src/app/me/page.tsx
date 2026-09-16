@@ -6,6 +6,8 @@ import { getEloPercentile } from "@/lib/percentile";
 import { getPendingChallenges } from "@/lib/challenge";
 import { getOpenObjections, type OpenObjection } from "@/lib/objections";
 import { getWeeklyMotion } from "@/lib/weekly-motion";
+import { getCaseStates, type CaseState } from "@/lib/cases";
+import { CaseTicks } from "@/components/debate/CaseTicks";
 import { OpenObjections } from "@/components/me/OpenObjections";
 import { DisplayNameForm } from "@/components/me/DisplayNameForm";
 import { WelcomeTracker } from "@/components/me/WelcomeTracker";
@@ -13,7 +15,7 @@ import { MeViewTracker } from "@/components/me/MeViewTracker";
 import { EloBlock } from "@/components/me/EloBlock";
 import { StreakBlock } from "@/components/me/StreakBlock";
 import { PendingChallenges } from "@/components/me/PendingChallenges";
-import { SCHOOL_COLORS } from "@/lib/school-colors";
+import { SCHOOL_ADHERENT, SCHOOL_COLORS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
 
 export const metadata = { title: "Me · Sophecs" };
@@ -70,6 +72,8 @@ export default async function MePage({
   let pendingChallenges: Awaited<ReturnType<typeof getPendingChallenges>> = [];
   let debateHistory: DebateHistoryRow[] = [];
   let revisionByParent = new Map<string, DebateHistoryRow>();
+  let caseStates: Record<string, CaseState> = {};
+  let allClosed = false;
   let openObjections: OpenObjection[] = [];
   let weeklyMotion: { slug: string; title: string; sort: number } | null = null;
   let hasAnyDebate = false;
@@ -104,7 +108,7 @@ export default async function MePage({
       getOpenObjections(admin, user.id),
       admin
         .from("debate_topics")
-        .select("slug, title, sort")
+        .select("slug, title, sort, micro_before")
         .eq("active", true)
         .order("sort", { ascending: true }),
     ]);
@@ -128,6 +132,17 @@ export default async function MePage({
         ((revisions as DebateHistoryRow[] | null) ?? []).map((r) => [r.parent_debate_id!, r])
       );
     }
+
+    const activeRows = (activeTopics.data ?? []).map((t) => ({
+      slug: t.slug as string,
+      microBefore: (t.micro_before as string | null) ?? null,
+    }));
+    caseStates = await getCaseStates(admin, user.id, activeRows);
+    // Six of six closed is the only completion signal in the product: one
+    // line, no badge, no certificate, and it says what to do next rather
+    // than congratulating.
+    allClosed =
+      activeRows.length > 0 && activeRows.every((t) => caseStates[t.slug]?.closed);
     weeklyMotion = getWeeklyMotion(
       (activeTopics.data ?? []).map((t) => ({
         slug: t.slug as string,
@@ -167,6 +182,16 @@ export default async function MePage({
               Take the quiz
             </Link>{" "}
             to find your school.
+          </p>
+        )}
+
+        {school && allClosed && (
+          <p className="mt-6 font-serif text-lg leading-relaxed text-ink max-w-[55ch]">
+            You&apos;ve closed every motion as a {SCHOOL_ADHERENT[school]}.{" "}
+            <Link href="/quiz" className="underline underline-offset-4">
+              Retake the quiz
+            </Link>{" "}
+            to argue from another school, or wait for the next motion.
           </p>
         )}
 
@@ -214,6 +239,11 @@ export default async function MePage({
                         {d.rejected ? "not judged" : d.score}
                       </span>
                     </div>
+                    {caseStates[d.topic_slug] && (
+                      <div className="mt-2">
+                        <CaseTicks state={caseStates[d.topic_slug]} />
+                      </div>
+                    )}
                     {/* Nested, not listed alongside: a revision is the second
                         half of one attempt, and reads as nonsense on its own. */}
                     {revision && (

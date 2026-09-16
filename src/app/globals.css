@@ -90,6 +90,26 @@ body {
   margin-top: 1.25em;
 }
 
+/* The next stretch of a lesson appearing after a retrieval prompt. Opt-in
+   rather than opt-out: with no motion preference expressed, or with reduced
+   motion asked for, the paragraphs are simply there. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    animation: reveal 280ms ease-out both;
+  }
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,

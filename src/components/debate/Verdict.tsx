@@ -7,7 +7,7 @@ import { PublishToggle } from "./PublishToggle";
 import { ShareRow } from "./ShareRow";
 import { track } from "@/lib/analytics/client";
 import { SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
-import type { MicroLessonContent } from "@/lib/micro-lessons";
+import type { MicroLessonContent } from "@/lib/lesson-chunks";
 import type { SchoolId } from "@/lib/types";
 
 export interface VerdictData {

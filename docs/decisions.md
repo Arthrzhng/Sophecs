@@ -468,3 +468,68 @@ The first scaffold line is "State what a [school] would say". Lowercasing the sc
 Six motions listed at once is a menu, and a menu is a decision to make before the real one. The week's motion gets the eyebrow, the stance line, and the only filled button on the page; the other five follow under `All motions` in the existing row style, and the weekly one is removed from that list rather than repeated. When `weeklySlug` is null — no active topics, or the admin client is unconfigured — the list renders exactly as it did before, so nothing depends on the rotation existing.
 
 `weekly_motion_clicked` needs an `onClick`, which would have made the whole list a client component. Only the button is one (`WeeklyMotionLink`); `TopicList` stays on the server.
+
+## Task 5: cases
+
+### The twelve prompts, and where they sit
+
+Two per before-lesson, after paragraph 0 and paragraph 1 (paragraph 0 and 2 for `opaque-benefit`, which has four paragraphs and puts its real fork in the third). The shape is the brief's own: the first prompt is recall from the source, the second asks the reader to carry it somewhere. Both are answerable from the paragraphs above them.
+
+The last paragraph of every before-lesson is the one that states the motion, so the loader **rejects** a prompt placed after it — a prompt there would sit between the motion and the `Begin` button, which is the one place in the reading where nothing should interrupt. That is a rule the brief didn't ask for; it falls out of the content actually being three paragraphs with a fixed job each.
+
+**These twelve are drafts pending Arthur's sign-off.** They are installed rather than held back, so the feature is live and testable end to end and the acceptance criterion is actually met; each is one line of frontmatter in `content/micro/*-before.md` and changing one needs no code.
+
+### Validation throws at module load
+
+`micro-lessons.ts` validates on read, and every route that renders a lesson imports it, so a bad prompt fails `next build` rather than silently swallowing the rest of a lesson at request time. Confirmed by pointing a prompt at paragraph 7 of a three-paragraph lesson: `after_paragraph 7 is out of range (lesson has 3 paragraphs, so 0-2)`, and the build stops.
+
+### Three modules, because `server-only` is load-bearing
+
+`micro-lessons.ts` reads the filesystem, so it carries `server-only` and cannot be imported by a client component. The reading flow and the retrieval prompt are client components and need the lesson shape, the chunking rule and the 300-character cap. Those moved to a pure `lib/lesson-chunks.ts`; `micro-lessons.ts` re-exports them and keeps the loading and the validation. Third time this pattern has come up this phase (`weekly-motion`, `share-line`, now `lesson-chunks`) — the rule is that anything a client component needs cannot live in a module that touches the disk.
+
+### `ReadingFlow` is a new component, not a mode on `MicroLesson`
+
+The acceptance criterion is that `/lessons/[slug]` renders exactly what it rendered before. A `showPrompts` flag on `MicroLesson` would have made that a promise about a code path; a separate component makes it a fact — `MicroLesson` is untouched, and `/lessons/[slug]` and the verdict-page objection still use it.
+
+Checked the content too, not just the component: the six before-lessons were rewritten by a YAML round-trip to add the frontmatter, so every `body`, `title` and `source` was compared against the previous commit and is byte-identical. The folded-scalar re-wrapping changes where the file breaks lines, not what parses out of it.
+
+A lesson with no prompts produces exactly one chunk, which is the whole body with `Begin` under it — the no-prompt path is the old path rather than a special case of the new one, which is what keeps `micro_lesson_viewed` timing and the button position unchanged.
+
+### Responses are keyed by prompt position, not by paragraph
+
+`chunk_index` is 0 or 1 — which prompt in the lesson, not which paragraph it follows. Moving a prompt to a different paragraph is then an edit to a content file, not something that orphans an answer a student already wrote.
+
+State is lifted to `DebateFlow` rather than held in `ReadingFlow`, because the editor quotes the notes back and the reading-to-editor transition has no navigation to reload them.
+
+### RLS, verified
+
+```
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"1111...","role":"authenticated"}';
+select id, response from reading_responses;
+-- [{"id":"rlstestaaa","response":"A wrote this"}]   <- B's row is invisible
+```
+
+And the write side, user A forging a row owned by B:
+
+```
+ERROR:  42501: new row violates row-level security policy for table "reading_responses"
+```
+
+Test rows and test users deleted afterwards; `reading_responses` is back to 0 rows.
+
+### Account deletion was already broken, and it is fixed here
+
+The brief asks that deletion cascade `reading_responses`. It does, via `on delete cascade` in the FK. Checking that turned up a bug that predates this task: `debates.user_id` and `ai_calls.user_id` both referenced `auth.users` with **no ON DELETE clause**, and `debates.user_id` was `NOT NULL`. So `auth.admin.deleteUser` hit a foreign-key violation for any user who had ever submitted an argument, and `/me/settings` showed them an error instead of deleting their account.
+
+`0011_account_deletion_fks.sql` makes both `ON DELETE SET NULL` and drops the not-null, following the reasoning already recorded for `quiz_results`: a verdict page is a public link and deleting the row would 404 a stranger's bookmark.
+
+The argument text is a different question, and `deleteAccount` now handles it separately: an **unpublished** argument is deleted, because it was never public and an orphaned row is no reason to keep someone's writing after they have asked to be forgotten. A published one is kept, because publishing it is the consent that keeps it up.
+
+### `getCaseStates` is plural first
+
+Every caller wants all six topics at once — `TopicList`, `/me`, and Task 9's `/class/[code]`. Two queries for the whole set, not two per topic. `getCaseState` (singular) is a wrapper for the one caller that wants one.
+
+`read` is satisfied when a lesson's prompts are all answered **or the lesson has none**, which matters: without that clause a topic whose before-lesson has no prompts could never be read, and so never closed.
+
+While adding case states to `/debate` I collapsed its per-topic best-score lookup into a single query. It was six round trips on a six-motion list and adding states per topic would have made it twelve.

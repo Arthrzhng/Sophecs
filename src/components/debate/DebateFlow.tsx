@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MicroLesson } from "./MicroLesson";
+import { ReadingFlow } from "./ReadingFlow";
 import { ArgumentEditor } from "./ArgumentEditor";
 import { track } from "@/lib/analytics/client";
-import type { MicroLessonContent } from "@/lib/micro-lessons";
+import type { MicroLessonContent } from "@/lib/lesson-chunks";
 import type { SchoolId } from "@/lib/types";
 
 // Micro-lesson before -> editor, one route, client-state transition (no
@@ -18,6 +18,7 @@ export function DebateFlow({
   challengeId,
   isAllowlisted,
   isFirstArgument,
+  readingResponses,
 }: {
   topicSlug: string;
   motion: string;
@@ -27,8 +28,12 @@ export function DebateFlow({
   challengeId?: string;
   isAllowlisted?: boolean;
   isFirstArgument?: boolean;
+  readingResponses: Record<number, string>;
 }) {
   const [began, setBegan] = useState(!microBefore);
+  // Lifted out of ReadingFlow: a note written during the reading has to
+  // survive the switch to the editor, which happens without a navigation.
+  const [responses, setResponses] = useState<Record<number, string>>(readingResponses);
 
   function begin() {
     track({
@@ -57,8 +62,11 @@ export function DebateFlow({
 
   if (!began && microBefore) {
     return (
-      <MicroLesson
+      <ReadingFlow
         lesson={microBefore}
+        topicSlug={topicSlug}
+        responses={responses}
+        onResponse={(index, value) => setResponses((prev) => ({ ...prev, [index]: value }))}
         action={
           <button
             type="button"
@@ -84,6 +92,10 @@ export function DebateFlow({
       challengeId={challengeId}
       isAllowlisted={isAllowlisted}
       isFirstArgument={isFirstArgument}
+      readingNotes={Object.keys(responses)
+        .map(Number)
+        .sort((a, b) => a - b)
+        .map((i) => responses[i])}
     />
   );
 }

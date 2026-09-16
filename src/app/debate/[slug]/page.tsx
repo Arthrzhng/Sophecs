@@ -57,6 +57,21 @@ export default async function DebateTopicPage({
 
   const microBefore = getMicroLesson(topic.micro_before);
 
+  // Answers from an earlier visit, so re-entering a lesson shows what was
+  // already written instead of asking for it again. Keyed by chunk index,
+  // which is what the reading flow and the editor both address them by.
+  const readingResponses: Record<number, string> = {};
+  if ((microBefore?.retrieval_prompts?.length ?? 0) > 0) {
+    const { data: saved } = await admin
+      .from("reading_responses")
+      .select("chunk_index, response")
+      .eq("user_id", user.id)
+      .eq("topic_slug", topic.slug);
+    for (const row of saved ?? []) {
+      readingResponses[Number(row.chunk_index)] = row.response as string;
+    }
+  }
+
   return (
     <main className="flex-1">
       <div className="mx-auto max-w-2xl px-6 pt-14 pb-24">
@@ -69,6 +84,7 @@ export default async function DebateTopicPage({
           challengeId={challenge}
           isAllowlisted={isJudgeAllowlisted(user.id)}
           isFirstArgument={(judgedCount ?? 0) === 0}
+          readingResponses={readingResponses}
         />
       </div>
     </main>

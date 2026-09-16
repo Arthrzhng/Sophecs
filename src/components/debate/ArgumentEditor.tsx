@@ -43,6 +43,7 @@ export function ArgumentEditor({
   parentDebateId,
   initialArgument,
   isFirstArgument,
+  readingNotes = [],
 }: {
   topicSlug: string;
   motion: string;
@@ -54,6 +55,7 @@ export function ArgumentEditor({
   parentDebateId?: string;
   initialArgument?: string;
   isFirstArgument?: boolean;
+  readingNotes?: string[];
 }) {
   const router = useRouter();
   const isRevision = mode === "revision";
@@ -185,6 +187,9 @@ export function ArgumentEditor({
             fidelity_delta: response.revision.fidelityDelta,
           },
         });
+        // A judged revision ends the case whether or not it answered the
+        // objection — there is no third attempt — so this fires on both.
+        track({ name: "case_closed", props: { topic_slug: topicSlug } });
         // Resolved means the objection no longer stands — a revision that
         // failed to answer it leaves it open, so no event.
         if (response.revision.objectionAnswered) {
@@ -246,6 +251,24 @@ export function ArgumentEditor({
           </li>
           <li>Name the strongest objection and say why it doesn&apos;t win.</li>
         </ol>
+      )}
+
+      {/* The answers they wrote during the reading, quoted back. The whole
+          reason for asking was to have something to point at here. */}
+      {readingNotes.length > 0 && (
+        <div className="mt-8 border-l-2 border-rule pl-4">
+          <p className="eyebrow text-ink-soft mb-3">Your notes from the reading</p>
+          <ul className="space-y-2">
+            {readingNotes.map((note, i) => (
+              <li key={i} className="font-serif text-base text-ink-mid leading-relaxed">
+                &ldquo;{note}&rdquo;
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 font-sans text-sm text-ink-soft">
+            You wrote these a minute ago. Use them.
+          </p>
+        </div>
       )}
 
       <textarea

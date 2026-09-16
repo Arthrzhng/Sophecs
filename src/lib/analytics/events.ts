@@ -134,6 +134,13 @@ export type AnalyticsEvent =
 
   // --- Phase 3 Task 4: first-run escalation and the weekly motion ---
   | { name: "first_argument_scaffold_shown"; props: { topic_slug: string } }
-  | { name: "weekly_motion_clicked"; props: { topic_slug: string } };
+  | { name: "weekly_motion_clicked"; props: { topic_slug: string } }
+
+  // --- Phase 3 Task 5: cases ---
+  | {
+      name: "retrieval_prompt_answered";
+      props: { topic_slug: string; chunk_index: number; chars: number };
+    }
+  | { name: "case_closed"; props: { topic_slug: string } };
 
 export type AnalyticsEventName = AnalyticsEvent["name"];

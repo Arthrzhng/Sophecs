@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { pickChallengeTopic } from "@/lib/challenge";
+import { MAX_RETRIEVAL_RESPONSE_CHARS } from "@/lib/micro-lessons";
+import { newId } from "@/lib/ids";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -68,4 +70,43 @@ export async function assignChallengeTopic(challengeId: string): Promise<AssignT
 
   await admin.from("challenges").update({ topic_slug: topicSlug }).eq("id", challengeId);
   return { ok: true, topicSlug };
+}
+
+// Upsert on (user_id, topic_slug, chunk_index): re-reading a lesson and
+// answering again replaces the note rather than failing on the unique
+// index or piling up rows. Uses the user-scoped client, not the admin one —
+// reading_responses has real insert/update/select-own RLS policies, so the
+// database enforces ownership here rather than application code.
+export async function saveReadingResponse(
+  topicSlug: string,
+  chunkIndex: number,
+  response: string
+): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const text = response.trim();
+  if (text.length === 0 || text.length > MAX_RETRIEVAL_RESPONSE_CHARS) {
+    return { ok: false, error: "Write between 1 and 300 characters." };
+  }
+  if (!Number.isInteger(chunkIndex) || chunkIndex < 0 || chunkIndex > 1) {
+    return { ok: false, error: "Unknown prompt." };
+  }
+
+  const { error } = await supabase.from("reading_responses").upsert(
+    {
+      id: newId(),
+      user_id: user.id,
+      topic_slug: topicSlug,
+      chunk_index: chunkIndex,
+      response: text,
+    },
+    { onConflict: "user_id,topic_slug,chunk_index" }
+  );
+  if (error) return { ok: false, error: error.message };
+
+  return { ok: true };
 }

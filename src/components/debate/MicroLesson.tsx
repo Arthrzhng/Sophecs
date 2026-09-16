@@ -1,4 +1,4 @@
-import type { MicroLessonContent } from "@/lib/micro-lessons";
+import type { MicroLessonContent } from "@/lib/lesson-chunks";
 
 // Self-contained excerpt — never links to /learn, per the brief. Used for
 // both the "before" step (with a Begin button) and the "after" objection

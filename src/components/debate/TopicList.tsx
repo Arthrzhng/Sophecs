@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { WeeklyMotionLink } from "./WeeklyMotionLink";
+import { CaseTicks } from "./CaseTicks";
+import type { CaseState } from "@/lib/cases";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
 
@@ -10,6 +12,7 @@ export interface TopicListItem {
   stances: Record<SchoolId, string>;
   parElo: number;
   bestScore: number | null;
+  caseState?: CaseState;
 }
 
 // Reads whatever debate_topics actually has — empty until Arthur's content
@@ -67,6 +70,11 @@ export function TopicList({
               {weekly.bestScore != null ? `Best ${weekly.bestScore}` : "Not yet debated"} · Par ELO{" "}
               {Math.round(weekly.parElo)}
             </p>
+            {weekly.caseState && (
+              <div className="mt-3">
+                <CaseTicks state={weekly.caseState} />
+              </div>
+            )}
           </div>
           <div className="mt-6">
             <WeeklyMotionLink
@@ -96,6 +104,11 @@ export function TopicList({
                       {topic.bestScore != null ? `Best ${topic.bestScore}` : "Not yet debated"} ·
                       Par ELO {Math.round(topic.parElo)}
                     </p>
+                    {topic.caseState && (
+                      <div className="mt-3">
+                        <CaseTicks state={topic.caseState} />
+                      </div>
+                    )}
                   </div>
                 </Link>
               </li>
