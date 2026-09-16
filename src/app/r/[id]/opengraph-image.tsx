@@ -3,7 +3,7 @@ import { CardLayout } from "@/components/card/CardLayout";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { loadOgFonts } from "@/lib/og-fonts";
 import { getSchool } from "@/lib/schools";
-import type { SchoolId, SchoolVector } from "@/lib/types";
+import type { SchoolId } from "@/lib/types";
 
 // Node.js runtime, not edge: see docs/decisions.md and card.png/route.tsx —
 // the embedded fonts push the edge bundle over Vercel's Hobby-plan 1MB
@@ -17,18 +17,16 @@ export default async function OGImage({ params }: { params: Promise<{ id: string
   const [spectral, plexSans, plexMono] = await loadOgFonts();
 
   let school: SchoolId = "stoicism";
-  let vector: SchoolVector = { stoicism: 1, utilitarianism: 0, "virtue-ethics": 0 };
 
   if (isAdminConfigured()) {
     const admin = createAdminClient();
     const { data } = await admin
       .from("public_results")
-      .select("school, vector")
+      .select("school")
       .eq("id", id)
       .single();
     if (data) {
       school = data.school as SchoolId;
-      vector = data.vector as SchoolVector;
     }
   }
 
@@ -40,7 +38,6 @@ export default async function OGImage({ params }: { params: Promise<{ id: string
         school={school}
         oneLine={content.one_line}
         oneLineAttribution={content.one_line_attribution}
-        vector={vector}
         width={1200}
         height={630}
         fonts={{ serif: "Spectral", sans: "IBM Plex Sans", mono: "IBM Plex Mono" }}

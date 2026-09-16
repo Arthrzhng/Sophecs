@@ -1,5 +1,5 @@
 import { SCHOOL_COLORS } from "@/lib/school-colors";
-import type { SchoolId, SchoolVector } from "@/lib/types";
+import type { SchoolId } from "@/lib/types";
 
 export interface CardFonts {
   serif: string;
@@ -11,7 +11,6 @@ export interface CardLayoutProps {
   school: SchoolId;
   oneLine: string;
   oneLineAttribution: string;
-  vector: SchoolVector;
   width: number;
   height: number;
   fonts: CardFonts;
@@ -21,24 +20,21 @@ export interface CardLayoutProps {
   unit?: "px" | "cqw";
 }
 
-const LABELS: Record<SchoolId, string> = {
-  stoicism: "STO",
-  utilitarianism: "UTI",
-  "virtue-ethics": "VIR",
-};
-
-const ORDER: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
-
 // Pure — no hooks, inline styles only, every size derived from `width` — so
 // this exact tree renders identically on /r/[id] and inside next/og's
 // ImageResponse (Satori). The only fully saturated surface in the product;
 // no user name, no illustration, no decoration beyond a hairline and the
 // wordmark.
+//
+// The card carries identity, not data. It used to print the three-way vector
+// as STO/UTI/VIR percentages, which is the one thing a recipient cannot read
+// at a glance and the one thing that makes a screenshot look like a
+// dashboard. The percentages live on /r/[id], next to a second result, where
+// a comparison is actually what they are for.
 export function CardLayout({
   school,
   oneLine,
   oneLineAttribution,
-  vector,
   width,
   height,
   fonts,
@@ -60,7 +56,13 @@ export function CardLayout({
       style={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
+        // space-between, not center: the same tree has to sit well on a
+        // 1200x630 link preview and a 1080x1350 portrait. Centring a short
+        // block on the portrait canvas leaves a third of the card empty
+        // under it. Here the identity block holds the optical centre and
+        // the closing line is pinned to the bottom edge, so the extra
+        // height becomes deliberate space rather than a gap.
+        justifyContent: "space-between",
         boxSizing: "border-box",
         width: u(width),
         height: u(height),
@@ -72,85 +74,79 @@ export function CardLayout({
     >
       <div
         style={{
-          fontFamily: fonts.mono,
-          fontSize: u(Math.round(width * 0.0165)),
-          letterSpacing: u(2),
-          textTransform: "uppercase",
-          opacity: 0.85,
-        }}
-      >
-        Assigned school
-      </div>
-
-      <div
-        style={{
-          fontFamily: fonts.serif,
-          fontSize: u(Math.round(width * 0.078)),
-          fontWeight: 500,
-          marginTop: u(Math.round(width * 0.02)),
-          lineHeight: 1,
-          maxWidth: "100%",
-          wordBreak: "break-word",
-        }}
-      >
-        {colors.name}
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          gap: u(Math.round(width * 0.045)),
-          marginTop: u(Math.round(width * 0.045)),
-          fontFamily: fonts.mono,
-          fontSize: u(Math.round(width * 0.019)),
-        }}
-      >
-        {ORDER.map((id) => (
-          <div key={id} style={{ display: "flex", gap: u(6) }}>
-            <span style={{ opacity: 0.85 }}>{LABELS[id]}</span>
-            <span style={{ fontWeight: 500 }}>{Math.round(vector[id] * 100)}%</span>
-          </div>
-        ))}
-      </div>
-
-      <div
-        style={{
           display: "flex",
           flexDirection: "column",
-          marginTop: u(Math.round(width * 0.05)),
-          paddingTop: u(Math.round(width * 0.045)),
-          borderTop: `1px solid rgba(250,248,242,0.25)`,
-          fontFamily: fonts.serif,
-          fontSize: u(Math.round(width * 0.026)),
-          lineHeight: 1.5,
-          maxWidth: u(Math.round(width * 0.78)),
+          justifyContent: "center",
+          flexGrow: 1,
         }}
       >
-        <div style={{ display: "flex", fontStyle: "italic" }}>{`“${oneLine}”`}</div>
         <div
           style={{
-            display: "flex",
             fontFamily: fonts.mono,
-            fontSize: u(Math.round(width * 0.014)),
-            marginTop: u(Math.round(width * 0.018)),
+            fontSize: u(Math.round(width * 0.0165)),
+            letterSpacing: u(2),
+            textTransform: "uppercase",
             opacity: 0.85,
           }}
         >
-          {`— ${oneLineAttribution}`}
+          Sophecs · Your school
+        </div>
+
+        <div
+          style={{
+            fontFamily: fonts.serif,
+            fontSize: u(Math.round(width * 0.078)),
+            fontWeight: 500,
+            marginTop: u(Math.round(width * 0.02)),
+            lineHeight: 1,
+            maxWidth: "100%",
+            wordBreak: "break-word",
+          }}
+        >
+          {colors.name}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginTop: u(Math.round(width * 0.055)),
+            paddingTop: u(Math.round(width * 0.045)),
+            borderTop: `1px solid rgba(250,248,242,0.25)`,
+            fontFamily: fonts.serif,
+            fontSize: u(Math.round(width * 0.026)),
+            lineHeight: 1.5,
+            maxWidth: u(Math.round(width * 0.78)),
+          }}
+        >
+          <div
+            style={{ display: "flex", fontStyle: "italic" }}
+          >{`“${oneLine}”`}</div>
+          <div
+            style={{
+              display: "flex",
+              fontFamily: fonts.mono,
+              fontSize: u(Math.round(width * 0.014)),
+              marginTop: u(Math.round(width * 0.018)),
+              opacity: 0.85,
+            }}
+          >
+            {`— ${oneLineAttribution}`}
+          </div>
         </div>
       </div>
 
       <div
         style={{
           display: "flex",
-          fontFamily: fonts.serif,
-          fontWeight: 600,
+          fontFamily: fonts.sans,
           fontSize: u(Math.round(width * 0.018)),
           marginTop: u(Math.round(width * 0.06)),
+          flexShrink: 0,
           opacity: 0.85,
         }}
       >
-        sophecs.com
+        Which school do you think in? sophecs.com
       </div>
     </div>
   );

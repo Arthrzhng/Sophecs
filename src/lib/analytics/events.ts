@@ -114,6 +114,7 @@ export type AnalyticsEvent =
     }
   | { name: "objection_answer_started"; props: { debate_id: string } }
   | { name: "rubric_viewed"; props: Record<string, never> }
+  | { name: "card_downloaded"; props: { result_id: string } }
 
   // --- Phase 3 Task 2: the revision loop ---
   | {

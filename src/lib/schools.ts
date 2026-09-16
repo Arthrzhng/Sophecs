@@ -2,6 +2,7 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { pickShareLineFrom } from "./share-line";
 import type { SchoolId } from "./types";
 
 export interface SchoolContent {
@@ -40,13 +41,8 @@ export function getSchool(id: SchoolId): SchoolContent {
 }
 
 // Deterministic rotation: same result id always shows the same share line,
-// so it's trackable and A/B-able in Phase 4.
+// so it's trackable and A/B-able in Phase 4. The choosing itself lives in
+// the pure `share-line` module, which /quiz/result imports on the client.
 export function pickShareLine(id: SchoolId, resultId: string): { text: string; index: number } {
-  const lines = getSchool(id).share_lines;
-  let hash = 0;
-  for (let i = 0; i < resultId.length; i++) {
-    hash = (hash * 31 + resultId.charCodeAt(i)) >>> 0;
-  }
-  const index = hash % lines.length;
-  return { text: lines[index], index };
+  return pickShareLineFrom(getSchool(id).share_lines, resultId);
 }

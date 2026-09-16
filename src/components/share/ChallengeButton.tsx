@@ -5,7 +5,23 @@ import { createChallenge } from "@/app/actions";
 import { track } from "@/lib/analytics/client";
 import type { SchoolId } from "@/lib/types";
 
-export function ChallengeButton({ resultId, school }: { resultId: string; school: SchoolId }) {
+// One primary button per screen. Where "Debate them" is already present it
+// takes that role, and this drops to the bordered style rather than
+// disappearing — the challenge link is still the main way a result travels.
+const STYLES = {
+  primary: "bg-ink text-surface hover:opacity-85 disabled:opacity-60",
+  secondary: "border border-rule bg-surface hover:border-ink-soft disabled:opacity-60",
+} as const;
+
+export function ChallengeButton({
+  resultId,
+  school,
+  variant = "primary",
+}: {
+  resultId: string;
+  school: SchoolId;
+  variant?: keyof typeof STYLES;
+}) {
   const [state, setState] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [link, setLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -41,7 +57,7 @@ export function ChallengeButton({ resultId, school }: { resultId: string; school
     <button
       type="button"
       onClick={handleClick}
-      className="min-h-11 px-5 rounded-md bg-ink text-surface text-sm font-medium hover:opacity-85 transition-opacity disabled:opacity-60"
+      className={`min-h-11 px-5 rounded-md text-sm font-medium transition-opacity ${STYLES[variant]}`}
       disabled={state === "loading"}
     >
       {state === "ready" ? (copied ? "Copied" : "Copy challenge link") : "Challenge a friend"}

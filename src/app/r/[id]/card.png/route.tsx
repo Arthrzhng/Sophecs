@@ -3,7 +3,7 @@ import { CardLayout } from "@/components/card/CardLayout";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { loadOgFonts } from "@/lib/og-fonts";
 import { getSchool } from "@/lib/schools";
-import type { SchoolId, SchoolVector } from "@/lib/types";
+import type { SchoolId } from "@/lib/types";
 
 // Node.js runtime, not edge: the three embedded TTF fonts (~500KB) push this
 // route's bundle over Vercel's 1MB Edge Function size limit on the Hobby
@@ -18,18 +18,16 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const [spectral, plexSans, plexMono] = await loadOgFonts();
 
   let school: SchoolId = "stoicism";
-  let vector: SchoolVector = { stoicism: 1, utilitarianism: 0, "virtue-ethics": 0 };
 
   if (isAdminConfigured()) {
     const admin = createAdminClient();
     const { data } = await admin
       .from("public_results")
-      .select("school, vector")
+      .select("school")
       .eq("id", id)
       .single();
     if (data) {
       school = data.school as SchoolId;
-      vector = data.vector as SchoolVector;
     }
   }
 
@@ -41,7 +39,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         school={school}
         oneLine={content.one_line}
         oneLineAttribution={content.one_line_attribution}
-        vector={vector}
         width={SIZE.width}
         height={SIZE.height}
         fonts={{ serif: "Spectral", sans: "IBM Plex Sans", mono: "IBM Plex Mono" }}

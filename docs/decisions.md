@@ -406,3 +406,39 @@ A revision is a genuine return, but it is not a second debate, so overwriting fu
 - [Second debate within 7 days](https://eu.posthog.com/project/264751/insights/7dG4OHVK) — unchanged
 - [Second debate or revision within 7 days](https://eu.posthog.com/project/264751/insights/4Hv7YA9T) — new
 - [Argument submitted (debate or revision)](https://eu.posthog.com/project/264751/data-management/actions/158532) — the action behind step two
+
+## Task 3: the share loop
+
+### The card lost its percentages, and two DB reads with them
+
+`STO 44% · UTI 33% · VIR 23%` was the one thing on the card a recipient could not read at a glance, and the one thing that made a screenshot look like a dashboard rather than a statement. The card carries identity now: eyebrow, school name, the school's line, the closing question. The percentages moved to `/r/[id]`, beside a second result, which is the only place a three-way split is a comparison rather than a decoration.
+
+Both image routes were selecting `vector` purely to pass it down, so `card.png` and the OG image now select `school` alone. `CardLayout` and `ResultCard` dropped the prop entirely rather than accepting and ignoring it.
+
+### The portrait card needed a different vertical rule
+
+Removing three lines exposed a composition problem that predated this task: `justifyContent: center` puts a short block in the middle of a 1080×1350 canvas and leaves a third of the card visibly empty underneath. The root is now `space-between` with the identity block in a `flexGrow: 1` centring wrapper and the closing line pinned to the bottom padding edge. On 1200×630 this is nearly a no-op (there was barely any slack to redistribute); on 1080×1350 it turns a gap into a margin. Both re-rendered and checked by eye, not just by dimensions.
+
+Rendered from a local production server: `/r/[id]/opengraph-image` 1200×630, `/r/[id]/card.png` 1080×1350, `/opengraph-image` 1200×630, `/debate/[slug]/[debateId]/opengraph-image` 1200×630 — all `200 image/png`.
+
+### `replaceState` instead of `router.replace`
+
+`router.replace("/r/" + id)` was a real navigation: it unmounted the card the user was already looking at and re-rendered a server component to show them the same thing. `window.history.replaceState` rewrites the address bar and nothing else. A refresh or a shared link still resolves to the server-rendered `/r/[id]`, because the URL is real — it is only the client-side transition that is skipped.
+
+Back-button behaviour was the risk. `QuizShell` uses `router.push("/quiz/result")`, so the stack is `/quiz → /quiz/result`; `replaceState` overwrites the top entry rather than adding one, so Back lands on `/quiz`. Verified in a headless Chromium at 375 px: ten questions, no page errors, `URL after back: /quiz`.
+
+### `pickShareLine` had to be split
+
+`/quiz/result` renders `ShareRow` inline once the id is known, which needs a share line on the client. `lib/schools.ts` carries `server-only` (it reads the filesystem), so importing it from a client component is a build error. The choosing is now a pure `lib/share-line.ts#pickShareLineFrom(lines, resultId)`; `schools.ts` keeps `pickShareLine` as a one-line wrapper. The school content itself was already being passed to `QuizResultClient` as a prop, so no new data crosses the boundary — only the hash function moved.
+
+The pre-id state is one line of text, `Saving your result…`, and not a spinner: the card above it is already complete, and an animation would suggest it is not.
+
+### One primary button, and the debate CTA moved down
+
+`/r/[id]` had three filled `bg-ink` buttons on one screen (`Challenge a friend`, `Debate them`, `Debate a motion`) and no ordering logic. Now: `Debate them` when a challenge has both sides, otherwise `ChallengeButton` — exactly one of them filled, the other bordered via a new `variant` prop — then `ShareRow`, then `Debate a motion` as a bordered button below the rule. A recipient who has just compared two vectors is ready to argue; someone who arrived cold is not, which is the whole reason the debate CTA sits last rather than first.
+
+### `card_downloaded` fires alongside `share_clicked`, not instead of it
+
+`share_clicked { channel: "download" }` already existed and answers "which control did they press". `card_downloaded { result_id }` answers "did the PNG actually leave the site", which is the number that matters for the card and which the Instagram path produces too — that path writes the file and copies a caption, and was previously indistinguishable from a link share. Both fire on both paths.
+
+The download control needed no change: it has been present and enabled since Phase 1 (desktop row), and the mobile row reaches the same PNG through `Instagram`.

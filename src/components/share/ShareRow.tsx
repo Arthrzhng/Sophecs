@@ -65,10 +65,19 @@ function useShare({ resultId, school, shareLine, shareLineIndex }: Props) {
     window.open(href, "_blank", "noopener,noreferrer");
   }
 
+  // Fires alongside share_clicked, not instead of it: share_clicked answers
+  // "which channel did they pick", this answers "did the PNG actually leave
+  // the site" — which is the number that matters for the card, and which
+  // the Instagram path produces too.
+  function logDownload() {
+    track({ name: "card_downloaded", props: { result_id: resultId } });
+  }
+
   async function shareInstagram() {
     log("instagram");
     const file = await fetchCardFile();
     if (file) {
+      logDownload();
       const blobUrl = URL.createObjectURL(file);
       const a = document.createElement("a");
       a.href = blobUrl;
@@ -96,6 +105,7 @@ function useShare({ resultId, school, shareLine, shareLineIndex }: Props) {
 
   function downloadCard() {
     log("download");
+    logDownload();
     const a = document.createElement("a");
     a.href = `/r/${resultId}/card.png`;
     a.download = "sophecs-result.png";

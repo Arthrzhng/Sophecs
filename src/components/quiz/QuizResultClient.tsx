@@ -4,9 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ResultCard } from "@/components/card/ResultCard";
+import { ShareRow } from "@/components/share/ShareRow";
+import { ChallengeButton } from "@/components/share/ChallengeButton";
 import { PENDING_RESULT_KEY } from "@/components/quiz/QuizShell";
 import { submitQuizResult } from "@/app/actions";
 import { track } from "@/lib/analytics/client";
+import { pickShareLineFrom } from "@/lib/share-line";
 import type { SchoolContent } from "@/lib/schools";
 import type { SchoolId, SchoolVector } from "@/lib/types";
 
@@ -27,12 +30,14 @@ interface PendingResult {
 
 // Transient — never linkable. Computes nothing itself (QuizShell already
 // scored the quiz client-side); this renders the card immediately from
-// sessionStorage while the insert happens in the background, then redirects
-// to the real /r/[id]. If the insert fails, the card stays up and sharing
-// falls back to /s/[school] instead of a dead /r/[id] link.
+// sessionStorage while the insert happens in the background, then rewrites
+// the URL to the real /r/[id] without navigating. If the insert fails, the
+// card stays up and sharing falls back to /s/[school] instead of a dead
+// /r/[id] link.
 export function QuizResultClient({ schools }: { schools: Record<SchoolId, SchoolContent> }) {
   const router = useRouter();
   const [pending, setPending] = useState<PendingResult | null | undefined>(undefined);
+  const [resultId, setResultId] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -88,7 +93,15 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
       } catch {
         // Non-fatal.
       }
-      router.replace(`/r/${result.id}`);
+      // replaceState, not router.replace: a real navigation would unmount
+      // and re-render the card the user is already looking at, for a page
+      // that shows them the same thing. This rewrites the address bar in
+      // place, so a refresh or a shared link resolves to the server-rendered
+      // /r/[id] while this render stays put. The history entry for
+      // /quiz/result is overwritten rather than added to, so Back lands on
+      // /quiz.
+      window.history.replaceState(null, "", `/r/${result.id}`);
+      setResultId(result.id);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -96,6 +109,7 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
   if (!pending) return null; // either loading or already redirecting to /quiz
 
   const school = schools[pending.primary];
+  const shareLine = resultId ? pickShareLineFrom(school.share_lines, resultId) : null;
 
   return (
     <main className="flex-1">
@@ -105,8 +119,37 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
           school={pending.primary}
           oneLine={school.one_line}
           oneLineAttribution={school.one_line_attribution}
-          vector={pending.vector}
         />
+
+        {/* One line, not a spinner: the card is already on screen and
+            finished, so an animation here would imply something is still
+            missing from it. */}
+        {!resultId && !failed && (
+          <p className="mt-8 text-sm text-ink-soft">Saving your result…</p>
+        )}
+
+        {resultId && shareLine && (
+          <>
+            <div className="mt-8">
+              <ShareRow
+                resultId={resultId}
+                school={pending.primary}
+                shareLine={shareLine.text}
+                shareLineIndex={shareLine.index}
+              />
+            </div>
+            <div className="mt-6 flex flex-wrap items-center gap-6">
+              <ChallengeButton resultId={resultId} school={pending.primary} />
+              <Link
+                href="/debate"
+                className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"
+              >
+                Defend your school in a debate
+              </Link>
+            </div>
+          </>
+        )}
+
         {failed && (
           <p className="mt-6 text-sm text-ink-mid max-w-[50ch]">
             Couldn&apos;t save this result just now, but it&apos;s yours to keep looking at.{" "}

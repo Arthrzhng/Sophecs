@@ -45,6 +45,14 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
         <p className="mt-5 text-lg text-ink-mid leading-relaxed max-w-[45ch]">
           Find out whether you agree with them.
         </p>
+        {/* A recipient arrives here knowing nothing. One sentence, static,
+            between the heading and the button — enough to say what this is
+            without moving the button below the fold. */}
+        <p className="mt-4 text-ink-mid leading-relaxed max-w-[52ch]">
+          Sophecs sorts you into one of three schools of ethics — Stoic,
+          Utilitarian or Virtue Ethicist — in ten questions, then asks you to
+          argue for it. No account needed.
+        </p>
         <div className="mt-10">
           <Link
             href={`/quiz?c=${id}`}

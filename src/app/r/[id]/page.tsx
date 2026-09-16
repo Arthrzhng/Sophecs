@@ -122,6 +122,7 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
   const otherResult =
     challengerFromLink ?? (challengeInfo ? await getResult(challengeInfo.otherResultId) : null);
   const { text: shareLine, index: shareLineIndex } = pickShareLine(result.school, result.id);
+  const showDebateThem = Boolean(challengeInfo && challengeInfo.status !== "complete");
 
   return (
     <main className="flex-1">
@@ -136,7 +137,6 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
           school={result.school}
           oneLine={school.one_line}
           oneLineAttribution={school.one_line_attribution}
-          vector={result.vector}
         />
 
         {otherResult && (
@@ -146,25 +146,28 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
           </div>
         )}
 
-        <div className="mt-8">
-          <ShareRow resultId={id} school={result.school} shareLine={shareLine} shareLineIndex={shareLineIndex} />
-        </div>
-
-        <div className="mt-6 flex flex-wrap items-center gap-4">
-          <ChallengeButton resultId={id} school={result.school} />
-          {challengeInfo && challengeInfo.status !== "complete" && (
+        {/* Order matters more than content here. A recipient who has just
+            compared two vectors is ready to answer; someone who arrived
+            cold is not, so the debate CTA sits last. Exactly one primary
+            button is on screen: "Debate them" when a challenge has both
+            sides, otherwise the challenge button. */}
+        <div className="mt-8 flex flex-wrap items-center gap-4">
+          {showDebateThem && (
             <DebateThemButton
-              challengeId={challengeInfo.challengeId}
+              challengeId={challengeInfo!.challengeId}
               resultId={id}
               isSignedIn={Boolean(user)}
             />
           )}
-          <Link
-            href={`/s/${result.school}`}
-            className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"
-          >
-            Read the case for {schoolDisplayName(result.school)}
-          </Link>
+          <ChallengeButton
+            resultId={id}
+            school={result.school}
+            variant={showDebateThem ? "secondary" : "primary"}
+          />
+        </div>
+
+        <div className="mt-6">
+          <ShareRow resultId={id} school={result.school} shareLine={shareLine} shareLineIndex={shareLineIndex} />
         </div>
 
         {/* The card is where most people land, so it needs a way into the
@@ -180,9 +183,15 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
           <div className="mt-5 flex flex-wrap items-center gap-6">
             <Link
               href="/debate"
-              className="inline-block bg-ink text-surface rounded-md px-6 py-3 text-base font-medium hover:opacity-85"
+              className="min-h-11 inline-flex items-center rounded-md border border-rule bg-surface px-5 text-sm font-medium hover:border-ink-soft"
             >
               Debate a motion
+            </Link>
+            <Link
+              href={`/s/${result.school}`}
+              className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"
+            >
+              Read the case for {schoolDisplayName(result.school)}
             </Link>
             <Link
               href="/lessons"

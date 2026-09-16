@@ -1,5 +1,5 @@
 import { CardLayout } from "./CardLayout";
-import type { SchoolId, SchoolVector } from "@/lib/types";
+import type { SchoolId } from "@/lib/types";
 
 const WEB_FONTS = {
   serif: "var(--font-spectral), Georgia, serif",
@@ -14,12 +14,10 @@ export function ResultCard({
   school,
   oneLine,
   oneLineAttribution,
-  vector,
 }: {
   school: SchoolId;
   oneLine: string;
   oneLineAttribution: string;
-  vector: SchoolVector;
 }) {
   return (
     <div
@@ -30,7 +28,6 @@ export function ResultCard({
         school={school}
         oneLine={oneLine}
         oneLineAttribution={oneLineAttribution}
-        vector={vector}
         width={1200}
         height={630}
         fonts={WEB_FONTS}
