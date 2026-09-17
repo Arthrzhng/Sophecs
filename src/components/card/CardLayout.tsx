@@ -1,10 +1,18 @@
 import { SCHOOL_COLORS } from "@/lib/school-colors";
+import {
+  CARD_INK,
+  CARD_MEASURE,
+  CARD_PADDING,
+  CARD_RULE,
+  CARD_SCALE,
+  CARD_SURFACE,
+  cardBasis,
+} from "@/lib/card-tokens";
 import type { SchoolId } from "@/lib/types";
 
 export interface CardFonts {
   serif: string;
   sans: string;
-  mono: string;
 }
 
 export interface CardLayoutProps {
@@ -23,14 +31,26 @@ export interface CardLayoutProps {
 // Pure — no hooks, inline styles only, every size derived from `width` — so
 // this exact tree renders identically on /r/[id] and inside next/og's
 // ImageResponse (Satori). The only fully saturated surface in the product;
-// no user name, no illustration, no decoration beyond a hairline and the
-// wordmark.
+// no user name, no illustration, no decoration beyond a hairline.
 //
 // The card carries identity, not data. It used to print the three-way vector
 // as STO/UTI/VIR percentages, which is the one thing a recipient cannot read
 // at a glance and the one thing that makes a screenshot look like a
 // dashboard. The percentages live on /r/[id], next to a second result, where
 // a comparison is actually what they are for.
+//
+// The quotation leads and the school name resolves it. That ordering is the
+// card's one deliberate typographic risk: a label with a caption under it is
+// a badge, and a badge is what every quiz result on the internet looks like.
+// A sentence in Spectral italic with its source under it, and the name set
+// below the rule, is a book plate — you read it before you know what it is
+// labelling, which is the right order for a sentence worth reading.
+//
+// There is no mono on this card. Mono is for measured values and the card
+// holds no number; the eyebrow it used to set in mono small caps
+// ("SOPHECS · YOUR SCHOOL") is gone entirely rather than restyled, because
+// with the quotation leading and the wordmark closing there was nothing left
+// for it to say.
 export function CardLayout({
   school,
   oneLine,
@@ -40,7 +60,6 @@ export function CardLayout({
   fonts,
   unit = "px",
 }: CardLayoutProps) {
-  const colors = SCHOOL_COLORS[school];
   // Sizes are authored against `width` and converted once, here. Scaling the
   // whole tree with a transform is not an option in pure CSS: scale() needs a
   // unitless number and calc(100cqw / <n>) is a length, so such a declaration
@@ -48,8 +67,12 @@ export function CardLayout({
   const u =
     unit === "cqw"
       ? (n: number): string | number => `${((n / width) * 100).toFixed(4)}cqw`
-      : (n: number): string | number => n;
-  const pad = Math.round(width * 0.075);
+      : (n: number): string | number => Math.round(n);
+  // Type sizes come off the basis, the column off the width. See
+  // cardBasis() for why those are not the same number.
+  const basis = cardBasis(width, height);
+  const pad = width * CARD_PADDING;
+  const measure = width * CARD_MEASURE;
 
   return (
     <div
@@ -67,8 +90,8 @@ export function CardLayout({
         width: u(width),
         height: u(height),
         padding: u(pad),
-        backgroundColor: colors.surface,
-        color: colors.ink,
+        backgroundColor: CARD_SURFACE[school],
+        color: CARD_INK,
         fontFamily: fonts.sans,
       }}
     >
@@ -80,59 +103,68 @@ export function CardLayout({
           flexGrow: 1,
         }}
       >
+        {/* The quotation. Spectral italic, set to a measure rather than to
+            the card edge, with typographic quotes. Satori has no ::before,
+            so the marks are in the string. */}
         <div
           style={{
-            fontFamily: fonts.mono,
-            fontSize: u(Math.round(width * 0.0165)),
-            letterSpacing: u(2),
-            textTransform: "uppercase",
-            opacity: 0.85,
+            display: "flex",
+            fontFamily: fonts.serif,
+            fontStyle: "italic",
+            fontWeight: 400,
+            fontSize: u(basis * CARD_SCALE.quote),
+            lineHeight: CARD_SCALE.quoteLeading,
+            maxWidth: u(measure),
           }}
         >
-          Sophecs · Your school
+          {`“${oneLine}”`}
         </div>
+
+        {/* Source, not a byline: no em-dash prefix, no mono, no brackets.
+            Spectral italic one step down, so the quotation and its source
+            read as one typeset block. */}
+        <div
+          style={{
+            display: "flex",
+            fontFamily: fonts.serif,
+            fontStyle: "italic",
+            fontWeight: 400,
+            fontSize: u(basis * CARD_SCALE.attribution),
+            lineHeight: 1.45,
+            marginTop: u(basis * CARD_SCALE.gapSource),
+            maxWidth: u(measure),
+            opacity: 0.8,
+          }}
+        >
+          {oneLineAttribution}
+        </div>
+
+        {/* The one hairline. Same structural device as the rest of the site,
+            at the one place on the card where the sentence ends and the
+            label begins. */}
+        <div
+          style={{
+            display: "flex",
+            width: u(measure),
+            height: u(1),
+            marginTop: u(basis * CARD_SCALE.gapRule),
+            backgroundColor: CARD_RULE,
+          }}
+        />
 
         <div
           style={{
             fontFamily: fonts.serif,
-            fontSize: u(Math.round(width * 0.078)),
+            fontStyle: "normal",
             fontWeight: 500,
-            marginTop: u(Math.round(width * 0.02)),
-            lineHeight: 1,
+            fontSize: u(basis * CARD_SCALE.name),
+            lineHeight: 1.05,
+            marginTop: u(basis * CARD_SCALE.gapName),
             maxWidth: "100%",
             wordBreak: "break-word",
           }}
         >
-          {colors.name}
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            marginTop: u(Math.round(width * 0.055)),
-            paddingTop: u(Math.round(width * 0.045)),
-            borderTop: `1px solid rgba(250,248,242,0.25)`,
-            fontFamily: fonts.serif,
-            fontSize: u(Math.round(width * 0.026)),
-            lineHeight: 1.5,
-            maxWidth: u(Math.round(width * 0.78)),
-          }}
-        >
-          <div
-            style={{ display: "flex", fontStyle: "italic" }}
-          >{`“${oneLine}”`}</div>
-          <div
-            style={{
-              display: "flex",
-              fontFamily: fonts.mono,
-              fontSize: u(Math.round(width * 0.014)),
-              marginTop: u(Math.round(width * 0.018)),
-              opacity: 0.85,
-            }}
-          >
-            {`— ${oneLineAttribution}`}
-          </div>
+          {SCHOOL_COLORS[school].name}
         </div>
       </div>
 
@@ -140,10 +172,10 @@ export function CardLayout({
         style={{
           display: "flex",
           fontFamily: fonts.sans,
-          fontSize: u(Math.round(width * 0.018)),
-          marginTop: u(Math.round(width * 0.06)),
+          fontSize: u(basis * CARD_SCALE.footer),
+          marginTop: u(basis * CARD_SCALE.gapFooter),
           flexShrink: 0,
-          opacity: 0.85,
+          opacity: 0.75,
         }}
       >
         Which school do you think in? sophecs.com

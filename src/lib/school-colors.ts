@@ -1,17 +1,25 @@
+import { CARD_INK, CARD_SURFACE } from "./card-tokens";
 import type { SchoolId } from "./types";
 
-// Duplicated from globals.css's @theme tokens on purpose: CardLayout renders
-// both as a normal React tree (where the CSS vars would resolve fine) and
-// inside next/og's ImageResponse (Satori — no CSS custom property
-// resolution, no external stylesheet, inline styles with literal values
-// only). Keeping one canonical hex map here means both call sites agree.
+// The saturated surfaces are read from card-tokens.ts, not restated here:
+// that file is the single place the globals.css literals are mirrored for
+// Satori, and two copies of the same hex is exactly the drift it exists to
+// prevent. What this map adds is the display name, which is not a token.
 export const SCHOOL_COLORS: Record<
   SchoolId,
   { surface: string; ink: string; name: string }
 > = {
-  stoicism: { surface: "#33503f", ink: "#faf8f2", name: "Stoicism" },
-  utilitarianism: { surface: "#7a5518", ink: "#faf8f2", name: "Utilitarianism" },
-  "virtue-ethics": { surface: "#6b2c37", ink: "#faf8f2", name: "Virtue Ethics" },
+  stoicism: { surface: CARD_SURFACE.stoicism, ink: CARD_INK, name: "Stoicism" },
+  utilitarianism: {
+    surface: CARD_SURFACE.utilitarianism,
+    ink: CARD_INK,
+    name: "Utilitarianism",
+  },
+  "virtue-ethics": {
+    surface: CARD_SURFACE["virtue-ethics"],
+    ink: CARD_INK,
+    name: "Virtue Ethics",
+  },
 };
 
 // What you call a person who argues from a school, as opposed to the

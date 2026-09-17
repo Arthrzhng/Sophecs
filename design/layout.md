@@ -184,16 +184,17 @@ answer rows must be distinguishable in greyscale.
 ─────────────────────────────────────────────────────
 
   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-  ▓                                                 ▓
-  ▓  Sophecs · Your school                          ▓  ← the ONE saturated
+  ▓                                                 ▓  ← the ONE saturated
   ▓                                                 ▓     surface. Square.
-  ▓  Stoicism                                       ▓     No shadow.
-  ▓                                                 ▓     1200×630.
+  ▓  “Of things some are in our power, and          ▓     No shadow.
+  ▓   others are not.”                              ▓     1200×630.
+  ▓                                                 ▓
+  ▓  Epictetus, Enchiridion, ch. 1                  ▓
+  ▓                                                 ▓
   ▓  ─────────────────────────────────────────      ▓
   ▓                                                 ▓
-  ▓  "Of things some are in our power, and          ▓
-  ▓   others are not."                              ▓
-  ▓  Epictetus, Enchiridion, ch. 1                  ▓
+  ▓  Stoicism                                       ▓
+  ▓                                                 ▓
   ▓                                                 ▓
   ▓  Which school do you think in? sophecs.com      ▓
   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
@@ -230,11 +231,42 @@ else stacks. Card aspect stays 1200:630 via container-query units so the
 on-screen card and the OG render are the same tree — already true today and
 preserved.
 
-**Open question for you — see report.** The brief says the card carries "the
-user's name if authenticated". The card has no name today, on screen or in
-the OG. Adding one changes a frozen-ish artefact and has a privacy edge
-(a shared OG image would carry a real name to anyone who sees the link). I
-have not drawn it in. Flagging rather than deciding.
+The card carries school only. No name, on screen or in either image.
+
+### The card's typography
+
+Four elements, in this order, and nothing else:
+
+| | face | size | notes |
+|---|---|---|---|
+| Quotation | Spectral italic 400 | 0.0435 × basis | the largest thing on the card |
+| Source | Spectral italic 400 | 0.021 × basis | no em dash, no brackets, 80% opacity |
+| Hairline | — | 1px | `rgba(250,248,242,0.22)`, 88% of width |
+| School name | Spectral 500 roman | 0.059 × basis | |
+| Closing line | IBM Plex Sans 400 | 0.019 × basis | the only sans, 75% opacity |
+
+No mono anywhere: the card holds no measured value. No eyebrow: with the
+quotation leading and the wordmark closing, the label it used to carry
+(`SOPHECS · YOUR SCHOOL`, mono small caps with a middle dot) had nothing
+left to say.
+
+The quotation leads and the name resolves it. That inversion is the card's
+one deliberate risk — a label with a caption under it is a badge, which is
+what every quiz result on the internet looks like; a sentence with its
+source under it and the name below the rule is a book plate.
+
+`basis` is `(width × 2 + height) / 3`, not width: the portrait canvas is
+narrower and twice as tall, so sizing on width alone leaves the same
+paragraph adrift in a much larger rectangle. The measure and padding stay
+on width, because those are about the column rather than the canvas.
+
+The quote size is set by line breaking rather than taste. Chromium and
+Satori shape the same face to slightly different widths, so a string within
+~4% of a line-count boundary wraps in one engine and not the other. At
+0.0435 the closest of the six combinations is 8.6% clear, and the quotes
+set 1/2/2 lines on the link preview and 2/3/3 on the portrait in both
+engines. **Editing a `one_line` in `content/schools/*.md` means re-checking
+that margin.**
 
 ---
 

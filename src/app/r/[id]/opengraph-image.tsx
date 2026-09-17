@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { CardLayout } from "@/components/card/CardLayout";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
-import { loadOgFonts } from "@/lib/og-fonts";
+import { loadCardFonts } from "@/lib/og-fonts";
 import { getSchool } from "@/lib/schools";
 import type { SchoolId } from "@/lib/types";
 
@@ -14,7 +14,7 @@ export const contentType = "image/png";
 
 export default async function OGImage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [spectral, plexSans, plexMono] = await loadOgFonts();
+  const [spectral, spectralItalic, plexSans] = await loadCardFonts();
 
   let school: SchoolId = "stoicism";
 
@@ -40,15 +40,18 @@ export default async function OGImage({ params }: { params: Promise<{ id: string
         oneLineAttribution={content.one_line_attribution}
         width={1200}
         height={630}
-        fonts={{ serif: "Spectral", sans: "IBM Plex Sans", mono: "IBM Plex Mono" }}
+        fonts={{ serif: "Spectral", sans: "IBM Plex Sans" }}
       />
     ),
     {
       ...size,
+      // Both Spectral styles, registered under one family name so the
+      // card's fontStyle: "italic" selects the real italic rather than
+      // rendering upright.
       fonts: [
         { name: "Spectral", data: spectral, weight: 500, style: "normal" },
+        { name: "Spectral", data: spectralItalic, weight: 400, style: "italic" },
         { name: "IBM Plex Sans", data: plexSans, weight: 400, style: "normal" },
-        { name: "IBM Plex Mono", data: plexMono, weight: 500, style: "normal" },
       ],
       headers: { "Cache-Control": "public, max-age=31536000, immutable" },
     }
