@@ -4,9 +4,8 @@ import {
   CARD_MEASURE,
   CARD_PADDING,
   CARD_RULE,
-  CARD_SCALE,
   CARD_SURFACE,
-  cardBasis,
+  cardScale,
 } from "@/lib/card-tokens";
 import type { SchoolId } from "@/lib/types";
 
@@ -68,9 +67,10 @@ export function CardLayout({
     unit === "cqw"
       ? (n: number): string | number => `${((n / width) * 100).toFixed(4)}cqw`
       : (n: number): string | number => Math.round(n);
-  // Type sizes come off the basis, the column off the width. See
-  // cardBasis() for why those are not the same number.
-  const basis = cardBasis(width, height);
+  // Each canvas has its own scale rather than one scaled off the other:
+  // a 1200x630 thumbnail in a feed and a 1080x1350 frame on a phone are
+  // different objects, and the second is not the first with more room.
+  const s = cardScale(width, height);
   const pad = width * CARD_PADDING;
   const measure = width * CARD_MEASURE;
 
@@ -112,8 +112,8 @@ export function CardLayout({
             fontFamily: fonts.serif,
             fontStyle: "italic",
             fontWeight: 400,
-            fontSize: u(basis * CARD_SCALE.quote),
-            lineHeight: CARD_SCALE.quoteLeading,
+            fontSize: u(width * s.quote),
+            lineHeight: s.quoteLeading,
             maxWidth: u(measure),
           }}
         >
@@ -129,9 +129,9 @@ export function CardLayout({
             fontFamily: fonts.serif,
             fontStyle: "italic",
             fontWeight: 400,
-            fontSize: u(basis * CARD_SCALE.attribution),
+            fontSize: u(width * s.source),
             lineHeight: 1.45,
-            marginTop: u(basis * CARD_SCALE.gapSource),
+            marginTop: u(width * s.gapSource),
             maxWidth: u(measure),
             opacity: 0.8,
           }}
@@ -147,7 +147,7 @@ export function CardLayout({
             display: "flex",
             width: u(measure),
             height: u(1),
-            marginTop: u(basis * CARD_SCALE.gapRule),
+            marginTop: u(width * s.gapRule),
             backgroundColor: CARD_RULE,
           }}
         />
@@ -157,9 +157,9 @@ export function CardLayout({
             fontFamily: fonts.serif,
             fontStyle: "normal",
             fontWeight: 500,
-            fontSize: u(basis * CARD_SCALE.name),
+            fontSize: u(width * s.name),
             lineHeight: 1.05,
-            marginTop: u(basis * CARD_SCALE.gapName),
+            marginTop: u(width * s.gapName),
             maxWidth: "100%",
             wordBreak: "break-word",
           }}
@@ -168,17 +168,43 @@ export function CardLayout({
         </div>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          fontFamily: fonts.sans,
-          fontSize: u(basis * CARD_SCALE.footer),
-          marginTop: u(basis * CARD_SCALE.gapFooter),
-          flexShrink: 0,
-          opacity: 0.75,
-        }}
-      >
-        Which school do you think in? sophecs.com
+      {/* The closing block, which is the call to action and the only sans
+          on the card.
+
+          Two lines rather than one, because the two halves have different
+          jobs at different sizes. A link preview in a feed is often served
+          at around 300px wide; at that scale everything here is a quarter
+          of its authored size, and a single line holding both the question
+          and the address puts the address at four or five pixels, which is
+          a smudge. Split, the address can be set large enough to survive
+          the downscale — it is the second most visible thing on the card
+          after the school name — while the question keeps its sentence
+          shape above it. Both at full opacity: this is the one element
+          that has to be read by someone who has not decided to read
+          anything yet. */}
+      <div style={{ display: "flex", flexDirection: "column", flexShrink: 0 }}>
+        <div
+          style={{
+            display: "flex",
+            fontFamily: fonts.sans,
+            fontSize: u(width * s.closingQuestion),
+            lineHeight: 1.4,
+            marginTop: u(width * s.gapClosing),
+          }}
+        >
+          Which school do you think in?
+        </div>
+        <div
+          style={{
+            display: "flex",
+            fontFamily: fonts.sans,
+            fontSize: u(width * s.closingUrl),
+            lineHeight: 1.2,
+            marginTop: u(width * s.gapUrl),
+          }}
+        >
+          sophecs.com
+        </div>
       </div>
     </div>
   );

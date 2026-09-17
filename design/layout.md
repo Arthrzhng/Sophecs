@@ -195,8 +195,8 @@ answer rows must be distinguishable in greyscale.
   ▓                                                 ▓
   ▓  Stoicism                                       ▓
   ▓                                                 ▓
-  ▓                                                 ▓
-  ▓  Which school do you think in? sophecs.com      ▓
+  ▓  Which school do you think in?                  ▓
+  ▓  sophecs.com                                    ▓
   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
   [ Share ]   Copy link   Save image        ← primary + two text actions
@@ -235,18 +235,20 @@ The card carries school only. No name, on screen or in either image.
 
 ### The card's typography
 
-Four elements, in this order, and nothing else:
+Five elements, in this order, and nothing else. Sizes are fractions of the
+card's width; the pixel figures are what those come to on each canvas.
 
-| | face | size | notes |
+| | face | landscape 1200×630 | portrait 1080×1350 |
 |---|---|---|---|
-| Quotation | Spectral italic 400 | 0.0435 × basis | the largest thing on the card |
-| Source | Spectral italic 400 | 0.021 × basis | no em dash, no brackets, 80% opacity |
-| Hairline | — | 1px | `rgba(250,248,242,0.22)`, 88% of width |
-| School name | Spectral 500 roman | 0.059 × basis | |
-| Closing line | IBM Plex Sans 400 | 0.019 × basis | the only sans, 75% opacity |
+| Quotation | Spectral italic 400 | 44px | 70px |
+| Source | Spectral italic 400 | 21px, 80% | 28px, 80% |
+| Hairline | — | 1px, ink at 22%, 88% of width | same |
+| School name | Spectral 500 roman | 60px | 136px |
+| Question | IBM Plex Sans 400 | 24px | 40px |
+| `sophecs.com` | IBM Plex Sans 400 | 46px | 105px |
 
 No mono anywhere: the card holds no measured value. No eyebrow: with the
-quotation leading and the wordmark closing, the label it used to carry
+quotation leading and the address closing, the label it used to carry
 (`SOPHECS · YOUR SCHOOL`, mono small caps with a middle dot) had nothing
 left to say.
 
@@ -255,18 +257,44 @@ one deliberate risk — a label with a caption under it is a badge, which is
 what every quiz result on the internet looks like; a sentence with its
 source under it and the name below the rule is a book plate.
 
-`basis` is `(width × 2 + height) / 3`, not width: the portrait canvas is
-narrower and twice as tall, so sizing on width alone leaves the same
-paragraph adrift in a much larger rectangle. The measure and padding stay
-on width, because those are about the column rather than the canvas.
+**Two scales, not one scaled off the other.** A 1200×630 thumbnail in a
+feed and a 1080×1350 frame on a phone are different objects, and the second
+is not the first with more room. On the landscape card the quotation is the
+largest element; on the portrait one the name is, by a clear margin, and
+most of the extra height goes into the gaps rather than the type. Both fill
+their content box to the same degree — measured at 90/96/96% across the
+three schools on landscape and 90/97/97% on portrait.
 
-The quote size is set by line breaking rather than taste. Chromium and
-Satori shape the same face to slightly different widths, so a string within
-~4% of a line-count boundary wraps in one engine and not the other. At
-0.0435 the closest of the six combinations is 8.6% clear, and the quotes
-set 1/2/2 lines on the link preview and 2/3/3 on the portrait in both
-engines. **Editing a `one_line` in `content/schools/*.md` means re-checking
-that margin.**
+**The closing block is two lines, and it is the call to action.** A link
+preview is often served around 300px wide, where everything is a quarter of
+its authored size; a single line holding the question and the address puts
+the address at four or five pixels. Split, the address is set at 46px — the
+second most visible element after the school name, ahead of the quotation —
+and lands at 11.5px in a 300px preview. Both lines are at full opacity.
+
+**Line counts are measured, not modelled.** Dividing a string's total width
+by the box underestimates, because greedy wrapping wastes whatever a word
+does not fill: Bentham's quote divides to 2.9 lines on the portrait and
+really sets to four. The margins below are empirical — how far the box can
+move before the count changes.
+
+| canvas | element | lines (Sto / Uti / Vir) | tightest margin |
+|---|---|---|---|
+| landscape | quote 44px | 1 / 2 / 2 | shrink 9%, grow >40% |
+| landscape | source 21px | 1 / 1 / 1 | shrink 39% |
+| portrait | quote 70px | 2 / 4 / 4 | shrink 16%, grow 6% |
+| portrait | source 28px | 1 / 1 / 1 | shrink 9% |
+
+Chromium and Satori shape the same face to slightly different widths, so a
+string near a boundary wraps in one engine and not the other — at an
+earlier size the Epictetus quote set one line on screen and two in the PNG.
+The two engines diverge by well under 1% here, so 6% is a wide margin. Only
+the landscape canvas renders in both engines; `/r/[id]` and `/quiz/result`
+are always 1200×630, so the portrait margins guard against an edited quote
+reflowing rather than against a disagreement.
+
+**Editing a `one_line` or a `one_line_attribution` in
+`content/schools/*.md` means re-deriving this table.**
 
 ---
 
