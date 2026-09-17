@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
-import { SCHOOL_COLORS } from "@/lib/school-colors";
+import { Page } from "@/components/layout/Page";
+import { ChallengeInvite } from "@/components/share/ChallengeInvite";
 import { ChallengeViewTracker } from "@/components/share/ChallengeViewTracker";
+import { getSchool } from "@/lib/schools";
 import type { SchoolId } from "@/lib/types";
 
 export const metadata = { title: "You've been challenged · Sophecs" };
@@ -32,36 +33,14 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
   const challenge = await getChallenge(id);
   if (!challenge) notFound();
 
-  const schoolName = SCHOOL_COLORS[challenge.school].name;
-
   return (
-    <main className="flex-1 flex items-center">
-      <div className="mx-auto max-w-xl px-6 py-20">
-        <ChallengeViewTracker challengeId={id} />
-        <p className="eyebrow text-ink-soft mb-6">You&apos;ve been challenged</p>
-        <h1 className="font-serif text-3xl sm:text-4xl font-medium leading-tight max-w-[16ch]">
-          Someone who thinks like a {schoolName.toLowerCase()} sent you this.
-        </h1>
-        <p className="mt-5 text-lg text-ink-mid leading-relaxed max-w-[45ch]">
-          Find out whether you agree with them.
-        </p>
-        {/* A recipient arrives here knowing nothing. One sentence, static,
-            between the heading and the button — enough to say what this is
-            without moving the button below the fold. */}
-        <p className="mt-4 text-ink-mid leading-relaxed max-w-[52ch]">
-          Sophecs sorts you into one of three schools of ethics — Stoic,
-          Utilitarian or Virtue Ethicist — in ten questions, then asks you to
-          argue for it. No account needed.
-        </p>
-        <div className="mt-10">
-          <Link
-            href={`/quiz?c=${id}`}
-            className="inline-block bg-ink text-surface rounded-md px-6 py-3 text-base font-medium hover:opacity-85 transition-opacity"
-          >
-            Take the quiz
-          </Link>
-        </div>
-      </div>
-    </main>
+    <Page width="read">
+      <ChallengeViewTracker challengeId={id} />
+      <ChallengeInvite
+        challengeId={id}
+        school={challenge.school}
+        content={getSchool(challenge.school)}
+      />
+    </Page>
   );
 }

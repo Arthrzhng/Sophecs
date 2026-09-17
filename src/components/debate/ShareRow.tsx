@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { Toast, useToast } from "@/components/ui/Toast";
 import { track } from "@/lib/analytics/client";
 
 const SITE = "https://sophecs.com";
@@ -18,16 +19,11 @@ export function ShareRow({
   score: number;
   shareLine: string;
 }) {
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, showToast, clearToast] = useToast();
   const url = `${SITE}/debate/${topicSlug}/${debateId}`;
 
   function log(channel: Channel) {
     track({ name: "verdict_share_clicked", props: { debate_id: debateId, channel, score } });
-  }
-
-  function showToast(message: string) {
-    setToast(message);
-    setTimeout(() => setToast(null), 2600);
   }
 
   function shareX() {
@@ -56,34 +52,21 @@ export function ShareRow({
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={shareX}
-          className="min-h-11 px-4 rounded-md border border-rule bg-surface text-sm font-medium hover:border-ink-soft"
-        >
+      <p className="mb-4 text-sm text-ink-soft">Share this verdict</p>
+      {/* No saturated surface here. The result card is the one place the
+          product shouts; a verdict is a mark, and a mark is quiet. */}
+      <div className="flex flex-wrap gap-3">
+        <Button variant="secondary" onClick={shareX}>
           X
-        </button>
-        <button
-          type="button"
-          onClick={shareWhatsApp}
-          className="min-h-11 px-4 rounded-md border border-rule bg-surface text-sm font-medium hover:border-ink-soft"
-        >
+        </Button>
+        <Button variant="secondary" onClick={shareWhatsApp}>
           WhatsApp
-        </button>
-        <button
-          type="button"
-          onClick={copyLink}
-          className="min-h-11 px-4 rounded-md border border-rule bg-surface text-sm font-medium hover:border-ink-soft"
-        >
+        </Button>
+        <Button variant="secondary" onClick={copyLink}>
           Copy link
-        </button>
+        </Button>
       </div>
-      {toast && (
-        <p role="status" className="mt-3 font-mono text-xs text-ink-mid">
-          {toast}
-        </p>
-      )}
+      <Toast message={toast} onDone={clearToast} />
     </div>
   );
 }

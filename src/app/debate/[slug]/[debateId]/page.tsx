@@ -5,6 +5,7 @@ import { Verdict, type VerdictData, type RevisionComparison } from "@/components
 import { getMicroLesson } from "@/lib/micro-lessons";
 import { getRevisionId } from "@/lib/objections";
 import { getSchool } from "@/lib/schools";
+import { Page } from "@/components/layout/Page";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
 
@@ -148,27 +149,25 @@ export default async function VerdictPage({
       : baseShareLine;
 
   return (
-    <main className="flex-1">
-      <div className="mx-auto max-w-2xl px-6 pt-14 pb-24">
-        <Verdict
-          debateId={debateId}
-          topicSlug={slug}
-          motion={topic.motion}
-          school={school}
-          verdict={verdict}
-          eloDelta={eloDelta}
-          eloAfter={eloAfter}
-          argument={argument}
-          isOwner={isOwner}
-          argumentPublic={argumentPublic}
-          afterLesson={afterLesson}
-          showAfterLessonInitially={isOwner && first === "1"}
-          shareLine={shareLine}
-          hasRevision={revisionId}
-          comparison={comparison}
-          counterpart={counterpart}
-        />
-      </div>
-    </main>
+    <Page width="read">
+      <Verdict
+        debateId={debateId}
+        topicSlug={slug}
+        motion={topic.motion}
+        school={school}
+        verdict={verdict}
+        eloDelta={eloDelta}
+        eloAfter={eloAfter}
+        argument={argument}
+        isOwner={isOwner}
+        argumentPublic={argumentPublic}
+        afterLesson={afterLesson}
+        showAfterLessonInitially={isOwner && first === "1"}
+        shareLine={shareLine}
+        hasRevision={revisionId}
+        comparison={comparison}
+        counterpart={counterpart}
+      />
+    </Page>
   );
 }

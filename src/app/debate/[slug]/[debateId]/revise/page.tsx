@@ -4,7 +4,10 @@ import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getRevisionId } from "@/lib/objections";
 import { ArgumentEditor } from "@/components/debate/ArgumentEditor";
 import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
-import { SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
+import { SCHOOL_COLORS } from "@/lib/school-colors";
+import { Page } from "@/components/layout/Page";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { TextLink } from "@/components/ui/TextLink";
 import type { SchoolId } from "@/lib/types";
 
 export const metadata = { title: "Answer the objection · Sophecs" };
@@ -67,44 +70,52 @@ export default async function RevisePage({
   const school = parent.school as SchoolId;
 
   return (
-    <main className="flex-1">
-      <div className="mx-auto max-w-2xl px-6 pt-14 pb-24">
-        <p className="eyebrow text-ink-soft mb-4">Answer the objection</p>
-
-        {existingRevision ? (
-          <div>
-            <p className="font-serif text-xl font-medium">{topic.motion}</p>
-            <p className="mt-6 text-ink-mid">
-              You&apos;ve already revised this argument. Start a new motion instead.
-            </p>
-          </div>
-        ) : (
-          <>
-            {/* Pinned, not dismissable: the objection is the brief for this
-                screen, and hiding it would leave the editor contextless. */}
-            <div className="border-l-2 border-rule pl-4 mb-10">
-              <p className={`eyebrow mb-2 ${SCHOOL_TEXT_CLASS[objection.school]}`}>
-                Objection · {SCHOOL_COLORS[objection.school].name}
-              </p>
-              <p className="font-serif text-lg leading-relaxed">{objection.claim}</p>
-              <p className="mt-2 font-sans text-sm text-ink-mid leading-relaxed">
-                {objection.why_it_stands}
-              </p>
-            </div>
-
-            <ArgumentEditor
-              topicSlug={slug}
-              motion={topic.motion}
-              school={school}
-              userId={user.id}
-              isAllowlisted={isJudgeAllowlisted(user.id)}
-              mode="revision"
-              parentDebateId={parent.id}
-              initialArgument={parent.argument ?? ""}
+    <Page width="read">
+      {existingRevision ? (
+        <div>
+          <p className="text-sm text-ink-soft">Answer the objection</p>
+          <h1 className="mt-1 max-w-[60ch] font-serif text-lg font-medium leading-snug text-ink">
+            {topic.motion}
+          </h1>
+          <div className="mt-8">
+            <EmptyState
+              title="You have already revised this argument."
+              body="One revision per argument, so this one is closed. The objection the judge left standing is worth carrying into a new motion rather than rewriting this one."
+              action={
+                <div className="flex flex-wrap items-center gap-6 text-sm">
+                  <TextLink href={`/debate/${slug}/${parent.id}`}>Read the verdict</TextLink>
+                  <TextLink href="/debate">Take another motion</TextLink>
+                </div>
+              }
             />
-          </>
-        )}
-      </div>
-    </main>
+          </div>
+        </div>
+      ) : (
+        <>
+          <p className="text-sm text-ink-soft">Answer the objection</p>
+          {/* Pinned, not dismissable: the objection is the brief for this
+              screen, and hiding it would leave the editor contextless. */}
+          <div
+            className="mt-4 mb-10 max-w-[60ch] border-l-2 pl-4"
+            style={{ borderColor: SCHOOL_COLORS[objection.school].surface }}
+          >
+            <p className="text-sm text-ink-mid">{SCHOOL_COLORS[objection.school].name}</p>
+            <p className="mt-2 font-serif text-md leading-relaxed text-ink">{objection.claim}</p>
+            <p className="mt-3 text-sm leading-relaxed text-ink-mid">{objection.why_it_stands}</p>
+          </div>
+
+          <ArgumentEditor
+            topicSlug={slug}
+            motion={topic.motion}
+            school={school}
+            userId={user.id}
+            isAllowlisted={isJudgeAllowlisted(user.id)}
+            mode="revision"
+            parentDebateId={parent.id}
+            initialArgument={parent.argument ?? ""}
+          />
+        </>
+      )}
+    </Page>
   );
 }

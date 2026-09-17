@@ -12,19 +12,21 @@ export function MicroLesson({
 }) {
   return (
     <div>
-      <p className="eyebrow text-ink-soft mb-4">
-        {lesson.position === "before" ? "Before you argue" : "The objection"}
+      <p className="mb-2 text-sm text-ink-soft">
+        {lesson.position === "before" ? "Before you argue" : "After you argue"}
       </p>
-      <h1 className="font-serif text-2xl font-medium">{lesson.title}</h1>
-      <div className="mt-6 prose-reading">
+      <h2 className="font-serif text-lg font-medium text-ink">{lesson.title}</h2>
+      <div className="prose-reading mt-5">
         {lesson.body.split("\n\n").map((paragraph, i) => (
           <p key={i}>{paragraph}</p>
         ))}
       </div>
-      <p className="mt-4 font-mono text-xs text-ink-soft">
-        — {lesson.source.author}, {lesson.source.work}, {lesson.source.section}
+      {/* A citation is not a measured value, so it is not mono, and it
+          does not need an em dash in front of it to be recognised as one. */}
+      <p className="mt-4 text-sm text-ink-soft">
+        {lesson.source.author}, {lesson.source.work}, {lesson.source.section}
       </p>
-      {action && <div className="mt-10">{action}</div>}
+      {action && <div className="mt-8">{action}</div>}
     </div>
   );
 }

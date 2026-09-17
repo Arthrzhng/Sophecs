@@ -2,9 +2,22 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { MIN_ARGUMENT_WORDS, MAX_ARGUMENT_WORDS, WORD_COUNT_WARNING_AT, wordCount } from "@/lib/debate-limits";
+import { BeforeLesson } from "./BeforeLesson";
+import { Button } from "@/components/ui/Button";
+import { Dialog } from "@/components/ui/Dialog";
+import { Textarea } from "@/components/ui/Textarea";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { TextLink } from "@/components/ui/TextLink";
+import {
+  MIN_ARGUMENT_WORDS,
+  MAX_ARGUMENT_WORDS,
+  TOPIC_LOCK_DAYS,
+  WORD_COUNT_WARNING_AT,
+  wordCount,
+} from "@/lib/debate-limits";
 import { track } from "@/lib/analytics/client";
 import { SCHOOL_ADHERENT, SCHOOL_COLORS } from "@/lib/school-colors";
+import type { MicroLessonContent } from "@/lib/lesson-chunks";
 import type { SchoolId } from "@/lib/types";
 
 type Status =
@@ -32,6 +45,41 @@ interface JudgeResponse {
   } | null;
 }
 
+// What each pause reason means, said as a fact with something to do about
+// it. "Judging is paused" on its own tells the reader nothing about whether
+// their four hundred words survived.
+const PAUSE_COPY: Record<string, { title: string; body: string }> = {
+  kill_switch: {
+    title: "Judging is paused.",
+    body: "Your argument is saved and will be judged when judging resumes. Nothing you wrote is lost.",
+  },
+  budget: {
+    title: "Judging is paused for today.",
+    body: "The judge has a daily spending limit and it has been reached. Your argument is saved and will be judged when the limit resets.",
+  },
+  daily_cap: {
+    title: "That is your last argument for today.",
+    body: "There is a cap on how many arguments one person can send the judge in a day. This one is saved; come back tomorrow and it goes through.",
+  },
+  topic_lock: {
+    title: "You have already argued this motion.",
+    body: `A motion locks for ${TOPIC_LOCK_DAYS} days after a judged argument, so the second attempt is a fresh case rather than a rewrite. Take a different motion in the meantime.`,
+  },
+  already_revised: {
+    title: "This argument has already been revised.",
+    body: "One revision per argument. The objection the judge left standing is worth carrying into your next motion instead.",
+  },
+};
+
+function pauseCopy(reason: string) {
+  return (
+    PAUSE_COPY[reason] ?? {
+      title: "Judging is paused.",
+      body: "Your argument is saved and will be judged when judging resumes.",
+    }
+  );
+}
+
 export function ArgumentEditor({
   topicSlug,
   motion,
@@ -43,6 +91,7 @@ export function ArgumentEditor({
   parentDebateId,
   initialArgument,
   isFirstArgument,
+  microBefore,
   readingNotes = [],
 }: {
   topicSlug: string;
@@ -55,6 +104,8 @@ export function ArgumentEditor({
   parentDebateId?: string;
   initialArgument?: string;
   isFirstArgument?: boolean;
+  /** The before-lesson, rendered inline as a disclosure. Null on a revision. */
+  microBefore?: MicroLessonContent | null;
   readingNotes?: string[];
 }) {
   const router = useRouter();
@@ -67,6 +118,7 @@ export function ArgumentEditor({
     : `draft:${topicSlug}:${userId}`;
   const [argument, setArgument] = useState(isRevision ? initialArgument ?? "" : "");
   const [status, setStatus] = useState<Status>({ kind: "editing" });
+  const [confirming, setConfirming] = useState(false);
   const restoredRef = useRef(false);
 
   // Restore a draft from a discarded tab or a sign-in round trip, then
@@ -111,6 +163,7 @@ export function ArgumentEditor({
     words >= MIN_ARGUMENT_WORDS && words <= MAX_ARGUMENT_WORDS && status.kind !== "submitting";
 
   async function submit() {
+    setConfirming(false);
     setStatus({ kind: "submitting" });
     // No analytics for an allowlisted reviewer's own judge calls — the
     // pre-launch review pass shouldn't pollute the real usage funnels.
@@ -146,7 +199,7 @@ export function ArgumentEditor({
       });
       response = await res.json();
     } catch {
-      setStatus({ kind: "error", message: "Judging failed. Your argument is saved. Try again." });
+      setStatus({ kind: "error", message: "The judge could not be reached." });
       return;
     }
 
@@ -159,7 +212,7 @@ export function ArgumentEditor({
     }
 
     if (!response.ok || !response.debateId) {
-      setStatus({ kind: "error", message: response.error ?? "Judging failed. Your argument is saved. Try again." });
+      setStatus({ kind: "error", message: response.error ?? "The judge could not be reached." });
       return;
     }
 
@@ -223,20 +276,56 @@ export function ArgumentEditor({
 
   if (status.kind === "submitting") {
     return (
-      <div className="py-20 text-center">
-        <p className="text-ink-mid">Reading your argument.</p>
+      <div className="border-t border-rule py-16">
+        <p className="font-serif text-md text-ink">The judge is reading your argument.</p>
+        <p className="mt-2 max-w-[54ch] text-sm leading-relaxed text-ink-mid">
+          It takes about half a minute. Leaving this page cancels nothing — the
+          verdict will be on your profile either way.
+        </p>
+      </div>
+    );
+  }
+
+  if (status.kind === "paused") {
+    const copy = pauseCopy(status.reason);
+    return (
+      <div className="mt-8">
+        <ErrorState
+          title={copy.title}
+          body={copy.body}
+          action={
+            <div className="flex flex-wrap items-center gap-6 text-sm">
+              <TextLink href="/debate">Back to the motions</TextLink>
+              <TextLink href="/lessons">Read the lessons</TextLink>
+            </div>
+          }
+        />
       </div>
     );
   }
 
   return (
     <div>
-      <p className="font-serif text-xl font-medium">{motion}</p>
-      <p className="mt-2 font-sans text-sm text-ink-mid">
+      <p className="text-sm text-ink-soft">{isRevision ? "Revision" : "Motion"}</p>
+      <h1 className="mt-1 max-w-[60ch] font-serif text-lg font-medium leading-snug text-ink">
+        {motion}
+      </h1>
+
+      {/* The only school colour on this screen. */}
+      <p
+        className="mt-5 border-l-2 pl-4 text-sm leading-relaxed text-ink-mid"
+        style={{ borderColor: SCHOOL_COLORS[school].surface }}
+      >
         {isRevision
           ? "Answer the objection inside your argument. Cut what no longer earns its place."
-          : `Defend the ${SCHOOL_COLORS[school].name} position.`}
+          : `You argue this as a ${SCHOOL_ADHERENT[school]}.`}
       </p>
+
+      {microBefore && (
+        <div className="mt-8">
+          <BeforeLesson lesson={microBefore} defaultOpen={Boolean(isFirstArgument)} />
+        </div>
+      )}
 
       {/* Shown once, on the first argument a user ever writes. The step from
           an 80-second quiz to a written defence is the steepest in the
@@ -244,11 +333,9 @@ export function ArgumentEditor({
           rather than a blank page. The word limits are unchanged — this is
           scaffolding, not a different exercise. */}
       {showScaffold && (
-        <ol className="mt-6 space-y-2 font-sans text-sm text-ink-mid max-w-[55ch] list-decimal pl-5">
+        <ol className="mt-8 max-w-[55ch] list-decimal space-y-2 pl-5 text-sm leading-relaxed text-ink-mid">
           <li>State what a {SCHOOL_ADHERENT[school]} would say about this motion.</li>
-          <li>
-            Give the reason your school gives — the excerpt you just read is the one to use.
-          </li>
+          <li>Give the reason your school gives — the excerpt above is the one to use.</li>
           <li>Name the strongest objection and say why it doesn&apos;t win.</li>
         </ol>
       )}
@@ -257,60 +344,74 @@ export function ArgumentEditor({
           reason for asking was to have something to point at here. */}
       {readingNotes.length > 0 && (
         <div className="mt-8 border-l-2 border-rule pl-4">
-          <p className="eyebrow text-ink-soft mb-3">Your notes from the reading</p>
+          <p className="mb-3 text-sm text-ink-soft">Your notes from the reading</p>
           <ul className="space-y-2">
             {readingNotes.map((note, i) => (
-              <li key={i} className="font-serif text-base text-ink-mid leading-relaxed">
+              <li key={i} className="font-serif text-base leading-relaxed text-ink-mid">
                 &ldquo;{note}&rdquo;
               </li>
             ))}
           </ul>
-          <p className="mt-3 font-sans text-sm text-ink-soft">
-            You wrote these a minute ago. Use them.
-          </p>
         </div>
       )}
 
-      <textarea
-        value={argument}
-        onChange={(e) => setArgument(e.target.value)}
-        rows={12}
-        placeholder={
-          showScaffold
-            ? "Eighty words is enough for all three. Most first arguments take about ten minutes."
-            : `At least ${MIN_ARGUMENT_WORDS} words — enough room to actually argue the case, not just assert it.`
-        }
-        className="mt-6 w-full bg-surface border border-rule rounded-md p-4 font-serif text-base leading-relaxed placeholder:text-ink-soft placeholder:font-sans placeholder:text-sm resize-y"
-      />
-
-      <div className="mt-2 flex items-center justify-between">
-        <span
-          className={`font-mono text-xs ${words >= WORD_COUNT_WARNING_AT ? "text-error" : "text-ink-soft"}`}
-        >
-          {words} / {MAX_ARGUMENT_WORDS} words
-        </span>
-        {status.kind === "error" && (
-          <span className="font-mono text-xs text-error">{status.message}</span>
-        )}
-        {status.kind === "paused" && (
-          <span className="font-mono text-xs text-ink-mid">
-            {status.reason === "already_revised"
-              ? "You've already revised this argument. Start a new motion instead."
-              : "Judging is paused. Your argument is saved and will be judged when it resumes."}
-          </span>
-        )}
+      <div className="mt-8">
+        <Textarea
+          id="argument"
+          label="Your argument"
+          serif
+          rows={12}
+          value={argument}
+          onChange={(e) => setArgument(e.target.value)}
+          count={`${words} / ${MAX_ARGUMENT_WORDS} words`}
+          countOverLimit={words >= WORD_COUNT_WARNING_AT}
+          placeholder={
+            showScaffold
+              ? "Eighty words is enough for all three. Most first arguments take about ten minutes."
+              : `At least ${MIN_ARGUMENT_WORDS} words — enough room to actually argue the case, not just assert it.`
+          }
+        />
       </div>
+
+      {status.kind === "error" && (
+        <div className="mt-6">
+          <ErrorState
+            title="The judge could not be reached."
+            body="Your argument is saved in this browser, so nothing is lost. Try again in a moment."
+            detail={status.message}
+            action={<Button variant="secondary" onClick={() => setConfirming(true)}>Try again</Button>}
+          />
+        </div>
+      )}
 
       <div className="mt-6">
-        <button
-          type="button"
-          onClick={submit}
-          disabled={!canSubmit}
-          className="min-h-11 px-6 bg-ink text-surface rounded-md text-base font-medium hover:opacity-85 disabled:opacity-40"
-        >
-          {isRevision ? "Submit revision" : "Submit for judgment"}
-        </button>
+        <Button onClick={() => setConfirming(true)} disabled={!canSubmit}>
+          {isRevision ? "Submit revision" : "Submit argument"}
+        </Button>
+        {words < MIN_ARGUMENT_WORDS && (
+          <p className="mt-3 text-sm text-ink-soft">
+            {MIN_ARGUMENT_WORDS - words} more{" "}
+            {MIN_ARGUMENT_WORDS - words === 1 ? "word" : "words"} before you can submit.
+          </p>
+        )}
       </div>
+
+      {/* Says what actually happens, in the order it happens, with no
+          reassurance. Submitting is the one irreversible step in the
+          product: it spends a judge call and locks the motion. */}
+      <Dialog
+        open={confirming}
+        title={isRevision ? "Submit this revision?" : "Submit this argument?"}
+        description={
+          isRevision
+            ? "It goes to the judge now. A revision is the last word on this argument — there is no second one."
+            : `It goes to the judge now. You get one verdict and one revision. This motion locks for ${TOPIC_LOCK_DAYS} days afterwards.`
+        }
+        confirmLabel={isRevision ? "Submit revision" : "Submit argument"}
+        cancelLabel="Keep editing"
+        onConfirm={submit}
+        onCancel={() => setConfirming(false)}
+      />
     </div>
   );
 }

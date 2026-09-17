@@ -1,23 +1,12 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getMicroLesson } from "@/lib/micro-lessons";
+import { type CaseState } from "@/lib/case-steps";
 
-// The four states of a case, in order. Computed from what the user has
-// actually done, never stored: every one of these is already a row
-// somewhere, and a denormalised `case_state` column would be a fifth place
-// to keep in sync with the other four.
-export interface CaseState {
-  read: boolean;
-  argued: boolean;
-  answered: boolean;
-  closed: boolean;
-}
-
-export const CASE_STEPS = ["Read", "Argued", "Answered", "Closed"] as const;
-
-export function caseTicks(state: CaseState): boolean[] {
-  return [state.read, state.argued, state.answered, state.closed];
-}
+// Re-exported so the existing server-side importers keep one import path.
+// Client components take them from @/lib/case-steps directly.
+export { CASE_STEPS, caseTicks } from "@/lib/case-steps";
+export type { CaseState } from "@/lib/case-steps";
 
 interface VerdictShape {
   rejected?: boolean;

@@ -66,7 +66,7 @@ export function FindCounterpartButton({
         type="button"
         onClick={seek}
         disabled={state === "busy"}
-        className="min-h-11 rounded-md border border-rule bg-surface px-5 text-sm font-medium hover:border-ink-soft disabled:opacity-50"
+        className="inline-flex min-h-11 items-center justify-center rounded-control border border-rule bg-surface px-5 text-sm font-medium text-ink hover:border-rule-strong disabled:text-ink-soft"
       >
         {state === "busy" ? "Looking…" : "Find a counterpart"}
       </button>

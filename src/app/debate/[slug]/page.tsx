@@ -4,6 +4,7 @@ import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getMicroLesson } from "@/lib/micro-lessons";
 import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
 import { DebateFlow } from "@/components/debate/DebateFlow";
+import { Page } from "@/components/layout/Page";
 import type { SchoolId } from "@/lib/types";
 
 export const metadata = { title: "Debate · Sophecs" };
@@ -73,20 +74,18 @@ export default async function DebateTopicPage({
   }
 
   return (
-    <main className="flex-1">
-      <div className="mx-auto max-w-2xl px-6 pt-14 pb-24">
-        <DebateFlow
-          topicSlug={topic.slug}
-          motion={topic.motion}
-          school={profile.school as SchoolId}
-          microBefore={microBefore}
-          userId={user.id}
-          challengeId={challenge}
-          isAllowlisted={isJudgeAllowlisted(user.id)}
-          isFirstArgument={(judgedCount ?? 0) === 0}
-          readingResponses={readingResponses}
-        />
-      </div>
-    </main>
+    <Page width="read">
+      <DebateFlow
+        topicSlug={topic.slug}
+        motion={topic.motion}
+        school={profile.school as SchoolId}
+        microBefore={microBefore}
+        userId={user.id}
+        challengeId={challenge}
+        isAllowlisted={isJudgeAllowlisted(user.id)}
+        isFirstArgument={(judgedCount ?? 0) === 0}
+        readingResponses={readingResponses}
+      />
+    </Page>
   );
 }

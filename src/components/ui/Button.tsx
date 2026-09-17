@@ -1,4 +1,5 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
+import Link from "next/link";
 
 export type ButtonVariant = "primary" | "secondary" | "quiet";
 
@@ -17,6 +18,9 @@ const VARIANTS: Record<ButtonVariant, string> = {
   quiet:
     "bg-transparent text-ink-mid border border-transparent underline underline-offset-4 hover:text-ink disabled:text-ink-soft disabled:no-underline",
 };
+
+const SHAPE =
+  "inline-flex min-h-11 items-center justify-center rounded-control px-5 text-sm font-medium";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -42,10 +46,34 @@ export function Button({
       // that was on it does not lose its place.
       aria-busy={loading || undefined}
       disabled={disabled || loading}
-      className={`inline-flex min-h-11 items-center justify-center rounded-control px-5 text-sm font-medium disabled:cursor-not-allowed ${VARIANTS[variant]} ${className}`}
+      className={`${SHAPE} disabled:cursor-not-allowed ${VARIANTS[variant]} ${className}`}
       {...props}
     >
       {loading ? loadingLabel ?? children : children}
     </button>
+  );
+}
+
+export interface ButtonLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+  href: string;
+  variant?: ButtonVariant;
+}
+
+// A link that carries a button's weight. Navigation is a link — making it a
+// button and calling router.push loses the middle click, the open-in-new-tab
+// and the status-bar URL — so this shares the shape and the variants rather
+// than restating them, which is how four hand-written copies of the primary
+// button's class string got into the arena in the first place.
+export function ButtonLink({
+  href,
+  variant = "primary",
+  className = "",
+  children,
+  ...props
+}: ButtonLinkProps) {
+  return (
+    <Link href={href} className={`${SHAPE} ${VARIANTS[variant]} ${className}`} {...props}>
+      {children}
+    </Link>
   );
 }

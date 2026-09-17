@@ -1,4 +1,4 @@
-import { CASE_STEPS, caseTicks, type CaseState } from "@/lib/cases";
+import { CASE_STEPS, caseTicks, type CaseState } from "@/lib/case-steps";
 
 // Four hairline ticks, ink only. Never colour-coded: the difference between
 // done and not-done is the fill, and the state is also in the aria-label,

@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { MicroLesson } from "./MicroLesson";
 import { PublishToggle } from "./PublishToggle";
 import { ShareRow } from "./ShareRow";
 import { FindCounterpartButton } from "./FindCounterpartButton";
+import { ButtonLink } from "@/components/ui/Button";
+import { TextLink } from "@/components/ui/TextLink";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { track } from "@/lib/analytics/client";
-import { SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
+import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
 import type { SchoolId } from "@/lib/types";
 
@@ -52,21 +54,41 @@ const SCHOOL_LABEL: Record<SchoolId, string> = {
   "virtue-ethics": "Virtue Ethics",
 };
 
-function Bar({ label, value }: { label: string; value: number }) {
+// One axis. A table row, not a bar: three bars filled to 80% of their track
+// is the one place in this product that looked like a dashboard, and a bar
+// says "progress toward full marks" about a number that is a judgement.
+function AxisRow({
+  label,
+  value,
+  outOf,
+  trailing,
+}: {
+  label: string;
+  value: number | null;
+  outOf?: string;
+  trailing?: React.ReactNode;
+}) {
   return (
-    <div>
-      <div className="flex items-baseline justify-between">
-        <span className="font-sans text-xs text-ink-mid">{label}</span>
-        <span className="font-mono text-xs text-ink-soft">{value.toFixed(1)} / 10</span>
-      </div>
-      <div className="mt-1 h-px bg-rule relative">
-        <div
-          className="absolute inset-y-0 left-0 bg-ink"
-          style={{ width: `${(value / 10) * 100}%`, height: 2, top: -0.5 }}
-        />
-      </div>
-    </div>
+    <tr className="border-b border-rule last:border-b-0">
+      <th scope="row" className="py-3 text-left text-sm font-normal text-ink-mid">
+        {label}
+      </th>
+      <td className="py-3 text-right font-mono text-sm tabular text-ink">
+        {/* The three sub-scores are fixed to one decimal so 8.0 and 6.5
+            line up in the column; Overall is an integer and stays one. */}
+        {value == null ? "—" : outOf ? value.toFixed(1) : value}
+        {outOf && <span className="text-ink-soft">{outOf}</span>}
+      </td>
+      <td className="py-3 pl-6 text-right font-mono text-sm tabular text-ink-mid">{trailing}</td>
+    </tr>
   );
+}
+
+// A signed number, never coloured. Green for up and red for down turns a
+// rating change into a reward, which is the opposite of what a rubric is
+// for.
+function signed(n: number): string {
+  return n > 0 ? `+${n}` : n < 0 ? `\u2212${Math.abs(n)}` : "0";
 }
 
 // One row of the revision comparison. Deliberately monospaced and
@@ -83,18 +105,18 @@ function DeltaRow({
   const delta = before != null && after != null ? after - before : null;
   const fmt = (n: number | null) => (n == null ? "—" : Number.isInteger(n) ? String(n) : n.toFixed(1));
   return (
-    <div className="flex items-baseline justify-between gap-4">
-      <span className="font-sans text-xs text-ink-mid">{label}</span>
-      <span className="font-mono text-xs text-ink-soft tabular-nums">
-        {fmt(before)} → <span className="text-ink">{fmt(after)}</span>
-        {delta != null && (
-          <span className="ml-3 text-ink-mid">
-            {delta > 0 ? "+" : delta < 0 ? "−" : "±"}
-            {Math.abs(Number(delta.toFixed(1)))}
-          </span>
-        )}
-      </span>
-    </div>
+    <tr className="border-b border-rule last:border-b-0">
+      <th scope="row" className="py-3 text-left text-sm font-normal text-ink-mid">
+        {label}
+      </th>
+      <td className="py-3 text-right font-mono text-sm tabular text-ink-soft">
+        {fmt(before)}
+      </td>
+      <td className="py-3 pl-4 text-right font-mono text-sm tabular text-ink">{fmt(after)}</td>
+      <td className="py-3 pl-6 text-right font-mono text-sm tabular text-ink-mid">
+        {delta == null ? "—" : signed(Number(delta.toFixed(1)))}
+      </td>
+    </tr>
   );
 }
 
@@ -168,47 +190,93 @@ export function Verdict({
   if (verdict.rejected) {
     return (
       <div>
-        <p className="eyebrow text-ink-soft mb-4">Not judged</p>
-        <p className="font-serif text-xl">{verdict.rejection_reason}</p>
-        <p className="mt-4 text-sm text-ink-mid">{motion}</p>
+        <p className="text-sm text-ink-soft">Verdict</p>
+        <h1 className="mt-1 max-w-[60ch] font-serif text-lg font-medium leading-snug text-ink">
+          {motion}
+        </h1>
+        <div className="mt-8">
+          <ErrorState
+            title="This was not judged."
+            body={verdict.rejection_reason ?? "The judge returned no verdict for this argument."}
+            action={
+              <div className="flex flex-wrap items-center gap-6 text-sm">
+                <TextLink href={`/debate/${topicSlug}`}>Write it again</TextLink>
+                <TextLink href="/debate/rubric">What the judge is looking for</TextLink>
+              </div>
+            }
+          />
+        </div>
       </div>
     );
   }
 
   return (
     <div>
-      <div className="flex items-baseline gap-4">
-        <span className="font-mono text-6xl font-medium">{verdict.score}</span>
-        {eloDelta != null && (
-          <span className={`font-mono text-lg ${SCHOOL_TEXT_CLASS[school]}`}>
-            {eloDelta >= 0 ? "+" : ""}
-            {eloDelta} ELO
-          </span>
-        )}
-      </div>
+      <p className="text-sm text-ink-soft">Verdict</p>
+      <h1 className="mt-1 max-w-[60ch] font-serif text-lg font-medium leading-snug text-ink">
+        {motion}
+      </h1>
 
-      <div className="mt-8 space-y-4 max-w-sm">
-        <Bar label="Fidelity" value={verdict.fidelity ?? 0} />
-        <Bar label="Rigor" value={verdict.rigor ?? 0} />
-        <Bar label="Engagement" value={verdict.engagement ?? 0} />
-        <Link
-          href="/debate/rubric"
-          className="inline-block font-sans text-xs text-ink-soft hover:text-ink underline underline-offset-4"
-        >
-          How this was judged
-        </Link>
+      {/* Four axes, one table. Overall carries the ELO change beside it
+          because that is the only row the change belongs to. */}
+      <table className="mt-8 w-full max-w-[34rem] border-t border-rule">
+        <caption className="sr-only">
+          How this argument scored on each of the four axes
+        </caption>
+        <thead>
+          <tr className="border-b border-rule">
+            <th scope="col" className="py-2 text-left text-sm font-normal text-ink-soft">
+              Axis
+            </th>
+            <th scope="col" className="py-2 text-right text-sm font-normal text-ink-soft">
+              Score
+            </th>
+            <th scope="col" className="py-2 pl-6 text-right text-sm font-normal text-ink-soft">
+              ELO
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <AxisRow
+            label="Overall"
+            value={verdict.score}
+            trailing={eloDelta == null ? "—" : signed(eloDelta)}
+          />
+          <AxisRow label={`Fidelity to ${SCHOOL_LABEL[school]}`} value={verdict.fidelity} outOf=" / 10" />
+          <AxisRow label="Rigor" value={verdict.rigor} outOf=" / 10" />
+          <AxisRow label="Engagement" value={verdict.engagement} outOf=" / 10" />
+        </tbody>
+      </table>
+      <p className="mt-3 text-sm">
+        <TextLink href="/debate/rubric">How this was judged</TextLink>
+      </p>
+
+      {/* The judge's reading of the argument, set as reading text rather
+          than three labelled boxes. It is prose about your prose. */}
+      <div className="mt-10 border-t border-rule pt-8">
+        <p className="font-serif text-md leading-relaxed text-ink max-w-[66ch]">
+          {verdict.verdict_line}
+        </p>
+        <div className="prose-reading mt-6">
+          <p>{verdict.strongest_move}</p>
+          <p>{verdict.weakest_move}</p>
+          <p>{verdict.a_stronger_version_would}</p>
+        </div>
       </div>
 
       {objection && (
-        <div className="mt-10 border-t border-rule pt-8 max-w-[55ch]">
-          <p className={`eyebrow mb-2 ${SCHOOL_TEXT_CLASS[objection.school]}`}>
-            Objection · {SCHOOL_LABEL[objection.school]}
-          </p>
-          <p className="font-sans text-xs text-ink-mid mb-3">The objection you left standing</p>
-          <p className="font-serif text-lg leading-relaxed">{objection.claim}</p>
-          <p className="mt-3 font-sans text-sm text-ink-mid leading-relaxed">
-            {objection.why_it_stands}
-          </p>
+        <div className="mt-10 max-w-[60ch] border-t border-rule pt-8">
+          <p className="text-sm text-ink-soft">The objection you left standing</p>
+          {/* The rival school's colour, on the rival school's objection —
+              the one place on this screen a tribal marker means something. */}
+          <div
+            className="mt-4 border-l-2 pl-4"
+            style={{ borderColor: SCHOOL_COLORS[objection.school].surface }}
+          >
+            <p className="text-sm text-ink-mid">{SCHOOL_LABEL[objection.school]}</p>
+            <p className="mt-2 font-serif text-md leading-relaxed text-ink">{objection.claim}</p>
+            <p className="mt-3 text-sm leading-relaxed text-ink-mid">{objection.why_it_stands}</p>
+          </div>
 
           {/* A revision can't itself be revised — one attempt per objection,
               so the judge's new objection here is something to carry into the
@@ -220,27 +288,24 @@ export function Verdict({
           )}
 
           {isOwner && !comparison && (
-            <div className="mt-6 flex flex-wrap items-center gap-6">
+            <div className="mt-6 flex flex-wrap items-center gap-4">
               {hasRevision ? (
-                <Link
-                  href={`/debate/${topicSlug}/${hasRevision}`}
-                  className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"
-                >
+                <TextLink href={`/debate/${topicSlug}/${hasRevision}`} className="text-sm">
                   Answered — read the revision
-                </Link>
+                </TextLink>
               ) : (
                 <>
-                  <Link
+                  <ButtonLink
                     href={`/debate/${topicSlug}/${debateId}/revise`}
                     onClick={() =>
                       track({ name: "objection_answer_started", props: { debate_id: debateId } })
                     }
-                    className="inline-block bg-ink text-surface rounded-md px-6 py-3 text-base font-medium hover:opacity-85"
                   >
                     Answer it
-                  </Link>
-                  <span className="text-sm text-ink-soft">
-                    Later — it will wait on your profile
+                  </ButtonLink>
+                  {/* A plain sentence, not a tooltip on a question mark. */}
+                  <span className="text-sm text-ink-mid">
+                    Answering does not change your ELO. Leave it and it waits on your profile.
                   </span>
                 </>
               )}
@@ -249,29 +314,12 @@ export function Verdict({
         </div>
       )}
 
-      <p className="mt-8 font-serif text-xl leading-snug max-w-[40ch]">{verdict.verdict_line}</p>
-
-      <div className="mt-8 space-y-6 max-w-[55ch]">
-        <div>
-          <p className="font-sans text-xs text-ink-mid mb-1">Strongest move</p>
-          <p className="font-serif text-base leading-relaxed">{verdict.strongest_move}</p>
-        </div>
-        <div>
-          <p className="font-sans text-xs text-ink-mid mb-1">Weakest move</p>
-          <p className="font-serif text-base leading-relaxed">{verdict.weakest_move}</p>
-        </div>
-        <div>
-          <p className="font-sans text-xs text-ink-mid mb-1">A stronger version would</p>
-          <p className="font-serif text-base leading-relaxed">{verdict.a_stronger_version_would}</p>
-        </div>
-      </div>
-
       {/* Below the objection block, not beside it: "Answer it" stays the
           primary move off a verdict, and this is the other thing you can do
           with the same argument. */}
       {isOwner && counterpart && !comparison && (
         <div className="mt-10 border-t border-rule pt-8">
-          <p className="eyebrow text-ink-soft mb-3">Counterpart</p>
+          <p className="mb-3 text-sm text-ink-soft">Counterpart</p>
           <FindCounterpartButton
             debateId={debateId}
             topicSlug={topicSlug}
@@ -309,36 +357,24 @@ export function Verdict({
       )}
 
       {comparison && (
-        <div className="mt-10 border-t border-rule pt-8 max-w-sm">
-          <p className="eyebrow text-ink-soft mb-4">Compared with your first attempt</p>
-          <div className="space-y-2">
-            <DeltaRow label="Score" before={comparison.first.score} after={verdict.score} />
-            <DeltaRow label="Fidelity" before={comparison.first.fidelity} after={verdict.fidelity} />
-            <DeltaRow label="Rigor" before={comparison.first.rigor} after={verdict.rigor} />
-            <DeltaRow
-              label="Engagement"
-              before={comparison.first.engagement}
-              after={verdict.engagement}
-            />
-          </div>
+        <div className="mt-10 max-w-[34rem] border-t border-rule pt-8">
+          <p className="text-sm text-ink-soft">Compared with your first attempt</p>
+  
 
           {verdict.objection_answered != null && (
-            <p className="mt-6 font-sans text-sm text-ink">
-              {verdict.objection_answered ? "Objection answered" : "Objection still standing"}
+            <p className="mt-6 text-sm text-ink">
+              {verdict.objection_answered ? "Objection answered." : "Objection still standing."}
             </p>
           )}
           {verdict.improvement_note && (
-            <p className="mt-2 font-serif text-base leading-relaxed text-ink-mid max-w-[55ch]">
-              {verdict.improvement_note}
-            </p>
+            <p className="prose-reading mt-3">{verdict.improvement_note}</p>
           )}
 
-          <Link
-            href={`/debate/${topicSlug}/${comparison.parentDebateId}`}
-            className="mt-6 inline-block font-mono text-xs text-ink-mid hover:text-ink underline underline-offset-4"
-          >
-            Read the first attempt
-          </Link>
+          <p className="mt-6 text-sm">
+            <TextLink href={`/debate/${topicSlug}/${comparison.parentDebateId}`}>
+              Read the first attempt
+            </TextLink>
+          </p>
         </div>
       )}
 

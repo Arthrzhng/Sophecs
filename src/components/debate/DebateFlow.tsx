@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ReadingFlow } from "./ReadingFlow";
 import { ArgumentEditor } from "./ArgumentEditor";
+import { Button } from "@/components/ui/Button";
 import { track } from "@/lib/analytics/client";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
 import type { SchoolId } from "@/lib/types";
@@ -69,16 +70,14 @@ export function DebateFlow({
         responses={responses}
         onResponse={(index, value) => setResponses((prev) => ({ ...prev, [index]: value }))}
         action={
-          <button
-            type="button"
+          <Button
             onClick={() => {
               begin();
               setBegan(true);
             }}
-            className="inline-block bg-ink text-surface rounded-md px-6 py-3 text-base font-medium hover:opacity-85"
           >
-            Begin
-          </button>
+            Start writing
+          </Button>
         }
       />
     );
@@ -93,6 +92,10 @@ export function DebateFlow({
       challengeId={challengeId}
       isAllowlisted={isAllowlisted}
       isFirstArgument={isFirstArgument}
+      // Carried through to the editor as a disclosure, so the excerpt is
+      // still there to quote from while the argument is being written
+      // rather than a screen the reader clicked past.
+      microBefore={microBefore}
       readingNotes={Object.keys(responses)
         .map(Number)
         .sort((a, b) => a - b)

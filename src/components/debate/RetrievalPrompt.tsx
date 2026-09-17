@@ -100,7 +100,7 @@ export function RetrievalPrompt({
             // Best-effort only.
           }
         }}
-        className="mt-3 w-full resize-none overflow-y-auto rounded-md border border-rule bg-surface p-3 font-serif text-base leading-relaxed"
+        className="mt-3 w-full resize-none overflow-y-auto rounded-control border border-rule bg-surface p-3 font-serif text-base leading-relaxed"
       />
       <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
         <span className="font-mono text-xs text-ink-soft">
@@ -110,7 +110,7 @@ export function RetrievalPrompt({
           type="button"
           onClick={submit}
           disabled={!canSubmit}
-          className="min-h-11 rounded-md border border-rule bg-surface px-5 text-sm font-medium hover:border-ink-soft disabled:opacity-40"
+          className="inline-flex min-h-11 items-center justify-center rounded-control border border-rule bg-surface px-5 text-sm font-medium text-ink hover:border-rule-strong disabled:text-ink-soft"
         >
           {saving ? "Saving…" : "Keep going"}
         </button>
