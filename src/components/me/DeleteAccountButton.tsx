@@ -30,7 +30,7 @@ export function DeleteAccountButton() {
       <button
         type="button"
         onClick={() => setConfirming(true)}
-        className="font-mono text-xs text-oxblood hover:underline"
+        className="font-mono text-xs text-error hover:underline"
       >
         Delete account
       </button>
@@ -48,7 +48,7 @@ export function DeleteAccountButton() {
           type="button"
           onClick={handleDelete}
           disabled={pending}
-          className="min-h-11 px-4 bg-oxblood text-surface rounded-md text-sm font-medium hover:opacity-85 disabled:opacity-60"
+          className="min-h-11 px-4 bg-error text-surface rounded-md text-sm font-medium hover:opacity-85 disabled:opacity-60"
         >
           {pending ? "Deleting…" : "Confirm delete"}
         </button>
@@ -60,7 +60,7 @@ export function DeleteAccountButton() {
           Cancel
         </button>
       </div>
-      {error && <p className="mt-2 font-mono text-xs text-oxblood">{error}</p>}
+      {error && <p className="mt-2 font-mono text-xs text-error">{error}</p>}
     </div>
   );
 }

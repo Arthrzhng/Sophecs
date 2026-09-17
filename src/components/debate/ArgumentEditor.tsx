@@ -285,12 +285,12 @@ export function ArgumentEditor({
 
       <div className="mt-2 flex items-center justify-between">
         <span
-          className={`font-mono text-xs ${words >= WORD_COUNT_WARNING_AT ? "text-oxblood" : "text-ink-soft"}`}
+          className={`font-mono text-xs ${words >= WORD_COUNT_WARNING_AT ? "text-error" : "text-ink-soft"}`}
         >
           {words} / {MAX_ARGUMENT_WORDS} words
         </span>
         {status.kind === "error" && (
-          <span className="font-mono text-xs text-oxblood">{status.message}</span>
+          <span className="font-mono text-xs text-error">{status.message}</span>
         )}
         {status.kind === "paused" && (
           <span className="font-mono text-xs text-ink-mid">

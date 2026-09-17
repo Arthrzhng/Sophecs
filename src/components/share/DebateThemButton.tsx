@@ -50,7 +50,7 @@ export function DebateThemButton({
       >
         {pending ? "Starting…" : "Debate them"}
       </button>
-      {error && <p className="mt-2 font-mono text-xs text-oxblood">{error}</p>}
+      {error && <p className="mt-2 font-mono text-xs text-error">{error}</p>}
     </div>
   );
 }

@@ -172,7 +172,7 @@ export function TurnComposer({
         className="mt-2 w-full resize-none rounded-md border border-rule bg-surface p-3 font-serif text-base italic leading-relaxed"
       />
       {quoteProblem && (
-        <p className="mt-1 font-mono text-xs text-oxblood">
+        <p className="mt-1 font-mono text-xs text-error">
           {quoteProblem === "not_found"
             ? "Quote the sentence you're answering."
             : quoteProblem === "too_short"
@@ -196,14 +196,14 @@ export function TurnComposer({
       <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
         <span
           className={`font-mono text-xs ${
-            chars > MAX_TURN_CHARS ? "text-oxblood" : "text-ink-soft"
+            chars > MAX_TURN_CHARS ? "text-error" : "text-ink-soft"
           }`}
         >
           {chars} / {MAX_TURN_CHARS}
           {chars < MIN_TURN_CHARS && ` · ${MIN_TURN_CHARS} minimum`}
         </span>
         {status.kind === "error" && (
-          <span className="font-mono text-xs text-oxblood">{status.message}</span>
+          <span className="font-mono text-xs text-error">{status.message}</span>
         )}
       </div>
 

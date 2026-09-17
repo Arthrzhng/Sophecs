@@ -116,7 +116,7 @@ export function RetrievalPrompt({
         </button>
       </div>
       {error && (
-        <p role="status" className="mt-2 font-mono text-xs text-oxblood">
+        <p role="status" className="mt-2 font-mono text-xs text-error">
           Couldn&apos;t save that. Your words are still here — try again.
         </p>
       )}

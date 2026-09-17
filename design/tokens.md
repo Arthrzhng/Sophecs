@@ -56,15 +56,17 @@ Virtue Ethics oxblood in use — see the collision note in §7.
 | Token | Value | Contrast on paper |
 | --- | --- | --- |
 | `--stoic` | `#3E5C4B` | 6.4:1 |
-| `--utilitarian` | `#8A6320` | **4.3:1 — fails AA for body text** |
+| `--utilitarian` | `#8A6320` | 5.1:1 |
 | `--virtue` | `#7A3540` | 7.5:1 |
 
-The brief freezes these three hex values. `#8A6320` measures 4.3:1 against
-the new paper and misses WCAG AA for body-size text.
+The brief freezes these three hex values. **Corrected after measuring
+against the final paper:** `#8A6320` measures **5.08:1** on `#F8F8F6` and
+passes WCAG AA for body text. The earlier draft of this document said it
+failed at 4.3:1 — that figure was against the old darker paper `#E9E9E3`.
+Lightening paper fixed the contrast problem by itself.
 
-**Resolution:** the frozen values stay exactly as given, and the *usage rule*
-carries the accessibility guarantee instead. A school colour may only be
-used as:
+The usage rule below therefore is not an accessibility workaround; it is a
+design rule, and it stands on its own. A school colour may only be used as:
 
 1. A 2px left rule or a 1px underline on a school-specific surface.
 2. A filled card background, paired with `--on-saturated` (see below).
@@ -76,9 +78,9 @@ never for a button, never for an icon, never for a focus ring. This is a
 stricter rule than "tribal markers only", and it is what makes the frozen
 palette compliant rather than requiring me to alter a value you froze.
 
-(This reverses a decision made earlier in the project, which darkened
-utilitarian to `#87611F` to clear AA at eyebrow size. The new spec removes
-all-caps eyebrows entirely, so the failing usage disappears with them.)
+(This reverts a change made earlier in the project, which darkened
+utilitarian to `#87611F` to clear AA at eyebrow size against the old paper.
+The frozen `#8A6320` is restored and passes on its own merits now.)
 
 ### Saturated card surfaces — the one exception
 

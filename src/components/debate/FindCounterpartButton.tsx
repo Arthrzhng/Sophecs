@@ -75,7 +75,7 @@ export function FindCounterpartButton({
         claim in it. Nobody else sees it. Two replies each, then it closes.
       </p>
       {state === "error" && (
-        <p className="mt-2 font-mono text-xs text-oxblood">Couldn&apos;t do that right now.</p>
+        <p className="mt-2 font-mono text-xs text-error">Couldn&apos;t do that right now.</p>
       )}
     </div>
   );

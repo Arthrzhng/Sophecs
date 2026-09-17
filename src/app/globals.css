@@ -1,65 +1,131 @@
 @import "tailwindcss";
 
 /*
-  Named design tokens. Tailwind v4's CSS-first @theme is the current
-  idiomatic way to define these (see docs/decisions.md — the brief asks for
-  tailwind.config.ts, which is Tailwind v3's mechanism; this is the same
-  contract on the current major version).
+  The single source of truth for every colour, size, radius, shadow and
+  duration in the product. Nothing outside this file declares a literal
+  value; components reference these tokens through Tailwind utilities.
 
-  Cool greyed paper background, near-black ink. School colours are tribal
-  markers only (a rule, a badge, a hairline) — never a full background or
-  button fill, except the result card, the one saturated surface.
+  Tailwind v4's CSS-first `@theme` is the mechanism here rather than
+  `tailwind.config.ts` — on v4 the config file is not read for theme values.
+  The contract is the one the brief asks for: utilities resolve to
+  variables, never to literals. See design/tokens.md.
+
+  Two exceptions, both structural rather than sloppy:
+    - src/lib/school-colors.ts duplicates the school hexes, because
+      next/og's Satori has no CSS custom-property resolution and needs
+      literals inline.
+    - The icon and OG image routes are Satori trees for the same reason.
+  Both are noted where they live.
 */
-@theme {
-  --color-paper: #e9e9e3;
-  --color-surface: #fafaf8;
-  --color-ink: #191917;
+/*
+  `static`, not bare `@theme`: Tailwind v4 tree-shakes theme variables that
+  no generated utility happens to reference, and drops them from `:root`.
+  Several tokens here are read at runtime through `var()` rather than
+  through a class — the saturated card surfaces above all — and those were
+  silently resolving to nothing, which renders as a transparent background
+  with near-white text on it. Caught by the styleguide on its first render.
+  `static` emits every token unconditionally.
+*/
+@theme static {
+  /* --- Base ------------------------------------------------------------ */
+  /* Near-white, very slightly cool. Warmer cream reads as a template. */
+  --color-paper: #f8f8f6;
+  --color-surface: #fdfdfc;
+  --color-ink: #141413;
   --color-ink-mid: #54544c;
-  --color-ink-soft: #63635b; /* darkened from an earlier draft value — 4.5:1 against paper, see docs/decisions.md */
-  --color-rule: rgba(25, 25, 23, 0.13);
+  --color-ink-soft: #63635b;
 
+  /* The primary structural device. Hairlines, not shadows, not fills. */
+  --color-rule: #dededa;
+  --color-rule-strong: #c4c4be;
+
+  /* --- Semantic -------------------------------------------------------- */
+  /* Destructive confirmations, over-limit counts, failed saves. */
+  --color-error: #8a1c1c;
+  /* Success is ink. A confirmation is a statement of fact, not a reward —
+     and the only green in this product means Stoicism. */
+  --color-success: #141413;
+
+  /* --- School markers -------------------------------------------------- */
+  /* Frozen values. Used only as a 2px rule, a 1px underline, a filled card,
+     or text at 24px and above. Never a link, button, icon or focus ring.
+     All three clear WCAG AA body text on paper (5.1 / 7.0 / 8.2). */
   --color-stoic: #3e5c4b;
-  /* Darkened from #8a6320, which measured 4.43:1 against --color-paper and
-     so missed WCAG AA body text by a hair. Eyebrows are 12px uppercase, so
-     the 4.5:1 threshold applies rather than the large-text 3:1. The other
-     two school colours already cleared it. */
-  --color-utilitarian: #87611f;
+  --color-utilitarian: #8a6320;
   --color-virtue: #7a3540;
 
-  /* Phase 2: warning/destructive accent — the debate editor's word-count
-     limit and destructive account actions. Deliberately not reused from a
-     school colour so a warning never reads as a tribal marker. 9.9:1 on
-     paper. See docs/decisions.md. */
-  --color-oxblood: #6b1414;
-
-  /* Card-only surfaces: the saturated fill plus a legible ink-on-colour text
-     pair for each school, chosen to clear WCAG AA (4.5:1 body / 3:1 large). */
+  /* The result card only — the one fully saturated surface in the app. */
   --color-stoic-surface: #33503f;
   --color-utilitarian-surface: #7a5518;
   --color-virtue-surface: #6b2c37;
   --color-on-saturated: #faf8f2;
 
-  --font-serif: var(--font-spectral), Georgia, serif;
-  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  /* --- Type ------------------------------------------------------------ */
+  --font-serif: var(--font-spectral), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-plex-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", monospace;
 
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
+  /* Six steps, no more. Serif never below 16px; sans never above 24px;
+     mono only ever holds a number. */
+  --text-xs: 12px;
+  --text-xs--line-height: 1.4;
+  --text-sm: 14px;
+  --text-sm--line-height: 1.45;
+  --text-base: 16px;
+  --text-base--line-height: 1.5;
+  --text-md: 19px;
+  --text-md--line-height: 1.65;
+  --text-lg: 24px;
+  --text-lg--line-height: 1.3;
+  --text-xl: 34px;
+  --text-xl--line-height: 1.2;
+
+  /* --- Layout ---------------------------------------------------------- */
+  /* Tailwind v4's spacing scale is already 4px-based: p-4 is 16px. The
+     design rule is which multiples are allowed — 1 2 3 4 6 8 12 20, i.e.
+     4 8 12 16 24 32 48 80. 64px is deliberately absent: next to 48 it is a
+     distinction nobody perceives, so section breaks jump to 80. */
+  --spacing: 4px;
+
+  --container-narrow: 560px;
+  --container-read: 720px;
+  --container-ui: 960px;
+
+  /* --- Radius ---------------------------------------------------------- */
+  /* Two values, applied by kind. Controls are rounded; content is square.
+     A squared content edge against a 6px control reads as a document with
+     controls on it rather than a UI with text in it. */
+  --radius-control: 6px;
+  --radius-container: 0px;
+
+  /* --- Shadow ---------------------------------------------------------- */
+  /* Only for things that genuinely float and can be dismissed. No card in
+     this product has a shadow. */
+  --shadow-raised: 0 1px 2px rgb(20 20 19 / 0.06), 0 2px 6px rgb(20 20 19 / 0.06);
+  --shadow-overlay: 0 4px 12px rgb(20 20 19 / 0.1), 0 16px 40px rgb(20 20 19 / 0.12);
+
+  /* --- Motion ---------------------------------------------------------- */
+  /* Permitted only in response to a user action: disclosure, dialog entry,
+     the verdict reveal. Never on hover, never on scroll, never a transform. */
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --ease-out-quiet: cubic-bezier(0.2, 0, 0, 1);
 }
 
 :root {
   color-scheme: light;
 }
 
-/* No dark mode in Phase 1 — explicit non-goal in the build brief. See
-   docs/decisions.md for the resolution of this against the vibe-coded-
-   avoidance doc, which asks for one. */
+/* No dark mode, and no tokens for one. Explicit non-goal in the rebuild
+   brief; adding a second palette now would double the surface every later
+   phase has to keep honest. */
 
 body {
   background-color: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -69,35 +135,57 @@ body {
   color: var(--color-paper);
 }
 
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+/* Numbers that sit in a column line up. Applied wherever a measured value
+   is rendered, so ELO and scores do not jitter between rows. */
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
 
+/*
+  Was uppercase mono with 0.14em tracking — an all-caps eyebrow, which the
+  rebuild brief forbids. Redefined in place rather than deleted so the 58
+  existing call sites across not-yet-rebuilt routes de-shout immediately
+  instead of losing their styling. Later phases replace the class with real
+  markup and this goes.
+*/
+.eyebrow,
 .eyebrow-sm {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-ink-mid);
 }
 
+/* Reading measure: 66ch of Spectral at 19px. The brief's 60–72 band. */
 .prose-reading {
   font-family: var(--font-serif);
-  font-size: 18.5px;
-  line-height: 1.7;
-  max-width: 63ch;
+  font-size: var(--text-md);
+  line-height: 1.65;
+  max-width: 66ch;
 }
 
 .prose-reading p + p {
   margin-top: 1.25em;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
 /* Everything that moves, off. Broader than disabling the named animations
    one at a time, and it stays correct for whatever gets added later: the
-   failure mode of forgetting a `transition-colors` somewhere is that a
-   preference the user has explicitly set is quietly ignored. */
+   failure mode of forgetting a `transition` somewhere is that a preference
+   the user has explicitly set is quietly ignored. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -109,12 +197,12 @@ body {
   }
 }
 
-/* The next stretch of a lesson appearing after a retrieval prompt. Opt-in
-   rather than opt-out: with no motion preference expressed, or with reduced
-   motion asked for, the paragraphs are simply there. */
+/* The next stretch of a lesson appearing after a retrieval prompt, and the
+   verdict reveal. Opt-in rather than opt-out: with no motion preference
+   expressed, or with reduced motion asked for, the content is simply there. */
 @media (prefers-reduced-motion: no-preference) {
   .reveal {
-    animation: reveal 280ms ease-out both;
+    animation: reveal var(--duration-base) var(--ease-out-quiet) both;
   }
 
   @keyframes reveal {
@@ -129,13 +217,26 @@ body {
   }
 }
 
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible,
-[tabindex]:focus-visible {
-  outline: 2px solid var(--color-ink);
-  outline-offset: 2px;
-  border-radius: 3px;
+/* Print: the lesson reading view has to produce a clean PDF from the
+   browser's own print dialog. Nav, footer, rails and controls are dropped;
+   ink goes true black on white and citations are kept. */
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  .prose-reading {
+    max-width: none;
+    font-size: 11pt;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+  }
 }
