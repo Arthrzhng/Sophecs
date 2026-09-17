@@ -1,84 +1,82 @@
-import Link from "next/link";
+import { Page } from "@/components/layout/Page";
+import { TextLink } from "@/components/ui/TextLink";
+import { LandingQuestion } from "@/components/quiz/LandingQuestion";
 import { getSchool } from "@/lib/schools";
+import { getAllTopicFiles } from "@/lib/topics";
 import type { SchoolId } from "@/lib/types";
 
 const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
 
+// The landing page opens with question one, live.
+//
+// It used to open with a headline describing the quiz and a button to reach
+// it, which is the shape of every generated landing page and costs a tap on
+// the only path that matters. A visitor now answers where they land. There
+// is no hero, no feature grid, no testimonials, no stats block — below the
+// question are the three schools as they actually are, one real motion, and
+// the footer.
 export default function LandingPage() {
+  // The lowest-sorted active motion, read from the content files rather than
+  // the database so the landing page never depends on Supabase being
+  // reachable and stays statically rendered.
+  const motion = getAllTopicFiles()
+    .filter((t) => t.active)
+    .sort((a, b) => a.sort - b.sort)[0];
+
   return (
-    <main className="flex-1">
-      <div className="mx-auto max-w-3xl px-6 pt-24 pb-20">
-        <p className="eyebrow text-ink-soft mb-6">Ten questions, no login</p>
-        <h1 className="font-serif text-[clamp(2rem,5vw,3.25rem)] font-medium leading-[1.15] tracking-tight max-w-[18ch]">
-          When an algorithm decides for you, which philosopher would back you up?
-        </h1>
-        <p className="mt-6 text-lg text-ink-mid leading-relaxed max-w-[52ch]">
-          A wallet with cash on the street. An AI that could finish your
-          assignment undetected. A self-driving car that has to choose.
-          Ten real scenarios, three schools of ethics, no answer that&apos;s
-          obviously correct.
-        </p>
-        <div className="mt-10">
-          <Link
-            href="/quiz"
-            className="inline-block bg-ink text-surface rounded-md px-6 py-3 text-base font-medium hover:opacity-85 transition-opacity"
-          >
-            Take the quiz
-          </Link>
-        </div>
-        <p className="mt-6 font-mono text-xs text-ink-soft">
-          About 80 seconds. Nothing saved unless you share it.
-        </p>
+    <Page width="read" tight>
+      {/* One short line, not a hero. The question underneath is the page. */}
+      <h1 className="text-base text-ink-mid">
+        Ten questions on how AI should decide things.
+      </h1>
+      <div className="mt-5">
+        <LandingQuestion />
       </div>
 
-      <div className="mx-auto max-w-3xl px-6 pb-20">
-        <div className="border-t border-rule pt-10">
-          <p className="eyebrow text-ink-soft mb-6">The three schools</p>
-          <ul className="grid gap-8 sm:grid-cols-3">
-            {SCHOOLS.map((id) => {
-              const school = getSchool(id);
-              return (
-                <li key={id}>
-                  <Link href={`/s/${id}`} className="block group">
-                    <h2 className="font-serif text-lg font-medium group-hover:underline underline-offset-4">
-                      {school.name}
-                    </h2>
-                    <p className="mt-2 text-sm text-ink-mid leading-relaxed">
-                      {school.one_line}
-                    </p>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </div>
+      {/* Below the question, not above it. This is reassurance, and putting
+          it first cost the third answer row its place above the fold on a
+          360x640 screen. Was mono; neither sentence is a measured value, so
+          it is Plex Sans at the small step. */}
+      <p className="mt-5 text-sm text-ink-soft">
+        About 80 seconds. Nothing is saved unless you share it.
+      </p>
 
-      <div className="mx-auto max-w-3xl px-6 pb-24">
-        <div className="border-t border-rule pt-10">
-          <p className="eyebrow text-ink-soft mb-3">Then argue it</p>
-          <p className="text-ink-mid leading-relaxed max-w-[54ch]">
-            The quiz gives you a starting position. The rest of Sophecs is
-            about defending it: take a motion, write a case, and get judged on
-            how faithfully you argue from your school — not on whether anyone
-            agrees with you.
+      <section className="mt-12 border-t border-rule pt-8">
+        <h2 className="font-serif text-lg font-medium text-ink">The three schools</h2>
+        {/*
+          Three columns of real quotation with real citation — a table of
+          contents, not the three feature cards the brief rules out. No
+          borders, no icons, no heading-plus-blurb.
+        */}
+        <ul className="mt-6 grid gap-8 sm:grid-cols-3">
+          {SCHOOLS.map((id) => {
+            const school = getSchool(id);
+            return (
+              <li key={id}>
+                <h3 className="font-serif text-base font-medium text-ink">
+                  <TextLink href={`/s/${id}`}>{school.name}</TextLink>
+                </h3>
+                <p className="mt-2 font-serif text-base leading-relaxed text-ink-mid">
+                  &ldquo;{school.one_line}&rdquo;
+                </p>
+                <p className="mt-2 text-sm text-ink-soft">{school.one_line_attribution}</p>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {motion && (
+        <section className="mt-12 border-t border-rule pt-8">
+          <h2 className="font-serif text-lg font-medium text-ink">A motion you could argue</h2>
+          <p className="mt-4 max-w-[66ch] font-serif text-md leading-relaxed text-ink">
+            {motion.motion}
           </p>
-          <div className="mt-6 flex flex-wrap items-center gap-6">
-            <Link
-              href="/debate"
-              className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"
-            >
-              See the motions
-            </Link>
-            <Link
-              href="/lessons"
-              className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"
-            >
-              Read the lessons
-            </Link>
-          </div>
-        </div>
-      </div>
-    </main>
+          <p className="mt-4 text-sm text-ink-mid">
+            <TextLink href={`/debate/${motion.slug}`}>Read the motion</TextLink>
+          </p>
+        </section>
+      )}
+    </Page>
   );
 }

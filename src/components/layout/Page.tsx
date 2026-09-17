@@ -18,16 +18,24 @@ const WIDTHS: Record<PageWidth, string> = {
 
 export function Page({
   width = "ui",
+  tight = false,
   children,
   className = "",
 }: {
   width?: PageWidth;
+  /**
+   * Halves the top gutter. For the landing page only, where the 48px of
+   * approach costs the third answer row its place above a 360x640 fold.
+   */
+  tight?: boolean;
   children: ReactNode;
   className?: string;
 }) {
   return (
     <main className="flex-1">
-      <div className={`mx-auto ${WIDTHS[width]} px-6 pt-12 pb-20 ${className}`}>{children}</div>
+      <div className={`mx-auto ${WIDTHS[width]} px-6 ${tight ? "pt-6" : "pt-12"} pb-20 ${className}`}>
+        {children}
+      </div>
     </main>
   );
 }

@@ -9,8 +9,8 @@ import type { SchoolId } from "@/lib/types";
 // takes that role, and this drops to the bordered style rather than
 // disappearing — the challenge link is still the main way a result travels.
 const STYLES = {
-  primary: "bg-ink text-surface hover:opacity-85 disabled:opacity-60",
-  secondary: "border border-rule bg-surface hover:border-ink-soft disabled:opacity-60",
+  primary: "border border-ink bg-ink text-paper hover:border-ink-mid hover:bg-ink-mid disabled:opacity-60",
+  secondary: "border border-rule bg-surface text-ink hover:border-rule-strong disabled:opacity-60",
 } as const;
 
 export function ChallengeButton({
@@ -57,7 +57,7 @@ export function ChallengeButton({
     <button
       type="button"
       onClick={handleClick}
-      className={`min-h-11 px-5 rounded-md text-sm font-medium transition-opacity ${STYLES[variant]}`}
+      className={`inline-flex min-h-11 items-center justify-center rounded-control px-5 text-sm font-medium ${STYLES[variant]}`}
       disabled={state === "loading"}
     >
       {state === "ready" ? (copied ? "Copied" : "Copy challenge link") : "Challenge a friend"}

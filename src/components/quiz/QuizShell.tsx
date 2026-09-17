@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Question } from "./Question";
+import { QuestionBlock } from "./QuestionBlock";
 import { QUIZ_QUESTIONS, type QuizOption } from "../../../content/quiz/questions";
 import { scoreQuiz } from "@/lib/scoring";
 import { track } from "@/lib/analytics/client";
 
-const SESSION_KEY = "sophecs.quiz.progress";
+export const SESSION_KEY = "sophecs.quiz.progress";
 export const PENDING_RESULT_KEY = "sophecs.quiz.pending_result";
 
 type Source = "landing" | "school_page" | "challenge" | "direct";
@@ -17,15 +17,21 @@ interface State {
   chosenIds: (string | null)[];
 }
 
-type Action = { type: "answer"; optionId: string } | { type: "back" } | { type: "restore"; state: State };
+type Action =
+  | { type: "select"; optionId: string }
+  | { type: "advance" }
+  | { type: "back" }
+  | { type: "restore"; state: State };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
-    case "answer": {
+    case "select": {
       const chosenIds = [...state.chosenIds];
       chosenIds[state.index] = action.optionId;
-      return { index: Math.min(state.index + 1, QUIZ_QUESTIONS.length), chosenIds };
+      return { ...state, chosenIds };
     }
+    case "advance":
+      return { ...state, index: Math.min(state.index + 1, QUIZ_QUESTIONS.length) };
     case "back":
       return { ...state, index: Math.max(0, state.index - 1) };
     case "restore":
@@ -63,7 +69,7 @@ export function QuizShell() {
   // result, `next` is set by /auth/callback and threaded through the same
   // payload — so neither has any business blocking first paint.
   const [challengeId, setChallengeId] = useState<string | null>(null);
-  const [next, setNext] = useState<string | null>(null);
+  const [nextPath, setNextPath] = useState<string | null>(null);
 
   const [state, dispatch] = useReducer(reducer, { index: 0, chosenIds: Array(QUIZ_QUESTIONS.length).fill(null) });
   const startedAtRef = useRef<number>(0);
@@ -72,12 +78,14 @@ export function QuizShell() {
 
   // Restore from a discarded tab; bootstrap timers and quiz_started otherwise.
   useEffect(() => {
+    let restored = false;
     try {
       const raw = sessionStorage.getItem(SESSION_KEY);
       if (raw) {
         const saved = JSON.parse(raw) as State;
         if (saved.chosenIds?.length === QUIZ_QUESTIONS.length && saved.index < QUIZ_QUESTIONS.length) {
           dispatch({ type: "restore", state: saved });
+          restored = true;
         }
       }
     } catch {
@@ -87,7 +95,7 @@ export function QuizShell() {
     const c = params.get("c");
     const n = params.get("next");
     setChallengeId(c);
-    setNext(n);
+    setNextPath(n);
 
     referrerRef.current = typeof document !== "undefined" ? document.referrer : "";
     startedAtRef.current = Date.now();
@@ -95,10 +103,17 @@ export function QuizShell() {
     // `c` from the parsed params rather than the state just set: state
     // updates are not visible until the next render, and this event has to
     // carry the challenge id it was started from.
-    track({
-      name: "quiz_started",
-      props: { source: detectSource(c), challenge_id: c ?? undefined },
-    });
+    //
+    // Skipped when progress was restored. Two cases restore: the visitor
+    // answered question one on the landing page, which fired quiz_started
+    // there, or they refreshed mid-quiz. Firing again in either case would
+    // double-count a start that already happened.
+    if (!restored) {
+      track({
+        name: "quiz_started",
+        props: { source: detectSource(c), challenge_id: c ?? undefined },
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -147,7 +162,7 @@ export function QuizShell() {
             answers,
             durationMs,
             challengeId,
-            next,
+            next: nextPath,
             referrer: referrerRef.current,
           })
         );
@@ -156,10 +171,20 @@ export function QuizShell() {
       }
       router.push("/quiz/result");
     },
-    [router, challengeId, next]
+    [router, challengeId, nextPath]
   );
 
-  function choose(optionId: string) {
+  // Selecting records the choice; Next commits it. The event fires on the
+  // commit, so changing your mind before pressing Next does not emit two
+  // answers for one question.
+  function select(optionId: string) {
+    dispatch({ type: "select", optionId });
+  }
+
+  function next() {
+    const optionId = state.chosenIds[state.index];
+    if (!optionId) return;
+
     const msOnQuestion = Date.now() - questionStartedAtRef.current;
     track({
       name: "quiz_question_answered",
@@ -167,14 +192,11 @@ export function QuizShell() {
     });
     questionStartedAtRef.current = Date.now();
 
-    const nextChosenIds = [...state.chosenIds];
-    nextChosenIds[state.index] = optionId;
-
     if (state.index + 1 >= QUIZ_QUESTIONS.length) {
-      finish(nextChosenIds);
+      finish(state.chosenIds);
       return;
     }
-    dispatch({ type: "answer", optionId });
+    dispatch({ type: "advance" });
   }
 
   if (state.index >= QUIZ_QUESTIONS.length) return null; // finishing → navigating away
@@ -184,37 +206,19 @@ export function QuizShell() {
 
   return (
     <div>
-      {next && state.index === 0 && (
-        <p className="font-mono text-xs text-ink-mid mb-6">
-          Take the quiz first. Your school is your side.
-        </p>
+      {nextPath && state.index === 0 && (
+        <p className="mb-6 text-sm text-ink-mid">Take the quiz first. Your school is your side.</p>
       )}
-      <div className="flex items-center justify-between mb-3">
-        {state.index > 0 ? (
-          <button
-            type="button"
-            onClick={() => dispatch({ type: "back" })}
-            aria-label="Previous question"
-            className="min-w-11 min-h-11 -ml-2 flex items-center justify-center text-ink-mid hover:text-ink"
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
-              <path d="M11 3 5 9l6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        ) : (
-          <span />
-        )}
-        <span className="font-mono text-xs text-ink-mid">
-          {state.index + 1} / {QUIZ_QUESTIONS.length}
-        </span>
-      </div>
-      <div className="h-px bg-rule mb-12 relative">
-        <div
-          className="absolute inset-y-0 left-0 bg-ink"
-          style={{ width: `${progress * 100}%`, height: "2px", top: "-0.5px" }}
-        />
-      </div>
-      <Question question={question} onChoose={choose} />
+      <QuestionBlock
+        question={question}
+        index={state.index}
+        total={QUIZ_QUESTIONS.length}
+        selectedId={state.chosenIds[state.index]}
+        onSelect={select}
+        onNext={next}
+        onBack={state.index > 0 ? () => dispatch({ type: "back" }) : undefined}
+        nextLabel={state.index + 1 >= QUIZ_QUESTIONS.length ? "See your school" : "Next"}
+      />
     </div>
   );
 }

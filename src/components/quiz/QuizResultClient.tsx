@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ResultCard } from "@/components/card/ResultCard";
-import { ShareRow } from "@/components/share/ShareRow";
+import { Page } from "@/components/layout/Page";
+import { Button } from "@/components/ui/Button";
+import { TextLink } from "@/components/ui/TextLink";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { ShareSheet } from "@/components/share/ShareSheet";
 import { ChallengeButton } from "@/components/share/ChallengeButton";
 import { PENDING_RESULT_KEY } from "@/components/quiz/QuizShell";
 import { submitQuizResult } from "@/app/actions";
@@ -112,54 +116,98 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
   const shareLine = resultId ? pickShareLineFrom(school.share_lines, resultId) : null;
 
   return (
-    <main className="flex-1">
-      <div className="mx-auto max-w-2xl px-6 pt-14 pb-20">
-        <p className="eyebrow text-ink-soft mb-5">Your result</p>
+    <Page width="read">
+      <p className="text-sm text-ink-soft">Your school</p>
+
+      <div className="mt-4">
         <ResultCard
           school={pending.primary}
           oneLine={school.one_line}
           oneLineAttribution={school.one_line_attribution}
         />
-
-        {/* One line, not a spinner: the card is already on screen and
-            finished, so an animation here would imply something is still
-            missing from it. */}
-        {!resultId && !failed && (
-          <p className="mt-8 text-sm text-ink-soft">Saving your result…</p>
-        )}
-
-        {resultId && shareLine && (
-          <>
-            <div className="mt-8">
-              <ShareRow
-                resultId={resultId}
-                school={pending.primary}
-                shareLine={shareLine.text}
-                shareLineIndex={shareLine.index}
-              />
-            </div>
-            <div className="mt-6 flex flex-wrap items-center gap-6">
-              <ChallengeButton resultId={resultId} school={pending.primary} />
-              <Link
-                href="/debate"
-                className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"
-              >
-                Defend your school in a debate
-              </Link>
-            </div>
-          </>
-        )}
-
-        {failed && (
-          <p className="mt-6 text-sm text-ink-mid max-w-[50ch]">
-            Couldn&apos;t save this result just now, but it&apos;s yours to keep looking at.{" "}
-            <Link href={`/s/${pending.primary}`} className="underline underline-offset-4 text-ink">
-              Read the case for {school.name}
-            </Link>{" "}
-            instead of sharing a link.
-          </p>
-        )}
       </div>
-    </main>
+
+      {/* One line, not a spinner: the card is already on screen and
+          finished, so an animation here would imply something about it is
+          still missing. */}
+      {!resultId && !failed && <p className="mt-6 text-sm text-ink-soft">Saving your result…</p>}
+
+      {resultId && shareLine && (
+        <div className="mt-6">
+          <ShareSheet
+            resultId={resultId}
+            school={pending.primary}
+            shareLine={shareLine.text}
+            shareLineIndex={shareLine.index}
+          />
+        </div>
+      )}
+
+      {failed && (
+        <div className="mt-6">
+          <ErrorState
+            title="Couldn't save this result."
+            body="It is still yours to look at, and the card above is correct. Sharing needs a saved result, so read the case for your school instead, or take the quiz again in a moment."
+            action={
+              <Button variant="secondary" onClick={() => window.location.reload()}>
+                Try again
+              </Button>
+            }
+          />
+          <p className="mt-4 text-sm text-ink-mid">
+            <TextLink href={`/s/${pending.primary}`}>Read the case for {school.name}</TextLink>
+          </p>
+        </div>
+      )}
+
+      {/*
+        The reading content for this school, with its primary source cited.
+        A result that hands you a label and nothing to read is a personality
+        quiz; this is the first thing that makes it not one.
+
+        The brief asks for "the before micro-lesson for that school". There
+        is no such thing in `content/`: micro-lessons are keyed by *topic*
+        (one before and one after per motion), not by school, and carry no
+        school field. What does exist per school is `read` in
+        content/schools/*.md — the case for that school with its own
+        citation, which is what this renders. Flagged rather than faked.
+      */}
+      <section className="mt-12 border-t border-rule pt-8">
+        <p className="text-sm text-ink-soft">The case for your school</p>
+        <h2 className="mt-1 font-serif text-lg font-medium text-ink">{school.name}</h2>
+        <div className="prose-reading mt-5 text-ink">
+          {school.read.split("\n\n").map((para, i) => (
+            <p key={i}>{para}</p>
+          ))}
+        </div>
+        <p className="mt-4 text-sm text-ink-soft">{school.one_line_attribution}</p>
+        <p className="mt-4 text-sm">
+          <TextLink href={`/s/${pending.primary}`}>
+            What this school gets wrong
+          </TextLink>
+        </p>
+      </section>
+
+      <section className="mt-12 border-t border-rule pt-8">
+        <h2 className="font-serif text-lg font-medium text-ink">Now defend it</h2>
+        <p className="mt-3 max-w-[54ch] text-sm leading-relaxed text-ink-mid">
+          The quiz gives you a starting position. The rest of Sophecs is about
+          holding it: take a motion, write a case, and get scored on how
+          faithfully you argue from {school.name} — not on whether anyone agrees.
+        </p>
+        <div className="mt-5 flex flex-wrap items-center gap-4">
+          <Link
+            href="/debate"
+            className="inline-flex min-h-11 items-center justify-center rounded-control border border-ink bg-ink px-5 text-sm font-medium text-paper hover:border-ink-mid hover:bg-ink-mid"
+          >
+            Take a motion
+          </Link>
+          {resultId && <ChallengeButton resultId={resultId} school={pending.primary} variant="secondary" />}
+          <TextLink href="/lessons" className="text-sm">
+            Read the lessons
+          </TextLink>
+        </div>
+      </section>
+    </Page>
   );
 }

@@ -1,18 +1,18 @@
 import { Suspense } from "react";
+import { Page } from "@/components/layout/Page";
 import { QuizShell } from "@/components/quiz/QuizShell";
 
 export const metadata = { title: "The quiz · Sophecs" };
 
-// Client component, questions bundled at build time, no fetch before the
-// final server action on /quiz/result.
+// Questions are bundled at build time; nothing is fetched until the server
+// action on /quiz/result. The narrow container is the one the landing page
+// uses for the same block, so the step between them is not a step.
 export default function QuizPage() {
   return (
-    <main className="flex-1">
-      <div className="mx-auto max-w-2xl px-6 pt-14 pb-20">
-        <Suspense fallback={null}>
-          <QuizShell />
-        </Suspense>
-      </div>
-    </main>
+    <Page width="narrow">
+      <Suspense fallback={null}>
+        <QuizShell />
+      </Suspense>
+    </Page>
   );
 }

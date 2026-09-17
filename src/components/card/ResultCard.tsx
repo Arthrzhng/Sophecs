@@ -22,7 +22,10 @@ export function ResultCard({
   return (
     <div
       style={{ containerType: "inline-size" }}
-      className="w-full rounded-lg overflow-hidden shadow-[0_1px_2px_rgba(25,25,23,0.08),0_8px_24px_rgba(25,25,23,0.12)]"
+      // Square and unshadowed. A saturated card at 8:1 against near-white
+      // paper already separates; a drop shadow on top is the detail that
+      // makes it read as a "card component" rather than a printed object.
+      className="w-full overflow-hidden"
     >
       <CardLayout
         school={school}
