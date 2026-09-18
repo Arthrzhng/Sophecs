@@ -13,6 +13,7 @@ import { DisplayNameForm } from "@/components/me/DisplayNameForm";
 import { ArgumentVisibilityToggle } from "@/components/me/ArgumentVisibilityToggle";
 import { SignOutButton } from "@/components/me/SignOutButton";
 import { DeleteAccountButton } from "@/components/me/DeleteAccountButton";
+import { Page } from "@/components/layout/Page";
 
 export const metadata = { title: "Settings · Sophecs" };
 
@@ -56,8 +57,7 @@ export default async function MeSettingsPage({
   }
 
   return (
-    <main className="flex-1">
-      <div className="mx-auto max-w-2xl px-6 pt-14 pb-24">
+    <Page width="read">
         <p className="eyebrow text-ink-soft mb-4">Settings</p>
 
         <div>
@@ -90,7 +90,6 @@ export default async function MeSettingsPage({
           </p>
           <DeleteAccountButton />
         </div>
-      </div>
-    </main>
+    </Page>
   );
 }

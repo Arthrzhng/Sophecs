@@ -7,8 +7,8 @@ const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
 // Placeholders, to be filled before the Phase 5 production deploy. They are
 // left visibly unfilled rather than guessed — a made-up name or address in
 // a footer is worse than an obvious gap.
-const MADE_BY = "[NAME]";
-const CONTACT = "[EMAIL]";
+const MADE_BY = "[YOUR NAME]";
+const CONTACT = "[YOUR EMAIL]";
 
 // Duplicated from src/lib/anthropic.ts's MODEL rather than imported. That
 // module reads the judge prompt off disk at module scope, so importing it

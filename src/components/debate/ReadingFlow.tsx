@@ -42,7 +42,7 @@ export function ReadingFlow({
   return (
     <div>
       <p className="mb-4 text-sm text-ink-soft">Before you argue</p>
-      <h1 className="font-serif text-2xl font-medium">{lesson.title}</h1>
+      <h1 className="font-serif text-xl font-medium leading-tight text-ink">{lesson.title}</h1>
 
       {chunks.slice(0, revealed).map((chunk, i) => {
         const answered = responses[i] !== undefined;

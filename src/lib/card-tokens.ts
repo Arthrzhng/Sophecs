@@ -1,7 +1,7 @@
 import type { SchoolId } from "./types";
 
 /**
- * The result card's design tokens, as literals.
+ * Design tokens as literals, for every surface that renders through Satori.
  *
  * Every colour here is a copy of a token in globals.css. It is a copy on
  * purpose, for the same reason SiteFooter copies the judge model name
@@ -25,6 +25,13 @@ import type { SchoolId } from "./types";
  *   --color-utilitarian-surface  #7a5518
  *   --color-virtue-surface       #6b2c37
  *   --color-on-saturated         #faf8f2
+ *   --color-paper                #f8f8f6
+ *   --color-ink                  #141413
+ *   --color-ink-mid              #54544c
+ *   --color-ink-soft             #63635b
+ *   --color-stoic                #3e5c4b
+ *   --color-utilitarian          #8a6320
+ *   --color-virtue               #7a3540
  */
 
 /** --color-on-saturated. Near-white, very slightly warm. */
@@ -171,3 +178,33 @@ export const CARD_MEASURE = 0.88;
 
 /** Padding, as a fraction of width. */
 export const CARD_PADDING = 0.066;
+
+/* --- The paper surfaces -------------------------------------------------
+ *
+ * The verdict card, the site's own OG image and the two icon routes all
+ * render on paper rather than on a school colour. Each of them used to
+ * carry its own literals, and each had drifted: paper was #e9e9e3 against
+ * the token's #f8f8f6, ink was #191917 against #141413, and the site OG
+ * image's utilitarian hairline was #87611f against #8a6320. Four copies of
+ * a colour is four chances to be slightly wrong, and all four were.
+ */
+
+/** --color-paper. */
+export const OG_PAPER = "#f8f8f6";
+/** --color-ink. */
+export const OG_INK = "#141413";
+/** --color-ink-mid. */
+export const OG_INK_MID = "#54544c";
+/** --color-ink-soft. */
+export const OG_INK_SOFT = "#63635b";
+
+/**
+ * --color-stoic / --color-utilitarian / --color-virtue: the muted markers
+ * meant to sit *on* paper, as opposed to CARD_SURFACE above, which carries
+ * near-white text on top of itself.
+ */
+export const SCHOOL_MARKER: Record<SchoolId, string> = {
+  stoicism: "#3e5c4b",
+  utilitarianism: "#8a6320",
+  "virtue-ethics": "#7a3540",
+};

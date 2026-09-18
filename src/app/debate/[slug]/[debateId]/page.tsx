@@ -124,7 +124,6 @@ export default async function VerdictPage({
     publicRow.elo_before != null && publicRow.elo_after != null
       ? Math.round(Number(publicRow.elo_after) - Number(publicRow.elo_before))
       : null;
-  const eloAfter = publicRow.elo_after != null ? Number(publicRow.elo_after) : null;
 
   const schoolContent = getSchool(school);
   const shortMotion = topic.motion.length > 60 ? `${topic.motion.slice(0, 57)}...` : topic.motion;
@@ -157,7 +156,6 @@ export default async function VerdictPage({
         school={school}
         verdict={verdict}
         eloDelta={eloDelta}
-        eloAfter={eloAfter}
         argument={argument}
         isOwner={isOwner}
         argumentPublic={argumentPublic}

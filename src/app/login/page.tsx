@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/auth/LoginForm";
+import { Page } from "@/components/layout/Page";
 
 export const metadata = { title: "Sign in · Sophecs" };
 
@@ -13,16 +14,14 @@ export default async function LoginPage({
   const { next } = await searchParams;
 
   return (
-    <main className="flex-1">
-      <div className="mx-auto max-w-sm px-6 pt-20 pb-24">
-        <h1 className="font-serif text-2xl font-medium">Sign in to defend your school.</h1>
+    <Page width="narrow">
+        <h1 className="font-serif text-xl font-medium leading-tight text-ink">Sign in to defend your school.</h1>
         <p className="mt-3 text-ink-mid text-sm leading-relaxed">
           No password. A link to your email, or Google.
         </p>
         <div className="mt-8">
           <LoginForm next={next} />
         </div>
-      </div>
-    </main>
+    </Page>
   );
 }

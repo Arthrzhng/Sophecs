@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Page } from "@/components/layout/Page";
 import { TextLink } from "@/components/ui/TextLink";
 import { ButtonLink } from "@/components/ui/Button";
-import { Passage, type RailEntry } from "@/components/lessons/Passage";
+import { Passage } from "@/components/lessons/Passage";
 import { getAllMicroLessons, getMicroLesson } from "@/lib/micro-lessons";
 import { getAllTopicFiles } from "@/lib/topics";
 import { formatSource, readingMinutes } from "@/lib/footnotes";
@@ -34,27 +34,6 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
     ) ?? null;
   const topic = getAllTopicFiles().find((t) => t.slug === lesson.topic) ?? null;
 
-  // The rail lists what is actually on this page.
-  //
-  // The approved wireframe showed section headings from inside the passage
-  // ("The sorting", "What you own"). There are none: a micro-lesson body is
-  // four unheaded paragraphs, and content/ is frozen, so inventing three
-  // headings per passage would be writing content under the guise of
-  // layout. These four anchors are real.
-  const rail: RailEntry[] = [
-    { id: "passage", label: "The passage" },
-    { id: "sources", label: "Sources" },
-    ...(sibling
-      ? [
-          {
-            id: "next",
-            label: sibling.position === "after" ? "The objection" : "Before you argue",
-          },
-        ]
-      : []),
-    { id: "argue", label: "Argue this motion" },
-  ];
-
   return (
     <Page width="ui">
       <p className="text-sm text-ink-soft">
@@ -63,18 +42,19 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
       <h1 className="mt-1 max-w-[30ch] font-serif text-xl font-medium leading-tight text-ink">
         {lesson.title}
       </h1>
+      {/* Reading time only. The citation is four paragraphs below under
+          Sources, and printing it twice on a page this short is the kind of
+          repetition that reads as padding. */}
       <p className="mt-3 text-sm text-ink-mid">
-        {formatSource(lesson.source)} —{" "}
         <span className="font-mono tabular">{readingMinutes(lesson.body)}</span> min
       </p>
 
       <div className="mt-10">
-        <Passage
-          storageKey={lesson.slug}
-          body={lesson.body}
-          sources={[lesson.source]}
-          rail={rail}
-        >
+        {/* No rail and no remembered position. A micro-passage is four
+            paragraphs — a contents list for a page you can already see, and
+            a saved scroll position cannot return you anywhere you had not
+            already reached. Both belong to modules, which are long. */}
+        <Passage body={lesson.body} sources={[lesson.source]}>
           {sibling && (
             <section id="next" className="mt-12 scroll-mt-8 border-t border-rule pt-8">
               <p className="text-sm text-ink-soft">

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSchool } from "@/lib/schools";
 import type { SchoolId } from "@/lib/types";
+import { Page } from "@/components/layout/Page";
+import { ButtonLink } from "@/components/ui/Button";
 
 const VALID_SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
 
@@ -23,13 +25,12 @@ export default async function SchoolPage({ params }: { params: Promise<{ school:
   const content = getSchool(school as SchoolId);
 
   return (
-    <main className="flex-1">
-      <div className="mx-auto max-w-2xl px-6 pt-16 pb-24">
-        <p className="eyebrow text-ink-soft mb-4">{content.name}</p>
-        <blockquote className="font-serif text-2xl sm:text-[28px] font-medium leading-snug italic">
+    <Page width="read">
+        <p className="mb-4 text-sm text-ink-soft">{content.name}</p>
+        <blockquote className="font-serif text-lg font-medium leading-snug italic text-ink">
           &ldquo;{content.one_line}&rdquo;
         </blockquote>
-        <p className="mt-2 font-mono text-xs text-ink-soft">— {content.one_line_attribution}</p>
+        <p className="mt-3 text-sm text-ink-soft">{content.one_line_attribution}</p>
 
         <div className="mt-10 prose-reading">
           {content.read.split("\n\n").map((paragraph, i) => (
@@ -47,12 +48,11 @@ export default async function SchoolPage({ params }: { params: Promise<{ school:
         </div>
 
         <div className="mt-12 flex flex-wrap items-center gap-6">
-          <Link
+          <ButtonLink
             href="/quiz"
-            className="inline-block bg-ink text-surface rounded-md px-6 py-3 text-base font-medium hover:opacity-85 transition-opacity"
           >
             Take the quiz
-          </Link>
+          </ButtonLink>
           <Link
             href="/debate"
             className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"
@@ -75,7 +75,6 @@ export default async function SchoolPage({ params }: { params: Promise<{ school:
             ))}
           </div>
         </div>
-      </div>
-    </main>
+    </Page>
   );
 }

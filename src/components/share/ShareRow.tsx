@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { track } from "@/lib/analytics/client";
 import type { SchoolId } from "@/lib/types";
+import { Button } from "@/components/ui/Button";
 
 const SITE = "https://sophecs.com";
 
@@ -117,13 +118,11 @@ function useShare({ resultId, school, shareLine, shareLineIndex }: Props) {
 
 function Btn({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
   return (
-    <button
-      type="button"
+    <Button variant="secondary"
       onClick={onClick}
-      className="min-h-11 px-4 rounded-md border border-rule bg-surface text-sm font-medium hover:border-ink-soft transition-colors"
     >
       {children}
-    </button>
+    </Button>
   );
 }
 

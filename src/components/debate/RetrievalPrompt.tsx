@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { saveReadingResponse } from "@/app/debate/actions";
 import { track } from "@/lib/analytics/client";
 import { MAX_RETRIEVAL_RESPONSE_CHARS } from "@/lib/lesson-chunks";
+import { Button } from "@/components/ui/Button";
 
 // Recall, not assessment. Nothing here grades the answer, calls a model, or
 // shows a correct response — the point is that writing the idea down once,
@@ -106,14 +107,12 @@ export function RetrievalPrompt({
         <span className="font-mono text-xs text-ink-soft">
           {trimmed.length} / {MAX_RETRIEVAL_RESPONSE_CHARS}
         </span>
-        <button
-          type="button"
+        <Button variant="secondary"
           onClick={submit}
           disabled={!canSubmit}
-          className="inline-flex min-h-11 items-center justify-center rounded-control border border-rule bg-surface px-5 text-sm font-medium text-ink hover:border-rule-strong disabled:text-ink-soft"
         >
           {saving ? "Saving…" : "Keep going"}
-        </button>
+        </Button>
       </div>
       {error && (
         <p role="status" className="mt-2 font-mono text-xs text-error">

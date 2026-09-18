@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { loadSerifFont } from "@/lib/og-fonts";
+import { OG_INK, OG_PAPER } from "@/lib/card-tokens";
 
 // Node runtime for the same reason as the card routes: the TTF is read from
 // disk, which the edge runtime has no filesystem for.
@@ -20,8 +21,8 @@ export default async function Icon() {
           justifyContent: "center",
           width: "100%",
           height: "100%",
-          backgroundColor: "#e9e9e3",
-          color: "#191917",
+          backgroundColor: OG_PAPER,
+          color: OG_INK,
           fontFamily: "Spectral",
           fontSize: 26,
           fontWeight: 500,

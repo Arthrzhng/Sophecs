@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { track } from "@/lib/analytics/client";
+import { Button } from "@/components/ui/Button";
 import {
   MAX_QUOTE_CHARS,
   MAX_TURN_CHARS,
@@ -169,7 +170,7 @@ export function TurnComposer({
         value={quote}
         onChange={(e) => setQuote(e.target.value)}
         maxLength={MAX_QUOTE_CHARS}
-        className="mt-2 w-full resize-none rounded-md border border-rule bg-surface p-3 font-serif text-base italic leading-relaxed"
+        className="mt-2 w-full resize-none rounded-control border border-rule bg-surface p-3 font-serif text-base italic leading-relaxed"
       />
       {quoteProblem && (
         <p className="mt-1 font-mono text-xs text-error">
@@ -190,7 +191,7 @@ export function TurnComposer({
         rows={8}
         value={body}
         onChange={(e) => setBody(e.target.value)}
-        className="mt-2 w-full rounded-md border border-rule bg-surface p-4 font-serif text-base leading-relaxed resize-y"
+        className="mt-2 w-full rounded-control border border-rule bg-surface p-4 font-serif text-base leading-relaxed resize-y"
       />
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
@@ -208,14 +209,9 @@ export function TurnComposer({
       </div>
 
       <div className="mt-5">
-        <button
-          type="button"
-          onClick={send}
-          disabled={!canSend}
-          className="min-h-11 rounded-md bg-ink px-6 text-base font-medium text-surface hover:opacity-85 disabled:opacity-40"
-        >
-          {status.kind === "sending" ? "Sending…" : "Send reply"}
-        </button>
+        <Button onClick={send} disabled={!canSend} loading={status.kind === "sending"} loadingLabel="Sending…">
+          Send reply
+        </Button>
       </div>
       <p className="mt-3 font-sans text-xs text-ink-soft max-w-[52ch]">
         Replies are checked before delivery. No names, schools, locations or links.

@@ -8,6 +8,7 @@ import { getCaseStates, type CaseState } from "@/lib/cases";
 import { normaliseClassCode } from "@/lib/classes";
 import { SCHOOL_ADHERENT, SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
+import { Page } from "@/components/layout/Page";
 
 export const metadata = { title: "Class · Sophecs" };
 
@@ -87,11 +88,10 @@ export default async function ClassPage({ params }: { params: Promise<{ code: st
   }
 
   return (
-    <main className="flex-1">
-      <div className="mx-auto max-w-3xl px-6 pt-14 pb-24">
+    <Page width="ui">
         <ClassViewTracker classId={klass.id as string} members={members.length} />
         <p className="eyebrow text-ink-soft mb-4">Class</p>
-        <h1 className="font-serif text-2xl font-medium">{klass.name}</h1>
+        <h1 className="font-serif text-xl font-medium leading-tight text-ink">{klass.name}</h1>
         <p className="mt-3 text-sm text-ink-mid max-w-[54ch]">
           Whether each motion has been read, argued, answered and closed. Not
           arguments, scores or ratings.
@@ -144,7 +144,6 @@ export default async function ClassPage({ params }: { params: Promise<{ code: st
             Settings →
           </Link>
         </div>
-      </div>
-    </main>
+    </Page>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { setDisplayName } from "@/app/me/actions";
+import { Button } from "@/components/ui/Button";
 
 export function DisplayNameForm({ initial }: { initial: string | null }) {
   const [value, setValue] = useState(initial ?? "");
@@ -25,15 +26,14 @@ export function DisplayNameForm({ initial }: { initial: string | null }) {
           onChange={(e) => setValue(e.target.value)}
           placeholder="Skippable — otherwise shown as “A Stoic”"
           maxLength={60}
-          className="flex-1 min-h-11 bg-surface border border-rule rounded-md px-3 text-sm placeholder:text-ink-soft"
+          className="flex-1 min-h-11 bg-surface border border-rule rounded-control px-3 text-sm placeholder:text-ink-soft"
         />
-        <button
+        <Button
           type="submit"
           disabled={pending}
-          className="min-h-11 px-4 bg-ink text-surface rounded-md text-sm font-medium hover:opacity-85 disabled:opacity-60"
         >
           Save
-        </button>
+        </Button>
       </form>
       {status && (
         <p role="status" className="mt-2 font-mono text-xs text-ink-mid">

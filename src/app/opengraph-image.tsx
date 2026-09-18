@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { loadOgFonts } from "@/lib/og-fonts";
+import { OG_INK, OG_INK_MID, OG_PAPER, SCHOOL_MARKER } from "@/lib/card-tokens";
 
 export const alt = "Sophecs — which school do you think in?";
 export const size = { width: 1200, height: 630 };
@@ -10,7 +11,11 @@ export const contentType = "image/png";
 // site rather than to any one school. The hairline below is the only place
 // on the site where all three school colours appear together — the muted
 // tokens, not the card surfaces, since these sit on paper.
-const SCHOOL_HAIRLINE = ["#3e5c4b", "#87611f", "#7a3540"];
+const SCHOOL_HAIRLINE = [
+  SCHOOL_MARKER.stoicism,
+  SCHOOL_MARKER.utilitarianism,
+  SCHOOL_MARKER["virtue-ethics"],
+];
 
 export default async function SiteOgImage() {
   const [spectral, plexSans] = await loadOgFonts();
@@ -26,8 +31,8 @@ export default async function SiteOgImage() {
           width: size.width,
           height: size.height,
           padding: 90,
-          backgroundColor: "#e9e9e3",
-          color: "#191917",
+          backgroundColor: OG_PAPER,
+          color: OG_INK,
           fontFamily: "IBM Plex Sans",
         }}
       >
@@ -54,7 +59,7 @@ export default async function SiteOgImage() {
               marginTop: 28,
               fontSize: 28,
               lineHeight: 1.4,
-              color: "#54544c",
+              color: OG_INK_MID,
             }}
           >
             Ten scenarios. Three schools. One result you&apos;ll want to argue about.

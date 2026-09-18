@@ -8,6 +8,7 @@ import { ExchangePublishToggle } from "@/components/counterpart/PublishToggle";
 import { isLapsed, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
 import { SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
+import { Page } from "@/components/layout/Page";
 
 export const metadata = { title: "Counterpart · Sophecs" };
 
@@ -105,10 +106,9 @@ export default async function CounterpartPage({
   }
 
   return (
-    <main className="flex-1">
-      <div className="mx-auto max-w-3xl px-6 pt-14 pb-24">
+    <Page width="read">
         <p className="eyebrow text-ink-soft mb-4">Counterpart</p>
-        <h1 className="font-serif text-2xl font-medium leading-snug max-w-[40ch]">
+        <h1 className="max-w-[40ch] font-serif text-xl font-medium leading-tight text-ink">
           {topic.motion}
         </h1>
 
@@ -206,8 +206,7 @@ export default async function CounterpartPage({
             Counterpart rules →
           </Link>
         </div>
-      </div>
-    </main>
+    </Page>
   );
 }
 

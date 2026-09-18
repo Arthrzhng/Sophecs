@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { seekCounterpart } from "@/app/debate/actions";
 import { track } from "@/lib/analytics/client";
+import { Button } from "@/components/ui/Button";
 
 // Secondary by design: "Answer it" is the main path off a verdict, and the
 // revision loop is what brings people back. This is the other thing you can
@@ -62,14 +63,12 @@ export function FindCounterpartButton({
 
   return (
     <div>
-      <button
-        type="button"
+      <Button variant="secondary"
         onClick={seek}
         disabled={state === "busy"}
-        className="inline-flex min-h-11 items-center justify-center rounded-control border border-rule bg-surface px-5 text-sm font-medium text-ink hover:border-rule-strong disabled:text-ink-soft"
       >
         {state === "busy" ? "Looking…" : "Find a counterpart"}
-      </button>
+      </Button>
       <p className="mt-2 font-sans text-sm text-ink-mid max-w-[52ch]">
         Someone who argued this motion from another school will see your argument and answer one
         claim in it. Nobody else sees it. Two replies each, then it closes.

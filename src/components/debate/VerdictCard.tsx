@@ -1,4 +1,5 @@
 import { SCHOOL_COLORS } from "@/lib/school-colors";
+import { OG_INK, OG_INK_SOFT, OG_PAPER } from "@/lib/card-tokens";
 import type { SchoolId } from "@/lib/types";
 
 // The share surface for a verdict — paper, not saturated, per the brief:
@@ -34,15 +35,15 @@ export function VerdictCard({
         width,
         height,
         padding: px(64),
-        backgroundColor: "#e9e9e3",
-        color: "#191917",
+        backgroundColor: OG_PAPER,
+        color: OG_INK,
         fontFamily: fonts.sans,
       }}
     >
       <div style={{ display: "flex", width: px(64), height: 3, backgroundColor: color.surface }} />
       <div style={{ display: "flex", alignItems: "baseline", gap: px(20), marginTop: px(28) }}>
         <span style={{ fontFamily: fonts.mono, fontSize: px(72), fontWeight: 500 }}>{score}</span>
-        <span style={{ fontFamily: fonts.mono, fontSize: px(20), color: "#63635b" }}>/ 100</span>
+        <span style={{ fontFamily: fonts.mono, fontSize: px(20), color: OG_INK_SOFT }}>/ 100</span>
       </div>
       <div
         style={{
@@ -61,7 +62,7 @@ export function VerdictCard({
           display: "flex",
           fontFamily: fonts.mono,
           fontSize: px(18),
-          color: "#63635b",
+          color: OG_INK_SOFT,
           marginTop: px(40),
         }}
       >

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { blockCounterpart, reportTurn } from "@/app/debate/actions";
 import { track } from "@/lib/analytics/client";
+import { Button } from "@/components/ui/Button";
 
 const REASONS = [
   { value: "harassment", label: "Harassment" },
@@ -68,7 +69,7 @@ export function TurnActions({ turnId, exchangeId }: { turnId: string; exchangeId
           type="button"
           onClick={block}
           disabled={busy}
-          className="font-mono text-xs text-ink-soft underline underline-offset-4 hover:text-ink disabled:opacity-50"
+          className="text-sm text-ink-soft underline underline-offset-4 hover:text-ink disabled:no-underline"
         >
           Block
         </button>
@@ -99,16 +100,14 @@ export function TurnActions({ turnId, exchangeId }: { turnId: string; exchangeId
             maxLength={300}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Anything else worth knowing (optional)"
-            className="mt-3 w-full resize-none rounded-md border border-rule bg-surface p-3 font-sans text-sm"
+            className="mt-3 w-full resize-none rounded-control border border-rule bg-surface p-3 font-sans text-sm"
           />
-          <button
-            type="button"
+          <Button variant="secondary"
             onClick={submitReport}
             disabled={busy}
-            className="mt-3 min-h-11 rounded-md border border-rule bg-surface px-5 text-sm font-medium hover:border-ink-soft disabled:opacity-50"
           >
             Send report
-          </button>
+          </Button>
         </div>
       )}
     </div>

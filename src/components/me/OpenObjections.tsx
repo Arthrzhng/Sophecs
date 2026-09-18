@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { OpenObjection } from "@/lib/objections";
+import { ButtonLink } from "@/components/ui/Button";
 
 const VISIBLE = 5;
 
@@ -33,12 +33,11 @@ export function OpenObjections({
             <p className="font-serif text-base">
               This week&apos;s motion: {weeklyMotion.title}
             </p>
-            <Link
+            <ButtonLink
               href={`/debate/${weeklyMotion.slug}`}
-              className="inline-block bg-ink text-surface rounded-md px-5 py-2.5 text-sm font-medium hover:opacity-85"
             >
               Defend your school
-            </Link>
+            </ButtonLink>
           </div>
         )}
       </section>
@@ -63,12 +62,11 @@ export function OpenObjections({
               Objection · {SCHOOL_COLORS[o.rivalSchool].name}
             </p>
             <p className="mt-2 font-serif text-base leading-relaxed max-w-[52ch]">{o.claim}</p>
-            <Link
+            <ButtonLink
               href={`/debate/${o.topicSlug}/${o.debateId}/revise`}
-              className="mt-4 inline-block bg-ink text-surface rounded-md px-5 py-2.5 text-sm font-medium hover:opacity-85"
             >
               Answer it
-            </Link>
+            </ButtonLink>
           </li>
         ))}
       </ul>
@@ -86,12 +84,11 @@ export function OpenObjections({
                   Objection · {SCHOOL_COLORS[o.rivalSchool].name}
                 </p>
                 <p className="mt-2 font-serif text-base leading-relaxed max-w-[52ch]">{o.claim}</p>
-                <Link
+                <ButtonLink
                   href={`/debate/${o.topicSlug}/${o.debateId}/revise`}
-                  className="mt-4 inline-block bg-ink text-surface rounded-md px-5 py-2.5 text-sm font-medium hover:opacity-85"
                 >
                   Answer it
-                </Link>
+                </ButtonLink>
               </li>
             ))}
           </ul>

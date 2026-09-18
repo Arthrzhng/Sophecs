@@ -14,13 +14,18 @@ export interface RailEntry {
 }
 
 /**
- * The reading view: a passage, its footnotes, a contents rail and a
- * remembered position.
+ * The reading view: a passage, its footnotes, and — for something long
+ * enough to need them — a contents rail and a remembered position.
  *
- * Client-side because of the last of those. It costs the route its static
- * prerender, which is why the *page* stays a server component and only this
- * subtree is a client one — the title, the sources and the links around it
- * are all still server-rendered HTML.
+ * Both of those are opt-in, and a micro-passage opts out of both. Four
+ * paragraphs is one screen and a bit: a contents rail for it is a table of
+ * contents for a page you can already see, and a remembered position
+ * cannot restore anything you had not already reached. They are for
+ * modules, which are long.
+ *
+ * Client-side only when it has to be. With neither prop this renders no
+ * effects at all; the route stays static either way, since a client
+ * component alone does not opt a page out of prerendering.
  */
 export function Passage({
   storageKey,
@@ -29,11 +34,12 @@ export function Passage({
   rail,
   children,
 }: {
-  /** Scroll position is remembered under this key. */
-  storageKey: string;
+  /** Scroll position is remembered under this key. Omit to not remember. */
+  storageKey?: string;
   body: string;
   sources: Source[];
-  rail: RailEntry[];
+  /** Omit for a passage short enough not to need one. */
+  rail?: RailEntry[];
   /** Everything after the passage: sources, siblings, the arena link. */
   children?: React.ReactNode;
 }) {
@@ -41,11 +47,13 @@ export function Passage({
   const paragraphs = body.split("\n\n");
   const article = useRef<HTMLDivElement>(null);
   const [restored, setRestored] = useState(false);
+  const showRail = Boolean(rail && rail.length > 0);
 
   // Restore where they stopped. Scoped by slug and to this browser: it is a
   // convenience, not state anyone else needs, so localStorage is the right
   // place and a failed read is a non-event.
   useEffect(() => {
+    if (!storageKey) return;
     let y = 0;
     try {
       y = Number(localStorage.getItem(`read:${storageKey}`) ?? 0);
@@ -64,6 +72,7 @@ export function Passage({
   // to be roughly right, and a listener that writes to localStorage on each
   // frame is the kind of thing that makes a page feel heavy.
   useEffect(() => {
+    if (!storageKey) return;
     const id = setInterval(() => {
       try {
         localStorage.setItem(`read:${storageKey}`, String(Math.round(window.scrollY)));
@@ -79,9 +88,10 @@ export function Passage({
   }
 
   return (
-    <div className="md:flex md:gap-10">
+    <div className={showRail ? "md:flex md:gap-10" : undefined}>
       {/* The rail, from md up. Sticky, no border, no background — it is a
           list of links, and giving it a panel would make it furniture. */}
+      {showRail && (
       <nav
         aria-label="On this page"
         data-print="hide"
@@ -90,7 +100,7 @@ export function Passage({
         <div className="sticky top-8">
           <p className="text-sm text-ink-soft">On this page</p>
           <ul className="mt-3 space-y-2">
-            {rail.map((entry) => (
+            {(rail ?? []).map((entry) => (
               <li key={entry.id}>
                 <a
                   href={`#${entry.id}`}
@@ -103,10 +113,12 @@ export function Passage({
           </ul>
         </div>
       </nav>
+      )}
 
       <div className="min-w-0 flex-1">
         {/* Below md the rail is a native select, so the OS picker does the
             work a custom menu would do worse. */}
+        {showRail && (
         <div className="md:hidden" data-print="hide">
           <label htmlFor="passage-rail" className="text-sm text-ink-soft">
             On this page
@@ -123,13 +135,14 @@ export function Passage({
             <option value="" disabled>
               Jump to…
             </option>
-            {rail.map((entry) => (
+            {(rail ?? []).map((entry) => (
               <option key={entry.id} value={entry.id}>
                 {entry.label}
               </option>
             ))}
           </select>
         </div>
+        )}
 
         {restored && (
           <p className="mt-4 text-sm text-ink-soft" data-print="hide">

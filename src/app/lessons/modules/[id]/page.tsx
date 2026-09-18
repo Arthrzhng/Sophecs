@@ -8,14 +8,14 @@ import { readingMinutes } from "@/lib/footnotes";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 
 export function generateStaticParams() {
-  return getAllModules().map((module) => ({ id: module.id }));
+  return getAllModules().map((m) => ({ id: m.id }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const module = getModule(id);
-  if (!module) return { title: "Sophecs" };
-  return { title: `${module.title} · Sophecs`, description: module.quiz_excerpt };
+  const mod = getModule(id);
+  if (!mod) return { title: "Sophecs" };
+  return { title: `${mod.title} · Sophecs`, description: mod.quiz_excerpt };
 }
 
 // The reading view for a module. Zero modules exist today, so this route
@@ -23,10 +23,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 // into content/modules/ is the whole of adding one.
 export default async function ModulePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const module = getModule(id);
-  if (!module) notFound();
+  const mod = getModule(id);
+  if (!mod) notFound();
 
-  const topics = getAllTopicFiles().filter((t) => module.debate_topics.includes(t.slug));
+  const topics = getAllTopicFiles().filter((t) => mod.debate_topics.includes(t.slug));
 
   const rail: RailEntry[] = [
     { id: "passage", label: "The module" },
@@ -36,19 +36,19 @@ export default async function ModulePage({ params }: { params: Promise<{ id: str
 
   return (
     <Page width="ui">
-      <p className="text-sm text-ink-soft">{SCHOOL_COLORS[module.school].name}</p>
+      <p className="text-sm text-ink-soft">{SCHOOL_COLORS[mod.school].name}</p>
       <h1 className="mt-1 max-w-[30ch] font-serif text-xl font-medium leading-tight text-ink">
-        {module.title}
+        {mod.title}
       </h1>
       <p className="mt-3 text-sm text-ink-mid">
-        <span className="font-mono tabular">{readingMinutes(module.body)}</span> min
+        <span className="font-mono tabular">{readingMinutes(mod.body)}</span> min
       </p>
 
       <div className="mt-10">
         <Passage
-          storageKey={`module:${module.id}`}
-          body={module.body}
-          sources={module.sources}
+          storageKey={`module:${mod.id}`}
+          body={mod.body}
+          sources={mod.sources}
           rail={rail}
         >
           {topics.length > 0 && (

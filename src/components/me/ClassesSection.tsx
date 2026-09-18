@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createClass, joinClass, leaveClass } from "@/app/me/actions";
 import { track } from "@/lib/analytics/client";
 import type { ClassSummary, JoinedClass } from "@/lib/classes";
+import { Button } from "@/components/ui/Button";
 
 const SITE_PATH = "/me/settings?join=";
 
@@ -100,17 +101,15 @@ export function ClassesSection({
             maxLength={60}
             onChange={(e) => setName(e.target.value)}
             placeholder="Year 12 Philosophy"
-            className="mt-2 w-full rounded-md border border-rule bg-surface p-3 text-base"
+            className="mt-2 w-full rounded-control border border-rule bg-surface p-3 text-base"
           />
         </div>
-        <button
-          type="button"
+        <Button variant="secondary"
           onClick={create}
           disabled={busy || !name.trim()}
-          className="min-h-11 rounded-md border border-rule bg-surface px-5 text-sm font-medium hover:border-ink-soft disabled:opacity-40"
         >
           Create
-        </button>
+        </Button>
       </div>
 
       {newCode && (
@@ -135,7 +134,7 @@ export function ClassesSection({
                   type="button"
                   onClick={() => leave(klass.id)}
                   disabled={busy}
-                  className="min-h-11 px-3 font-mono text-xs text-ink-soft underline underline-offset-4 hover:text-ink disabled:opacity-50"
+                  className="text-sm text-ink-soft underline underline-offset-4 hover:text-ink disabled:no-underline"
                 >
                   Leave
                 </button>
@@ -155,17 +154,15 @@ export function ClassesSection({
               maxLength={12}
               onChange={(e) => setCode(e.target.value)}
               placeholder="8-character code"
-              className="mt-2 w-full rounded-md border border-rule bg-surface p-3 font-mono text-base"
+              className="mt-2 w-full rounded-control border border-rule bg-surface p-3 font-mono text-base"
             />
           </div>
-          <button
-            type="button"
+          <Button variant="secondary"
             onClick={join}
             disabled={busy || !code.trim()}
-            className="min-h-11 rounded-md border border-rule bg-surface px-5 text-sm font-medium hover:border-ink-soft disabled:opacity-40"
           >
             Join
-          </button>
+          </Button>
         </div>
         <p className="mt-3 font-sans text-sm text-ink-soft max-w-[54ch]">
           Your teacher will see which motions you&apos;ve read, argued and answered — not your
@@ -196,7 +193,6 @@ function CopyLink({ code }: { code: string }) {
           // The code is on screen either way.
         }
       }}
-      className="min-h-11 rounded-md border border-rule bg-surface px-4 text-sm font-medium hover:border-ink-soft"
     >
       {copied ? "Copied" : "Copy link"}
     </button>

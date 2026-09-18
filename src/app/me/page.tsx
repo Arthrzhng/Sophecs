@@ -19,6 +19,7 @@ import { StreakBlock } from "@/components/me/StreakBlock";
 import { PendingChallenges } from "@/components/me/PendingChallenges";
 import { SCHOOL_ADHERENT, SCHOOL_COLORS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
+import { Page } from "@/components/layout/Page";
 
 export const metadata = { title: "Me · Sophecs" };
 
@@ -177,8 +178,7 @@ export default async function MePage({
   }
 
   return (
-    <main className="flex-1">
-      <div className="mx-auto max-w-2xl px-6 pt-14 pb-24">
+    <Page width="ui">
         <MeViewTracker openObjections={openObjections.length} />
         <WelcomeTracker
           active={welcome === "1"}
@@ -195,7 +195,7 @@ export default async function MePage({
             style={{ borderColor: SCHOOL_COLORS[school].surface }}
           >
             <p className="font-mono text-xs text-ink-soft">Your school</p>
-            <h1 className="font-serif text-2xl font-medium mt-1">
+            <h1 className="mt-1 font-serif text-xl font-medium leading-tight text-ink">
               {SCHOOL_COLORS[school].name}
             </h1>
           </div>
@@ -312,7 +312,6 @@ export default async function MePage({
             Settings →
           </Link>
         </div>
-      </div>
-    </main>
+    </Page>
   );
 }

@@ -114,7 +114,6 @@ export function QuizShell() {
         props: { source: detectSource(c), challenge_id: c ?? undefined },
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -202,7 +201,6 @@ export function QuizShell() {
   if (state.index >= QUIZ_QUESTIONS.length) return null; // finishing → navigating away
 
   const question = QUIZ_QUESTIONS[state.index];
-  const progress = state.index / QUIZ_QUESTIONS.length;
 
   return (
     <div>

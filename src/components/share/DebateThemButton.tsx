@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { assignChallengeTopic } from "@/app/debate/actions";
+import { Button, ButtonLink } from "@/components/ui/Button";
 
 export function DebateThemButton({
   challengeId,
@@ -20,12 +20,11 @@ export function DebateThemButton({
 
   if (!isSignedIn) {
     return (
-      <Link
+      <ButtonLink
         href={`/login?next=${encodeURIComponent(`/r/${resultId}`)}`}
-        className="inline-block bg-ink text-surface rounded-md px-5 py-2.5 text-sm font-medium hover:opacity-85"
       >
         Debate them
-      </Link>
+      </ButtonLink>
     );
   }
 
@@ -42,14 +41,12 @@ export function DebateThemButton({
 
   return (
     <div>
-      <button
-        type="button"
+      <Button
         onClick={start}
         disabled={pending}
-        className="inline-block bg-ink text-surface rounded-md px-5 py-2.5 text-sm font-medium hover:opacity-85 disabled:opacity-60"
       >
         {pending ? "Starting…" : "Debate them"}
-      </button>
+      </Button>
       {error && <p className="mt-2 font-mono text-xs text-error">{error}</p>}
     </div>
   );

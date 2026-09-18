@@ -139,7 +139,6 @@ export function Verdict({
   school,
   verdict,
   eloDelta,
-  eloAfter,
   argument,
   isOwner,
   argumentPublic,
@@ -156,7 +155,6 @@ export function Verdict({
   school: SchoolId;
   verdict: VerdictData;
   eloDelta: number | null;
-  eloAfter: number | null;
   argument: string | null;
   isOwner: boolean;
   argumentPublic: boolean;
@@ -374,7 +372,42 @@ export function Verdict({
       {comparison && (
         <div className="mt-10 max-w-[34rem] border-t border-rule pt-8">
           <p className="text-sm text-ink-soft">Compared with your first attempt</p>
-  
+
+          {/* The same four axes as the verdict above, read against the
+              original. Lost its rows in the Phase 3 rewrite and rendered an
+              empty heading until lint flagged DeltaRow as unused. */}
+          <table className="mt-4 w-full border-t border-rule">
+            <thead>
+              <tr className="border-b border-rule">
+                <th scope="col" className="py-2 text-left text-sm font-normal text-ink-soft">
+                  Axis
+                </th>
+                <th scope="col" className="py-2 text-right text-sm font-normal text-ink-soft">
+                  First
+                </th>
+                <th scope="col" className="py-2 pl-4 text-right text-sm font-normal text-ink-soft">
+                  Now
+                </th>
+                <th scope="col" className="py-2 pl-6 text-right text-sm font-normal text-ink-soft">
+                  Change
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <DeltaRow label="Overall" before={comparison.first.score} after={verdict.score} />
+              <DeltaRow
+                label="Fidelity"
+                before={comparison.first.fidelity}
+                after={verdict.fidelity}
+              />
+              <DeltaRow label="Rigor" before={comparison.first.rigor} after={verdict.rigor} />
+              <DeltaRow
+                label="Engagement"
+                before={comparison.first.engagement}
+                after={verdict.engagement}
+              />
+            </tbody>
+          </table>
 
           {verdict.objection_answered != null && (
             <p className="mt-6 text-sm text-ink">

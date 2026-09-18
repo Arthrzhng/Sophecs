@@ -13,6 +13,7 @@ import { createClient as createSupabaseServerClient } from "@/lib/supabase/serve
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { QuizResultRow, SchoolId } from "@/lib/types";
+import { ButtonLink } from "@/components/ui/Button";
 
 function schoolDisplayName(id: SchoolId): string {
   return SCHOOL_COLORS[id].name;
@@ -205,12 +206,11 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
               {schoolDisplayName(result.school)}, not on whether we agree.
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-4">
-              <Link
+              <ButtonLink variant="secondary"
                 href="/debate"
-                className="inline-flex min-h-11 items-center justify-center rounded-control border border-rule bg-surface px-5 text-sm font-medium text-ink hover:border-rule-strong"
               >
                 Take a motion
-              </Link>
+              </ButtonLink>
               <TextLink href={`/s/${result.school}`} className="text-sm">
                 Read the case for {schoolDisplayName(result.school)}
               </TextLink>

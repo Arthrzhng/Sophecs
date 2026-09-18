@@ -1,17 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { Button, type ButtonVariant } from "@/components/ui/Button";
 import { createChallenge } from "@/app/actions";
 import { track } from "@/lib/analytics/client";
 import type { SchoolId } from "@/lib/types";
-
-// One primary button per screen. Where "Debate them" is already present it
-// takes that role, and this drops to the bordered style rather than
-// disappearing — the challenge link is still the main way a result travels.
-const STYLES = {
-  primary: "border border-ink bg-ink text-paper hover:border-ink-mid hover:bg-ink-mid disabled:opacity-60",
-  secondary: "border border-rule bg-surface text-ink hover:border-rule-strong disabled:opacity-60",
-} as const;
 
 export function ChallengeButton({
   resultId,
@@ -20,7 +13,7 @@ export function ChallengeButton({
 }: {
   resultId: string;
   school: SchoolId;
-  variant?: keyof typeof STYLES;
+  variant?: ButtonVariant;
 }) {
   const [state, setState] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [link, setLink] = useState<string | null>(null);
@@ -53,14 +46,17 @@ export function ChallengeButton({
     return <span className="text-sm text-ink-soft">Couldn&apos;t create a challenge link right now.</span>;
   }
 
+  // One primary button per screen. Where "Debate them" is already present it
+  // takes that role, and this drops to the bordered style rather than
+  // disappearing — the challenge link is still the main way a result travels.
   return (
-    <button
-      type="button"
+    <Button
+      variant={variant}
       onClick={handleClick}
-      className={`inline-flex min-h-11 items-center justify-center rounded-control px-5 text-sm font-medium ${STYLES[variant]}`}
-      disabled={state === "loading"}
+      loading={state === "loading"}
+      loadingLabel="Creating…"
     >
       {state === "ready" ? (copied ? "Copied" : "Copy challenge link") : "Challenge a friend"}
-    </button>
+    </Button>
   );
 }

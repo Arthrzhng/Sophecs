@@ -2,11 +2,7 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import {
-  chunkLesson,
-  MAX_RETRIEVAL_PROMPTS,
-  type MicroLessonContent,
-} from "./lesson-chunks";
+import { MAX_RETRIEVAL_PROMPTS, type MicroLessonContent } from "./lesson-chunks";
 
 // The shape and the chunking rule live in `lesson-chunks`, which the client
 // components import directly; this module adds the filesystem loading and

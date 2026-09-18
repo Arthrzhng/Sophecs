@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteAccount } from "@/app/me/actions";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/Button";
 
 export function DeleteAccountButton() {
   const router = useRouter();
@@ -44,21 +45,17 @@ export function DeleteAccountButton() {
         share links stay up, just no longer attached to you.
       </p>
       <div className="mt-3 flex gap-3">
-        <button
-          type="button"
+        <Button
           onClick={handleDelete}
-          disabled={pending}
-          className="min-h-11 px-4 bg-error text-surface rounded-md text-sm font-medium hover:opacity-85 disabled:opacity-60"
+          loading={pending}
+          loadingLabel="Deleting…"
+          className="border-error bg-error hover:border-error hover:bg-error"
         >
-          {pending ? "Deleting…" : "Confirm delete"}
-        </button>
-        <button
-          type="button"
-          onClick={() => setConfirming(false)}
-          className="min-h-11 px-4 text-sm text-ink-mid hover:text-ink"
-        >
+          Confirm delete
+        </Button>
+        <Button variant="quiet" onClick={() => setConfirming(false)}>
           Cancel
-        </button>
+        </Button>
       </div>
       {error && <p className="mt-2 font-mono text-xs text-error">{error}</p>}
     </div>

@@ -66,7 +66,12 @@
   --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", monospace;
 
   /* Six steps, no more. Serif never below 16px; sans never above 24px;
-     mono only ever holds a number. */
+     mono only ever holds a number.
+
+     `--text-*: initial` first, for the same reason as the radius scale
+     below: Tailwind's own 2xl/3xl/4xl kept working and six headings had
+     drifted onto them. Cleared, `text-2xl` is not a class. */
+  --text-*: initial;
   --text-xs: 12px;
   --text-xs--line-height: 1.4;
   --text-sm: 14px;
@@ -94,7 +99,15 @@
   /* --- Radius ---------------------------------------------------------- */
   /* Two values, applied by kind. Controls are rounded; content is square.
      A squared content edge against a 6px control reads as a document with
-     controls on it rather than a UI with text in it. */
+     controls on it rather than a UI with text in it.
+
+     `--radius-*: initial` first, which clears Tailwind's own sm/md/lg/xl
+     scale: those utilities kept working even though no token here defined
+     them, which is how twenty-six `rounded-md`s accumulated alongside the
+     two real values. With the namespace cleared, `rounded-md` is no longer
+     a class and a stray one fails to apply rather than quietly disagreeing
+     with the six pixels next to it. */
+  --radius-*: initial;
   --radius-control: 6px;
   --radius-container: 0px;
 
@@ -179,7 +192,10 @@ summary:focus-visible,
 [tabindex]:focus-visible {
   outline: 2px solid var(--color-ink);
   outline-offset: 2px;
-  border-radius: 3px;
+  /* Half the control radius: the ring sits 2px outside the element, so
+     matching 6px exactly would read as a looser curve than the thing it
+     is tracing. */
+  border-radius: calc(var(--radius-control) / 2);
 }
 
 /* Everything that moves, off. Broader than disabling the named animations

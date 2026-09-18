@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { track } from "@/lib/analytics/client";
+import { Button } from "@/components/ui/Button";
 
 const configured = Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -60,14 +61,13 @@ export function LoginForm({ next }: { next?: string }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.org"
-            className="flex-1 min-h-11 bg-surface border border-rule rounded-md px-3 text-sm placeholder:text-ink-soft"
+            className="flex-1 min-h-11 bg-surface border border-rule rounded-control px-3 text-sm placeholder:text-ink-soft"
           />
-          <button
+          <Button
             type="submit"
-            className="min-h-11 px-4 bg-ink text-surface rounded-md text-sm font-medium hover:opacity-85"
           >
             Send link
-          </button>
+          </Button>
         </div>
       </form>
 
@@ -77,13 +77,11 @@ export function LoginForm({ next }: { next?: string }) {
         <span className="h-px bg-rule flex-1" />
       </div>
 
-      <button
-        type="button"
+      <Button variant="secondary"
         onClick={signInWithGoogle}
-        className="w-full min-h-11 border border-rule bg-surface rounded-md text-sm font-medium hover:border-ink-soft"
       >
         Continue with Google
-      </button>
+      </Button>
 
       {status && (
         <p role="status" className="mt-5 font-mono text-xs text-ink-mid">

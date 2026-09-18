@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
+import { ButtonLink } from "@/components/ui/Button";
 
 export interface ExchangeRow {
   id: string;
@@ -33,12 +34,7 @@ export function OpenExchanges({ exchanges }: { exchanges: ExchangeRow[] }) {
                   </p>
                   <p className="mt-1 font-serif text-base">{exchange.topicTitle}</p>
                 </div>
-                <Link
-                  href={`/counterpart/${exchange.id}`}
-                  className="min-h-11 inline-flex items-center rounded-md bg-ink px-5 text-sm font-medium text-surface hover:opacity-85"
-                >
-                  Reply
-                </Link>
+                <ButtonLink href={`/counterpart/${exchange.id}`}>Reply</ButtonLink>
               </li>
             ))}
           </ul>

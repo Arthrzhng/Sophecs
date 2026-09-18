@@ -83,7 +83,6 @@ export default function ArenaPreviewPage() {
           school="stoicism"
           verdict={FIXTURE_VERDICT}
           eloDelta={18}
-          eloAfter={1218}
           argument={FIXTURE_ARGUMENT}
           isOwner
           argumentPublic
