@@ -239,4 +239,31 @@ summary:focus-visible,
     content: " (" attr(href) ")";
     font-size: 9pt;
   }
+
+  /* A printed passage is a handout. The URL after every internal link is
+     noise on paper — only outbound links get one, which the rule above
+     already handles by matching http. Anchors within the page get nothing. */
+  a[href^="#"] {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  /* Footnote markers stay, and the numbered sources they point at go with
+     them. That pairing is the whole reason the passage is worth printing. */
+  sup a {
+    color: inherit;
+  }
+
+  /* Sections are page-break candidates, not orphans. */
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  p,
+  li {
+    orphans: 3;
+    widows: 3;
+  }
 }

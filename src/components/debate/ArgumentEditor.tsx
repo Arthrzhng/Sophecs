@@ -323,7 +323,7 @@ export function ArgumentEditor({
 
       {microBefore && (
         <div className="mt-8">
-          <BeforeLesson lesson={microBefore} defaultOpen={Boolean(isFirstArgument)} />
+          <BeforeLesson lesson={microBefore} />
         </div>
       )}
 
@@ -335,7 +335,18 @@ export function ArgumentEditor({
       {showScaffold && (
         <ol className="mt-8 max-w-[55ch] list-decimal space-y-2 pl-5 text-sm leading-relaxed text-ink-mid">
           <li>State what a {SCHOOL_ADHERENT[school]} would say about this motion.</li>
-          <li>Give the reason your school gives — the excerpt above is the one to use.</li>
+          {/* The excerpt is keyed to the motion, not to the school: the
+              Stoic and the Utilitarian arguing this motion read the same
+              one. It sets up the question; the reason belongs to the
+              school, and the case is where that reason is written down. */}
+          <li>
+            Give the reason your school gives. The excerpt above sets up the
+            question, not your answer to it — your reason comes from{" "}
+            <TextLink href={`/s/${school}`}>
+              the case for {SCHOOL_COLORS[school].name}
+            </TextLink>
+            .
+          </li>
           <li>Name the strongest objection and say why it doesn&apos;t win.</li>
         </ol>
       )}

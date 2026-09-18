@@ -84,6 +84,18 @@ function AxisRow({
   );
 }
 
+// One of the judge's three paragraphs, with the label it came with. Sans
+// at the small step, sentence case, no colon — a label, not a field name.
+function Reading({ label, body }: { label: string; body?: string }) {
+  if (!body) return null;
+  return (
+    <div>
+      <p className="text-sm text-ink-soft">{label}</p>
+      <p className="prose-reading mt-1">{body}</p>
+    </div>
+  );
+}
+
 // A signed number, never coloured. Green for up and red for down turns a
 // rating change into a reward, which is the opposite of what a rubric is
 // for.
@@ -251,16 +263,19 @@ export function Verdict({
         <TextLink href="/debate/rubric">How this was judged</TextLink>
       </p>
 
-      {/* The judge's reading of the argument, set as reading text rather
-          than three labelled boxes. It is prose about your prose. */}
+      {/* The judge's reading of the argument. The one-line summary is a
+          heading, and each of the three paragraphs keeps its label: without
+          them the reader has to work out which paragraph is praise, which
+          is the problem, and which is the instruction — information the
+          judge already supplied. */}
       <div className="mt-10 border-t border-rule pt-8">
-        <p className="font-serif text-md leading-relaxed text-ink max-w-[66ch]">
+        <h2 className="max-w-[54ch] font-serif text-md font-medium leading-snug text-ink">
           {verdict.verdict_line}
-        </p>
-        <div className="prose-reading mt-6">
-          <p>{verdict.strongest_move}</p>
-          <p>{verdict.weakest_move}</p>
-          <p>{verdict.a_stronger_version_would}</p>
+        </h2>
+        <div className="mt-8 space-y-6">
+          <Reading label="Strongest move" body={verdict.strongest_move} />
+          <Reading label="Weakest move" body={verdict.weakest_move} />
+          <Reading label="A stronger version would" body={verdict.a_stronger_version_would} />
         </div>
       </div>
 

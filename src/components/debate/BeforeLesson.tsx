@@ -1,37 +1,25 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { track } from "@/lib/analytics/client";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
 
 // The lesson that used to be a separate screen with a Begin button in front
-// of the editor. It is a disclosure on the write screen now: a reader who
-// has just read it should be able to look at it again while writing without
-// losing the draft, and a reader on their fifth motion should not be made
-// to click past it.
+// of the editor. It is a disclosure on the write screen now, so the excerpt
+// is there to look at again while writing rather than a screen the reader
+// clicked past.
+//
+// Closed by default, including on a first argument. The reading step in
+// front of this one already showed the lesson and took answers on it, so
+// opening it again pushed the textarea about 1,100px below the fold at
+// 360px for exactly the reader least able to afford that. The title is in
+// the summary line, so the thing behind the disclosure is named rather than
+// hidden.
 //
 // Native <details>, so the open state, the keyboard handling and the
-// in-page find are the browser's. Open by default on a first argument,
-// closed after that.
-export function BeforeLesson({
-  lesson,
-  defaultOpen,
-}: {
-  lesson: MicroLessonContent;
-  defaultOpen: boolean;
-}) {
+// in-page find are the browser's.
+export function BeforeLesson({ lesson }: { lesson: MicroLessonContent }) {
   const fired = useRef(false);
-
-  useEffect(() => {
-    // Fires once whether or not the disclosure is opened by hand: on a
-    // first argument it is open on arrival, and the event means "this
-    // reader was shown the lesson", which is true either way.
-    if (defaultOpen && !fired.current) {
-      fired.current = true;
-      track({ name: "micro_lesson_viewed", props: { slug: lesson.slug, position: "before" } });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   function onToggle(e: React.SyntheticEvent<HTMLDetailsElement>) {
     if (e.currentTarget.open && !fired.current) {
@@ -41,11 +29,7 @@ export function BeforeLesson({
   }
 
   return (
-    <details
-      open={defaultOpen}
-      onToggle={onToggle}
-      className="border-y border-rule py-4"
-    >
+    <details onToggle={onToggle} className="border-y border-rule py-4">
       <summary className="flex cursor-pointer list-none items-baseline gap-2 text-sm text-ink [&::-webkit-details-marker]:hidden">
         <span
           aria-hidden="true"
@@ -53,7 +37,7 @@ export function BeforeLesson({
         >
           ▸
         </span>
-        Before you argue: {lesson.title}
+        Read the excerpt again: {lesson.title}
       </summary>
       <div className="prose-reading mt-5">
         {lesson.body.split("\n\n").map((paragraph, i) => (

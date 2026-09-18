@@ -511,7 +511,7 @@ that actually exists.
 
   ─────────────────────────────────────────────────────
   Borrowed judgement                      ← serif lg
-                                             2 passages · 4 min
+                                             2 passages, 2 min
   │ What is up to us                      ← before
   │   Epictetus, Enchiridion, ch. 1
   │ The strongest objection               ← after
@@ -520,7 +520,7 @@ that actually exists.
   Argue this motion                       ← text link into the arena
   ─────────────────────────────────────────────────────
   The careful builder
-                                             2 passages · 4 min
+                                             2 passages, 2 min
   │ The lorry driver
   │   Bernard Williams, Moral Luck (1976)
   │ …
@@ -528,8 +528,12 @@ that actually exists.
 ```
 
 Reading time is computed from word count at 200wpm, rounded to the nearest
-minute — the passages are 226–250 words each, so every topic reads "4 min".
-That uniformity is honest and I would rather show it than invent variance.
+minute, never below 1. The passages are 226–250 words each, so a single one
+reads "1 min" and a topic's pair reads "2 min". Every topic comes out the
+same, which is honest and better shown than dressed up with invented
+variance. (An earlier draft of this file said "4 min" — that was arithmetic
+at 100wpm, not the rule stated here, and the rendered figure is the correct
+one.)
 
 ### Mobile (360)
 
@@ -544,30 +548,38 @@ Stacks; source lines wrap under their titles.
 ```
 ═══════════════════════════════════════════════════════════
               │                                             
-  In this     │  Before you argue                           
-  passage     │  What is up to us            ← serif xl     
-              │  Epictetus, Enchiridion, ch. 1              
-  The sorting │                                             
-  What you own│  The Enchiridion opens with a sorting. Some 
-  The handover│  things are up to us and some are not,      
-              │  Epictetus says, and he gives both lists.   
-  ───────     │  Up to us: opinion, impulse, desire,        
-  Sources     │  aversion, "in a word, whatever is our own  
-  Argue this  │  doing."¹                                   
-              │                                             
-  ← plain     │  Notice what is on the short list…          
-    left rail │                                             
-    sticky,   │  ───────────────────────────────────        
-    no border │  Sources                                    
+  On this     │  Before you argue                           
+  page        │  What is up to us            ← serif xl     
+              │  Epictetus, Enchiridion, ch. 1 — 1 min      
+  The passage │                                             
+  Sources     │  The Enchiridion opens with a sorting. Some 
+  The         │  things are up to us and some are not,      
+   objection  │  Epictetus says, and he gives both lists.   
+  Argue this  │  Up to us: opinion, impulse, desire,        
+   motion     │  aversion, "in a word, whatever is our own  
+              │  doing."                                    
+  ← plain     │                                             
+    left rail │  Notice what is on the short list…          
+    sticky,   │                                             
+    no border │  ───────────────────────────────────        
+              │  Sources                                    
               │  1. Epictetus, Enchiridion, ch. 1           
               │                                             
               │  Argue this motion                          
 ═══════════════════════════════════════════════════════════
 ```
 
-Footnotes are numbered, rendered at the end, and also available inline on
-hover (desktop) or tap (mobile) as a small popover. Reading position is
-remembered per lesson in `localStorage`, scoped by user id.
+Footnotes are numbered and rendered at the end, with the marker linking to
+the entry and the entry anchored so the back button returns. Markers are
+written `[^1]` in the content file and number into the passage's sources in
+order; a marker with no matching source stays literal text rather than
+becoming a dead superscript. No hover popover: a popover on a page with one
+source is furniture, and the sources list is four lines below the passage.
+
+Reading position is remembered per passage in `localStorage`, keyed by slug
+rather than by user id — it is a convenience for this browser, not state
+anyone else needs, and keying it to an account would mean writing it to the
+database.
 
 ### Mobile (360)
 
