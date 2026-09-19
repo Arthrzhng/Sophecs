@@ -4,11 +4,11 @@ import type { SchoolId } from "@/lib/types";
 
 const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
 
-// Placeholders, to be filled before the Phase 5 production deploy. They are
-// left visibly unfilled rather than guessed — a made-up name or address in
-// a footer is worse than an obvious gap.
-const MADE_BY = "[YOUR NAME]";
-const CONTACT = "[YOUR EMAIL]";
+// The real values, supplied by Arthur. This address is published on every
+// page of the site, which is the point of a contact line — change it here
+// and it changes everywhere.
+const MADE_BY = "Arthur";
+const CONTACT = "arthur.rzhang@gmail.com";
 
 // Duplicated from src/lib/anthropic.ts's MODEL rather than imported. That
 // module reads the judge prompt off disk at module scope, so importing it
