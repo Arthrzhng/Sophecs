@@ -69,7 +69,8 @@ export function SiteFooter() {
           <Column heading="About">
             <li className="text-ink-mid">Made by {MADE_BY}</li>
             <li className="text-ink-mid">{CONTACT}</li>
-            <Row href="/debate/rubric">Sources and method</Row>
+            <Row href="/method">How the judge works</Row>
+            <Row href="/debate/rubric">The rubric</Row>
           </Column>
         </div>
 
@@ -93,10 +94,13 @@ export function SiteFooter() {
           </p>
           <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-soft">
             We store your quiz result, your arguments and your verdicts. We do
-            not sell data. We use PostHog for analytics. Deleting your account
-            in settings removes your profile and your reading notes, and takes
-            your name off everything else; arguments you chose to publish stay
-            up without you attached to them.
+            not sell data. Analytics come from PostHog, a third-party service,
+            loaded from its EU servers. Deleting your account in settings
+            removes your profile, your reading notes and the text of any
+            argument you did not publish. Your quiz results, scores, verdicts
+            and rating history are kept with your name taken off them, and
+            arguments you chose to publish stay up without you attached to
+            them.
           </p>
         </div>
       </div>

@@ -29,5 +29,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...topics,
     { url: `${BASE}/lessons`, priority: 0.5 },
     ...lessons,
+    // Both were public and unlisted. A product that scores a teenager's
+    // reasoning should have the pages explaining the scoring findable.
+    { url: `${BASE}/method`, priority: 0.6 },
+    { url: `${BASE}/debate/rubric`, priority: 0.6 },
   ];
 }

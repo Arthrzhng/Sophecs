@@ -1,14 +1,13 @@
 # Sophecs
 
-Philosophy × AI, taught through allegiance. A diagnostic quiz sorts you into
-one of three schools (Stoicism, Utilitarianism, Virtue Ethics), an async
-arena makes you defend that school on AI-related motions, and a lessons
-library teaches each school from its primary sources.
+Philosophy and AI, taught through allegiance. A ten-question diagnostic
+places you in one of three schools of ethics (Stoicism, Utilitarianism,
+Virtue Ethics). You then argue an AI-related motion from that school, and a
+judge scores how faithfully you argued from it rather than whether it agrees
+with you. A lessons library holds the primary-source passages behind each
+motion.
 
-This repository holds the full routing, data model, components, and design
-system, plus the three real content modules (Stoicism on determinism,
-Utilitarianism on self-driving cars, Virtue Ethics on RLHF habituation) and
-the full ten-question diagnostic.
+Live at [sophecs.com](https://sophecs.com). Built for 15 to 18 year olds.
 
 ## Running it
 
@@ -17,45 +16,76 @@ npm install
 npm run dev
 ```
 
-No environment variables needed for local work. Without Supabase credentials
-the data layer (`src/lib/data`) serves an in-memory mirror of the seed data,
-so every screen renders populated and the quiz, forum, and debate flows work
-end-to-end. Add credentials from `.env.example` to point at a real project;
-`supabase/migrations/0001_init.sql` creates the schema and `npm run seed`
-fills it with the same rows the fixtures serve.
+The site builds and renders without any environment variables, but the
+parts backed by a service degrade rather than work:
+
+- **No Supabase credentials:** quiz submission fails gracefully and
+  `/r/[id]` returns 404. Sign-in, the arena, and `/me` need a real project.
+- **No `ANTHROPIC_API_KEY`:** `/api/judge` returns its paused state instead
+  of a verdict.
+- **No `NEXT_PUBLIC_POSTHOG_KEY`:** analytics calls no-op.
+
+`.env.example` documents every variable. `supabase/migrations/` holds the
+schema, applied in order. `npm run seed:topics` upserts `content/topics/`
+into the `debate_topics` table; the other content directories are read off
+disk at build or request time and need no seed step.
+
+Checks, all of which must pass before a push:
+
+```
+npx tsc --noEmit && npm run lint && npm run test && npm run build
+```
+
+## Judging is deliberately paused
+
+`KILL_SWITCH_JUDGE=true` is the default in `.env.example`, and it is on in
+production. Arguments are not sent to the judge while it is on, and the
+debate screens say so. The switch stays on until a batch of real verdicts
+has been reviewed for quality.
+
+The judge itself is a real model call, not a stub: `src/lib/anthropic.ts`
+sends the prompt in `content/prompts/judge.v2.md` (the active version) to
+`claude-sonnet-5`. It scores three criteria, in this order of weight:
+Fidelity, Rigor and Engagement. It returns a combined score out of 100
+alongside them. The criteria are published at `/debate/rubric`, and what the
+score does and does not mean is at `/method`.
 
 ## Where things live
 
-- `content/modules/` — one markdown file per module, YAML frontmatter with a
-  fixed schema (`id`, `school`, `title`, `quiz_excerpt`, `debate_topics`,
-  `sources`), parsed at build time by `src/lib/content.ts`. Content is files,
-  not database rows. `debate_topics` entries are `{id, text}` pairs; a
-  motion's id matches one of these, and `content.ts#getDebateTopic` is the
-  only place that resolves a motion back to its wording, so the text is never
-  duplicated into the data layer. Swapping a module file for a new one, or
-  adding a fourth, needs no code change as long as the shape holds.
-- `src/lib/data/` — the single data access layer. Supabase when configured,
-  fixtures otherwise; pages never know which.
-- `src/lib/judge.ts` — `judge(submissionA, submissionB, motion)`, currently a
-  hardcoded verdict behind a fake delay. A real model call replaces the
-  function body and nothing upstream changes.
-- `src/lib/elo.ts` — standard Elo, K=24.
-- `supabase/` — schema migration with row-level security. Reads are public
-  everywhere (lessons and the arena are browsable without an account);
-  writes require auth and ownership.
+- `content/topics/`: six motions, frontmatter only, one file each. Each
+  carries a one-sentence stance for all three schools; motions are not
+  owned by a single school.
+- `content/micro/`: twelve micro-lessons, a before and an after for every
+  motion, each with one primary source. Read by `src/lib/micro-lessons.ts`.
+- `content/schools/`: the three school pages behind `/s/[school]`.
+- `content/quiz/questions.ts`: the ten diagnostic questions.
+- `content/prompts/`: the judge prompts (`judge.v1.md`, `judge.v2.md`) and
+  the counterpart screening prompt.
+- `content/modules/`: **empty.** Longer teaching units slot in here and
+  `/lessons` grows a Modules section the moment a file lands. The schema is
+  documented in that directory's README. The lessons index is complete
+  without them.
+- `src/lib/supabase/`: the Supabase clients. There is no fixtures fallback;
+  without credentials the backed features degrade as listed above.
+- `src/lib/elo.ts`: Elo, K=32.
+- `supabase/`: schema and row-level security policies.
 
 ## Design system
 
 Paper and ink; colour is allegiance. The three school colours appear only to
-mark a school — a dot, a stripe, an eyebrow label — and the quiz result card
-is the single fully-saturated surface in the product. Spectral carries
-anything that is an argument, IBM Plex Sans carries the interface, IBM Plex
-Mono carries anything measured. Tokens are defined once in
-`src/app/globals.css`. No dark mode in v1.
+mark a school, and the quiz result card is the single fully saturated surface
+in the product. Spectral carries anything that is an argument, IBM Plex Sans
+carries the interface, IBM Plex Mono carries anything measured. Tokens are
+defined once in `src/app/globals.css` under Tailwind v4's `@theme static`.
+No dark mode. The written plan is in `design/tokens.md` and
+`design/layout.md`.
 
-## Stubbed on purpose
+## Not built
 
-AI judging (`judge()` returns a hardcoded verdict) and share-card image
-export (button ships disabled). Real-time features, notifications,
-moderation, and payments are out of scope entirely. A fourth school is a
-data change, not a code change: everything is keyed by `school_id`.
+No real-time features, notifications, payments, or moderation queue beyond
+the counterpart reply screening. There is no evidence yet that any of this
+improves anyone's reasoning, and the site makes no such claim. A fourth
+school is a content change rather than a code change: everything is keyed by
+school id.
+
+Contributor rules, including the frozen paths, are in `CONTRIBUTING.md`.
