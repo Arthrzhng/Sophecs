@@ -84,9 +84,11 @@ export default async function MeSettingsPage({
 
         <div className="mt-10 border-t border-rule pt-8">
           <p className="text-sm text-ink-mid max-w-[50ch] mb-3">
-            Deleting your account removes your profile. It does not delete
-            your quiz results — a share link should never go dead — it just
-            unattaches them from you.
+            Deleting your account removes your profile, your reading notes
+            and the text of any argument you did not publish. Your quiz
+            results, scores and verdicts are kept with your name taken off
+            them, so a link someone else saved does not go dead. Arguments
+            you chose to publish stay up without you attached to them.
           </p>
           <DeleteAccountButton />
         </div>

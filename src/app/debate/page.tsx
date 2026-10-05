@@ -10,7 +10,11 @@ import { getCaseStates, type CaseState } from "@/lib/cases";
 import { TOPIC_LOCK_DAYS } from "@/lib/debate-limits";
 import type { SchoolId } from "@/lib/types";
 
-export const metadata = { title: "Debate · Sophecs" };
+export const metadata = {
+  title: "Debate · Sophecs",
+  description:
+    "Six motions on AI and ethics. Pick one and argue it from your school; the judge scores how faithfully you argued from it.",
+};
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -152,8 +156,13 @@ export default async function DebatePage() {
         <div className="mt-8">
           <ErrorState
             title="Judging is paused."
-            body="Arguments are still saved, and each one is judged when judging resumes. Nothing you write now is lost, but no verdict comes back today."
-            action={<TextLink href="/lessons">Read the lessons instead</TextLink>}
+            body="Judging is paused while we check the quality of the verdicts. You can still read the motions and write an argument, and your draft stays in this browser, but nothing reaches the judge today and no verdict comes back."
+            action={
+              <div className="flex flex-wrap items-center gap-6 text-sm">
+                <TextLink href="/method">How the judge works</TextLink>
+                <TextLink href="/lessons">Read the lessons instead</TextLink>
+              </div>
+            }
           />
         </div>
       )}

@@ -2,7 +2,11 @@ import { Suspense } from "react";
 import { Page } from "@/components/layout/Page";
 import { QuizShell } from "@/components/quiz/QuizShell";
 
-export const metadata = { title: "The quiz · Sophecs" };
+export const metadata = {
+  title: "The quiz · Sophecs",
+  description:
+    "Ten questions that place you in Stoicism, Utilitarianism or Virtue Ethics, by what you already think rather than what you have read.",
+};
 
 // Questions are bundled at build time; nothing is fetched until the server
 // action on /quiz/result. The narrow container is the one the landing page

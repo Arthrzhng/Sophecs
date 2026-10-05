@@ -5,7 +5,7 @@ colour_token: --color-virtue
 one_line: >-
   We become just by doing just acts, temperate by doing temperate acts,
   brave by doing brave acts.
-one_line_attribution: Aristotle, Nicomachean Ethics, Book II, ch. 1
+one_line_attribution: Aristotle, Nicomachean Ethics, Book II, ch. 1 (trans. W. D. Ross)
 read: |-
   Aristotle's account of virtue runs through habit, not instruction. You
   become just the same way you become a builder — by doing the thing
@@ -16,13 +16,13 @@ read: |-
   character, not a one-off correct output.
 
   That distinction is exactly what's at stake in AI trained on human
-  feedback. A model shaped by enough rounds of correction can reach what
-  researchers have called nice-teenager-level morality — reliably
-  acceptable behavior in situations like the ones it's seen before. What
-  it doesn't have is phronesis: practical judgment for a genuinely novel
-  case nothing in its training resembles. The same test applies to a
-  person leaning on that model. The question was never whether the output
-  looked right. It's what the habit of using it is making of you.
+  feedback. A model shaped by enough rounds of correction can learn
+  reliably acceptable behavior in situations like the ones it has seen
+  before. What it doesn't have is phronesis: practical judgment for a
+  genuinely novel case nothing in its training resembles. The same test
+  applies to a person leaning on that model. The question was never
+  whether the output looked right. It's what the habit of using it is
+  making of you.
 gets_wrong: |-
   Utilitarians would say this has no answer for scale — knowing your own
   character doesn't tell you which policy saves more lives, and "what a

@@ -1,7 +1,10 @@
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Page } from "@/components/layout/Page";
 
-export const metadata = { title: "Sign in · Sophecs" };
+export const metadata = {
+  title: "Sign in · Sophecs",
+  description: "Sign in to argue a motion and keep your verdicts.",
+};
 
 // Reached only from the debate CTA ("Debate this" / "Debate them") per the
 // Phase 2 brief — sign-in is prompted at exactly that one moment, never on

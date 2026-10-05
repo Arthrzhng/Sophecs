@@ -48,18 +48,25 @@ interface JudgeResponse {
 // What each pause reason means, said as a fact with something to do about
 // it. "Judging is paused" on its own tells the reader nothing about whether
 // their four hundred words survived.
+//
+// These three reasons all return from /api/judge before it writes anything,
+// so there is no saved row and nothing queued: the only copy of the text is
+// the localStorage draft this component autosaves. Saying "saved and will be
+// judged when judging resumes" promised a queue that does not exist, and
+// someone who believed it would close the tab and lose the argument. The
+// copy now says where the text actually is and that it has to be sent again.
 const PAUSE_COPY: Record<string, { title: string; body: string }> = {
   kill_switch: {
     title: "Judging is paused.",
-    body: "Your argument is saved and will be judged when judging resumes. Nothing you wrote is lost.",
+    body: "Judging is paused while we check the quality of the verdicts. Your draft stays in this browser, so you can come back and send it once judging resumes. It has not reached the judge yet, so no verdict is on its way.",
   },
   budget: {
     title: "Judging is paused for today.",
-    body: "The judge has a daily spending limit and it has been reached. Your argument is saved and will be judged when the limit resets.",
+    body: "The judge has a daily spending limit and it has been reached. Your draft stays in this browser; send it again once the limit resets and it goes through.",
   },
   daily_cap: {
     title: "That is your last argument for today.",
-    body: "There is a cap on how many arguments one person can send the judge in a day. This one is saved; come back tomorrow and it goes through.",
+    body: "There is a cap on how many arguments one person can send the judge in a day. Your draft stays in this browser; come back tomorrow and send it again.",
   },
   topic_lock: {
     title: "You have already argued this motion.",
@@ -75,7 +82,7 @@ function pauseCopy(reason: string) {
   return (
     PAUSE_COPY[reason] ?? {
       title: "Judging is paused.",
-      body: "Your argument is saved and will be judged when judging resumes.",
+      body: "Your draft stays in this browser. It has not reached the judge, so send it again once judging resumes.",
     }
   );
 }
