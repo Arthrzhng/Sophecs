@@ -89,13 +89,16 @@ export function TodayClient({
               className="chunky mt-5 inline-flex min-h-12 items-center rounded-chunky bg-surface px-5 text-sm font-extrabold tracking-wide uppercase text-ink"
               style={shade("var(--color-rule-strong)")}
             >
-              {caseOpen ? "Hide the case" : "Read the case"}
+              {caseOpen ? "Hide the passage" : "Show the passage"}
             </button>
           )}
         </section>
 
-        {/* The passage in full, not an extract: choosing which part to show
-            would be an editorial call on content this does not own. */}
+        {/* "Show the passage", not "Read the case": step 1 is called "Read
+            the case" and means the passage plus two written notes, so the
+            toggle must not share its name for a strictly smaller thing.
+            Shown in full rather than extracted, because choosing which part
+            to show would be an editorial call on content this does not own. */}
         {passage && caseOpen && (
           <blockquote className="enter mt-5 rounded-card border-2 border-rule bg-surface p-6">
             <div className="prose-reading">
