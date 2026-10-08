@@ -2,7 +2,11 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { MAX_RETRIEVAL_PROMPTS, type MicroLessonContent } from "./lesson-chunks";
+import {
+  MAX_RETRIEVAL_PROMPTS,
+  readingCheckProblems,
+  type MicroLessonContent,
+} from "./lesson-chunks";
 
 // The shape and the chunking rule live in `lesson-chunks`, which the client
 // components import directly; this module adds the filesystem loading and
@@ -11,14 +15,24 @@ export {
   chunkLesson,
   MAX_RETRIEVAL_PROMPTS,
   MAX_RETRIEVAL_RESPONSE_CHARS,
+  READING_CHECK_LENGTH,
+  readingCheckScore,
 } from "./lesson-chunks";
-export type { MicroLessonContent, RetrievalPrompt, LessonChunk } from "./lesson-chunks";
+export type {
+  MicroLessonContent,
+  RetrievalPrompt,
+  LessonChunk,
+  ReadingCheckQuestion,
+} from "./lesson-chunks";
 
 // Thrown at module load, which in practice means during `next build` (every
 // route that renders a lesson imports this). A prompt pointing at a
 // paragraph that doesn't exist would otherwise silently swallow the rest of
 // the lesson at request time.
 function validate(lesson: MicroLessonContent): void {
+  const [checkProblem] = readingCheckProblems(lesson);
+  if (checkProblem) throw new Error(checkProblem);
+
   const prompts = lesson.retrieval_prompts;
   if (!prompts) return;
 

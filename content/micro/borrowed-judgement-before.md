@@ -41,4 +41,41 @@ retrieval_prompts:
     prompt: >-
       He narrows it further — not outcomes, and not even actions. In your own
       words, what is the one thing he thinks you own?
+reading_check:
+  - question: >-
+      Why does Epictetus leave actions off the list of what is up to us?
+    options:
+      - >-
+        Because actions depend on a body, and a body can be stopped.
+      - >-
+        Because actions are judged by outcomes, and outcomes are luck.
+      - >-
+        Because only the wise act well, and most people are not wise.
+    answer: 0
+    right: >-
+      That is the reason the passage gives. Your body can be held back, so
+      what you do with it is never wholly yours. The judging that comes before
+      it is.
+    wrong: >-
+      The passage gives one reason: actions depend on a body, and a body can
+      be stopped. What stays yours is the judging that comes before the
+      action.
+  - question: >-
+      What does the passage ask you to decide about handing your choices to an
+      assistant?
+    options:
+      - >-
+        Whether the assistant would choose better than you would.
+      - >-
+        Whether the assistant's choices would be fairer to other people.
+      - >-
+        Whether the handover exercises your judgement or gives it away.
+    answer: 2
+    right: >-
+      Trusting the assistant looks like a judgement. But what you hand over is
+      opinion, impulse and desire, and those are on Epictetus's short list.
+    wrong: >-
+      The passage sets aside whether the assistant chooses better; the motion
+      holds even if it does. The question is whether the handover is your
+      judgement at work or the one thing you were not supposed to give away.
 ---

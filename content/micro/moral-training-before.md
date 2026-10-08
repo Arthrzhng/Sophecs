@@ -41,4 +41,40 @@ retrieval_prompts:
     prompt: >-
       Repetition first, settled disposition after. Where do you see that same
       order in how a model is trained?
+reading_check:
+  - question: >-
+      What does Aristotle compare becoming just to?
+    options:
+      - >-
+        Memorising rules until they come without thinking.
+      - >-
+        Learning a craft, as builders learn by building.
+      - >-
+        Growing into a temperament you were born with.
+    answer: 1
+    right: >-
+      We become builders by building and just by doing just acts. The acts
+      come first and the character follows.
+    wrong: >-
+      Aristotle's comparison is a craft: builders become builders by building.
+      He also says virtue does not arise in us by nature, so it is not a
+      temperament you are born with.
+  - question: >-
+      When does a just act not yet make someone just?
+    options:
+      - >-
+        When it is done slowly, over many years of patient practice.
+      - >-
+        When it is done in private, with nobody there to see it.
+      - >-
+        When it is done by accident, under instruction, or for a reward.
+    answer: 2
+    right: >-
+      That is the condition the motion turns on. A trained model has done the
+      acts many times; the question is whether it did them in the way that
+      counts.
+    wrong: >-
+      The passage names three cases: an act done by accident, under
+      instruction, or for a reward. Hold onto them, because the motion turns
+      on whether training is one of them.
 ---
