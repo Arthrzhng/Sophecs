@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { QuestionBlock } from "./QuestionBlock";
+import { QuizQuestionCard } from "./QuizQuestionCard";
 import { QUIZ_QUESTIONS, type QuizOption } from "../../../content/quiz/questions";
 import { scoreQuiz } from "@/lib/scoring";
 import { track } from "@/lib/analytics/client";
@@ -202,16 +202,25 @@ export function QuizShell() {
 
   const question = QUIZ_QUESTIONS[state.index];
 
+  // The options committed on earlier questions, for the triangle. Answers
+  // after the current one are excluded deliberately: stepping back should
+  // show where the reader stood then, not where they later ended up.
+  const chosenSoFar = state.chosenIds
+    .slice(0, state.index)
+    .map((optId, qIdx) => QUIZ_QUESTIONS[qIdx].options.find((o) => o.id === optId))
+    .filter((o): o is QuizOption => Boolean(o));
+
   return (
     <div>
       {nextPath && state.index === 0 && (
         <p className="mb-6 text-sm text-ink-mid">Take the quiz first. Your school is your side.</p>
       )}
-      <QuestionBlock
+      <QuizQuestionCard
         question={question}
         index={state.index}
         total={QUIZ_QUESTIONS.length}
         selectedId={state.chosenIds[state.index]}
+        chosenSoFar={chosenSoFar}
         onSelect={select}
         onNext={next}
         onBack={state.index > 0 ? () => dispatch({ type: "back" }) : undefined}
