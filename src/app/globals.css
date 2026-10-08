@@ -378,6 +378,23 @@ summary:focus-visible,
 }
 
 /*
+  A quiz answer row.
+
+  The native radio is hidden rather than replaced: it still takes focus,
+  still answers to the arrow keys, and still groups under the fieldset's
+  legend, which a set of aria-pressed buttons would all give up. What is
+  visible is the chunky row and its A/B/C badge.
+
+  Because the radio itself is off-screen, the focus ring has to be drawn on
+  the row around it, or a keyboard user would see nothing move.
+*/
+[data-daily-path] .dp-option:focus-within {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+  border-radius: calc(var(--radius-chunky) / 2);
+}
+
+/*
   Motion, all of it opt-in under `no-preference` for the same reason
   `.reveal` above is: with reduced motion asked for, or with no preference
   expressed at all, the thing is simply there. The blanket reduce rule

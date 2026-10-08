@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/Button";
 import { TextLink } from "@/components/ui/TextLink";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { ShareSheet } from "@/components/share/ShareSheet";
+import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
+import { SCHOOL_ADHERENT } from "@/lib/school-colors";
 import { ChallengeButton } from "@/components/share/ChallengeButton";
 import { PENDING_RESULT_KEY } from "@/components/quiz/QuizShell";
 import { submitQuizResult } from "@/app/actions";
@@ -117,15 +119,32 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
 
   return (
     <Page width="read">
-      <p className="text-sm text-ink-soft">Your school</p>
+      <div data-daily-path>
+      {/* "You argue like a ..." rather than "Your school": the quiz reports
+          how someone argues, which is the claim the product can actually
+          support. Every adherent name takes "a". */}
+      <p className="text-sm text-ink-mid">You argue like a</p>
+      <h1 className="mt-1 text-xl font-extrabold tracking-tight text-ink">
+        {SCHOOL_ADHERENT[pending.primary]}
+      </h1>
 
-      <div className="mt-4">
+      {/* The card itself is untouched: its layout is accepted and the share
+          image is generated from the same design. */}
+      <div className="mt-5">
         <ResultCard
           school={pending.primary}
           oneLine={school.one_line}
           oneLineAttribution={school.one_line_attribution}
         />
       </div>
+
+      <div className="mt-6 flex flex-wrap items-center gap-4">
+        <ChunkyLink href="/today" school={pending.primary}>
+          Start my path
+        </ChunkyLink>
+      </div>
+
+      <p className="mt-4 text-sm text-ink-mid">Your card names your school, never you.</p>
 
       {/* One line, not a spinner: the card is already on screen and
           finished, so an animation here would imply something about it is
@@ -162,9 +181,9 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
         A result that hands you a label and nothing to read is a personality
         quiz; this is the first thing that makes it not one.
       */}
-      <section className="mt-12 border-t border-rule pt-8">
-        <p className="text-sm text-ink-soft">The case for your school</p>
-        <h2 className="mt-1 font-serif text-lg font-medium text-ink">{school.name}</h2>
+      <section className="mt-12 border-t-2 border-rule pt-8">
+        <p className="text-sm text-ink-mid">The case for your school</p>
+        <h2 className="mt-1 text-lg font-extrabold tracking-tight text-ink">{school.name}</h2>
         <div className="prose-reading mt-5 text-ink">
           {school.read.split("\n\n").map((para, i) => (
             <p key={i}>{para}</p>
@@ -178,8 +197,8 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
         </p>
       </section>
 
-      <section className="mt-12 border-t border-rule pt-8">
-        <h2 className="font-serif text-lg font-medium text-ink">Now defend it</h2>
+      <section className="mt-12 border-t-2 border-rule pt-8">
+        <h2 className="text-lg font-extrabold tracking-tight text-ink">Now defend it</h2>
         <p className="mt-3 max-w-[54ch] text-sm leading-relaxed text-ink-mid">
           The quiz gives you a starting position. The rest of Sophecs is about
           holding it: take a motion, write a case, and get scored on how
@@ -198,6 +217,7 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
           </TextLink>
         </div>
       </section>
+      </div>
     </Page>
   );
 }
