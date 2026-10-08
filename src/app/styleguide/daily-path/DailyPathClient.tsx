@@ -7,7 +7,7 @@ import { ProgressBar } from "@/components/daily-path/ProgressBar";
 import { FeedbackSheet } from "@/components/daily-path/FeedbackSheet";
 import { Celebration } from "@/components/daily-path/Celebration";
 import { StatTile } from "@/components/daily-path/StatTile";
-import { STEPS, SHIFTS } from "./steps";
+import { TODAY_STEPS, TODAY_SHIFTS } from "@/lib/today-path";
 
 // One real question, verbatim from content/micro/no-decision-before.md on
 // the content branch. The sheet has to be shown in both states, and a
@@ -34,7 +34,7 @@ export function InteractivePath() {
   return (
     <div>
       <ol className="flex list-none flex-col items-center gap-7 py-3">
-        {STEPS.map((step, i) => {
+        {TODAY_STEPS.map((step, i) => {
           const state: PathNodeState = i < done ? "done" : i === done ? "current" : "locked";
           return (
             <PathNode
@@ -45,7 +45,7 @@ export function InteractivePath() {
               state={state}
               lockReason={i >= 2 ? "judging" : "order"}
               school="stoicism"
-              shift={SHIFTS[i]}
+              shift={TODAY_SHIFTS[i]}
               onClick={() => setDone(i + 1)}
             />
           );

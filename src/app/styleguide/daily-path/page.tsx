@@ -124,7 +124,7 @@ export default function DailyPathStyleguide() {
           <div className="mt-6 flex flex-wrap items-center gap-5">
             <ChunkyButton tone="paper">Open the case</ChunkyButton>
             <ChunkyButton tone="correct">Next question</ChunkyButton>
-            <ChunkyButton tone="wrong">Got it</ChunkyButton>
+            <ChunkyButton tone="wrong">Next question</ChunkyButton>
             <ChunkyButton disabled>Check</ChunkyButton>
             <ChunkyLink href="/styleguide/daily-path" tone="paper">
               A link, same shape

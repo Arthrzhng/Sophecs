@@ -2,14 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { ReadingFlow } from "./ReadingFlow";
+import { ReadingCheck } from "./ReadingCheck";
+import { ReadingCheckDone } from "./ReadingCheckDone";
 import { ArgumentEditor } from "./ArgumentEditor";
-import { Button } from "@/components/ui/Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 import { track } from "@/lib/analytics/client";
-import type { MicroLessonContent } from "@/lib/lesson-chunks";
+import { readingCheckScore, type MicroLessonContent } from "@/lib/lesson-chunks";
+import { loadPicks, isCheckComplete, type Picks } from "@/lib/reading-check-progress";
 import type { SchoolId } from "@/lib/types";
 
-// Micro-lesson before -> editor, one route, client-state transition (no
-// nav) per the brief's numbered steps for /debate/[slug].
+// Micro-lesson before -> reading check -> celebration -> editor, one route,
+// client-state transitions (no nav) per the brief's numbered steps for
+// /debate/[slug].
+//
+// The check sits after the whole passage and both typed notes and before
+// the editor, which is where docs/daily-path-copy.md §2 puts it, and is why
+// path steps 1 and 2 are two different signals rather than one.
+type Phase = "reading" | "check" | "done" | "editor";
+
 export function DebateFlow({
   topicSlug,
   motion,
@@ -31,10 +41,18 @@ export function DebateFlow({
   isFirstArgument?: boolean;
   readingResponses: Record<number, string>;
 }) {
-  const [began, setBegan] = useState(!microBefore);
+  const check = microBefore?.reading_check ?? null;
+  const [phase, setPhase] = useState<Phase>(microBefore ? "reading" : "editor");
   // Lifted out of ReadingFlow: a note written during the reading has to
   // survive the switch to the editor, which happens without a navigation.
   const [responses, setResponses] = useState<Record<number, string>>(readingResponses);
+  const [picks, setPicks] = useState<Picks>([]);
+
+  // Storage is read on mount, never during render: a value that differed
+  // between the server pass and the first client pass would break hydration.
+  useEffect(() => {
+    setPicks(loadPicks(userId, topicSlug));
+  }, [userId, topicSlug]);
 
   function begin() {
     track({
@@ -61,7 +79,13 @@ export function DebateFlow({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!began && microBefore) {
+  // A reader who has already answered both questions on an earlier visit
+  // goes straight on rather than being asked them again, the same courtesy
+  // ReadingFlow already extends to the typed notes.
+  const alreadyChecked = isCheckComplete(picks);
+
+  if (phase === "reading" && microBefore) {
+    const next = check && !alreadyChecked ? "check" : "editor";
     return (
       <ReadingFlow
         lesson={microBefore}
@@ -70,15 +94,47 @@ export function DebateFlow({
         responses={responses}
         onResponse={(index, value) => setResponses((prev) => ({ ...prev, [index]: value }))}
         action={
-          <Button
+          <ChunkyButton
+            school={school}
             onClick={() => {
+              // Fires here, at the click that leaves the lesson, which is
+              // exactly where it fired before the check existed. The event
+              // means the reader finished the reading and moved on; that
+              // moment has not changed.
               begin();
-              setBegan(true);
+              setPhase(next);
             }}
           >
-            Start writing
-          </Button>
+            {next === "check" ? "Check your reading" : "Argue the motion"}
+          </ChunkyButton>
         }
+      />
+    );
+  }
+
+  if (phase === "check" && check) {
+    return (
+      <ReadingCheck
+        check={check}
+        topicSlug={topicSlug}
+        userId={userId}
+        school={school}
+        onDone={(final) => {
+          setPicks(final);
+          setPhase("done");
+        }}
+      />
+    );
+  }
+
+  if (phase === "done" && check) {
+    return (
+      <ReadingCheckDone
+        score={readingCheckScore(check, picks)}
+        notesWritten={Object.keys(responses).length}
+        school={school}
+        onArgue={() => setPhase("editor")}
+        onReadAgain={() => setPhase("reading")}
       />
     );
   }
