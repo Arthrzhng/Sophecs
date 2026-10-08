@@ -123,6 +123,47 @@
   --duration-fast: 120ms;
   --duration-base: 180ms;
   --ease-out-quiet: cubic-bezier(0.2, 0, 0, 1);
+
+  /* --- Daily path ------------------------------------------------------ */
+  /*
+    The restyle's own tokens. Two kinds live here.
+
+    The genuinely new semantic colours are declared here so Tailwind
+    generates utilities for them. `correct` is blue, not green, because the
+    only green in this product means Stoicism (design/tokens.md §7), and
+    right/wrong are never carried by colour alone anywhere they are used.
+
+    The restyle's base palette is NOT here. It overrides the existing
+    paper/ink/rule tokens inside [data-daily-path] below, so components can
+    be written once against the final class names (`bg-paper`, `text-ink`)
+    while every screen that has not been restyled yet keeps its current
+    appearance. Promoting the restyle means moving those six lines up into
+    this block and deleting the wrapper.
+  */
+  --color-correct: #1e5fa0;
+  --color-correct-deep: #123d68;
+  --color-correct-tint: #e2edf8;
+  --color-wrong: #b4501a;
+  --color-wrong-deep: #7a3510;
+  --color-wrong-tint: #fbeadf;
+  --color-streak: #b8650f;
+  --color-step-done: #d9822b;
+  --color-step-done-deep: #a35f17;
+
+  /* The pressed-shadow shade for each school, so a chunky control in the
+     reader's own school colour has a bottom edge to sit on. */
+  --color-stoic-deep: #26392e;
+  --color-utilitarian-deep: #5e4314;
+  --color-virtue-deep: #52232b;
+
+  /* Chunky radii. The existing scale is cleared by `--radius-*: initial`
+     above, so these are additions, not overrides: controls 14, cards 18,
+     the largest surfaces 22. */
+  --radius-chunky: 14px;
+  --radius-card: 18px;
+  --radius-panel: 22px;
+
+  --font-ui: var(--font-bricolage), system-ui, -apple-system, sans-serif;
 }
 
 :root {
@@ -230,6 +271,189 @@ summary:focus-visible,
       opacity: 1;
       transform: none;
     }
+  }
+}
+
+/*
+  The Daily path palette, scoped.
+
+  Every value here is an override of a token already declared in
+  `@theme static`, which is why the restyled components can use the ordinary
+  `bg-paper` / `text-ink` / `border-rule` utilities and still come out in the
+  new colours: those utilities compile to `var(--color-paper)` and friends,
+  and a descendant redeclaration wins. Nothing outside this wrapper moves.
+
+  The warm paper is a deliberate reversal of the note on --color-paper above
+  ("Warmer cream reads as a template"). That was the right call for the
+  previous design; the Daily path mockups are built on #F7F3EA throughout,
+  and this is the restyle it was commissioned for.
+*/
+[data-daily-path] {
+  --color-paper: #f7f3ea;
+  --color-surface: #ffffff;
+  --color-ink: #1c1b18;
+  --color-ink-mid: #5e5950;
+  --color-ink-soft: #5e5950;
+  --color-rule: #e3dccd;
+  --color-rule-strong: #d2c9b6;
+
+  /* Bricolage carries the interface; Spectral still carries every passage,
+     quotation, motion and argument, and mono still carries every number. */
+  --font-sans: var(--font-ui);
+
+  /* Controls are chunky here, which the focus ring below reads from. */
+  --radius-control: var(--radius-chunky);
+
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/*
+  The path column snakes: each node carries its own horizontal offset as
+  `--shift`. At phone width the full offset would push a 80px node off the
+  side, so the scale drops rather than the offsets being recomputed per
+  breakpoint in the component.
+*/
+[data-daily-path] .dp-node {
+  --shift-scale: 1;
+  transform: translateX(calc(var(--shift, 0px) * var(--shift-scale)));
+}
+
+@media (max-width: 640px) {
+  [data-daily-path] .dp-node {
+    --shift-scale: 0.4;
+  }
+}
+
+/*
+  A real <progress>, restyled. The vendor pseudo-elements are the only way
+  to colour the bar without giving up the element's own semantics, and they
+  cannot be combined into one selector: a browser drops the whole rule if
+  it does not recognise one selector in the list.
+*/
+[data-daily-path] .dp-progress {
+  background-color: var(--color-rule);
+  border: 0;
+}
+
+[data-daily-path] .dp-progress::-webkit-progress-bar {
+  background-color: var(--color-rule);
+}
+
+[data-daily-path] .dp-progress::-webkit-progress-value {
+  background-color: var(--color-correct);
+  transition: inline-size var(--duration-base) var(--ease-out-quiet);
+}
+
+[data-daily-path] .dp-progress::-moz-progress-bar {
+  background-color: var(--color-correct);
+}
+
+/*
+  The chunky press.
+
+  A solid bottom edge rather than a blur, set per element through `--sh`, and
+  the element travels the full 5px down on press so the edge disappears
+  under it. `translate` rather than `top`/`margin` so it never reflows the
+  row it sits in.
+
+  `--sh` defaults to the strong rule so a `.chunky` with no shade set still
+  has an edge instead of silently losing its depth.
+*/
+[data-daily-path] .chunky {
+  --sh: var(--color-rule-strong);
+  box-shadow: 0 5px 0 0 var(--sh);
+  transition: transform var(--duration-fast) var(--ease-out-quiet),
+    box-shadow var(--duration-fast) var(--ease-out-quiet);
+}
+
+[data-daily-path] .chunky:active:not(:disabled) {
+  transform: translateY(5px);
+  box-shadow: 0 0 0 0 var(--sh);
+}
+
+[data-daily-path] .chunky:disabled {
+  box-shadow: 0 5px 0 0 var(--sh);
+}
+
+/*
+  Motion, all of it opt-in under `no-preference` for the same reason
+  `.reveal` above is: with reduced motion asked for, or with no preference
+  expressed at all, the thing is simply there. The blanket reduce rule
+  further up is the second line of defence, not the first.
+*/
+@media (prefers-reduced-motion: no-preference) {
+  /* The "Up next" label above the current step. */
+  .bob {
+    animation: bob 2.6s var(--ease-out-quiet) infinite;
+  }
+
+  /* The ring around the current step. Opacity and scale only. */
+  .ring {
+    animation: pulse-ring 2.2s var(--ease-out-quiet) infinite;
+  }
+
+  /* A step going done, and the score tiles landing. */
+  .pop {
+    animation: pop var(--duration-base) var(--ease-out-quiet) both;
+  }
+
+  /* The streak flame. */
+  .flick {
+    animation: flick 3.2s ease-in-out infinite;
+  }
+
+  /* Anything entering a settled layout: the case passage, celebration rows. */
+  .enter {
+    animation: enter 260ms var(--ease-out-quiet) both;
+  }
+
+  /* The right/wrong sheet arriving from the bottom of the viewport. */
+  .sheet {
+    animation: sheet 220ms var(--ease-out-quiet) both;
+  }
+
+  .confetti-piece {
+    animation: confetti 900ms var(--ease-out-quiet) both;
+  }
+
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  @keyframes pulse-ring {
+    0% { opacity: 0.9; transform: scale(1); }
+    70% { opacity: 0; transform: scale(1.18); }
+    100% { opacity: 0; transform: scale(1.18); }
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0.9); opacity: 0; }
+    60% { transform: scale(1.04); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes flick {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    40% { transform: scale(1.06) rotate(-2deg); }
+    70% { transform: scale(0.98) rotate(1.5deg); }
+  }
+
+  @keyframes enter {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes sheet {
+    from { transform: translateY(100%); }
+    to { transform: none; }
+  }
+
+  @keyframes confetti {
+    from { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+    to { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--dr)); }
   }
 }
 

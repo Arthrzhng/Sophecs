@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { spectral, plexSans, plexMono } from "@/lib/fonts";
+import { spectral, plexSans, plexMono, bricolage } from "@/lib/fonts";
 import { AnalyticsProvider } from "@/components/analytics-provider";
 import { SiteHeader } from "@/components/nav/SiteHeader";
 import { SiteFooter } from "@/components/nav/SiteFooter";
@@ -39,7 +39,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spectral.variable} ${plexSans.variable} ${plexMono.variable}`}
+      className={`${spectral.variable} ${plexSans.variable} ${plexMono.variable} ${bricolage.variable}`}
     >
       <body className="min-h-screen flex flex-col bg-paper text-ink">
         <Suspense fallback={null}>
