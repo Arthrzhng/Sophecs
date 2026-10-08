@@ -43,4 +43,40 @@ retrieval_prompts:
     prompt: >-
       Two readings of "tend" are on the table. State the one you find harder
       to dismiss, in a sentence.
+reading_check:
+  - question: >-
+      On Mill's principle, what makes an action right?
+    options:
+      - >-
+        That whoever acts can explain why it works.
+      - >-
+        That it follows a rule everyone could accept.
+      - >-
+        That it tends to promote happiness, over time.
+    answer: 2
+    right: >-
+      The small word is tend. Mill asks what an action does, on the whole and
+      over time, not whether you know why it works.
+    wrong: >-
+      Mill's principle is that actions are right in proportion as they tend to
+      promote happiness. He asks what an action does, not whether anyone can
+      explain why.
+  - question: >-
+      On the second reading, what separates a tendency from a track record?
+    options:
+      - >-
+        Enough grasp of the mechanism to expect it to hold somewhere new.
+      - >-
+        A track record is measured, while a tendency is only guessed at.
+      - >-
+        Nothing; on that reading the two are the same thing.
+    answer: 0
+    right: >-
+      That is the second reading. To call something a tendency you need reason
+      to expect it to hold tomorrow, in a new hospital, with different
+      patients.
+    wrong: >-
+      On the second reading you can assert a tendency only because you
+      understand enough of the mechanism to expect it to hold somewhere new.
+      Without that you have a track record, which is a different thing.
 ---

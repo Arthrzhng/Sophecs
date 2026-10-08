@@ -38,4 +38,39 @@ retrieval_prompts:
     prompt: >-
       Bentham's arithmetic is easy in the crash case. Say in one sentence why
       that ease is the problem rather than the solution.
+reading_check:
+  - question: >-
+      What does Bentham's procedure do with everyone an act affects?
+    options:
+      - >-
+        Counts only the people the act would harm.
+      - >-
+        Ranks them by age and condition, and protects the weakest.
+      - >-
+        Adds up each person's pleasures and pains and takes the balance.
+    answer: 2
+    right: >-
+      That is the recipe: pleasures against pains, person by person, then the
+      balance across everyone concerned.
+    wrong: >-
+      Bentham counts everyone affected, pleasures and pains alike, and takes
+      the balance across all of them. Weighting by age or condition is what
+      Germany's commission ruled out.
+  - question: >-
+      How does the passage tell you to treat Germany's 2017 Ethics Commission?
+    options:
+      - >-
+        As settling the motion, since the question has been decided.
+      - >-
+        As a fact about what one country decided, not an argument.
+      - >-
+        As proof that Bentham's arithmetic gives the wrong answer.
+    answer: 1
+    right: >-
+      The Commission ruled out offsetting victims, but a decision is not a
+      reason. You still have to say whether the sum is right, and why.
+    wrong: >-
+      The passage is explicit: what Germany decided is a fact, not an
+      argument. You still have to say whether Bentham's balance is the right
+      thing for a car to compute.
 ---

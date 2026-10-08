@@ -40,4 +40,44 @@ retrieval_prompts:
     prompt: >-
       Chrysippus thought a fated act could still be yours. In one sentence,
       what did he say made it yours?
+reading_check:
+  - question: >-
+      What was the cylinder and the top meant to show?
+    options:
+      - >-
+        That fate and responsibility fit: the push is outside, the shape is
+        the thing's own.
+      - >-
+        That nothing is fated, since the same push could have made the
+        cylinder spin.
+      - >-
+        That the push is what matters, since without it nothing would move at
+        all.
+    answer: 0
+    right: >-
+      The same push makes one roll and the other spin. The push starts the
+      motion; the thing's own nature gives it its shape.
+    wrong: >-
+      Chrysippus held that everything is fated and that we are still
+      responsible. The image shows how: the push comes from outside, but the
+      shape of the motion comes from the object.
+  - question: >-
+      Once a language model takes the cylinder's place, what does the passage
+      ask you to decide?
+    options:
+      - >-
+        Whether its outputs are fully determined by its training.
+      - >-
+        Whether it has a nature that gives its output its form.
+      - >-
+        Whether its trainers are responsible for it instead.
+    answer: 1
+    right: >-
+      The passage grants that the chain is determined, and Chrysippus never
+      thought that was the problem. The question is whether anything plays the
+      part of the cylinder's shape.
+    wrong: >-
+      The passage grants that the chain is determined, and Chrysippus did not
+      think that mattered. What you have to decide is whether the model has a
+      nature that gives its output its form.
 ---

@@ -21,6 +21,14 @@ body: |-
   source. A self-contained excerpt — it does not link to /learn.
 ```
 
+"before" lessons also carry `reading_check`: exactly two multiple-choice
+questions, asked after the whole passage. Each has three `options` (at most
+100 characters), an `answer` (0-based index), and two explanations, `right`
+and `wrong`, which the interface shows under its own "Exactly." / "Not
+quite." — so neither opens with a verdict word. `wrong` must make sense
+whichever wrong option was picked. The loader rejects anything else at build
+time; `tests/reading-check.test.ts` checks every file.
+
 No seed step needed for these — `src/lib/micro-lessons.ts` reads this
 directory directly at request time (Node runtime), the same way
 `src/lib/schools.ts` reads `content/schools/`.
