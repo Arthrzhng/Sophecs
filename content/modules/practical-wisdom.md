@@ -46,4 +46,11 @@ body: |-
   Anscombe's "Modern Moral Philosophy" is a large part of why this reading is live today. In 1958 she argued that the language of moral obligation, the moral "ought", was a survival from a law conception of ethics whose lawgiver most philosophers no longer believed in. She proposed setting that vocabulary aside and starting again from the psychology of action, intention and human flourishing.[^6] The modern revival of virtue ethics is usually dated from that paper.
 
   The weakness is the one the other schools press hardest. "Do what the practically wise person would do" helps most when you already are that person. When a self-driving car must choose between its passenger and two pedestrians, a utilitarian at least gives an answer that can be written down and checked. The virtue ethicist says no rule written in advance can carry that weight. That may be true, and it is still nothing an engineer can implement. Defending this school well means owning that cost.
+readings:
+  - title: Becoming good
+    from_paragraph: 0
+  - title: Practical wisdom
+    from_paragraph: 3
+  - title: The motions, and the weak point
+    from_paragraph: 5
 ---

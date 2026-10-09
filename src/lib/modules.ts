@@ -5,6 +5,7 @@ import matter from "gray-matter";
 import { SCHOOL_IDS } from "./footnotes";
 import type { Source } from "./footnotes";
 import type { SchoolId } from "./types";
+import { moduleReadingProblems, type ModuleReadingMark } from "./module-readings";
 
 export interface ModuleContent {
   id: string;
@@ -14,6 +15,9 @@ export interface ModuleContent {
   debate_topics: string[];
   sources: Source[];
   body: string;
+  // Where each reading starts; absent means the module is one reading.
+  // See module-readings.ts.
+  readings?: ModuleReadingMark[];
 }
 
 const MODULES_DIR = path.join(process.cwd(), "content", "modules");
@@ -63,6 +67,12 @@ export function getAllModules(): ModuleContent[] {
       continue;
     }
 
+    // Unlike the fields above, bad reading marks fail the build: they are a
+    // few lines of frontmatter, and a wrong one would silently drop or
+    // duplicate paragraphs of the module.
+    const [readingProblem] = moduleReadingProblems(where, data.body, data.readings);
+    if (readingProblem) throw new Error(readingProblem);
+
     modules.push({
       id: String(data.id),
       school: data.school as SchoolId,
@@ -71,6 +81,7 @@ export function getAllModules(): ModuleContent[] {
       debate_topics: data.debate_topics.map(String),
       sources: data.sources as Source[],
       body: data.body,
+      readings: data.readings as ModuleReadingMark[] | undefined,
     });
   }
   return modules;

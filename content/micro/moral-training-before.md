@@ -7,6 +7,7 @@ source:
   author: Aristotle
   work: Nicomachean Ethics
   section: 'II.1, 1103a31–b2'
+  translation: W. D. Ross, 1908
 body: >-
   Aristotle's account of how anyone becomes good is the closest thing in the
   ancient world to a training procedure. Virtue of character, he says, does

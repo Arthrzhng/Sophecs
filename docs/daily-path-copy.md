@@ -238,8 +238,64 @@ Replaces the mockup's "Illustrative path".
 | Empty | `Your rating appears here after your first judged argument.` |
 | One point | show the point, with `One week so far.` |
 
-## 10. Not changed
+## 10. Lessons (Stage 5, mockups 07 and 08)
+
+Added after the Stage 5 review, which left three parts of the mockups
+unbuilt for want of content or a decision. Both are now supplied.
+
+### Module readings
+
+Each module in `content/modules/` now carries `readings`: a title and the
+paragraph each reading starts at. The body is unchanged. Use
+`splitModule()` in `src/lib/module-readings.ts`; do not split the body any
+other way.
+
+| Module | Readings |
+|---|---|
+| What is up to us | `The sorting` · `The faculty that judges` · `The motions, and the price` |
+| Counting happiness | `Two sovereign masters` · `What counts, and what does not` · `The motions, and the objection` |
+| Practical wisdom and the settled state | `Becoming good` · `Practical wisdom` · `The motions, and the weak point` |
+
+One page per module, as now. Each reading is a section with its title as an
+h2. The progress track counts readings, and "Reading {n} of {N}" names the
+reading in view (scroll position), not a page.
+
+### Module progress
+
+Stored in `localStorage` under `module:${userId}:${moduleId}`, holding the
+highest reading reached; for signed-out readers, under
+`module:anon:${moduleId}`. Same trade as the reading check: no migration,
+does not follow a reader across devices. A reading counts as reached when
+its heading has scrolled into view.
+
+| Element | Copy |
+|---|---|
+| Card count | `{N} readings` |
+| Card chip, none reached | `Not started` |
+| Card chip, some | `Reading {n} of {N}` |
+| Card chip, all | `Read` |
+| Reading bar | `Reading {n} of {N}` |
+| Card button | `Start` / `Continue` / `Read again` |
+
+### Translator line
+
+Sources may carry `translation` (e.g. `W. D. Ross, 1908`). Where present,
+show `Translated by {translation}` under the source line. Where absent,
+show nothing; never a placeholder. Today only
+`moral-training-before` has one, because it is the only passage that
+quotes a translation verbatim and the translation was checked against the
+published text. The mockup's "Elizabeth Carter, 1758" does not apply:
+`borrowed-judgement-before` does not quote Carter's wording.
+
+### Marked passages and notes
+
+Not built in this restyle. Drop "Your marked passages" and "Add a note"
+from the reading page. They need a new table, an RLS policy, a deletion
+rule and new privacy copy, which is a feature decision, not a restyle.
+
+## 11. Not changed
 
 `content/topics/`, `content/schools/`, the after-lessons, the retrieval
 prompts, the judge prompts, the schema, `streak.ts`, `elo.ts`, the kill
-switch, the share card and the footer privacy copy.
+switch, the share card and the footer privacy copy. Module bodies and
+micro-lesson bodies are unchanged; Stage 5 content only added fields.

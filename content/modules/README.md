@@ -34,6 +34,24 @@ body: |-
   with no matching source is left as written rather than silently dropped.
 ```
 
+`readings` (optional) splits the body into titled readings without
+splitting the file:
+
+```yaml
+readings:
+  - title: The sorting
+    from_paragraph: 0
+  - title: The faculty that judges
+    from_paragraph: 2
+```
+
+Each reading runs from its paragraph to the next reading's. The first must
+start at 0 and each must start later than the one before; a bad mark fails
+the build. Without `readings` the module is one reading.
+
+A source may also carry `translation` ("W. D. Ross, 1908") when the text
+quotes that translation verbatim. Leave it off for paraphrase.
+
 Every field above is required except `body`, which may be omitted while a
 module is being drafted — `src/lib/modules.ts` skips any file missing a
 required field rather than rendering half a module, and says which file and
