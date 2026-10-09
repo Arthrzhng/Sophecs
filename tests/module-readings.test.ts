@@ -11,6 +11,14 @@ const modules = fs
   .map((f) => ({ file: f, data: matter(fs.readFileSync(path.join(DIR, f), "utf8")).data }));
 
 describe("module readings content", () => {
+  // Today's lessons card says "All three modules read." in words
+  // (docs/daily-path-copy.md §5). A fourth module would make that line
+  // false, and this is where it is caught.
+  it("is three modules, one for each school", () => {
+    expect(modules).toHaveLength(3);
+    expect(new Set(modules.map((m) => m.data.school)).size).toBe(3);
+  });
+
   it("every module marks valid readings", () => {
     for (const { file, data } of modules) {
       expect(data.readings, file).toBeDefined();

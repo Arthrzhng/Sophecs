@@ -7,10 +7,15 @@ import { getMicroLesson } from "@/lib/micro-lessons";
 import { getSchool } from "@/lib/schools";
 import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
 import { TodayClient } from "@/components/today/TodayClient";
-import { StreakCard, SchoolCard, LessonsCard } from "@/components/today/TodayCards";
+import { StreakCard, SchoolCard } from "@/components/today/TodayCards";
+import { LessonsCard, type LessonsCardModule } from "@/components/today/LessonsCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Page } from "@/components/layout/Page";
-import type { SchoolId } from "@/lib/types";
+import { getAllModules } from "@/lib/modules";
+import { splitModule } from "@/lib/module-readings";
+import { isoWeekRange, rankSchools, type JudgedArgument } from "@/lib/school-table";
+import { todayUTC } from "@/lib/streak";
+import { SCHOOL_IDS, type SchoolId } from "@/lib/types";
 
 export const metadata = {
   title: "Today · Sophecs",
@@ -34,7 +39,7 @@ export default async function TodayPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("school, streak")
+    .select("school, streak, streak_updated_on, elo")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -46,13 +51,17 @@ export default async function TodayPage() {
   const paused = !isJudgeAllowlisted(user.id) && process.env.KILL_SWITCH_JUDGE === "true";
   const streak = Number(profile?.streak ?? 0);
 
-  const sidebar = (
-    <>
-      <StreakCard streak={streak} paused={paused} />
-      <SchoolCard school={school} oneLine={getSchool(school).one_line} />
-      <LessonsCard />
-    </>
-  );
+  // Sorted by school in the same order the lessons index sorts by, so
+  // "the next module" is the same module on both screens, and split by the
+  // same function, so the two can never disagree about how many readings
+  // one has.
+  const modules: LessonsCardModule[] = getAllModules()
+    .sort((a, b) => SCHOOL_IDS.indexOf(a.school) - SCHOOL_IDS.indexOf(b.school))
+    .map((m) => ({
+      id: m.id,
+      title: m.title,
+      readings: splitModule(m.title, m.body, m.readings).length,
+    }));
 
   // Without Supabase configured there is no topic table to pick a motion
   // from. Say so rather than rendering a path with nothing behind it.
@@ -68,10 +77,63 @@ export default async function TodayPage() {
   }
 
   const admin = createAdminClient();
-  const { data: topics } = await admin
-    .from("debate_topics")
-    .select("slug, title, motion, micro_before, sort, active")
-    .eq("active", true);
+  const { start, end } = isoWeekRange(new Date());
+
+  const [topicRows, judgedRows] = await Promise.all([
+    admin
+      .from("debate_topics")
+      .select("slug, title, motion, micro_before, sort, active")
+      .eq("active", true),
+    // The same rows the school table counts: originals, not rejected,
+    // judged, inside this ISO week. Kept in step by reading the same
+    // columns through the same rankSchools, not by a second tally.
+    admin
+      .from("debates")
+      .select("school, verdict")
+      .eq("kind", "original")
+      .eq("rejected", false)
+      .not("verdict", "is", null)
+      .gte("created_at", start.toISOString())
+      .lt("created_at", end.toISOString()),
+  ]);
+  const topics = topicRows.data;
+
+  const judged: JudgedArgument[] = (
+    (judgedRows.data ?? []) as { school: SchoolId; verdict: { fidelity?: number | null } | null }[]
+  ).map((row) => ({
+    school: row.school,
+    fidelity: typeof row.verdict?.fidelity === "number" ? row.verdict.fidelity : null,
+  }));
+
+  // Joined and left are the table's own columns and play no part in the
+  // order, which is average fidelity then argument count. Passing zeroes
+  // gives the same ranks and saves reading school_history for every
+  // profile in the database to draw one line in a sidebar.
+  const ranks = rankSchools(
+    judged,
+    Object.fromEntries(SCHOOL_IDS.map((s) => [s, { joined: 0, left: 0 }])) as Record<
+      SchoolId,
+      { joined: number; left: number }
+    >
+  );
+
+  const sidebar = (
+    <>
+      <StreakCard
+        streak={streak}
+        streakUpdatedOn={(profile?.streak_updated_on as string | null) ?? null}
+        today={todayUTC()}
+        paused={paused}
+      />
+      <SchoolCard
+        school={school}
+        oneLine={getSchool(school).one_line}
+        elo={Number(profile?.elo ?? 1200)}
+        rank={ranks.find((r) => r.school === school)?.rank ?? null}
+      />
+      <LessonsCard modules={modules} />
+    </>
+  );
 
   const weekly = getWeeklyMotion(
     (topics ?? []).map((t) => ({
