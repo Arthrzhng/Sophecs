@@ -28,12 +28,15 @@ export interface RailEntry {
  * component alone does not opt a page out of prerendering.
  */
 export function Passage({
+  className = "",
   storageKey,
   body,
   sources,
   rail,
   children,
 }: {
+  /** Spacing from whatever the page puts above the reading. */
+  className?: string;
   /** Scroll position is remembered under this key. Omit to not remember. */
   storageKey?: string;
   body: string;
@@ -88,7 +91,7 @@ export function Passage({
   }
 
   return (
-    <div className={showRail ? "md:flex md:gap-10" : undefined}>
+    <div className={`${showRail ? "md:flex md:gap-10" : ""} ${className}`}>
       {/* The rail, from md up. Sticky, no border, no background — it is a
           list of links, and giving it a panel would make it furniture. */}
       {showRail && (
@@ -99,12 +102,12 @@ export function Passage({
       >
         <div className="sticky top-8">
           <p className="text-sm text-ink-soft">On this page</p>
-          <ul className="mt-3 space-y-2">
+          <ul className="mt-2">
             {(rail ?? []).map((entry) => (
               <li key={entry.id}>
                 <a
                   href={`#${entry.id}`}
-                  className="text-sm text-ink-mid underline-offset-4 hover:text-ink hover:underline"
+                  className="inline-flex min-h-11 items-center text-sm text-ink-mid underline-offset-4 hover:text-ink hover:underline"
                 >
                   {entry.label}
                 </a>
@@ -130,7 +133,7 @@ export function Passage({
               if (e.target.value) jump(e.target.value);
               e.target.value = "";
             }}
-            className="mt-1 block w-full rounded-control border border-rule bg-surface px-3 py-2 text-sm text-ink"
+            className="mt-1 block min-h-11 w-full rounded-control border border-rule bg-surface px-3 py-2 text-sm text-ink"
           >
             <option value="" disabled>
               Jump to…
