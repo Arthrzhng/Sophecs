@@ -38,4 +38,11 @@ body: |-
   Each motion turns on one of these commitments. "Crash arithmetic" turns on impartiality: the passenger counts as one person, no more and no less. "The opaque benefit" turns on what explanation is for: it was always a means of making systems safer, and a system already shown to be safe has met the end without it. "The careful builder" turns on chapter 13, since punishing care that failed by bad luck prevents nothing. "Borrowed judgement" turns on Mill's view of motive, and asks what exactly is lost if your choices improve and you are happier.
 
   The standard objection is that counting can license things nobody should accept, such as sacrificing one innocent person to save five. A virtue ethicist adds that an impartial spectator has no friends, and that a theory with no room for the special weight of your own child has misdescribed love. Mill's reply is that the rules people have learned, including the rule against killing innocents, are themselves the best available guide to the general happiness. That defence is strong. It is also an admission that the counting cannot always be done directly, and a debater on this side should know where the admission leads.
+readings:
+  - title: Two sovereign masters
+    from_paragraph: 0
+  - title: What counts, and what does not
+    from_paragraph: 2
+  - title: The motions, and the objection
+    from_paragraph: 5
 ---

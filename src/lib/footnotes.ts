@@ -7,6 +7,11 @@ export interface Source {
   author: string;
   work: string;
   section?: string;
+  // Who translated the edition the text quotes, with its year, e.g.
+  // "W. D. Ross, 1908". Present only where a passage quotes a translation
+  // verbatim; paraphrase and English originals carry none. Rendered as
+  // "Translated by {translation}".
+  translation?: string;
 }
 
 /** A source with the number it is cited by, ready to render in a list. */

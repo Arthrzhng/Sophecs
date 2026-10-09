@@ -38,4 +38,11 @@ body: |-
   The motions on Sophecs test this in two directions. "Does the model decide?" asks whether a language model contains anything that does what the ruling faculty does, receiving an impression and then assenting or withholding. The Stoic answer is that it has inputs and outputs and nothing in between that judges. "Borrowed judgement" turns the question on the user. Handing your choices to an assistant gives away the one possession that was wholly yours, and better outcomes cannot buy it back, because outcomes were never yours. "The careful builder" follows from the same line. Blame attaches to judgement, so a builder who judged well and was unlucky did nothing wrong.
 
   The cost of this view is what it says about results. A Stoic can call the careful builder blameless while the people the system hurt are still hurt, and the theory files their injury under things not up to them. A utilitarian will reply that a moral theory which treats a death as an indifferent has lost track of what morality is for. The Stoic answer, that the victim's own virtue is untouched by what happened to them, is consistent. Whether it is enough is what you have to defend.
+readings:
+  - title: The sorting
+    from_paragraph: 0
+  - title: The faculty that judges
+    from_paragraph: 2
+  - title: The motions, and the price
+    from_paragraph: 5
 ---

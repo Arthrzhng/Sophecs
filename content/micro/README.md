@@ -29,6 +29,10 @@ quite." — so neither opens with a verdict word. `wrong` must make sense
 whichever wrong option was picked. The loader rejects anything else at build
 time; `tests/reading-check.test.ts` checks every file.
 
+`source.translation` (optional, e.g. "W. D. Ross, 1908") credits the
+translation a passage quotes verbatim. Leave it off for paraphrase and
+English originals.
+
 No seed step needed for these — `src/lib/micro-lessons.ts` reads this
 directory directly at request time (Node runtime), the same way
 `src/lib/schools.ts` reads `content/schools/`.

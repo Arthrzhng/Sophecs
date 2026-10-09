@@ -14,7 +14,8 @@ export interface MicroLessonContent {
   topic: string;
   position: "before" | "after";
   title: string;
-  source: { author: string; work: string; section: string };
+  // `translation`: see Source in footnotes.ts.
+  source: { author: string; work: string; section: string; translation?: string };
   body: string; // 150-250 words, frontmatter field — same convention as content/schools' `read`
   // Optional, "before" lessons only in practice. At most two, each following
   // a paragraph that exists, each answerable from the paragraphs above it.
