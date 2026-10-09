@@ -17,12 +17,15 @@ export async function generateMetadata({ params }: { params: Promise<{ school: s
 }
 
 /**
- * One school, in its own colour.
+ * One school, led by what it says.
  *
  * The page a share card lands on, so the quotation is the first thing on
- * it and the school's colour is the surface it sits on rather than a rule
- * somewhere down the page. The one saturated panel per page the design
- * allows, and this is the page that has the best claim to it.
+ * it. On white, though, and not on a filled school-coloured panel: a
+ * saturated surface here would echo the result card, which is the one
+ * poster in the product and earns that treatment by being the thing people
+ * share. The school's colour is a 4px left edge instead, which is the
+ * marker rule's own form (design/tokens.md §1) and leaves the card reading
+ * as a page rather than as a second card.
  *
  * Still static. Nothing here is read from a session, and the links are the
  * three the page already had: the quiz, the arena, and the other two
@@ -45,17 +48,23 @@ export default async function SchoolPage({ params }: { params: Promise<{ school:
   return (
     <main className="flex-1" data-daily-path>
       <div className="mx-auto max-w-read px-6 py-10">
+        {/* The left edge is the only school colour on the page. 2px
+            elsewhere; 4px here because this is the one surface whose whole
+            job is to say which school you are looking at. */}
         <section
-          className="chunky rounded-panel p-6 text-white"
-          style={{ ...shade(tone.shade), background: tone.bg }}
+          className="rounded-card border-2 border-l-4 border-rule bg-surface p-6"
+          style={{ borderLeftColor: tone.bg }}
         >
-          <h1 className="text-xs font-extrabold tracking-widest uppercase opacity-90">
-            {content.name}
-          </h1>
-          <blockquote className="mt-3 font-serif text-lg font-medium leading-snug">
+          {/* The quotation leads, because it is what the share card
+              promised whoever followed it. Ink on white: the name below
+              identifies the school, so the colour does not have to. */}
+          <blockquote className="font-serif text-lg font-medium leading-snug text-ink sm:text-xl">
             &ldquo;{content.one_line}&rdquo;
           </blockquote>
-          <p className="mt-3 text-sm opacity-90">{content.one_line_attribution}</p>
+          <p className="mt-3 text-sm text-ink-mid">{content.one_line_attribution}</p>
+          <h1 className="mt-5 text-lg font-extrabold tracking-tight text-ink">
+            {content.name}
+          </h1>
         </section>
 
         <div className="prose-reading mt-10">
