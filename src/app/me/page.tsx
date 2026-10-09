@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getEloPercentile } from "@/lib/percentile";
+import { ratingByWeek, type RatingPoint } from "@/lib/rating-history";
 import { getPendingChallenges } from "@/lib/challenge";
 import { getOpenObjections, type OpenObjection } from "@/lib/objections";
 import { getWeeklyMotion } from "@/lib/weekly-motion";
@@ -16,6 +17,7 @@ import { WelcomeTracker } from "@/components/me/WelcomeTracker";
 import { MeViewTracker } from "@/components/me/MeViewTracker";
 import { EloBlock } from "@/components/me/EloBlock";
 import { StreakBlock } from "@/components/me/StreakBlock";
+import { RatingChart } from "@/components/me/RatingChart";
 import { PendingChallenges } from "@/components/me/PendingChallenges";
 import { SCHOOL_ADHERENT, SCHOOL_COLORS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
@@ -81,6 +83,7 @@ export default async function MePage({
   let openObjections: OpenObjection[] = [];
   let weeklyMotion: { slug: string; title: string; sort: number } | null = null;
   let hasAnyDebate = false;
+  let ratingPoints: RatingPoint[] = [];
 
   if (isAdminConfigured()) {
     const admin = createAdminClient();
@@ -96,7 +99,8 @@ export default async function MePage({
       claimedResultId = latest?.id ?? "";
     }
 
-    const [percentileValue, pending, history, objectionRows, activeTopics] = await Promise.all([
+    const [percentileValue, pending, history, objectionRows, activeTopics, ratings] =
+      await Promise.all([
       getEloPercentile(user.id, elo),
       getPendingChallenges(admin, user.id),
       // Originals only: each revision is looked up separately and rendered
@@ -115,8 +119,23 @@ export default async function MePage({
         .select("slug, title, sort, micro_before")
         .eq("active", true)
         .order("sort", { ascending: true }),
+      // Originals only, and only the two fields the chart plots: a
+      // revision does not move the rating (the verdict page says so), so
+      // including one would draw a point where nothing changed.
+      admin
+        .from("debates")
+        .select("created_at, elo_after")
+        .eq("user_id", user.id)
+        .eq("kind", "original")
+        .not("elo_after", "is", null)
+        .order("created_at", { ascending: true }),
     ]);
     percentile = percentileValue;
+    ratingPoints = ratingByWeek(
+      ((ratings.data as { created_at: string; elo_after: number | null }[] | null) ?? []).map(
+        (row) => ({ created_at: row.created_at, elo_after: Number(row.elo_after) })
+      )
+    );
     pendingChallenges = pending;
     debateHistory = (history.data as DebateHistoryRow[] | null) ?? [];
     openObjections = objectionRows;
@@ -242,6 +261,14 @@ export default async function MePage({
           <div className="mt-10 border-t border-rule pt-8 grid grid-cols-2 gap-6">
             <EloBlock elo={elo} percentile={percentile} />
             <StreakBlock streak={streak} />
+          </div>
+        )}
+
+        {/* The rating over time, which the two blocks above can only give
+            as today's number. docs/daily-path-copy.md §9. */}
+        {school && (
+          <div className="mt-10 border-t border-rule pt-8" data-daily-path>
+            <RatingChart points={ratingPoints} />
           </div>
         )}
 

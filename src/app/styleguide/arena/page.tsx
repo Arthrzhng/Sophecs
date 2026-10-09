@@ -7,11 +7,21 @@ import { ChallengeInvite } from "@/components/share/ChallengeInvite";
 import { getMicroLesson } from "@/lib/micro-lessons";
 import { getSchool } from "@/lib/schools";
 import { ObjectionBrief } from "@/components/debate/ObjectionBrief";
+import { SchoolTable } from "@/components/table/SchoolTable";
+import { RatingChart } from "@/components/me/RatingChart";
+import { countsOnTable, yourTableLine } from "@/lib/school-table";
 import {
   FIXTURE_ARGUMENT,
   FIXTURE_MOTION,
   FIXTURE_VERDICT,
   FIXTURE_REJECTED_VERDICT,
+  FIXTURE_RATINGS_MANY,
+  FIXTURE_RATINGS_ONE,
+  FIXTURE_TABLE_EMPTY,
+  FIXTURE_TABLE_ROWS,
+  FIXTURE_TABLE_TIED,
+  FIXTURE_OLD_VERDICT_AT,
+  FIXTURE_WEEK,
   fixtureTopics,
 } from "@/lib/arena-fixtures";
 
@@ -105,6 +115,7 @@ export default function ArenaPreviewPage() {
           eloAfter={1218}
           streak={3}
           weekNumber={41}
+          tableContribution={1}
           argument={FIXTURE_ARGUMENT}
           isOwner
           argumentPublic
@@ -148,6 +159,137 @@ export default function ArenaPreviewPage() {
           />
         </Section>
       )}
+
+      {/* The table line is gated on countsOnTable: original, judged, and
+          inside the week the table is showing. Sections 5 and 6 cover a
+          qualifying original and a rejected one; these two cover the other
+          two ways to miss. */}
+      <Section title="7b. Verdict: a revision, which does not move the table">
+        <Verdict
+          debateId="preview-revision"
+          topicSlug="opaque-benefit"
+          motion={FIXTURE_MOTION}
+          school="stoicism"
+          verdict={FIXTURE_VERDICT}
+          eloDelta={null}
+          eloAfter={1218}
+          streak={3}
+          weekNumber={41}
+          tableContribution={
+            countsOnTable({
+              kind: "revision",
+              rejected: false,
+              createdAt: new Date().toISOString(),
+            })
+              ? 1
+              : null
+          }
+          argument={FIXTURE_ARGUMENT}
+          isOwner
+          argumentPublic
+          afterLesson={null}
+          showAfterLessonInitially={false}
+          shareLine=""
+        />
+      </Section>
+
+      <Section title="7c. Verdict: an older week, whose table has closed">
+        <Verdict
+          debateId="preview-old"
+          topicSlug="opaque-benefit"
+          motion={FIXTURE_MOTION}
+          school="stoicism"
+          verdict={FIXTURE_VERDICT}
+          eloDelta={12}
+          eloAfter={1206}
+          streak={0}
+          weekNumber={34}
+          tableContribution={
+            countsOnTable({
+              kind: "original",
+              rejected: false,
+              createdAt: FIXTURE_OLD_VERDICT_AT,
+            })
+              ? 1
+              : null
+          }
+          argument={FIXTURE_ARGUMENT}
+          isOwner
+          argumentPublic
+          afterLesson={null}
+          showAfterLessonInitially={false}
+          shareLine=""
+        />
+      </Section>
+
+      <Section title="8. School table: a week with a clear order, your line argued">
+        <SchoolTable
+          week={FIXTURE_WEEK}
+          rows={FIXTURE_TABLE_ROWS}
+          yourSchool="stoicism"
+          yourLine={yourTableLine(3, "Stoicism")}
+          emptyWeek={false}
+          paused={false}
+        />
+      </Section>
+
+      <Section title="9. School table: two schools tied, your line not argued yet">
+        <SchoolTable
+          week={FIXTURE_WEEK}
+          rows={FIXTURE_TABLE_TIED}
+          yourSchool="virtue-ethics"
+          yourLine={yourTableLine(0, "Virtue Ethics")}
+          emptyWeek={false}
+          paused={false}
+        />
+      </Section>
+
+      <Section title="10. School table: nothing judged yet this week">
+        <SchoolTable
+          week={FIXTURE_WEEK}
+          rows={FIXTURE_TABLE_EMPTY}
+          yourSchool="utilitarianism"
+          yourLine={yourTableLine(0, "Utilitarianism")}
+          emptyWeek
+          paused={false}
+        />
+      </Section>
+
+      <Section title="11. School table: judging paused">
+        <SchoolTable
+          week={FIXTURE_WEEK}
+          rows={FIXTURE_TABLE_EMPTY}
+          yourSchool="stoicism"
+          yourLine={yourTableLine(0, "Stoicism")}
+          emptyWeek
+          paused
+        />
+      </Section>
+
+      {/* Signed out: the table is public, the line about you is not. */}
+      <Section title="12. School table: signed out, no line about you">
+        <SchoolTable
+          week={FIXTURE_WEEK}
+          rows={FIXTURE_TABLE_ROWS}
+          yourSchool={null}
+          yourLine={null}
+          emptyWeek={false}
+          paused={false}
+        />
+      </Section>
+
+      <Section title="13. Profile chart: several weeks" narrow>
+        <div data-daily-path>
+          <RatingChart points={FIXTURE_RATINGS_MANY} id="chart-many" />
+        </div>
+      </Section>
+
+      <Section title="14. Profile chart: one week, and none yet" narrow>
+        <div data-daily-path className="flex flex-col gap-4">
+          <RatingChart points={FIXTURE_RATINGS_ONE} id="chart-one" />
+          <RatingChart points={[]} id="chart-empty" />
+        </div>
+      </Section>
     </Page>
   );
 }

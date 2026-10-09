@@ -214,7 +214,7 @@ Argue screen panel heading: `What the judge looks for`. Link under it:
 | Nav label | `School table` |
 | Heading | `School table` |
 | Week line | `Week {N} · closes Sunday, midnight UTC` |
-| Intro | `How each school argued this week. Fidelity is the judge's 0–10 mark for arguing the way the school reasons, averaged across every judged argument.` |
+| Intro | `How each school argued this week. Fidelity is the judge's 0–10 mark for arguing the way the school reasons, averaged across every judged original argument.` |
 | Columns | `Rank` · `School` · `Avg fidelity` · `Arguments` · `Joined / left` |
 | Joined / left cell | `+{in} / −{out}`; screen reader: `{in} joined, {out} left this week` |
 | Your line, has argued | `You argued {n} times for {school} this week.` (`once` when 1) |
@@ -224,7 +224,14 @@ Argue screen panel heading: `What the judge looks for`. Link under it:
 | Judging paused | the empty-week line, then `Judging is paused while we check the quality of the verdicts.` |
 
 Ties share a rank. Rank is by average fidelity, then by number of arguments.
-Week is the ISO week, the same one the weekly motion uses.
+A school with no average has no rank. Week is the ISO week, the same one
+the weekly motion uses.
+
+Originals only. A revision is a second attempt at the same motion after
+feedback and does not move the reader's rating, so it does not move their
+school's row either. The verdict says `+1 for the {school} on the table`
+only where the same three things hold: original, judged, and inside the
+week the table is showing.
 
 ## 9. Profile chart
 

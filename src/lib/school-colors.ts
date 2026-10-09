@@ -32,6 +32,16 @@ export const SCHOOL_ADHERENT: Record<SchoolId, string> = {
   "virtue-ethics": "Virtue Ethicist",
 };
 
+// The same, in the plural, for talking about a school's side rather than
+// one of its arguers: "+1 for the Stoics on the table". Written out rather
+// than suffixed with an "s", so a school whose plural is irregular is a
+// one-line change here instead of a bug in three places.
+export const SCHOOL_ADHERENT_PLURAL: Record<SchoolId, string> = {
+  stoicism: "Stoics",
+  utilitarianism: "Utilitarians",
+  "virtue-ethics": "Virtue Ethicists",
+};
+
 // The muted --color-stoic/utilitarian/virtue tokens (globals.css), meant
 // for text/hairlines on paper — not the saturated card-only surfaces
 // above. Phase 2's verdict page is the first thing to use them as a

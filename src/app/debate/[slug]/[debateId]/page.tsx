@@ -4,6 +4,7 @@ import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { Verdict, type VerdictData, type RevisionComparison } from "@/components/debate/Verdict";
 import { getMicroLesson } from "@/lib/micro-lessons";
 import { isoWeekNumber } from "@/lib/weekly-motion";
+import { countsOnTable } from "@/lib/school-table";
 import { getRevisionId } from "@/lib/objections";
 import { getSchool } from "@/lib/schools";
 import { Page } from "@/components/layout/Page";
@@ -178,6 +179,17 @@ export default async function VerdictPage({
         eloAfter={publicRow.elo_after == null ? null : Math.round(Number(publicRow.elo_after))}
         streak={streak}
         weekNumber={weekNumber}
+        // One, where this argument actually moved its school's row:
+        // original, judged, and inside the week the table is showing. A
+        // revision, a rejected argument and an older week each get no
+        // line rather than a number the table will not corroborate.
+        tableContribution={countsOnTable({
+          kind: publicRow.kind as string | null,
+          rejected: verdict.rejected,
+          createdAt: publicRow.created_at as string | null,
+        })
+          ? 1
+          : null}
         argument={argument}
         isOwner={isOwner}
         argumentPublic={argumentPublic}

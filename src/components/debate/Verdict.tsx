@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { MicroLesson } from "./MicroLesson";
 import { PublishToggle } from "./PublishToggle";
 import { ShareRow } from "./ShareRow";
@@ -9,7 +10,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { TextLink } from "@/components/ui/TextLink";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { track } from "@/lib/analytics/client";
-import { SCHOOL_COLORS } from "@/lib/school-colors";
+import { SCHOOL_ADHERENT_PLURAL, SCHOOL_COLORS } from "@/lib/school-colors";
 import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
 import { JUDGE_AXES, AXIS_MAX } from "@/lib/judge-axes";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
@@ -114,6 +115,7 @@ export function Verdict({
   eloAfter,
   streak,
   weekNumber,
+  tableContribution,
   argument,
   isOwner,
   argumentPublic,
@@ -136,6 +138,13 @@ export function Verdict({
   streak?: number | null;
   /** ISO week the argument was written in. */
   weekNumber?: number | null;
+  /**
+   * What this argument added to its school's row on the table: one, for a
+   * judged argument, and nothing at all for a rejected one. Passed in
+   * rather than assumed, so the day the table counts something other than
+   * arguments this is one line, not a hunt.
+   */
+  tableContribution?: number | null;
   argument: string | null;
   isOwner: boolean;
   argumentPublic: boolean;
@@ -236,6 +245,21 @@ export function Verdict({
             {streak != null && (
               <span>
                 Streak &middot; Day <span className="font-mono tabular text-ink">{streak}</span>
+              </span>
+            )}
+            {/* The school table exists as of stage 6, so the verdict can
+                say what this argument did for the reader's side. A link,
+                not a chip: the number is only worth anything next to the
+                row it landed in. */}
+            {tableContribution != null && tableContribution > 0 && (
+              <span>
+                <Link
+                  href="/table"
+                  className="inline-flex min-h-11 items-center text-ink underline underline-offset-4"
+                >
+                  <span className="font-mono tabular">+{tableContribution}</span>
+                  &nbsp;for the {SCHOOL_ADHERENT_PLURAL[school]} on the table
+                </Link>
               </span>
             )}
           </p>
