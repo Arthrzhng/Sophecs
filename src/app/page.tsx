@@ -80,8 +80,8 @@ export default function LandingPage() {
                     step and progress colours, which belong to no school. */}
                 <span
                   aria-hidden="true"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-chunky text-base font-extrabold text-white"
-                  style={{ background: step.badge }}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-chunky text-base font-extrabold"
+                  style={{ background: step.badge, color: step.badgeInk }}
                 >
                   {i + 1}
                 </span>
@@ -164,20 +164,27 @@ export default function LandingPage() {
 // Mockup 01's three cards. Card 3 said "four axes"; docs/daily-path-copy.md
 // §6 settles the count at three, and content/prompts/judge.v2.md is what
 // actually decides.
+//
+// `badgeInk` is the numeral's colour, picked per badge by what clears on
+// the fill underneath it. White on the step orange is 2.93:1 and fails;
+// ink on it is 5.89:1. White clears both of the others comfortably.
 const STEPS = [
   {
     title: "Find your school",
     body: "A short quiz. Every answer moves you across the triangle.",
     badge: "var(--color-ink)",
+    badgeInk: "#ffffff",
   },
   {
     title: "Walk the weekly path",
     body: "Read the case, check your reading, argue, face an objection, revise once.",
     badge: "var(--color-step-done)",
+    badgeInk: "var(--color-ink)",
   },
   {
     title: "Get the verdict",
     body: "Scored on three axes, including fidelity to your school. Keep your streak alive.",
     badge: "var(--color-correct)",
+    badgeInk: "#ffffff",
   },
 ];
