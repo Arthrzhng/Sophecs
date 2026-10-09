@@ -199,18 +199,72 @@ for word.
 
 Rows 2 to 4 are the existing `StreakBlock` wording; reuse it, do not copy it.
 
+#### The week strip
+
+Seven circles under the number, Monday to Sunday of the current ISO week in
+UTC, the same week the school table and the weekly motion use. Lit is a
+filled disc, unlit an open ring, so the two differ in shape before they
+differ in colour.
+
+A day is lit when it falls inside the run of `streak` days ending on
+`streak_updated_on`, and only when `streak_updated_on` is today or
+yesterday. The count is written opportunistically at judge time and nothing
+clears it when a day is missed, so a run that ended earlier than that is
+over whatever the number says, and the strip lights nothing. The number
+itself is left alone: the rules are in `streak.ts` and this is display.
+
+On the Monday after a live run, nothing is lit. The run is real and the
+number still stands, but none of it happened this week.
+
+Hidden whenever the paused line above shows, along with the number.
+
+| Element | Copy |
+|---|---|
+| Under each circle | `M` `T` `W` `T` `F` `S` `S` (decorative, hidden from assistive technology) |
+| Screen reader, a lit day | `{Weekday}, streak day` |
+| Screen reader, any other day | `{Weekday}` |
+
+The letters repeat and name nothing on their own, which is why the weekday
+is given in full to a screen reader rather than the letter.
+
 ### School card
 
 - Eyebrow: `Your school`
 - Name: the school name
 - Line: the school's `one_line` from `content/schools/`
+- Rating: `Rating {elo}`, the reader's own rating from `profiles.elo`,
+  rounded. The numeral is mono; the word is not.
+- Standing, from the same `rankSchools` the school table uses:
+
+| State | Copy |
+|---|---|
+| ranked | `{First\|Second\|Third} on the table this week` |
+| the school has nothing judged this week | `Not ranked yet this week` |
+
+The place is a word, not `1st`: the rating on the line above is a numeral
+set in mono, and two numerals one under the other saying different kinds of
+thing read as a table of figures. Ties share a rank and no school can place
+below third, so three words cover it.
+
 - Link: `See the school table` → school table
 
 ### Lessons card
 
 - Eyebrow: `Lessons`
-- Line: `A longer reading for each school, and twelve short passages: one before and one after each motion.`
-- Link: `Open the lessons` → `/lessons`
+- Title: the first module in the lessons index's own order that is not
+  fully read, so "the next one" means the same thing on both screens.
+  Progress is the same `localStorage` mark §10 describes, so the card shows
+  the first module as unstarted until the viewer is known.
+
+| State | Line | Button |
+|---|---|---|
+| started | `Reading {n} of {N}` | `Open lesson` → that module |
+| not started | `{N} readings` | `Open lesson` → that module |
+| every module read | `All three modules read.` | `Browse lessons` → `/lessons` |
+
+`All three modules read.` counts the three modules that exist, one per
+school. A fourth would make the line false, and
+`tests/module-readings.test.ts` is where that is caught.
 
 ## 6. Verdict and argue: the three axes
 

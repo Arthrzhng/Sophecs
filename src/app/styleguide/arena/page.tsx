@@ -11,6 +11,12 @@ import { SchoolTable } from "@/components/table/SchoolTable";
 import { RatingChart } from "@/components/me/RatingChart";
 import { SharePage } from "@/components/share/SharePage";
 import { LiveReadingCheck, ReadingCheckFrame } from "./ReadingCheckPreview";
+import { StreakCard, SchoolCard } from "@/components/today/TodayCards";
+import { LessonsCard, type LessonsCardModule } from "@/components/today/LessonsCard";
+import { StreakBlock } from "@/components/me/StreakBlock";
+import { getAllModules } from "@/lib/modules";
+import { splitModule } from "@/lib/module-readings";
+import { SCHOOL_IDS } from "@/lib/types";
 import { countsOnTable, yourTableLine } from "@/lib/school-table";
 import {
   FIXTURE_ARGUMENT,
@@ -69,6 +75,22 @@ export default function ArenaPreviewPage() {
   // Two real questions, so the player is reviewed against the copy it will
   // actually hold rather than against something written to fit the box.
   const check = lesson?.reading_check ?? [];
+  // A Wednesday, so a run of three covers Monday to Wednesday and the four
+  // days after it are still open. The cards are read against a fixed date
+  // rather than the real one: a fixture whose picture changes with the day
+  // of the week cannot be reviewed.
+  const today = "2026-10-07";
+
+  // The real modules, in the order Today picks the next one from. A made-up
+  // title here would be the one place in the restyle where the sidebar is
+  // reviewed against copy the product does not have.
+  const modules: LessonsCardModule[] = getAllModules()
+    .sort((a, b) => SCHOOL_IDS.indexOf(a.school) - SCHOOL_IDS.indexOf(b.school))
+    .map((m) => ({
+      id: m.id,
+      title: m.title,
+      readings: splitModule(m.title, m.body, m.readings).length,
+    }));
   const objection = FIXTURE_VERDICT.unanswered_objection ?? null;
 
   return (
@@ -435,7 +457,106 @@ export default function ArenaPreviewPage() {
         </Section>
         </>
       )}
+
+      <p className="mt-12 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+        The Today sidebar. Every card needs a session and a row, so they are
+        rendered here against fixtures at the width the sidebar gives them.
+        The week is read against Wednesday 7 October 2026 throughout.
+      </p>
+
+      <Section title="22. Streak: a run of three, ending today">
+        <TodayCards>
+          <StreakCard streak={3} streakUpdatedOn={today} today={today} paused={false} />
+          <StreakCard streak={7} streakUpdatedOn="2026-10-11" today="2026-10-11" paused={false} />
+        </TodayCards>
+      </Section>
+
+      <Section title="23. Streak: never started, and gone stale">
+        <TodayCards>
+          <StreakCard streak={0} streakUpdatedOn={null} today={today} paused={false} />
+          {/* profiles.streak still says 4, last extended on Monday. The run
+              ended before yesterday, so the card shows 0 and lights
+              nothing. The stored value is untouched. */}
+          <StreakCard streak={4} streakUpdatedOn="2026-10-05" today={today} paused={false} />
+        </TodayCards>
+      </Section>
+
+      <Section title="24. Streak: the Monday after a live run, and judging paused">
+        <TodayCards>
+          {/* Live, extended last night, but none of it happened this week. */}
+          <StreakCard streak={5} streakUpdatedOn="2026-10-04" today="2026-10-05" paused={false} />
+          <StreakCard streak={3} streakUpdatedOn={today} today={today} paused />
+        </TodayCards>
+      </Section>
+
+      <Section title="25. School card: ranked, and nothing judged yet this week">
+        <TodayCards>
+          <SchoolCard
+            school="stoicism"
+            oneLine={getSchool("stoicism").one_line}
+            elo={1284}
+            rank={1}
+          />
+          <SchoolCard
+            school="virtue-ethics"
+            oneLine={getSchool("virtue-ethics").one_line}
+            elo={1200}
+            rank={null}
+          />
+        </TodayCards>
+      </Section>
+
+      <Section title="26. Profile streak: live, and the same stored 4 gone stale">
+        {/* No data-daily-path here: /me has not been redrawn yet, so this
+            is the block as that route renders it today. */}
+        <TodayCards dailyPath={false}>
+          <StreakBlock streak={4} streakUpdatedOn="2026-10-06" today={today} />
+          <StreakBlock streak={4} streakUpdatedOn="2026-10-05" today={today} />
+        </TodayCards>
+        <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+          Both have a stored streak of 4. The second was last extended on
+          Monday, so by Wednesday the run is over and the block says so.
+          Nothing is written either way.
+        </p>
+      </Section>
+
+      <Section title="27. Lessons card: not started, part read, and all three read">
+        <TodayCards>
+          <LessonsCard modules={modules} />
+          <LessonsCard modules={[]} />
+        </TodayCards>
+        <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+          The first card holds the real modules and reads progress out of
+          this browser, so it shows whichever one you have not finished and
+          moves as you read. The second is given an empty list, which is the
+          same branch as having finished them all.
+        </p>
+      </Section>
     </Page>
+  );
+}
+
+// The sidebar's own width, so a card fixture wraps where the real card
+// wraps. Two to a row on a wide screen only because the page is wide; the
+// real sidebar stacks them.
+function TodayCards({
+  children,
+  dailyPath = true,
+}: {
+  children: React.ReactNode;
+  /** False for a component on a route the restyle has not reached yet. */
+  dailyPath?: boolean;
+}) {
+  return (
+    <div data-daily-path={dailyPath || undefined} className="flex flex-wrap gap-6">
+      {Array.isArray(children)
+        ? children.map((child, i) => (
+            <div key={i} className="w-full max-w-sm">
+              {child}
+            </div>
+          ))
+        : children}
+    </div>
   );
 }
 
