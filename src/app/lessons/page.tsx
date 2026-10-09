@@ -4,6 +4,7 @@ import { ModuleFilter, type ModuleCard } from "@/components/lessons/ModuleFilter
 import { getAllMicroLessons } from "@/lib/micro-lessons";
 import { getAllTopicFiles } from "@/lib/topics";
 import { getAllModules } from "@/lib/modules";
+import { splitModule } from "@/lib/module-readings";
 import { authorList, moduleNumbers } from "@/lib/lesson-index";
 import { SCHOOL_IDS } from "@/lib/footnotes";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
@@ -43,9 +44,9 @@ export default function LessonsPage() {
     title: m.title,
     excerpt: m.quiz_excerpt,
     numberInSchool: numbers[m.id],
-    // One, until a module is split into an ordered sequence. Counted rather
-    // than written down, so the number follows the split when it lands.
-    readings: 1,
+    // Counted by the same function the module page splits with, so the card
+    // and the bar on that page can never disagree about how many there are.
+    readings: splitModule(m.title, m.body, m.readings).length,
     sources: authorList(m.sources),
   }));
 

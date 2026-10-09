@@ -14,13 +14,21 @@ import Link from "next/link";
  */
 export function ReadingTopBar({
   width = "read",
+  sticky = false,
   position,
 }: {
   /** Matches the column under it: `ui` only where a contents rail widens it. */
   width?: "read" | "ui";
+  /**
+   * Pins the bar to the top. For a module, whose counter follows the scroll
+   * and would otherwise report the reading you are on from somewhere you
+   * can no longer see. A passage's counter never changes, so its bar stays
+   * at the top of the document and out of the way.
+   */
+  sticky?: boolean;
   position?: { index: number; total: number };
 }) {
-  return (
+  const bar = (
     <div
       className={`mx-auto flex w-full items-center gap-4 px-6 py-5 ${
         width === "ui" ? "max-w-ui" : "max-w-read"
@@ -61,6 +69,13 @@ export function ReadingTopBar({
           </span>
         </>
       )}
+    </div>
+  );
+
+  if (!sticky) return bar;
+  return (
+    <div className="sticky top-0 z-10 border-b-2 border-rule bg-paper" data-print="hide">
+      {bar}
     </div>
   );
 }

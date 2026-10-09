@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
+import { loadReached, progressAction, progressChip } from "@/lib/module-progress";
+import { useViewerId } from "./useViewerId";
 import type { SchoolId } from "@/lib/types";
 
 export interface ModuleCard {
@@ -22,6 +24,62 @@ type Filter = "all" | SchoolId;
 
 const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
 
+function Tick() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
+    </svg>
+  );
+}
+
+/**
+ * The circle beside the progress chip.
+ *
+ * Three states, told apart by shape as well as fill: an empty ring, a ring
+ * filled clockwise to the fraction read, and a solid disc with a tick. The
+ * words beside it say the same thing, so the circle is decoration and is
+ * hidden from assistive technology.
+ */
+function ProgressRing({ reached, total }: { reached: number; total: number }) {
+  const done = total > 0 && reached >= total;
+  if (done) {
+    return (
+      <span
+        aria-hidden="true"
+        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-correct text-white"
+      >
+        <Tick />
+      </span>
+    );
+  }
+  const fraction = total > 0 ? Math.max(0, Math.min(reached, total)) / total : 0;
+  return (
+    <span
+      aria-hidden="true"
+      className="h-6 w-6 shrink-0 rounded-full"
+      style={{
+        background:
+          fraction > 0
+            ? `conic-gradient(var(--color-correct) ${fraction * 360}deg, var(--color-rule) 0)`
+            : "var(--color-rule)",
+        // The hole, which is what makes it a ring rather than a pie.
+        mask: "radial-gradient(circle, transparent 54%, black 55%)",
+        WebkitMask: "radial-gradient(circle, transparent 54%, black 55%)",
+      }}
+    />
+  );
+}
+
 /**
  * The module cards, filtered by school, under the index's own heading.
  *
@@ -33,7 +91,7 @@ const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
  *
  * The heading comes in as a prop rather than sitting on the page above this,
  * because the mockup puts the chips on the heading's own baseline, to its
- * right — and the chips need the state that makes this a client component.
+ * right, and the chips need the state that makes this a client component.
  */
 export function ModuleFilter({
   heading,
@@ -43,6 +101,19 @@ export function ModuleFilter({
   modules: ModuleCard[];
 }) {
   const [filter, setFilter] = useState<Filter>("all");
+  const viewerId = useViewerId();
+  const [reached, setReached] = useState<Record<string, number> | null>(null);
+
+  // Read once the viewer is known, so one reader's place in a module is
+  // never drawn for another. Until then the card shows no chip at all,
+  // rather than "Not started" for someone who has read it.
+  useEffect(() => {
+    if (!viewerId) return;
+    const next: Record<string, number> = {};
+    for (const m of modules) next[m.id] = loadReached(viewerId, m.id);
+    setReached(next);
+  }, [viewerId, modules]);
+
   const shown = filter === "all" ? modules : modules.filter((m) => m.school === filter);
 
   // A chip for a school with no module would empty the list, which reads as
@@ -84,6 +155,7 @@ export function ModuleFilter({
       <ul className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-5">
         {shown.map((m) => {
           const tone = SCHOOL_CHUNKY[m.school];
+          const got = reached?.[m.id] ?? 0;
           return (
             <li key={m.id} className="flex">
               <article
@@ -105,19 +177,28 @@ export function ModuleFilter({
                     {m.readings === 1 ? "reading" : "readings"}
                     {m.sources && <> &middot; {m.sources}</>}
                   </p>
-                  {/* The mockup's card has no excerpt and a progress chip
-                      instead. There is no progress store yet, so the line
-                      the index already carries stays rather than the space
-                      going empty. */}
+                  {/* The mockup's card has no excerpt. The line the index
+                      already carries stays: it is the only description of
+                      the module anywhere on this page. */}
                   <p className="text-sm leading-relaxed text-ink-mid">{m.excerpt}</p>
-                  <div className="mt-auto flex justify-end pt-2">
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-2">
+                    {/* Held back until the viewer is known; the card is not
+                        allowed to guess at someone's progress. */}
+                    {reached ? (
+                      <span className="inline-flex items-center gap-2 text-sm font-bold text-ink-mid">
+                        <ProgressRing reached={got} total={m.readings} />
+                        {progressChip(got, m.readings)}
+                      </span>
+                    ) : (
+                      <span />
+                    )}
                     <Link
                       href={`/lessons/modules/${m.id}`}
-                      aria-label={`Start ${m.title}`}
-                      className="chunky inline-flex min-h-12 items-center rounded-chunky px-5 text-sm font-extrabold tracking-wide uppercase text-white"
+                      aria-label={`${progressAction(got, m.readings)}: ${m.title}`}
+                      className="chunky ml-auto inline-flex min-h-12 items-center rounded-chunky px-5 text-sm font-extrabold tracking-wide uppercase text-white"
                       style={{ ...shade(tone.shade), background: tone.bg }}
                     >
-                      Start
+                      {progressAction(got, m.readings)}
                     </Link>
                   </div>
                 </div>
