@@ -4,7 +4,7 @@ import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getRevisionId } from "@/lib/objections";
 import { ArgumentEditor } from "@/components/debate/ArgumentEditor";
 import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
-import { SCHOOL_COLORS } from "@/lib/school-colors";
+import { ObjectionBrief } from "@/components/debate/ObjectionBrief";
 import { Page } from "@/components/layout/Page";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { TextLink } from "@/components/ui/TextLink";
@@ -91,18 +91,8 @@ export default async function RevisePage({
           </div>
         </div>
       ) : (
-        <>
-          <p className="text-sm text-ink-soft">Answer the objection</p>
-          {/* Pinned, not dismissable: the objection is the brief for this
-              screen, and hiding it would leave the editor contextless. */}
-          <div
-            className="mt-4 mb-10 max-w-[60ch] border-l-2 pl-4"
-            style={{ borderColor: SCHOOL_COLORS[objection.school].surface }}
-          >
-            <p className="text-sm text-ink-mid">{SCHOOL_COLORS[objection.school].name}</p>
-            <p className="mt-2 font-serif text-md leading-relaxed text-ink">{objection.claim}</p>
-            <p className="mt-3 text-sm leading-relaxed text-ink-mid">{objection.why_it_stands}</p>
-          </div>
+        <div data-daily-path>
+          <ObjectionBrief objection={objection} />
 
           <ArgumentEditor
             topicSlug={slug}
@@ -114,7 +104,7 @@ export default async function RevisePage({
             parentDebateId={parent.id}
             initialArgument={parent.argument ?? ""}
           />
-        </>
+        </div>
       )}
     </Page>
   );

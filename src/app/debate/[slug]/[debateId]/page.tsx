@@ -3,6 +3,7 @@ import { createClient as createSupabaseServerClient } from "@/lib/supabase/serve
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { Verdict, type VerdictData, type RevisionComparison } from "@/components/debate/Verdict";
 import { getMicroLesson } from "@/lib/micro-lessons";
+import { isoWeekNumber } from "@/lib/weekly-motion";
 import { getRevisionId } from "@/lib/objections";
 import { getSchool } from "@/lib/schools";
 import { Page } from "@/components/layout/Page";
@@ -29,7 +30,7 @@ export default async function VerdictPage({
   const { data: publicRow } = await admin
     .from("debates_public")
     .select(
-      "id, topic_slug, school, score, verdict, elo_before, elo_after, argument, kind, parent_debate_id"
+      "id, topic_slug, school, score, verdict, elo_before, elo_after, argument, kind, parent_debate_id, created_at"
     )
     .eq("id", debateId)
     .maybeSingle();
@@ -125,6 +126,24 @@ export default async function VerdictPage({
       ? Math.round(Number(publicRow.elo_after) - Number(publicRow.elo_before))
       : null;
 
+  // Only the owner sees a streak, and only the owner has one to see. One
+  // extra read, guarded, rather than widening the public row.
+  let streak: number | null = null;
+  if (isOwner && user) {
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("streak")
+      .eq("id", user.id)
+      .maybeSingle();
+    streak = profile ? Number(profile.streak ?? 0) : null;
+  }
+
+  // The week the argument was written in, not the week it is being read
+  // in: a verdict opened a fortnight later still belongs to its own week.
+  const weekNumber = publicRow.created_at
+    ? isoWeekNumber(new Date(publicRow.created_at as string))
+    : null;
+
   const schoolContent = getSchool(school);
   const shortMotion = topic.motion.length > 60 ? `${topic.motion.slice(0, 57)}...` : topic.motion;
   const baseShareLine = schoolContent.verdict_share_line
@@ -148,7 +167,7 @@ export default async function VerdictPage({
       : baseShareLine;
 
   return (
-    <Page width="read">
+    <Page width="ui">
       <Verdict
         debateId={debateId}
         topicSlug={slug}
@@ -156,6 +175,9 @@ export default async function VerdictPage({
         school={school}
         verdict={verdict}
         eloDelta={eloDelta}
+        eloAfter={publicRow.elo_after == null ? null : Math.round(Number(publicRow.elo_after))}
+        streak={streak}
+        weekNumber={weekNumber}
         argument={argument}
         isOwner={isOwner}
         argumentPublic={argumentPublic}

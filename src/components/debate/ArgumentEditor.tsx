@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BeforeLesson } from "./BeforeLesson";
 import { Button } from "@/components/ui/Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
+import { AxisPanel } from "@/components/daily-path/AxisPanel";
 import { Dialog } from "@/components/ui/Dialog";
 import { Textarea } from "@/components/ui/Textarea";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -126,6 +128,8 @@ export function ArgumentEditor({
   const [argument, setArgument] = useState(isRevision ? initialArgument ?? "" : "");
   const [status, setStatus] = useState<Status>({ kind: "editing" });
   const [confirming, setConfirming] = useState(false);
+  // Only claimed once the autosave below has actually written one.
+  const [draftSaved, setDraftSaved] = useState(false);
   const restoredRef = useRef(false);
 
   // Restore a draft from a discarded tab or a sign-in round trip, then
@@ -157,7 +161,10 @@ export function ArgumentEditor({
   useEffect(() => {
     const id = setInterval(() => {
       try {
-        if (argument) localStorage.setItem(draftKey, argument);
+        if (argument) {
+          localStorage.setItem(draftKey, argument);
+          setDraftSaved(true);
+        }
       } catch {
         // Best-effort only.
       }
@@ -312,21 +319,30 @@ export function ArgumentEditor({
   }
 
   return (
-    <div>
-      <p className="text-sm text-ink-soft">{isRevision ? "Revision" : "Motion"}</p>
-      <h1 className="mt-1 max-w-[60ch] font-serif text-lg font-medium leading-snug text-ink">
-        {motion}
-      </h1>
-
-      {/* The only school colour on this screen. */}
-      <p
-        className="mt-5 border-l-2 pl-4 text-sm leading-relaxed text-ink-mid"
-        style={{ borderColor: SCHOOL_COLORS[school].surface }}
-      >
-        {isRevision
-          ? "Answer the objection inside your argument. Cut what no longer earns its place."
-          : `You argue this as a ${SCHOOL_ADHERENT[school]}.`}
-      </p>
+    <div data-daily-path>
+      {/* On a revision the heading and the lead-in belong to the objection
+          screen that wraps this editor, so only the motion is repeated
+          here: two h1s on one screen would be one too many. */}
+      {isRevision ? (
+        <p className="max-w-[60ch] font-serif text-md leading-snug text-ink-mid">{motion}</p>
+      ) : (
+        <>
+          <p className="text-sm text-ink-mid">Step 3 of 6</p>
+          <h1 className="mt-1 text-xl font-extrabold tracking-tight text-ink">
+            Argue the motion
+          </h1>
+          <p className="mt-4 max-w-[60ch] font-serif text-md leading-snug text-ink">
+            {motion}
+          </p>
+          {/* The only school colour on this screen. */}
+          <p
+            className="mt-4 border-l-4 pl-4 text-sm font-semibold leading-relaxed text-ink-mid"
+            style={{ borderColor: SCHOOL_COLORS[school].surface }}
+          >
+            Arguing as a {SCHOOL_ADHERENT[school]}
+          </p>
+        </>
+      )}
 
       {microBefore && (
         <div className="mt-8">
@@ -373,7 +389,8 @@ export function ArgumentEditor({
         </div>
       )}
 
-      <div className="mt-8">
+      <div className="mt-8 flex flex-col gap-6 lg:flex-row lg:items-start">
+        <div className="min-w-0 flex-1">
         <Textarea
           id="argument"
           label="Your argument"
@@ -381,7 +398,14 @@ export function ArgumentEditor({
           rows={12}
           value={argument}
           onChange={(e) => setArgument(e.target.value)}
-          count={`${words} / ${MAX_ARGUMENT_WORDS} words`}
+          // Counts toward the minimum until it is met, then toward the
+          // maximum. Before eighty words the number that matters is the one
+          // standing between the writer and the submit button; after it, the
+          // ceiling is.
+          count={
+            `${words} / ${words < MIN_ARGUMENT_WORDS ? MIN_ARGUMENT_WORDS : MAX_ARGUMENT_WORDS} words` +
+            (draftSaved ? " \u00b7 draft saved" : "")
+          }
           countOverLimit={words >= WORD_COUNT_WARNING_AT}
           placeholder={
             showScaffold
@@ -389,6 +413,15 @@ export function ArgumentEditor({
               : `At least ${MIN_ARGUMENT_WORDS} words — enough room to actually argue the case, not just assert it.`
           }
         />
+        </div>
+
+        {/* Not shown on a revision: that screen's brief is the objection
+            pinned above it, and a second panel would compete with it. */}
+        {!isRevision && (
+          <div className="w-full lg:max-w-xs">
+            <AxisPanel />
+          </div>
+        )}
       </div>
 
       {status.kind === "error" && (
@@ -402,10 +435,10 @@ export function ArgumentEditor({
         </div>
       )}
 
-      <div className="mt-6">
-        <Button onClick={() => setConfirming(true)} disabled={!canSubmit}>
-          {isRevision ? "Submit revision" : "Submit argument"}
-        </Button>
+      <div className="mt-8">
+        <ChunkyButton school={school} onClick={() => setConfirming(true)} disabled={!canSubmit}>
+          {isRevision ? "Submit revision" : "Send to the judge"}
+        </ChunkyButton>
         {words < MIN_ARGUMENT_WORDS && (
           <p className="mt-3 text-sm text-ink-soft">
             {MIN_ARGUMENT_WORDS - words} more{" "}
@@ -419,13 +452,13 @@ export function ArgumentEditor({
           product: it spends a judge call and locks the motion. */}
       <Dialog
         open={confirming}
-        title={isRevision ? "Submit this revision?" : "Submit this argument?"}
+        title={isRevision ? "Submit this revision?" : "Send this to the judge?"}
         description={
           isRevision
             ? "It goes to the judge now. A revision is the last word on this argument — there is no second one."
             : `It goes to the judge now. You get one verdict and one revision. This motion locks for ${TOPIC_LOCK_DAYS} days afterwards.`
         }
-        confirmLabel={isRevision ? "Submit revision" : "Submit argument"}
+        confirmLabel={isRevision ? "Submit revision" : "Send to the judge"}
         cancelLabel="Keep editing"
         onConfirm={submit}
         onCancel={() => setConfirming(false)}

@@ -10,6 +10,8 @@ import { TextLink } from "@/components/ui/TextLink";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { track } from "@/lib/analytics/client";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
+import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
+import { JUDGE_AXES, AXIS_MAX } from "@/lib/judge-axes";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
 import type { SchoolId } from "@/lib/types";
 
@@ -53,36 +55,6 @@ const SCHOOL_LABEL: Record<SchoolId, string> = {
   utilitarianism: "Utilitarianism",
   "virtue-ethics": "Virtue Ethics",
 };
-
-// One axis. A table row, not a bar: three bars filled to 80% of their track
-// is the one place in this product that looked like a dashboard, and a bar
-// says "progress toward full marks" about a number that is a judgement.
-function AxisRow({
-  label,
-  value,
-  outOf,
-  trailing,
-}: {
-  label: string;
-  value: number | null;
-  outOf?: string;
-  trailing?: React.ReactNode;
-}) {
-  return (
-    <tr className="border-b border-rule last:border-b-0">
-      <th scope="row" className="py-3 text-left text-sm font-normal text-ink-mid">
-        {label}
-      </th>
-      <td className="py-3 text-right font-mono text-sm tabular text-ink">
-        {/* The three sub-scores are fixed to one decimal so 8.0 and 6.5
-            line up in the column; Overall is an integer and stays one. */}
-        {value == null ? "—" : outOf ? value.toFixed(1) : value}
-        {outOf && <span className="text-ink-soft">{outOf}</span>}
-      </td>
-      <td className="py-3 pl-6 text-right font-mono text-sm tabular text-ink-mid">{trailing}</td>
-    </tr>
-  );
-}
 
 // One of the judge's three paragraphs, with the label it came with. Sans
 // at the small step, sentence case, no colon — a label, not a field name.
@@ -139,6 +111,9 @@ export function Verdict({
   school,
   verdict,
   eloDelta,
+  eloAfter,
+  streak,
+  weekNumber,
   argument,
   isOwner,
   argumentPublic,
@@ -155,6 +130,12 @@ export function Verdict({
   school: SchoolId;
   verdict: VerdictData;
   eloDelta: number | null;
+  /** The rating this argument left the reader on. */
+  eloAfter?: number | null;
+  /** The owner's streak. Absent on someone else's verdict. */
+  streak?: number | null;
+  /** ISO week the argument was written in. */
+  weekNumber?: number | null;
   argument: string | null;
   isOwner: boolean;
   argumentPublic: boolean;
@@ -221,42 +202,76 @@ export function Verdict({
   }
 
   return (
-    <div>
-      <p className="text-sm text-ink-soft">Verdict</p>
-      <h1 className="mt-1 max-w-[60ch] font-serif text-lg font-medium leading-snug text-ink">
-        {motion}
-      </h1>
+    <div data-daily-path>
+      <div className="flex flex-wrap items-center gap-6">
+        {/* The composite out of 100. It is not one of the three criteria,
+            which is why it sits apart from them rather than as a fourth
+            row in the table below. */}
+        <div
+          className="chunky flex h-28 w-28 shrink-0 flex-col items-center justify-center rounded-full text-white"
+          style={{ ...shade(SCHOOL_CHUNKY[school].shade), background: SCHOOL_CHUNKY[school].bg }}
+        >
+          <span className="text-xs font-extrabold tracking-widest uppercase opacity-90">
+            Score
+          </span>
+          <span className="font-mono tabular text-xl font-extrabold leading-none">
+            {verdict.score ?? "\u2014"}
+          </span>
+        </div>
 
-      {/* Four axes, one table. Overall carries the ELO change beside it
-          because that is the only row the change belongs to. */}
-      <table className="mt-8 w-full max-w-[34rem] border-t border-rule">
-        <caption className="sr-only">
-          How this argument scored on each of the four axes
-        </caption>
-        <thead>
-          <tr className="border-b border-rule">
-            <th scope="col" className="py-2 text-left text-sm font-normal text-ink-soft">
-              Axis
-            </th>
-            <th scope="col" className="py-2 text-right text-sm font-normal text-ink-soft">
-              Score
-            </th>
-            <th scope="col" className="py-2 pl-6 text-right text-sm font-normal text-ink-soft">
-              ELO
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <AxisRow
-            label="Overall"
-            value={verdict.score}
-            trailing={eloDelta == null ? "—" : signed(eloDelta)}
-          />
-          <AxisRow label={`Fidelity to ${SCHOOL_LABEL[school]}`} value={verdict.fidelity} outOf=" / 10" />
-          <AxisRow label="Rigor" value={verdict.rigor} outOf=" / 10" />
-          <AxisRow label="Engagement" value={verdict.engagement} outOf=" / 10" />
-        </tbody>
-      </table>
+        <div className="min-w-0 flex-1">
+          {weekNumber != null && (
+            <p className="text-sm text-ink-mid">Week {weekNumber} &middot; verdict is in</p>
+          )}
+          <h1 className="mt-1 max-w-[34ch] text-xl font-extrabold leading-tight tracking-tight text-ink">
+            {verdict.verdict_line}
+          </h1>
+          <p className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-mid">
+            {eloDelta != null && eloAfter != null && (
+              <span>
+                Rating <span className="font-mono tabular text-ink">{signed(eloDelta)}</span>{" "}
+                &rarr; <span className="font-mono tabular text-ink">{eloAfter}</span>
+              </span>
+            )}
+            {streak != null && (
+              <span>
+                Streak &middot; Day <span className="font-mono tabular text-ink">{streak}</span>
+              </span>
+            )}
+          </p>
+        </div>
+      </div>
+
+      <p className="mt-6 max-w-[60ch] font-serif text-md leading-snug text-ink-mid">{motion}</p>
+
+      {/* Three criteria, not four. The table this replaces counted the
+          overall score as an axis, which is where the recurring "four
+          axes" in the mockups came from; judge.v2.md defines three and one
+          composite, and the composite is the circle above. */}
+      <section className="mt-10 border-t-2 border-rule pt-8">
+        <h2 className="text-lg font-extrabold tracking-tight text-ink">
+          How the judge scored you
+        </h2>
+        <ul className="mt-5 max-w-[40rem] space-y-4">
+          {JUDGE_AXES.map((axis) => {
+            const value = verdict[axis.key];
+            return (
+              <li
+                key={axis.key}
+                className="flex items-baseline justify-between gap-6 border-b border-rule pb-3"
+              >
+                <span className="text-base font-bold text-ink">{axis.label}</span>
+                {/* Fixed to one decimal so 8.0 and 6.5 line up in the
+                    column, which the table this replaces also did. */}
+                <span className="shrink-0 font-mono tabular text-base text-ink">
+                  {value == null ? "\u2014" : value.toFixed(1)}
+                  <span className="text-ink-mid"> / {AXIS_MAX}</span>
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
       <p className="mt-3 text-sm">
         <TextLink href="/debate/rubric">How this was judged</TextLink>
       </p>
@@ -266,11 +281,14 @@ export function Verdict({
           them the reader has to work out which paragraph is praise, which
           is the problem, and which is the instruction — information the
           judge already supplied. */}
-      <div className="mt-10 border-t border-rule pt-8">
-        <h2 className="max-w-[54ch] font-serif text-md font-medium leading-snug text-ink">
-          {verdict.verdict_line}
+      <div className="mt-10 border-t-2 border-rule pt-8">
+        {/* The one-line verdict is the page heading now, so it is not
+            repeated here; what follows is the judge's reading of the
+            argument, which is what this section was always for. */}
+        <h2 className="text-lg font-extrabold tracking-tight text-ink">
+          The judge&apos;s note
         </h2>
-        <div className="mt-8 space-y-6">
+        <div className="mt-6 space-y-6">
           <Reading label="Strongest move" body={verdict.strongest_move} />
           <Reading label="Weakest move" body={verdict.weakest_move} />
           <Reading label="A stronger version would" body={verdict.a_stronger_version_would} />
@@ -354,16 +372,22 @@ export function Verdict({
       </div>
 
       {afterLesson && (
-        <div className="mt-10 border-t border-rule pt-8">
+        <div className="mt-10 border-t-2 border-rule pt-8">
+          <h2 className="text-lg font-extrabold tracking-tight text-ink">Read next</h2>
           {showAfter ? (
-            <MicroLesson lesson={afterLesson} />
+            <div className="mt-6">
+              <MicroLesson lesson={afterLesson} />
+            </div>
           ) : (
+            /* The title rather than "read the objection again": a reader
+               who has just been handed an objection is being offered the
+               passage that answers it, and naming it says which one. */
             <button
               type="button"
               onClick={() => setShowAfter(true)}
-              className="font-mono text-xs text-ink-mid hover:text-ink underline underline-offset-4"
+              className="mt-3 inline-flex min-h-11 max-w-[48ch] items-center text-left font-serif text-md text-ink underline underline-offset-4 hover:text-ink-mid"
             >
-              Read the objection again
+              {afterLesson.title}
             </button>
           )}
         </div>
@@ -426,8 +450,13 @@ export function Verdict({
         </div>
       )}
 
-      <div className="mt-10 border-t border-rule pt-8">
+      <div className="mt-10 border-t-2 border-rule pt-8">
         <ShareRow debateId={debateId} topicSlug={topicSlug} score={verdict.score ?? 0} shareLine={shareLine} />
+        {isOwner && (
+          <p className="mt-6">
+            <TextLink href="/today">Back to today</TextLink>
+          </p>
+        )}
       </div>
 
       {isOwner && (

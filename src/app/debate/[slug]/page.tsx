@@ -74,7 +74,7 @@ export default async function DebateTopicPage({
   }
 
   return (
-    <Page width="read">
+    <Page width="ui">
       <DebateFlow
         topicSlug={topic.slug}
         motion={topic.motion}
