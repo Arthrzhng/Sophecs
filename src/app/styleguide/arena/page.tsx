@@ -10,6 +10,7 @@ import { ObjectionBrief } from "@/components/debate/ObjectionBrief";
 import { SchoolTable } from "@/components/table/SchoolTable";
 import { RatingChart } from "@/components/me/RatingChart";
 import { SharePage } from "@/components/share/SharePage";
+import { LiveReadingCheck, ReadingCheckFrame } from "./ReadingCheckPreview";
 import { countsOnTable, yourTableLine } from "@/lib/school-table";
 import {
   FIXTURE_ARGUMENT,
@@ -65,6 +66,9 @@ export default function ArenaPreviewPage() {
 
   const lesson = getMicroLesson("opaque-benefit-before");
   const afterLesson = getMicroLesson("opaque-benefit-after");
+  // Two real questions, so the player is reviewed against the copy it will
+  // actually hold rather than against something written to fit the box.
+  const check = lesson?.reading_check ?? [];
   const objection = FIXTURE_VERDICT.unanswered_objection ?? null;
 
   return (
@@ -351,6 +355,86 @@ export default function ArenaPreviewPage() {
           shareLineIndex={0}
         />
       </Section>
+
+      {/* Guarded rather than assumed: every before-lesson carries two
+          questions and a test enforces it, but a styleguide that 500s
+          because content moved is worse than one that shows less. */}
+      {check.length === 2 && (
+        <>
+        <p className="mt-12 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+          The lesson player. On the route it is a modal dialog over the whole
+          viewport, which cannot be shown four ways at once; these are the same
+          step in a frame. Section 21 opens the real one.
+        </p>
+
+        <Section title="18. Reading check: the question, nothing picked yet">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <ReadingCheckFrame
+              question={check[0]}
+              index={0}
+              total={check.length}
+              picked={null}
+              checked={false}
+              school="utilitarianism"
+            />
+            <ReadingCheckFrame
+              question={check[0]}
+              index={0}
+              total={check.length}
+              picked={1}
+              checked={false}
+              school="utilitarianism"
+            />
+          </div>
+        </Section>
+
+        <Section title="19. Reading check: checked right, and checked wrong">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <ReadingCheckFrame
+              question={check[0]}
+              index={0}
+              total={check.length}
+              picked={check[0].answer}
+              checked
+              school="utilitarianism"
+            />
+            <ReadingCheckFrame
+              question={check[0]}
+              index={0}
+              total={check.length}
+              picked={(check[0].answer + 1) % check[0].options.length}
+              checked
+              school="utilitarianism"
+            />
+          </div>
+        </Section>
+
+        <Section title="20. Reading check: the last question, where the button changes">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <ReadingCheckFrame
+              question={check[1]}
+              index={1}
+              total={check.length}
+              picked={null}
+              checked={false}
+              school="utilitarianism"
+            />
+            <ReadingCheckFrame
+              question={check[1]}
+              index={1}
+              total={check.length}
+              picked={(check[1].answer + 1) % check[1].options.length}
+              checked
+              school="utilitarianism"
+            />
+          </div>
+        </Section>
+
+        <Section title="21. Reading check: opened for real, over the site header" narrow>
+          <LiveReadingCheck check={check} school="utilitarianism" />
+        </Section>
+        </>
+      )}
     </Page>
   );
 }

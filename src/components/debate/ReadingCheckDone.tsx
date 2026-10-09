@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Celebration } from "@/components/daily-path/Celebration";
 import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 import { StatTile } from "@/components/daily-path/StatTile";
@@ -30,8 +31,18 @@ export function ReadingCheckDone({
   onArgue: () => void;
   onReadAgain: () => void;
 }) {
+  const root = useRef<HTMLDivElement>(null);
+
+  // The check was a modal dialog, and closing it leaves focus on the
+  // document body. Taking it here means a keyboard or screen-reader user
+  // arrives at the score rather than at the top of the page, and hears it:
+  // a focused container is read out, which is the whole of this screen.
+  useEffect(() => {
+    root.current?.focus();
+  }, []);
+
   return (
-    <div data-daily-path>
+    <div ref={root} tabIndex={-1} data-daily-path className="outline-none">
       <Celebration
         heading={HEADINGS[score] ?? HEADINGS[0]}
         tiles={

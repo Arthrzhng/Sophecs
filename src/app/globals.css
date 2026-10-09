@@ -175,8 +175,15 @@
   --color-virtue-deep: #52232b;
 
   /* Chunky radii. The existing scale is cleared by `--radius-*: initial`
-     above, so these are additions, not overrides: controls 14, cards 18,
-     the largest surfaces 22. */
+     above, so these are additions, not overrides: badges 10, controls 14,
+     cards 18, the largest surfaces 22, four steps of the same 4px.
+
+     10 exists because 14 does not work below about 40px. On the reading
+     check's 32px letter badge, 14 is within 2px of a full circle and the
+     badge stops reading as a square at all, which puts it in the path
+     node's idiom rather than the option row's. It is the smallest chunky
+     radius and nothing larger than a badge should use it. */
+  --radius-badge: 10px;
   --radius-chunky: 14px;
   --radius-card: 18px;
   --radius-panel: 22px;
