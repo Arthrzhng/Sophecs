@@ -44,9 +44,16 @@ export function AuthSlot() {
   const label = signedIn === false ? "Sign in" : "Me";
   const href = signedIn === false ? "/login" : "/me";
 
+  // A chunky control, as the landing mockup draws it. The reserved width
+  // still belongs on the wrapper rather than the button: the label swaps
+  // after hydration, and a button that changes width would move the header.
   return (
-    <span className="inline-flex min-w-[4.5rem] justify-end">
-      <Link href={href} className="text-sm text-ink-mid hover:text-ink">
+    <span className="inline-flex min-w-[6rem] justify-end">
+      <Link
+        href={href}
+        className="chunky inline-flex min-h-11 items-center rounded-chunky border-2 border-rule-strong bg-surface px-4 text-sm font-extrabold tracking-wide uppercase text-ink"
+        style={{ ["--sh" as string]: "var(--color-rule-strong)" }}
+      >
         {label}
       </Link>
     </span>

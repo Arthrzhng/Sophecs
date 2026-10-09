@@ -23,8 +23,10 @@ const JUDGE_MODEL = "claude-sonnet-5";
 function Column({ heading, children }: { heading: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="text-sm font-medium text-ink">{heading}</h2>
-      <ul className="mt-3 space-y-2 text-sm">{children}</ul>
+      <h2 className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
+        {heading}
+      </h2>
+      <ul className="mt-1 text-sm">{children}</ul>
     </div>
   );
 }
@@ -32,7 +34,10 @@ function Column({ heading, children }: { heading: string; children: React.ReactN
 function Row({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <li>
-      <Link href={href} className="text-ink-mid hover:text-ink">
+      <Link
+        href={href}
+        className="inline-flex min-h-11 items-center font-semibold text-ink-mid hover:text-ink"
+      >
         {children}
       </Link>
     </li>
@@ -40,9 +45,14 @@ function Row({ href, children }: { href: string; children: React.ReactNode }) {
 }
 
 // Session-free, so it renders inside the static acquisition routes.
+//
+// Stage 8 put it on the Daily path palette and Bricolage. Visual only:
+// every link, every destination and every word of the disclosure and the
+// privacy paragraph are unchanged, which is the whole point of touching a
+// footer that says what the product does with a teenager's data.
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t border-rule" data-print="hide">
+    <footer className="mt-auto border-t-2 border-rule" data-daily-path data-print="hide">
       <div className="mx-auto max-w-ui px-6 py-12">
         <p className="max-w-[54ch] text-sm leading-relaxed text-ink-mid">
           Sophecs is a philosophy tool for 15 to 18 year olds. Ten questions
@@ -67,8 +77,8 @@ export function SiteFooter() {
           </Column>
 
           <Column heading="About">
-            <li className="text-ink-mid">Made by {MADE_BY}</li>
-            <li className="text-ink-mid">{CONTACT}</li>
+            <li className="flex min-h-11 items-center text-ink-mid">Made by {MADE_BY}</li>
+            <li className="flex min-h-11 items-center text-ink-mid">{CONTACT}</li>
             <Row href="/method">How the judge works</Row>
             <Row href="/debate/rubric">The rubric</Row>
           </Column>
@@ -80,7 +90,7 @@ export function SiteFooter() {
           way to read the criteria, and the rubric page already exists and
           is public.
         */}
-        <div className="mt-10 border-t border-rule pt-6">
+        <div className="mt-10 border-t-2 border-rule pt-6">
           <p className="max-w-[60ch] text-sm leading-relaxed text-ink-soft">
             Arguments are scored by {JUDGE_MODEL}, an AI model made by Anthropic,
             against a published rubric. The model sees your argument, the
