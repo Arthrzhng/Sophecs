@@ -60,7 +60,7 @@ export function SchoolTable({
           <p className="mt-2 max-w-[60ch] text-base leading-relaxed text-ink-mid">
             How each school argued this week. Fidelity is the judge&apos;s 0&ndash;10 mark
             for arguing the way the school reasons, averaged across every judged
-            argument.
+            original argument.
           </p>
         </div>
         <span className="rounded-card border-2 border-rule bg-surface px-4 py-2 text-sm font-extrabold text-ink">

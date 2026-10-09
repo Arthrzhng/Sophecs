@@ -125,6 +125,28 @@ export function rankSchools(
   });
 }
 
+/**
+ * Whether one debate counts towards its school's row.
+ *
+ * Originals only, judged, and inside the week the table is showing. A
+ * revision is a second attempt at the same motion after feedback: it does
+ * not move the reader's rating, so it does not move their school's row
+ * either, and counting it would let one motion be argued twice.
+ *
+ * Shared by the table's query and the line on the verdict that reports it,
+ * so the two cannot say different things about the same argument.
+ */
+export function countsOnTable(
+  debate: { kind: string | null; rejected: boolean; createdAt: string | null },
+  now: Date = new Date()
+): boolean {
+  if (debate.kind !== "original" || debate.rejected || !debate.createdAt) return false;
+  const at = new Date(debate.createdAt).getTime();
+  if (!Number.isFinite(at)) return false;
+  const { start, end } = isoWeekRange(now);
+  return at >= start.getTime() && at < end.getTime();
+}
+
 /** §8's "Your line". `once` rather than "1 times". */
 export function yourTableLine(count: number, schoolName: string): string {
   if (count <= 0) return `You haven't argued for ${schoolName} this week yet.`;

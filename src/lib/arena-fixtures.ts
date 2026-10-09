@@ -179,6 +179,14 @@ export const FIXTURE_RATINGS_MANY = ratingByWeek([
   { created_at: "2026-10-07T10:00:00Z", elo_after: 1255 },
 ]);
 
+/**
+ * Eight weeks before now, so the verdict's table line is gated off by the
+ * week check rather than by a date that goes stale in the repository.
+ */
+export const FIXTURE_OLD_VERDICT_AT = new Date(
+  Date.now() - 56 * 86_400_000
+).toISOString();
+
 /** The first judged week. */
 export const FIXTURE_RATINGS_ONE = ratingByWeek([
   { created_at: "2026-10-07T10:00:00Z", elo_after: 1218 },

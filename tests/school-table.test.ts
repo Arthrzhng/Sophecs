@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  countsOnTable,
   isoWeekRange,
   joinedLeftLabel,
   rankSchools,
@@ -125,6 +126,43 @@ describe("yourTableLine", () => {
     expect(yourTableLine(0, "Stoicism")).toBe(
       "You haven't argued for Stoicism this week yet."
     );
+  });
+});
+
+describe("countsOnTable", () => {
+  // Friday of the ISO week that opens Monday 2026-10-05.
+  const now = new Date("2026-10-09T12:00:00Z");
+  const original = {
+    kind: "original",
+    rejected: false,
+    createdAt: "2026-10-07T10:00:00Z",
+  };
+
+  it("counts a judged original from this week", () => {
+    expect(countsOnTable(original, now)).toBe(true);
+  });
+
+  it("does not count a revision", () => {
+    expect(countsOnTable({ ...original, kind: "revision" }, now)).toBe(false);
+  });
+
+  it("does not count a rejected argument", () => {
+    expect(countsOnTable({ ...original, rejected: true }, now)).toBe(false);
+  });
+
+  it("does not count an older week, or the week after", () => {
+    expect(countsOnTable({ ...original, createdAt: "2026-10-04T23:59:59Z" }, now)).toBe(false);
+    expect(countsOnTable({ ...original, createdAt: "2026-10-12T00:00:00Z" }, now)).toBe(false);
+  });
+
+  it("does not count the same week number in a different year", () => {
+    expect(countsOnTable({ ...original, createdAt: "2025-10-07T10:00:00Z" }, now)).toBe(false);
+  });
+
+  it("does not count a row with no date, or an unreadable one", () => {
+    expect(countsOnTable({ ...original, createdAt: null }, now)).toBe(false);
+    expect(countsOnTable({ ...original, createdAt: "not a date" }, now)).toBe(false);
+    expect(countsOnTable({ ...original, kind: null }, now)).toBe(false);
   });
 });
 

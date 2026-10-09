@@ -66,6 +66,10 @@ export default async function SchoolTablePage() {
       admin
         .from("debates")
         .select("user_id, school, verdict")
+        // Originals only. A revision is a second attempt at the same
+        // motion after feedback and does not move the reader's rating, so
+        // it does not move their school's row either. See countsOnTable.
+        .eq("kind", "original")
         .eq("rejected", false)
         .not("verdict", "is", null)
         .gte("created_at", start.toISOString())

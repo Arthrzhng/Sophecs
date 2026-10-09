@@ -9,7 +9,7 @@ import { getSchool } from "@/lib/schools";
 import { ObjectionBrief } from "@/components/debate/ObjectionBrief";
 import { SchoolTable } from "@/components/table/SchoolTable";
 import { RatingChart } from "@/components/me/RatingChart";
-import { yourTableLine } from "@/lib/school-table";
+import { countsOnTable, yourTableLine } from "@/lib/school-table";
 import {
   FIXTURE_ARGUMENT,
   FIXTURE_MOTION,
@@ -20,6 +20,7 @@ import {
   FIXTURE_TABLE_EMPTY,
   FIXTURE_TABLE_ROWS,
   FIXTURE_TABLE_TIED,
+  FIXTURE_OLD_VERDICT_AT,
   FIXTURE_WEEK,
   fixtureTopics,
 } from "@/lib/arena-fixtures";
@@ -158,6 +159,68 @@ export default function ArenaPreviewPage() {
           />
         </Section>
       )}
+
+      {/* The table line is gated on countsOnTable: original, judged, and
+          inside the week the table is showing. Sections 5 and 6 cover a
+          qualifying original and a rejected one; these two cover the other
+          two ways to miss. */}
+      <Section title="7b. Verdict: a revision, which does not move the table">
+        <Verdict
+          debateId="preview-revision"
+          topicSlug="opaque-benefit"
+          motion={FIXTURE_MOTION}
+          school="stoicism"
+          verdict={FIXTURE_VERDICT}
+          eloDelta={null}
+          eloAfter={1218}
+          streak={3}
+          weekNumber={41}
+          tableContribution={
+            countsOnTable({
+              kind: "revision",
+              rejected: false,
+              createdAt: new Date().toISOString(),
+            })
+              ? 1
+              : null
+          }
+          argument={FIXTURE_ARGUMENT}
+          isOwner
+          argumentPublic
+          afterLesson={null}
+          showAfterLessonInitially={false}
+          shareLine=""
+        />
+      </Section>
+
+      <Section title="7c. Verdict: an older week, whose table has closed">
+        <Verdict
+          debateId="preview-old"
+          topicSlug="opaque-benefit"
+          motion={FIXTURE_MOTION}
+          school="stoicism"
+          verdict={FIXTURE_VERDICT}
+          eloDelta={12}
+          eloAfter={1206}
+          streak={0}
+          weekNumber={34}
+          tableContribution={
+            countsOnTable({
+              kind: "original",
+              rejected: false,
+              createdAt: FIXTURE_OLD_VERDICT_AT,
+            })
+              ? 1
+              : null
+          }
+          argument={FIXTURE_ARGUMENT}
+          isOwner
+          argumentPublic
+          afterLesson={null}
+          showAfterLessonInitially={false}
+          shareLine=""
+        />
+      </Section>
 
       <Section title="8. School table: a week with a clear order, your line argued">
         <SchoolTable
