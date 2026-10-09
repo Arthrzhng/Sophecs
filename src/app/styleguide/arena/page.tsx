@@ -13,6 +13,7 @@ import { SharePage } from "@/components/share/SharePage";
 import { LiveReadingCheck, ReadingCheckFrame } from "./ReadingCheckPreview";
 import { StreakCard, SchoolCard } from "@/components/today/TodayCards";
 import { LessonsCard, type LessonsCardModule } from "@/components/today/LessonsCard";
+import { StreakBlock } from "@/components/me/StreakBlock";
 import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
 import { SCHOOL_IDS } from "@/lib/types";
@@ -473,8 +474,9 @@ export default function ArenaPreviewPage() {
       <Section title="23. Streak: never started, and gone stale">
         <TodayCards>
           <StreakCard streak={0} streakUpdatedOn={null} today={today} paused={false} />
-          {/* Four days, last extended on Monday. Nothing is lit: the run
-              ended before yesterday, so the stored number is a leftover. */}
+          {/* profiles.streak still says 4, last extended on Monday. The run
+              ended before yesterday, so the card shows 0 and lights
+              nothing. The stored value is untouched. */}
           <StreakCard streak={4} streakUpdatedOn="2026-10-05" today={today} paused={false} />
         </TodayCards>
       </Section>
@@ -504,7 +506,21 @@ export default function ArenaPreviewPage() {
         </TodayCards>
       </Section>
 
-      <Section title="26. Lessons card: not started, part read, and all three read">
+      <Section title="26. Profile streak: live, and the same stored 4 gone stale">
+        {/* No data-daily-path here: /me has not been redrawn yet, so this
+            is the block as that route renders it today. */}
+        <TodayCards dailyPath={false}>
+          <StreakBlock streak={4} streakUpdatedOn="2026-10-06" today={today} />
+          <StreakBlock streak={4} streakUpdatedOn="2026-10-05" today={today} />
+        </TodayCards>
+        <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+          Both have a stored streak of 4. The second was last extended on
+          Monday, so by Wednesday the run is over and the block says so.
+          Nothing is written either way.
+        </p>
+      </Section>
+
+      <Section title="27. Lessons card: not started, part read, and all three read">
         <TodayCards>
           <LessonsCard modules={modules} />
           <LessonsCard modules={[]} />
@@ -523,9 +539,16 @@ export default function ArenaPreviewPage() {
 // The sidebar's own width, so a card fixture wraps where the real card
 // wraps. Two to a row on a wide screen only because the page is wide; the
 // real sidebar stacks them.
-function TodayCards({ children }: { children: React.ReactNode }) {
+function TodayCards({
+  children,
+  dailyPath = true,
+}: {
+  children: React.ReactNode;
+  /** False for a component on a route the restyle has not reached yet. */
+  dailyPath?: boolean;
+}) {
   return (
-    <div data-daily-path className="flex flex-wrap gap-6">
+    <div data-daily-path={dailyPath || undefined} className="flex flex-wrap gap-6">
       {Array.isArray(children)
         ? children.map((child, i) => (
             <div key={i} className="w-full max-w-sm">

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { streakDayLabel, streakWeek } from "../src/lib/streak-week";
+import { liveStreak, streakDayLabel, streakWeek } from "../src/lib/streak-week";
 
 // 2026-10-07 is a Wednesday. 2026-10-05 is the Monday of its ISO week and
 // 2026-10-11 the Sunday, which is the span every case below is read against.
@@ -81,5 +81,60 @@ describe("streakDayLabel", () => {
     const week = streakWeek(3, WEDNESDAY, WEDNESDAY);
     expect(streakDayLabel(week[0])).toBe("Monday, streak day");
     expect(streakDayLabel(week[3])).toBe("Thursday");
+  });
+});
+
+// The number on Today and on /me reads through this, so a lapsed run shows
+// 0 rather than the count the judge last wrote. The stored value is never
+// changed; only what is shown is.
+describe("liveStreak", () => {
+  it("is the stored count while the run is live", () => {
+    expect(liveStreak(4, WEDNESDAY, WEDNESDAY)).toBe(4);
+    expect(liveStreak(4, "2026-10-06", WEDNESDAY)).toBe(4);
+    expect(liveStreak(1, WEDNESDAY, WEDNESDAY)).toBe(1);
+  });
+
+  it("is 0 once the run ended before yesterday", () => {
+    expect(liveStreak(4, "2026-10-05", WEDNESDAY)).toBe(0);
+    expect(liveStreak(400, "2025-01-01", WEDNESDAY)).toBe(0);
+  });
+
+  it("is 0 for a streak nobody has started", () => {
+    expect(liveStreak(0, null, WEDNESDAY)).toBe(0);
+    expect(liveStreak(0, WEDNESDAY, WEDNESDAY)).toBe(0);
+  });
+
+  it("is 0 for a count with no day attached, and for a day with no count", () => {
+    expect(liveStreak(3, null, WEDNESDAY)).toBe(0);
+    expect(liveStreak(-1, WEDNESDAY, WEDNESDAY)).toBe(0);
+  });
+
+  it("is 0 for a date in the future or one that will not parse", () => {
+    expect(liveStreak(3, "2026-10-09", WEDNESDAY)).toBe(0);
+    expect(liveStreak(3, "not-a-date", WEDNESDAY)).toBe(0);
+  });
+
+  // The number and the circles are one rule, so they cannot disagree: a
+  // week with nothing lit is never shown beside a number above zero.
+  it("agrees with the strip in every case the strip is tested on", () => {
+    const cases: [number, string | null, string][] = [
+      [3, WEDNESDAY, WEDNESDAY],
+      [2, "2026-10-06", WEDNESDAY],
+      [0, null, WEDNESDAY],
+      [4, "2026-10-05", WEDNESDAY],
+      [3, "2026-10-09", WEDNESDAY],
+      [5, "2026-10-04", "2026-10-05"],
+      [7, "2026-10-11", "2026-10-11"],
+    ];
+    for (const [streak, updatedOn, today] of cases) {
+      const anyLit = streakWeek(streak, updatedOn, today).some((d) => d.lit);
+      const shown = liveStreak(streak, updatedOn, today);
+      // The one direction that must hold: a lit day means a live number.
+      // The reverse does not, and the Monday case is why.
+      if (anyLit) expect(shown, `${streak}/${updatedOn}/${today}`).toBeGreaterThan(0);
+    }
+    // Monday after a live run: the number stands, the week is empty.
+    expect(liveStreak(5, "2026-10-04", "2026-10-05")).toBe(5);
+    expect(streakWeek(5, "2026-10-04", "2026-10-05").some((d) => d.lit)).toBe(false);
   });
 });

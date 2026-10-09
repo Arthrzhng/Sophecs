@@ -20,6 +20,7 @@ import { StreakBlock } from "@/components/me/StreakBlock";
 import { RatingChart } from "@/components/me/RatingChart";
 import { PendingChallenges } from "@/components/me/PendingChallenges";
 import { SCHOOL_ADHERENT, SCHOOL_COLORS } from "@/lib/school-colors";
+import { todayUTC } from "@/lib/streak";
 import type { SchoolId } from "@/lib/types";
 import { Page } from "@/components/layout/Page";
 
@@ -30,6 +31,9 @@ interface ProfileRow {
   school: SchoolId | null;
   elo: number;
   streak: number;
+  // The judge writes both. The number alone cannot say whether the run is
+  // still going, which is why the block reads them together.
+  streak_updated_on: string | null;
 }
 
 interface DebateHistoryRow {
@@ -59,13 +63,14 @@ export default async function MePage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, school, elo, streak")
+    .select("display_name, school, elo, streak, streak_updated_on")
     .eq("id", user.id)
     .maybeSingle<ProfileRow>();
 
   const school = profile?.school ?? null;
   const elo = profile?.elo ?? 1200;
   const streak = profile?.streak ?? 0;
+  const streakUpdatedOn = profile?.streak_updated_on ?? null;
   const method = user.app_metadata?.provider === "google" ? "google" : "magic";
 
   // quiz_results' RLS only allows anon_id-header reads, not auth.uid() —
@@ -260,7 +265,11 @@ export default async function MePage({
         {school && (
           <div className="mt-10 border-t border-rule pt-8 grid grid-cols-2 gap-6">
             <EloBlock elo={elo} percentile={percentile} />
-            <StreakBlock streak={streak} />
+            <StreakBlock
+              streak={streak}
+              streakUpdatedOn={streakUpdatedOn}
+              today={todayUTC()}
+            />
           </div>
         )}
 

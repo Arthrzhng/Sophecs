@@ -40,32 +40,53 @@ function dayString(ms: number): string {
 }
 
 /**
+ * The streak as it stands today: the stored count, or 0 once the run has
+ * ended.
+ *
+ * Stored numbers go stale. The count is written opportunistically at judge
+ * time and nothing clears it when a day is missed, so a reader who last
+ * argued on Tuesday still carries `streak: 4` on Friday. A run is live only
+ * if it was last extended today or yesterday; past that it is over, and a
+ * screen showing 4 is reporting a streak the reader does not have.
+ *
+ * Display only. The stored value is the judge's and is not touched here:
+ * `applyStreakDay` in streak.ts resets it the next time a qualifying
+ * argument lands, which is the only thing that may write it.
+ *
+ * Every screen that shows the number reads it through this, and so does
+ * the week strip below, so the number and the circles cannot disagree.
+ */
+export function liveStreak(
+  streak: number,
+  streakUpdatedOn: string | null,
+  today: string
+): number {
+  if (!streakUpdatedOn || streak <= 0) return 0;
+
+  const end = Date.parse(`${streakUpdatedOn}T00:00:00Z`);
+  const now = Date.parse(`${today}T00:00:00Z`);
+  if (!Number.isFinite(end) || !Number.isFinite(now)) return 0;
+
+  // Today or yesterday, and nothing else. A date in the future is bad data
+  // rather than a streak, and it fails this the same way a stale one does.
+  const gap = Math.round((now - end) / DAY);
+  return gap === 0 || gap === 1 ? streak : 0;
+}
+
+/**
  * The dates of the run, as far back as a week of circles could show.
  *
- * A streak is only live if it was last extended today or yesterday. Stored
- * numbers go stale: the count is written opportunistically at judge time
- * and nothing clears it when a day is missed, so a reader who last argued
- * on Tuesday still has `streak: 4` on Friday. Lighting four circles for it
- * would be the display inventing a run that has already ended.
- *
- * Seven steps back is always enough, because the run ends today or
+ * Seven steps back is always enough, because a live run ends today or
  * yesterday and the strip is seven days wide: anything further back falls
  * outside the week whatever the stored count says.
  */
 function runDates(streak: number, streakUpdatedOn: string | null, today: string): Set<string> {
   const dates = new Set<string>();
-  if (!streakUpdatedOn || streak <= 0) return dates;
+  const live = liveStreak(streak, streakUpdatedOn, today);
+  if (live === 0) return dates;
 
-  const end = Date.parse(`${streakUpdatedOn}T00:00:00Z`);
-  const now = Date.parse(`${today}T00:00:00Z`);
-  if (!Number.isFinite(end) || !Number.isFinite(now)) return dates;
-
-  // Today or yesterday, and nothing else. A date in the future is bad data
-  // rather than a streak, and it fails this the same way a stale one does.
-  const gap = Math.round((now - end) / DAY);
-  if (gap !== 0 && gap !== 1) return dates;
-
-  for (let i = 0; i < Math.min(streak, 7); i += 1) dates.add(dayString(end - i * DAY));
+  const end = Date.parse(`${streakUpdatedOn as string}T00:00:00Z`);
+  for (let i = 0; i < Math.min(live, 7); i += 1) dates.add(dayString(end - i * DAY));
   return dates;
 }
 

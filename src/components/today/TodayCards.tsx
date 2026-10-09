@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import { streakLine, STREAK_PAUSED_LINE } from "@/lib/streak-copy";
-import { streakDayLabel, streakWeek } from "@/lib/streak-week";
+import { liveStreak, streakDayLabel, streakWeek } from "@/lib/streak-week";
 import type { SchoolId } from "@/lib/types";
 
 function Card({ children }: { children: React.ReactNode }) {
@@ -79,6 +79,7 @@ export function StreakCard({
   today,
   paused,
 }: {
+  /** profiles.streak, as the judge last wrote it. Shown through liveStreak. */
   streak: number;
   /** profiles.streak_updated_on, a UTC date, or null. */
   streakUpdatedOn: string | null;
@@ -86,6 +87,10 @@ export function StreakCard({
   today: string;
   paused: boolean;
 }) {
+  // A run that ended before yesterday reads 0, here and on /me, by the same
+  // rule that leaves the week empty. A flame over a 4 above seven unlit
+  // circles was the display reporting a streak the reader no longer has.
+  const shown = liveStreak(streak, streakUpdatedOn, today);
   return (
     <Card>
       <Eyebrow>Streak</Eyebrow>
@@ -93,18 +98,18 @@ export function StreakCard({
         <>
           <p className="mt-3 flex items-center gap-3">
             <span
-              className={streak > 0 ? "flick inline-flex" : "inline-flex"}
-              style={{ color: streak > 0 ? "var(--color-streak)" : "var(--color-rule-strong)" }}
+              className={shown > 0 ? "flick inline-flex" : "inline-flex"}
+              style={{ color: shown > 0 ? "var(--color-streak)" : "var(--color-rule-strong)" }}
             >
               <Flame />
             </span>
-            <span className="font-mono tabular text-xl font-extrabold text-ink">{streak}</span>
+            <span className="font-mono tabular text-xl font-extrabold text-ink">{shown}</span>
           </p>
           <StreakStrip streak={streak} streakUpdatedOn={streakUpdatedOn} today={today} />
         </>
       )}
       <p className="mt-3 max-w-[34ch] text-sm leading-relaxed text-ink-mid">
-        {paused ? STREAK_PAUSED_LINE : streakLine(streak)}
+        {paused ? STREAK_PAUSED_LINE : streakLine(shown)}
       </p>
     </Card>
   );
