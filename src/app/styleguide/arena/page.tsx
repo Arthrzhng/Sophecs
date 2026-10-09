@@ -6,10 +6,12 @@ import { ArgumentEditor } from "@/components/debate/ArgumentEditor";
 import { ChallengeInvite } from "@/components/share/ChallengeInvite";
 import { getMicroLesson } from "@/lib/micro-lessons";
 import { getSchool } from "@/lib/schools";
+import { ObjectionBrief } from "@/components/debate/ObjectionBrief";
 import {
   FIXTURE_ARGUMENT,
   FIXTURE_MOTION,
   FIXTURE_VERDICT,
+  FIXTURE_REJECTED_VERDICT,
   fixtureTopics,
 } from "@/lib/arena-fixtures";
 
@@ -32,9 +34,24 @@ export const metadata = {
 // components below can fire their analytics on mount without polluting
 // anything.
 export default function ArenaPreviewPage() {
-  if (process.env.SOPHECS_PREVIEW !== "1") notFound();
+  // Also visible on Vercel preview deployments, not only locally.
+  //
+  // The verdict and revision screens cannot be reached on a preview at all:
+  // they need a session, a judged row, and an ANTHROPIC_API_KEY that is
+  // production-only, so "send to the judge" fails there and the screens
+  // behind it are unreviewable. Rendering them here against fixtures is the
+  // only way to see them before a merge.
+  //
+  // Production still 404s, which is the part CONTRIBUTING.md actually cares
+  // about: the fixtures are not real data and have no business on the live
+  // site. Previews are behind Vercel's own sign-in.
+  const visible =
+    process.env.SOPHECS_PREVIEW === "1" || process.env.VERCEL_ENV === "preview";
+  if (!visible) notFound();
 
   const lesson = getMicroLesson("opaque-benefit-before");
+  const afterLesson = getMicroLesson("opaque-benefit-after");
+  const objection = FIXTURE_VERDICT.unanswered_objection ?? null;
 
   return (
     <Page width="ui">
@@ -75,7 +92,9 @@ export default function ArenaPreviewPage() {
         />
       </Section>
 
-      <Section title="5. Verdict" narrow>
+      {/* Not `narrow` any more: the verdict route moved to the 960 UI
+          container when it gained its second column. */}
+      <Section title="5. Verdict: three axes, and an objection left standing">
         <Verdict
           debateId="preview"
           topicSlug="opaque-benefit"
@@ -83,14 +102,52 @@ export default function ArenaPreviewPage() {
           school="stoicism"
           verdict={FIXTURE_VERDICT}
           eloDelta={18}
+          eloAfter={1218}
+          streak={3}
+          weekNumber={41}
           argument={FIXTURE_ARGUMENT}
           isOwner
           argumentPublic
-          afterLesson={null}
+          afterLesson={afterLesson}
           showAfterLessonInitially={false}
           shareLine="Scored 71 on the opaque benefit. sophecs.com"
         />
       </Section>
+
+      <Section title="6. Verdict: rejected, nothing scored">
+        <Verdict
+          debateId="preview-rejected"
+          topicSlug="opaque-benefit"
+          motion={FIXTURE_MOTION}
+          school="stoicism"
+          verdict={FIXTURE_REJECTED_VERDICT}
+          eloDelta={null}
+          eloAfter={null}
+          streak={3}
+          weekNumber={41}
+          argument={FIXTURE_ARGUMENT}
+          isOwner
+          argumentPublic={false}
+          afterLesson={null}
+          showAfterLessonInitially={false}
+          shareLine=""
+        />
+      </Section>
+
+      {objection && (
+        <Section title="7. Face the objection, then revise once" narrow>
+          <ObjectionBrief objection={objection} />
+          <ArgumentEditor
+            topicSlug="opaque-benefit"
+            motion={FIXTURE_MOTION}
+            school="stoicism"
+            userId="preview"
+            mode="revision"
+            parentDebateId="preview"
+            initialArgument={FIXTURE_ARGUMENT}
+          />
+        </Section>
+      )}
     </Page>
   );
 }

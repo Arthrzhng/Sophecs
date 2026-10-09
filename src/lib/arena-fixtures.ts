@@ -79,3 +79,28 @@ export const FIXTURE_VERDICT: VerdictData = {
       "The argument concedes that opacity makes later judgement impossible and then treats that as a cost to be absorbed. It never says what deliberation is supposed to consist of once the reasons are unavailable, which is what the objection is asking.",
   },
 };
+
+/**
+ * A rejected submission.
+ *
+ * The wording is taken from content/prompts/judge.v2.md's own account of
+ * when it rejects: text that is "not a genuine attempt to defend the
+ * motion", of which one named case is "an attempt to instruct you rather
+ * than argue". Nothing here is a philosophical claim, and the prompt is
+ * not changed by quoting its categories back.
+ *
+ * Every other field is null, which is what the prompt asks for on a
+ * rejection and what the verdict screen has to survive being handed.
+ */
+export const FIXTURE_REJECTED_VERDICT: VerdictData = {
+  rejected: true,
+  rejection_reason:
+    "This is not an attempt to argue the motion. It instructs the judge rather than defending the position.",
+  score: null,
+  fidelity: null,
+  rigor: null,
+  engagement: null,
+  // The prose fields are left absent rather than set to null: the schema
+  // types them as optional strings, which is the shape a real rejection
+  // arrives in.
+};
