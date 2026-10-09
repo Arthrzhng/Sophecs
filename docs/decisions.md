@@ -761,6 +761,16 @@ The arena needs a session, rows in Supabase and an `ANTHROPIC_API_KEY` that is p
 
 The seven colour lines live in `@theme static` now, so every route shares one palette. `[data-daily-path]` still exists and still carries `--font-sans` and `--radius-control`: the routes not yet redrawn keep Plex Sans and their 6px controls, and take the warm paper and nothing else. The wrapper goes when the last of them is redrawn. `--color-ink-soft` and `--color-ink-mid` are one value now, site-wide, rather than two names for one colour on some routes and not others.
 
+### One saturated surface, and one sanctioned exception
+
+The result card is the product's only fully saturated surface. `design/tokens.md` §1 reserves `--*-surface` and `--on-saturated` for it and its OG and PNG renders, and says any other component referencing them is a bug. That still holds and nothing here touches those four tokens.
+
+The marker rule in the same section separately permits a filled card in a school's *marker* colour (`--color-stoic` and its two siblings). **Today's case card is the one place that is used, and it is the only sanctioned exception.** It earns it: the motion is the single thing that screen is about, the card is the reader's own school answering back, and there is nothing else on the page competing to be looked at first.
+
+`/s/[school]` was built with the same treatment during stage 13 and it was wrong. A filled school panel at the top of a public page read as a second result card, which cheapened the real one: the poster stops being a poster when every school page is already wearing it. That page now leads with the quotation in Spectral, ink on white, inside a card whose school colour is a 4px left edge. The edge is the marker rule's first form, widened from 2px because identifying the school is the whole job of that one surface.
+
+The test for a future filled card is not whether it looks good. It is whether that screen is about one school in the way Today is, and whether anything else on the page is asking to be looked at first.
+
 ### The card colours are frozen against the palette, on purpose
 
 `src/lib/card-tokens.ts` described itself as a mirror of `globals.css` that must be resynced whenever a token moves. Four of its values no longer mirror anything: `OG_PAPER`, `OG_INK`, `OG_INK_MID` and `OG_INK_SOFT` hold the pre-restyle colours. A shared image is not a page. Every link preview, saved card and favicon already sitting in a feed, a chat or a bookmark bar was rendered at those values, and matching the site would have recoloured all of them at once. `/opengraph-image`, `/icon` and `/apple-icon` hash to the same bytes either side of the promotion, which is how this was checked rather than argued. The school values in that file *are* still a mirror and must be kept in step.
