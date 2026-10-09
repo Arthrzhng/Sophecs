@@ -170,7 +170,7 @@ export default function DailyPathStyleguide() {
 
         <Section
           title="Check your reading"
-          note="One real question from the reading check. Pick an option and press Check. The result is carried by the heading, by the glyph shape (tick against cross) and by colour, so no one of them is load-bearing alone."
+          note="One real question in the lesson player, framed at phone height; the route opens the same step as a full-screen overlay. Pick an option and press Check. The result is carried by the heading, by the mark in the right-hand column (tick against cross), by the sentence under the heading and by colour, so no one of them is load-bearing alone. The X leaves without recording anything."
         >
           <InteractiveCheck />
         </Section>

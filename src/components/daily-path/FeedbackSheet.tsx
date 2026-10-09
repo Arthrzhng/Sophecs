@@ -19,7 +19,7 @@ function Cross() {
 }
 
 /**
- * The right/wrong panel that arrives from the bottom after an answer is
+ * The right/wrong bar that arrives from the bottom after an answer is
  * checked.
  *
  * Three things carry the result, so none of them is load-bearing alone: the
@@ -30,6 +30,12 @@ function Cross() {
  *
  * Blue for right rather than green: the only green in this product means
  * Stoicism.
+ *
+ * It positions nothing itself. In the lesson player it is the last child of
+ * a full-height column, so it lands at the bottom of the overlay without a
+ * `sticky` or a `fixed` of its own; the caller passes whatever placement it
+ * needs through `className`. Its content sits in the same 720px column the
+ * question above it does, while the band itself runs the full width.
  */
 export function FeedbackSheet({
   correct,
@@ -37,6 +43,7 @@ export function FeedbackSheet({
   body,
   extra,
   action,
+  className = "",
 }: {
   correct: boolean;
   heading: string;
@@ -44,6 +51,8 @@ export function FeedbackSheet({
   /** The "The right answer: ..." line, shown only on a wrong answer. */
   extra?: string;
   action: ReactNode;
+  /** Placement, from the caller. The bar has no position of its own. */
+  className?: string;
 }) {
   const tone = correct
     ? {
@@ -60,10 +69,15 @@ export function FeedbackSheet({
   return (
     <div
       role="status"
-      className="sheet sticky bottom-0 left-0 right-0 border-t-4 px-6 py-5"
+      className={`sheet @container w-full border-t-4 px-6 py-5 ${className}`}
       style={{ background: tone.bg, borderColor: tone.line }}
     >
-      <div className="mx-auto flex max-w-ui flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* A container query, not the sm: breakpoint: the bar goes side by
+          side when the bar is wide, which is what decides whether the text
+          and the button fit. The viewport does not, and a styleguide frame
+          640px wide inside a 1280px window would otherwise lay the bar out
+          as it never lays out at that size on a device. */}
+      <div className="mx-auto flex max-w-read flex-col gap-4 @min-[640px]:flex-row @min-[640px]:items-center @min-[640px]:justify-between">
         <div className="flex items-start gap-3">
           <span className="mt-0.5 shrink-0" style={{ color: tone.line }}>
             {correct ? <Tick /> : <Cross />}

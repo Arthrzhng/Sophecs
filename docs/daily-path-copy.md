@@ -67,24 +67,55 @@ like the reading drafts), holding the picks. No migration, no change to
 `reading_responses`. Cost: step 2 does not follow a reader across devices.
 If that matters later, it is one small table; not now.
 
+Nothing is written until both questions are answered. Leaving the player
+by the X or by Escape stores nothing, so an abandoned check is a check not
+taken rather than a half-finished one, and step 2 means what it says.
+
 The check gates nothing. A reader who gets both wrong can still argue.
+
+### The player
+
+A full-screen overlay, not a section of the page: a modal `<dialog>`, so it
+covers the site header, traps focus inside itself and leaves the page
+behind it inert. Three bands, and only the middle one scrolls.
+
+Top: the X, then the progress track alone. The count stays as the track's
+accessible name rather than being drawn, which is the one piece of copy here
+that only a screen reader gets.
+
+Middle: the question, then the three options. A row is 66px, with a 32px
+rounded-square letter badge on the left and a mark column on the right. The
+mark column holds a tick on the answer and a cross on a wrong pick, and
+keeps its width when empty so checking an answer never reflows the text.
+
+Foot: the feedback, full width.
+
+The passage stays its own earlier step and the progress stays labelled. Both
+are recorded decisions; see docs/decisions.md.
 
 ### Interface copy
 
 | Element | Copy |
 |---|---|
 | Step heading | `Check your reading` |
-| Progress label | `Question {n} of 2` |
+| Overlay, accessible name | `Check your reading` |
+| Leave button, accessible name (an X, no visible label) | `Leave lesson` |
+| Progress track, accessible name (not drawn) | `Question {n} of 2` |
 | Submit button (disabled until an option is picked) | `Check` |
-| Sheet heading, right | `Exactly.` |
-| Sheet heading, wrong | `Not quite.` |
-| Sheet body | the question's `right` or `wrong` text |
-| Sheet button, question 1 | `Next question` |
-| Sheet button, question 2 | `See how you did` |
+| Feedback heading, right | `Exactly.` |
+| Feedback heading, wrong | `Not quite.` |
+| Feedback body | the question's `right` or `wrong` text |
+| Feedback button, question 1 | `Next question` |
+| Feedback button, question 2 | `See how you did` |
 | Wrong answer, extra line under the body | `The right answer: {correct option}` |
+| Mark column, screen reader only, on the answer | `Correct answer` |
+| Mark column, screen reader only, on a wrong pick | `Your answer, wrong` |
 
-Screen reader: the sheet is announced with its heading, so the result is
-never colour or icon alone.
+Where the X and Escape go: `/today`. Not back to the passage, because the
+check is the step and a reader who stops mid-step has stopped for now.
+
+Screen reader: the feedback is announced with its heading, and each marked
+row names its mark, so the result is never colour or icon alone.
 
 ### Celebration
 

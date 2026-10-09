@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ReadingFlow } from "./ReadingFlow";
 import { ReadingCheck } from "./ReadingCheck";
 import { ReadingCheckDone } from "./ReadingCheckDone";
@@ -41,6 +42,7 @@ export function DebateFlow({
   isFirstArgument?: boolean;
   readingResponses: Record<number, string>;
 }) {
+  const router = useRouter();
   const check = microBefore?.reading_check ?? null;
   const [phase, setPhase] = useState<Phase>(microBefore ? "reading" : "editor");
   // Lifted out of ReadingFlow: a note written during the reading has to
@@ -84,46 +86,55 @@ export function DebateFlow({
   // ReadingFlow already extends to the typed notes.
   const alreadyChecked = isCheckComplete(picks);
 
-  if (phase === "reading" && microBefore) {
+  // The check is a modal overlay, so the reading stays mounted underneath
+  // it rather than being swapped out: an overlay over a blank page would
+  // flash that page for a frame before the dialog opened, and leaving the
+  // check by Escape would show it. It also keeps the passage's scroll
+  // position for a reader who comes back to it.
+  if (microBefore && (phase === "reading" || phase === "check")) {
     const next = check && !alreadyChecked ? "check" : "editor";
     return (
-      <ReadingFlow
-        lesson={microBefore}
-        topicSlug={topicSlug}
-        userId={userId}
-        responses={responses}
-        onResponse={(index, value) => setResponses((prev) => ({ ...prev, [index]: value }))}
-        action={
-          <ChunkyButton
-            school={school}
-            onClick={() => {
-              // Fires here, at the click that leaves the lesson, which is
-              // exactly where it fired before the check existed. The event
-              // means the reader finished the reading and moved on; that
-              // moment has not changed.
-              begin();
-              setPhase(next);
-            }}
-          >
-            {next === "check" ? "Check your reading" : "Argue the motion"}
-          </ChunkyButton>
-        }
-      />
-    );
-  }
+      <>
+        <ReadingFlow
+          lesson={microBefore}
+          topicSlug={topicSlug}
+          userId={userId}
+          responses={responses}
+          onResponse={(index, value) => setResponses((prev) => ({ ...prev, [index]: value }))}
+          action={
+            <ChunkyButton
+              school={school}
+              onClick={() => {
+                // Fires here, at the click that leaves the lesson, which is
+                // exactly where it fired before the check existed. The event
+                // means the reader finished the reading and moved on; that
+                // moment has not changed.
+                begin();
+                setPhase(next);
+              }}
+            >
+              {next === "check" ? "Check your reading" : "Argue the motion"}
+            </ChunkyButton>
+          }
+        />
 
-  if (phase === "check" && check) {
-    return (
-      <ReadingCheck
-        check={check}
-        topicSlug={topicSlug}
-        userId={userId}
-        school={school}
-        onDone={(final) => {
-          setPicks(final);
-          setPhase("done");
-        }}
-      />
+        {phase === "check" && check && (
+          <ReadingCheck
+            check={check}
+            topicSlug={topicSlug}
+            userId={userId}
+            school={school}
+            // The X and Escape leave for Today rather than closing back
+            // onto the lesson: the check is the step, and a reader who
+            // stops mid-step has stopped for now. Nothing is recorded.
+            onLeave={() => router.push("/today")}
+            onDone={(final) => {
+              setPicks(final);
+              setPhase("done");
+            }}
+          />
+        )}
+      </>
     );
   }
 
