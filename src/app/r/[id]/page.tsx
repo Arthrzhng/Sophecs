@@ -1,23 +1,11 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cookies, headers } from "next/headers";
-import { ResultCard } from "@/components/card/ResultCard";
-import { ShareSheet } from "@/components/share/ShareSheet";
-import { Page } from "@/components/layout/Page";
-import { TextLink } from "@/components/ui/TextLink";
-import { ChallengeButton } from "@/components/share/ChallengeButton";
-import { DebateThemButton } from "@/components/share/DebateThemButton";
 import { CardViewTracker } from "@/components/card/CardViewTracker";
+import { SharePage } from "@/components/share/SharePage";
 import { getSchool, pickShareLine } from "@/lib/schools";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
-import { SCHOOL_COLORS } from "@/lib/school-colors";
-import type { QuizResultRow, SchoolId } from "@/lib/types";
-import { ButtonLink } from "@/components/ui/Button";
-
-function schoolDisplayName(id: SchoolId): string {
-  return SCHOOL_COLORS[id].name;
-}
+import type { QuizResultRow } from "@/lib/types";
 
 export const revalidate = 86400; // s-maxage=86400 — result rows never change
 
@@ -127,117 +115,25 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
   const { text: shareLine, index: shareLineIndex } = pickShareLine(result.school, result.id);
   const showDebateThem = Boolean(challengeInfo && challengeInfo.status !== "complete");
 
-  // A cold recipient — not the owner, no challenge in play — gets the card
-  // and one action. Everything else on this page is for someone who already
-  // has a result of their own; showing a stranger four competing next steps
-  // is how a shared link stops converting.
-  const coldRecipient = !isOwner && !showDebateThem && !otherResult;
 
   return (
-    <Page width="read">
+    <>
       <CardViewTracker resultId={id} school={result.school} isOwner={isOwner} referrer={referrer} />
-
-      <p className="text-sm text-ink-soft">
-        {isOwner ? "Your school" : "Someone shared their result"}
-        {isSavedToProfile && " · saved to your profile"}
-      </p>
-
-      <div className="mt-4">
-        <ResultCard
-          school={result.school}
-          oneLine={school.one_line}
-          oneLineAttribution={school.one_line_attribution}
-        />
-      </div>
-
-      {coldRecipient ? (
-        <div className="mt-8">
-          <Link
-            href="/"
-            className="inline-flex min-h-11 items-center justify-center rounded-control border border-ink bg-ink px-5 text-sm font-medium text-paper hover:border-ink-mid hover:bg-ink-mid"
-          >
-            Take the quiz
-          </Link>
-          <p className="mt-4 max-w-[54ch] text-sm leading-relaxed text-ink-mid">
-            Ten questions on how AI should decide things. No account needed,
-            about eighty seconds.
-          </p>
-        </div>
-      ) : (
-        <>
-          {/* Percentages live here and nowhere else: beside a second result,
-              where a three-way split is a comparison rather than decoration. */}
-          {otherResult && (
-            <div className="mt-8 grid grid-cols-2 gap-6 border-t border-rule pt-6">
-              <VectorColumn label="This result" vector={result.vector} />
-              <VectorColumn label="Whoever sent it" vector={otherResult.vector} />
-            </div>
-          )}
-
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            {showDebateThem && (
-              <DebateThemButton
-                challengeId={challengeInfo!.challengeId}
-                resultId={id}
-                isSignedIn={Boolean(user)}
-              />
-            )}
-            <ChallengeButton
-              resultId={id}
-              school={result.school}
-              variant={showDebateThem ? "secondary" : "primary"}
-            />
-          </div>
-
-          <div className="mt-6">
-            <ShareSheet
-              resultId={id}
-              school={result.school}
-              shareLine={shareLine}
-              shareLineIndex={shareLineIndex}
-            />
-          </div>
-
-          <section className="mt-12 border-t border-rule pt-8">
-            <h2 className="font-serif text-lg font-medium text-ink">Now defend it</h2>
-            <p className="mt-3 max-w-[54ch] text-sm leading-relaxed text-ink-mid">
-              A result is a starting position, not a verdict. Take a motion and
-              defend it — you are scored on how faithfully you argue from{" "}
-              {schoolDisplayName(result.school)}, not on whether we agree.
-            </p>
-            <div className="mt-5 flex flex-wrap items-center gap-4">
-              <ButtonLink variant="secondary"
-                href="/debate"
-              >
-                Take a motion
-              </ButtonLink>
-              <TextLink href={`/s/${result.school}`} className="text-sm">
-                Read the case for {schoolDisplayName(result.school)}
-              </TextLink>
-              <TextLink href="/lessons" className="text-sm">
-                Read the lessons
-              </TextLink>
-            </div>
-          </section>
-        </>
-      )}
-    </Page>
-  );
-}
-
-function VectorColumn({ label, vector }: { label: string; vector: QuizResultRow["vector"] }) {
-  const order: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
-  return (
-    <div>
-      <p className="mb-2 text-sm text-ink-soft">{label}</p>
-      <dl className="space-y-1 text-sm">
-        {order.map((id) => (
-          <div key={id} className="flex justify-between gap-4">
-            <dt className="text-ink-mid">{schoolDisplayName(id)}</dt>
-            <dd className="font-mono tabular text-ink">{Math.round(vector[id] * 100)}%</dd>
-          </div>
-        ))}
-      </dl>
-    </div>
+      <SharePage
+        resultId={id}
+        school={result.school}
+        oneLine={school.one_line}
+        oneLineAttribution={school.one_line_attribution}
+        vector={result.vector}
+        otherVector={otherResult?.vector ?? null}
+        isOwner={isOwner}
+        isSavedToProfile={isSavedToProfile}
+        showDebateThem={showDebateThem}
+        challengeId={challengeInfo?.challengeId ?? null}
+        isSignedIn={Boolean(user)}
+        shareLine={shareLine}
+        shareLineIndex={shareLineIndex}
+      />
+    </>
   );
 }

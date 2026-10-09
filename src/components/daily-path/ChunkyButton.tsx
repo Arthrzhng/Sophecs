@@ -54,11 +54,16 @@ function toneStyles(tone: ChunkyTone, school?: SchoolId) {
 export interface ChunkyButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   tone?: ChunkyTone;
   school?: SchoolId;
+  loading?: boolean;
+  /** Replaces the label while `loading`. Defaults to the label itself. */
+  loadingLabel?: string;
 }
 
 export function ChunkyButton({
   tone = "school",
   school,
+  loading = false,
+  loadingLabel,
   className = "",
   children,
   disabled,
@@ -67,19 +72,25 @@ export function ChunkyButton({
   // A disabled primary keeps the chunky edge but drops to the inert shade,
   // which is how the mockups show "Check" before an option is picked: still
   // clearly a button, visibly not yet usable.
-  const { cls, style } = disabled
+  const inert = disabled || loading;
+  const { cls, style } = inert
     ? { cls: "bg-rule text-ink-soft", style: shade("var(--color-rule-strong)") }
     : toneStyles(tone, school);
 
   return (
     <button
       type="button"
-      disabled={disabled}
+      // A loading button stays focusable and keeps its accessible name; it
+      // is `aria-busy` rather than removed from the tree, so a screen
+      // reader that was on it does not lose its place. Same contract as the
+      // old Button, which this replaces one surface at a time.
+      aria-busy={loading || undefined}
+      disabled={inert}
       style={style}
       className={`${SHAPE} ${cls} ${className}`}
       {...props}
     >
-      {children}
+      {loading ? loadingLabel ?? children : children}
     </button>
   );
 }

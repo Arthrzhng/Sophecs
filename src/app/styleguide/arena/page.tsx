@@ -9,6 +9,7 @@ import { getSchool } from "@/lib/schools";
 import { ObjectionBrief } from "@/components/debate/ObjectionBrief";
 import { SchoolTable } from "@/components/table/SchoolTable";
 import { RatingChart } from "@/components/me/RatingChart";
+import { SharePage } from "@/components/share/SharePage";
 import { countsOnTable, yourTableLine } from "@/lib/school-table";
 import {
   FIXTURE_ARGUMENT,
@@ -21,6 +22,9 @@ import {
   FIXTURE_TABLE_ROWS,
   FIXTURE_TABLE_TIED,
   FIXTURE_OLD_VERDICT_AT,
+  FIXTURE_OTHER_VECTOR,
+  FIXTURE_RESULT_ID,
+  FIXTURE_VECTOR,
   FIXTURE_WEEK,
   fixtureTopics,
 } from "@/lib/arena-fixtures";
@@ -289,6 +293,63 @@ export default function ArenaPreviewPage() {
           <RatingChart points={FIXTURE_RATINGS_ONE} id="chart-one" />
           <RatingChart points={[]} id="chart-empty" />
         </div>
+      </Section>
+
+      {/* /r/[id] is the share target and the most-visited page in the
+          product, and it renders nowhere without Supabase. These are its
+          three shapes. The card inside them is deliberately unchanged. */}
+      <Section title="15. Shared result: a cold recipient" narrow>
+        <SharePage
+          resultId={FIXTURE_RESULT_ID}
+          school="stoicism"
+          oneLine={getSchool("stoicism").one_line}
+          oneLineAttribution={getSchool("stoicism").one_line_attribution}
+          vector={FIXTURE_VECTOR}
+          otherVector={null}
+          isOwner={false}
+          isSavedToProfile={false}
+          showDebateThem={false}
+          challengeId={null}
+          isSignedIn={false}
+          shareLine="Scored 71 on the opaque benefit. sophecs.com"
+          shareLineIndex={0}
+        />
+      </Section>
+
+      <Section title="16. Shared result: your own, saved to your profile" narrow>
+        <SharePage
+          resultId={FIXTURE_RESULT_ID}
+          school="utilitarianism"
+          oneLine={getSchool("utilitarianism").one_line}
+          oneLineAttribution={getSchool("utilitarianism").one_line_attribution}
+          vector={FIXTURE_VECTOR}
+          otherVector={null}
+          isOwner
+          isSavedToProfile
+          showDebateThem={false}
+          challengeId={null}
+          isSignedIn
+          shareLine="Scored 71 on the opaque benefit. sophecs.com"
+          shareLineIndex={0}
+        />
+      </Section>
+
+      <Section title="17. Shared result: a challenge, both sides present" narrow>
+        <SharePage
+          resultId={FIXTURE_RESULT_ID}
+          school="virtue-ethics"
+          oneLine={getSchool("virtue-ethics").one_line}
+          oneLineAttribution={getSchool("virtue-ethics").one_line_attribution}
+          vector={FIXTURE_VECTOR}
+          otherVector={FIXTURE_OTHER_VECTOR}
+          isOwner={false}
+          isSavedToProfile={false}
+          showDebateThem
+          challengeId="preview-challenge"
+          isSignedIn
+          shareLine="Scored 71 on the opaque benefit. sophecs.com"
+          shareLineIndex={0}
+        />
       </Section>
     </Page>
   );

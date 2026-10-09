@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Button, type ButtonVariant } from "@/components/ui/Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
+
+/** Kept so callers read the same as before; mapped onto a chunky tone. */
+export type ButtonVariant = "primary" | "secondary";
 import { createChallenge } from "@/app/actions";
 import { track } from "@/lib/analytics/client";
 import type { SchoolId } from "@/lib/types";
@@ -50,13 +53,14 @@ export function ChallengeButton({
   // takes that role, and this drops to the bordered style rather than
   // disappearing — the challenge link is still the main way a result travels.
   return (
-    <Button
-      variant={variant}
+    <ChunkyButton
+      tone={variant === "primary" ? "school" : "paper"}
+      school={school}
       onClick={handleClick}
       loading={state === "loading"}
       loadingLabel="Creating…"
     >
       {state === "ready" ? (copied ? "Copied" : "Copy challenge link") : "Challenge a friend"}
-    </Button>
+    </ChunkyButton>
   );
 }
