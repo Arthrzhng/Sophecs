@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/quiz", label: "Quiz" },
   { href: "/debate", label: "Debate" },
   { href: "/lessons", label: "Lessons" },
+  { href: "/table", label: "School table" },
 ];
 
 function useActive(pathname: string) {

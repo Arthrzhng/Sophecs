@@ -178,6 +178,9 @@ export default async function VerdictPage({
         eloAfter={publicRow.elo_after == null ? null : Math.round(Number(publicRow.elo_after))}
         streak={streak}
         weekNumber={weekNumber}
+        // One: a judged argument adds itself to its school's row on the
+        // table. A rejected one adds nothing, and gets no line.
+        tableContribution={verdict.rejected ? null : 1}
         argument={argument}
         isOwner={isOwner}
         argumentPublic={argumentPublic}

@@ -1,4 +1,12 @@
 import { getAllTopicFiles } from "./topics";
+import {
+  rankSchools,
+  schoolChanges,
+  type JudgedArgument,
+  type SchoolChange,
+} from "./school-table";
+import { ratingByWeek } from "./rating-history";
+import type { SchoolId } from "./types";
 import type { TopicListItem, TopicStatus } from "@/components/debate/TopicList";
 import type { VerdictData } from "@/components/debate/Verdict";
 
@@ -104,3 +112,74 @@ export const FIXTURE_REJECTED_VERDICT: VerdictData = {
   // types them as optional strings, which is the shape a real rejection
   // arrives in.
 };
+
+/*
+ * Stage 6: the school table and the profile chart.
+ *
+ * Both are built by running the real functions over fixture inputs rather
+ * than by writing the output rows out: a hand-written table would still
+ * look right with the ranking broken, which is the one thing a review of
+ * this screen is for.
+ */
+
+const FIXTURE_WEEK_START = new Date("2026-10-05T00:00:00Z");
+const FIXTURE_WEEK_END = new Date("2026-10-12T00:00:00Z");
+export const FIXTURE_WEEK = 41;
+
+function judged(school: SchoolId, marks: number[]): JudgedArgument[] {
+  return marks.map((fidelity) => ({ school, fidelity }));
+}
+
+function at(day: number): string {
+  return new Date(FIXTURE_WEEK_START.getTime() + day * 86_400_000).toISOString();
+}
+
+const FIXTURE_CHANGES: SchoolChange[] = [
+  { from: "utilitarianism", to: "stoicism", at: at(1) },
+  { from: "virtue-ethics", to: "stoicism", at: at(2) },
+  { from: "stoicism", to: "virtue-ethics", at: at(3) },
+  { from: null, to: "utilitarianism", at: at(4) },
+];
+
+const CHANGES = schoolChanges(FIXTURE_CHANGES, FIXTURE_WEEK_START, FIXTURE_WEEK_END);
+const NO_CHANGES = schoolChanges([], FIXTURE_WEEK_START, FIXTURE_WEEK_END);
+
+/** A week with a clear order and no ties. */
+export const FIXTURE_TABLE_ROWS = rankSchools(
+  [
+    ...judged("stoicism", [7.5, 8.0, 6.5]),
+    ...judged("utilitarianism", [8.5, 9.0]),
+    ...judged("virtue-ethics", [6.0, 7.0, 6.5, 7.5]),
+  ],
+  CHANGES
+);
+
+/** Two schools level on both average and count, so they share a rank. */
+export const FIXTURE_TABLE_TIED = rankSchools(
+  [
+    ...judged("stoicism", [7.0, 8.0]),
+    ...judged("utilitarianism", [8.0, 7.0]),
+    ...judged("virtue-ethics", [6.0]),
+  ],
+  CHANGES
+);
+
+/** Nothing judged yet. The schools still have rows; the marks are absent. */
+export const FIXTURE_TABLE_EMPTY = rankSchools([], NO_CHANGES);
+
+/** Many weeks, moving both ways, so the line is not a straight climb. */
+export const FIXTURE_RATINGS_MANY = ratingByWeek([
+  { created_at: "2026-08-04T10:00:00Z", elo_after: 1200 },
+  { created_at: "2026-08-12T10:00:00Z", elo_after: 1218 },
+  { created_at: "2026-08-19T10:00:00Z", elo_after: 1207 },
+  { created_at: "2026-08-26T10:00:00Z", elo_after: 1231 },
+  { created_at: "2026-09-02T10:00:00Z", elo_after: 1226 },
+  { created_at: "2026-09-09T10:00:00Z", elo_after: 1248 },
+  { created_at: "2026-09-16T10:00:00Z", elo_after: 1262 },
+  { created_at: "2026-10-07T10:00:00Z", elo_after: 1255 },
+]);
+
+/** The first judged week. */
+export const FIXTURE_RATINGS_ONE = ratingByWeek([
+  { created_at: "2026-10-07T10:00:00Z", elo_after: 1218 },
+]);

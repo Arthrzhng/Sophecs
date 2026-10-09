@@ -53,13 +53,7 @@ export function StreakCard({ streak, paused }: { streak: number; paused: boolean
   );
 }
 
-/**
- * The reader's school and its one line.
- *
- * The mockup's "See the school table" link is deliberately absent: the
- * school table is stage 6 and the route does not exist yet, and a link to a
- * 404 is worse than no link. It goes in with that stage.
- */
+/** The reader's school, its one line, and the way to the table. */
 export function SchoolCard({ school, oneLine }: { school: SchoolId; oneLine: string }) {
   return (
     <Card>
@@ -72,6 +66,14 @@ export function SchoolCard({ school, oneLine }: { school: SchoolId; oneLine: str
       </p>
       <p className="mt-2 max-w-[34ch] font-serif text-base leading-relaxed text-ink-mid">
         {oneLine}
+      </p>
+      <p className="mt-3">
+        <Link
+          href="/table"
+          className="inline-flex min-h-11 items-center text-sm font-semibold text-ink underline underline-offset-4"
+        >
+          See the school table
+        </Link>
       </p>
     </Card>
   );
