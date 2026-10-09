@@ -1,80 +1,126 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSchool } from "@/lib/schools";
-import type { SchoolId } from "@/lib/types";
-import { Page } from "@/components/layout/Page";
-import { ButtonLink } from "@/components/ui/Button";
-
-const VALID_SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
+import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
+import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
+import { SCHOOL_IDS, type SchoolId } from "@/lib/types";
 
 export function generateStaticParams() {
-  return VALID_SCHOOLS.map((school) => ({ school }));
+  return SCHOOL_IDS.map((school) => ({ school }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ school: string }> }) {
   const { school } = await params;
-  if (!VALID_SCHOOLS.includes(school as SchoolId)) return { title: "Sophecs" };
+  if (!SCHOOL_IDS.includes(school as SchoolId)) return { title: "Sophecs" };
   const content = getSchool(school as SchoolId);
   return { title: `${content.name} · Sophecs`, description: content.one_line };
 }
 
+/**
+ * One school, in its own colour.
+ *
+ * The page a share card lands on, so the quotation is the first thing on
+ * it and the school's colour is the surface it sits on rather than a rule
+ * somewhere down the page. The one saturated panel per page the design
+ * allows, and this is the page that has the best claim to it.
+ *
+ * Still static. Nothing here is read from a session, and the links are the
+ * three the page already had: the quiz, the arena, and the other two
+ * schools. A redraw, not a new information architecture.
+ *
+ * The container is written out rather than taken from <Page>, because the
+ * wrapper has to sit on <main>. /today and /table do the same for the same
+ * reason; all three go back to <Page> in the stage that deletes the
+ * wrapper and promotes the font and the radius.
+ */
 export default async function SchoolPage({ params }: { params: Promise<{ school: string }> }) {
   const { school } = await params;
-  if (!VALID_SCHOOLS.includes(school as SchoolId)) notFound();
+  if (!SCHOOL_IDS.includes(school as SchoolId)) notFound();
 
-  const content = getSchool(school as SchoolId);
+  const id = school as SchoolId;
+  const content = getSchool(id);
+  const tone = SCHOOL_CHUNKY[id];
+  const others = SCHOOL_IDS.filter((other) => other !== id);
 
   return (
-    <Page width="read">
-        <p className="mb-4 text-sm text-ink-soft">{content.name}</p>
-        <blockquote className="font-serif text-lg font-medium leading-snug italic text-ink">
-          &ldquo;{content.one_line}&rdquo;
-        </blockquote>
-        <p className="mt-3 text-sm text-ink-soft">{content.one_line_attribution}</p>
+    <main className="flex-1" data-daily-path>
+      <div className="mx-auto max-w-read px-6 py-10">
+        <section
+          className="chunky rounded-panel p-6 text-white"
+          style={{ ...shade(tone.shade), background: tone.bg }}
+        >
+          <h1 className="text-xs font-extrabold tracking-widest uppercase opacity-90">
+            {content.name}
+          </h1>
+          <blockquote className="mt-3 font-serif text-lg font-medium leading-snug">
+            &ldquo;{content.one_line}&rdquo;
+          </blockquote>
+          <p className="mt-3 text-sm opacity-90">{content.one_line_attribution}</p>
+        </section>
 
-        <div className="mt-10 prose-reading">
+        <div className="prose-reading mt-10">
           {content.read.split("\n\n").map((paragraph, i) => (
             <p key={i}>{paragraph}</p>
           ))}
         </div>
 
-        <div className="mt-12 border-t border-rule pt-8">
-          <p className="eyebrow text-ink-soft mb-4">What {content.name.toLowerCase()} gets wrong</p>
-          <div className="prose-reading">
+        {/* A card rather than a hairline-topped section: this is the other
+            two schools talking, not the next part of the same voice, and
+            the border is what says so. */}
+        <section className="mt-12 rounded-card border-2 border-rule bg-surface p-6">
+          {/* The name as it is written, not lowercased. The old page
+              lowercased it to read as mid-sentence, which turned three
+              proper nouns into "what stoicism gets wrong" and, worse,
+              "what virtue ethics gets wrong". */}
+          <h2 className="text-base font-extrabold text-ink">
+            What {content.name} gets wrong
+          </h2>
+          <div className="prose-reading mt-4">
             {content.gets_wrong.split("\n\n").map((paragraph, i) => (
               <p key={i}>{paragraph}</p>
             ))}
           </div>
-        </div>
+        </section>
 
-        <div className="mt-12 flex flex-wrap items-center gap-6">
-          <ButtonLink
-            href="/quiz"
-          >
+        <section className="mt-12 flex flex-wrap items-center gap-6">
+          <ChunkyLink href="/quiz" school={id}>
             Take the quiz
-          </ButtonLink>
+          </ChunkyLink>
           <Link
             href="/debate"
-            className="text-sm font-medium text-ink-mid hover:text-ink underline underline-offset-4"
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-ink underline underline-offset-4"
           >
             Argue a motion from it
           </Link>
-        </div>
+        </section>
 
-        <div className="mt-12 border-t border-rule pt-8">
-          <p className="eyebrow text-ink-soft mb-3">The other two</p>
-          <div className="flex flex-wrap gap-6 text-sm">
-            {VALID_SCHOOLS.filter((id) => id !== school).map((id) => (
-              <Link
-                key={id}
-                href={`/s/${id}`}
-                className="text-ink-mid hover:text-ink underline underline-offset-4"
-              >
-                {getSchool(id).name}
-              </Link>
-            ))}
-          </div>
-        </div>
-    </Page>
+        <section className="mt-12 border-t-2 border-rule pt-8">
+          <h2 className="text-base font-extrabold text-ink">The other two</h2>
+          <ul className="mt-5 grid gap-5 sm:grid-cols-2">
+            {others.map((other) => {
+              const that = getSchool(other);
+              return (
+                <li key={other} className="flex">
+                  <Link
+                    href={`/s/${other}`}
+                    className="chunky flex min-w-0 flex-1 flex-col gap-2 rounded-card border-2 border-rule-strong bg-surface p-5"
+                    style={shade("var(--color-rule-strong)")}
+                  >
+                    {/* Ink, not the other school's colour. The markers are
+                        for a 2px rule, an underline, a filled card or text
+                        at 24px and up, and never for a link; these cards
+                        are links at 16px. The page's colour is its own. */}
+                    <span className="text-base font-extrabold text-ink">{that.name}</span>
+                    <span className="font-serif text-base leading-relaxed text-ink-mid">
+                      &ldquo;{that.one_line}&rdquo;
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      </div>
+    </main>
   );
 }
