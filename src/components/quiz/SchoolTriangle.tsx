@@ -28,6 +28,7 @@ export function SchoolTriangle({
   primary,
   secondary,
   previewLetter,
+  caption,
   neutral = false,
 }: {
   /** Position from the answers already given. */
@@ -38,6 +39,12 @@ export function SchoolTriangle({
   secondary: SchoolId;
   /** The A/B/C letter of the selected answer, for the caption. */
   previewLetter?: string | null;
+  /**
+   * Shown when no answer is selected, for a reader meeting the triangle
+   * for the first time. The preview caption wins once there is one, since
+   * it describes something that is happening.
+   */
+  caption?: string | null;
   /** No answers committed yet, so there is no position to colour in. */
   neutral?: boolean;
 }) {
@@ -119,10 +126,16 @@ export function SchoolTriangle({
         />
       </svg>
 
-      {previewLetter && (
+      {previewLetter ? (
         <figcaption className="text-center text-sm text-ink-mid">
           The dashed ring shows where answer {previewLetter} moves you.
         </figcaption>
+      ) : (
+        caption && (
+          <figcaption className="text-center text-xs font-extrabold tracking-widest uppercase text-ink-mid">
+            {caption}
+          </figcaption>
+        )
       )}
     </figure>
   );
