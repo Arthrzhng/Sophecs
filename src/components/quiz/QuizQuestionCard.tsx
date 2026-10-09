@@ -79,10 +79,18 @@ export function QuizQuestionCard({
         </div>
       )}
 
-      <div className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-start">
+      <div className="mt-6 flex flex-col gap-8 sm:mt-8 lg:flex-row lg:items-start">
         <fieldset className="min-w-0 flex-1 border-0 p-0">
           <legend className="text-sm text-ink-mid">Answer as you actually think</legend>
-          <p className="mt-2 max-w-[28ch] text-xl font-extrabold leading-tight tracking-tight text-ink">
+          {/* One step down below `sm` on the landing only, where the
+              headline sits above the question and a 34px prompt costs the
+              answer rows the fold. /quiz has nothing above it and keeps
+              the size it was approved at. */}
+          <p
+            className={`mt-2 max-w-[28ch] font-extrabold leading-tight tracking-tight text-ink ${
+              immediate ? "text-lg sm:text-xl" : "text-xl"
+            }`}
+          >
             {question.prompt}
           </p>
 

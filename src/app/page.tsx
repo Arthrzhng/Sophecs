@@ -26,32 +26,45 @@ export default function LandingPage() {
 
   return (
     <main className="flex-1" data-daily-path>
-      <div className="mx-auto max-w-ui px-6 pt-8 pb-20">
-        <h1 className="max-w-[26ch] text-xl font-extrabold leading-tight tracking-tight text-ink">
-          Find your school of ethics. Then defend it, a little every day.
-        </h1>
-        <p className="mt-4 max-w-[52ch] text-base leading-relaxed text-ink-mid">
-          A short quiz places you with the Stoics, the Utilitarians or the Virtue
-          Ethicists. Then a few minutes a day: read the case, argue the week&apos;s
-          question about AI, and get judged on how true you stay to your school.
-        </p>
+      <div className="mx-auto max-w-ui px-6 pt-6 pb-20 sm:pt-8">
+        {/*
+          Below `sm` the subtitle sits under the answer rows, so all three
+          answers clear the fold on a 375x667 phone. Source order is left
+          alone: a screen reader still hears the headline, then what the
+          product is, then the question, which is the order that reads.
+        */}
+        <div className="flex flex-col">
+          <h1 className="order-1 max-w-[26ch] text-lg font-extrabold leading-tight tracking-tight text-ink sm:text-xl">
+            Find your school of ethics. Then defend it, a little every day.
+          </h1>
+          <p className="order-3 mt-6 max-w-[52ch] text-base leading-relaxed text-ink-mid sm:order-2 sm:mt-4">
+            A short quiz places you with the Stoics, the Utilitarians or the Virtue
+            Ethicists. Then a few minutes a day: read the case, argue the week&apos;s
+            question about AI, and get judged on how true you stay to your school.
+          </p>
 
-        {/* Question one, live. The triangle beside it is the mockup's hero
-            illustration doing a real job: at zero answers the marker sits
-            at the centre, which is where you start. */}
-        <div className="mt-8">
-          <LandingQuestion />
+          {/* Question one, live. The triangle beside it is the mockup's hero
+              illustration doing a real job: at zero answers the marker sits
+              at the centre, which is where you start. */}
+          <div className="order-2 mt-4 sm:order-3 sm:mt-8">
+            <LandingQuestion />
+          </div>
+
+          <p className="order-4 mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-soft">
+            {/* Not "nothing is saved unless you share it": the result
+                screen writes the answers and the school to quiz_results
+                against the anon_id cookie, and PostHog records
+                quiz_completed. What is true is that neither carries a
+                name. */}
+            <span>About 80 seconds. No sign-up, and no name attached to your answers.</span>
+            <Link
+              href="/login"
+              className="inline-flex min-h-11 items-center font-semibold text-ink underline underline-offset-4"
+            >
+              I already have a school
+            </Link>
+          </p>
         </div>
-
-        <p className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-soft">
-          <span>About 80 seconds. Nothing is saved unless you share it.</span>
-          <Link
-            href="/login"
-            className="inline-flex min-h-11 items-center font-semibold text-ink underline underline-offset-4"
-          >
-            I already have a school
-          </Link>
-        </p>
 
         <ol className="mt-12 grid grid-cols-[repeat(auto-fit,minmax(min(17rem,100%),1fr))] gap-4">
           {STEPS.map((step, i) => (
