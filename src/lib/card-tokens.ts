@@ -15,20 +15,33 @@ import type { SchoolId } from "./types";
  * `var()` there resolves to nothing and the card renders as near-white text
  * on a transparent background.
  *
- * So the literals live here, once, and both call sites read them. If a
- * token below changes in globals.css it must change here too, and the
- * styleguide's card row is what catches it: the two are rendered side by
- * side and a drift shows as a colour seam.
+ * So the literals live here, once, and both call sites read them.
+ *
+ * The school values below still mirror globals.css and must be kept in
+ * step with it. The four paper values no longer do, and must NOT be
+ * resynced:
+ *
+ *   --color-paper     globals.css #f7f3ea   OG_PAPER    #f8f8f6
+ *   --color-ink       globals.css #1c1b18   OG_INK      #141413
+ *   --color-ink-mid   globals.css #5e5950   OG_INK_MID  #54544c
+ *   --color-ink-soft  globals.css #5e5950   OG_INK_SOFT #63635b
+ *
+ * They diverged when the Daily path palette was promoted site-wide. A
+ * shared image is not a page: every link preview, saved card and favicon
+ * already in a feed, a chat or a bookmark bar was rendered at the values
+ * on the right, and matching the site would have reflowed none of them but
+ * recoloured all of them. Holding these still is what keeps the cards
+ * pixel-identical across that change. Moving them is a deliberate decision
+ * about shipped artefacts, not a drift to tidy up.
+ *
+ * The styleguide's card row therefore shows a seam between the card's
+ * paper and the page's, on purpose.
  *
  * Tokens mirrored, by their globals.css names:
  *   --color-stoic-surface        #33503f
  *   --color-utilitarian-surface  #7a5518
  *   --color-virtue-surface       #6b2c37
  *   --color-on-saturated         #faf8f2
- *   --color-paper                #f8f8f6
- *   --color-ink                  #141413
- *   --color-ink-mid              #54544c
- *   --color-ink-soft             #63635b
  *   --color-stoic                #3e5c4b
  *   --color-utilitarian          #8a6320
  *   --color-virtue               #7a3540
@@ -187,6 +200,11 @@ export const CARD_PADDING = 0.066;
  * the token's #f8f8f6, ink was #191917 against #141413, and the site OG
  * image's utilitarian hairline was #87611f against #8a6320. Four copies of
  * a colour is four chances to be slightly wrong, and all four were.
+ *
+ * These four are now the images' own values rather than a mirror of the
+ * page tokens, which have moved on to the warm palette. See the note at
+ * the top of this file: they are held still so that everything already
+ * shared stays the colour it was shared as.
  */
 
 /** --color-paper. */

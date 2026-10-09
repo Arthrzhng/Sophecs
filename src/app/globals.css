@@ -28,23 +28,42 @@
 */
 @theme static {
   /* --- Base ------------------------------------------------------------ */
-  /* Near-white, very slightly cool. Warmer cream reads as a template. */
-  --color-paper: #f8f8f6;
-  --color-surface: #fdfdfc;
-  --color-ink: #141413;
-  --color-ink-mid: #54544c;
-  --color-ink-soft: #63635b;
+  /*
+    The Daily path palette, promoted out of [data-daily-path] once every
+    screen in the product had been restyled onto it. These seven were the
+    whole of the wrapper's colour override; the font and the control radius
+    are still scoped, because the routes that have not been redrawn keep
+    Plex Sans and their 6px controls and only change colour.
+
+    The earlier note here read "Near-white, very slightly cool. Warmer cream
+    reads as a template." That was the right call for the previous design.
+    This one is built on warm paper throughout and was commissioned to be.
+
+    --color-ink-soft and --color-ink-mid are now the same value. They were
+    one step apart before; the restyle collapsed them, and promoting the
+    palette collapses them everywhere rather than leaving two names for the
+    same colour on some routes and not others.
+  */
+  --color-paper: #f7f3ea;
+  --color-surface: #ffffff;
+  --color-ink: #1c1b18;
+  --color-ink-mid: #5e5950;
+  --color-ink-soft: #5e5950;
 
   /* The primary structural device. Hairlines, not shadows, not fills. */
-  --color-rule: #dededa;
-  --color-rule-strong: #c4c4be;
+  --color-rule: #e3dccd;
+  --color-rule-strong: #d2c9b6;
 
   /* --- Semantic -------------------------------------------------------- */
   /* Destructive confirmations, over-limit counts, failed saves. */
   --color-error: #8a1c1c;
   /* Success is ink. A confirmation is a statement of fact, not a reward —
-     and the only green in this product means Stoicism. */
-  --color-success: #141413;
+     and the only green in this product means Stoicism. Written as a
+     reference rather than a copy of the hex: it was #141413, which stopped
+     being ink the moment the palette was promoted. Nothing renders it
+     today, so this is the invariant being kept rather than a pixel being
+     fixed. */
+  --color-success: var(--color-ink);
 
   /* --- School markers -------------------------------------------------- */
   /* Frozen values. Used only as a 2px rule, a 1px underline, a filled card,
@@ -133,12 +152,11 @@
     only green in this product means Stoicism (design/tokens.md §7), and
     right/wrong are never carried by colour alone anywhere they are used.
 
-    The restyle's base palette is NOT here. It overrides the existing
-    paper/ink/rule tokens inside [data-daily-path] below, so components can
-    be written once against the final class names (`bg-paper`, `text-ink`)
-    while every screen that has not been restyled yet keeps its current
-    appearance. Promoting the restyle means moving those six lines up into
-    this block and deleting the wrapper.
+    The restyle's base palette used to live in [data-daily-path] below, so
+    components could be written against the final class names (`bg-paper`,
+    `text-ink`) while un-restyled screens kept their old colours. It is in
+    the Base block above now: every route shares one palette, and the
+    wrapper is down to the font and the control radius.
   */
   --color-correct: #1e5fa0;
   --color-correct-deep: #123d68;
@@ -275,28 +293,16 @@ summary:focus-visible,
 }
 
 /*
-  The Daily path palette, scoped.
+  What is left of the Daily path wrapper.
 
-  Every value here is an override of a token already declared in
-  `@theme static`, which is why the restyled components can use the ordinary
-  `bg-paper` / `text-ink` / `border-rule` utilities and still come out in the
-  new colours: those utilities compile to `var(--color-paper)` and friends,
-  and a descendant redeclaration wins. Nothing outside this wrapper moves.
-
-  The warm paper is a deliberate reversal of the note on --color-paper above
-  ("Warmer cream reads as a template"). That was the right call for the
-  previous design; the Daily path mockups are built on #F7F3EA throughout,
-  and this is the restyle it was commissioned for.
+  The colours are gone from here: they are the Base block's values now, so
+  every route is on the warm paper and a `bg-paper` or `text-ink` means the
+  same thing everywhere. What remains is what the routes still drawn to the
+  old design should NOT pick up — Bricolage, and the chunky control radius
+  the focus ring reads from. Those arrive screen by screen as each one is
+  redrawn; the wrapper goes when the last one is.
 */
 [data-daily-path] {
-  --color-paper: #f7f3ea;
-  --color-surface: #ffffff;
-  --color-ink: #1c1b18;
-  --color-ink-mid: #5e5950;
-  --color-ink-soft: #5e5950;
-  --color-rule: #e3dccd;
-  --color-rule-strong: #d2c9b6;
-
   /* Bricolage carries the interface; Spectral still carries every passage,
      quotation, motion and argument, and mono still carries every number. */
   --font-sans: var(--font-ui);
