@@ -1,6 +1,7 @@
 import { ChunkyButton, ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { ChunkyCard } from "@/components/daily-path/ChunkyCard";
 import { StatTile } from "@/components/daily-path/StatTile";
+import { AxisPanel } from "@/components/daily-path/AxisPanel";
 import { SCHOOL_CHUNKY } from "@/components/daily-path/chunky";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
@@ -179,6 +180,15 @@ export default function DailyPathStyleguide() {
           note="No streak tile and no flame on this screen: reading does not extend a streak. The burst is decorative and is the first thing reduced motion removes."
         >
           <CelebrationDemo />
+        </Section>
+
+        <Section
+          title="What the judge looks for"
+          note="Three criteria, not four. The composite score out of 100 is not one of them: on the verdict it is the large circle. Shown on the argue screen beside the editor."
+        >
+          <div className="max-w-sm">
+            <AxisPanel />
+          </div>
         </Section>
 
         <Section
