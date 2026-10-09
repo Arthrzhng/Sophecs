@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 import { Toast, useToast } from "@/components/ui/Toast";
 import { track } from "@/lib/analytics/client";
 import type { SchoolId } from "@/lib/types";
@@ -19,11 +19,19 @@ export function ShareSheet({
   school,
   shareLine,
   shareLineIndex,
+  primary = true,
 }: {
   resultId: string;
   school: SchoolId;
   shareLine: string;
   shareLineIndex: number;
+  /**
+   * False where the page already has a primary action above this row. One
+   * saturated button per screen: with "Debate them" or "Challenge a
+   * friend" above it, a filled "Copy link" is a second primary competing
+   * with the first. The old flat design hid this; the chunky one does not.
+   */
+  primary?: boolean;
 }) {
   const [toast, showToast, clearToast] = useToast();
   const [busy, setBusy] = useState(false);
@@ -95,16 +103,31 @@ export function ShareSheet({
     <div>
       <div className="flex flex-wrap items-center gap-3">
         {canNativeShare && (
-          <Button onClick={shareNative} loading={busy} loadingLabel="Sharing…">
+          <ChunkyButton
+            tone={primary ? "school" : "paper"}
+            school={school}
+            onClick={shareNative}
+            loading={busy}
+            loadingLabel="Sharing…"
+          >
             Share
-          </Button>
+          </ChunkyButton>
         )}
-        <Button variant={canNativeShare ? "secondary" : "primary"} onClick={copyLink}>
+        <ChunkyButton
+          tone={primary && !canNativeShare ? "school" : "paper"}
+          school={school}
+          onClick={copyLink}
+        >
           Copy link
-        </Button>
-        <Button variant="secondary" onClick={downloadCard} loading={busy} loadingLabel="Saving…">
+        </ChunkyButton>
+        <ChunkyButton
+          tone="paper"
+          onClick={downloadCard}
+          loading={busy}
+          loadingLabel="Saving…"
+        >
           Save image
-        </Button>
+        </ChunkyButton>
       </div>
       <Toast message={toast} onDone={clearToast} />
     </div>

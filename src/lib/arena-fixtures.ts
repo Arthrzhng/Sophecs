@@ -191,3 +191,25 @@ export const FIXTURE_OLD_VERDICT_AT = new Date(
 export const FIXTURE_RATINGS_ONE = ratingByWeek([
   { created_at: "2026-10-07T10:00:00Z", elo_after: 1218 },
 ]);
+
+/*
+ * Stage 10: /r/[id].
+ *
+ * The route needs the admin client for four lookups, so it renders nowhere
+ * without Supabase. These are the three shapes it can take.
+ */
+
+/** A vector that sums to 1, as scoreQuiz produces. */
+export const FIXTURE_VECTOR = {
+  stoicism: 0.52,
+  utilitarianism: 0.31,
+  "virtue-ethics": 0.17,
+};
+
+export const FIXTURE_OTHER_VECTOR = {
+  stoicism: 0.18,
+  utilitarianism: 0.24,
+  "virtue-ethics": 0.58,
+};
+
+export const FIXTURE_RESULT_ID = "preview-result";

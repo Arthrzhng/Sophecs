@@ -3,16 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { assignChallengeTopic } from "@/app/debate/actions";
-import { Button, ButtonLink } from "@/components/ui/Button";
+import { ChunkyButton, ChunkyLink } from "@/components/daily-path/ChunkyButton";
+import type { SchoolId } from "@/lib/types";
 
 export function DebateThemButton({
   challengeId,
   resultId,
   isSignedIn,
+  school,
 }: {
   challengeId: string;
   resultId: string;
   isSignedIn: boolean;
+  /** The result's school, so the primary action carries its colour. */
+  school: SchoolId;
 }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
@@ -20,11 +24,12 @@ export function DebateThemButton({
 
   if (!isSignedIn) {
     return (
-      <ButtonLink
+      <ChunkyLink
         href={`/login?next=${encodeURIComponent(`/r/${resultId}`)}`}
+        school={school}
       >
         Debate them
-      </ButtonLink>
+      </ChunkyLink>
     );
   }
 
@@ -41,12 +46,9 @@ export function DebateThemButton({
 
   return (
     <div>
-      <Button
-        onClick={start}
-        disabled={pending}
-      >
+      <ChunkyButton school={school} onClick={start} disabled={pending}>
         {pending ? "Starting…" : "Debate them"}
-      </Button>
+      </ChunkyButton>
       {error && <p className="mt-2 font-mono text-xs text-error">{error}</p>}
     </div>
   );
