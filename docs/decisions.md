@@ -726,3 +726,39 @@ No failing accessibility audit on any measured route. No horizontal scroll at 37
 Every control carries `min-h-11` (44 px) or `py-3`/`py-2.5`, well past the 24 × 24 minimum; a grep for interactive elements without one returns nothing. Focus is a single global `:focus-visible` rule — 2 px ink outline, 2 px offset — on links, buttons, inputs, textareas, selects and anything with `tabindex`, so a control added later inherits it rather than needing to remember.
 
 Nothing conveys information by colour alone. The case ticks are fill-vs-hairline with a full `aria-label` naming each of the four states; every school-coloured eyebrow names its school in text (`Objection · Utilitarianism`, `You · Stoicism`); the vector columns are a `<dl>` with school names as terms. The school-coloured left stripes on `/debate` and `/me` are the same colour for every row — they are the reader's own school, not per-row data — so there is no information in them to lose.
+
+## The Daily path restyle
+
+Nine stages, from mockups 00 to 10. What follows is the part that outlives the work: the decisions a later change could undo by accident.
+
+### The cream reversal
+
+`--color-paper` used to be `#f8f8f6`, near-white and very slightly cool, with the note "Warmer cream reads as a template" sitting beside it. The Daily path mockups are built on `#f7f3ea` throughout and the restyle was commissioned for them, so paper is warm now and that note is gone. It was the right call for the previous design; it is not a rule that was broken, it is a rule that was superseded, and the comment in `globals.css` says so rather than leaving a contradiction for someone to resolve the wrong way.
+
+### Three axes, not four
+
+Mockups 02, 04 and 06 all leave room for four scores, the landing mockup says "four axes" in prose, and the verdict table this replaced called itself four by counting the composite out of 100 as one of them. `content/prompts/judge.v2.md` defines three criteria and one composite. Three won, and `tests/judge-axes.test.ts` reads the prompt file directly and asserts the count, the order and the key names, so a fourth cannot be added to the UI without the prompt agreeing first.
+
+### The school table counts originals only
+
+`docs/daily-path-copy.md` §8 first said "every judged argument", which would have included revisions. A revision is a second attempt at the same motion after feedback and does not move the reader's rating, so it should not move their school's row either, and counting it let one motion be argued twice. The query takes `kind = "original"`, the copy says "every judged original argument", and `countsOnTable()` is the single rule both the table and the verdict's `+1 for the {school} on the table` line read, so the two cannot disagree about the same argument.
+
+### The reading check lives in the browser
+
+Step 2's picks are in `localStorage` under `check:${userId}:${topicSlug}`, not in a table. The score gates nothing and is only ever read back to draw one tile, so a row per answer would be a migration and a write path for a picture. Module progress followed the same reasoning, under `module:${viewerId}:${moduleId}`, holding the furthest reading reached. The cost, in both cases, is that neither follows a reader across devices. Keyed by user as well as by topic because two people share a browser more often than anyone plans for.
+
+### Module readings are marks in the frontmatter, not files
+
+A module carries a `readings` list of titles and starting paragraphs; the body is one run of prose and stays that way. `splitModule()` in `src/lib/module-readings.ts` is the only thing that divides it, which is why the index's count and the reading page's "Reading n of N" cannot drift apart. Bad marks fail the build rather than warning, unlike the other module fields: they are four lines of frontmatter, and a wrong one silently drops or repeats paragraphs of a lesson.
+
+### `/styleguide/arena` is visible on previews
+
+The arena needs a session, rows in Supabase and an `ANTHROPIC_API_KEY` that is production-only, so the verdict and revision screens cannot be reached on a preview at all. The gate is `SOPHECS_PREVIEW === "1" || VERCEL_ENV === "preview"`: local when the env var is set, every Vercel preview, and a 404 in production, which is the part `CONTRIBUTING.md` cares about. Previews sit behind Vercel's own sign-in. Fixtures are not real data and have no business on the live site.
+
+### The palette is promoted, the wrapper is not finished
+
+The seven colour lines live in `@theme static` now, so every route shares one palette. `[data-daily-path]` still exists and still carries `--font-sans` and `--radius-control`: the routes not yet redrawn keep Plex Sans and their 6px controls, and take the warm paper and nothing else. The wrapper goes when the last of them is redrawn. `--color-ink-soft` and `--color-ink-mid` are one value now, site-wide, rather than two names for one colour on some routes and not others.
+
+### The card colours are frozen against the palette, on purpose
+
+`src/lib/card-tokens.ts` described itself as a mirror of `globals.css` that must be resynced whenever a token moves. Four of its values no longer mirror anything: `OG_PAPER`, `OG_INK`, `OG_INK_MID` and `OG_INK_SOFT` hold the pre-restyle colours. A shared image is not a page. Every link preview, saved card and favicon already sitting in a feed, a chat or a bookmark bar was rendered at those values, and matching the site would have recoloured all of them at once. `/opengraph-image`, `/icon` and `/apple-icon` hash to the same bytes either side of the promotion, which is how this was checked rather than argued. The school values in that file *are* still a mirror and must be kept in step.
