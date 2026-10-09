@@ -63,9 +63,17 @@ export function PathNode({
   const locked = state === "locked";
   const schoolTone = SCHOOL_CHUNKY[school];
 
+  // Ink on the done orange, not white. White on --color-step-done is
+  // 2.93:1, which misses even the 3:1 a graphic needs; ink is 5.89:1. The
+  // token is left alone: it is the fill on four surfaces and darkening it
+  // to carry white would change the orange everywhere.
   const face =
     state === "done"
-      ? { bg: "var(--color-step-done)", sh: "var(--color-step-done-deep)", fg: "#ffffff" }
+      ? {
+          bg: "var(--color-step-done)",
+          sh: "var(--color-step-done-deep)",
+          fg: "var(--color-ink)",
+        }
       : locked
         ? { bg: "var(--color-rule)", sh: "var(--color-rule-strong)", fg: "var(--color-ink-soft)" }
         : { bg: schoolTone.bg, sh: schoolTone.shade, fg: "#ffffff" };
