@@ -1,21 +1,27 @@
 import { CASE_STEPS, caseTicks, type CaseState } from "@/lib/case-steps";
 
-// Four hairline ticks, ink only. Never colour-coded: the difference between
-// done and not-done is the fill, and the state is also in the aria-label,
-// so nothing here depends on seeing a hue.
+/**
+ * How far a case has got: four marks, named.
+ *
+ * Never colour-coded. Done against not-done is the fill and the height of
+ * the bar, and the whole thing is also read out as one label, so nothing
+ * here depends on seeing a hue.
+ *
+ * The step names are in sans now, not mono. Mono carries numbers in this
+ * product and "Argued" is not one; it was reading as a terminal log.
+ */
 export function CaseTicks({ state }: { state: CaseState }) {
   const ticks = caseTicks(state);
   const label = CASE_STEPS.map((step, i) => `${step}: ${ticks[i] ? "done" : "not yet"}`).join(", ");
 
   return (
-    <div className="flex items-center gap-3" role="img" aria-label={label}>
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2" role="img" aria-label={label}>
       {CASE_STEPS.map((step, i) => (
-        <span key={step} className="flex items-center gap-1.5" aria-hidden="true">
+        <span key={step} className="flex items-center gap-2" aria-hidden="true">
           <span
-            className={`inline-block h-px w-4 ${ticks[i] ? "bg-ink" : "bg-rule"}`}
-            style={{ height: ticks[i] ? 2 : 1 }}
+            className={`inline-block h-1 w-5 rounded-badge ${ticks[i] ? "bg-ink" : "bg-rule-strong"}`}
           />
-          <span className={`font-mono text-xs ${ticks[i] ? "text-ink-mid" : "text-ink-soft"}`}>
+          <span className={`text-xs ${ticks[i] ? "font-bold text-ink" : "text-ink-soft"}`}>
             {step}
           </span>
         </span>
