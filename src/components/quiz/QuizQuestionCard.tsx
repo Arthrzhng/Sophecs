@@ -10,10 +10,10 @@ const LETTERS = ["A", "B", "C", "D"];
 /**
  * One quiz question in the Daily path design.
  *
- * Separate from QuestionBlock rather than a mode on it: that component also
- * renders question one on the landing page, which is stage 7, and the new
- * landing has no inline question at all. Converge them when the landing
- * lands; until then neither stage disturbs the other.
+ * This is the only question renderer. It replaced QuestionBlock on /quiz in
+ * stage 3 and on the landing page in stage 7, which is what `immediate` is
+ * for: the landing commits on the first tap, so the two routes share one
+ * component and the step from landing to quiz stays invisible.
  *
  * The answer rows keep the radio-in-a-label semantics the old block had,
  * against the mockup's aria-pressed buttons. A single-choice question is
@@ -31,6 +31,7 @@ export function QuizQuestionCard({
   onNext,
   onBack,
   nextLabel = "Next",
+  immediate = false,
 }: {
   question: QuizQuestion;
   index: number;
@@ -39,9 +40,16 @@ export function QuizQuestionCard({
   /** The options committed on earlier questions, for the triangle. */
   chosenSoFar: QuizOption[];
   onSelect: (optionId: string) => void;
-  onNext: () => void;
+  /** Given the option id in `immediate` mode, where state has not settled. */
+  onNext: (optionId?: string) => void;
   onBack?: () => void;
   nextLabel?: string;
+  /**
+   * Selecting commits straight away and no buttons render. Question one on
+   * the landing page: there is nothing to go back to, and a Next button
+   * makes the first tap of the product two taps.
+   */
+  immediate?: boolean;
 }) {
   const selected = question.options.find((o) => o.id === selectedId) ?? null;
   const selectedIndex = question.options.findIndex((o) => o.id === selectedId);
@@ -58,17 +66,31 @@ export function QuizQuestionCard({
           {index + 1} / {total}
         </p>
       </div>
-      <div className="mt-2 h-2 w-full overflow-hidden rounded-chunky bg-rule" aria-hidden="true">
-        <div
-          className="h-full bg-ink"
-          style={{ width: `${((index + 1) / total) * 100}%` }}
-        />
-      </div>
+      {/* No bar on the landing page: nothing is in flight there, and a
+          10%-filled track is progress through something the visitor has
+          not started. The "1 / 10" above it still says how long the quiz
+          is, which is the part that earns its place. */}
+      {!immediate && (
+        <div className="mt-2 h-2 w-full overflow-hidden rounded-chunky bg-rule" aria-hidden="true">
+          <div
+            className="h-full bg-ink"
+            style={{ width: `${((index + 1) / total) * 100}%` }}
+          />
+        </div>
+      )}
 
-      <div className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-start">
+      <div className="mt-6 flex flex-col gap-8 sm:mt-8 lg:flex-row lg:items-start">
         <fieldset className="min-w-0 flex-1 border-0 p-0">
           <legend className="text-sm text-ink-mid">Answer as you actually think</legend>
-          <p className="mt-2 max-w-[28ch] text-xl font-extrabold leading-tight tracking-tight text-ink">
+          {/* One step down below `sm` on the landing only, where the
+              headline sits above the question and a 34px prompt costs the
+              answer rows the fold. /quiz has nothing above it and keeps
+              the size it was approved at. */}
+          <p
+            className={`mt-2 max-w-[28ch] font-extrabold leading-tight tracking-tight text-ink ${
+              immediate ? "text-lg sm:text-xl" : "text-xl"
+            }`}
+          >
             {question.prompt}
           </p>
 
@@ -94,7 +116,10 @@ export function QuizQuestionCard({
                     name={`q${question.id}`}
                     value={option.id}
                     checked={checked}
-                    onChange={() => onSelect(option.id)}
+                    onChange={() => {
+                      onSelect(option.id);
+                      if (immediate) onNext(option.id);
+                    }}
                     className="sr-only"
                   />
                   <span
@@ -122,20 +147,23 @@ export function QuizQuestionCard({
             secondary={here.secondary}
             neutral={chosenSoFar.length === 0}
             previewLetter={selectedIndex >= 0 ? LETTERS[selectedIndex] : null}
+            caption={immediate ? "You start here" : null}
           />
         </div>
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center gap-4">
-        {onBack && (
-          <ChunkyButton tone="paper" onClick={onBack}>
-            Back
+      {!immediate && (
+        <div className="mt-8 flex flex-wrap items-center gap-4">
+          {onBack && (
+            <ChunkyButton tone="paper" onClick={onBack}>
+              Back
+            </ChunkyButton>
+          )}
+          <ChunkyButton onClick={() => onNext()} disabled={!selectedId} school={here.primary}>
+            {nextLabel}
           </ChunkyButton>
-        )}
-        <ChunkyButton onClick={onNext} disabled={!selectedId} school={here.primary}>
-          {nextLabel}
-        </ChunkyButton>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

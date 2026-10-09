@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { QuestionBlock } from "./QuestionBlock";
+import { QuizQuestionCard } from "./QuizQuestionCard";
 import { SESSION_KEY } from "./QuizShell";
 import { track } from "@/lib/analytics/client";
 import { QUIZ_QUESTIONS } from "../../../content/quiz/questions";
@@ -18,6 +18,10 @@ import { QUIZ_QUESTIONS } from "../../../content/quiz/questions";
 //
 // A client component, which does not stop the page being statically
 // rendered; only a server component reading cookies would do that.
+//
+// The same card /quiz renders, in `immediate` mode, as of stage 7: the
+// landing used to have its own block in the old design, which meant the
+// first tap of the product looked nothing like the second.
 export function LandingQuestion() {
   const router = useRouter();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -48,11 +52,12 @@ export function LandingQuestion() {
   }
 
   return (
-    <QuestionBlock
+    <QuizQuestionCard
       question={question}
       index={0}
       total={QUIZ_QUESTIONS.length}
       selectedId={selectedId}
+      chosenSoFar={[]}
       onSelect={setSelectedId}
       onNext={next}
       immediate
