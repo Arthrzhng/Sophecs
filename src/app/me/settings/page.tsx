@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
-import { ClassesSection } from "@/components/me/ClassesSection";
+import { SettingsPage } from "@/components/me/SettingsPage";
 import {
   getJoinedClasses,
   getOwnedClasses,
@@ -9,11 +9,6 @@ import {
   type ClassSummary,
   type JoinedClass,
 } from "@/lib/classes";
-import { DisplayNameForm } from "@/components/me/DisplayNameForm";
-import { ArgumentVisibilityToggle } from "@/components/me/ArgumentVisibilityToggle";
-import { SignOutButton } from "@/components/me/SignOutButton";
-import { DeleteAccountButton } from "@/components/me/DeleteAccountButton";
-import { Page } from "@/components/layout/Page";
 
 export const metadata = { title: "Settings · Sophecs" };
 
@@ -56,42 +51,17 @@ export default async function MeSettingsPage({
     ]);
   }
 
+  // The container is written out rather than taken from <Page>, because
+  // the daily-path wrapper has to sit on <main>; see the note on /me.
   return (
-    <Page width="read">
-        <p className="eyebrow text-ink-soft mb-4">Settings</p>
-
-        <div>
-          <p className="font-mono text-xs text-ink-soft mb-2">Display name</p>
-          <DisplayNameForm initial={profile?.display_name ?? null} />
-        </div>
-
-        <div className="mt-10 border-t border-rule pt-8">
-          <ArgumentVisibilityToggle initial={profile?.argument_default_public ?? false} />
-        </div>
-
-        <div className="mt-10 border-t border-rule pt-8">
-          <p className="eyebrow text-ink-soft mb-4">Classes</p>
-          <ClassesSection
-            owned={owned}
-            joined={joined}
-            prefillCode={join ? normaliseClassCode(join) : undefined}
-          />
-        </div>
-
-        <div className="mt-10 border-t border-rule pt-8">
-          <SignOutButton />
-        </div>
-
-        <div className="mt-10 border-t border-rule pt-8">
-          <p className="text-sm text-ink-mid max-w-[50ch] mb-3">
-            Deleting your account removes your profile, your reading notes
-            and the text of any argument you did not publish. Your quiz
-            results, scores and verdicts are kept with your name taken off
-            them, so a link someone else saved does not go dead. Arguments
-            you chose to publish stay up without you attached to them.
-          </p>
-          <DeleteAccountButton />
-        </div>
-    </Page>
+    <main className="flex-1" data-daily-path>
+      <SettingsPage
+        displayName={profile?.display_name ?? null}
+        argumentDefaultPublic={profile?.argument_default_public ?? false}
+        owned={owned}
+        joined={joined}
+        prefillCode={join ? normaliseClassCode(join) : undefined}
+      />
+    </main>
   );
 }

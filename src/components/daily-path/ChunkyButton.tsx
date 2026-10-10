@@ -3,7 +3,14 @@ import Link from "next/link";
 import type { SchoolId } from "@/lib/types";
 import { SCHOOL_CHUNKY, shade } from "./chunky";
 
-export type ChunkyTone = "school" | "ink" | "paper" | "correct" | "wrong" | "quiet";
+export type ChunkyTone =
+  | "school"
+  | "ink"
+  | "error"
+  | "paper"
+  | "correct"
+  | "wrong"
+  | "quiet";
 
 /**
  * The restyle's primary control: a solid bottom edge that the button travels
@@ -21,6 +28,13 @@ export type ChunkyTone = "school" | "ink" | "paper" | "correct" | "wrong" | "qui
  * edge is the strong rule instead, which reads on paper as the button
  * standing proud of the page rather than as a shadow under it.
  *
+ * `error` is for a destructive confirmation and nothing else. It is the
+ * one tone that is not an invitation: deleting an account is the only
+ * place it is used, and it keeps the same lighter edge as `ink` for the
+ * same reason, there being nothing below --color-error in the palette.
+ * Never for a school, never for ink, and never for an action that can be
+ * undone.
+ *
  * min-h-14 is 56px, which is both the mockups' primary-button height and
  * comfortably past the 44px floor. Focus comes from the global
  * :focus-visible rule rather than a per-tone ring, so a new tone cannot
@@ -29,6 +43,10 @@ export type ChunkyTone = "school" | "ink" | "paper" | "correct" | "wrong" | "qui
 const TONES: Record<Exclude<ChunkyTone, "school">, { cls: string; shade: string }> = {
   ink: {
     cls: "bg-ink text-paper",
+    shade: "var(--color-rule-strong)",
+  },
+  error: {
+    cls: "bg-error text-white",
     shade: "var(--color-rule-strong)",
   },
   paper: {

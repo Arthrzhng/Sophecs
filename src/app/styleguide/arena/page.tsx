@@ -17,6 +17,8 @@ import { LiveReadingCheck, ReadingCheckFrame } from "./ReadingCheckPreview";
 import { StreakCard, SchoolCard } from "@/components/today/TodayCards";
 import { LessonsCard, type LessonsCardModule } from "@/components/today/LessonsCard";
 import { StreakBlock } from "@/components/me/StreakBlock";
+import { ProfilePage } from "@/components/me/ProfilePage";
+import { SettingsPage } from "@/components/me/SettingsPage";
 import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
 import { SCHOOL_IDS } from "@/lib/types";
@@ -36,6 +38,12 @@ import {
   FIXTURE_RESULT_ID,
   FIXTURE_VECTOR,
   FIXTURE_WEEK,
+  FIXTURE_CHALLENGES,
+  FIXTURE_CLASSES_JOINED,
+  FIXTURE_CLASSES_OWNED,
+  FIXTURE_DEBATES,
+  FIXTURE_EXCHANGES,
+  FIXTURE_OBJECTION,
   fixtureTopics,
 } from "@/lib/arena-fixtures";
 
@@ -548,6 +556,78 @@ export default function ArenaPreviewPage() {
           this browser, so it shows whichever one you have not finished and
           moves as you read. The second is given an empty list, which is the
           same branch as having finished them all.
+        </p>
+      </Section>
+      <p className="mt-12 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+        The profile and its settings. Both need a session and a row per
+        block, so neither renders without one. The three below are the
+        states worth looking at.
+      </p>
+
+      <Section title="28. Profile: signed in, nothing argued yet">
+        <div data-daily-path className="rounded-panel border-2 border-rule">
+          <ProfilePage
+            school="stoicism"
+            displayName={null}
+            elo={1200}
+            percentile={0.5}
+            streak={0}
+            streakUpdatedOn={null}
+            today={today}
+            ratingPoints={[]}
+            objections={[]}
+            weeklyMotion={{ slug: "opaque-benefit", title: "The opaque benefit" }}
+            hasAnyDebate={false}
+            exchanges={[]}
+            pendingChallenges={[]}
+            debates={[]}
+            caseStates={{}}
+            allClosed={false}
+          />
+        </div>
+      </Section>
+
+      <Section title="29. Profile: an objection open, a chart, and a history">
+        <div data-daily-path className="rounded-panel border-2 border-rule">
+          <ProfilePage
+            school="stoicism"
+            displayName="A Stoic"
+            elo={1284}
+            percentile={0.82}
+            streak={3}
+            streakUpdatedOn={today}
+            today={today}
+            ratingPoints={FIXTURE_RATINGS_MANY}
+            objections={[FIXTURE_OBJECTION]}
+            weeklyMotion={{ slug: "opaque-benefit", title: "The opaque benefit" }}
+            hasAnyDebate
+            exchanges={FIXTURE_EXCHANGES}
+            pendingChallenges={FIXTURE_CHALLENGES}
+            debates={FIXTURE_DEBATES}
+            caseStates={{
+              "opaque-benefit": { read: true, argued: true, answered: false, closed: false },
+              "crash-arithmetic": { read: true, argued: true, answered: true, closed: true },
+            }}
+            allClosed={false}
+          />
+        </div>
+      </Section>
+
+      <Section title="30. Settings, with the deletion step open">
+        <div data-daily-path className="rounded-panel border-2 border-rule">
+          <SettingsPage
+            displayName="A Stoic"
+            argumentDefaultPublic={false}
+            owned={FIXTURE_CLASSES_OWNED}
+            joined={FIXTURE_CLASSES_JOINED}
+          />
+        </div>
+        <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+          Press &ldquo;Delete account&rdquo; at the foot to open the
+          confirmation. It is the real control, so the second press really
+          would delete this preview&apos;s account if one were signed in;
+          nobody is, so it reports the failure instead. Every word of that
+          block is frozen copy.
         </p>
       </Section>
     </Page>

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 
 export function SignOutButton() {
   const router = useRouter();
@@ -14,12 +15,8 @@ export function SignOutButton() {
   }
 
   return (
-    <button
-      type="button"
-      onClick={signOut}
-      className="min-h-11 px-4 border border-rule rounded-control text-sm font-medium hover:border-ink-soft"
-    >
+    <ChunkyButton tone="paper" onClick={signOut} className="border-2 border-rule-strong">
       Sign out
-    </button>
+    </ChunkyButton>
   );
 }

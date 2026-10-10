@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { setDisplayName } from "@/app/me/actions";
-import { Button } from "@/components/ui/Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 
 export function DisplayNameForm({ initial }: { initial: string | null }) {
   const [value, setValue] = useState(initial ?? "");
@@ -19,24 +19,28 @@ export function DisplayNameForm({ initial }: { initial: string | null }) {
 
   return (
     <div>
-      <form onSubmit={save} className="flex gap-2">
+      {/* Stacked below sm for the same reason /login's is: a 56px field
+          beside a 56px button leaves no room to read back what you typed. */}
+      <form onSubmit={save} className="flex flex-col gap-3 sm:flex-row">
         <input
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Skippable — otherwise shown as “A Stoic”"
           maxLength={60}
-          className="flex-1 min-h-11 bg-surface border border-rule rounded-control px-3 text-sm placeholder:text-ink-soft"
+          className="min-h-14 flex-1 rounded-chunky border-2 border-rule-strong bg-surface px-4 text-base text-ink placeholder:text-ink-soft"
         />
-        <Button
+        <ChunkyButton
           type="submit"
+          tone="paper"
           disabled={pending}
+          className="border-2 border-rule-strong"
         >
           Save
-        </Button>
+        </ChunkyButton>
       </form>
       {status && (
-        <p role="status" className="mt-2 font-mono text-xs text-ink-mid">
+        <p role="status" className="mt-3 text-sm text-ink-mid">
           {status}
         </p>
       )}

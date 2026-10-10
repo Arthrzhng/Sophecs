@@ -7,6 +7,11 @@ import {
 } from "./school-table";
 import { ratingByWeek } from "./rating-history";
 import type { CaseState } from "./case-steps";
+import type { PendingChallenge } from "./challenge";
+import type { ClassSummary, JoinedClass } from "./classes";
+import type { OpenObjection } from "./objections";
+import type { ExchangeRow } from "@/components/me/OpenExchanges";
+import type { ProfileDebate } from "@/components/me/ProfilePage";
 import type { SchoolId } from "./types";
 import type { TopicListItem, TopicStatus } from "@/components/debate/TopicList";
 import type { VerdictData } from "@/components/debate/Verdict";
@@ -224,3 +229,73 @@ export const FIXTURE_OTHER_VECTOR = {
 };
 
 export const FIXTURE_RESULT_ID = "preview-result";
+
+/*
+ * The profile and its settings.
+ *
+ * Both routes need a session, two or three admin queries and a row per
+ * block, so neither can be looked at while it is being built. The empty
+ * profile and the full one are different enough pages that both have to
+ * be reviewed, and the claim below is the same one the verdict fixture
+ * already uses rather than a second invented objection.
+ */
+export const FIXTURE_OBJECTION: OpenObjection = {
+  debateId: FIXTURE_RESULT_ID,
+  topicSlug: "opaque-benefit",
+  topicTitle: "The opaque benefit",
+  school: "stoicism",
+  rivalSchool: "virtue-ethics",
+  claim:
+    FIXTURE_VERDICT.unanswered_objection?.claim ??
+    "Practical wisdom is exercised in deliberation.",
+  createdAt: FIXTURE_OLD_VERDICT_AT,
+};
+
+export const FIXTURE_CHALLENGES: PendingChallenge[] = [
+  {
+    challengeId: "preview-challenge",
+    topicSlug: "crash-arithmetic",
+    otherSchool: "utilitarianism",
+  },
+  { challengeId: "preview-challenge-2", topicSlug: null, otherSchool: null },
+];
+
+export const FIXTURE_EXCHANGES: ExchangeRow[] = [
+  {
+    id: "preview-exchange",
+    topicTitle: "Trained to be good",
+    theirSchool: "virtue-ethics",
+    myTurn: true,
+  },
+  {
+    id: "preview-exchange-2",
+    topicTitle: "The careful builder",
+    theirSchool: "utilitarianism",
+    myTurn: false,
+  },
+];
+
+export const FIXTURE_DEBATES: ProfileDebate[] = [
+  {
+    id: FIXTURE_RESULT_ID,
+    topicSlug: "opaque-benefit",
+    score: 71,
+    rejected: false,
+    revision: {
+      id: "preview-revision",
+      topicSlug: "opaque-benefit",
+      score: 78,
+      rejected: false,
+    },
+  },
+  { id: "preview-debate-2", topicSlug: "crash-arithmetic", score: 64, rejected: false },
+  { id: "preview-debate-3", topicSlug: "no-decision", score: null, rejected: true },
+];
+
+export const FIXTURE_CLASSES_OWNED: ClassSummary[] = [
+  { id: "preview-class", code: "KQ47PD", name: "Year 12 Philosophy", memberCount: 24 },
+];
+
+export const FIXTURE_CLASSES_JOINED: JoinedClass[] = [
+  { id: "preview-joined", name: "Thursday ethics club", memberCount: 9 },
+];

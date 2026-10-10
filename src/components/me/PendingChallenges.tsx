@@ -4,25 +4,28 @@ import type { PendingChallenge } from "@/lib/challenge";
 
 export function PendingChallenges({ challenges }: { challenges: PendingChallenge[] }) {
   if (challenges.length === 0) {
-    return <p className="text-sm text-ink-soft">No pending challenges.</p>;
+    return <p className="text-sm text-ink-mid">No pending challenges.</p>;
   }
 
   return (
-    <ul className="space-y-3">
+    <ul className="flex flex-col gap-3">
       {challenges.map((c) => (
-        <li key={c.challengeId} className="flex items-center justify-between gap-4">
-          <span className="text-sm">
+        <li
+          key={c.challengeId}
+          className="flex flex-wrap items-center justify-between gap-3 rounded-card border-2 border-rule bg-surface p-4"
+        >
+          <span className="text-sm text-ink">
             {c.otherSchool ? SCHOOL_COLORS[c.otherSchool].name : "Someone"} challenged you
           </span>
           {c.topicSlug ? (
             <Link
               href={`/debate/${c.topicSlug}?challenge=${c.challengeId}`}
-              className="font-mono text-xs text-ink underline underline-offset-4"
+              className="inline-flex min-h-11 items-center text-sm font-semibold text-ink underline underline-offset-4"
             >
               Debate them
             </Link>
           ) : (
-            <span className="font-mono text-xs text-ink-soft">Topic not set yet</span>
+            <span className="text-sm text-ink-soft">Topic not set yet</span>
           )}
         </li>
       ))}

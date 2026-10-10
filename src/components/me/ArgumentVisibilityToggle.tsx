@@ -17,17 +17,19 @@ export function ArgumentVisibilityToggle({ initial }: { initial: boolean }) {
   }
 
   return (
-    <label className="flex items-start gap-3 cursor-pointer">
+    <label className="flex cursor-pointer items-start gap-4 rounded-card border-2 border-rule bg-surface p-5">
       <input
         type="checkbox"
         checked={checked}
         onChange={toggle}
         disabled={pending}
-        className="mt-0.5 h-4 w-4"
+        className="mt-0.5 size-5 shrink-0 accent-[color:var(--color-ink)]"
       />
-      <span className="text-sm">
-        Publish arguments by default
-        <span className="block text-ink-soft text-xs mt-0.5">
+      <span className="min-w-0">
+        <span className="block text-base font-bold text-ink">
+          Publish arguments by default
+        </span>
+        <span className="mt-1 block max-w-[54ch] text-sm leading-relaxed text-ink-mid">
           Off by default. When a debate opens, you can still publish or hide
           each argument individually on its verdict page.
         </span>

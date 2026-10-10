@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
@@ -9,20 +8,12 @@ import { getOpenObjections, type OpenObjection } from "@/lib/objections";
 import { getWeeklyMotion } from "@/lib/weekly-motion";
 import { getCaseStates, type CaseState } from "@/lib/cases";
 import { isLapsed } from "@/lib/counterpart";
-import { CaseTicks } from "@/components/debate/CaseTicks";
-import { OpenObjections } from "@/components/me/OpenObjections";
-import { OpenExchanges, type ExchangeRow } from "@/components/me/OpenExchanges";
-import { DisplayNameForm } from "@/components/me/DisplayNameForm";
+import type { ExchangeRow } from "@/components/me/OpenExchanges";
 import { WelcomeTracker } from "@/components/me/WelcomeTracker";
 import { MeViewTracker } from "@/components/me/MeViewTracker";
-import { EloBlock } from "@/components/me/EloBlock";
-import { StreakBlock } from "@/components/me/StreakBlock";
-import { RatingChart } from "@/components/me/RatingChart";
-import { PendingChallenges } from "@/components/me/PendingChallenges";
-import { SCHOOL_ADHERENT, SCHOOL_COLORS } from "@/lib/school-colors";
+import { ProfilePage } from "@/components/me/ProfilePage";
 import { todayUTC } from "@/lib/streak";
 import type { SchoolId } from "@/lib/types";
-import { Page } from "@/components/layout/Page";
 
 export const metadata = { title: "Me · Sophecs" };
 
@@ -201,153 +192,53 @@ export default async function MePage({
     );
   }
 
+  // The container is written out rather than taken from <Page>, because
+  // the daily-path wrapper has to sit on <main>; five other routes do the
+  // same, and they all go back to <Page> in the stage that deletes it.
   return (
-    <Page width="ui">
-        <MeViewTracker openObjections={openObjections.length} />
-        <WelcomeTracker
-          active={welcome === "1"}
-          userId={user.id}
-          method={method}
-          school={school}
-          resultId={claimedResultId}
-        />
-        <p className="eyebrow text-ink-soft mb-4">Me</p>
-
-        {school ? (
-          <div
-            className="border-l-2 pl-4"
-            style={{ borderColor: SCHOOL_COLORS[school].surface }}
-          >
-            <p className="font-mono text-xs text-ink-soft">Your school</p>
-            <h1 className="mt-1 font-serif text-xl font-medium leading-tight text-ink">
-              {SCHOOL_COLORS[school].name}
-            </h1>
-          </div>
-        ) : (
-          <p className="text-ink-mid text-sm max-w-[50ch]">
-            No result attached to your account yet.{" "}
-            <Link href="/quiz" className="underline underline-offset-4 text-ink">
-              Take the quiz
-            </Link>{" "}
-            to find your school.
-          </p>
-        )}
-
-        {school && allClosed && (
-          <p className="mt-6 font-serif text-lg leading-relaxed text-ink max-w-[55ch]">
-            You&apos;ve closed every motion as a {SCHOOL_ADHERENT[school]}.{" "}
-            <Link href="/quiz" className="underline underline-offset-4">
-              Retake the quiz
-            </Link>{" "}
-            to argue from another school, or wait for the next motion.
-          </p>
-        )}
-
-        {/* Leads the page: the open objection is the reason to come back,
-            so it sits above the rating and the streak. */}
-        {school && (
-          <div className="mt-10 border-t border-rule pt-8">
-            <OpenObjections
-              objections={openObjections}
-              weeklyMotion={weeklyMotion}
-              hasAnyDebate={hasAnyDebate}
-              school={school}
-            />
-          </div>
-        )}
-
-        {exchanges.length > 0 && (
-          <div className="mt-10 border-t border-rule pt-8">
-            <OpenExchanges exchanges={exchanges} />
-          </div>
-        )}
-
-        {school && (
-          <div className="mt-10 border-t border-rule pt-8 grid grid-cols-2 gap-6">
-            <EloBlock elo={elo} percentile={percentile} />
-            <StreakBlock
-              streak={streak}
-              streakUpdatedOn={streakUpdatedOn}
-              today={todayUTC()}
-            />
-          </div>
-        )}
-
-        {/* The rating over time, which the two blocks above can only give
-            as today's number. docs/daily-path-copy.md §9. */}
-        {school && (
-          <div className="mt-10 border-t border-rule pt-8" data-daily-path>
-            <RatingChart points={ratingPoints} />
-          </div>
-        )}
-
-        <div className="mt-10 border-t border-rule pt-8">
-          <p className="eyebrow text-ink-soft mb-4">Pending challenges</p>
-          <PendingChallenges challenges={pendingChallenges} />
-        </div>
-
-        {debateHistory.length > 0 && (
-          <div className="mt-10 border-t border-rule pt-8">
-            <p className="eyebrow text-ink-soft mb-4">Debate history</p>
-            <ul className="space-y-3">
-              {debateHistory.map((d) => {
-                const revision = revisionByParent.get(d.id);
-                return (
-                  <li key={d.id}>
-                    <div className="flex items-center justify-between text-sm">
-                      <Link
-                        href={`/debate/${d.topic_slug}/${d.id}`}
-                        className="text-ink hover:underline underline-offset-4"
-                      >
-                        {d.topic_slug}
-                      </Link>
-                      <span className="font-mono text-xs text-ink-soft">
-                        {d.rejected ? "not judged" : d.score}
-                      </span>
-                    </div>
-                    {caseStates[d.topic_slug] && (
-                      <div className="mt-2">
-                        <CaseTicks state={caseStates[d.topic_slug]} />
-                      </div>
-                    )}
-                    {/* Nested, not listed alongside: a revision is the second
-                        half of one attempt, and reads as nonsense on its own. */}
-                    {revision && (
-                      <div className="mt-1 ml-4 border-l border-rule pl-3 flex items-center justify-between text-sm">
-                        <Link
-                          href={`/debate/${revision.topic_slug}/${revision.id}`}
-                          className="text-ink-mid hover:text-ink hover:underline underline-offset-4"
-                        >
-                          Revision
-                        </Link>
-                        <span className="font-mono text-xs text-ink-soft">
-                          {revision.rejected ? "not judged" : revision.score}
-                        </span>
-                      </div>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-
-        <div className="mt-10 border-t border-rule pt-8">
-          <p className="eyebrow text-ink-soft mb-4">Display name</p>
-          <DisplayNameForm initial={profile?.display_name ?? null} />
-        </div>
-
-        <div className="mt-10 border-t border-rule pt-8">
-          <Link href="/debate" className="font-mono text-xs text-ink-mid hover:text-ink">
-            Debate →
-          </Link>
-        </div>
-
-        <div className="mt-4">
-          <Link href="/me/settings" className="font-mono text-xs text-ink-mid hover:text-ink">
-            Settings →
-          </Link>
-        </div>
-    </Page>
+    <main className="flex-1" data-daily-path>
+      <MeViewTracker openObjections={openObjections.length} />
+      <WelcomeTracker
+        active={welcome === "1"}
+        userId={user.id}
+        method={method}
+        school={school}
+        resultId={claimedResultId}
+      />
+      <ProfilePage
+        school={school}
+        displayName={profile?.display_name ?? null}
+        elo={elo}
+        percentile={percentile}
+        streak={streak}
+        streakUpdatedOn={streakUpdatedOn}
+        today={todayUTC()}
+        ratingPoints={ratingPoints}
+        objections={openObjections}
+        weeklyMotion={weeklyMotion}
+        hasAnyDebate={hasAnyDebate}
+        exchanges={exchanges}
+        pendingChallenges={pendingChallenges}
+        debates={debateHistory.map((d) => {
+          const revision = revisionByParent.get(d.id);
+          return {
+            id: d.id,
+            topicSlug: d.topic_slug,
+            score: d.score,
+            rejected: d.rejected,
+            revision: revision
+              ? {
+                  id: revision.id,
+                  topicSlug: revision.topic_slug,
+                  score: revision.score,
+                  rejected: revision.rejected,
+                }
+              : undefined,
+          };
+        })}
+        caseStates={caseStates}
+        allClosed={allClosed}
+      />
+    </main>
   );
 }
