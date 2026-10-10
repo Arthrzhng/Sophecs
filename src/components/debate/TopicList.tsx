@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CaseTicks } from "./CaseTicks";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { TextLink } from "@/components/ui/TextLink";
+import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { CaseState } from "@/lib/case-steps";
 import type { SchoolId } from "@/lib/types";
@@ -30,18 +31,25 @@ export interface TopicListItem {
   caseState?: CaseState;
 }
 
-// A list, not a grid. Each motion is a row: the motion on the left, the
-// measured values on the right, and a hairline between. Six cards in a
-// two-column grid is a menu of products; this is a reading list.
-//
-// The school colour appears once on this screen, on the week's motion, and
-// nowhere else. It was previously a 2px rule on every row, which is the
-// definition of using a tribal marker as a general UI accent.
-//
-// No filters. Six rows fit on one screen, and a control that narrows six
-// things to four costs more attention than it saves; the status is on every
-// row, which is what the filter was reading anyway. Past about a dozen
-// motions the two native selects should come back.
+/**
+ * The six motions, one card each.
+ *
+ * Still a list and still one column. The earlier note here warned that six
+ * cards in a two-column grid is a menu of products rather than a reading
+ * list, and that still holds: what changed is the row, not the shape. A
+ * motion is now a card you press, which is what every other list in the
+ * restyle is, and the hairline between rows became the card's own edge.
+ *
+ * The school colour appears once on this screen, as the week's 4px left
+ * edge, and nowhere else. Same device /s/[school] uses, for the same
+ * reason: it says which school is being talked about without filling
+ * anything.
+ *
+ * No filters. Six cards fit on one screen, and a control that narrows six
+ * things to four costs more attention than it saves; the status is on every
+ * card, which is what the filter was reading anyway. Past about a dozen
+ * motions the two native selects should come back.
+ */
 export function TopicList({
   topics,
   school,
@@ -66,118 +74,99 @@ export function TopicList({
     );
   }
 
-  // A column that holds the same number on every row is not a column. While
-  // every motion is set at the same par, it is one sentence above the list;
-  // the column comes back the moment a motion is set anywhere else.
+  // A value that is the same on every card is not a value worth repeating.
+  // While every motion is set at the same par it is one sentence above the
+  // list; it moves onto the cards the moment a motion is set anywhere else.
   const par = topics[0].parElo;
   const uniformPar = topics.every((t) => t.parElo === par);
-  const cols = uniformPar
-    ? "md:grid-cols-[1fr_10rem_5rem]"
-    : "md:grid-cols-[1fr_10rem_5rem_5rem]";
 
   return (
     <div>
       {uniformPar && (
-        <p className="text-sm text-ink-mid">
+        <p className="max-w-[60ch] text-sm leading-relaxed text-ink-mid">
           Every motion is set at par{" "}
-          <span className="font-mono tabular text-ink">{Math.round(par)}</span>. Beating
-          par raises your rating; falling short of it lowers it.
+          <span className="font-mono tabular font-bold text-ink">{Math.round(par)}</span>.
+          Beating par raises your rating; falling short of it lowers it.
         </p>
       )}
 
-      <div className="mt-6">
-        {/* Column headers only where there are columns. Below md the row
-            collapses to a definition list rather than scrolling. */}
-        <div
-          className={`hidden border-b border-rule pb-2 text-sm text-ink-soft md:grid md:gap-4 ${cols}`}
-        >
-          <span>Motion</span>
-          <span>Status</span>
-          <span className="text-right">Your best</span>
-          {!uniformPar && <span className="text-right">Par ELO</span>}
-        </div>
-
-        <ul className="divide-y divide-rule">
-          {topics.map((topic) => (
-            <li key={topic.slug}>
+      <ul className={`flex flex-col gap-4 ${uniformPar ? "mt-6" : ""}`}>
+        {topics.map((topic) => {
+          const weekly = Boolean(topic.isWeekly && school);
+          return (
+            <li key={topic.slug} className="flex">
               <Link
                 href={`/debate/${topic.slug}`}
-                className={`group block py-6 md:grid md:gap-4 ${cols}`}
+                className={`chunky group flex min-w-0 flex-1 flex-col rounded-panel border-2 border-rule-strong bg-surface p-5 ${
+                  weekly ? "border-l-4" : ""
+                }`}
+                style={{
+                  ...shade("var(--color-rule-strong)"),
+                  ...(weekly && school
+                    ? { borderLeftColor: SCHOOL_CHUNKY[school].bg }
+                    : {}),
+                }}
               >
-                {/* The week's marker hangs into the gutter rather than
-                    indenting its row. Indenting it put one title 18px in
-                    from every other title, which is a ragged left edge on
-                    the one column the eye reads down. The container has
-                    24px of padding for it to hang in. */}
-                <div
-                  className={
-                    topic.isWeekly && school ? "-ml-[18px] border-l-2 pl-4" : undefined
-                  }
-                  style={
-                    topic.isWeekly && school
-                      ? { borderColor: SCHOOL_COLORS[school].surface }
-                      : undefined
-                  }
-                >
-                  {topic.isWeekly && (
-                    <p className="mb-1 text-sm text-ink-soft">This week&apos;s motion</p>
-                  )}
-                  <h3 className="font-serif text-md font-medium text-ink underline-offset-4 group-hover:underline">
-                    {topic.title}
-                  </h3>
-                  <p className="mt-1 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
-                    {topic.motion}
-                  </p>
-                  {school && (
-                    <p className="mt-2 max-w-[60ch] text-sm leading-relaxed text-ink">
-                      Your stance: {topic.stances[school]}
-                    </p>
-                  )}
-                  {topic.caseState && (
-                    <div className="mt-3">
-                      <CaseTicks state={topic.caseState} />
-                    </div>
-                  )}
-                </div>
-
-                {/* Status is a word, not a pill, a dot or an icon. */}
-                <p className="mt-3 text-sm text-ink-mid md:mt-0">
-                  {topic.status === "locked" && topic.locksFor != null
-                    ? `Locked for ${topic.locksFor} more ${topic.locksFor === 1 ? "day" : "days"}`
-                    : STATUS_LABEL[topic.status]}
-                </p>
-
-                {/* Below md the measured values join the status as labelled
-                    pairs, rather than a middle-dotted string to decode. */}
-                <p className="mt-1 flex gap-6 text-sm text-ink-mid md:hidden">
-                  <span>
-                    <span className="font-mono tabular text-ink">
-                      {topic.bestScore != null ? topic.bestScore : "—"}
-                    </span>{" "}
-                    best
-                  </span>
-                  {!uniformPar && (
-                    <span>
-                      <span className="font-mono tabular text-ink">
-                        {Math.round(topic.parElo)}
-                      </span>{" "}
-                      par ELO
-                    </span>
-                  )}
-                </p>
-                <p className="hidden text-right font-mono text-sm tabular text-ink md:block">
-                  {topic.bestScore != null ? topic.bestScore : "—"}
-                </p>
-                {!uniformPar && (
-                  <p className="hidden text-right font-mono text-sm tabular text-ink md:block">
-                    {Math.round(topic.parElo)}
+                {topic.isWeekly && (
+                  <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
+                    This week&apos;s motion
                   </p>
                 )}
+                <h3
+                  className={`font-serif text-md font-medium text-ink underline-offset-4 group-hover:underline ${
+                    topic.isWeekly ? "mt-2" : ""
+                  }`}
+                >
+                  {topic.title}
+                </h3>
+                <p className="mt-2 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+                  {topic.motion}
+                </p>
+                {school && (
+                  <p className="mt-3 max-w-[60ch] text-sm leading-relaxed text-ink">
+                    Your stance: {topic.stances[school]}
+                  </p>
+                )}
+                {topic.caseState && (
+                  <div className="mt-4">
+                    <CaseTicks state={topic.caseState} />
+                  </div>
+                )}
+
+                {/* The two measured things, on the card's own foot rather
+                    than in columns beside it. A column that is empty on
+                    five cards out of six was a column of dashes. */}
+                <div className="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-t-2 border-rule pt-4">
+                  {/* Status is a word, not a pill, a dot or an icon. */}
+                  <p className="text-sm font-bold text-ink-mid">
+                    {topic.status === "locked" && topic.locksFor != null
+                      ? `Locked for ${topic.locksFor} more ${topic.locksFor === 1 ? "day" : "days"}`
+                      : STATUS_LABEL[topic.status]}
+                  </p>
+                  <p className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-ink-mid">
+                    {topic.bestScore != null && (
+                      <span>
+                        Your best{" "}
+                        <span className="font-mono tabular font-bold text-ink">
+                          {topic.bestScore}
+                        </span>
+                      </span>
+                    )}
+                    {!uniformPar && (
+                      <span>
+                        Par{" "}
+                        <span className="font-mono tabular font-bold text-ink">
+                          {Math.round(topic.parElo)}
+                        </span>
+                      </span>
+                    )}
+                  </p>
+                </div>
               </Link>
             </li>
-          ))}
-        </ul>
-      </div>
+          );
+        })}
+      </ul>
     </div>
   );
 }

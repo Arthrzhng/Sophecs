@@ -6,6 +6,7 @@ import {
   type SchoolChange,
 } from "./school-table";
 import { ratingByWeek } from "./rating-history";
+import type { CaseState } from "./case-steps";
 import type { SchoolId } from "./types";
 import type { TopicListItem, TopicStatus } from "@/components/debate/TopicList";
 import type { VerdictData } from "@/components/debate/Verdict";
@@ -40,6 +41,15 @@ const TOPIC_STATUS: Record<string, TopicStatus> = {
   "no-decision": "pending",
 };
 
+// How far each case has got. Absent means no case at all, which is what a
+// signed-out reader sees and what an untouched motion shows; the three
+// here cover part-way, one step in, and closed.
+const TOPIC_CASE: Record<string, CaseState> = {
+  "opaque-benefit": { read: true, argued: true, answered: false, closed: false },
+  "crash-arithmetic": { read: true, argued: true, answered: true, closed: true },
+  "no-decision": { read: true, argued: false, answered: false, closed: false },
+};
+
 export function fixtureTopics(): TopicListItem[] {
   return getAllTopicFiles()
     .filter((t) => t.active)
@@ -54,6 +64,7 @@ export function fixtureTopics(): TopicListItem[] {
       status: TOPIC_STATUS[t.slug] ?? "open",
       locksFor: t.slug === "crash-arithmetic" ? 5 : null,
       isWeekly: t.slug === "opaque-benefit",
+      caseState: TOPIC_CASE[t.slug],
     }));
 }
 

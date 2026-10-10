@@ -2,7 +2,7 @@ import { createClient as createSupabaseServerClient } from "@/lib/supabase/serve
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { TopicList, type TopicListItem, type TopicStatus } from "@/components/debate/TopicList";
 import { DebateListViewTracker } from "@/components/debate/DebateListViewTracker";
-import { Page } from "@/components/layout/Page";
+import { JudgingPausedNotice } from "@/components/debate/JudgingPausedNotice";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { TextLink } from "@/components/ui/TextLink";
 import { getWeeklyMotion } from "@/lib/weekly-motion";
@@ -137,47 +137,49 @@ export default async function DebatePage() {
   // display only — it decides nothing.
   const judgePaused = process.env.KILL_SWITCH_JUDGE === "true";
 
+  // The container is written out rather than taken from <Page>, because
+  // the daily-path wrapper has to sit on <main>; /today, /table,
+  // /s/[school] and /login do the same, and all five go back to <Page> in
+  // the stage that deletes the wrapper.
   return (
-    <Page width="ui">
-      <DebateListViewTracker />
-      <h1 className="font-serif text-lg font-medium text-ink">Motions</h1>
-      <p className="mt-2 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
-        Pick a motion and argue it from your school. A judge scores how
-        faithfully you argued from it, not whether it agrees with you.
-      </p>
+    <main className="flex-1" data-daily-path>
+      <div className="mx-auto max-w-ui px-6 py-10">
+        <DebateListViewTracker />
+        <h1 className="text-xl font-extrabold tracking-tight text-ink">Motions</h1>
+        <p className="mt-3 max-w-[60ch] text-base leading-relaxed text-ink-mid">
+          Pick a motion and argue it from your school. A judge scores how
+          faithfully you argued from it, not whether it agrees with you.
+        </p>
 
-      {/* Said here rather than at submission time: the reader deserves to
-          know before writing, not after.
+        {/* Said here rather than at submission time: the reader deserves to
+            know before writing, not after.
 
-          Suppressed when the list itself failed — two role="alert" blocks
-          on one page is two assertive announcements, and the one that
-          matters is the one that says there is nothing to read. */}
-      {judgePaused && !listFailed && (
-        <div className="mt-8">
-          <ErrorState
-            title="Judging is paused."
-            body="Judging is paused while we check the quality of the verdicts. You can still read the motions and write an argument, and your draft stays in this browser, but nothing reaches the judge today and no verdict comes back."
-            action={
-              <div className="flex flex-wrap items-center gap-6 text-sm">
-                <TextLink href="/method">How the judge works</TextLink>
-                <TextLink href="/lessons">Read the lessons instead</TextLink>
-              </div>
-            }
-          />
-        </div>
-      )}
+            A card rather than the shared ErrorState below it, and the same
+            card Today uses to say the same thing: judging being off is the
+            state of the product today, not a fault in this page. The
+            failure underneath it is a fault, and keeps the alert.
 
-      <div className="mt-10">
-        {listFailed ? (
-          <ErrorState
-            title="The motions could not be loaded."
-            body="This is on our side, not yours. Reloading usually fixes it; if it does not, the lessons and the case for your school are unaffected."
-            action={<TextLink href="/lessons">Read the lessons</TextLink>}
-          />
-        ) : (
-          <TopicList topics={topics} school={school} />
+            Suppressed when the list itself failed — two notices on one
+            page is two things to read before the one that matters, which
+            is the one saying there is nothing to read. */}
+        {judgePaused && !listFailed && (
+          <div className="mt-8">
+            <JudgingPausedNotice />
+          </div>
         )}
+
+        <div className="mt-10">
+          {listFailed ? (
+            <ErrorState
+              title="The motions could not be loaded."
+              body="This is on our side, not yours. Reloading usually fixes it; if it does not, the lessons and the case for your school are unaffected."
+              action={<TextLink href="/lessons">Read the lessons</TextLink>}
+            />
+          ) : (
+            <TopicList topics={topics} school={school} />
+          )}
+        </div>
       </div>
-    </Page>
+    </main>
   );
 }

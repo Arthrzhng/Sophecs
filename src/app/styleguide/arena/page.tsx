@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
 import { Page } from "@/components/layout/Page";
 import { TopicList } from "@/components/debate/TopicList";
+import { JudgingPausedNotice } from "@/components/debate/JudgingPausedNotice";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { TextLink } from "@/components/ui/TextLink";
 import { Verdict } from "@/components/debate/Verdict";
 import { ArgumentEditor } from "@/components/debate/ArgumentEditor";
 import { ChallengeInvite } from "@/components/share/ChallengeInvite";
@@ -103,6 +106,21 @@ export default function ArenaPreviewPage() {
 
       <Section title="1. Arena index, with motions">
         <TopicList topics={fixtureTopics()} school="stoicism" />
+      </Section>
+
+      <Section title="1b. Arena notices: judging paused, and the list unreadable">
+        <div className="flex flex-col gap-8">
+          <JudgingPausedNotice />
+          {/* The shared ErrorState, unchanged. A paused judge is the state
+              of the product; this is a fault, and it keeps the alert and
+              the error rule. It gets its own pass when the shared UI
+              components are redrawn. */}
+          <ErrorState
+            title="The motions could not be loaded."
+            body="This is on our side, not yours. Reloading usually fixes it; if it does not, the lessons and the case for your school are unaffected."
+            action={<TextLink href="/lessons">Read the lessons</TextLink>}
+          />
+        </div>
       </Section>
 
       <Section title="2. Arena index, no open motions">
