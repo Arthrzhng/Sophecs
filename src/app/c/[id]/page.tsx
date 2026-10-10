@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
-import { Page } from "@/components/layout/Page";
 import { ChallengeInvite } from "@/components/share/ChallengeInvite";
 import { ChallengeViewTracker } from "@/components/share/ChallengeViewTracker";
 import { getSchool } from "@/lib/schools";
@@ -33,14 +32,18 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
   const challenge = await getChallenge(id);
   if (!challenge) notFound();
 
+  // The container is written out rather than taken from <Page>, because
+  // the daily-path wrapper has to sit on <main>; see the note on /me.
   return (
-    <Page width="read">
-      <ChallengeViewTracker challengeId={id} />
-      <ChallengeInvite
-        challengeId={id}
-        school={challenge.school}
-        content={getSchool(challenge.school)}
-      />
-    </Page>
+    <main className="flex-1" data-daily-path>
+      <div className="mx-auto max-w-read px-6 py-10">
+        <ChallengeViewTracker challengeId={id} />
+        <ChallengeInvite
+          challengeId={id}
+          school={challenge.school}
+          content={getSchool(challenge.school)}
+        />
+      </div>
+    </main>
   );
 }
