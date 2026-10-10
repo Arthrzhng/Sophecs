@@ -783,15 +783,23 @@ So: the content names its subject in that subject's colour, as a word or a 2px r
 
 The two places this bites hardest are the ones still to be redrawn: Counterpart, where two schools are on screen at once and only one of them is yours, and /c/[id], where the challenger and the challenged both have one.
 
-### What the last stage of the restyle has to do
+### What the last stage of the restyle did
 
-Written down because it accumulates: every route redrawn so far has left something that could only be done once they all were, and a list in a commit message is a list nobody finds.
+Written down while it accumulated, because every route redrawn left something that could only be done once they all were. All five are done; the list stays as the record of what the stage was.
 
 1. **Promote the font and the radius.** `--font-sans: var(--font-ui)` and `--radius-control: var(--radius-chunky)` move from `[data-daily-path]` into `@theme static`, the way the seven colour lines already did.
 2. **Delete the wrapper.** `[data-daily-path]` goes, and with it the CSS block and every `data-daily-path` attribute. The `.chunky`, `.dp-progress`, `.dp-node` and motion rules scoped under it lose the prefix.
 3. **Put the containers back.** `/today`, `/table`, `/s/[school]`, `/login` and `/debate` each write out `<main className="flex-1">` plus a `mx-auto max-w-* px-6 py-10` div, because the wrapper had to sit on `<main>` and `<Page>` owns that element. With the wrapper gone they all go back to `<Page>`.
 4. **Delete `src/components/ui/Button.tsx`.** `ChunkyButton` and `ChunkyLink` replace it. Eighteen files still import `Button` or `ButtonLink`; each one is a route that will have been redrawn by then.
-5. **Redraw `ErrorState` and `EmptyState`.** Both are shared across routes, so neither could be done in a stage that owns one route: changing them would change pages that branch did not touch. `ErrorState` keeps its `role="alert"` and its error rule, which is what separates it from the notice cards the redraw introduced; what changes is the serif title and the hairline left rule. `EmptyState` is the same job on the other side.
+5. **Redraw `ErrorState` and `EmptyState`.** Both are shared across routes, so neither could be done in a stage that owns one route: changing them would change pages that branch did not touch. `ErrorState` keeps its `role="alert"` and its error rule, which is what separates it from the notice cards the redraw introduced; what changes is the serif title and the hairline left rule. `EmptyState` is the same job on the other side, and is a plain card: emptiness is not a fault and must not announce itself as one.
+
+**Two things the stage turned up that were not on the list.**
+
+`/404` had never been redrawn. It is not a route anyone lists, it carried the last `ButtonLink` in the product, and it was still in Plex Sans because it never had the wrapper to take Bricolage from. Deleting `Button.tsx` made it visible.
+
+Six routes had lost their `<main>` landmark. `/lessons`, `/lessons/[slug]`, `/today`, the module reader and `/styleguide/daily-path` each replaced `<Page>` with a bare `<div className="min-h-screen">` in order to carry the wrapper, and `<Page>` is what renders `<main>`. A page with no main landmark has nothing for a screen reader to jump to. They are back on a `<main>`, and the ones that could take `<Page>` have.
+
+**One thing the stage deliberately did not do.** `<Page>` now has two vertical rhythms: `page` at 48 top / 80 bottom, and `path` at 40/40, which the restyled routes hand-rolled while the wrapper existed. Collapsing them is a decision about how much air the product'"'"'s pages have, and nothing should change its spacing as a side effect of an attribute being removed. The prop exists so that the two can be made one deliberately, in a change whose whole subject is that.
 
 ### The ink tone: a primary for screens with no school
 

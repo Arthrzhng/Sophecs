@@ -38,7 +38,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const index = inTopic.findIndex((l) => l.slug === lesson.slug) + 1;
 
   return (
-    <div data-daily-path className="flex min-h-screen flex-col">
+    <main className="flex flex-1 flex-col">
       <ReadingTopBar position={{ index, total: inTopic.length }} />
 
       <div className="mx-auto w-full max-w-read flex-1 px-6 pb-12">
@@ -105,6 +105,6 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           </ChunkyLink>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 import { Dialog } from "@/components/ui/Dialog";
 import { Toast, useToast } from "@/components/ui/Toast";
 
@@ -15,13 +15,15 @@ export function InteractiveSection() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
-        <Button onClick={() => setDialogOpen(true)}>Open a dialog</Button>
-        <Button variant="secondary" onClick={() => setDestructiveOpen(true)}>
+        <ChunkyButton tone="ink" onClick={() => setDialogOpen(true)}>
+          Open a dialog
+        </ChunkyButton>
+        <ChunkyButton tone="paper" className="border-2 border-rule-strong" onClick={() => setDestructiveOpen(true)}>
           Open a destructive dialog
-        </Button>
-        <Button variant="secondary" onClick={() => showToast("Copied.")}>
+        </ChunkyButton>
+        <ChunkyButton tone="paper" className="border-2 border-rule-strong" onClick={() => showToast("Copied.")}>
           Fire a toast
-        </Button>
+        </ChunkyButton>
       </div>
 
       <Dialog

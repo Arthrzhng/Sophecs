@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/auth/LoginForm";
+import { Page } from "@/components/layout/Page";
 
 export const metadata = {
   title: "Sign in · Sophecs",
@@ -20,9 +21,11 @@ export default async function LoginPage({
 }) {
   const { next } = await searchParams;
 
+  // Back on <Page> now the daily-path wrapper is gone: the wrapper had to
+  // sit on <main>, which <Page> owns. `rhythm="path"` keeps the 40/40 this
+  // route has had since it was redrawn.
   return (
-    <main className="flex-1" data-daily-path>
-      <div className="mx-auto max-w-narrow px-6 py-10">
+    <Page width="narrow" rhythm="path">
         <h1 className="max-w-[20ch] text-xl font-extrabold leading-tight tracking-tight text-ink">
           Sign in to defend your school.
         </h1>
@@ -32,7 +35,6 @@ export default async function LoginPage({
         <div className="mt-8">
           <LoginForm next={next} />
         </div>
-      </div>
-    </main>
+    </Page>
   );
 }

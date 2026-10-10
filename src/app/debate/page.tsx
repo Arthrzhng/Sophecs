@@ -1,4 +1,5 @@
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
+import { Page } from "@/components/layout/Page";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { TopicList, type TopicListItem, type TopicStatus } from "@/components/debate/TopicList";
 import { DebateListViewTracker } from "@/components/debate/DebateListViewTracker";
@@ -137,13 +138,11 @@ export default async function DebatePage() {
   // display only — it decides nothing.
   const judgePaused = process.env.KILL_SWITCH_JUDGE === "true";
 
-  // The container is written out rather than taken from <Page>, because
-  // the daily-path wrapper has to sit on <main>; /today, /table,
-  // /s/[school] and /login do the same, and all five go back to <Page> in
-  // the stage that deletes the wrapper.
+  // Back on <Page> now the daily-path wrapper is gone: the wrapper had to
+  // sit on <main>, which <Page> owns. `rhythm="path"` keeps the 40/40 this
+  // route has had since it was redrawn.
   return (
-    <main className="flex-1" data-daily-path>
-      <div className="mx-auto max-w-ui px-6 py-10">
+    <Page width="ui" rhythm="path">
         <DebateListViewTracker />
         <h1 className="text-xl font-extrabold tracking-tight text-ink">Motions</h1>
         <p className="mt-3 max-w-[60ch] text-base leading-relaxed text-ink-mid">
@@ -179,7 +178,6 @@ export default async function DebatePage() {
             <TopicList topics={topics} school={school} />
           )}
         </div>
-      </div>
-    </main>
+    </Page>
   );
 }

@@ -1,4 +1,5 @@
 import { createClient as createSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { Page } from "@/components/layout/Page";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
 import { SchoolTable } from "@/components/table/SchoolTable";
@@ -103,9 +104,11 @@ export default async function SchoolTablePage() {
   const paused =
     process.env.KILL_SWITCH_JUDGE === "true" && !(userId && isJudgeAllowlisted(userId));
 
+  // Back on <Page> now the daily-path wrapper is gone: the wrapper had to
+  // sit on <main>, which <Page> owns. `rhythm="path"` keeps the 40/40 this
+  // route has had since it was redrawn.
   return (
-    <main className="flex-1" data-daily-path>
-      <div className="mx-auto max-w-ui px-6 py-10">
+    <Page width="ui" rhythm="path">
         <SchoolTable
           week={week}
           rows={rows}
@@ -121,7 +124,6 @@ export default async function SchoolTablePage() {
           emptyWeek={judged.length === 0}
           paused={paused}
         />
-      </div>
-    </main>
+    </Page>
   );
 }

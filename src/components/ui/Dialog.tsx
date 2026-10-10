@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
-import { Button } from "./Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 
 // Built on <dialog>, not a div with a portal. The browser gives us the
 // focus trap, the Escape handler, the inert background and the top-layer
@@ -72,18 +72,20 @@ export function Dialog({
       )}
       {children}
       <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
-        <Button variant="secondary" onClick={onCancel} disabled={busy}>
+        <ChunkyButton tone="paper" className="border-2 border-rule-strong" onClick={onCancel} disabled={busy}>
           {cancelLabel}
-        </Button>
-        <Button
-          variant="primary"
+        </ChunkyButton>
+        {/* Ink for a confirmation, error for a destructive one. Neither
+            is a school: a dialog does not know whose school is asking,
+            and a destructive act is coloured for the act. */}
+        <ChunkyButton
+          tone={destructive ? "error" : "ink"}
           onClick={onConfirm}
           loading={busy}
           loadingLabel="Working…"
-          className={destructive ? "border-error bg-error hover:border-error hover:bg-error" : ""}
         >
           {confirmLabel}
-        </Button>
+        </ChunkyButton>
       </div>
     </dialog>
   );

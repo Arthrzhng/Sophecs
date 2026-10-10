@@ -69,7 +69,7 @@ export default function LessonsPage() {
   );
 
   return (
-    <div data-daily-path className="min-h-screen">
+    <main className="flex-1">
       <div className="mx-auto max-w-ui px-6 py-10">
         {cards.length > 0 ? (
           <ModuleFilter heading={heading} modules={cards} />
@@ -142,6 +142,6 @@ export default function LessonsPage() {
           </section>
         )}
       </div>
-    </div>
+    </main>
   );
 }

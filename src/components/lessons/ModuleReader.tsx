@@ -48,7 +48,7 @@ export function ModuleReader({
   }, [viewerId, moduleId, current]);
 
   return (
-    <div data-daily-path className="flex min-h-screen flex-col">
+    <main className="flex flex-1 flex-col">
       <ReadingTopBar
         width="ui"
         sticky
@@ -79,6 +79,6 @@ export function ModuleReader({
           </Passage>
         </article>
       </div>
-    </div>
+    </main>
   );
 }

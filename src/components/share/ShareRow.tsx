@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { track } from "@/lib/analytics/client";
 import type { SchoolId } from "@/lib/types";
-import { Button } from "@/components/ui/Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 
 const SITE = "https://sophecs.com";
 
@@ -118,11 +118,11 @@ function useShare({ resultId, school, shareLine, shareLineIndex }: Props) {
 
 function Btn({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
   return (
-    <Button variant="secondary"
+    <ChunkyButton tone="paper" className="border-2 border-rule-strong"
       onClick={onClick}
     >
       {children}
-    </Button>
+    </ChunkyButton>
   );
 }
 

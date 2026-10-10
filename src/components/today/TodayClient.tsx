@@ -67,7 +67,7 @@ export function TodayClient({
   const tone = SCHOOL_CHUNKY[school];
 
   return (
-    <div data-daily-path className="min-h-screen">
+    <main className="flex-1">
       <div className="mx-auto max-w-ui px-6 py-10">
         <h1 className="text-xl font-extrabold tracking-tight text-ink">Today</h1>
 
@@ -188,6 +188,6 @@ export function TodayClient({
           <aside className="flex w-full flex-col gap-4 lg:max-w-sm">{children}</aside>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

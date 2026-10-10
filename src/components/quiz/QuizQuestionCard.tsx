@@ -60,7 +60,7 @@ export function QuizQuestionCard({
   const preview = selected ? scoreQuiz([...chosenSoFar, selected]) : null;
 
   return (
-    <div data-daily-path>
+    <div>
       <div className="flex items-center justify-between gap-4">
         <p className="font-mono tabular text-sm font-bold text-ink-mid">
           {index + 1} / {total}

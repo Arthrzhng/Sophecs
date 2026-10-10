@@ -5,11 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ResultCard } from "@/components/card/ResultCard";
 import { Page } from "@/components/layout/Page";
-import { Button } from "@/components/ui/Button";
 import { TextLink } from "@/components/ui/TextLink";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { ShareSheet } from "@/components/share/ShareSheet";
-import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
+import { ChunkyButton, ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { SCHOOL_ADHERENT } from "@/lib/school-colors";
 import { ChallengeButton } from "@/components/share/ChallengeButton";
 import { PENDING_RESULT_KEY } from "@/components/quiz/QuizShell";
@@ -119,7 +118,7 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
 
   return (
     <Page width="read">
-      <div data-daily-path>
+      <div>
       {/* "You argue like a ..." rather than "Your school": the quiz reports
           how someone argues, which is the claim the product can actually
           support. Every adherent name takes "a". */}
@@ -168,9 +167,9 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
             title="Couldn't save this result."
             body="The card above is correct and the case for your school is below. What a save buys you is a link worth sharing, so try again in a moment if you want one."
             action={
-              <Button variant="secondary" onClick={() => window.location.reload()}>
+              <ChunkyButton tone="paper" className="border-2 border-rule-strong" onClick={() => window.location.reload()}>
                 Try again
-              </Button>
+              </ChunkyButton>
             }
           />
         </div>

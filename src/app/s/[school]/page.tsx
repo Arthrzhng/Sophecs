@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Page } from "@/components/layout/Page";
 import { notFound } from "next/navigation";
 import { getSchool } from "@/lib/schools";
 import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
@@ -45,9 +46,11 @@ export default async function SchoolPage({ params }: { params: Promise<{ school:
   const tone = SCHOOL_CHUNKY[id];
   const others = SCHOOL_IDS.filter((other) => other !== id);
 
+  // Back on <Page> now the daily-path wrapper is gone: the wrapper had to
+  // sit on <main>, which <Page> owns. `rhythm="path"` keeps the 40/40 this
+  // route has had since it was redrawn.
   return (
-    <main className="flex-1" data-daily-path>
-      <div className="mx-auto max-w-read px-6 py-10">
+    <Page width="read" rhythm="path">
         {/* The left edge is the only school colour on the page. 2px
             elsewhere; 4px here because this is the one surface whose whole
             job is to say which school you are looking at. */}
@@ -129,7 +132,6 @@ export default async function SchoolPage({ params }: { params: Promise<{ school:
             })}
           </ul>
         </section>
-      </div>
-    </main>
+    </Page>
   );
 }

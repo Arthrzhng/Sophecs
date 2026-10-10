@@ -25,7 +25,7 @@ export default function LandingPage() {
     .sort((a, b) => a.sort - b.sort)[0];
 
   return (
-    <main className="flex-1" data-daily-path>
+    <main className="flex-1">
       <div className="mx-auto max-w-ui px-6 pt-6 pb-20 sm:pt-8">
         {/*
           Below `sm` the subtitle sits under the answer rows, so all three

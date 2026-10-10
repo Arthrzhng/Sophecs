@@ -202,7 +202,7 @@ export default async function MePage({
   // the daily-path wrapper has to sit on <main>; five other routes do the
   // same, and they all go back to <Page> in the stage that deletes it.
   return (
-    <main className="flex-1" data-daily-path>
+    <main className="flex-1">
       <MeViewTracker openObjections={openObjections.length} />
       <WelcomeTracker
         active={welcome === "1"}

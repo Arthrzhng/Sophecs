@@ -1,5 +1,6 @@
 import { Page } from "@/components/layout/Page";
-import { Button } from "@/components/ui/Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
+import { SCHOOL_IDS } from "@/lib/types";
 import { TextLink } from "@/components/ui/TextLink";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -175,19 +176,35 @@ export default function StyleguidePage() {
         </div>
       </Section>
 
-      <Section title="Buttons" note="Three variants, one shape, 44px minimum. Focus comes from one global rule, so a new variant cannot forget it.">
+      <Section title="Buttons" note="One shape, 56px, a solid bottom edge it travels down onto. The tone says whose action it is: the reader's own school where they have one, ink where they do not, error for a destructive confirmation, paper for everything secondary. Focus comes from one global rule, so a new tone cannot forget it.">
         <div className="space-y-6">
-          {(["primary", "secondary", "quiet"] as const).map((variant) => (
-            <div key={variant}>
-              <p className="font-mono text-xs text-ink-soft">{variant}</p>
+          {SCHOOL_IDS.map((school) => (
+            <div key={school}>
+              <p className="text-sm text-ink-soft">school · {school}</p>
               <div className="mt-2 flex flex-wrap items-center gap-3">
-                <Button variant={variant}>Start the quiz</Button>
-                <Button variant={variant} disabled>
+                <ChunkyButton school={school}>Start the quiz</ChunkyButton>
+                <ChunkyButton school={school} disabled>
                   Disabled
-                </Button>
-                <Button variant={variant} loading loadingLabel="Submitting…">
+                </ChunkyButton>
+                <ChunkyButton school={school} loading loadingLabel="Submitting…">
                   Submit argument
-                </Button>
+                </ChunkyButton>
+              </div>
+            </div>
+          ))}
+          {(["ink", "error", "paper", "correct", "wrong", "quiet"] as const).map((tone) => (
+            <div key={tone}>
+              <p className="text-sm text-ink-soft">{tone}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                <ChunkyButton
+                  tone={tone}
+                  className={tone === "paper" ? "border-2 border-rule-strong" : ""}
+                >
+                  Start the quiz
+                </ChunkyButton>
+                <ChunkyButton tone={tone} disabled>
+                  Disabled
+                </ChunkyButton>
               </div>
             </div>
           ))}
@@ -254,7 +271,7 @@ export default function StyleguidePage() {
         <EmptyState
           title="No open motions yet."
           body="Six motions are live. Take the one for this week and you will have a verdict in about ten minutes."
-          action={<Button>See the motions</Button>}
+          action={<ChunkyButton tone="ink">See the motions</ChunkyButton>}
         />
       </Section>
 
@@ -263,7 +280,9 @@ export default function StyleguidePage() {
           title="The judge is unavailable."
           body="Your argument is saved. Judging is paused while we check something; come back and submit it later today."
           detail="reason: kill_switch"
-          action={<Button variant="secondary">Back to the motions</Button>}
+          action={
+            <ChunkyButton tone="paper" className="border-2 border-rule-strong">Back to the motions</ChunkyButton>
+          }
         />
       </Section>
 

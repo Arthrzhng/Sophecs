@@ -81,7 +81,12 @@
 
   /* --- Type ------------------------------------------------------------ */
   --font-serif: var(--font-spectral), Georgia, "Times New Roman", serif;
-  --font-sans: var(--font-plex-sans), system-ui, -apple-system, sans-serif;
+  /* Bricolage carries the interface. Promoted out of [data-daily-path]
+     with the control radius below, once the last route was redrawn: Plex
+     Sans is no longer the interface font anywhere, and --font-ui below is
+     kept as its own name because the components that reach for the
+     interface face by name should not have to know which face it is. */
+  --font-sans: var(--font-ui);
   --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", monospace;
 
   /* Six steps, no more. Serif never below 16px; sans never above 24px;
@@ -127,7 +132,10 @@
      a class and a stray one fails to apply rather than quietly disagreeing
      with the six pixels next to it. */
   --radius-*: initial;
-  --radius-control: 6px;
+  /* 14px, the chunky control radius, promoted out of [data-daily-path]
+     with the font above. The 6px it replaced was the previous design's
+     and is not used anywhere now. The focus ring reads this. */
+  --radius-control: var(--radius-chunky);
   --radius-container: 0px;
 
   /* --- Shadow ---------------------------------------------------------- */
@@ -152,7 +160,7 @@
     only green in this product means Stoicism (design/tokens.md §7), and
     right/wrong are never carried by colour alone anywhere they are used.
 
-    The restyle's base palette used to live in [data-daily-path] below, so
+    The restyle's base palette used to live in a [data-daily-path] wrapper, so
     components could be written against the final class names (`bg-paper`,
     `text-ink`) while un-restyled screens kept their old colours. It is in
     the Base block above now: every route shares one palette, and the
@@ -193,6 +201,10 @@
      badge stops reading as a square at all, which puts it in the path
      node's idiom rather than the option row's. It is the smallest chunky
      radius and nothing larger than a badge should use it. */
+  /* Referenced by --radius-control in the Radius block above. Custom
+     properties resolve where they are used, not where they are written,
+     so the forward reference is fine; it is here because this is where
+     the chunky scale lives. */
   --radius-badge: 10px;
   --radius-chunky: 14px;
   --radius-card: 18px;
@@ -310,27 +322,18 @@ summary:focus-visible,
 }
 
 /*
-  What is left of the Daily path wrapper.
+  The Daily path wrapper is gone.
 
-  The colours are gone from here: they are the Base block's values now, so
-  every route is on the warm paper and a `bg-paper` or `text-ink` means the
-  same thing everywhere. What remains is what the routes still drawn to the
-  old design should NOT pick up — Bricolage, and the chunky control radius
-  the focus ring reads from. Those arrive screen by screen as each one is
-  redrawn; the wrapper goes when the last one is.
+  It existed so a route could opt into Bricolage and the chunky control
+  radius while the routes not yet redrawn kept Plex Sans and 6px corners.
+  Every route is redrawn, so both are in `@theme static` above and the
+  wrapper has nothing left to carry. The rules below, which were scoped
+  under it, are now plain classes: `.chunky`, `.dp-progress`, `.dp-node`
+  and `.dp-option` only ever appear on components the restyle owns.
+
+  The paper, the ink and the font it also set are the `body` rule's job
+  and always were; the wrapper was restating them for its own subtree.
 */
-[data-daily-path] {
-  /* Bricolage carries the interface; Spectral still carries every passage,
-     quotation, motion and argument, and mono still carries every number. */
-  --font-sans: var(--font-ui);
-
-  /* Controls are chunky here, which the focus ring below reads from. */
-  --radius-control: var(--radius-chunky);
-
-  background-color: var(--color-paper);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
-}
 
 /*
   The path column snakes: each node carries its own horizontal offset as
@@ -338,13 +341,13 @@ summary:focus-visible,
   side, so the scale drops rather than the offsets being recomputed per
   breakpoint in the component.
 */
-[data-daily-path] .dp-node {
+.dp-node {
   --shift-scale: 1;
   transform: translateX(calc(var(--shift, 0px) * var(--shift-scale)));
 }
 
 @media (max-width: 640px) {
-  [data-daily-path] .dp-node {
+  .dp-node {
     --shift-scale: 0.4;
   }
 }
@@ -355,21 +358,21 @@ summary:focus-visible,
   cannot be combined into one selector: a browser drops the whole rule if
   it does not recognise one selector in the list.
 */
-[data-daily-path] .dp-progress {
+.dp-progress {
   background-color: var(--color-rule);
   border: 0;
 }
 
-[data-daily-path] .dp-progress::-webkit-progress-bar {
+.dp-progress::-webkit-progress-bar {
   background-color: var(--color-rule);
 }
 
-[data-daily-path] .dp-progress::-webkit-progress-value {
+.dp-progress::-webkit-progress-value {
   background-color: var(--color-correct);
   transition: inline-size var(--duration-base) var(--ease-out-quiet);
 }
 
-[data-daily-path] .dp-progress::-moz-progress-bar {
+.dp-progress::-moz-progress-bar {
   background-color: var(--color-correct);
 }
 
@@ -384,19 +387,19 @@ summary:focus-visible,
   `--sh` defaults to the strong rule so a `.chunky` with no shade set still
   has an edge instead of silently losing its depth.
 */
-[data-daily-path] .chunky {
+.chunky {
   --sh: var(--color-rule-strong);
   box-shadow: 0 5px 0 0 var(--sh);
   transition: transform var(--duration-fast) var(--ease-out-quiet),
     box-shadow var(--duration-fast) var(--ease-out-quiet);
 }
 
-[data-daily-path] .chunky:active:not(:disabled) {
+.chunky:active:not(:disabled) {
   transform: translateY(5px);
   box-shadow: 0 0 0 0 var(--sh);
 }
 
-[data-daily-path] .chunky:disabled {
+.chunky:disabled {
   box-shadow: 0 5px 0 0 var(--sh);
 }
 
@@ -411,7 +414,7 @@ summary:focus-visible,
   Because the radio itself is off-screen, the focus ring has to be drawn on
   the row around it, or a keyboard user would see nothing move.
 */
-[data-daily-path] .dp-option:focus-within {
+.dp-option:focus-within {
   outline: 2px solid var(--color-ink);
   outline-offset: 2px;
   border-radius: calc(var(--radius-chunky) / 2);

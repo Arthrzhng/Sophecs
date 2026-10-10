@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Page } from "@/components/layout/Page";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { ChallengeInvite } from "@/components/share/ChallengeInvite";
 import { ChallengeViewTracker } from "@/components/share/ChallengeViewTracker";
@@ -32,18 +33,17 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
   const challenge = await getChallenge(id);
   if (!challenge) notFound();
 
-  // The container is written out rather than taken from <Page>, because
-  // the daily-path wrapper has to sit on <main>; see the note on /me.
+  // Back on <Page> now the daily-path wrapper is gone: the wrapper had to
+  // sit on <main>, which <Page> owns. `rhythm="path"` keeps the 40/40 this
+  // route has had since it was redrawn.
   return (
-    <main className="flex-1" data-daily-path>
-      <div className="mx-auto max-w-read px-6 py-10">
+    <Page width="read" rhythm="path">
         <ChallengeViewTracker challengeId={id} />
         <ChallengeInvite
           challengeId={id}
           school={challenge.school}
           content={getSchool(challenge.school)}
         />
-      </div>
-    </main>
+    </Page>
   );
 }
