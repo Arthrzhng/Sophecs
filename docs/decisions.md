@@ -771,6 +771,24 @@ The marker rule in the same section separately permits a filled card in a school
 
 The test for a future filled card is not whether it looks good. It is whether that screen is about one school in the way Today is, and whether anything else on the page is asking to be looked at first.
 
+### What the last stage of the restyle has to do
+
+Written down because it accumulates: every route redrawn so far has left something that could only be done once they all were, and a list in a commit message is a list nobody finds.
+
+1. **Promote the font and the radius.** `--font-sans: var(--font-ui)` and `--radius-control: var(--radius-chunky)` move from `[data-daily-path]` into `@theme static`, the way the seven colour lines already did.
+2. **Delete the wrapper.** `[data-daily-path]` goes, and with it the CSS block and every `data-daily-path` attribute. The `.chunky`, `.dp-progress`, `.dp-node` and motion rules scoped under it lose the prefix.
+3. **Put the containers back.** `/today`, `/table`, `/s/[school]`, `/login` and `/debate` each write out `<main className="flex-1">` plus a `mx-auto max-w-* px-6 py-10` div, because the wrapper had to sit on `<main>` and `<Page>` owns that element. With the wrapper gone they all go back to `<Page>`.
+4. **Delete `src/components/ui/Button.tsx`.** `ChunkyButton` and `ChunkyLink` replace it. Eighteen files still import `Button` or `ButtonLink`; each one is a route that will have been redrawn by then.
+5. **Redraw `ErrorState` and `EmptyState`.** Both are shared across routes, so neither could be done in a stage that owns one route: changing them would change pages that branch did not touch. `ErrorState` keeps its `role="alert"` and its error rule, which is what separates it from the notice cards the redraw introduced; what changes is the serif title and the hairline left rule. `EmptyState` is the same job on the other side.
+
+### The ink tone: a primary for screens with no school
+
+Every primary action in the restyle is the reader's own school colour. That works everywhere the reader has a school, which is everywhere except the screens that exist to give them one. `/login` is the first; the quiz escapes it by colouring its buttons with whichever school the answers so far are leaning towards, and the landing page escapes it by having no primary at all.
+
+`ChunkyButton`'s `ink` tone fills with `--color-ink` and letters in `--color-paper`. It introduces no token: both already exist. Its edge is `--color-rule-strong`, which makes it the only tone whose edge is lighter than its fill, because ink is two steps off black and this palette has nothing darker to sit a button on. On paper a lighter edge under a near-black button reads as the button standing proud of the page rather than casting a shadow, which is the same thing the chunky press is saying everywhere else.
+
+Use it where the reader has no school and the screen still needs one clear action. Do not use it as a general dark primary next to a school-coloured one: two saturated primaries on a screen is two answers to "what now", which is the rule the lessons card on Today already follows by staying paper.
+
 ### The card colours are frozen against the palette, on purpose
 
 `src/lib/card-tokens.ts` described itself as a mirror of `globals.css` that must be resynced whenever a token moves. Four of its values no longer mirror anything: `OG_PAPER`, `OG_INK`, `OG_INK_MID` and `OG_INK_SOFT` hold the pre-restyle colours. A shared image is not a page. Every link preview, saved card and favicon already sitting in a feed, a chat or a bookmark bar was rendered at those values, and matching the site would have recoloured all of them at once. `/opengraph-image`, `/icon` and `/apple-icon` hash to the same bytes either side of the promotion, which is how this was checked rather than argued. The school values in that file *are* still a mirror and must be kept in step.

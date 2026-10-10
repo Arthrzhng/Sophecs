@@ -168,6 +168,16 @@
   --color-step-done: #d9822b;
   --color-step-done-deep: #a35f17;
 
+  /* The chunky button has one tone that is not a school and not paper:
+     `ink`, the primary for a screen where the reader has no school yet.
+     /login is the first and the reason it exists. It needs no token of
+     its own, because it is --color-ink filled and --color-paper lettered,
+     and its edge is --color-rule-strong: ink is two steps off black and
+     there is nothing darker in this palette to sit a button on. It is the
+     only tone whose edge is lighter than its fill, which on paper reads as
+     the button standing proud of the page rather than casting a shadow.
+     See src/components/daily-path/ChunkyButton.tsx. */
+
   /* The pressed-shadow shade for each school, so a chunky control in the
      reader's own school colour has a bottom edge to sit on. */
   --color-stoic-deep: #26392e;
