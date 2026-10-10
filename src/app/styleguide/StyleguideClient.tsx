@@ -31,6 +31,7 @@ export function InteractiveSection() {
         title="Submit this argument?"
         description="It goes to the judge now. You get one verdict and one revision. This motion locks for seven days afterwards."
         confirmLabel="Submit argument"
+        school="stoicism"
         onConfirm={() => setDialogOpen(false)}
         onCancel={() => setDialogOpen(false)}
       />

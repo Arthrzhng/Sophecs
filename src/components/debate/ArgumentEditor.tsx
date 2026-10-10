@@ -463,6 +463,7 @@ export function ArgumentEditor({
         }
         confirmLabel={isRevision ? "Submit revision" : "Send to the judge"}
         cancelLabel="Keep editing"
+        school={school}
         onConfirm={submit}
         onCancel={() => setConfirming(false)}
       />

@@ -263,7 +263,7 @@ export default function StyleguidePage() {
         </div>
       </Section>
 
-      <Section title="Dialog and toast" note="Dialog is the native element — the browser supplies the focus trap, Escape and top-layer stacking. Both are allowed a shadow because they genuinely float.">
+      <Section title="Dialog and toast" note="Dialog is the native element — the browser supplies the focus trap, Escape and top-layer stacking. Both are allowed a shadow because they genuinely float. The confirm is coloured for whoever is acting: the reader's school here, error when the act is destructive, ink only where the reader has no school.">
         <InteractiveSection />
       </Section>
 
