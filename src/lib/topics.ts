@@ -2,6 +2,7 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { isDraft } from "./drafts";
 import type { SchoolId } from "./types";
 
 export interface TopicFile {
@@ -13,6 +14,8 @@ export interface TopicFile {
   micro_after: string;
   sort: number;
   active: boolean;
+  /** See lib/drafts.ts. */
+  status?: "draft";
 }
 
 const TOPICS_DIR = path.join(process.cwd(), "content", "topics");
@@ -34,5 +37,11 @@ export function getAllTopicFiles(): TopicFile[] {
       const raw = fs.readFileSync(path.join(TOPICS_DIR, file), "utf8");
       const { data } = matter(raw);
       return data as TopicFile;
-    });
+    })
+    // No `includeDrafts` here, unlike the other three loaders. Nothing
+    // renders a draft topic, and this function also feeds
+    // scripts/seed-topics.ts, which writes to whatever database the
+    // environment points at. A draft topic must never be able to reach a
+    // row in debate_topics, so there is no way to ask for one.
+    .filter((topic) => !isDraft(topic));
 }

@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { pickShareLineFrom } from "./share-line";
+import { excluded, type LoadOptions } from "./drafts";
 import type { SchoolId } from "./types";
 
 export interface SchoolContent {
@@ -15,25 +16,41 @@ export interface SchoolContent {
   gets_wrong: string;
   share_lines: string[];
   verdict_share_line: string;
+  /** See lib/drafts.ts. Draft files load only on /styleguide/drafts. */
+  status?: "draft";
 }
 
 const SCHOOLS_DIR = path.join(process.cwd(), "content", "schools");
 
-let cache: Record<SchoolId, SchoolContent> | null = null;
+// Everything on disk, drafts included. The filter happens per call rather
+// than per cache, so one read of the directory serves both callers.
+let cache: SchoolContent[] | null = null;
 
-export function getAllSchools(): Record<SchoolId, SchoolContent> {
+function loadAll(): SchoolContent[] {
   if (cache) return cache;
-  const files = fs.readdirSync(SCHOOLS_DIR).filter((f) => f.endsWith(".md"));
+  cache = fs
+    .readdirSync(SCHOOLS_DIR)
+    .filter((f) => f.endsWith(".md"))
+    .map((file) => {
+      const raw = fs.readFileSync(path.join(SCHOOLS_DIR, file), "utf8");
+      return matter(raw).data as SchoolContent;
+    });
+  return cache;
+}
+
+export function getAllSchools(options: LoadOptions = {}): Record<SchoolId, SchoolContent> {
   const result = {} as Record<SchoolId, SchoolContent>;
-  for (const file of files) {
-    const raw = fs.readFileSync(path.join(SCHOOLS_DIR, file), "utf8");
-    const { data } = matter(raw);
-    result[data.id as SchoolId] = data as SchoolContent;
+  for (const school of loadAll()) {
+    if (excluded(school, options)) continue;
+    result[school.id] = school;
   }
-  cache = result;
   return result;
 }
 
+// Deliberately has no `includeDrafts`. Every caller looks a school up by a
+// `SchoolId`, which no draft can be until the union is widened, so an
+// opt-in here would be unreachable. The review route reads drafts through
+// getAllSchools instead.
 export function getSchool(id: SchoolId): SchoolContent {
   const school = getAllSchools()[id];
   if (!school) throw new Error(`No content for school "${id}"`);

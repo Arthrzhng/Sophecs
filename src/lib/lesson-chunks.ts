@@ -12,7 +12,19 @@ export interface RetrievalPrompt {
 export interface MicroLessonContent {
   slug: string;
   topic: string;
-  position: "before" | "after";
+  /**
+   * Where the passage sits relative to arguing the motion.
+   *
+   * `before` and `after` are the pair every motion ships with, and the
+   * reading flow is built on there being exactly two. `elsewhere` is a
+   * third reading on the same motion from a tradition the product does not
+   * yet teach as a school. It has no production surface: it is keyed to a
+   * motion by `topic` like the other two, but nothing in the live app
+   * enumerates it, and it is written as a draft so no loader returns it.
+   */
+  position: "before" | "after" | "elsewhere";
+  /** See lib/drafts.ts. Draft files load only on /styleguide/drafts. */
+  status?: "draft";
   title: string;
   // `translation`: see Source in footnotes.ts.
   source: { author: string; work: string; section: string; translation?: string };
@@ -39,6 +51,20 @@ export interface ReadingCheckQuestion {
   wrong: string;
 }
 
+/**
+ * Reading order within a motion.
+ *
+ * Written out rather than compared inline, because the sort this replaces
+ * was `position === "before" ? -1 : 1`, which would have dropped a third
+ * position wherever the comparison happened to land. "before" then
+ * "after" is unchanged, and "elsewhere" sorts last.
+ */
+export const POSITION_ORDER: Record<MicroLessonContent["position"], number> = {
+  before: 0,
+  after: 1,
+  elsewhere: 2,
+};
+
 export const READING_CHECK_LENGTH = 2;
 export const READING_CHECK_OPTIONS = 3;
 // Options render as chunky full-width cards on a 375px screen; past this
@@ -64,8 +90,14 @@ export function readingCheckProblems(lesson: MicroLessonContent): string[] {
   const where = `content/micro/${lesson.slug}.md`;
   const check = lesson.reading_check;
 
-  if (lesson.position === "after") {
-    return check === undefined ? [] : [`${where}: "after" lessons have no reading_check`];
+  // Only a "before" lesson has a reading check. The test is written this
+  // way round on purpose: a position added later inherits "no check" rather
+  // than inheriting the requirement to carry one, which is what the old
+  // `position === "after"` test would have done to "elsewhere".
+  if (lesson.position !== "before") {
+    return check === undefined
+      ? []
+      : [`${where}: only "before" lessons have a reading_check`];
   }
   if (!Array.isArray(check) || check.length !== READING_CHECK_LENGTH) {
     return [`${where}: reading_check must list exactly ${READING_CHECK_LENGTH} questions`];
