@@ -279,6 +279,7 @@ export const FIXTURE_DEBATES: ProfileDebate[] = [
   {
     id: FIXTURE_RESULT_ID,
     topicSlug: "opaque-benefit",
+    topicTitle: "The opaque benefit",
     score: 71,
     rejected: false,
     revision: {
@@ -288,8 +289,20 @@ export const FIXTURE_DEBATES: ProfileDebate[] = [
       rejected: false,
     },
   },
-  { id: "preview-debate-2", topicSlug: "crash-arithmetic", score: 64, rejected: false },
-  { id: "preview-debate-3", topicSlug: "no-decision", score: null, rejected: true },
+  {
+    id: "preview-debate-2",
+    topicSlug: "crash-arithmetic",
+    topicTitle: "Crash arithmetic",
+    score: 64,
+    rejected: false,
+  },
+  {
+    id: "preview-debate-3",
+    topicSlug: "no-decision",
+    topicTitle: "Does the model decide?",
+    score: null,
+    rejected: true,
+  },
 ];
 
 export const FIXTURE_CLASSES_OWNED: ClassSummary[] = [
