@@ -1,10 +1,8 @@
 ---
 id: ubuntu
 name: Ubuntu
-one_line: >-
-  Every individual shall have duties towards his family and society...
-one_line_attribution: >-
-  African Charter on Human and Peoples' Rights, Article 27.1 (1981)
+one_line: TODO-SOURCE
+one_line_attribution: TODO-SOURCE
 status: draft
 read: |-
   Ubuntu is not one doctrine and not the ethics of a continent, but a
@@ -13,9 +11,9 @@ read: |-
   maxim umuntu ngumuntu ngabantu is its best known compression. Sophecs
   takes Thaddeus Metz's relational reading, not Ifeanyi Menkiti's stronger
   claim that the community confers personhood once its demands are met. Kwame Gyekye's moderate version sits between them,
-  insisting individuals keep their own worth and rights. The African
-  Charter is quoted above because it puts duties toward community into
-  law, not because it is an Ubuntu scripture.
+  insisting individuals keep their own worth and rights. Its sources are
+  lived practice, language and oral tradition rather than a canon, which is
+  part of why it resists reduction to a slogan.
 
   For AI this changes the first question. Sabelo Mhlambi argues that a
   discriminatory automated decision is not only an unfair output but a
@@ -44,9 +42,9 @@ share_lines:
     Ten questions about AI and I never once thought the data was only
     mine. Sophecs called that Ubuntu.
   - >-
-    My whole ethics, per this quiz: a person is a person through other
-    people, so judge the system by the relationships it leaves behind.
-    Sophecs says Ubuntu.
+    My whole ethics, per this quiz: you are made by the people around you,
+    so judge a system by the relationships it leaves behind. Sophecs says
+    Ubuntu.
 verdict_share_line: >-
   Scored {score} defending the Ubuntu line on {topic}. The judge's note:
   {verdict_line}. sophecs.com/debate/{slug}/{id}
