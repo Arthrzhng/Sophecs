@@ -51,8 +51,10 @@ export default async function MeSettingsPage({
     ]);
   }
 
-  // The container is written out rather than taken from <Page>, because
-  // the daily-path wrapper has to sit on <main>; see the note on /me.
+  // <main> here, container in SettingsPage at the path rhythm, 40/40,
+  // hand-rolled by decision rather than asked of <Page>. Same as /me, and
+  // the reasoning is in docs/decisions.md under "What the last stage of
+  // the restyle did".
   return (
     <main className="flex-1">
       <SettingsPage

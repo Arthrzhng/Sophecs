@@ -198,9 +198,13 @@ export default async function MePage({
     );
   }
 
-  // The container is written out rather than taken from <Page>, because
-  // the daily-path wrapper has to sit on <main>; five other routes do the
-  // same, and they all go back to <Page> in the stage that deletes it.
+  // <main> is here and the container is in ProfilePage, hand-rolled at the
+  // path rhythm, 40/40, rather than asked of <Page>. It began as a
+  // workaround, because the daily-path wrapper had to sit on <main>, and it
+  // stays by decision now the wrapper is gone. See "What the last stage of
+  // the restyle did" in docs/decisions.md: both rhythms are kept, and a
+  // later collapse has to cover the hand-rolled containers as well, this
+  // one among them.
   return (
     <main className="flex-1">
       <MeViewTracker openObjections={openObjections.length} />
