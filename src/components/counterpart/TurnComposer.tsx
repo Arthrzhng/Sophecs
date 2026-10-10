@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { track } from "@/lib/analytics/client";
-import { Button } from "@/components/ui/Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
+import type { SchoolId } from "@/lib/types";
 import {
   MAX_QUOTE_CHARS,
   MAX_TURN_CHARS,
@@ -30,12 +31,15 @@ export function TurnComposer({
   userId,
   sourceLabel,
   sourceText,
+  school,
 }: {
   exchangeId: string;
   seq: number;
   userId: string;
   sourceLabel: string;
   sourceText: string;
+  /** The sender's own school: the button belongs to whoever presses it. */
+  school: SchoolId;
 }) {
   const router = useRouter();
   // Same rule as the other two editors: a draft belongs to one account on
@@ -160,8 +164,8 @@ export function TurnComposer({
 
   return (
     <div>
-      <p className="eyebrow text-ink-soft mb-3">Your reply</p>
-      <label htmlFor="quoted-claim" className="block font-sans text-sm text-ink-mid">
+      <h2 className="text-lg font-extrabold tracking-tight text-ink">Your reply</h2>
+      <label htmlFor="quoted-claim" className="mt-4 block text-sm font-bold text-ink">
         Select a sentence in {sourceLabel} above, or paste it here.
       </label>
       <textarea
@@ -170,10 +174,10 @@ export function TurnComposer({
         value={quote}
         onChange={(e) => setQuote(e.target.value)}
         maxLength={MAX_QUOTE_CHARS}
-        className="mt-2 w-full resize-none rounded-control border border-rule bg-surface p-3 font-serif text-base italic leading-relaxed"
+        className="mt-2 w-full resize-none rounded-chunky border-2 border-rule-strong bg-surface p-4 font-serif text-base italic leading-relaxed text-ink"
       />
       {quoteProblem && (
-        <p className="mt-1 font-mono text-xs text-error">
+        <p className="mt-2 text-sm text-[color:var(--color-error)]">
           {quoteProblem === "not_found"
             ? "Quote the sentence you're answering."
             : quoteProblem === "too_short"
@@ -182,7 +186,7 @@ export function TurnComposer({
         </p>
       )}
 
-      <label htmlFor="turn-body" className="mt-6 block font-sans text-sm text-ink-mid">
+      <label htmlFor="turn-body" className="mt-6 block text-sm font-bold text-ink">
         Answer it.
       </label>
       <textarea
@@ -191,7 +195,7 @@ export function TurnComposer({
         rows={8}
         value={body}
         onChange={(e) => setBody(e.target.value)}
-        className="mt-2 w-full rounded-control border border-rule bg-surface p-4 font-serif text-base leading-relaxed resize-y"
+        className="mt-2 w-full resize-y rounded-chunky border-2 border-rule-strong bg-surface p-4 font-serif text-base leading-relaxed text-ink"
       />
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
@@ -204,16 +208,22 @@ export function TurnComposer({
           {chars < MIN_TURN_CHARS && ` · ${MIN_TURN_CHARS} minimum`}
         </span>
         {status.kind === "error" && (
-          <span className="font-mono text-xs text-error">{status.message}</span>
+          <span className="text-sm text-[color:var(--color-error)]">{status.message}</span>
         )}
       </div>
 
       <div className="mt-5">
-        <Button onClick={send} disabled={!canSend} loading={status.kind === "sending"} loadingLabel="Sending…">
+        <ChunkyButton
+          school={school}
+          onClick={send}
+          disabled={!canSend}
+          loading={status.kind === "sending"}
+          loadingLabel="Sending…"
+        >
           Send reply
-        </Button>
+        </ChunkyButton>
       </div>
-      <p className="mt-3 font-sans text-xs text-ink-soft max-w-[52ch]">
+      <p className="mt-4 max-w-[52ch] text-sm leading-relaxed text-ink-soft">
         Replies are checked before delivery. No names, schools, locations or links.
       </p>
     </div>

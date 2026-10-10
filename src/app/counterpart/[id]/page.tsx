@@ -8,7 +8,6 @@ import { ExchangePublishToggle } from "@/components/counterpart/PublishToggle";
 import { isLapsed, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
 import { SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
-import { Page } from "@/components/layout/Page";
 
 export const metadata = { title: "Counterpart · Sophecs" };
 
@@ -105,10 +104,15 @@ export default async function CounterpartPage({
     }
   }
 
+  // The container is written out rather than taken from <Page>, because
+  // the daily-path wrapper has to sit on <main>; see the note on /me.
   return (
-    <Page width="read">
-        <p className="eyebrow text-ink-soft mb-4">Counterpart</p>
-        <h1 className="max-w-[40ch] font-serif text-xl font-medium leading-tight text-ink">
+    <main className="flex-1" data-daily-path>
+      <div className="mx-auto max-w-read px-6 py-10">
+        <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
+          Counterpart
+        </p>
+        <h1 className="mt-2 max-w-[40ch] font-serif text-xl font-medium leading-tight text-ink">
           {topic.motion}
         </h1>
 
@@ -120,7 +124,7 @@ export default async function CounterpartPage({
         )}
 
         {/* Stacked at 375 px, side by side from `sm` up. */}
-        <div className="mt-10 grid gap-8 sm:grid-cols-2">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2">
           <Argument
             eyebrow={`You · ${SCHOOL_COLORS[mySchool].name}`}
             school={mySchool}
@@ -134,23 +138,26 @@ export default async function CounterpartPage({
         </div>
 
         {visible.length > 0 && (
-          <div className="mt-12 space-y-10 border-t border-rule pt-10">
+          <div className="mt-12 flex flex-col gap-5 border-t-2 border-rule pt-10">
             {visible.map((turn) => {
               const mine = turn.author_id === user.id;
               return (
-                <div key={turn.id}>
+                <div key={turn.id} className="rounded-card border-2 border-rule bg-surface p-5">
+                  {/* Whose reply this is, in their school's colour. The
+                      marker names the speaker; it is never on a control,
+                      which belongs to whoever presses it. */}
                   <p
-                    className={`eyebrow mb-3 ${
+                    className={`text-sm font-bold ${
                       mine ? SCHOOL_TEXT_CLASS[mySchool] : SCHOOL_TEXT_CLASS[theirSchool]
                     }`}
                   >
-                    {mine ? "You" : "Counterpart"} · Reply {turn.seq}
+                    {mine ? "You" : "Counterpart"} &middot; Reply {turn.seq}
                     {turn.screen_result !== "ok" && " · held for review"}
                   </p>
-                  <blockquote className="border-l-2 border-rule pl-4 font-serif text-base italic text-ink-mid leading-relaxed max-w-[60ch]">
+                  <blockquote className="mt-3 max-w-[60ch] border-l-2 border-rule pl-4 font-serif text-base italic leading-relaxed text-ink-mid">
                     {turn.quoted_claim}
                   </blockquote>
-                  <p className="mt-4 font-serif text-base leading-relaxed whitespace-pre-wrap max-w-[60ch]">
+                  <p className="mt-4 max-w-[60ch] whitespace-pre-wrap font-serif text-base leading-relaxed text-ink">
                     {turn.body}
                   </p>
                   {!mine && <TurnActions turnId={turn.id} exchangeId={id} />}
@@ -160,7 +167,7 @@ export default async function CounterpartPage({
           </div>
         )}
 
-        <div className="mt-12 border-t border-rule pt-10">
+        <div className="mt-12 border-t-2 border-rule pt-10">
           {myHeld ? (
             <p className="text-sm text-ink-mid">This reply was held for review.</p>
           ) : status === "blocked" ? (
@@ -189,6 +196,10 @@ export default async function CounterpartPage({
               userId={user.id}
               sourceLabel={sourceLabel}
               sourceText={sourceText}
+              // Your school, because you are the one sending. Your
+              // counterpart's colour is on their words, not on your
+              // button. See docs/decisions.md.
+              school={mySchool}
             />
           ) : (
             <p className="text-sm text-ink-mid">Waiting for your counterpart.</p>
@@ -198,15 +209,19 @@ export default async function CounterpartPage({
         <div className="mt-10 flex flex-wrap items-center gap-6">
           <Link
             href={`/debate/${exchange.topic_slug}/${myDebateId}`}
-            className="font-mono text-xs text-ink-mid hover:text-ink"
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-ink underline underline-offset-4"
           >
-            Your verdict →
+            Your verdict
           </Link>
-          <Link href="/debate/rubric" className="font-mono text-xs text-ink-mid hover:text-ink">
-            Counterpart rules →
+          <Link
+            href="/debate/rubric"
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-ink underline underline-offset-4"
+          >
+            Counterpart rules
           </Link>
         </div>
-    </Page>
+      </div>
+    </main>
   );
 }
 
@@ -220,9 +235,9 @@ function Argument({
   text: string;
 }) {
   return (
-    <div>
-      <p className={`eyebrow mb-3 ${SCHOOL_TEXT_CLASS[school]}`}>{eyebrow}</p>
-      <p className="font-serif text-base leading-relaxed whitespace-pre-wrap">
+    <div className="rounded-card border-2 border-rule bg-surface p-5">
+      <p className={`text-sm font-bold ${SCHOOL_TEXT_CLASS[school]}`}>{eyebrow}</p>
+      <p className="mt-3 whitespace-pre-wrap font-serif text-base leading-relaxed text-ink">
         {text || "This argument is no longer available."}
       </p>
     </div>
