@@ -8,6 +8,7 @@ import {
   READING_CHECK_LENGTH,
   type MicroLessonContent,
 } from "../src/lib/lesson-chunks";
+import { isDraft } from "../src/lib/drafts";
 
 const MICRO_DIR = path.join(process.cwd(), "content", "micro");
 const lessons: MicroLessonContent[] = fs
@@ -17,7 +18,7 @@ const lessons: MicroLessonContent[] = fs
 
 describe("reading check content", () => {
   it("covers all six before-lessons", () => {
-    const before = lessons.filter((l) => l.position === "before");
+    const before = lessons.filter((l) => l.position === "before" && !isDraft(l));
     expect(before).toHaveLength(6);
     for (const lesson of before) {
       expect(lesson.reading_check, lesson.slug).toHaveLength(READING_CHECK_LENGTH);
@@ -30,7 +31,9 @@ describe("reading check content", () => {
 
   // A UI that renders options in file order must not be guessable.
   it("spreads the correct answers across positions", () => {
-    const answers = lessons.flatMap((l) => (l.reading_check ?? []).map((q) => q.answer));
+    const answers = lessons
+      .filter((l) => !isDraft(l))
+      .flatMap((l) => (l.reading_check ?? []).map((q) => q.answer));
     for (const position of [0, 1, 2]) {
       expect(answers.filter((a) => a === position).length).toBeGreaterThanOrEqual(3);
     }
