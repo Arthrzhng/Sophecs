@@ -24,14 +24,15 @@ read: |-
   makes, which it degrades, and whether the people inside them can still
   hold each other to what they owe.
 gets_wrong: |-
-  Reciprocity inside a role leaves the role itself unexamined. The paper
-  Confucian Role-Ethics with Non-Domination concedes the point: role
-  ethics is too ready to authorise hierarchy, and mutual duties do not by
-  themselves make a ruler and a subject equals. Li-Hsiang Lisa Rosenlee's
-  Confucianism and Women shows what that cost historically, tracing how
-  filial piety and patrilineal descent held women in place. An algorithm
-  can honour every expectation attaching to employer and worker and leave
-  the power between them exactly where it found it. Utilitarians would
+  The line this school leads with is advice to whoever already holds
+  power, and telling a ruler to rule reverently is not the same as asking
+  why there is a ruler. The paper Confucian Role-Ethics with
+  Non-Domination concedes it: role ethics is too ready to authorise
+  hierarchy, and mutual duties do not make a ruler and a subject equals. Li-Hsiang Lisa Rosenlee's Confucianism and
+  Women traces what that cost historically, as filial piety and
+  patrilineal descent held women in place. An algorithm
+  can honour every expectation attaching to employer and worker and leave the
+  power between them where it found it. Utilitarians would
   add that a school built on who owes what to whom has little to say
   about a stranger nobody stands in a relation to.
 share_lines:
