@@ -771,6 +771,16 @@ The marker rule in the same section separately permits a filled card in a school
 
 The test for a future filled card is not whether it looks good. It is whether that screen is about one school in the way Today is, and whether anything else on the page is asking to be looked at first.
 
+### A primary button is coloured for whoever acts
+
+A primary action takes the school colour of the person pressing it, never the school colour of whoever or whatever the content is about.
+
+Three buttons on /me broke this on the first pass and all three looked plausible. "Answer it" under an objection took the objector's school; "Reply" on a counterpart card took the counterpart's. Both read as reasonable, because the colour was next to a name in the same colour. Both were wrong: the reader is the one answering, and the card had already said whose objection it is, on its own line, in their colour. A button in someone else's colour says they are about to act.
+
+So: the content names its subject in that subject's colour, as a word or a 2px rule; the button carries the actor's. Where the actor has no school, the `ink` tone is the primary and the entry above says when. Where the action is destructive, the `error` tone is, and it is coloured for the act rather than for anyone.
+
+The two places this bites hardest are the ones still to be redrawn: Counterpart, where two schools are on screen at once and only one of them is yours, and /c/[id], where the challenger and the challenged both have one.
+
 ### What the last stage of the restyle has to do
 
 Written down because it accumulates: every route redrawn so far has left something that could only be done once they all were, and a list in a commit message is a list nobody finds.

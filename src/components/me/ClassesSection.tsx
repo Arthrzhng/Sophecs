@@ -6,7 +6,7 @@ import Link from "next/link";
 import { createClass, joinClass, leaveClass } from "@/app/me/actions";
 import { track } from "@/lib/analytics/client";
 import type { ClassSummary, JoinedClass } from "@/lib/classes";
-import { Button } from "@/components/ui/Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 
 const SITE_PATH = "/me/settings?join=";
 
@@ -71,7 +71,7 @@ export function ClassesSection({
       {owned.length > 0 && (
         <ul className="mb-8 space-y-4">
           {owned.map((klass) => (
-            <li key={klass.id} className="flex flex-wrap items-center justify-between gap-3">
+            <li key={klass.id} className="flex flex-wrap items-center justify-between gap-3 rounded-card border-2 border-rule bg-surface p-4">
               <div>
                 <Link
                   href={`/class/${klass.code}`}
@@ -79,7 +79,7 @@ export function ClassesSection({
                 >
                   {klass.name}
                 </Link>
-                <p className="mt-1 font-mono text-xs text-ink-soft">
+                <p className="mt-1 text-sm text-ink-soft">
                   {klass.code} · {klass.memberCount}{" "}
                   {klass.memberCount === 1 ? "member" : "members"}
                 </p>
@@ -92,7 +92,7 @@ export function ClassesSection({
 
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex-1 min-w-[12rem]">
-          <label htmlFor="class-name" className="block font-sans text-sm text-ink-mid">
+          <label htmlFor="class-name" className="block text-sm font-bold text-ink">
             Create a class link
           </label>
           <input
@@ -101,19 +101,19 @@ export function ClassesSection({
             maxLength={60}
             onChange={(e) => setName(e.target.value)}
             placeholder="Year 12 Philosophy"
-            className="mt-2 w-full rounded-control border border-rule bg-surface p-3 text-base"
+            className="mt-2 min-h-14 w-full rounded-chunky border-2 border-rule-strong bg-surface px-4 text-base text-ink"
           />
         </div>
-        <Button variant="secondary"
+        <ChunkyButton tone="paper" className="border-2 border-rule-strong"
           onClick={create}
           disabled={busy || !name.trim()}
         >
           Create
-        </Button>
+        </ChunkyButton>
       </div>
 
       {newCode && (
-        <p className="mt-3 font-mono text-xs text-ink-mid">
+        <p className="mt-3 text-sm text-ink-mid">
           Code <span className="text-ink">{newCode}</span> · share{" "}
           <span className="text-ink">sophecs.com{SITE_PATH}{newCode}</span>
         </p>
@@ -123,10 +123,10 @@ export function ClassesSection({
         {joined.length > 0 && (
           <ul className="mb-6 space-y-3">
             {joined.map((klass) => (
-              <li key={klass.id} className="flex flex-wrap items-center justify-between gap-3">
+              <li key={klass.id} className="flex flex-wrap items-center justify-between gap-3 rounded-card border-2 border-rule bg-surface p-4">
                 <div>
                   <p className="font-serif text-base">{klass.name}</p>
-                  <p className="mt-1 font-mono text-xs text-ink-soft">
+                  <p className="mt-1 text-sm text-ink-soft">
                     {klass.memberCount} {klass.memberCount === 1 ? "member" : "members"}
                   </p>
                 </div>
@@ -134,7 +134,7 @@ export function ClassesSection({
                   type="button"
                   onClick={() => leave(klass.id)}
                   disabled={busy}
-                  className="text-sm text-ink-soft underline underline-offset-4 hover:text-ink disabled:no-underline"
+                  className="inline-flex min-h-11 items-center text-sm text-ink-mid underline underline-offset-4 hover:text-ink disabled:no-underline"
                 >
                   Leave
                 </button>
@@ -145,7 +145,7 @@ export function ClassesSection({
 
         <div className="flex flex-wrap items-end gap-3">
           <div className="flex-1 min-w-[12rem]">
-            <label htmlFor="class-code" className="block font-sans text-sm text-ink-mid">
+            <label htmlFor="class-code" className="block text-sm font-bold text-ink">
               Join a class
             </label>
             <input
@@ -154,24 +154,24 @@ export function ClassesSection({
               maxLength={12}
               onChange={(e) => setCode(e.target.value)}
               placeholder="8-character code"
-              className="mt-2 w-full rounded-control border border-rule bg-surface p-3 font-mono text-base"
+              className="mt-2 min-h-14 w-full rounded-chunky border-2 border-rule-strong bg-surface px-4 font-mono text-base text-ink"
             />
           </div>
-          <Button variant="secondary"
+          <ChunkyButton tone="paper" className="border-2 border-rule-strong"
             onClick={join}
             disabled={busy || !code.trim()}
           >
             Join
-          </Button>
+          </ChunkyButton>
         </div>
-        <p className="mt-3 font-sans text-sm text-ink-soft max-w-[54ch]">
+        <p className="mt-3 max-w-[54ch] text-sm leading-relaxed text-ink-soft">
           Your teacher will see which motions you&apos;ve read, argued and answered — not your
           arguments, scores or rating.
         </p>
       </div>
 
       {message && (
-        <p role="status" className="mt-4 font-mono text-xs text-ink-mid">
+        <p role="status" className="mt-4 text-sm text-ink-mid">
           {message}
         </p>
       )}
@@ -184,6 +184,10 @@ function CopyLink({ code }: { code: string }) {
   return (
     <button
       type="button"
+      // Matches "Leave" on the joined-class card beside it: both are the
+      // one action on a class row, and one of them had no underline and
+      // no tap target at all.
+      className="inline-flex min-h-11 items-center text-sm text-ink-mid underline underline-offset-4 hover:text-ink"
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(`https://sophecs.com${SITE_PATH}${code}`);

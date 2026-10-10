@@ -22,10 +22,10 @@ export function StreakBlock({
 }) {
   const shown = liveStreak(streak, streakUpdatedOn, today);
   return (
-    <div>
-      <p className="text-sm text-ink-soft">Streak</p>
-      <p className="mt-1 font-mono text-lg tabular text-ink">{shown}</p>
-      <p className="mt-1 max-w-[32ch] text-sm leading-relaxed text-ink-mid">
+    <div className="rounded-card border-2 border-rule bg-surface p-5">
+      <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">Streak</p>
+      <p className="mt-2 font-mono tabular text-xl font-extrabold text-ink">{shown}</p>
+      <p className="mt-2 max-w-[32ch] text-sm leading-relaxed text-ink-mid">
         {streakLine(shown)}
       </p>
     </div>

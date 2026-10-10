@@ -1,6 +1,7 @@
 import { SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { OpenObjection } from "@/lib/objections";
-import { ButtonLink } from "@/components/ui/Button";
+import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
+import type { SchoolId } from "@/lib/types";
 
 const VISIBLE = 5;
 
@@ -22,22 +23,25 @@ export function OpenObjections({
   if (objections.length === 0) {
     return (
       <section>
-        <p className="eyebrow text-ink-soft mb-4">Awaiting your answer</p>
-        <p className="text-ink-mid">
+        <h2 className="text-lg font-extrabold tracking-tight text-ink">
+          Awaiting your answer
+        </h2>
+        <p className="mt-3 text-base text-ink-mid">
           {hasAnyDebate
             ? "Every objection answered."
             : `You haven't defended ${school ? SCHOOL_COLORS[school as keyof typeof SCHOOL_COLORS]?.name ?? "your school" : "your school"} yet.`}
         </p>
         {weeklyMotion && (
-          <div className="mt-6 flex flex-wrap items-center gap-4 border-t border-rule pt-6">
-            <p className="font-serif text-base">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-card border-2 border-rule bg-surface p-5">
+            <p className="min-w-0 font-serif text-base text-ink">
               This week&apos;s motion: {weeklyMotion.title}
             </p>
-            <ButtonLink
+            <ChunkyLink
               href={`/debate/${weeklyMotion.slug}`}
+              school={(school as SchoolId | null) ?? "stoicism"}
             >
               Defend your school
-            </ButtonLink>
+            </ChunkyLink>
           </div>
         )}
       </section>
@@ -49,46 +53,67 @@ export function OpenObjections({
 
   return (
     <section>
-      <div className="flex items-baseline justify-between">
-        <p className="eyebrow text-ink-soft">Awaiting your answer</p>
-        <span className="font-mono text-xs text-ink-soft">{objections.length}</span>
+      <div className="flex items-baseline justify-between gap-4">
+        <h2 className="text-lg font-extrabold tracking-tight text-ink">
+          Awaiting your answer
+        </h2>
+        <span className="font-mono tabular text-sm font-bold text-ink-mid">
+          {objections.length}
+        </span>
       </div>
 
-      <ul className="mt-4 divide-y divide-rule border-t border-rule">
+      <ul className="mt-5 flex flex-col gap-4">
         {shown.map((o) => (
-          <li key={o.debateId} className="py-5">
-            <h3 className="font-serif text-lg font-medium">{o.topicTitle}</h3>
-            <p className={`eyebrow-sm mt-1 ${SCHOOL_TEXT_CLASS[o.rivalSchool]}`}>
-              Objection · {SCHOOL_COLORS[o.rivalSchool].name}
+          <li key={o.debateId} className="rounded-card border-2 border-rule bg-surface p-5">
+            <h3 className="font-serif text-md font-medium leading-snug text-ink">
+              {o.topicTitle}
+            </h3>
+            <p className={`mt-2 text-sm font-bold ${SCHOOL_TEXT_CLASS[o.rivalSchool]}`}>
+              Objection &middot; {SCHOOL_COLORS[o.rivalSchool].name}
             </p>
-            <p className="mt-2 font-serif text-base leading-relaxed max-w-[52ch]">{o.claim}</p>
-            <ButtonLink
-              href={`/debate/${o.topicSlug}/${o.debateId}/revise`}
-            >
-              Answer it
-            </ButtonLink>
+            <p className="mt-3 max-w-[52ch] font-serif text-base leading-relaxed text-ink">
+              {o.claim}
+            </p>
+            <p className="mt-4">
+              {/* The reader's own school, not the objector's: answering
+                  is their action. Whose objection it is was said above,
+                  in that school's colour. */}
+              <ChunkyLink
+                href={`/debate/${o.topicSlug}/${o.debateId}/revise`}
+                school={(school as SchoolId | null) ?? o.rivalSchool}
+              >
+                Answer it
+              </ChunkyLink>
+            </p>
           </li>
         ))}
       </ul>
 
       {rest > 0 && (
-        <details className="mt-4">
-          <summary className="font-mono text-xs text-ink-soft cursor-pointer hover:text-ink">
+        <details className="mt-5">
+          <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-ink underline underline-offset-4">
             Show all ({objections.length})
           </summary>
-          <ul className="mt-4 divide-y divide-rule border-t border-rule">
+          <ul className="mt-4 flex flex-col gap-4">
             {objections.slice(VISIBLE).map((o) => (
-              <li key={o.debateId} className="py-5">
-                <h3 className="font-serif text-lg font-medium">{o.topicTitle}</h3>
-                <p className={`eyebrow-sm mt-1 ${SCHOOL_TEXT_CLASS[o.rivalSchool]}`}>
-                  Objection · {SCHOOL_COLORS[o.rivalSchool].name}
+              <li key={o.debateId} className="rounded-card border-2 border-rule bg-surface p-5">
+                <h3 className="font-serif text-md font-medium leading-snug text-ink">
+                  {o.topicTitle}
+                </h3>
+                <p className={`mt-2 text-sm font-bold ${SCHOOL_TEXT_CLASS[o.rivalSchool]}`}>
+                  Objection &middot; {SCHOOL_COLORS[o.rivalSchool].name}
                 </p>
-                <p className="mt-2 font-serif text-base leading-relaxed max-w-[52ch]">{o.claim}</p>
-                <ButtonLink
-                  href={`/debate/${o.topicSlug}/${o.debateId}/revise`}
-                >
-                  Answer it
-                </ButtonLink>
+                <p className="mt-3 max-w-[52ch] font-serif text-base leading-relaxed text-ink">
+                  {o.claim}
+                </p>
+                <p className="mt-4">
+                  <ChunkyLink
+                    href={`/debate/${o.topicSlug}/${o.debateId}/revise`}
+                    school={(school as SchoolId | null) ?? o.rivalSchool}
+                  >
+                    Answer it
+                  </ChunkyLink>
+                </p>
               </li>
             ))}
           </ul>
