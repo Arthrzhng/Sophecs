@@ -7,11 +7,12 @@ source:
   author: Epictetus
   work: Enchiridion
   section: '1'
+  translation: W. A. Oldfather, 1928
 body: >-
   The Enchiridion opens with a sorting. Some things are up to us and some are
   not, Epictetus says, and he gives both lists. Up to us: opinion, impulse,
-  desire, aversion, "in a word, whatever is our own doing." Not up to us: the
-  body, property, reputation, office, "whatever is not our own doing"
+  desire, aversion, "in a word, everything that is our own doing." Not up to us: the
+  body, property, reputation, office, "everything that is not our own doing"
   (Enchiridion, 1). Everything else in Stoic ethics follows from getting the
   sorting right. Confuse the two and you will be hindered and will grieve.
   Keep them straight and nothing can compel you.
