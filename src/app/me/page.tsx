@@ -78,6 +78,12 @@ export default async function MePage({
   let exchanges: ExchangeRow[] = [];
   let openObjections: OpenObjection[] = [];
   let weeklyMotion: { slug: string; title: string; sort: number } | null = null;
+  // Motion titles, keyed by slug. Built once from the active-topics read
+  // the page already makes, and used by both the open exchanges and the
+  // debate history. Not read from content/topics: the running app takes
+  // titles from debate_topics so a content edit does not need a deploy
+  // (see src/lib/topics.ts), and a second source would be a second answer.
+  let titleBySlug = new Map<string, string>();
   let hasAnyDebate = false;
   let ratingPoints: RatingPoint[] = [];
 
@@ -165,7 +171,7 @@ export default async function MePage({
       .eq("status", "open")
       .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
       .order("last_turn_at", { ascending: false });
-    const titleBySlug = new Map(
+    titleBySlug = new Map(
       (activeTopics.data ?? []).map((t) => [t.slug as string, t.title as string])
     );
     exchanges = (exchangeRows ?? [])
@@ -224,6 +230,10 @@ export default async function MePage({
           return {
             id: d.id,
             topicSlug: d.topic_slug,
+            // Falls back to the slug for a motion since made inactive:
+            // the row is still the reader's, and a blank is worse than a
+            // slug.
+            topicTitle: titleBySlug.get(d.topic_slug) ?? d.topic_slug,
             score: d.score,
             rejected: d.rejected,
             revision: revision

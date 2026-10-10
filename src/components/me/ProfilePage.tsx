@@ -19,6 +19,8 @@ import type { SchoolId } from "@/lib/types";
 export interface ProfileDebate {
   id: string;
   topicSlug: string;
+  /** The motion's title. The slug, for one since made inactive. */
+  topicTitle: string;
   score: number | null;
   rejected: boolean;
   revision?: { id: string; topicSlug: string; score: number | null; rejected: boolean };
@@ -168,9 +170,9 @@ export function ProfilePage({
                 <div className="flex items-baseline justify-between gap-4">
                   <Link
                     href={`/debate/${d.topicSlug}/${d.id}`}
-                    className="text-sm font-bold text-ink underline-offset-4 hover:underline"
+                    className="font-serif text-base text-ink underline-offset-4 hover:underline"
                   >
-                    {d.topicSlug}
+                    {d.topicTitle}
                   </Link>
                   <span className="font-mono tabular text-sm text-ink-mid">
                     {d.rejected ? "not judged" : d.score}
