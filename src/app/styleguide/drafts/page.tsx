@@ -79,12 +79,12 @@ export default function DraftsPage() {
                 <p className="mt-1 text-sm text-ink-mid">{school.one_line_attribution}</p>
                 {/* The result card's wrap margins were set against the
                     existing three, which run 52 to 96 characters. */}
-                <Measure n={school.one_line?.length ?? 0} low={52} high={96} unit="characters" />
+                <Measure n={school.one_line?.length ?? 0} pass={[52, 96]} unit="characters" />
               </Field>
 
               <Field label="read">
                 <Prose text={school.read} />
-                <Measure n={words(school.read)} low={161} high={171} unit="words" />
+                <Measure n={words(school.read)} aim={[165, 175]} pass={[155, 185]} />
               </Field>
 
               <Field label="gets_wrong">
@@ -174,7 +174,7 @@ export default function DraftsPage() {
               <Field label="body">
                 <Prose text={lesson.body} />
                 {/* content/micro/README puts a passage at 150 to 250 words. */}
-                <Measure n={words(lesson.body)} low={150} high={250} unit="words" />
+                <Measure n={words(lesson.body)} pass={[150, 250]} />
               </Field>
             </article>
           ))}
@@ -241,31 +241,45 @@ function Count({ n, one, many }: { n: number; one: string; many: string }) {
   );
 }
 
-// A count against the range the existing files sit in, so a draft that is
-// going to need rewriting says so here rather than at the end of a review.
+// A count against the bands a draft should land in. Two of them: the aim
+// is where a finished piece sits, the pass is the wider range that is
+// acceptable. Neither fails anything. The page exists so a draft can be
+// read and corrected, so a number out of band is a note to whoever is
+// writing it, not a gate.
 function Measure({
   n,
-  low,
-  high,
+  aim,
+  pass,
   unit = "words",
 }: {
   n: number;
-  low?: number;
-  high?: number;
+  aim?: [number, number];
+  pass?: [number, number];
   unit?: string;
 }) {
-  const outside = low !== undefined && high !== undefined && (n < low || n > high);
+  const outsidePass = pass !== undefined && (n < pass[0] || n > pass[1]);
+  const outsideAim = !outsidePass && aim !== undefined && (n < aim[0] || n > aim[1]);
+  const tone = outsidePass ? "text-error" : outsideAim ? "text-ink-mid" : "text-ink-soft";
   return (
-    <p className={`mt-2 text-sm ${outside ? "text-error" : "text-ink-soft"}`}>
+    <p className={`mt-2 text-sm ${tone}`}>
       <span className="font-mono tabular">{n}</span> {unit}
-      {low !== undefined && high !== undefined && (
+      {aim && (
         <>
           {" "}
-          (<span className="font-mono tabular">{low}</span> to{" "}
-          <span className="font-mono tabular">{high}</span>
-          {outside ? ", outside the range" : ""})
+          (aim <span className="font-mono tabular">{aim[0]}</span> to{" "}
+          <span className="font-mono tabular">{aim[1]}</span>
         </>
       )}
+      {pass && (
+        <>
+          {aim ? ", pass " : " (pass "}
+          <span className="font-mono tabular">{pass[0]}</span> to{" "}
+          <span className="font-mono tabular">{pass[1]}</span>
+        </>
+      )}
+      {(aim || pass) && ")"}
+      {outsidePass && ", outside the pass band"}
+      {outsideAim && ", outside the aim"}
     </p>
   );
 }
