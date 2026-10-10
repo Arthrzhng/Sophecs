@@ -42,7 +42,7 @@ export function ReadingCheckDone({
   }, []);
 
   return (
-    <div ref={root} tabIndex={-1} data-daily-path className="outline-none">
+    <div ref={root} tabIndex={-1} className="outline-none">
       <Celebration
         heading={HEADINGS[score] ?? HEADINGS[0]}
         tiles={

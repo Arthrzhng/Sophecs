@@ -72,7 +72,7 @@ export function InteractiveCheck() {
   // shows the same three bands, and the X and the feedback bar land where
   // they land on the device.
   return (
-    <div data-daily-path className="h-[32rem] overflow-hidden rounded-panel border-2 border-rule">
+    <div className="h-[32rem] overflow-hidden rounded-panel border-2 border-rule">
       {left ? (
         <div className="flex h-full flex-col items-center justify-center gap-4 bg-paper px-6 text-center">
           <p className="text-sm text-ink-mid">

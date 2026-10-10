@@ -7,10 +7,13 @@ import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
 import { InteractivePath, InteractiveCheck, CelebrationDemo } from "./DailyPathClient";
 
-// Stage 1 of the Daily path restyle, and the only place it is visible. Not
-// linked from navigation, not in the sitemap, noindex. Everything below is
-// wrapped in `data-daily-path`, which is what swaps the palette and the
-// interface face in; no other route changes until its own stage lands.
+// Where the Daily path restyle started, and the specimen sheet it left
+// behind. Not linked from navigation, not in the sitemap, noindex.
+//
+// It was the only place the restyle was visible for one stage. Everything
+// below now draws with the site's own tokens, because the restyle's
+// tokens are the site's: the wrapper that kept them to one subtree is
+// gone and this page shows what every route is made of.
 export const metadata = {
   title: "Daily path styleguide · Sophecs",
   robots: { index: false, follow: false },
@@ -51,7 +54,7 @@ function Swatch({ token, label }: { token: string; label: string }) {
 
 export default function DailyPathStyleguide() {
   return (
-    <div data-daily-path className="min-h-screen">
+    <main className="flex-1">
       <div className="mx-auto max-w-ui px-6 py-12">
         <p className="text-sm text-ink-mid">Stage 1</p>
         <h1 className="mt-1 text-xl font-extrabold tracking-tight text-ink">
@@ -200,6 +203,6 @@ export default function DailyPathStyleguide() {
           </p>
         </Section>
       </div>
-    </div>
+    </main>
   );
 }

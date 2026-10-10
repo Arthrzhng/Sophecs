@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
-import { Button } from "./Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
+import type { SchoolId } from "@/lib/types";
 
 // Built on <dialog>, not a div with a portal. The browser gives us the
 // focus trap, the Escape handler, the inert background and the top-layer
@@ -18,6 +19,7 @@ export function Dialog({
   confirmLabel,
   cancelLabel = "Cancel",
   destructive = false,
+  school,
   busy = false,
   onConfirm,
   onCancel,
@@ -29,6 +31,11 @@ export function Dialog({
   confirmLabel: string;
   cancelLabel?: string;
   destructive?: boolean;
+  /**
+   * The school of the reader doing the confirming, where the screen knows
+   * it. Omitted on a screen that has no school to speak of.
+   */
+  school?: SchoolId;
   busy?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
@@ -72,18 +79,23 @@ export function Dialog({
       )}
       {children}
       <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
-        <Button variant="secondary" onClick={onCancel} disabled={busy}>
+        <ChunkyButton tone="paper" className="border-2 border-rule-strong" onClick={onCancel} disabled={busy}>
           {cancelLabel}
-        </Button>
-        <Button
-          variant="primary"
+        </ChunkyButton>
+        {/* Coloured for whoever is acting, like every other primary.
+            A destructive act is coloured for the act, so error wins even
+            when a school is passed. Otherwise it is the reader's school,
+            and ink only where they have none: the dialog is school-less,
+            not the reader, and the caller knows which. */}
+        <ChunkyButton
+          tone={destructive ? "error" : school ? "school" : "ink"}
+          school={school}
           onClick={onConfirm}
           loading={busy}
           loadingLabel="Working…"
-          className={destructive ? "border-error bg-error hover:border-error hover:bg-error" : ""}
         >
           {confirmLabel}
-        </Button>
+        </ChunkyButton>
       </div>
     </dialog>
   );

@@ -34,7 +34,7 @@ export function SiteHeader() {
   const isActive = useActive(pathname);
 
   return (
-    <header className="border-b-2 border-rule" data-daily-path data-print="hide">
+    <header className="border-b-2 border-rule" data-print="hide">
       <div className="mx-auto flex min-h-16 max-w-ui items-center gap-5 px-6 py-2">
         <Link
           href="/"

@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BeforeLesson } from "./BeforeLesson";
-import { Button } from "@/components/ui/Button";
 import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 import { AxisPanel } from "@/components/daily-path/AxisPanel";
 import { Dialog } from "@/components/ui/Dialog";
@@ -319,7 +318,7 @@ export function ArgumentEditor({
   }
 
   return (
-    <div data-daily-path>
+    <div>
       {/* On a revision the heading and the lead-in belong to the objection
           screen that wraps this editor, so only the motion is repeated
           here: two h1s on one screen would be one too many. */}
@@ -430,7 +429,11 @@ export function ArgumentEditor({
             title="The judge could not be reached."
             body="Your argument is saved in this browser, so nothing is lost. Try again in a moment."
             detail={status.message}
-            action={<Button variant="secondary" onClick={() => setConfirming(true)}>Try again</Button>}
+            action={
+              <ChunkyButton tone="paper" className="border-2 border-rule-strong" onClick={() => setConfirming(true)}>
+                Try again
+              </ChunkyButton>
+            }
           />
         </div>
       )}
@@ -460,6 +463,7 @@ export function ArgumentEditor({
         }
         confirmLabel={isRevision ? "Submit revision" : "Send to the judge"}
         cancelLabel="Keep editing"
+        school={school}
         onConfirm={submit}
         onCancel={() => setConfirming(false)}
       />

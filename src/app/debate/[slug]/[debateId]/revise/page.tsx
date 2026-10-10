@@ -91,7 +91,7 @@ export default async function RevisePage({
           </div>
         </div>
       ) : (
-        <div data-daily-path>
+        <div>
           <ObjectionBrief objection={objection} />
 
           <ArgumentEditor

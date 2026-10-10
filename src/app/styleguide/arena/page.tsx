@@ -370,13 +370,13 @@ export default function ArenaPreviewPage() {
       </Section>
 
       <Section title="13. Profile chart: several weeks" narrow>
-        <div data-daily-path>
+        <div>
           <RatingChart points={FIXTURE_RATINGS_MANY} id="chart-many" />
         </div>
       </Section>
 
       <Section title="14. Profile chart: one week, and none yet" narrow>
-        <div data-daily-path className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           <RatingChart points={FIXTURE_RATINGS_ONE} id="chart-one" />
           <RatingChart points={[]} id="chart-empty" />
         </div>
@@ -568,9 +568,7 @@ export default function ArenaPreviewPage() {
       </Section>
 
       <Section title="26. Profile streak: live, and the same stored 4 gone stale">
-        {/* No data-daily-path here: /me has not been redrawn yet, so this
-            is the block as that route renders it today. */}
-        <TodayCards dailyPath={false}>
+        <TodayCards>
           <StreakBlock streak={4} streakUpdatedOn="2026-10-06" today={today} />
           <StreakBlock streak={4} streakUpdatedOn="2026-10-05" today={today} />
         </TodayCards>
@@ -600,7 +598,7 @@ export default function ArenaPreviewPage() {
       </p>
 
       <Section title="28. Profile: signed in, nothing argued yet">
-        <div data-daily-path className="rounded-panel border-2 border-rule">
+        <div className="rounded-panel border-2 border-rule">
           <ProfilePage
             school="stoicism"
             displayName={null}
@@ -623,7 +621,7 @@ export default function ArenaPreviewPage() {
       </Section>
 
       <Section title="29. Profile: an objection open, a chart, and a history">
-        <div data-daily-path className="rounded-panel border-2 border-rule">
+        <div className="rounded-panel border-2 border-rule">
           <ProfilePage
             school="stoicism"
             displayName="A Stoic"
@@ -649,7 +647,7 @@ export default function ArenaPreviewPage() {
       </Section>
 
       <Section title="30. Settings, with the deletion step open">
-        <div data-daily-path className="rounded-panel border-2 border-rule">
+        <div className="rounded-panel border-2 border-rule">
           <SettingsPage
             displayName="A Stoic"
             argumentDefaultPublic={false}
@@ -672,7 +670,7 @@ export default function ArenaPreviewPage() {
       </p>
 
       <Section title="31. Counterpart: your turn to reply">
-        <div data-daily-path className="rounded-panel border-2 border-rule">
+        <div className="rounded-panel border-2 border-rule">
           <ExchangeView
             {...exchange}
             turns={FIXTURE_TURNS}
@@ -686,13 +684,13 @@ export default function ArenaPreviewPage() {
       </Section>
 
       <Section title="32. Counterpart: waiting on the other person">
-        <div data-daily-path className="rounded-panel border-2 border-rule">
+        <div className="rounded-panel border-2 border-rule">
           <ExchangeView {...exchange} turns={[FIXTURE_TURNS[0]]} status="open" />
         </div>
       </Section>
 
       <Section title="33. Counterpart: four replies in, and finished">
-        <div data-daily-path className="rounded-panel border-2 border-rule">
+        <div className="rounded-panel border-2 border-rule">
           <ExchangeView
             {...exchange}
             turns={[
@@ -706,7 +704,7 @@ export default function ArenaPreviewPage() {
       </Section>
 
       <Section title="34. Counterpart: your reply held by the screening check">
-        <div data-daily-path className="rounded-panel border-2 border-rule">
+        <div className="rounded-panel border-2 border-rule">
           <ExchangeView
             {...exchange}
             turns={[...FIXTURE_TURNS, FIXTURE_HELD_TURN]}
@@ -729,7 +727,7 @@ export default function ArenaPreviewPage() {
       </p>
 
       <Section title="35. Class: four students across the three schools">
-        <div data-daily-path className="rounded-panel border-2 border-rule">
+        <div className="rounded-panel border-2 border-rule">
           <ClassView
             name="Year 12 Philosophy"
             code="KQ47PD"
@@ -745,7 +743,7 @@ export default function ArenaPreviewPage() {
       </Section>
 
       <Section title="36. Class: nobody has joined yet">
-        <div data-daily-path className="rounded-panel border-2 border-rule">
+        <div className="rounded-panel border-2 border-rule">
           <ClassView
             name="Thursday ethics club"
             code="KQ47PD"
@@ -761,16 +759,9 @@ export default function ArenaPreviewPage() {
 // The sidebar's own width, so a card fixture wraps where the real card
 // wraps. Two to a row on a wide screen only because the page is wide; the
 // real sidebar stacks them.
-function TodayCards({
-  children,
-  dailyPath = true,
-}: {
-  children: React.ReactNode;
-  /** False for a component on a route the restyle has not reached yet. */
-  dailyPath?: boolean;
-}) {
+function TodayCards({ children }: { children: React.ReactNode }) {
   return (
-    <div data-daily-path={dailyPath || undefined} className="flex flex-wrap gap-6">
+    <div className="flex flex-wrap gap-6">
       {Array.isArray(children)
         ? children.map((child, i) => (
             <div key={i} className="w-full max-w-sm">

@@ -88,7 +88,7 @@ export default async function ClassPage({ params }: { params: Promise<{ code: st
   // The container is written out rather than taken from <Page>, because
   // the daily-path wrapper has to sit on <main>; see the note on /me.
   return (
-    <main className="flex-1" data-daily-path>
+    <main className="flex-1">
       <ClassViewTracker classId={klass.id as string} members={members.length} />
       <ClassView
         name={klass.name as string}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Page } from "@/components/layout/Page";
 import { RubricViewTracker } from "@/components/debate/RubricViewTracker";
 import { SCHOOL_CHUNKY } from "@/components/daily-path/chunky";
 import { FIDELITY_CRITERIA } from "@/lib/judge/rubric";
@@ -39,11 +40,11 @@ const AXES = [
 // longest continuous prose in the product outside the lessons, and the
 // fidelity criteria below are the exact text the judge is given.
 export default function RubricPage() {
-  // The container is written out rather than taken from <Page>, because
-  // the daily-path wrapper has to sit on <main>; see the note on /me.
+  // Back on <Page> now the daily-path wrapper is gone: the wrapper had to
+  // sit on <main>, which <Page> owns. `rhythm="path"` keeps the 40/40 this
+  // route has had since it was redrawn.
   return (
-    <main className="flex-1" data-daily-path>
-      <div className="mx-auto max-w-read px-6 py-10">
+    <Page width="read" rhythm="path">
         <RubricViewTracker />
         <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
           The rubric
@@ -133,7 +134,6 @@ export default function RubricPage() {
             Back to the motions
           </Link>
         </div>
-      </div>
-    </main>
+    </Page>
   );
 }

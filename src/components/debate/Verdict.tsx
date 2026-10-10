@@ -6,7 +6,7 @@ import { MicroLesson } from "./MicroLesson";
 import { PublishToggle } from "./PublishToggle";
 import { ShareRow } from "./ShareRow";
 import { FindCounterpartButton } from "./FindCounterpartButton";
-import { ButtonLink } from "@/components/ui/Button";
+import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { TextLink } from "@/components/ui/TextLink";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { track } from "@/lib/analytics/client";
@@ -211,7 +211,7 @@ export function Verdict({
   }
 
   return (
-    <div data-daily-path>
+    <div>
       <div className="flex flex-wrap items-center gap-6">
         {/* The composite out of 100. It is not one of the three criteria,
             which is why it sits apart from them rather than as a fourth
@@ -350,14 +350,18 @@ export function Verdict({
                 </TextLink>
               ) : (
                 <>
-                  <ButtonLink
+                  {/* The reader's own school: answering the objection is
+                      their action. The objecting school is named above in
+                      its own colour. See docs/decisions.md. */}
+                  <ChunkyLink
                     href={`/debate/${topicSlug}/${debateId}/revise`}
+                    school={school}
                     onClick={() =>
                       track({ name: "objection_answer_started", props: { debate_id: debateId } })
                     }
                   >
                     Answer it
-                  </ButtonLink>
+                  </ChunkyLink>
                   {/* A plain sentence, not a tooltip on a question mark. */}
                   <span className="text-sm text-ink-mid">
                     Answering does not change your ELO. Leave it and it waits on your profile.

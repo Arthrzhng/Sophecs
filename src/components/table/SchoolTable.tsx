@@ -53,7 +53,7 @@ export function SchoolTable({
   paused,
 }: SchoolTableProps) {
   return (
-    <div data-daily-path>
+    <div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           <h1 className="text-xl font-extrabold tracking-tight text-ink">School table</h1>

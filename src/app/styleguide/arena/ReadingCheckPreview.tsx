@@ -46,7 +46,6 @@ export function ReadingCheckFrame({
   return (
     <div
       ref={frame}
-      data-daily-path
       className="h-[32rem] overflow-hidden rounded-panel border-2 border-rule"
     >
       <ReadingCheckStep

@@ -52,7 +52,7 @@ function Row({ href, children }: { href: string; children: React.ReactNode }) {
 // footer that says what the product does with a teenager's data.
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t-2 border-rule" data-daily-path data-print="hide">
+    <footer className="mt-auto border-t-2 border-rule" data-print="hide">
       <div className="mx-auto max-w-ui px-6 py-12">
         <p className="max-w-[54ch] text-sm leading-relaxed text-ink-mid">
           Sophecs is a philosophy tool for 15 to 18 year olds. Ten questions

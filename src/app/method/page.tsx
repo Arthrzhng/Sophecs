@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Page } from "@/components/layout/Page";
 
 export const metadata = {
   title: "How the judge works · Sophecs",
@@ -17,11 +18,11 @@ export const metadata = {
 // Rigor and Engagement under "Score in this order of priority", and the
 // response schema adds one composite `score` on top of them.
 export default function MethodPage() {
-  // The container is written out rather than taken from <Page>, because
-  // the daily-path wrapper has to sit on <main>; see the note on /me.
+  // Back on <Page> now the daily-path wrapper is gone: the wrapper had to
+  // sit on <main>, which <Page> owns. `rhythm="path"` keeps the 40/40 this
+  // route has had since it was redrawn.
   return (
-    <main className="flex-1" data-daily-path>
-      <div className="mx-auto max-w-read px-6 py-10">
+    <Page width="read" rhythm="path">
         <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
           The method
         </p>
@@ -102,7 +103,6 @@ export default function MethodPage() {
             Questions or corrections: arthur.rzhang@gmail.com
           </p>
         </div>
-      </div>
-    </main>
+    </Page>
   );
 }

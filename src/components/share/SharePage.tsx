@@ -61,7 +61,7 @@ export function SharePage({
   const coldRecipient = !isOwner && !showDebateThem && !otherVector;
 
   return (
-    <main className="flex-1" data-daily-path>
+    <main className="flex-1">
       <div className="mx-auto max-w-read px-6 py-10">
         <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
           {isOwner ? "Your school" : "Someone shared their result"}

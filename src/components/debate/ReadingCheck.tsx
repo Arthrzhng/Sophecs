@@ -150,7 +150,6 @@ export function ReadingCheck({
   return (
     <dialog
       ref={dialog}
-      data-daily-path
       aria-label="Check your reading"
       // The UA centres a dialog and caps it at a fraction of the viewport,
       // so every one of those defaults has to be undone for it to be the

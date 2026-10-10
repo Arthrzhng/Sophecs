@@ -54,7 +54,7 @@ export default async function MeSettingsPage({
   // The container is written out rather than taken from <Page>, because
   // the daily-path wrapper has to sit on <main>; see the note on /me.
   return (
-    <main className="flex-1" data-daily-path>
+    <main className="flex-1">
       <SettingsPage
         displayName={profile?.display_name ?? null}
         argumentDefaultPublic={profile?.argument_default_public ?? false}

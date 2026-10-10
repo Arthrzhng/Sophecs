@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 import { Toast, useToast } from "@/components/ui/Toast";
 import { track } from "@/lib/analytics/client";
 
@@ -56,15 +56,15 @@ export function ShareRow({
       {/* No saturated surface here. The result card is the one place the
           product shouts; a verdict is a mark, and a mark is quiet. */}
       <div className="flex flex-wrap gap-3">
-        <Button variant="secondary" onClick={shareX}>
+        <ChunkyButton tone="paper" className="border-2 border-rule-strong" onClick={shareX}>
           X
-        </Button>
-        <Button variant="secondary" onClick={shareWhatsApp}>
+        </ChunkyButton>
+        <ChunkyButton tone="paper" className="border-2 border-rule-strong" onClick={shareWhatsApp}>
           WhatsApp
-        </Button>
-        <Button variant="secondary" onClick={copyLink}>
+        </ChunkyButton>
+        <ChunkyButton tone="paper" className="border-2 border-rule-strong" onClick={copyLink}>
           Copy link
-        </Button>
+        </ChunkyButton>
       </div>
       <Toast message={toast} onDone={clearToast} />
     </div>
