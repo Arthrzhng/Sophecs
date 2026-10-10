@@ -19,6 +19,7 @@ import { LessonsCard, type LessonsCardModule } from "@/components/today/LessonsC
 import { StreakBlock } from "@/components/me/StreakBlock";
 import { ProfilePage } from "@/components/me/ProfilePage";
 import { ExchangeView } from "@/components/counterpart/ExchangeView";
+import { ClassView } from "@/components/class/ClassView";
 import { SettingsPage } from "@/components/me/SettingsPage";
 import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
@@ -48,6 +49,7 @@ import {
   FIXTURE_HELD_TURN,
   FIXTURE_THEIR_ARGUMENT,
   FIXTURE_TURNS,
+  FIXTURE_STUDENTS,
   fixtureTopics,
 } from "@/lib/arena-fixtures";
 
@@ -119,6 +121,11 @@ export default function ArenaPreviewPage() {
     publishMine: false,
     publishTheirs: false,
   };
+  // The two motions the student fixtures carry progress on, named as the
+  // class page names them.
+  const classTopics = fixtureTopics()
+    .filter((t) => t.slug === "opaque-benefit" || t.slug === "crash-arithmetic")
+    .map((t) => ({ slug: t.slug, title: t.title }));
 
   // The real modules, in the order Today picks the next one from. A made-up
   // title here would be the one place in the restyle where the sidebar is
@@ -712,6 +719,40 @@ export default function ArenaPreviewPage() {
           itself rather than relying on the policy, because it reads through
           the admin client; this is what the author sees while it waits.
         </p>
+      </Section>
+
+      <p className="mt-12 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+        The teacher&apos;s view. It needs a class, a membership row per
+        student and a case state per motion, and a class with nobody in it
+        looks nothing like a class with four. The names are plainly
+        invented, because the real page carries real ones.
+      </p>
+
+      <Section title="35. Class: four students across the three schools">
+        <div data-daily-path className="rounded-panel border-2 border-rule">
+          <ClassView
+            name="Year 12 Philosophy"
+            code="KQ47PD"
+            members={FIXTURE_STUDENTS}
+            topics={classTopics}
+          />
+        </div>
+        <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+          Student D joined and has opened nothing. Their motions read &ldquo;Not
+          opened&rdquo; rather than sitting blank: a row with nothing in it
+          reads as the page failing to load their progress.
+        </p>
+      </Section>
+
+      <Section title="36. Class: nobody has joined yet">
+        <div data-daily-path className="rounded-panel border-2 border-rule">
+          <ClassView
+            name="Thursday ethics club"
+            code="KQ47PD"
+            members={[]}
+            topics={classTopics}
+          />
+        </div>
       </Section>
     </Page>
   );

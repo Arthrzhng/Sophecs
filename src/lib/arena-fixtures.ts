@@ -353,3 +353,50 @@ export const FIXTURE_HELD_TURN: ViewTurn = {
   body: "This reply is waiting on the screening check. Only its author can see it until that comes back, which is the rule the route applies rather than the policy.",
   held: true,
 };
+
+/*
+ * The class page.
+ *
+ * Plainly fictional names. A teacher's view carries real students' names
+ * in production, so a fixture that looked like one would be the only
+ * place in the styleguide where invented data could be mistaken for a
+ * real person.
+ */
+export interface FixtureStudent {
+  id: string;
+  name: string;
+  school: SchoolId | null;
+  states: Record<string, CaseState>;
+}
+
+export const FIXTURE_STUDENTS: FixtureStudent[] = [
+  {
+    id: "student-a",
+    name: "Student A",
+    school: "stoicism",
+    states: {
+      "opaque-benefit": { read: true, argued: true, answered: true, closed: true },
+      "crash-arithmetic": { read: true, argued: true, answered: false, closed: false },
+    },
+  },
+  {
+    id: "student-b",
+    name: "Student B",
+    school: "utilitarianism",
+    states: {
+      "opaque-benefit": { read: true, argued: true, answered: false, closed: false },
+    },
+  },
+  {
+    id: "student-c",
+    name: "Student C",
+    school: "virtue-ethics",
+    states: {
+      "opaque-benefit": { read: true, argued: false, answered: false, closed: false },
+      "crash-arithmetic": { read: true, argued: true, answered: true, closed: true },
+    },
+  },
+  // Joined, took the quiz, and has opened nothing since. The row a
+  // teacher most needs to be able to pick out.
+  { id: "student-d", name: "Student D", school: "virtue-ethics", states: {} },
+];

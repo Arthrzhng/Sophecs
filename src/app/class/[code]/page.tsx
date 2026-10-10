@@ -1,12 +1,11 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
-import { CaseTicks } from "@/components/debate/CaseTicks";
 import { ClassViewTracker } from "@/components/me/ClassViewTracker";
+import { ClassView } from "@/components/class/ClassView";
 import { getCaseStates, type CaseState } from "@/lib/cases";
 import { normaliseClassCode } from "@/lib/classes";
-import { SCHOOL_ADHERENT, SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
+import { SCHOOL_ADHERENT } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
 
 export const metadata = { title: "Class · Sophecs" };
@@ -90,76 +89,25 @@ export default async function ClassPage({ params }: { params: Promise<{ code: st
   // the daily-path wrapper has to sit on <main>; see the note on /me.
   return (
     <main className="flex-1" data-daily-path>
-      <div className="mx-auto max-w-ui px-6 py-10">
-        <ClassViewTracker classId={klass.id as string} members={members.length} />
-        <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">Class</p>
-        <h1 className="mt-2 text-xl font-extrabold leading-tight tracking-tight text-ink">
-          {klass.name}
-        </h1>
-        <p className="mt-3 max-w-[54ch] text-base leading-relaxed text-ink-mid">
-          Whether each motion has been read, argued, answered and closed. Not
-          arguments, scores or ratings.
-        </p>
-
-        {members.length === 0 ? (
-          <p className="mt-10 text-base text-ink-mid">
-            Nobody has joined yet. Share the code{" "}
-            <span className="font-mono tabular font-bold text-ink">{normalised}</span>{" "}
-            with your class.
-          </p>
-        ) : (
-          <div className="mt-10 flex flex-col gap-5">
-            {members.map((member) => {
-              const id = member.user_id as string;
-              const profile = profileById.get(id);
-              const school = profile?.school ?? null;
-              const name =
-                profile?.displayName ??
-                (school ? `A ${SCHOOL_ADHERENT[school]}` : "A student");
-              const states = statesByUser.get(id) ?? {};
-
-              return (
-                <div
-                  key={id}
-                  className="rounded-card border-2 border-rule bg-surface p-5"
-                >
-                  {/* The student's school, on the student. There is no
-                      control on this page at all: a teacher reads it and
-                      presses nothing, so the colour rule has no actor to
-                      follow here. */}
-                  {school && (
-                    <p className={`text-sm font-bold ${SCHOOL_TEXT_CLASS[school]}`}>
-                      {SCHOOL_COLORS[school].name}
-                    </p>
-                  )}
-                  <h2 className="mt-1 font-serif text-md font-medium text-ink">{name}</h2>
-                  <ul className="mt-4 flex flex-col gap-4">
-                    {topics.map((topic) => (
-                      <li key={topic.slug}>
-                        <p className="text-sm text-ink-mid">{topic.title}</p>
-                        {states[topic.slug] && (
-                          <div className="mt-2">
-                            <CaseTicks state={states[topic.slug]} />
-                          </div>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        <div className="mt-12 border-t-2 border-rule pt-10">
-          <Link
-            href="/me/settings"
-            className="inline-flex min-h-11 items-center text-sm font-semibold text-ink underline underline-offset-4"
-          >
-            Settings
-          </Link>
-        </div>
-      </div>
+      <ClassViewTracker classId={klass.id as string} members={members.length} />
+      <ClassView
+        name={klass.name as string}
+        code={normalised}
+        topics={topics.map((t) => ({ slug: t.slug, title: t.title }))}
+        members={members.map((member) => {
+          const id = member.user_id as string;
+          const profile = profileById.get(id);
+          const school = profile?.school ?? null;
+          return {
+            id,
+            name:
+              profile?.displayName ??
+              (school ? `A ${SCHOOL_ADHERENT[school]}` : "A student"),
+            school,
+            states: statesByUser.get(id) ?? {},
+          };
+        })}
+      />
     </main>
   );
 }
