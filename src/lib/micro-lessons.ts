@@ -2,8 +2,10 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { excluded, type LoadOptions } from "./drafts";
 import {
   MAX_RETRIEVAL_PROMPTS,
+  POSITION_ORDER,
   readingCheckProblems,
   type MicroLessonContent,
 } from "./lesson-chunks";
@@ -92,17 +94,20 @@ function loadAll(): Record<string, MicroLessonContent> {
   return result;
 }
 
-export function getMicroLesson(slug: string): MicroLessonContent | null {
-  return loadAll()[slug] ?? null;
+export function getMicroLesson(slug: string, options: LoadOptions = {}): MicroLessonContent | null {
+  const lesson = loadAll()[slug];
+  if (!lesson || excluded(lesson, options)) return null;
+  return lesson;
 }
 
 // Backs /lessons, so a reader can find an excerpt again after meeting it
 // once inside a debate. Grouped by topic, "before" ahead of "after", which
 // is the order they're encountered in.
-export function getAllMicroLessons(): MicroLessonContent[] {
-  return Object.values(loadAll()).sort(
-    (a, b) =>
-      a.topic.localeCompare(b.topic) ||
-      (a.position === b.position ? 0 : a.position === "before" ? -1 : 1)
-  );
+export function getAllMicroLessons(options: LoadOptions = {}): MicroLessonContent[] {
+  return Object.values(loadAll())
+    .filter((lesson) => !excluded(lesson, options))
+    .sort(
+      (a, b) =>
+        a.topic.localeCompare(b.topic) || POSITION_ORDER[a.position] - POSITION_ORDER[b.position]
+    );
 }

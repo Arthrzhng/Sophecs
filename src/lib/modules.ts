@@ -2,6 +2,7 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { excluded, isDraft, type LoadOptions } from "./drafts";
 import { SCHOOL_IDS } from "./footnotes";
 import type { Source } from "./footnotes";
 import type { SchoolId } from "./types";
@@ -18,6 +19,8 @@ export interface ModuleContent {
   // Where each reading starts; absent means the module is one reading.
   // See module-readings.ts.
   readings?: ModuleReadingMark[];
+  /** See lib/drafts.ts. Draft files load only on /styleguide/drafts. */
+  status?: "draft";
 }
 
 const MODULES_DIR = path.join(process.cwd(), "content", "modules");
@@ -40,7 +43,7 @@ const REQUIRED = ["id", "school", "title", "quiz_excerpt", "debate_topics", "sou
  * does throw, because those are load-bearing for the debate flow and an
  * empty one would silently swallow a reader's argument prompt.
  */
-export function getAllModules(): ModuleContent[] {
+export function getAllModules(options: LoadOptions = {}): ModuleContent[] {
   if (!fs.existsSync(MODULES_DIR)) return [];
 
   const modules: ModuleContent[] = [];
@@ -48,6 +51,9 @@ export function getAllModules(): ModuleContent[] {
     if (!file.endsWith(".md") || file === "README.md") continue;
     const where = `content/modules/${file}`;
     const { data } = matter(fs.readFileSync(path.join(MODULES_DIR, file), "utf8"));
+
+    if (excluded(data, options)) continue;
+    const draft = isDraft(data);
 
     const missing = REQUIRED.filter((key) => data[key] == null || data[key] === "");
     if (missing.length > 0) {
@@ -58,7 +64,14 @@ export function getAllModules(): ModuleContent[] {
       console.warn(`${where}: skipped, no body yet`);
       continue;
     }
-    if (!SCHOOL_IDS.includes(data.school as SchoolId)) {
+    // A draft may name a school the product does not teach yet; that is
+    // the point of drafting one. A published module may not, and a draft
+    // only gets this far when the caller asked for drafts, which only
+    // /styleguide/drafts does. The cast below is therefore the one place
+    // a ModuleContent.school can hold a string outside the union, and the
+    // review route must put it through knownSchool() before using it to
+    // index anything keyed by SchoolId.
+    if (!draft && !SCHOOL_IDS.includes(data.school as SchoolId)) {
       console.warn(`${where}: skipped, school "${data.school}" is not one of ${SCHOOL_IDS.join(", ")}`);
       continue;
     }
@@ -82,11 +95,12 @@ export function getAllModules(): ModuleContent[] {
       sources: data.sources as Source[],
       body: data.body,
       readings: data.readings as ModuleReadingMark[] | undefined,
+      ...(draft ? { status: "draft" as const } : {}),
     });
   }
   return modules;
 }
 
-export function getModule(id: string): ModuleContent | null {
-  return getAllModules().find((m) => m.id === id) ?? null;
+export function getModule(id: string, options: LoadOptions = {}): ModuleContent | null {
+  return getAllModules(options).find((m) => m.id === id) ?? null;
 }

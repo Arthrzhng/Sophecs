@@ -52,6 +52,11 @@ export default function LessonsPage() {
 
   const byTopic = new Map<string, { before?: MicroLessonContent; after?: MicroLessonContent }>();
   for (const lesson of lessons) {
+    // The index pairs a motion's two readings, and a third position has no
+    // slot in that pair. `getAllMicroLessons` already hides "elsewhere"
+    // lessons by hiding drafts; this keeps the index right even if one is
+    // ever published by mistake, rather than letting it widen the map.
+    if (lesson.position !== "before" && lesson.position !== "after") continue;
     const entry = byTopic.get(lesson.topic) ?? {};
     entry[lesson.position] = lesson;
     byTopic.set(lesson.topic, entry);
