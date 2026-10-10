@@ -12,12 +12,15 @@ const configured = Boolean(
 /**
  * The two ways in.
  *
- * Both buttons are paper. Every other primary in the product is the
- * reader's own school colour, and a reader signing in does not have one:
- * this is the screen where they go to get one. Colouring it with a school
- * they have not been given would be the interface guessing. The hierarchy
- * is the layout instead, which is what the landing page does for the same
- * reason.
+ * "Send link" is the ink primary, the tone for a screen where the reader
+ * has no school yet: every other primary in the product is the reader's
+ * own school colour, and a reader signing in has not been given one. This
+ * is the screen they go to in order to get one, so the button is neutral
+ * rather than a guess.
+ *
+ * Google stays paper, below the rule. Two primaries would be two answers
+ * to the same question, and the email field is the path the product
+ * actually leads with.
  */
 export function LoginForm({ next }: { next?: string }) {
   const [email, setEmail] = useState("");
@@ -82,13 +85,7 @@ export function LoginForm({ next }: { next?: string }) {
             placeholder="you@example.org"
             className="min-h-14 flex-1 rounded-chunky border-2 border-rule-strong bg-surface px-4 text-base text-ink placeholder:text-ink-soft"
           />
-          <ChunkyButton
-            type="submit"
-            tone="paper"
-            loading={sending}
-            loadingLabel="Sending…"
-            className="border-2 border-rule-strong"
-          >
+          <ChunkyButton type="submit" tone="ink" loading={sending} loadingLabel="Sending…">
             Send link
           </ChunkyButton>
         </div>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { SchoolId } from "@/lib/types";
 import { SCHOOL_CHUNKY, shade } from "./chunky";
 
-export type ChunkyTone = "school" | "paper" | "correct" | "wrong" | "quiet";
+export type ChunkyTone = "school" | "ink" | "paper" | "correct" | "wrong" | "quiet";
 
 /**
  * The restyle's primary control: a solid bottom edge that the button travels
@@ -11,9 +11,15 @@ export type ChunkyTone = "school" | "paper" | "correct" | "wrong" | "quiet";
  * so every chunky surface, not only buttons, presses the same way.
  *
  * `school` is the default because the design makes the primary action the
- * reader's own school colour. The school has to be passed in; there is no
- * fallback tone standing in for "no school yet", because a reader without a
- * school has not taken the quiz and sees a different screen.
+ * reader's own school colour. The school has to be passed in rather than
+ * defaulted; a wrong school on a button is worse than no colour.
+ *
+ * `ink` is the primary for the screens where the reader genuinely has no
+ * school: /login is the first, and it is where they go to get one. It is
+ * the only tone whose shade is lighter than its fill. Ink is two steps off
+ * black and there is nothing darker in the palette to sit it on, so the
+ * edge is the strong rule instead, which reads on paper as the button
+ * standing proud of the page rather than as a shadow under it.
  *
  * min-h-14 is 56px, which is both the mockups' primary-button height and
  * comfortably past the 44px floor. Focus comes from the global
@@ -21,6 +27,10 @@ export type ChunkyTone = "school" | "paper" | "correct" | "wrong" | "quiet";
  * forget it.
  */
 const TONES: Record<Exclude<ChunkyTone, "school">, { cls: string; shade: string }> = {
+  ink: {
+    cls: "bg-ink text-paper",
+    shade: "var(--color-rule-strong)",
+  },
   paper: {
     cls: "bg-surface text-ink",
     shade: "var(--color-rule-strong)",
