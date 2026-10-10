@@ -12,6 +12,7 @@ import type { ClassSummary, JoinedClass } from "./classes";
 import type { OpenObjection } from "./objections";
 import type { ExchangeRow } from "@/components/me/OpenExchanges";
 import type { ProfileDebate } from "@/components/me/ProfilePage";
+import type { ViewTurn } from "@/components/counterpart/ExchangeView";
 import type { SchoolId } from "./types";
 import type { TopicListItem, TopicStatus } from "@/components/debate/TopicList";
 import type { VerdictData } from "@/components/debate/Verdict";
@@ -312,3 +313,43 @@ export const FIXTURE_CLASSES_OWNED: ClassSummary[] = [
 export const FIXTURE_CLASSES_JOINED: JoinedClass[] = [
   { id: "preview-joined", name: "Thursday ethics club", memberCount: 9 },
 ];
+
+/*
+ * The counterpart exchange.
+ *
+ * Two real arguments from the fixtures above, so the two columns hold
+ * writing of the length they really hold. The replies are written, like
+ * the verdict: no exchange is checked into the repo, and nothing in the
+ * product generates one without two accounts.
+ */
+export const FIXTURE_THEIR_ARGUMENT = `A virtue ethicist asks what kind of person deploys a system they cannot interrogate. Not what the system does on average, and not whether the evidence was good on the day: what the habit of deferring to an unexaminable result does to the people who form it.
+
+Phronesis is exercised in deliberation about particulars. A deployer who can give no account of why this case went the way it did has not deliberated about it; they have outsourced the deliberation and kept the title. Over enough decisions that is not a lapse, it is a character.`;
+
+export const FIXTURE_TURNS: ViewTurn[] = [
+  {
+    id: "preview-turn-1",
+    seq: 1,
+    mine: false,
+    quotedClaim: "What is up to us is the assent: did the people responsible look at the evidence and form a sound judgement about it?",
+    body: "Sound by what measure, though? You can only call an assent sound by examining the reasons it rested on. Where the mechanism is closed, the reasons are not available to examine, so \"they judged well\" is a claim nobody can check, including the person making it about themselves.",
+    held: false,
+  },
+  {
+    id: "preview-turn-2",
+    seq: 2,
+    mine: true,
+    quotedClaim: "Where the mechanism is closed, the reasons are not available to examine.",
+    body: "The reasons for the assent are available: the trial evidence, the error rates, the population it was tested on. Those are the particulars a deployer deliberates about. What is closed is the mechanism, which was never what the judgement was about.",
+    held: false,
+  },
+];
+
+export const FIXTURE_HELD_TURN: ViewTurn = {
+  id: "preview-turn-held",
+  seq: 3,
+  mine: true,
+  quotedClaim: "What is closed is the mechanism, which was never what the judgement was about.",
+  body: "This reply is waiting on the screening check. Only its author can see it until that comes back, which is the rule the route applies rather than the policy.",
+  held: true,
+};

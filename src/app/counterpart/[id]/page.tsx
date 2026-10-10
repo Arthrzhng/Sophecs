@@ -1,14 +1,12 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
-import { TurnComposer } from "@/components/counterpart/TurnComposer";
-import { TurnActions } from "@/components/counterpart/TurnActions";
-import { ExchangePublishToggle } from "@/components/counterpart/PublishToggle";
+import {
+  ExchangeView,
+  type ExchangeStatus,
+} from "@/components/counterpart/ExchangeView";
 import { isLapsed, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
-import { SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
-import { Page } from "@/components/layout/Page";
 
 export const metadata = { title: "Counterpart · Sophecs" };
 
@@ -105,126 +103,39 @@ export default async function CounterpartPage({
     }
   }
 
+  // The container is written out rather than taken from <Page>, because
+  // the daily-path wrapper has to sit on <main>; see the note on /me.
   return (
-    <Page width="read">
-        <p className="eyebrow text-ink-soft mb-4">Counterpart</p>
-        <h1 className="max-w-[40ch] font-serif text-xl font-medium leading-tight text-ink">
-          {topic.motion}
-        </h1>
-
-        {!theirUserId && (
-          <p className="mt-6 text-sm text-ink-mid">Your counterpart has left.</p>
-        )}
-        {anyRemoved && (
-          <p className="mt-4 text-sm text-ink-mid">A reply was removed for breaking the rules.</p>
-        )}
-
-        {/* Stacked at 375 px, side by side from `sm` up. */}
-        <div className="mt-10 grid gap-8 sm:grid-cols-2">
-          <Argument
-            eyebrow={`You · ${SCHOOL_COLORS[mySchool].name}`}
-            school={mySchool}
-            text={argumentById.get(myDebateId as string) ?? ""}
-          />
-          <Argument
-            eyebrow={`Counterpart · ${SCHOOL_COLORS[theirSchool].name}`}
-            school={theirSchool}
-            text={argumentById.get(theirDebateId as string) ?? ""}
-          />
-        </div>
-
-        {visible.length > 0 && (
-          <div className="mt-12 space-y-10 border-t border-rule pt-10">
-            {visible.map((turn) => {
-              const mine = turn.author_id === user.id;
-              return (
-                <div key={turn.id}>
-                  <p
-                    className={`eyebrow mb-3 ${
-                      mine ? SCHOOL_TEXT_CLASS[mySchool] : SCHOOL_TEXT_CLASS[theirSchool]
-                    }`}
-                  >
-                    {mine ? "You" : "Counterpart"} · Reply {turn.seq}
-                    {turn.screen_result !== "ok" && " · held for review"}
-                  </p>
-                  <blockquote className="border-l-2 border-rule pl-4 font-serif text-base italic text-ink-mid leading-relaxed max-w-[60ch]">
-                    {turn.quoted_claim}
-                  </blockquote>
-                  <p className="mt-4 font-serif text-base leading-relaxed whitespace-pre-wrap max-w-[60ch]">
-                    {turn.body}
-                  </p>
-                  {!mine && <TurnActions turnId={turn.id} exchangeId={id} />}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        <div className="mt-12 border-t border-rule pt-10">
-          {myHeld ? (
-            <p className="text-sm text-ink-mid">This reply was held for review.</p>
-          ) : status === "blocked" ? (
-            <p className="text-sm text-ink-mid">This exchange is closed.</p>
-          ) : status === "lapsed" ? (
-            <p className="text-sm text-ink-mid">
-              This exchange lapsed after two weeks without a reply.
-            </p>
-          ) : status === "complete" ? (
-            <div>
-              <p className="text-sm text-ink-mid">
-                Four replies, and it&apos;s finished. Neither of you has to concede.
-              </p>
-              <div className="mt-6">
-                <ExchangePublishToggle
-                  exchangeId={id}
-                  initial={Boolean(iAmA ? exchange.publish_a : exchange.publish_b)}
-                  otherAgreed={Boolean(iAmA ? exchange.publish_b : exchange.publish_a)}
-                />
-              </div>
-            </div>
-          ) : myTurn ? (
-            <TurnComposer
-              exchangeId={id}
-              seq={nextSeq}
-              userId={user.id}
-              sourceLabel={sourceLabel}
-              sourceText={sourceText}
-            />
-          ) : (
-            <p className="text-sm text-ink-mid">Waiting for your counterpart.</p>
-          )}
-        </div>
-
-        <div className="mt-10 flex flex-wrap items-center gap-6">
-          <Link
-            href={`/debate/${exchange.topic_slug}/${myDebateId}`}
-            className="font-mono text-xs text-ink-mid hover:text-ink"
-          >
-            Your verdict →
-          </Link>
-          <Link href="/debate/rubric" className="font-mono text-xs text-ink-mid hover:text-ink">
-            Counterpart rules →
-          </Link>
-        </div>
-    </Page>
-  );
-}
-
-function Argument({
-  eyebrow,
-  school,
-  text,
-}: {
-  eyebrow: string;
-  school: SchoolId;
-  text: string;
-}) {
-  return (
-    <div>
-      <p className={`eyebrow mb-3 ${SCHOOL_TEXT_CLASS[school]}`}>{eyebrow}</p>
-      <p className="font-serif text-base leading-relaxed whitespace-pre-wrap">
-        {text || "This argument is no longer available."}
-      </p>
-    </div>
+    <main className="flex-1" data-daily-path>
+      <ExchangeView
+        exchangeId={id}
+        userId={user.id}
+        topicSlug={exchange.topic_slug as string}
+        myDebateId={myDebateId as string}
+        motion={topic.motion as string}
+        mySchool={mySchool}
+        theirSchool={theirSchool}
+        myArgument={argumentById.get(myDebateId as string) ?? ""}
+        theirArgument={argumentById.get(theirDebateId as string) ?? ""}
+        turns={visible.map((turn) => ({
+          id: turn.id,
+          seq: turn.seq,
+          mine: turn.author_id === user.id,
+          quotedClaim: turn.quoted_claim,
+          body: turn.body,
+          held: turn.screen_result !== "ok",
+        }))}
+        counterpartLeft={!theirUserId}
+        anyRemoved={anyRemoved}
+        myHeld={Boolean(myHeld)}
+        status={status as ExchangeStatus}
+        myTurn={myTurn}
+        nextSeq={nextSeq}
+        sourceLabel={sourceLabel}
+        sourceText={sourceText}
+        publishMine={Boolean(iAmA ? exchange.publish_a : exchange.publish_b)}
+        publishTheirs={Boolean(iAmA ? exchange.publish_b : exchange.publish_a)}
+      />
+    </main>
   );
 }

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { blockCounterpart, reportTurn } from "@/app/debate/actions";
 import { track } from "@/lib/analytics/client";
-import { Button } from "@/components/ui/Button";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 
 const REASONS = [
   { value: "harassment", label: "Harassment" },
@@ -52,7 +52,7 @@ export function TurnActions({ turnId, exchangeId }: { turnId: string; exchangeId
   }
 
   if (done) {
-    return <p className="mt-2 font-mono text-xs text-ink-soft">Reported. We&apos;ll look at it.</p>;
+    return <p className="mt-3 text-sm text-ink-mid">Reported. We&apos;ll look at it.</p>;
   }
 
   return (
@@ -61,7 +61,7 @@ export function TurnActions({ turnId, exchangeId }: { turnId: string; exchangeId
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="font-mono text-xs text-ink-soft underline underline-offset-4 hover:text-ink"
+          className="inline-flex min-h-11 items-center text-sm text-ink-mid underline underline-offset-4 hover:text-ink"
         >
           Report
         </button>
@@ -69,7 +69,7 @@ export function TurnActions({ turnId, exchangeId }: { turnId: string; exchangeId
           type="button"
           onClick={block}
           disabled={busy}
-          className="text-sm text-ink-soft underline underline-offset-4 hover:text-ink disabled:no-underline"
+          className="inline-flex min-h-11 items-center text-sm text-ink-mid underline underline-offset-4 hover:text-ink disabled:no-underline"
         >
           Block
         </button>
@@ -78,7 +78,7 @@ export function TurnActions({ turnId, exchangeId }: { turnId: string; exchangeId
       {open && (
         <div className="mt-3 border-l-2 border-rule pl-4">
           <fieldset>
-            <legend className="font-sans text-sm text-ink-mid">What&apos;s wrong with it?</legend>
+            <legend className="text-sm font-bold text-ink">What&apos;s wrong with it?</legend>
             <div className="mt-2 space-y-1">
               {REASONS.map((r) => (
                 <label key={r.value} className="flex items-center gap-2 text-sm">
@@ -100,14 +100,18 @@ export function TurnActions({ turnId, exchangeId }: { turnId: string; exchangeId
             maxLength={300}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Anything else worth knowing (optional)"
-            className="mt-3 w-full resize-none rounded-control border border-rule bg-surface p-3 font-sans text-sm"
+            className="mt-3 w-full resize-none rounded-chunky border-2 border-rule-strong bg-surface p-4 text-base text-ink"
           />
-          <Button variant="secondary"
+          {/* Paper, not a school colour. The colour rule puts the
+              actor's school on a primary action; reporting is not one,
+              and a safety control wearing your school says the wrong
+              thing about what it is for. */}
+          <ChunkyButton tone="paper" className="border-2 border-rule-strong"
             onClick={submitReport}
             disabled={busy}
           >
             Send report
-          </Button>
+          </ChunkyButton>
         </div>
       )}
     </div>
