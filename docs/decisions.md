@@ -779,6 +779,8 @@ Three buttons on /me broke this on the first pass and all three looked plausible
 
 So: the content names its subject in that subject's colour, as a word or a 2px rule; the button carries the actor's. Where the actor has no school, the `ink` tone is the primary and the entry above says when. Where the action is destructive, the `error` tone is, and it is coloured for the act rather than for anyone.
 
+**A safety control is never in a school colour, and never in ink.** Report and block are not primary actions and the rule does not reach them: a report button wearing your school says the thing you are doing is an argument, which is exactly what it is not. They stay paper. The same holds for anything that exists so a reader can get away from another reader.
+
 The two places this bites hardest are the ones still to be redrawn: Counterpart, where two schools are on screen at once and only one of them is yours, and /c/[id], where the challenger and the challenged both have one.
 
 ### What the last stage of the restyle has to do

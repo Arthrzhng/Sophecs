@@ -18,6 +18,7 @@ import { StreakCard, SchoolCard } from "@/components/today/TodayCards";
 import { LessonsCard, type LessonsCardModule } from "@/components/today/LessonsCard";
 import { StreakBlock } from "@/components/me/StreakBlock";
 import { ProfilePage } from "@/components/me/ProfilePage";
+import { ExchangeView } from "@/components/counterpart/ExchangeView";
 import { SettingsPage } from "@/components/me/SettingsPage";
 import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
@@ -44,6 +45,9 @@ import {
   FIXTURE_DEBATES,
   FIXTURE_EXCHANGES,
   FIXTURE_OBJECTION,
+  FIXTURE_HELD_TURN,
+  FIXTURE_THEIR_ARGUMENT,
+  FIXTURE_TURNS,
   fixtureTopics,
 } from "@/lib/arena-fixtures";
 
@@ -91,6 +95,30 @@ export default function ArenaPreviewPage() {
   // rather than the real one: a fixture whose picture changes with the day
   // of the week cannot be reviewed.
   const today = "2026-10-07";
+
+  // Everything the exchange needs that does not change between its four
+  // states. Spread into each, so a state differs from its neighbour by
+  // exactly the props that name it.
+  const exchange = {
+    exchangeId: "preview-exchange",
+    userId: "preview",
+    topicSlug: "opaque-benefit",
+    myDebateId: FIXTURE_RESULT_ID,
+    motion: FIXTURE_MOTION,
+    mySchool: "stoicism" as const,
+    theirSchool: "virtue-ethics" as const,
+    myArgument: FIXTURE_ARGUMENT,
+    theirArgument: FIXTURE_THEIR_ARGUMENT,
+    counterpartLeft: false,
+    anyRemoved: false,
+    myHeld: false,
+    myTurn: false,
+    nextSeq: 3,
+    sourceLabel: "",
+    sourceText: "",
+    publishMine: false,
+    publishTheirs: false,
+  };
 
   // The real modules, in the order Today picks the next one from. A made-up
   // title here would be the one place in the restyle where the sidebar is
@@ -628,6 +656,61 @@ export default function ArenaPreviewPage() {
           would delete this preview&apos;s account if one were signed in;
           nobody is, so it reports the failure instead. Every word of that
           block is frozen copy.
+        </p>
+      </Section>
+      <p className="mt-12 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+        The counterpart exchange, in its four states. It needs two accounts,
+        two judged arguments and a row of turns, so it is the one screen in
+        the product that two people have to build between them.
+      </p>
+
+      <Section title="31. Counterpart: your turn to reply">
+        <div data-daily-path className="rounded-panel border-2 border-rule">
+          <ExchangeView
+            {...exchange}
+            turns={FIXTURE_TURNS}
+            status="open"
+            myTurn
+            nextSeq={3}
+            sourceLabel="their last reply"
+            sourceText={FIXTURE_TURNS[0].body}
+          />
+        </div>
+      </Section>
+
+      <Section title="32. Counterpart: waiting on the other person">
+        <div data-daily-path className="rounded-panel border-2 border-rule">
+          <ExchangeView {...exchange} turns={[FIXTURE_TURNS[0]]} status="open" />
+        </div>
+      </Section>
+
+      <Section title="33. Counterpart: four replies in, and finished">
+        <div data-daily-path className="rounded-panel border-2 border-rule">
+          <ExchangeView
+            {...exchange}
+            turns={[
+              ...FIXTURE_TURNS,
+              { ...FIXTURE_TURNS[0], id: "preview-turn-3", seq: 3 },
+              { ...FIXTURE_TURNS[1], id: "preview-turn-4", seq: 4 },
+            ]}
+            status="complete"
+          />
+        </div>
+      </Section>
+
+      <Section title="34. Counterpart: your reply held by the screening check">
+        <div data-daily-path className="rounded-panel border-2 border-rule">
+          <ExchangeView
+            {...exchange}
+            turns={[...FIXTURE_TURNS, FIXTURE_HELD_TURN]}
+            status="open"
+            myHeld
+          />
+        </div>
+        <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+          Only the author sees a held reply. The route applies that rule
+          itself rather than relying on the policy, because it reads through
+          the admin client; this is what the author sees while it waits.
         </p>
       </Section>
     </Page>
