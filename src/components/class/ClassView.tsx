@@ -72,10 +72,15 @@ export function ClassView({
                         <CaseTicks state={member.states[topic.slug]} />
                       </div>
                     ) : (
-                      // A student who joined and has opened nothing. Said
-                      // in words rather than left blank: an empty row
+                      // A student who has done nothing on this motion.
+                      // Said in words rather than left blank: an empty row
                       // reads as the page failing to load their progress.
-                      <p className="mt-2 text-sm text-ink-soft">Not opened</p>
+                      //
+                      // "Not started", not "Not opened": the four ticks
+                      // record progress, and opening a page is not one of
+                      // them. Same word the module cards use for the same
+                      // state (src/lib/module-progress.ts).
+                      <p className="mt-2 text-sm text-ink-soft">Not started</p>
                     )}
                   </li>
                 ))}

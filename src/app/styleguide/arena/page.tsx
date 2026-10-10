@@ -738,9 +738,9 @@ export default function ArenaPreviewPage() {
           />
         </div>
         <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
-          Student D joined and has opened nothing. Their motions read &ldquo;Not
-          opened&rdquo; rather than sitting blank: a row with nothing in it
-          reads as the page failing to load their progress.
+          Student D joined and has done nothing since. Their motions read
+          &ldquo;Not started&rdquo; rather than sitting blank: a row with
+          nothing in it reads as the page failing to load their progress.
         </p>
       </Section>
 
