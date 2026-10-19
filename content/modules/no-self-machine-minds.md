@@ -19,27 +19,32 @@ readings:
   - title: The second sermon
     from_paragraph: 0
   - title: Running it on a machine
-    from_paragraph: 2
+    from_paragraph: 3
   - title: What it costs
-    from_paragraph: 5
+    from_paragraph: 6
 body: |-
   The usual complaint about a language model is that there is nobody in
   there. No self, no standpoint, nothing that owns the output. Whatever
   the thing is doing, the argument goes, it is not what a person does when
-  a person decides.
+  a person decides. The complaint assumes that the human case is settled,
+  and that what makes it settled is the presence of a self the machine
+  lacks.
 
   The second sermon of the Pali canon runs that argument and does not stop
   at machines. The body, it says, is not the self.[^1] The reason given is
-  not mystical: if the body were the self it would not fall sick, and you
-  could say to it, let my body be thus, let my body not be thus. You
-  cannot, so it is not yours in the way the word self implies. The text
-  then does the same to sensation, to perception, to mental formations,
-  and finally to consciousness, which is the one most people expect it to
-  spare.
+  not mystical. If the body were the self it would not be subject to
+  disease, and it could be controlled at will. Neither holds. You do not consent to illness, and you cannot simply
+  direct the thing you are supposed to own. The test is ownership and
+  control, which is a plain test and not a metaphysical one, and the body
+  fails it the way a rented room fails it.
 
-  Nothing survives the procedure. What is left is a sequence of processes
-  with no owner behind them, each conditioned by the last, none of them
-  the thing doing the conditioning.
+  What makes the sermon more than a remark about bodies is that it does
+  not stop there. The same analysis is run on sensation, then on
+  perception, then on mental formations, and finally on consciousness,
+  which is the one most people expect it to spare. Each is tested the same
+  way and each fails the same test. Nothing survives the procedure. What
+  is left is a sequence of processes with no owner behind them, each
+  conditioned by the last, none of them the thing doing the conditioning.
 
   Run that against the complaint and it reverses. If no self was found in
   the human case, the absence of one in the machine stops being the
@@ -56,13 +61,19 @@ body: |-
   cause of suffering, and a tradition organised around suffering rather
   than around agents is well placed to say so.
 
+  It cuts the other way too, which is worth saying plainly. If selfhood
+  was never what made a human act weighty, then a developer cannot use the
+  model's lack of one to put the act outside the moral frame. The absence
+  of a self excuses nobody, because on this reading it never excused us.
+
   The weakness is the one Damien Keown names. Buddhist traditions carry a
   great deal of moral teaching and comparatively little systematic moral
   philosophy, the emphasis having fallen on liberation and monastic life
   rather than on institutions. No-self is a precise claim about what a
-  person is. It is not a procedure for deciding who audits a model, who is
-  liable when it harms someone, or what a company owes the people its
-  outputs land on.
+  person is. It is not a procedure for deciding who audits a model, who is liable
+  when it harms someone, or what a company owes the people its outputs
+  land on. Those questions need an account of offices and remedies, and
+  the canon was not written to supply one.
 
   Charles Hallisey answers that the missing theory may be
   context-sensitive reasoning rather than a failure to theorise, which
