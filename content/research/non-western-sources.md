@@ -242,3 +242,157 @@ Each full school should have four separate layers:
 - Do not reduce Buddhism to mindfulness or "reducing suffering"; preserve intention, karma, liberation, wisdom and differences among Buddhist schools.
 - Do not call Mohism simply "Chinese utilitarianism"; use **impartial-care or dao-consequentialist tradition**.
 - Do not teach Daoism as anti-technology. Present competing readings of the "machine-heart" as rejection of machinery, dependency, instrumental consciousness or domination.
+
+---
+
+## Round 2 (19 Oct 2026)
+
+Pasted by Arthur on 2026-10-19. Same rule as above: anything marked
+UNVERIFIED is not used.
+
+Below, page numbers mean the printed page, not the PDF viewer's counter. I have reproduced only wording visible in the linked text; where the edition, translator attribution or printed page could not be checked directly, it is marked UNVERIFIED.
+
+### Ubuntu
+
+#### Metz: relational personhood
+
+"a person is a person through other persons."
+
+* Author: Thaddeus Metz
+* Work: "Toward an African Moral Theory"
+* Edition: The Journal of Political Philosophy, vol. 15, no. 3, 2007, pp. 321–341
+* Page: 322
+* Translator: None; Metz wrote the article in English
+* Context: Metz presents this as the maxim in which ubuntu often figures, noting both descriptive and prescriptive interpretations.
+* Text: [Visible PDF](https://www.thenovacastrianphilosopher.com/uploads/1/2/4/8/124802260/metz_toward_an_african_moral_theory.pdf)
+* Publisher record: [DOI](https://doi.org/10.1111/j.1467-9760.2007.00280.x)
+
+The journal metadata, volume 15, issue 3, 2007, pages 321–341, and the quotation on printed page 322 are visible in the PDF.
+
+#### Metz: relational moral value
+
+"moral value fundamentally lies not in the individual, but rather in a relationship between individuals."
+
+* Author: Thaddeus Metz
+* Work and edition: Same article
+* Page: 332
+* Translator: None
+* Text: [Visible PDF](https://www.thenovacastrianphilosopher.com/uploads/1/2/4/8/124802260/metz_toward_an_african_moral_theory.pdf)
+
+This occurs as Metz introduces the idea that interpersonal relationships, rather than properties internal to individuals, can possess fundamental moral status.
+
+#### Nguni maxim
+
+The original expression is:
+
+umuntu ngumuntu ngabantu
+
+A strict named-translator verification was not achieved. Metz's 2007 article visibly gives the English rendering "a person is a person through other persons," but he calls it a maxim rather than explicitly identifying himself as its translator.
+
+Dirk Louw attributes the same rendering to Augustine Shutte:
+
+"a person is a person through other persons"
+
+* Attributed source: Augustine Shutte, Philosophy for Africa (1993), p. 46
+* Attributing author: Dirk J. Louw, "Ubuntu: An African Assessment of the Religious Other"
+* Text: [Boston University conference text](https://www.bu.edu/wcp/Papers/Afri/AfriLouw.htm)
+* Verification status: UNVERIFIED as a first-hand Shutte quotation, because Shutte's printed page was not directly visible.
+
+Louw also identifies a longer rendering by W. L. van der Merwe, but the underlying 1996 publication was not directly inspected; it therefore remains UNVERIFIED as a primary-source translation.
+
+### Analects
+
+#### Edition
+
+James Legge (trans.), The Chinese Classics, vol. I: Confucian Analects, The Great Learning, and The Doctrine of the Mean, second revised edition, Oxford: Clarendon Press, 1893. The Dover edition is an unabridged republication of this 1893 edition.
+
+* Page images: [Internet Archive](https://archive.org/details/confuciananalect00conf)
+* Searchable transcription: [Project Gutenberg](https://www.gutenberg.org/cache/epub/4094/pg4094-images.html)
+* Copyright: Public domain; Legge lived from 1815 to 1897.
+
+#### Analects 12.7
+
+Printed pages 161–162:
+
+1. Tsze-kung asked about government. The Master said, "The requisites of government are that there be sufficiency of food, sufficiency of military equipment, and the confidence of the people in their ruler."
+2. Tsze-kung said, "If it cannot be helped, and one of these must be dispensed with, which of the three should be foregone first?" "The military equipment," said the Master.
+3. Tsze-kung again asked, "If it cannot be helped, and one of the remaining two must be dispensed with, which of them should be foregone?" The Master answered, "Part with the food. From of old, death has been the lot of all men; but if the people have no faith in their rulers, there is no standing for the state."
+
+The first two paragraphs begin on printed p. 161; paragraph 3 continues on printed p. 162 in the 1893 Legge edition.
+
+#### Analects 12.11
+
+Printed pages 165–166:
+
+1. The duke Ching, of Ch'i, asked Confucius about government.
+2. Confucius replied, "There is government, when the prince is prince, and the minister is minister; when the father is father, and the son is son."
+3. "Good!" said the duke; "if, indeed, the prince be not prince, the minister not minister, the father not father, and the son not son, although I have my revenue, can I enjoy it?"
+
+Paragraphs 1–2 appear on printed p. 165; paragraph 3 appears on p. 166.
+
+### Buddhist no-self
+
+#### Anattalakkhaṇa discourse
+
+"The body (Rûpa), O Bhikkhus, is not the self."
+
+* Canonical location: Mahāvagga I.6.38; the discourse conventionally called the Anattalakkhaṇa Sutta, corresponding to SN 22.59
+* Edition: Vinaya Texts, Part I: The Pâtimokkha; The Mahâvagga I–IV, Sacred Books of the East, vol. XIII
+* Translators: T. W. Rhys Davids and Hermann Oldenberg
+* Publisher/year: Oxford: Clarendon Press, 1881
+* Printed page: 100
+* Page images: [Internet Archive](https://archive.org/details/vinayatexts0013unse)
+* Exact searchable text: [Sacred Texts, Mahāvagga I](https://sacred-texts.com/bud/sbe13/sbe1312.htm)
+
+The immediately following argument says that if the body were self, it would not be subject to disease and could be controlled at will; the text then applies the same analysis to sensation, perception, mental formations and consciousness.
+
+Licence/status: Public domain, rather than released under a modern Creative Commons licence. The online edition expressly identifies the work as public domain; Rhys Davids lived from 1843 to 1922 and Oldenberg from 1854 to 1920.
+
+### Mohism
+
+#### Verified digital wording
+
+"Mozi said: Partiality is to be replaced by universality."
+
+* Work: Mozi, chapter 16, "Universal Love III" (Jian ai xia, 兼愛下)
+* Digital translator attribution: "English translation by W.P. Mei"
+* Visible text: [Mozi chapter 16](https://www.themozi.org/chapters/ch16.html)
+* Print edition represented: Yi-Pao Mei (trans.), The Ethical and Political Works of Motse, London: Arthur Probsthain, 1929
+* Printed page: UNVERIFIED
+
+The linked chapter explicitly displays both the quotation and the attribution "English translation by W.P. Mei." The site describes its English texts as drawn from Mei's 1929 translation and Ian Johnston, while chapter 16 specifically attributes its English to Mei.
+
+#### Bibliographical warning
+
+The digital chapter uses "W.P. Mei," whereas library and scholarly catalogues identify the 1929 translator as Yi-Pao Mei. I could not inspect a paginated scan of the 1929 chapter itself, so I cannot responsibly supply or infer its printed page.
+
+* Translator's birth and death dates: UNVERIFIED
+* Whether "W.P. Mei" and "Yi-Pao Mei" are merely variant romanizations/initials in this transcription: UNVERIFIED
+* US copyright: The 1929 edition is now public domain in the United States.
+* UK copyright: UNVERIFIED, because the translator's death date was not established.
+
+A longer, directly visible Mei formulation appears in chapter 15:
+
+"It is to regard the state of others as one's own"
+
+This is the opening clause of Mei's explanation of "the way of universal love and mutual aid". Its printed page is likewise UNVERIFIED.
+
+### Ubuntu and data
+
+#### Mhlambi quotation
+
+"the notion that truths, and perhaps all truths, about an individual can be rationally computed destroys the core idea of privacy."
+
+* Author: Sabelo Mhlambi
+* Work: "From Rationality to Relationality: Ubuntu as an Ethical & Human Rights Framework for Artificial Intelligence Governance"
+* Edition: Carr Center Discussion Paper 2020-009, Harvard Kennedy School, 8 July 2020
+* Printed page: 6
+* Translator: None; written in English
+* Official PDF: [Harvard Carr Center PDF](https://carrcenter.hks.harvard.edu/files/cchr/files/ccdp_2020-009_sabelo_b.pdf)
+* Readable mirror: [PDF copy](http://data-ethics.jonreeve.com/static/papers/mhlambi2020rationality.pdf)
+
+The sentence occurs in Mhlambi's discussion of AI-enabled digital colonialism, surveillance capitalism and models that generalise from aggregated personal data. A separate concise formulation on printed p. 3 is:
+
+"Personhood is fundamentally relational."
+
+Both passages are directly visible in the Carr Center paper; the data-and-privacy passage on p. 6 is the stronger quotation for Sophecs' data-ownership module.

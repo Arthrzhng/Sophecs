@@ -57,7 +57,10 @@ module is being drafted — `src/lib/modules.ts` skips any file missing a
 required field rather than rendering half a module, and says which file and
 which field on the build log.
 
-`school` must be one of `stoicism`, `utilitarianism`, `virtue-ethics`.
+`school` must be one of `stoicism`, `utilitarianism`, `virtue-ethics`,
+unless the file carries `status: draft`, in which case it may name a
+school the product does not teach yet. A draft is loaded only by
+`/styleguide/drafts`; see `src/lib/drafts.ts`.
 `debate_topics` must be slugs that exist in `content/topics/`.
 
 No seed step: `src/lib/modules.ts` reads this directory at build time, the

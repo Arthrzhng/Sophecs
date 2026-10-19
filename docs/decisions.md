@@ -822,3 +822,37 @@ Use it where the reader has no school and the screen still needs one clear actio
 ### The card colours are frozen against the palette, on purpose
 
 `src/lib/card-tokens.ts` described itself as a mirror of `globals.css` that must be resynced whenever a token moves. Four of its values no longer mirror anything: `OG_PAPER`, `OG_INK`, `OG_INK_MID` and `OG_INK_SOFT` hold the pre-restyle colours. A shared image is not a page. Every link preview, saved card and favicon already sitting in a feed, a chat or a bookmark bar was rendered at those values, and matching the site would have recoloured all of them at once. `/opengraph-image`, `/icon` and `/apple-icon` hash to the same bytes either side of the promotion, which is how this was checked rather than argued. The school values in that file *are* still a mirror and must be kept in step.
+
+### A motion is read live, so a reword rewrites the past
+
+`debates` has no motion column. The `motion text not null` in
+`0003_debates.sql` belongs to `debate_topics`, and the verdict page, the
+debate OG image and `/api/judge` all look the motion up by slug at the
+moment they run. Nothing is snapshotted with the argument.
+
+So seeding a reworded motion rewrites what every past verdict page says
+the argument was arguing. The argument and the verdict text stay as
+written; the line above them changes. This was found during Phase 1F, when
+the only judged debate on `opaque-benefit` was Arthur's own and not
+public, so the whole blast radius was one page one person could see. The
+next time it will not be.
+
+**Phase 2 adds an additive `motion_text` column on `debates`,** filled at
+argument submission, read by the verdict page, the OG image and
+`/api/judge` in place of the live lookup. Additive because every existing
+row predates it.
+
+Two things that scoping should not skip. **Pending arguments are the
+sharper half**: a verdict re-rendering with new wording is cosmetic, but
+an argument submitted before a reword and judged after it would be scored
+against a motion its author never read, and that is a wrong answer rather
+than an untidy one. And **the backfill needs a decision**: the one
+existing judged debate was argued against wording that now survives only
+in `docs/seed-snapshots/`, so filling the column for old rows means
+reading it back out of a snapshot rather than out of the live table.
+
+Until that lands, a reword is a two-step operation and the steps belong
+minutes apart. The markdown surfaces (`/`, `/lessons`, the module pages)
+change on merge; the database surfaces (the whole arena, `/today`, `/me`,
+and the judge) change only on the seed. In between, a reader can read one
+motion and be asked to argue another.
