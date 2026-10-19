@@ -10,8 +10,8 @@ source:
   section: "7"
   translation: James Legge
 body: >-
-  The motion puts two things on the scales: the suffering a system prevents,
-  and the explanation nobody can give for how it decides. The Analects
+  The motion puts two things on the scales: the suffering a system
+  prevents, and the reason the people it decides about are never given. The Analects
   weighs a third thing, and treats it as the one that cannot be done
   without.
 

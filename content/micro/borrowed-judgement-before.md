@@ -29,7 +29,8 @@ body: >-
   it knows what you will regret. You tell it your goals once and it chooses
   the meals, the replies, the job to apply for. Every one of those choices is,
   on Epictetus's list, an opinion or an impulse or a desire. The motion says
-  giving them away costs you something even if the assistant chooses better.
+  giving them away costs something that matters even if the assistant
+  chooses better.
   Before you answer, ask what Epictetus would count the handover as: an
   exercise of your judgement, since you judged the assistant reliable, or the
   one thing on the list you were not supposed to give to anyone.

@@ -1,0 +1,104 @@
+{
+  "taken_at": "2026-10-19",
+  "project_ref": "tekifezydjlgxgndkxul",
+  "table": "debate_topics",
+  "note": "The rows as they stood before the Phase 1F reword was seeded. par_elo and par_n are recorded for reference only: the restore script never writes them, for the same reason the seeder never does, because /api/judge owns them.",
+  "rows": [
+    {
+      "slug": "opaque-benefit",
+      "title": "The opaque benefit",
+      "motion": "An AI system that reliably reduces suffering should be deployed even where nobody can explain its decisions.",
+      "stances": {
+        "stoicism": "Deploy it if the people responsible judged the evidence well; the mechanism is an external, and a sound judgement does not become unsound because the machine is opaque.",
+        "virtue-ethics": "Do not deploy it, because nobody can act with practical wisdom on the strength of a result they cannot deliberate about.",
+        "utilitarianism": "Deploy it, because the suffering it prevents is real and an explanation was only ever a means to that end."
+      },
+      "micro_before": "opaque-benefit-before",
+      "micro_after": "opaque-benefit-after",
+      "sort": 1,
+      "active": true,
+      "par_elo": "1200",
+      "par_n": 1
+    },
+    {
+      "slug": "crash-arithmetic",
+      "title": "Crash arithmetic",
+      "motion": "A self-driving car should be programmed to minimise total deaths in an unavoidable crash, even when that means sacrificing its own passenger.",
+      "stances": {
+        "stoicism": "Whatever the rule is, it must be one a rational passenger could assent to before getting in, so the wrong lies in concealing the rule, not in the count.",
+        "virtue-ethics": "No rule written in advance can stand in for the judgement a wise person would exercise in the moment, so the real question is whether the engineers deliberated justly, not whether their arithmetic balances.",
+        "utilitarianism": "Two deaths are worse than one whoever the one is, and a rule that counts the passenger as exactly one person is the only impartial rule on offer."
+      },
+      "micro_before": "crash-arithmetic-before",
+      "micro_after": "crash-arithmetic-after",
+      "sort": 2,
+      "active": true,
+      "par_elo": "1200",
+      "par_n": 0
+    },
+    {
+      "slug": "no-decision",
+      "title": "Does the model decide?",
+      "motion": "It is a mistake to say that a language model decides anything.",
+      "stances": {
+        "stoicism": "A decision is assent to an impression by a ruling faculty, and a model has neither, so the word is misapplied however determined the output.",
+        "virtue-ethics": "Choice is deliberate desire formed by character, and a system with no character cannot choose, which is why calling its output a decision quietly moves responsibility off the people who trained it.",
+        "utilitarianism": "Whether there is a decision inside the box changes nothing about what the output does to people, so the mistake, if it is one, does not matter."
+      },
+      "micro_before": "no-decision-before",
+      "micro_after": "no-decision-after",
+      "sort": 3,
+      "active": true,
+      "par_elo": "1200",
+      "par_n": 0
+    },
+    {
+      "slug": "moral-training",
+      "title": "Trained to be good",
+      "motion": "Training a model on human feedback can make it good in the same sense that habit makes a person good.",
+      "stances": {
+        "stoicism": "Goodness is correct assent, and a model has no impressions to assent to, so training makes it a well-made tool, which is neither good nor bad.",
+        "virtue-ethics": "Habit makes a person good only once they choose the act for its own sake from a settled character, and reward shaping produces the acts without the state.",
+        "utilitarianism": "If the trained behaviour reliably produces good outcomes then it is good in the only sense that counts, and how it got there is a detail."
+      },
+      "micro_before": "moral-training-before",
+      "micro_after": "moral-training-after",
+      "sort": 4,
+      "active": true,
+      "par_elo": "1200",
+      "par_n": 0
+    },
+    {
+      "slug": "careful-builder",
+      "title": "The careful builder",
+      "motion": "When an AI system causes harm, the people who built it are to blame in proportion to the harm, however careful they were.",
+      "stances": {
+        "stoicism": "Blame attaches to judgement, not to fortune, so a builder who judged well and was unlucky is blameless whatever the damage.",
+        "virtue-ethics": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken while a builder who shrugs reveals a defect of character.",
+        "utilitarianism": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing."
+      },
+      "micro_before": "careful-builder-before",
+      "micro_after": "careful-builder-after",
+      "sort": 5,
+      "active": true,
+      "par_elo": "1200",
+      "par_n": 0
+    },
+    {
+      "slug": "borrowed-judgement",
+      "title": "Borrowed judgement",
+      "motion": "Handing your daily choices to an AI assistant costs you something that matters, even when its choices are better than yours.",
+      "stances": {
+        "stoicism": "The only thing that is truly yours is the faculty that judges impressions, and handing that over is the one loss no better outcome can repay.",
+        "virtue-ethics": "Practical wisdom exists only in the person who exercises it, so a life of delegated choices is one in which you never become anyone in particular.",
+        "utilitarianism": "Nothing that matters is lost unless your life goes worse, and if the choices are better and you are happier then the worry about whose judgement it was is sentiment."
+      },
+      "micro_before": "borrowed-judgement-before",
+      "micro_after": "borrowed-judgement-after",
+      "sort": 6,
+      "active": true,
+      "par_elo": "1200",
+      "par_n": 0
+    }
+  ]
+}

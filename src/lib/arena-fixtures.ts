@@ -75,7 +75,7 @@ export function fixtureTopics(): TopicListItem[] {
 }
 
 export const FIXTURE_MOTION =
-  "An AI system that reliably reduces suffering should be deployed even where nobody can explain its decisions.";
+  "An AI system that reliably reduces suffering should be deployed even where the people it decides about cannot be told why.";
 
 export const FIXTURE_ARGUMENT = `The Stoic case here is narrower than it first looks. Whether the model can explain itself is an external — it is a fact about the machine, not about the judgement of the people who chose to deploy it. What is up to us is the assent: did the people responsible look at the evidence and form a sound judgement about it?
 

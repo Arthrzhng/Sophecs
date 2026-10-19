@@ -1,7 +1,7 @@
 ---
 slug: borrowed-judgement
 title: "Borrowed judgement"
-motion: "Handing your daily choices to an AI assistant costs you something that matters, even when its choices are better than yours."
+motion: "Handing daily choices to an AI assistant costs something that matters, even when its choices are better than the ones it replaces."
 stances:
   stoicism: "The only thing that is truly yours is the faculty that judges impressions, and handing that over is the one loss no better outcome can repay."
   utilitarianism: "Nothing that matters is lost unless your life goes worse, and if the choices are better and you are happier then the worry about whose judgement it was is sentiment."

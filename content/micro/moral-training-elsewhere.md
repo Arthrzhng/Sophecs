@@ -11,7 +11,7 @@ source:
   translation: Lord Chalmers, 1926
 body: >-
   The motion asks whether training a model on human feedback can make it
-  good the way habit makes a person good. Discourse 61 is itself a training
+  good the way a moral upbringing makes a person good. Discourse 61 is itself a training
   instruction, which makes it a useful thing to hold the comparison against.
 
 
