@@ -3,35 +3,35 @@ slug: crash-arithmetic-elsewhere
 topic: crash-arithmetic
 position: elsewhere
 status: draft
-title: Who the arithmetic leaves out
+title: Where the moral value is
 source:
-  author: TODO-SOURCE
-  work: TODO-SOURCE
-  section: TODO-SOURCE
+  author: Thaddeus Metz
+  work: Toward an African Moral Theory
+  section: "2007, p. 332"
 body: >-
   The motion asks a car to minimise total deaths, counting its own passenger
-  as one. The relational traditions of Southern and sub-Saharan Africa
-  supply the sharpest standing objection to that, and it is not the usual
-  one about the passenger's special claim.
+  as one. The relational traditions of Southern and sub-Saharan Africa have
+  a standing objection to that, and it is not the usual one about the
+  passenger having a special claim.
 
 
-  Thaddeus Metz has argued directly against programming automated systems to
-  maximise expected utility, and proposed a relational alternative in its
-  place. The objection is not that the sum comes out wrong. It is that
-  summing is the wrong operation, because what makes an act right on this
-  view is whether it honours people's capacity to stand in relationships of
-  shared identity and solidarity. A number that treats two people as
-  interchangeable units has already discarded the thing being assessed.
+  Thaddeus Metz puts the point in a sentence: moral value fundamentally
+  lies not in the individual, but rather in a relationship between
+  individuals. Read that against the crash and the arithmetic stops being
+  wrong and starts being beside the point. A sum needs units that can be
+  added, so it has to treat each person as a quantity of something. If what
+  carries the moral weight is the relationship rather than the person, the
+  quantity was never the thing to count.
 
 
-  Sabelo Mhlambi pushes in the same direction from the harm side, arguing
-  that a discriminatory automated decision is not only an unfair output but
-  a failure of relational personhood, and tying such harms to colonial and
-  economic power rather than to bad arithmetic.
+  Metz has argued separately against programming automated systems to
+  maximise expected utility at all, which is this objection applied to
+  engineering rather than to a thought experiment.
 
 
-  What this does to the motion is move the question. Not whether one death
-  is better than two, which the motion assumes is the question, but who was
-  in the room when the rule was written, and whether the people most likely
-  to be on the wrong side of it were ever a party to it.
+  What that does to the motion is move the question. Not whether one death
+  is better than two, which the motion treats as the whole of it, but what
+  the rule does to the relationships it runs through: who was in the room
+  when it was written, whose standing it assumes, and whether the people
+  most likely to end up on the wrong side of it were ever a party to it.
 ---
