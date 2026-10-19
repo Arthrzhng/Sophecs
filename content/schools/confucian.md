@@ -1,34 +1,32 @@
 ---
 id: confucian
-name: Confucian Role Ethics
+name: Confucianism
 one_line: >-
-  There is government, when the prince is prince, and the minister is
-  minister.
+  When the prince is prince, and the minister is minister; when the father
+  is father, and the son is son.
 one_line_attribution: >-
   The Analects, 12.11 (trans. James Legge, 1893, p. 165)
 status: draft
 read: |-
-  The Analects was assembled by several hands over time, so what follows
-  is the book's position rather than one man's. Sophecs takes it as role
-  ethics, after Roger Ames and Henry Rosemont, rather than as a virtue
-  ethics of cultivated qualities. You are
-  not a bearer of general properties who then enters relationships; the relationships constitute you, as somebody's
-  child, colleague, citizen. What you owe is never owed in the abstract. Asked what government is, Book 12 answers
-  with relations rather than with a principle: there is government when
-  the prince is prince and the minister is minister.
+  The Analects was assembled by several hands, so this is the book's
+  position, not one man's. Sophecs reads it as role ethics, after Roger Ames and Henry Rosemont,
+  not as the virtue ethics of cultivated qualities Shannon Vallor sees. You do not enter relationships as a finished individual; the
+  relationships constitute you, as somebody's child, colleague, citizen. What you owe is never owed in the abstract. Asked what government is,
+  Book 12 answers with relations and not a principle: there is government when the prince is prince and the
+  minister is minister, when the father is father and the son is son.
 
-  Book 13 supplies the other half. If names are not correct, it says,
-  language does not accord with the truth of things.
-  Call a ranking system intelligent, or fair, or explainable, and the
-  word has done work the system has not. The Confucian question about an AI is not what it
-  maximises. It is which relationships it makes, which it degrades, and
-  whether the people inside them can still hold each other to what they
-  owe.
+  Book 13 supplies the other half: if names are not correct, language does
+  not accord with the truth of things.
+  Call a system intelligent, or fair, or explainable, and the word has done
+  work the system has not. The Confucian question about an AI is not what it
+  maximises. It is which relationships it makes, which it degrades, and whether the
+  people inside them can still hold each other to what they owe.
 gets_wrong: |-
-  The line this school leads with puts one person above another and calls
-  the arrangement government. The objection is not hidden inside it, it is
-  the sentence: order is said to consist in everyone being what their
-  position requires, and father and son are named in the same breath as ruler and ruled. The paper Confucian Role-Ethics with
+  The passage this school leads with names two relations, prince to
+  minister and father to son, and both are unequal. The objection is not
+  hidden inside it, it is the sentence: order consists in each party being
+  what their position requires, and the same structure covers a household
+  and a state alike. The paper Confucian Role-Ethics with
   Non-Domination concedes it: role ethics is too ready to authorise
   hierarchy, and mutual duties do not make a ruler and a subject equals. Li-Hsiang Lisa Rosenlee's Confucianism and Women traces what that cost,
   as filial piety and patrilineal descent held women in place. An algorithm
