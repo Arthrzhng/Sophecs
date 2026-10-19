@@ -10,8 +10,9 @@ source:
   section: "3"
   translation: James Legge
 body: >-
-  The motion is a claim about a word. It says that calling what a language
-  model does a decision is a mistake. Book 13 of the Analects is about
+  The motion is a claim about a word, and about what follows from it. It
+  says that calling what a language model does a decision is a mistake,
+  and that the mistake matters. Book 13 of the Analects is about
   exactly that kind of mistake, and about why it is not merely verbal.
 
 

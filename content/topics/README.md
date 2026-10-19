@@ -7,7 +7,7 @@ example in `docs/phase2-brief.md` under "Content schemas," reproduced here:
 ```yaml
 slug: opaque-benefit
 title: The opaque benefit
-motion: "An AI system that reliably reduces suffering should be deployed even where nobody can explain its decisions."
+motion: "An AI system that reliably reduces suffering should be deployed even where the people it decides about cannot be told why."
 stances:
   stoicism: one sentence, the position a Stoic would most likely defend
   utilitarianism: ...

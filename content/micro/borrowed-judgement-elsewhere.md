@@ -10,8 +10,9 @@ source:
   section: "12"
   translation: James Legge, 1891
 body: >-
-  The motion says that handing your daily choices to an assistant costs you
-  something, even when its choices are better. Chapter 12 of the Zhuangzi
+  The motion says that handing daily choices to an assistant costs
+  something that matters, even when its choices are better than the ones
+  it replaces. Chapter 12 of the Zhuangzi
   names a candidate for what the something is, and locates it somewhere
   unexpected.
 

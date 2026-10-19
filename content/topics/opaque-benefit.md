@@ -1,7 +1,7 @@
 ---
 slug: opaque-benefit
 title: "The opaque benefit"
-motion: "An AI system that reliably reduces suffering should be deployed even where nobody can explain its decisions."
+motion: "An AI system that reliably reduces suffering should be deployed even where the people it decides about cannot be told why."
 stances:
   stoicism: "Deploy it if the people responsible judged the evidence well; the mechanism is an external, and a sound judgement does not become unsound because the machine is opaque."
   utilitarianism: "Deploy it, because the suffering it prevents is real and an explanation was only ever a means to that end."
