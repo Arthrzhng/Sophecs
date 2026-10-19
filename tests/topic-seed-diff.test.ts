@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { seedDiff, SEEDED_FIELDS, type TopicRow } from "../src/lib/topic-seed-diff";
+import { seedDiff, restoreDiff, SEEDED_FIELDS, type TopicRow } from "../src/lib/topic-seed-diff";
 import type { TopicFile } from "../src/lib/topics";
 
 const topic: TopicFile = {
@@ -71,5 +71,38 @@ describe("seedDiff", () => {
     expect(SEEDED_FIELDS).not.toContain("par_n");
     const withPar = { ...row, motion: topic.motion, par_elo: "1400", par_n: 9 } as TopicRow;
     expect(seedDiff([topic], [withPar]).topics[0].kind).toBe("unchanged");
+  });
+});
+
+describe("restoreDiff", () => {
+  const snapshot: TopicRow[] = [{ ...row, motion: "The old motion." }];
+
+  it("reports nothing when the rows already match the snapshot", () => {
+    expect(restoreDiff(snapshot, [{ ...row, motion: "The old motion." }]).topics[0].kind).toBe(
+      "unchanged"
+    );
+  });
+
+  // The property worth having: whatever the seed changed, the restore
+  // changes back, and nothing else.
+  it("names exactly the rows a seed changed, and reverses them", () => {
+    const afterSeed = [{ ...row, motion: "The new motion." }];
+    const seeded = seedDiff([topic], snapshot);
+    const restored = restoreDiff(snapshot, afterSeed);
+
+    const seededSlugs = seeded.topics.filter((t) => t.kind !== "unchanged").map((t) => t.slug);
+    const restoredSlugs = restored.topics.filter((t) => t.kind !== "unchanged").map((t) => t.slug);
+    expect(restoredSlugs).toEqual(seededSlugs);
+
+    expect(restored.topics[0].changes).toEqual([
+      { field: "motion", before: "The new motion.", after: "The old motion." },
+    ]);
+  });
+
+  it("ignores par_elo and par_n in the snapshot", () => {
+    const withPar = [{ ...snapshot[0], par_elo: "1400", par_n: 9 } as TopicRow];
+    expect(restoreDiff(withPar, [{ ...row, motion: "The old motion." }]).topics[0].kind).toBe(
+      "unchanged"
+    );
   });
 });

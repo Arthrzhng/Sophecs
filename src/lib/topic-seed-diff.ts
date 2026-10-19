@@ -87,15 +87,23 @@ function stable(value: unknown): string {
   return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${stable(v)}`).join(",")}}`;
 }
 
-export function seedDiff(topics: TopicFile[], rows: TopicRow[]): SeedDiff {
+/**
+ * The shared comparison. Both directions of the pipeline use it: seeding
+ * writes the topic files over the rows, restoring writes a snapshot over
+ * them. They differ only in where the wanted payload comes from, so they
+ * must not differ in how a difference is decided.
+ */
+function diffAgainstRows(
+  wanted: { slug: string; payload: Record<SeededField, unknown> }[],
+  rows: TopicRow[]
+): SeedDiff {
   const bySlug = new Map(rows.map((row) => [row.slug, row]));
 
-  const diffs: TopicDiff[] = topics.map((topic) => {
-    const row = bySlug.get(topic.slug);
-    const payload = payloadOf(topic);
+  const diffs: TopicDiff[] = wanted.map(({ slug, payload }) => {
+    const row = bySlug.get(slug);
     if (!row) {
       return {
-        slug: topic.slug,
+        slug,
         kind: "insert",
         changes: SEEDED_FIELDS.map((field) => ({
           field,
@@ -107,12 +115,42 @@ export function seedDiff(topics: TopicFile[], rows: TopicRow[]): SeedDiff {
     const changes = SEEDED_FIELDS.filter(
       (field) => !sameValue(row[field], payload[field])
     ).map((field) => ({ field, before: row[field], after: payload[field] }));
-    return { slug: topic.slug, kind: changes.length > 0 ? "update" : "unchanged", changes };
+    return { slug, kind: changes.length > 0 ? "update" : "unchanged", changes };
   });
 
-  const claimed = new Set(topics.map((t) => t.slug));
+  const claimed = new Set(wanted.map((w) => w.slug));
   return {
     topics: diffs,
     orphanedSlugs: rows.map((r) => r.slug).filter((slug) => !claimed.has(slug)),
   };
+}
+
+/** What `npm run seed:topics` would change. */
+export function seedDiff(topics: TopicFile[], rows: TopicRow[]): SeedDiff {
+  return diffAgainstRows(
+    topics.map((topic) => ({ slug: topic.slug, payload: payloadOf(topic) })),
+    rows
+  );
+}
+
+/**
+ * What restoring a snapshot would change.
+ *
+ * The snapshot records par_elo and par_n, and this deliberately ignores
+ * them: a restore puts the wording back, it does not rewind anybody's
+ * debates. Running this against rows the seed has already written should
+ * name exactly the rows the seed changed, which is the check worth doing
+ * before trusting a restore.
+ */
+export function restoreDiff(snapshot: TopicRow[], rows: TopicRow[]): SeedDiff {
+  return diffAgainstRows(
+    snapshot.map((row) => ({
+      slug: row.slug,
+      payload: Object.fromEntries(SEEDED_FIELDS.map((f) => [f, row[f]])) as Record<
+        SeededField,
+        unknown
+      >,
+    })),
+    rows
+  );
 }
