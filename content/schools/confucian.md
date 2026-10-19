@@ -23,9 +23,8 @@ read: |-
   people inside them can still hold each other to what they owe.
 gets_wrong: |-
   The passage this school leads with names two relations, prince to
-  minister and father to son, and both are unequal. The objection is not
-  hidden inside it, it is the sentence: order consists in each party being
-  what their position requires, and the same structure covers a household
+  minister and father to son, and both are unequal. The objection is not hidden inside it. It is the sentence:
+  order consists in each party being what their position requires, and the same structure covers a household
   and a state alike. The paper Confucian Role-Ethics with
   Non-Domination concedes it: role ethics is too ready to authorise
   hierarchy, and mutual duties do not make a ruler and a subject equals. Li-Hsiang Lisa Rosenlee's Confucianism and Women traces what that cost,
