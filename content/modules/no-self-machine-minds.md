@@ -32,8 +32,8 @@ body: |-
 
   The second sermon of the Pali canon runs that argument and does not stop
   at machines. The body, it says, is not the self.[^1] The reason given is
-  not mystical. If the body were the self it would not be subject to
-  disease, and it could be controlled at will. Neither holds. You do not consent to illness, and you cannot simply
+  not mystical. If the body were self, it would not be subject to disease and could be
+  controlled at will. Neither holds. You do not consent to illness, and you cannot simply
   direct the thing you are supposed to own. The test is ownership and
   control, which is a plain test and not a metaphysical one, and the body
   fails it the way a rented room fails it.

@@ -15,9 +15,9 @@ body: >-
   exactly that kind of mistake, and about why it is not merely verbal.
 
 
-  If names be not correct, the passage says, language is not in accordance
-  with the truth of things, and if language is not in accordance with the
-  truth of things, affairs cannot be carried on to success. The order
+  If names be not correct, the passage says, language is not in accordance with the truth of things. If
+  language be not in accordance with the truth of things, affairs cannot
+  be carried on to success. The order
   matters. A wrong name is not the end of the problem. It is the start of a
   chain that ends somewhere practical, in work that fails and in people
   treated as the wrong name implies.
