@@ -1,4 +1,4 @@
-import { totalOverSchools, type SchoolId } from "./school-registry";
+import { publishedLookup, type SchoolId } from "./school-registry";
 
 /**
  * Design tokens as literals, for every surface that renders through Satori.
@@ -69,9 +69,9 @@ const CARD_SURFACE_BY_SCHOOL: Partial<Record<SchoolId, string>> = {
  */
 export const CARD_SURFACE_NEUTRAL = "#1c1b18";
 
-export const CARD_SURFACE: Record<SchoolId, string> = totalOverSchools(
+export const CARD_SURFACE: Record<SchoolId, string> = publishedLookup(
   CARD_SURFACE_BY_SCHOOL,
-  CARD_SURFACE_NEUTRAL
+  () => CARD_SURFACE_NEUTRAL
 );
 
 /**
@@ -243,7 +243,7 @@ const SCHOOL_MARKER_BY_SCHOOL: Partial<Record<SchoolId, string>> = {
 /** --color-ink-mid: the existing neutral for marks sitting on paper. */
 export const SCHOOL_MARKER_NEUTRAL = "#5e5950";
 
-export const SCHOOL_MARKER: Record<SchoolId, string> = totalOverSchools(
+export const SCHOOL_MARKER: Record<SchoolId, string> = publishedLookup(
   SCHOOL_MARKER_BY_SCHOOL,
-  SCHOOL_MARKER_NEUTRAL
+  () => SCHOOL_MARKER_NEUTRAL
 );

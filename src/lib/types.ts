@@ -7,14 +7,18 @@
 // two different senses, "the schools the quiz sorts into" and "the schools
 // the product has", which are no longer the same list; removing it makes
 // the compiler ask every one of its callers which it meant.
+//
+// Only the client-safe half is re-exported. The draft-aware helpers live
+// in `school-registry.drafts.ts` behind `server-only`, and re-exporting
+// them from here, which client components import freely, would defeat
+// that.
 export type { SchoolId, QuizSchoolId, SchoolStatus, SchoolEntry } from "./school-registry";
 export {
-  SCHOOLS,
+  PUBLISHED_SCHOOLS,
   QUIZ_SCHOOLS,
-  ALL_SCHOOL_IDS,
   PUBLISHED_SCHOOL_IDS,
-  knownSchool,
-  schoolEntry,
+  publishedEntry,
+  publishedLookup,
   schoolName,
   isPublished,
   isQuizSchool,

@@ -6,8 +6,7 @@ import { getAllModules } from "@/lib/modules";
 import { getAllMicroLessons } from "@/lib/micro-lessons";
 import { isDraft } from "@/lib/drafts";
 import { formatSource } from "@/lib/footnotes";
-import { SCHOOL_COLORS } from "@/lib/school-colors";
-import { knownSchool } from "@/lib/types";
+import { knownSchool, schoolDisplayName } from "@/lib/school-registry.drafts";
 
 export const metadata = {
   title: "Drafts · Sophecs",
@@ -230,7 +229,9 @@ function Prose({ text }: { text: string | undefined }) {
 // colour and name maps cannot be indexed before narrowing. See
 // knownSchool in lib/types.
 function SchoolLabel({ school }: { school: string }) {
-  return <Mono>{knownSchool(school) ? SCHOOL_COLORS[school].name : school}</Mono>;
+  // schoolDisplayName, not SCHOOL_COLORS: the client-safe registry has no
+  // name for a draft school, and this route exists to review drafts.
+  return <Mono>{knownSchool(school) ? schoolDisplayName(school) : school}</Mono>;
 }
 
 function Count({ n, one, many }: { n: number; one: string; many: string }) {

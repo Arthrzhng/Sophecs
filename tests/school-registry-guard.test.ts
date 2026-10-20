@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, it, expect } from "vitest";
-import { ALL_SCHOOL_IDS } from "../src/lib/school-registry";
+import { ALL_SCHOOL_IDS } from "../src/lib/school-registry.drafts";
 
 /**
  * Fails if a hard-coded school list or a per-school map appears outside
@@ -31,7 +31,9 @@ const ROOTS = ["src", "scripts"];
  */
 const REGISTRY_FILES: Record<string, string> = {
   "src/lib/school-registry.ts":
-    "The registry itself. This is the one file the list is written down in, and the reason the others do not.",
+    "The registry's client-safe half. This is the one file the published list is written down in, and the reason the others do not.",
+  "src/lib/school-registry.drafts.ts":
+    "The registry's server-only half. The draft entries live here so that no draft school's id or name can reach a production client bundle.",
   "src/lib/card-tokens.ts":
     "The only file allowed a colour literal, because Satori cannot read CSS custom properties. Its maps are partial and go through totalOverSchools.",
   "src/lib/school-colors.ts":
@@ -57,11 +59,27 @@ function sourceFiles(): string[] {
   return out.map((f) => path.relative(process.cwd(), f));
 }
 
-/** School ids appearing as a quoted string literal. */
+/**
+ * Comments stripped, so the guard reads code rather than prose. A comment
+ * explaining why a school id must not appear is not a school id
+ * appearing.
+ *
+ * `//` is only treated as a comment when it is not preceded by a colon,
+ * so a `https://` inside a string literal does not swallow the rest of
+ * its line.
+ */
+function withoutComments(source: string): string {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, " ")
+    .replace(/(^|[^:])\/\/[^\n]*/g, "$1");
+}
+
+/** School ids appearing as a quoted string literal, in code. */
 function enumeratedIn(source: string): string[] {
+  const code = withoutComments(source);
   return ALL_SCHOOL_IDS.filter((id) => {
     const quoted = new RegExp(`['"\`]${id}['"\`]`);
-    return quoted.test(source);
+    return quoted.test(code);
   });
 }
 
@@ -116,6 +134,21 @@ describe("the school registry guard", () => {
 
   it("catches a map keyed on a new school too", () => {
     expect(enumeratedIn('const M = { "ubuntu": 1, "buddhist": 2 };').length).toBe(2);
+  });
+
+  it("ignores school ids quoted in a comment", () => {
+    expect(
+      enumeratedIn('// "confucian", "ubuntu" and "buddhist" must not ship.').length
+    ).toBe(0);
+    expect(
+      enumeratedIn('/* "stoicism" and "utilitarianism" are published. */').length
+    ).toBe(0);
+  });
+
+  it("is not fooled by a url into skipping the rest of a line", () => {
+    expect(
+      enumeratedIn('const a = "https://x.test"; const m = { "ubuntu": 1, "buddhist": 2 };').length
+    ).toBe(2);
   });
 
   it("leaves a single named school alone", () => {

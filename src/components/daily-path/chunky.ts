@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import {
-  ALL_SCHOOL_IDS,
+  PUBLISHED_SCHOOL_IDS,
+  publishedLookup,
   schoolColourVar,
   schoolShadeVar,
   type SchoolId,
@@ -15,15 +16,21 @@ import {
  * rather than hexes so the tokens stay the single source of truth.
  *
  * Built from the registry, which also means a school with no colour token
- * gets a neutral ink control rather than another school's green.
+ * gets a neutral ink control rather than another school's green. Only the
+ * published schools are enumerated: this module is imported by
+ * ChunkyButton, which is on nearly every page, so anything it enumerates
+ * ends up in the client bundle.
  */
 export const SCHOOL_CHUNKY: Record<SchoolId, { bg: string; shade: string }> =
-  Object.fromEntries(
-    ALL_SCHOOL_IDS.map((id) => [
-      id,
-      { bg: schoolColourVar(id), shade: schoolShadeVar(id) },
-    ])
-  ) as Record<SchoolId, { bg: string; shade: string }>;
+  publishedLookup(
+    Object.fromEntries(
+      PUBLISHED_SCHOOL_IDS.map((id) => [
+        id,
+        { bg: schoolColourVar(id), shade: schoolShadeVar(id) },
+      ])
+    ),
+    (id) => ({ bg: schoolColourVar(id), shade: schoolShadeVar(id) })
+  );
 
 /** The inline style that gives a `.chunky` element its bottom edge. */
 export function shade(value: string): CSSProperties {

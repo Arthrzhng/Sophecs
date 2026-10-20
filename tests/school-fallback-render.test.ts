@@ -2,8 +2,8 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, it, expect } from "vitest";
 import { SchoolCard } from "../src/components/today/TodayCards";
-import { PUBLISHED_SCHOOL_IDS, ALL_SCHOOL_IDS, isPublished } from "../src/lib/school-registry";
-import { schoolColourVar } from "../src/lib/school-registry";
+import { PUBLISHED_SCHOOL_IDS, schoolColourVar } from "../src/lib/school-registry";
+import { DRAFT_SCHOOL_IDS } from "../src/lib/school-registry.drafts";
 import type { SchoolId } from "../src/lib/types";
 
 /**
@@ -29,7 +29,9 @@ function render(school: SchoolId) {
   );
 }
 
-const DRAFTS = ALL_SCHOOL_IDS.filter((id) => !isPublished(id));
+// The drafts, plus a string that is not a school at all: both arrive at
+// the card the same way, as an id the client registry does not hold.
+const UNKNOWN: SchoolId[] = [...DRAFT_SCHOOL_IDS, "mohism" as SchoolId];
 
 describe("the Your school card", () => {
   it.each([...PUBLISHED_SCHOOL_IDS])("renders %s in its own colour", (id) => {
@@ -38,22 +40,15 @@ describe("the Your school card", () => {
     expect(html).not.toContain("var(--color-ink)");
   });
 
-  it.each([...DRAFTS])("renders %s in neutral ink and names it correctly", (id) => {
+  it.each(UNKNOWN)("renders %s in neutral ink, never another school's colour", (id) => {
     const html = render(id);
     expect(html).toContain("var(--color-ink)");
-    // Never another school's token.
     for (const other of PUBLISHED_SCHOOL_IDS) {
       expect(html, `${id} borrowed ${other}'s colour`).not.toContain(schoolColourVar(other));
     }
-    // And the name is the school's own, not "undefined".
+    // The name falls back to the id, which is true and is not the string
+    // "undefined". A draft school's real name is server-side only.
+    expect(html).toContain(id);
     expect(html).not.toContain("undefined");
-  });
-
-  it("renders a school the registry has never heard of without borrowing a colour", () => {
-    // Not a SchoolId: this is the case the old ternary chain silently
-    // handled by falling through to Stoic green. A string from a database
-    // row that 2C's widened constraint lets through, or from a profile
-    // written by a later version of the app, arrives exactly like this.
-    expect(() => render("mohism" as SchoolId)).toThrowError(/no entry for "mohism"/);
   });
 });
