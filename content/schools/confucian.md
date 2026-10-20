@@ -12,8 +12,8 @@ read: |-
   position, not one man's. Sophecs reads it as role ethics, after Roger Ames and Henry Rosemont,
   not as the virtue ethics of cultivated qualities Shannon Vallor sees. You do not enter relationships as a finished individual; the
   relationships constitute you, as somebody's child, colleague, citizen. What you owe is never owed in the abstract. Asked what government is,
-  Book 12 answers with relations and not a principle: there is government when the prince is prince and the
-  minister is minister, when the father is father and the son is son.
+  Book 12 answers with relations and not a principle: there is government, when the prince is prince, and the
+  minister is minister; when the father is father, and the son is son.
 
   Book 13 supplies the other half: if names are not correct, language does
   not accord with the truth of things.

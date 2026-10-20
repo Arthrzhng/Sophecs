@@ -31,8 +31,8 @@ body: >-
 
 
   Paragraph three presses it. Asked which of the remaining two to give up,
-  the Master says part with the food: from of old death has been the lot
-  of all men, but if the people have no faith in their rulers, there is no
+  the Master says part with the food. From of old, death has been the lot
+  of all men; but if the people have no faith in their rulers, there is no
   standing for the state. Confidence outranks survival there, which is a
   strong claim and not a decorative one.
 

@@ -18,7 +18,7 @@ body: >-
 
 
   Where there are ingenious contrivances, the chapter says, there are sure
-  to be subtle doings, and a scheming mind. Then the line that does the
+  to be subtle doings; and, in words the text omits here, a scheming mind. Then the line that does the
   work: when there is a scheming mind in the breast, its pure simplicity is
   impaired. The damage is not in the contrivance and not in the outcome it
   produces. It is in what the habit of using it makes of the person using
