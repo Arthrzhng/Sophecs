@@ -37,12 +37,14 @@ rather than trusting that number — it goes stale on the next merge.
 
 ## Before pushing
 
-All four must pass:
+All five must pass:
 
-    npx tsc --noEmit && npm run lint && npm run test && npm run build
+    npx tsc --noEmit && npm run lint && npm run test && npm run build && npm run check:bundle
 
 `npm run build` catches what `tsc` does not: Satori rendering in the image
-routes, and the `server-only` boundary.
+routes, and the `server-only` boundary. `npm run check:bundle` reads that
+build and fails if a draft school's id or name is in any client chunk.
+`CONTRIBUTING.md` says why.
 
 ## Frozen
 
