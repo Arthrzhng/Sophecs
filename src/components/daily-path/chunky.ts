@@ -1,5 +1,10 @@
 import type { CSSProperties } from "react";
-import type { SchoolId } from "@/lib/types";
+import {
+  ALL_SCHOOL_IDS,
+  schoolColourVar,
+  schoolShadeVar,
+  type SchoolId,
+} from "@/lib/school-registry";
 
 /**
  * The shade a chunky control's bottom edge uses, per school.
@@ -8,15 +13,17 @@ import type { SchoolId } from "@/lib/types";
  * utility for a colour, but not for setting an arbitrary variable that the
  * `.chunky` rule in globals.css then reads. Values are `var()` references
  * rather than hexes so the tokens stay the single source of truth.
+ *
+ * Built from the registry, which also means a school with no colour token
+ * gets a neutral ink control rather than another school's green.
  */
-export const SCHOOL_CHUNKY: Record<SchoolId, { bg: string; shade: string }> = {
-  stoicism: { bg: "var(--color-stoic)", shade: "var(--color-stoic-deep)" },
-  utilitarianism: {
-    bg: "var(--color-utilitarian)",
-    shade: "var(--color-utilitarian-deep)",
-  },
-  "virtue-ethics": { bg: "var(--color-virtue)", shade: "var(--color-virtue-deep)" },
-};
+export const SCHOOL_CHUNKY: Record<SchoolId, { bg: string; shade: string }> =
+  Object.fromEntries(
+    ALL_SCHOOL_IDS.map((id) => [
+      id,
+      { bg: schoolColourVar(id), shade: schoolShadeVar(id) },
+    ])
+  ) as Record<SchoolId, { bg: string; shade: string }>;
 
 /** The inline style that gives a `.chunky` element its bottom edge. */
 export function shade(value: string): CSSProperties {

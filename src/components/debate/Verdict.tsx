@@ -51,12 +51,6 @@ export interface RevisionComparison {
   };
 }
 
-const SCHOOL_LABEL: Record<SchoolId, string> = {
-  stoicism: "Stoicism",
-  utilitarianism: "Utilitarianism",
-  "virtue-ethics": "Virtue Ethics",
-};
-
 // One of the judge's three paragraphs, with the label it came with. Sans
 // at the small step, sentence case, no colon — a label, not a field name.
 function Reading({ label, body }: { label: string; body?: string }) {
@@ -328,7 +322,7 @@ export function Verdict({
             className="mt-4 border-l-2 pl-4"
             style={{ borderColor: SCHOOL_COLORS[objection.school].surface }}
           >
-            <p className="text-sm text-ink-mid">{SCHOOL_LABEL[objection.school]}</p>
+            <p className="text-sm text-ink-mid">{SCHOOL_COLORS[objection.school].name}</p>
             <p className="mt-2 font-serif text-md leading-relaxed text-ink">{objection.claim}</p>
             <p className="mt-3 text-sm leading-relaxed text-ink-mid">{objection.why_it_stands}</p>
           </div>

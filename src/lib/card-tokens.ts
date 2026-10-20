@@ -1,4 +1,4 @@
-import type { SchoolId } from "./types";
+import { totalOverSchools, type SchoolId } from "./school-registry";
 
 /**
  * Design tokens as literals, for every surface that renders through Satori.
@@ -55,11 +55,24 @@ export const CARD_INK = "#faf8f2";
  * --color-virtue markers used on paper, because these carry near-white text
  * at 8.9 / 8.1 / 8.4 : 1 rather than sitting as text on paper themselves.
  */
-export const CARD_SURFACE: Record<SchoolId, string> = {
+const CARD_SURFACE_BY_SCHOOL: Partial<Record<SchoolId, string>> = {
   stoicism: "#33503f",
   utilitarianism: "#7a5518",
   "virtue-ethics": "#6b2c37",
 };
+
+/**
+ * --color-ink. The surface a school with no colour of its own gets, so a
+ * card for one renders in neutral ink rather than picking up whichever
+ * school happens to be first in the map. Nothing in production reaches
+ * it: every school a reader can be is published and has a surface.
+ */
+export const CARD_SURFACE_NEUTRAL = "#1c1b18";
+
+export const CARD_SURFACE: Record<SchoolId, string> = totalOverSchools(
+  CARD_SURFACE_BY_SCHOOL,
+  CARD_SURFACE_NEUTRAL
+);
 
 /**
  * The one hairline on the card, as an rgba of CARD_INK. Satori has no
@@ -221,8 +234,16 @@ export const OG_INK_SOFT = "#63635b";
  * meant to sit *on* paper, as opposed to CARD_SURFACE above, which carries
  * near-white text on top of itself.
  */
-export const SCHOOL_MARKER: Record<SchoolId, string> = {
+const SCHOOL_MARKER_BY_SCHOOL: Partial<Record<SchoolId, string>> = {
   stoicism: "#3e5c4b",
   utilitarianism: "#8a6320",
   "virtue-ethics": "#7a3540",
 };
+
+/** --color-ink-mid: the existing neutral for marks sitting on paper. */
+export const SCHOOL_MARKER_NEUTRAL = "#5e5950";
+
+export const SCHOOL_MARKER: Record<SchoolId, string> = totalOverSchools(
+  SCHOOL_MARKER_BY_SCHOOL,
+  SCHOOL_MARKER_NEUTRAL
+);

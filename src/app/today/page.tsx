@@ -15,7 +15,7 @@ import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
 import { isoWeekRange, rankSchools, type JudgedArgument } from "@/lib/school-table";
 import { todayUTC } from "@/lib/streak";
-import { SCHOOL_IDS, type SchoolId } from "@/lib/types";
+import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "@/lib/types";
 
 export const metadata = {
   title: "Today · Sophecs",
@@ -56,7 +56,10 @@ export default async function TodayPage() {
   // same function, so the two can never disagree about how many readings
   // one has.
   const modules: LessonsCardModule[] = getAllModules()
-    .sort((a, b) => SCHOOL_IDS.indexOf(a.school) - SCHOOL_IDS.indexOf(b.school))
+    .sort(
+      (a, b) =>
+        PUBLISHED_SCHOOL_IDS.indexOf(a.school) - PUBLISHED_SCHOOL_IDS.indexOf(b.school)
+    )
     .map((m) => ({
       id: m.id,
       title: m.title,
@@ -109,13 +112,7 @@ export default async function TodayPage() {
   // order, which is average fidelity then argument count. Passing zeroes
   // gives the same ranks and saves reading school_history for every
   // profile in the database to draw one line in a sidebar.
-  const ranks = rankSchools(
-    judged,
-    Object.fromEntries(SCHOOL_IDS.map((s) => [s, { joined: 0, left: 0 }])) as Record<
-      SchoolId,
-      { joined: number; left: number }
-    >
-  );
+  const ranks = rankSchools(judged, {});
 
   const sidebar = (
     <>

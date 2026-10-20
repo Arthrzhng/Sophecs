@@ -9,7 +9,13 @@ export interface TopicFile {
   slug: string;
   title: string;
   motion: string;
-  stances: Record<SchoolId, string>;
+  /**
+   * One stance line per school, as written in the topic's content file.
+   * Sparse over `SchoolId`: a topic carries lines for the schools that
+   * existed when it was written. `tests/topic-stances.test.ts` fails if a
+   * published topic is missing one for a published school.
+   */
+  stances: Partial<Record<SchoolId, string>>;
   micro_before: string;
   micro_after: string;
   sort: number;

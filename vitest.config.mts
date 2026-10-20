@@ -1,8 +1,8 @@
 import { defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
 
-// Two aliases, and nothing else: the defaults picked the whole suite up
-// fine until a test needed to import the judge path.
+// The defaults picked the whole suite up fine until a test needed to
+// import the judge path and another needed to render a component.
 //
 // `@/*` matches the tsconfig paths mapping, which vitest does not read.
 // `server-only` is redirected to the same empty shim the standalone
@@ -10,6 +10,11 @@ import { fileURLToPath } from "node:url";
 // requires); without it, importing src/lib/anthropic.ts throws at module
 // load, because the real package exists only to throw.
 export default defineConfig({
+  // tsconfig sets `jsx: "preserve"`, which is right for Next and leaves
+  // vitest unable to parse a component on its own. Vite 8 transforms with
+  // Oxc rather than esbuild, so this is where that is overridden, and only
+  // for tests: the build's own tsconfig is untouched.
+  oxc: { jsx: { runtime: "automatic" } },
   resolve: {
     alias: {
       "server-only": fileURLToPath(new URL("./scripts/server-only-shim.cjs", import.meta.url)),

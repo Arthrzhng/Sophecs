@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { excluded, isDraft, type LoadOptions } from "./drafts";
-import { SCHOOL_IDS } from "./footnotes";
+import { PUBLISHED_SCHOOL_IDS } from "./footnotes";
 import type { Source } from "./footnotes";
 import type { SchoolId } from "./types";
 import { moduleReadingProblems, type ModuleReadingMark } from "./module-readings";
@@ -71,8 +71,10 @@ export function getAllModules(options: LoadOptions = {}): ModuleContent[] {
     // a ModuleContent.school can hold a string outside the union, and the
     // review route must put it through knownSchool() before using it to
     // index anything keyed by SchoolId.
-    if (!draft && !SCHOOL_IDS.includes(data.school as SchoolId)) {
-      console.warn(`${where}: skipped, school "${data.school}" is not one of ${SCHOOL_IDS.join(", ")}`);
+    if (!draft && !PUBLISHED_SCHOOL_IDS.includes(data.school as SchoolId)) {
+      console.warn(
+        `${where}: skipped, school "${data.school}" is not one of ${PUBLISHED_SCHOOL_IDS.join(", ")}`
+      );
       continue;
     }
     if (!Array.isArray(data.debate_topics) || !Array.isArray(data.sources)) {

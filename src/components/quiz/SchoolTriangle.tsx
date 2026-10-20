@@ -1,12 +1,7 @@
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import { TRIANGLE, vectorToPoint } from "@/lib/quiz-position";
+import { QUIZ_SCHOOLS, schoolColourVar } from "@/lib/school-registry";
 import type { SchoolId, SchoolVector } from "@/lib/types";
-
-const CORNER: Record<SchoolId, string> = {
-  stoicism: "var(--color-stoic)",
-  utilitarianism: "var(--color-utilitarian)",
-  "virtue-ethics": "var(--color-virtue)",
-};
 
 /**
  * Where the reader sits between the three schools, and where the answer
@@ -50,7 +45,7 @@ export function SchoolTriangle({
 }) {
   const here = vectorToPoint(vector);
   const preview = previewVector ? vectorToPoint(previewVector) : null;
-  const schools = Object.keys(TRIANGLE.vertices) as SchoolId[];
+  const schools = QUIZ_SCHOOLS;
 
   return (
     <figure className="m-0 flex flex-col items-center gap-2.5 rounded-panel border-2 border-rule bg-surface p-4">
@@ -97,7 +92,7 @@ export function SchoolTriangle({
             cx={TRIANGLE.vertices[s].x}
             cy={TRIANGLE.vertices[s].y}
             r="16"
-            fill={CORNER[s]}
+            fill={schoolColourVar(s)}
           />
         ))}
 
@@ -120,7 +115,7 @@ export function SchoolTriangle({
           cx={here.x}
           cy={here.y}
           r="10"
-          fill={neutral ? "var(--color-ink-soft)" : CORNER[primary]}
+          fill={neutral ? "var(--color-ink-soft)" : schoolColourVar(primary)}
           stroke="var(--color-surface)"
           strokeWidth="3"
         />

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllTopicFiles } from "@/lib/topics";
 import { getAllMicroLessons } from "@/lib/micro-lessons";
+import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
 
 const BASE = "https://sophecs.com";
 
@@ -22,9 +23,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: BASE, priority: 1 },
     { url: `${BASE}/quiz`, priority: 0.9 },
-    { url: `${BASE}/s/stoicism`, priority: 0.8 },
-    { url: `${BASE}/s/utilitarianism`, priority: 0.8 },
-    { url: `${BASE}/s/virtue-ethics`, priority: 0.8 },
+    // Every published school, in registry order, which is the order
+    // /s/[school] generates its static params in.
+    ...PUBLISHED_SCHOOL_IDS.map((school) => ({
+      url: `${BASE}/s/${school}`,
+      priority: 0.8,
+    })),
     { url: `${BASE}/debate`, priority: 0.7 },
     ...topics,
     { url: `${BASE}/lessons`, priority: 0.5 },

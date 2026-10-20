@@ -5,6 +5,7 @@ import { ChallengeButton } from "@/components/share/ChallengeButton";
 import { DebateThemButton } from "@/components/share/DebateThemButton";
 import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
+import { QUIZ_SCHOOLS } from "@/lib/school-registry";
 import type { QuizResultRow, SchoolId } from "@/lib/types";
 
 export interface SharePageProps {
@@ -158,7 +159,9 @@ export function SharePage({
   );
 }
 
-const ORDER: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
+// The quiz's own three weights, so this reads QUIZ_SCHOOLS and not the
+// registry: a vector has a number for each school the quiz sorts into.
+const ORDER = QUIZ_SCHOOLS;
 
 function VectorColumn({ label, vector }: { label: string; vector: QuizResultRow["vector"] }) {
   return (

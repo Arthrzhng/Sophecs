@@ -7,6 +7,7 @@ import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
 import { loadReached, progressAction, progressChip } from "@/lib/module-progress";
 import { useViewerId } from "./useViewerId";
 import type { SchoolId } from "@/lib/types";
+import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
 
 export interface ModuleCard {
   id: string;
@@ -22,7 +23,7 @@ export interface ModuleCard {
 
 type Filter = "all" | SchoolId;
 
-const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
+const SCHOOLS = PUBLISHED_SCHOOL_IDS;
 
 function Tick() {
   return (

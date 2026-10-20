@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
+import { schoolColourVar } from "@/lib/school-registry";
 import { streakLine, STREAK_PAUSED_LINE } from "@/lib/streak-copy";
 import { liveStreak, streakDayLabel, streakWeek } from "@/lib/streak-week";
 import type { SchoolId } from "@/lib/types";
@@ -142,7 +143,11 @@ export function SchoolCard({
       <Eyebrow>Your school</Eyebrow>
       <p
         className="mt-2 text-lg font-extrabold tracking-tight"
-        style={{ color: `var(--color-${school === "virtue-ethics" ? "virtue" : school === "utilitarianism" ? "utilitarian" : "stoic"})` }}
+        // The school's own colour, or neutral ink for a school that has
+        // none. This was a ternary chain whose final branch was the Stoic
+        // token, so any school it did not name rendered in Stoic green
+        // rather than failing visibly.
+        style={{ color: schoolColourVar(school) }}
       >
         {SCHOOL_COLORS[school].name}
       </p>

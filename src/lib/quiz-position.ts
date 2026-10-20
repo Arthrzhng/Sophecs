@@ -1,4 +1,4 @@
-import { SCHOOL_IDS, type SchoolVector } from "./types";
+import { QUIZ_SCHOOLS, type QuizSchoolId, type SchoolVector } from "./types";
 
 /**
  * Where a reader sits on the three-school triangle.
@@ -11,8 +11,17 @@ import { SCHOOL_IDS, type SchoolVector } from "./types";
  * decides which school you land in.
  *
  * Vertices match mockup 02's triangle, in its own 300x270 viewBox.
+ *
+ * Keyed by `QuizSchoolId`, not `SchoolId`, and the type is the point: a
+ * triangle has three corners, so this map is total over the schools the
+ * quiz sorts into and says nothing about the rest of the product. Giving a
+ * fourth school a corner is a different shape, not another entry.
  */
-export const TRIANGLE = {
+export const TRIANGLE: {
+  width: number;
+  height: number;
+  vertices: Record<QuizSchoolId, { x: number; y: number }>;
+} = {
   width: 300,
   height: 270,
   vertices: {
@@ -20,7 +29,7 @@ export const TRIANGLE = {
     utilitarianism: { x: 26, y: 240 },
     "virtue-ethics": { x: 274, y: 240 },
   },
-} as const;
+};
 
 export interface Point {
   x: number;
@@ -44,9 +53,9 @@ export function centroid(): Point {
  * triangle entirely and would put the marker in the corner of the frame.
  */
 export function vectorToPoint(vector: SchoolVector): Point {
-  const sum = SCHOOL_IDS.reduce((s, id) => s + vector[id], 0);
+  const sum = QUIZ_SCHOOLS.reduce((s, id) => s + vector[id], 0);
   if (sum <= 0) return centroid();
-  return SCHOOL_IDS.reduce(
+  return QUIZ_SCHOOLS.reduce(
     (acc, id) => {
       const weight = vector[id] / sum;
       const vertex = TRIANGLE.vertices[id];

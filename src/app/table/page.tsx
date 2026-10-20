@@ -11,8 +11,9 @@ import {
   yourTableLine,
   type JudgedArgument,
   type SchoolChange,
+  type SchoolChangeCounts,
 } from "@/lib/school-table";
-import { SCHOOL_IDS, type SchoolId } from "@/lib/types";
+import type { SchoolId } from "@/lib/types";
 
 export const metadata = {
   title: "School table · Sophecs",
@@ -20,9 +21,9 @@ export const metadata = {
     "How each school argued this week, by the judge's fidelity mark. No names.",
 };
 
-const NO_CHANGES = Object.fromEntries(
-  SCHOOL_IDS.map((s) => [s, { joined: 0, left: 0 }])
-) as Record<SchoolId, { joined: number; left: number }>;
+// Empty rather than a zero per school: the counts are sparse, and
+// rankSchools reads a missing school as nothing joined and nothing left.
+const NO_CHANGES: SchoolChangeCounts = {};
 
 /*
  * Declared dynamic rather than left to be inferred.
