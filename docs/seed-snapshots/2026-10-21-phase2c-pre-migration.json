@@ -1,0 +1,44 @@
+{
+  "taken_at": "2026-10-21",
+  "project_ref": "tekifezydjlgxgndkxul",
+  "note": "Production as it stood before migrations 0014 and 0015 were applied. Schema and shape only. No user rows are recorded here, because this repository is public: quiz_results, profiles and debates all carry user data, and a rollback does not need it. For the data itself the rollback mechanism is Supabase's own point-in-time backup, taken at apply time. What is recorded is everything the two rollbacks do need, plus the one thing 0015 cannot reconstruct on its own: the motion wording each existing debate was actually argued against.",
+  "constraints_before": [
+    { "table": "debates", "name": "debates_school_check", "definition": "CHECK ((school = ANY (ARRAY['stoicism'::text, 'utilitarianism'::text, 'virtue-ethics'::text])))" },
+    { "table": "profiles", "name": "profiles_school_check", "definition": "CHECK ((school = ANY (ARRAY['stoicism'::text, 'utilitarianism'::text, 'virtue-ethics'::text])))" },
+    { "table": "quiz_results", "name": "quiz_results_school_check", "definition": "CHECK ((school = ANY (ARRAY['stoicism'::text, 'utilitarianism'::text, 'virtue-ethics'::text])))" },
+    { "table": "quiz_results", "name": "quiz_results_secondary_check", "definition": "CHECK ((secondary = ANY (ARRAY['stoicism'::text, 'utilitarianism'::text, 'virtue-ethics'::text])))" }
+  ],
+  "exchanges_constraints_before": [
+    "CHECK (((user_a IS NULL) OR (user_b IS NULL) OR (user_a <> user_b)))",
+    "CHECK ((school_a <> school_b))",
+    "CHECK ((status = ANY (ARRAY['open'::text, 'complete'::text, 'lapsed'::text, 'blocked'::text])))"
+  ],
+  "debates_columns_before": [
+    "id", "user_id", "topic_slug", "challenge_id", "school", "argument", "rejected",
+    "rejection_reason", "verdict", "score", "prompt_version", "argument_public",
+    "elo_before", "elo_after", "elo_recomputed_at", "created_at", "kind",
+    "parent_debate_id", "seeking_counterpart_at"
+  ],
+  "row_counts": {
+    "quiz_results": 27,
+    "quiz_results_secondary_not_null": 27,
+    "profiles": 1,
+    "debates": 1,
+    "exchanges": 0,
+    "challenges": 3
+  },
+  "school_values_in_use": ["stoicism", "utilitarianism", "virtue-ethics"],
+  "motion_text_backfill": {
+    "note": "What 0015 must write, and why it is not a join against debate_topics. This debate was argued on 2026-09-14 and the Phase 1F reword reached the database on 2026-10-19, so the live motion today is not the wording its author read. Joining debate_topics would stamp the new wording onto an old argument, which is the exact falsehood the column exists to prevent. The wording below is from docs/seed-snapshots/2026-10-19-debate-topics.json, which was taken before that reword was seeded.",
+    "rows": [
+      {
+        "debate_id": "jjSZVZFBmu",
+        "topic_slug": "opaque-benefit",
+        "school": "utilitarianism",
+        "created_at": "2026-09-14T15:45:24.12946+00:00",
+        "motion_text_to_write": "An AI system that reliably reduces suffering should be deployed even where nobody can explain its decisions.",
+        "live_motion_now": "An AI system that reliably reduces suffering should be deployed even where the people it decides about cannot be told why."
+      }
+    ]
+  }
+}
