@@ -3,7 +3,7 @@ import { LandingQuestion } from "@/components/quiz/LandingQuestion";
 import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { getSchool } from "@/lib/schools";
 import { getAllTopicFiles } from "@/lib/topics";
-import { SCHOOL_IDS } from "@/lib/types";
+import { PUBLISHED_SCHOOL_IDS } from "@/lib/types";
 
 // Static, and it stays static: every string here comes from a content file
 // read at build time, the question is a client component (which does not
@@ -99,7 +99,7 @@ export default function LandingPage() {
           {/* Real quotation with real citation, which is the only thing on
               this page that shows what the schools actually say. */}
           <ul className="mt-6 grid gap-6 sm:grid-cols-3">
-            {SCHOOL_IDS.map((id) => {
+            {PUBLISHED_SCHOOL_IDS.map((id) => {
               const school = getSchool(id);
               return (
                 <li key={id} className="rounded-card border-2 border-rule bg-surface p-5">

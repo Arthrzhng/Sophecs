@@ -1,6 +1,6 @@
 import { Page } from "@/components/layout/Page";
 import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
-import { SCHOOL_IDS } from "@/lib/types";
+import { PUBLISHED_SCHOOL_IDS } from "@/lib/types";
 import { TextLink } from "@/components/ui/TextLink";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -178,7 +178,7 @@ export default function StyleguidePage() {
 
       <Section title="Buttons" note="One shape, 56px, a solid bottom edge it travels down onto. The tone says whose action it is: the reader's own school where they have one, ink where they do not, error for a destructive confirmation, paper for everything secondary. Focus comes from one global rule, so a new tone cannot forget it.">
         <div className="space-y-6">
-          {SCHOOL_IDS.map((school) => (
+          {PUBLISHED_SCHOOL_IDS.map((school) => (
             <div key={school}>
               <p className="text-sm text-ink-soft">school · {school}</p>
               <div className="mt-2 flex flex-wrap items-center gap-3">

@@ -34,11 +34,19 @@ npx tsc --noEmit
 npm run lint
 npm run test
 npm run build
+npm run check:bundle
 ```
 
-All four must pass. `npm run build` catches things `tsc` does not —
+All five must pass. `npm run build` catches things `tsc` does not —
 notably Satori rendering in the image routes, and the `server-only`
 boundary.
+
+`npm run check:bundle` runs last because it reads the build. It greps
+`.next/static` for any draft school's id or name and fails if one is
+there, which is the Phase 1B guarantee that no draft reaches a page or a
+bundle. It was added after a registry that enumerated every school put
+three unreleased school names into thirteen production client chunks; the
+other four gates were all green at the time.
 
 ## Things that are frozen
 

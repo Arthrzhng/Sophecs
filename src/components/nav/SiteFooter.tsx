@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
-import type { SchoolId } from "@/lib/types";
+import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
 
-const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
+const SCHOOLS = PUBLISHED_SCHOOL_IDS;
 
 // The real values, supplied by Arthur. This address is published on every
 // page of the site, which is the point of a contact line — change it here

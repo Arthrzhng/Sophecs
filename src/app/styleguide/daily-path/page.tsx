@@ -4,8 +4,8 @@ import { StatTile } from "@/components/daily-path/StatTile";
 import { AxisPanel } from "@/components/daily-path/AxisPanel";
 import { SCHOOL_CHUNKY } from "@/components/daily-path/chunky";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
-import type { SchoolId } from "@/lib/types";
 import { InteractivePath, InteractiveCheck, CelebrationDemo } from "./DailyPathClient";
+import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
 
 // Where the Daily path restyle started, and the specimen sheet it left
 // behind. Not linked from navigation, not in the sitemap, noindex.
@@ -19,7 +19,7 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
+const SCHOOLS = PUBLISHED_SCHOOL_IDS;
 
 function Section({
   title,

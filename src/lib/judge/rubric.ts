@@ -1,13 +1,17 @@
-import type { SchoolId } from "@/lib/types";
+import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "@/lib/school-registry";
 
 // Fidelity criteria per school — what makes an argument a genuine instance
 // of that school's reasoning, not just reasoning that happens to reach a
 // position the school would agree with. Drafted by Claude at Arthur's
 // request (he asked for a draft rather than writing these himself — see
-// docs/decisions.md); intended to be reviewed/edited before the judge comes
-// off KILL_SWITCH_JUDGE. Bump the prompt version if these change after
-// review, per the brief's golden-set discipline.
-export const FIDELITY_CRITERIA: Record<SchoolId, string> = {
+// docs/decisions.md). Bump the prompt version if these change, per the
+// brief's golden-set discipline.
+//
+// A registry extension point: the criteria themselves are judge content
+// and are Arthur's to write, so this map holds only the schools somebody
+// has written criteria for, and `CRITERIA_BY_SCHOOL` below is where a new
+// school's go.
+const CRITERIA_BY_SCHOOL: Partial<Record<SchoolId, string>> = {
   stoicism: `A faithful Stoic argument grounds its claim in the dichotomy of
 control: judgments, desires, and one's own choices are "up to us"; outcomes,
 others' actions, health, reputation, and death are not. It treats virtue
@@ -51,3 +55,41 @@ to "externals don't matter, only my judgments do" (Stoic bleed); or asserts
 "a good person would do X" without naming the virtue at stake or the excess
 and deficiency it sits between.`,
 };
+
+/**
+ * The criteria the judge prompt interpolates, keyed by school.
+ *
+ * Typed and read as a total record, because that is what the judge path
+ * expects, but backed by a proxy that throws on a school nobody has
+ * written criteria for. The alternative was returning undefined, which
+ * `src/lib/anthropic.ts` would substitute into the prompt as the literal
+ * string "undefined" and send to the model: a verdict produced against no
+ * criteria at all, and nothing to show it had happened.
+ *
+ * Throwing is the safe failure here. A draft school cannot reach the judge
+ * today, because `profiles.school` is constrained to the published three,
+ * so this guards the window between 2C widening that constraint and a new
+ * school's criteria being written. `/api/judge` would answer 500 rather
+ * than judging; it should learn to refuse gracefully before any new school
+ * is published, which is a 2E question and is not in this branch.
+ */
+export const FIDELITY_CRITERIA: Record<SchoolId, string> = new Proxy(
+  CRITERIA_BY_SCHOOL as Record<SchoolId, string>,
+  {
+    get(target, key: string) {
+      const criteria = target[key as SchoolId];
+      if (criteria === undefined) {
+        throw new Error(
+          `judge/rubric: no fidelity criteria for school "${key}". ` +
+            `A school cannot be judged against another school's criteria.`
+        );
+      }
+      return criteria;
+    },
+  }
+);
+
+/** The schools that can be judged: published, and with criteria written. */
+export function judgeableSchools(): SchoolId[] {
+  return PUBLISHED_SCHOOL_IDS.filter((id) => CRITERIA_BY_SCHOOL[id] !== undefined);
+}

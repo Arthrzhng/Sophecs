@@ -4,7 +4,7 @@ import { RubricViewTracker } from "@/components/debate/RubricViewTracker";
 import { SCHOOL_CHUNKY } from "@/components/daily-path/chunky";
 import { FIDELITY_CRITERIA } from "@/lib/judge/rubric";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
-import type { SchoolId } from "@/lib/types";
+import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
 
 export const metadata = {
   title: "How this was judged · Sophecs",
@@ -12,7 +12,7 @@ export const metadata = {
     "The criteria the judge scores on: fidelity to the school first, rigor second, engagement third.",
 };
 
-const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
+const SCHOOLS = PUBLISHED_SCHOOL_IDS;
 
 const AXES = [
   {

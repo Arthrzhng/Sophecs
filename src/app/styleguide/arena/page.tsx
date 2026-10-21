@@ -23,7 +23,7 @@ import { ClassView } from "@/components/class/ClassView";
 import { SettingsPage } from "@/components/me/SettingsPage";
 import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
-import { SCHOOL_IDS } from "@/lib/types";
+import { PUBLISHED_SCHOOL_IDS } from "@/lib/types";
 import { countsOnTable, yourTableLine } from "@/lib/school-table";
 import {
   FIXTURE_ARGUMENT,
@@ -131,7 +131,10 @@ export default function ArenaPreviewPage() {
   // title here would be the one place in the restyle where the sidebar is
   // reviewed against copy the product does not have.
   const modules: LessonsCardModule[] = getAllModules()
-    .sort((a, b) => SCHOOL_IDS.indexOf(a.school) - SCHOOL_IDS.indexOf(b.school))
+    .sort(
+      (a, b) =>
+        PUBLISHED_SCHOOL_IDS.indexOf(a.school) - PUBLISHED_SCHOOL_IDS.indexOf(b.school)
+    )
     .map((m) => ({
       id: m.id,
       title: m.title,

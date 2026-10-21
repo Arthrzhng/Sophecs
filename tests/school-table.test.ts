@@ -9,11 +9,11 @@ import {
   type JudgedArgument,
   type SchoolChange,
 } from "../src/lib/school-table";
-import { SCHOOL_IDS } from "../src/lib/types";
+import { PUBLISHED_SCHOOL_IDS } from "../src/lib/types";
 
 const NONE = Object.fromEntries(
-  SCHOOL_IDS.map((s) => [s, { joined: 0, left: 0 }])
-) as Record<(typeof SCHOOL_IDS)[number], { joined: number; left: number }>;
+  PUBLISHED_SCHOOL_IDS.map((s) => [s, { joined: 0, left: 0 }])
+) as Record<(typeof PUBLISHED_SCHOOL_IDS)[number], { joined: number; left: number }>;
 
 describe("isoWeekRange", () => {
   it("opens on Monday 00:00 UTC and runs to the next Monday", () => {

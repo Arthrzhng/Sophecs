@@ -4,15 +4,15 @@ import { notFound } from "next/navigation";
 import { getSchool } from "@/lib/schools";
 import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
 import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
-import { SCHOOL_IDS, type SchoolId } from "@/lib/types";
+import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "@/lib/types";
 
 export function generateStaticParams() {
-  return SCHOOL_IDS.map((school) => ({ school }));
+  return PUBLISHED_SCHOOL_IDS.map((school) => ({ school }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ school: string }> }) {
   const { school } = await params;
-  if (!SCHOOL_IDS.includes(school as SchoolId)) return { title: "Sophecs" };
+  if (!PUBLISHED_SCHOOL_IDS.includes(school as SchoolId)) return { title: "Sophecs" };
   const content = getSchool(school as SchoolId);
   return { title: `${content.name} · Sophecs`, description: content.one_line };
 }
@@ -39,12 +39,12 @@ export async function generateMetadata({ params }: { params: Promise<{ school: s
  */
 export default async function SchoolPage({ params }: { params: Promise<{ school: string }> }) {
   const { school } = await params;
-  if (!SCHOOL_IDS.includes(school as SchoolId)) notFound();
+  if (!PUBLISHED_SCHOOL_IDS.includes(school as SchoolId)) notFound();
 
   const id = school as SchoolId;
   const content = getSchool(id);
   const tone = SCHOOL_CHUNKY[id];
-  const others = SCHOOL_IDS.filter((other) => other !== id);
+  const others = PUBLISHED_SCHOOL_IDS.filter((other) => other !== id);
 
   // Back on <Page> now the daily-path wrapper is gone: the wrapper had to
   // sit on <main>, which <Page> owns. `rhythm="path"` keeps the 40/40 this

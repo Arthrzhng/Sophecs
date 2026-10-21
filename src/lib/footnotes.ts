@@ -1,7 +1,8 @@
-import type { SchoolId } from "./types";
-
-/** The three school ids, as a runtime list for validating content files. */
-export const SCHOOL_IDS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
+// Re-exported, not restated. This file used to hold a second copy of the
+// list so client components could import it without crossing the
+// server-only boundary; the registry has no such boundary, so the copy was
+// only ever a way for the two to disagree.
+export { PUBLISHED_SCHOOL_IDS } from "./school-registry";
 
 export interface Source {
   author: string;

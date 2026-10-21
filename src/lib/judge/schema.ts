@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "@/lib/school-registry";
 
 export const PROMPT_VERSION = "v2" as const;
 
@@ -12,7 +13,11 @@ function maxWords(max: number) {
   return (val: string) => val.trim().split(/\s+/).filter(Boolean).length <= max;
 }
 
-export const SCHOOL_IDS = ["stoicism", "utilitarianism", "virtue-ethics"] as const;
+// The schools a verdict may name. Published only: a verdict naming a
+// school still in draft would be a verdict about something no reader can
+// see. The cast is zod's tuple requirement, not a widening; the enum's
+// members are checked against the registry in tests/school-registry.test.ts.
+const JUDGEABLE_SCHOOLS = PUBLISHED_SCHOOL_IDS as unknown as [SchoolId, ...SchoolId[]];
 
 // What the model must return. `rejected` discriminates the two valid
 // shapes — a judged verdict has every score field, a rejection has none.
@@ -41,7 +46,7 @@ export const VerdictSchema = z.discriminatedUnion("rejected", [
     // never answered. The route additionally checks `school` differs from
     // the argued school — zod can't see the argued school from here.
     unanswered_objection: z.object({
-      school: z.enum(SCHOOL_IDS),
+      school: z.enum(JUDGEABLE_SCHOOLS),
       claim: z
         .string()
         .min(1)

@@ -107,7 +107,6 @@ describe("original schools, report only", () => {
       const quote = normalise(oneLine[1]);
       if (!normalise(RESEARCH).includes(quote)) untraceable.push(`${file}: ${quote}`);
     }
-    // eslint-disable-next-line no-console
     console.log(
       `\n  Report only, nothing changed. ${untraceable.length} quotation(s) not in the research file:\n` +
         untraceable.map((u) => `    ${u}`).join("\n")

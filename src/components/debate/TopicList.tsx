@@ -21,7 +21,8 @@ export interface TopicListItem {
   slug: string;
   title: string;
   motion: string;
-  stances: Record<SchoolId, string>;
+  /** Sparse over SchoolId: see TopicFile.stances in lib/topics.ts. */
+  stances: Partial<Record<SchoolId, string>>;
   parElo: number;
   bestScore: number | null;
   status: TopicStatus;
@@ -122,7 +123,11 @@ export function TopicList({
                 <p className="mt-2 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
                   {topic.motion}
                 </p>
-                {school && (
+                {/* Only where this topic has a line for the reader's
+                    school. Every published topic has one for every
+                    published school, so the absent case is a draft school
+                    in review, never a reader on a live page. */}
+                {school && topic.stances[school] && (
                   <p className="mt-3 max-w-[60ch] text-sm leading-relaxed text-ink">
                     Your stance: {topic.stances[school]}
                   </p>

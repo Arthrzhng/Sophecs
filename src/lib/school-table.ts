@@ -1,5 +1,5 @@
 import { isoWeekNumber } from "./weekly-motion";
-import { SCHOOL_IDS, type SchoolId } from "./types";
+import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "./types";
 
 /**
  * The school table's arithmetic, kept pure so it is testable without a
@@ -12,6 +12,17 @@ export interface JudgedArgument {
   school: SchoolId;
   fidelity: number | null;
 }
+
+/**
+ * Joiners and leavers per school over a week.
+ *
+ * Sparse over `SchoolId`: a school with no movement has no entry, which
+ * reads the same as a zero. That is what lets a caller with no interest in
+ * the columns pass `{}` instead of building a zero for every school.
+ */
+export type SchoolChangeCounts = Partial<
+  Record<SchoolId, { joined: number; left: number }>
+>;
 
 /** One entry of profiles.school_history, as written by retakeQuizSchool. */
 export interface SchoolChange {
@@ -63,16 +74,18 @@ export function schoolChanges(
   entries: SchoolChange[],
   start: Date,
   end: Date
-): Record<SchoolId, { joined: number; left: number }> {
+): SchoolChangeCounts {
   const counts = Object.fromEntries(
-    SCHOOL_IDS.map((s) => [s, { joined: 0, left: 0 }])
-  ) as Record<SchoolId, { joined: number; left: number }>;
+    PUBLISHED_SCHOOL_IDS.map((s) => [s, { joined: 0, left: 0 }])
+  ) as SchoolChangeCounts;
 
   for (const entry of entries) {
     const at = new Date(entry.at).getTime();
     if (!Number.isFinite(at) || at < start.getTime() || at >= end.getTime()) continue;
-    if (counts[entry.to]) counts[entry.to].joined += 1;
-    if (entry.from && counts[entry.from]) counts[entry.from].left += 1;
+    const joining = counts[entry.to];
+    if (joining) joining.joined += 1;
+    const leaving = entry.from ? counts[entry.from] : undefined;
+    if (leaving) leaving.left += 1;
   }
   return counts;
 }
@@ -87,9 +100,9 @@ export function schoolChanges(
  */
 export function rankSchools(
   judged: JudgedArgument[],
-  changes: Record<SchoolId, { joined: number; left: number }>
+  changes: SchoolChangeCounts
 ): SchoolTableRow[] {
-  const tallies = SCHOOL_IDS.map((school) => {
+  const tallies = PUBLISHED_SCHOOL_IDS.map((school) => {
     const marks = judged
       .filter((a) => a.school === school && a.fidelity != null)
       .map((a) => a.fidelity as number);

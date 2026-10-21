@@ -4,7 +4,7 @@ import { ImageResponse } from "next/og";
 import { CardLayout } from "../src/components/card/CardLayout";
 import { loadCardFonts } from "../src/lib/og-fonts";
 import { getSchool } from "../src/lib/schools";
-import type { SchoolId } from "../src/lib/types";
+import { PUBLISHED_SCHOOL_IDS } from "../src/lib/school-registry";
 
 // Renders the result card through Satori for every school, at both
 // canvases, without a database. The image routes need a saved result id to
@@ -13,7 +13,7 @@ import type { SchoolId } from "../src/lib/types";
 //
 //   npx tsx --require ./scripts/preload-server-only-shim.cjs scripts/render-cards.tsx <outdir>
 
-const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
+const SCHOOLS = PUBLISHED_SCHOOL_IDS;
 const CANVASES = [
   { tag: "og", width: 1200, height: 630 },
   { tag: "portrait", width: 1080, height: 1350 },
