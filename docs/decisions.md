@@ -856,3 +856,109 @@ minutes apart. The markdown surfaces (`/`, `/lessons`, the module pages)
 change on merge; the database surfaces (the whole arena, `/today`, `/me`,
 and the judge) change only on the seed. In between, a reader can read one
 motion and be asked to argue another.
+
+## Phase 2B: the school registry
+
+### Draft schools are behind `server-only`, not behind a filter
+
+The registry's first shape held all six schools in one client-safe module.
+It compiled, it passed 242 tests, it rendered byte-identical pages, and it
+put `confucian`, `ubuntu`, `buddhist`, `Confucianism`, `Ubuntu` and
+`Buddhist Ethics` into thirteen chunks under `.next/static`, including the
+ones for `/`, `/quiz`, `/r/[id]`, `/me`, `/login` and `/today`. `main`
+shipped none of them. Three unreleased product decisions in the production
+client bundle, with every gate green.
+
+So the registry is two files. `src/lib/school-registry.ts` holds the
+published schools; `src/lib/school-registry.drafts.ts` holds the drafts
+behind `import "server-only"`. `SchoolId` still names all six, which costs
+nothing, because a type is erased before a bundle exists.
+
+**Why not a build-time filter on `status`.** A filter has to be trusted to
+work. It depends on the bundler proving a branch unreachable, it leaves the
+draft strings sitting in a module client code may import, and when it stops
+working it does so silently: the names are simply in the output again. A
+`server-only` import is checked on every build, and the failure is a build
+error naming the file that did it. The guarantee should be enforced by the
+tool that assembles the bundle, not inferred from its optimiser.
+
+The split also made the fallback rule true by construction. The first
+version built every per-school map over all six schools and wrote a
+neutral for the ones with no colour, which is what baked the draft keys in.
+`publishedLookup` holds the published entries and computes a neutral from
+the id for anything else, so a draft school renders in neutral ink because
+the client genuinely does not know it, rather than because somebody
+remembered to write a fallback. A name falls back to the id, which is true,
+is not another school's name, and is not the string `undefined`.
+
+Three things legitimately see a draft, and all three are server-side:
+`/styleguide/drafts`, which is the preview-only review route;
+`src/lib/modules.ts`, which recognises a draft school in order to skip it;
+and the tests.
+
+### `npm run check:bundle` is the fifth gate
+
+The four gates were all green while those thirteen chunks shipped, so the
+honest conclusion was a fifth gate rather than a note in a pull request.
+
+`scripts/check-client-bundle.ts` greps `.next/static` for every draft
+school's id, name and adherent nouns, taking the strings from the registry
+so a school added tomorrow is covered without touching the script. It runs
+last because it reads what `npm run build` produced, and it fails when
+there is no build to read rather than passing vacuously.
+`tests/client-bundle.test.ts` runs the same check when a build is present
+and checks the checker against a fixture, so a regression in the matcher
+fails rather than passing quietly.
+
+`CONTRIBUTING.md` is the authority on the gate; `CLAUDE.md` restates the
+five commands.
+
+### Two things 2E owes before any school is published
+
+**`/api/judge` must refuse a school with no fidelity criteria cleanly.**
+`FIDELITY_CRITERIA` is a proxy that throws on a school nobody has written
+criteria for, because the alternative was returning `undefined` and letting
+`src/lib/anthropic.ts` substitute the literal string "undefined" into the
+prompt and send it: a verdict produced against no criteria at all, with
+nothing to show it had happened. Throwing is the safe failure, not a good
+answer. Today a draft school cannot reach the judge, because
+`profiles.school` is constrained to the published three. Phase 2C widens
+that constraint, and from then until a new school has criteria the only
+thing standing between a reader and a 500 is that nothing writes a draft
+school into a profile. `/api/judge` should answer a `paused`-style refusal
+the way it does for the kill switch and the budget.
+
+**The judge never sees the stance.** The request is the system prompt with
+the school's fidelity criteria interpolated, then the motion, the school
+and the argument. `debate_topics.stances` is read by `/debate` and shown to
+the reader; it reaches no model. Anything that claims to pin the whole
+judge request, the fixtures in `tests/judge-request/` included, must not
+assume otherwise.
+
+### Open item: drop `backup_20261022` after 2026-10-29
+
+This Supabase project is on the free plan, and Supabase's own
+documentation is explicit that daily backups cover Pro, Team and
+Enterprise only, with Point-in-Time Recovery a paid add-on on top of
+those. Their advice to free projects is to export their own data. There
+was nothing to restore from before Phase 2C, so 2C took its own copy:
+a schema named `backup_20261022` holding `quiz_results`, `profiles`,
+`debates` and `exchanges` as they stood before migrations 0014 and 0015.
+Row counts matched the source exactly, 27 / 1 / 1 / 0.
+
+It is deliberately unreachable rather than merely unlisted. The Data
+API's exposed-schema list is not readable from SQL on this project, so the
+guarantee does not rest on it: `anon`, `authenticated` and `service_role`
+all have no `USAGE` on the schema, so nothing served by PostgREST can read
+it whatever that list says. A restore would run as the owner, over the
+management connection, which is also the only thing that can read it.
+
+**Drop it once 2C is settled, from 2026-10-29.** It is a copy of real
+user rows with no row-level security of its own, kept only because the
+plan offers no alternative, and it should not outlive the reason for it.
+
+    drop schema backup_20261022 cascade;
+
+Nothing in the repository holds any of it: the committed snapshot,
+`docs/seed-snapshots/2026-10-21-phase2c-pre-migration.json`, is schema and
+shape only, because this repository is public.
