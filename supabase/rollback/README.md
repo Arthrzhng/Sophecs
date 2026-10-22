@@ -12,3 +12,10 @@ database, rolls the last two back, and applies them again.
 
 Two of them are not loss-free, and each says so at the top of the file.
 Read the file before running it.
+
+None of these files, and none of the migrations, opens its own
+transaction: Supabase's runner wraps a migration in one, and nesting a
+`begin` inside that ends the runner's transaction early. Run them by hand
+with `--single-transaction` so a failure rolls the whole file back:
+
+    psql --single-transaction -v ON_ERROR_STOP=1 -f supabase/rollback/00NN_....down.sql

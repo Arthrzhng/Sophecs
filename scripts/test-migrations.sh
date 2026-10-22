@@ -20,7 +20,10 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 export PGHOST=127.0.0.1 PGPORT="$PORT" PGUSER=postgres
 
 say() { printf '\n== %s ==\n' "$1"; }
-psql_q() { psql -v ON_ERROR_STOP=1 -q -d "$DB" "$@"; }
+# --single-transaction, because the files no longer open their own: a
+# failure part way through has to roll back everything before it, which is
+# what the runner does in production.
+psql_q() { psql --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" "$@"; }
 
 "$BIN/pg_isready" -h 127.0.0.1 -p "$PORT" >/dev/null || {
   echo "No server on port $PORT. Start one from $PGDATA_DIR first." >&2

@@ -20,8 +20,13 @@
 -- edit under ACCESS EXCLUSIVE and does not rewrite the table, so it is
 -- effectively instant at any size. The backfill is an ordinary UPDATE
 -- taking row locks, not a table lock; it touches one row here.
+--
+-- This file does not open its own transaction. Supabase's migration runner
+-- wraps each migration in one, and nesting a `begin` inside that would end
+-- the runner's transaction early at the `commit`. Run it by hand with
+-- `psql --single-transaction` so a failure rolls the whole file back;
+-- scripts/test-migrations.sh does.
 
-begin;
 
 alter table debates add column motion_text text;
 
@@ -85,5 +90,3 @@ begin
       unfilled;
   end if;
 end $$;
-
-commit;

@@ -25,8 +25,6 @@
 -- column's data is not reclaimed until a later VACUUM, which is fine and
 -- is also why the drop is instant at any size.
 
-begin;
-
 do $$
 declare
   stored int;
@@ -41,5 +39,3 @@ begin
 end $$;
 
 alter table debates drop column motion_text;
-
-commit;

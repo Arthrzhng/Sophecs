@@ -15,8 +15,6 @@
 -- Locks: the same as the forward migration. ACCESS EXCLUSIVE per
 -- statement, a validating scan on each ADD.
 
-begin;
-
 do $$
 declare
   bad_quiz int;
@@ -68,5 +66,3 @@ alter table debates
 -- left and what 0014 changed.
 alter table exchanges drop constraint exchanges_school_a_check;
 alter table exchanges drop constraint exchanges_school_b_check;
-
-commit;

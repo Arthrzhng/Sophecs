@@ -30,8 +30,13 @@
 --
 -- The whole file is one transaction, so the old constraint is never absent
 -- to a concurrent writer: it is replaced, not removed and then restored.
+--
+-- This file does not open its own transaction. Supabase's migration runner
+-- wraps each migration in one, and nesting a `begin` inside that would end
+-- the runner's transaction early at the `commit`. Run it by hand with
+-- `psql --single-transaction` so a failure rolls the whole file back;
+-- scripts/test-migrations.sh does.
 
-begin;
 
 alter table quiz_results drop constraint quiz_results_school_check;
 alter table quiz_results
@@ -68,5 +73,3 @@ alter table exchanges
 alter table exchanges
   add constraint exchanges_school_b_check
   check (school_b in ('stoicism','utilitarianism','virtue-ethics','confucian','ubuntu','buddhist'));
-
-commit;
