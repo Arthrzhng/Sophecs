@@ -934,3 +934,31 @@ and the argument. `debate_topics.stances` is read by `/debate` and shown to
 the reader; it reaches no model. Anything that claims to pin the whole
 judge request, the fixtures in `tests/judge-request/` included, must not
 assume otherwise.
+
+### Open item: drop `backup_20261022` after 2026-10-29
+
+This Supabase project is on the free plan, and Supabase's own
+documentation is explicit that daily backups cover Pro, Team and
+Enterprise only, with Point-in-Time Recovery a paid add-on on top of
+those. Their advice to free projects is to export their own data. There
+was nothing to restore from before Phase 2C, so 2C took its own copy:
+a schema named `backup_20261022` holding `quiz_results`, `profiles`,
+`debates` and `exchanges` as they stood before migrations 0014 and 0015.
+Row counts matched the source exactly, 27 / 1 / 1 / 0.
+
+It is deliberately unreachable rather than merely unlisted. The Data
+API's exposed-schema list is not readable from SQL on this project, so the
+guarantee does not rest on it: `anon`, `authenticated` and `service_role`
+all have no `USAGE` on the schema, so nothing served by PostgREST can read
+it whatever that list says. A restore would run as the owner, over the
+management connection, which is also the only thing that can read it.
+
+**Drop it once 2C is settled, from 2026-10-29.** It is a copy of real
+user rows with no row-level security of its own, kept only because the
+plan offers no alternative, and it should not outlive the reason for it.
+
+    drop schema backup_20261022 cascade;
+
+Nothing in the repository holds any of it: the committed snapshot,
+`docs/seed-snapshots/2026-10-21-phase2c-pre-migration.json`, is schema and
+shape only, because this repository is public.
