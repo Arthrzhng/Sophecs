@@ -36,6 +36,20 @@ export const DECLARED: Record<string, FileQuotes> = {
     ],
   },
 
+  // Not content a reader sees: the draft fidelity criteria, pending
+  // approval and loaded by nothing. Declared anyway, because the claim
+  // made for them is that they came only from the school files and the
+  // research file, and this is what makes that checkable.
+  "content/prompts/fidelity-criteria.draft.md": {
+    quotes: [
+      {
+        source: "a person is a person through other persons.",
+        exceptions: [{ kind: "lowercase-first" }, { kind: "drop-full-stop" }],
+        note: "the Ubuntu criteria, which run the maxim on after a colon",
+      },
+    ],
+  },
+
   "content/schools/ubuntu.md": {
     quotes: [
       {

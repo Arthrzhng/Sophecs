@@ -106,24 +106,31 @@ describe("judge.v3.md", () => {
   it("takes the rival schools from the registry instead of its prose", () => {
     expect(v3body).toContain("{{RIVAL_SCHOOLS}}");
 
-    // Checked above the response-format section only. The JSON block below
-    // it has to put some string in the `school` field to show the shape,
-    // and a placeholder there would stop being JSON. That example names a
-    // school in v2 too; it illustrates rather than constrains, and the
-    // constraint above it is the registry's now.
-    const instructions = v3body.slice(0, v3body.indexOf("## Response format"));
-    expect(instructions.length).toBeGreaterThan(0);
+    // Nowhere in the body, the JSON shape example included. v2 named a
+    // school there to show the shape; v3 uses a quoted placeholder, which
+    // is still valid JSON and names nobody.
     for (const id of [...PUBLISHED_SCHOOL_IDS, ...DRAFT_SCHOOL_IDS]) {
-      expect(instructions, `v3 should not name ${id} where it states the rule`).not.toContain(id);
+      expect(v3body, `v3 should not name ${id} anywhere`).not.toContain(id);
     }
   });
 
-  it("names a school only in the shape example, and only once", () => {
+  it("keeps the shape example valid JSON, with a placeholder and a warning", () => {
     const example = v3body.slice(v3body.indexOf("## Response format"));
-    const named = [...PUBLISHED_SCHOOL_IDS, ...DRAFT_SCHOOL_IDS].filter((id) =>
-      example.includes(id)
-    );
-    expect(named.length, `schools named in the example: ${named.join(", ")}`).toBe(1);
+    const fence = /```json\n([\s\S]*?)```/.exec(example);
+    expect(fence, "the JSON fence").not.toBeNull();
+    expect(() => JSON.parse(fence![1])).not.toThrow();
+    expect(JSON.parse(fence![1]).unanswered_objection.school).toBe("RIVAL_SCHOOL");
+    // And the model is told not to return the placeholder, since it would
+    // fail the zod enum and leave the debate unjudged.
+    expect(example).toContain("Do not return the word");
+  });
+
+  it("names the placeholder for what the field holds, not what it must not", () => {
+    // The brief suggested ASSIGNED_SCHOOL. That field must never hold the
+    // assigned school, so naming it that would contradict the rule stated
+    // a few lines above it.
+    expect(v3body).not.toContain("ASSIGNED_SCHOOL");
+    expect(v3body).toContain("RIVAL_SCHOOL");
   });
 
   it("no longer counts the schools", () => {
@@ -154,5 +161,47 @@ describe("judge.v3.md", () => {
     const header = v3.slice(0, v3.indexOf("-->"));
     expect(header).toContain("not the production default");
     expect(header).toContain("RIVAL_SCHOOLS");
+  });
+});
+
+describe("the draft fidelity criteria", () => {
+  const DRAFT = path.join(PROMPTS, "fidelity-criteria.draft.md");
+
+  it("exists and says it is a draft the judge does not read", () => {
+    const draft = read(DRAFT);
+    expect(draft).toContain("NOT LOADED BY ANYTHING");
+    expect(draft).toContain("Pending approval");
+  });
+
+  it("is loaded by nothing", () => {
+    for (const file of ["src/lib/judge/rubric.ts", "src/lib/anthropic.ts", "src/lib/judge/schema.ts"]) {
+      expect(read(path.join(process.cwd(), file)), file).not.toContain("fidelity-criteria.draft");
+    }
+    // And the three schools it covers still cannot be judged.
+    for (const id of DRAFT_SCHOOL_IDS) expect(hasFidelityCriteria(id), id).toBe(false);
+  });
+
+  it("covers the three schools that have no criteria", () => {
+    const draft = read(DRAFT);
+    for (const id of DRAFT_SCHOOL_IDS) expect(draft).toContain(`## \`${id}\``);
+  });
+
+  it("matches the shape of the three that are live", () => {
+    const draft = read(DRAFT);
+    const sections = [...draft.matchAll(/## `[a-z-]+` \([^)]*\)\n\n([\s\S]*?)(?=\n\n## |$)/g)];
+    expect(sections.length).toBe(DRAFT_SCHOOL_IDS.length);
+    for (const [, text] of sections) {
+      const body = text.trim();
+      // Two paragraphs: the commitments, then the fidelity failures.
+      expect(body.split("\n\n").length).toBe(2);
+      expect(body).toMatch(/^A faithful /);
+      expect(body).toContain("Score fidelity down when the argument:");
+      // The band the three live ones occupy.
+      expect(body.length).toBeGreaterThanOrEqual(730);
+      expect(body.length).toBeLessThanOrEqual(893);
+      const words = body.split(/\s+/).length;
+      expect(words).toBeGreaterThanOrEqual(114);
+      expect(words).toBeLessThanOrEqual(142);
+    }
   });
 });
