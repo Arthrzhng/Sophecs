@@ -56,7 +56,7 @@ describe("non-Western content quotations", () => {
 
   it("covers every non-Western content file that carries a source", () => {
     const sourced: string[] = [];
-    for (const dir of ["content/schools", "content/micro", "content/modules"]) {
+    for (const dir of ["content/schools", "content/micro", "content/modules", "content/prompts"]) {
       for (const name of fs.readdirSync(path.join(process.cwd(), dir))) {
         if (!name.endsWith(".md") || name.toLowerCase() === "readme.md") continue;
         const file = `${dir}/${name}`;
@@ -67,7 +67,11 @@ describe("non-Western content quotations", () => {
         const nonWestern =
           file.endsWith("-elsewhere.md") ||
           /^content\/schools\/(confucian|ubuntu|buddhist)\.md$/.test(file) ||
-          (dir === "content/modules" && /status:\s*draft/.test(text));
+          (dir === "content/modules" && /status:\s*draft/.test(text)) ||
+          // The draft fidelity criteria, which quote the Nguni maxim the
+          // Ubuntu school leads with. The judge prompts themselves quote
+          // nothing, so only this one file in the directory is sourced.
+          file === "content/prompts/fidelity-criteria.draft.md";
         if (nonWestern) sourced.push(file);
       }
     }

@@ -84,7 +84,13 @@ export type AnalyticsEvent =
   | {
       name: "judge_paused";
       props: {
-        reason: "kill_switch" | "budget" | "daily_cap" | "topic_lock" | "already_revised";
+        reason:
+          | "kill_switch"
+          | "budget"
+          | "daily_cap"
+          | "topic_lock"
+          | "already_revised"
+          | "no_criteria";
       };
     }
   | {
