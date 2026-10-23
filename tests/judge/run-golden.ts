@@ -11,8 +11,21 @@
 // /api/judge.
 import fs from "node:fs";
 import path from "node:path";
-import { callJudgeModel, logAiCall, JudgeValidationError } from "../../src/lib/anthropic";
+import { callJudgeModel, logAiCall, JudgeValidationError, MODEL, PROMPT_VERSION } from "../../src/lib/anthropic";
+import { FIDELITY_CRITERIA } from "../../src/lib/judge/rubric";
+import { flush, record, requestFingerprint, startRun, type GoldenRun } from "./golden-log";
 import type { SchoolId } from "../../src/lib/types";
+
+// Where a run logs. `file` writes tests/judge/golden-runs/<run>.json and
+// touches nothing else; `ai_calls` is the old behaviour, kept for anyone
+// who wants an eval to show up in the production ledger.
+//
+// `file` is the default on purpose. A judge run is not production spend,
+// and logging to ai_calls made the run need a route to Supabase that an
+// eval box has no other reason to have. Production logging is unchanged:
+// judgeDebate still writes to ai_calls and nothing in src/ imports the
+// file sink. See tests/golden-log.test.ts.
+const LOG_TO = process.env.GOLDEN_LOG === "ai_calls" ? "ai_calls" : "file";
 
 // claude-sonnet-5 rejects `temperature`, so sampling can't be pinned and a
 // single sample per case is a coin flip on any argument sitting near a band
@@ -66,36 +79,85 @@ function spread(values: number[]): string {
   return min === max ? `${min}` : `${min}-${max}`;
 }
 
-async function sampleCase(c: GoldenCase): Promise<{ samples: Sample[]; failures: string[] }> {
+async function logCall(
+  run: GoldenRun | null,
+  c: GoldenCase,
+  sample: number,
+  costUsd: number,
+  latencyMs: number,
+  verdict: { score: number; fidelity: number; unanswered_objection: { school: string } } | null,
+  raw: unknown,
+  error: string | null
+): Promise<void> {
+  if (LOG_TO === "ai_calls") {
+    await logAiCall({ userId: null, debateId: null, kind: "golden", costUsd, latencyMs });
+    return;
+  }
+  if (!run) return;
+  record(run, {
+    sample,
+    fixture: c.name,
+    school: c.school,
+    prompt_version: PROMPT_VERSION,
+    request_fingerprint: requestFingerprint({
+      promptVersion: PROMPT_VERSION,
+      promptText: promptText(),
+      criteria: FIDELITY_CRITERIA[c.school],
+      motion: c.motion,
+      school: c.school,
+      argument: c.argument,
+    }),
+    model: MODEL,
+    response: raw,
+    score: verdict?.score ?? null,
+    fidelity: verdict?.fidelity ?? null,
+    objection_school: verdict?.unanswered_objection.school ?? null,
+    cost_usd: costUsd,
+    latency_ms: latencyMs,
+    error,
+    at: new Date().toISOString(),
+  });
+  // Written after every call, so a run that dies part way through still
+  // leaves a record of what it spent.
+  flush(run);
+}
+
+function promptText(): string {
+  return fs.readFileSync(
+    path.join(process.cwd(), "content", "prompts", `judge.${PROMPT_VERSION}.md`),
+    "utf-8"
+  );
+}
+
+async function sampleCase(
+  c: GoldenCase,
+  run: GoldenRun | null
+): Promise<{ samples: Sample[]; failures: string[] }> {
   const samples: Sample[] = [];
   const failures: string[] = [];
 
   for (let i = 0; i < SAMPLES; i++) {
     try {
       const { verdict, costUsd, latencyMs } = await callJudgeModel(c.motion, c.school, c.argument);
-      await logAiCall({ userId: null, debateId: null, kind: "golden", costUsd, latencyMs });
 
       if (verdict.rejected) {
+        await logCall(run, c, i + 1, costUsd, latencyMs, null, verdict, "model rejected the submission");
         failures.push("model rejected the submission");
         continue;
       }
+      await logCall(run, c, i + 1, costUsd, latencyMs, verdict, verdict, null);
       samples.push({
         score: verdict.score,
         fidelity: verdict.fidelity,
         objectionSchool: verdict.unanswered_objection.school,
       });
     } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
       // A billed call still counts even when the response didn't validate.
       if (err instanceof JudgeValidationError) {
-        await logAiCall({
-          userId: null,
-          debateId: null,
-          kind: "golden",
-          costUsd: err.costUsd,
-          latencyMs: err.latencyMs,
-        });
+        await logCall(run, c, i + 1, err.costUsd, err.latencyMs, null, null, message);
       }
-      failures.push(err instanceof Error ? err.message : String(err));
+      failures.push(message);
     }
   }
 
@@ -104,6 +166,15 @@ async function sampleCase(c: GoldenCase): Promise<{ samples: Sample[]; failures:
 
 async function main() {
   const cases = loadCases();
+  const run =
+    LOG_TO === "file"
+      ? startRun({
+          promptVersion: PROMPT_VERSION,
+          promptText: promptText(),
+          model: MODEL,
+          samplesPerCase: SAMPLES,
+        })
+      : null;
   const rows: {
     name: string;
     score: string;
@@ -118,7 +189,7 @@ async function main() {
   let anyFail = false;
 
   for (const c of cases) {
-    const { samples, failures } = await sampleCase(c);
+    const { samples, failures } = await sampleCase(c, run);
 
     // Fewer than half the samples usable means the case has no measurable
     // result, not a low one — reporting a median of one sample would hide
@@ -194,6 +265,14 @@ async function main() {
   for (const r of rows.filter((row) => row.notes.length)) {
     console.log(`  ${r.name}:`);
     for (const note of r.notes) console.log(`    - ${note}`);
+  }
+
+  if (run) {
+    const file = flush(run, true);
+    console.log(
+      `\n${run.calls} call(s), $${run.total_cost_usd.toFixed(4)}, logged to ` +
+        `${path.relative(process.cwd(), file)}`
+    );
   }
 
   if (anyFail) {
