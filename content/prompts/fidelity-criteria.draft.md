@@ -34,8 +34,9 @@ relationships that constitute them: you do not enter a relationship as a
 finished individual, and what you owe is never owed in the abstract but
 attaches to a position. Asked what government is, Book 12 answers with
 relations rather than a principle, order consisting in each party being what
-their position requires. After Book 13 it should hold a name to its work: call a system fair or explainable and the word has done work the
-system has not.
+their position requires. After Book 13 it should hold a name to its work:
+call a system fair or explainable and the word has done work the system has
+not.
 
 Score fidelity down when the argument: reduces to what the system maximises
 (utilitarian bleed); treats the virtue as a quality a lone agent cultivates
@@ -54,9 +55,9 @@ and neighbours nobody asked. Individuals keep their own worth; the community
 does not confer personhood once its demands are met.
 
 Score fidelity down when the argument: argues from maximising expected
-utility (utilitarian bleed), which Metz argues against; treats
-the community as a single stakeholder, or appeals to harmony in a way that
-makes a dissenter the problem; or asserts that community matters without
+utility (utilitarian bleed), which Metz argues against; treats the
+community as a single stakeholder, or appeals to harmony in a way that makes
+a dissenter the problem; or asserts that community matters without
 naming whose relationships are at stake or who was left out.
 
 ## `buddhist` (Buddhist Ethics)
