@@ -3,6 +3,7 @@ import { VerdictCard } from "@/components/debate/VerdictCard";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { loadOgFonts } from "@/lib/og-fonts";
 import type { SchoolId } from "@/lib/types";
+import { motionForDebate } from "@/lib/motion-text";
 
 // Node runtime (not edge) — see docs/decisions.md and r/[id]/opengraph-image.tsx:
 // the embedded fonts push an edge bundle over Vercel Hobby's 1MB limit.
@@ -32,12 +33,16 @@ export default async function VerdictOGImage({
     if (data) {
       school = data.school as SchoolId;
       score = Number(data.score ?? 0);
-      const { data: topic } = await admin
-        .from("debate_topics")
-        .select("motion")
-        .eq("slug", data.topic_slug)
-        .maybeSingle();
-      if (topic) motion = topic.motion;
+      // Same two reads as the verdict page, and for the same reason:
+      // `debates_public` does not carry `motion_text`, so the stored
+      // wording comes from `debates` instead of from a migration.
+      const [{ data: topic }, { data: storedMotion }] = await Promise.all([
+        admin.from("debate_topics").select("motion").eq("slug", data.topic_slug).maybeSingle(),
+        admin.from("debates").select("motion_text").eq("id", debateId).maybeSingle(),
+      ]);
+      if (topic) {
+        motion = motionForDebate(storedMotion?.motion_text as string | null, topic.motion);
+      }
     }
   }
 

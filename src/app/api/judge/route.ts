@@ -9,6 +9,7 @@ import { applyStreakDay, isStreakEligible } from "@/lib/streak";
 import { recordChallengeDebate, resolveChallengeSide } from "@/lib/challenge";
 import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
 import { MIN_ARGUMENT_WORDS, MAX_ARGUMENT_WORDS, wordCount } from "@/lib/debate-limits";
+import { motionForDebate } from "@/lib/motion-text";
 import type { SchoolId } from "@/lib/types";
 
 const DAILY_CAP = 5;
@@ -97,11 +98,14 @@ export async function POST(request: Request) {
     elo_after: number | null;
     argument: string | null;
     created_at: string | null;
+    motion_text: string | null;
   } | null = null;
   if (isRevision) {
     const { data: parentRow } = await admin
       .from("debates")
-      .select("id, user_id, kind, rejected, verdict, elo_after, topic_slug, argument, created_at")
+      .select(
+        "id, user_id, kind, rejected, verdict, elo_after, topic_slug, argument, created_at, motion_text"
+      )
       .eq("id", body.parentDebateId!)
       .maybeSingle();
 
@@ -129,6 +133,7 @@ export async function POST(request: Request) {
       elo_after: parentRow.elo_after as number | null,
       argument: (parentRow.argument as string | null) ?? null,
       created_at: (parentRow.created_at as string | null) ?? null,
+      motion_text: (parentRow.motion_text as string | null) ?? null,
     };
   }
 
@@ -137,7 +142,7 @@ export async function POST(request: Request) {
     ? { data: null }
     : await admin
         .from("debates")
-        .select("id, verdict, argument")
+        .select("id, verdict, argument, motion_text")
         // Only originals hold the lock. Without this filter a revision
         // would lock its own topic for seven days the moment it landed.
         .eq("kind", "original")
@@ -166,6 +171,20 @@ export async function POST(request: Request) {
   const debateId = recent?.id ?? newId();
   const school = profile.school as SchoolId;
 
+  // The wording this argument is judged against, decided once and used for
+  // both the row and the model.
+  //
+  // A fresh row stores the motion as it reads now. An unjudged row being
+  // reused keeps whatever it stored when it was first created, so a reword
+  // between a submission and its verdict cannot change what the argument is
+  // scored against. A revision takes its parent's wording, because it is
+  // answering an objection to an argument written against those words, and
+  // because that is what the revise editor puts above the box.
+  const motionText = motionForDebate(
+    isRevision ? parent?.motion_text : recent?.motion_text,
+    topic.motion
+  );
+
   if (!recent) {
     // `recent` is always null on a revision, so this always inserts a fresh
     // row there — never the reuse path below, which would otherwise let a
@@ -180,6 +199,7 @@ export async function POST(request: Request) {
       argument: body.argument,
       kind: isRevision ? "revision" : "original",
       parent_debate_id: isRevision ? parent!.id : null,
+      motion_text: motionText,
     });
     // The unique index is the real guard against a double-submit: two
     // concurrent revisions both pass the existence check above, and the
@@ -211,7 +231,7 @@ export async function POST(request: Request) {
   let judged;
   try {
     judged = await judgeDebate({
-      motion: topic.motion,
+      motion: motionText,
       school,
       argument: body.argument,
       userId: user.id,

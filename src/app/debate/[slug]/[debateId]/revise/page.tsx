@@ -9,6 +9,7 @@ import { Page } from "@/components/layout/Page";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { TextLink } from "@/components/ui/TextLink";
 import type { SchoolId } from "@/lib/types";
+import { motionForDebate } from "@/lib/motion-text";
 
 export const metadata = { title: "Answer the objection · Sophecs" };
 
@@ -39,7 +40,7 @@ export default async function RevisePage({
 
   const { data: parent } = await admin
     .from("debates")
-    .select("id, user_id, kind, rejected, verdict, argument, school, topic_slug")
+    .select("id, user_id, kind, rejected, verdict, argument, school, topic_slug, motion_text")
     .eq("id", debateId)
     .maybeSingle();
 
@@ -69,13 +70,19 @@ export default async function RevisePage({
 
   const school = parent.school as SchoolId;
 
+  // A revision answers an objection to an argument written against the
+  // parent's wording, so the parent's wording is what goes above the box
+  // and what /api/judge is given. The two have to agree or the author is
+  // answering one motion and being marked against another.
+  const motion = motionForDebate(parent.motion_text as string | null, topic.motion);
+
   return (
     <Page width="read">
       {existingRevision ? (
         <div>
           <p className="text-sm text-ink-soft">Answer the objection</p>
           <h1 className="mt-1 max-w-[60ch] font-serif text-lg font-medium leading-snug text-ink">
-            {topic.motion}
+            {motion}
           </h1>
           <div className="mt-8">
             <EmptyState
@@ -96,7 +103,7 @@ export default async function RevisePage({
 
           <ArgumentEditor
             topicSlug={slug}
-            motion={topic.motion}
+            motion={motion}
             school={school}
             userId={user.id}
             isAllowlisted={isJudgeAllowlisted(user.id)}

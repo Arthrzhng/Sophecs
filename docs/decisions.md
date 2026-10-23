@@ -962,3 +962,55 @@ plan offers no alternative, and it should not outlive the reason for it.
 Nothing in the repository holds any of it: the committed snapshot,
 `docs/seed-snapshots/2026-10-21-phase2c-pre-migration.json`, is schema and
 shape only, because this repository is public.
+
+### Open pre-pilot item: there is no restorable backup
+
+The project is on Supabase's free plan, which has no daily backups and no
+Point-in-Time Recovery; both start at Pro. Phase 2C worked around it by
+taking its own copy into `backup_20261022` before applying, by hand, once.
+That is adequate for one migration Arthur is watching. It is not adequate
+for a term's worth of student work.
+
+**Decide before the Winchester pilot puts student data in**, because the
+choice changes what a bad afternoon costs:
+
+- **Pro upgrade.** Daily backups for the last 7 days, with PITR available
+  as a paid add-on on top. Nothing to build and nothing to remember.
+- **A scheduled private export.** `supabase db dump` on a timer into
+  storage Arthur controls, which is what Supabase themselves recommend to
+  free projects. Cheaper, and it is one more thing that can silently stop
+  working.
+
+Either way it needs settling while the only rows at risk are Arthur's own.
+A pilot turns "we lost a day" from an annoyance into a letter to a school.
+
+### Phase 3 item: move `motion_text` into `debates_public`
+
+2D reads `debates.motion_text` with the admin client on the verdict page
+and on the verdict OG image, in parallel with the topic read. It is one
+column, keyed to the debate the page is already rendering, and it costs no
+extra round trip. It is also the second read of a table those two surfaces
+otherwise reach only through the view.
+
+The tidier shape is the column on `debates_public`, where every other
+public field on those pages comes from, and no admin read of `debates` at
+all. 2D did not do it because of the order it forces: the view has to be
+widened in production **before** the code that selects the new column can
+deploy, or both pages ask the view for a column it does not have and
+`notFound()`. That is a migration gating a deploy, on a branch whose point
+was the readers.
+
+So, in Phase 3, in this order:
+
+1. A migration adding `motion_text` to `debates_public`, by
+   `create or replace view` with the column appended, which keeps the
+   grants and needs no drop. Applied and confirmed on its own.
+2. Then the code: `motion_text` moves into the existing
+   `debates_public` select on both surfaces, and the `admin.from("debates")`
+   read for it goes away.
+
+Worth knowing before step 1: `anon` and `authenticated` hold SELECT on
+that view, so the column becomes readable through the Data API. That grants
+no new private data, since the motion is public content and the page it
+feeds has always been public, but it is a deliberate widening rather than
+an incidental one.

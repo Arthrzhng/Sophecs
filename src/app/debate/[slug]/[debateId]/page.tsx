@@ -10,6 +10,7 @@ import { getSchool } from "@/lib/schools";
 import { Page } from "@/components/layout/Page";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
+import { motionForDebate, shortMotionForShare } from "@/lib/motion-text";
 
 export const metadata = { title: "Verdict · Sophecs" };
 
@@ -37,11 +38,16 @@ export default async function VerdictPage({
     .maybeSingle();
   if (!publicRow || publicRow.topic_slug !== slug) notFound();
 
-  const { data: topic } = await admin
-    .from("debate_topics")
-    .select("motion, micro_after")
-    .eq("slug", slug)
-    .maybeSingle();
+  // `motion_text` comes from `debates` rather than from `debates_public`,
+  // which exposes a fixed column list and does not carry it. Adding it to
+  // the view would have meant a migration before this code could deploy,
+  // and the column is public content the admin client already reads from
+  // this table further down the page. Parallel with the topic read, so it
+  // costs no extra round trip.
+  const [{ data: topic }, { data: storedMotion }] = await Promise.all([
+    admin.from("debate_topics").select("motion, micro_after").eq("slug", slug).maybeSingle(),
+    admin.from("debates").select("motion_text").eq("id", debateId).maybeSingle(),
+  ]);
   if (!topic) notFound();
 
   const supabase = await createSupabaseServerClient();
@@ -146,7 +152,11 @@ export default async function VerdictPage({
     : null;
 
   const schoolContent = getSchool(school);
-  const shortMotion = topic.motion.length > 60 ? `${topic.motion.slice(0, 57)}...` : topic.motion;
+  // The wording this argument was actually argued against, not the wording
+  // the motion carries now. The two differ for any debate submitted before
+  // a reword, and this page is the one that used to say the wrong thing.
+  const motion = motionForDebate(storedMotion?.motion_text as string | null, topic.motion);
+  const shortMotion = shortMotionForShare(motion);
   const baseShareLine = schoolContent.verdict_share_line
     .replaceAll("{score}", String(verdict.score ?? ""))
     .replaceAll("{topic}", shortMotion)
@@ -172,7 +182,7 @@ export default async function VerdictPage({
       <Verdict
         debateId={debateId}
         topicSlug={slug}
-        motion={topic.motion}
+        motion={motion}
         school={school}
         verdict={verdict}
         eloDelta={eloDelta}

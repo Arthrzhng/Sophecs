@@ -48,6 +48,7 @@ vi.mock("@anthropic-ai/sdk", () => {
 });
 
 const { callJudgeModel } = await import("../src/lib/anthropic");
+const { motionForDebate } = await import("../src/lib/motion-text");
 
 // The three schools with rows in production. Written out rather than read
 // from the registry on purpose: if the registry ever stopped listing one
@@ -105,5 +106,66 @@ describe("the request sent to the judge", () => {
     expect(new Set(systems).size).toBe(LIVE_IN_PRODUCTION.length);
     // No template placeholder survives into the request.
     for (const system of systems) expect(system).not.toContain("{{RUBRIC}}");
+  });
+});
+
+describe("2D: the motion the route now passes", () => {
+  // /api/judge used to pass `topic.motion`. It now passes
+  // `motionForDebate(stored, topic.motion)`. Judging is live, so every
+  // shape a submission can take is composed through the selector and
+  // compared against the fixtures captured before 2D existed. A fixture
+  // that changed would fail here, and none of them is in this branch's
+  // diff.
+  const REWORDED_TO =
+    "An AI system that reliably reduces suffering should be deployed even where the people it decides about cannot be told why.";
+
+  function userTurnOf(params: Record<string, unknown>): string {
+    return String((params.messages as { content: string }[])[0].content);
+  }
+
+  for (const school of LIVE_IN_PRODUCTION) {
+    it(`an original on a fresh row is byte-identical for ${school}`, async () => {
+      // Nothing stored yet, so the selector returns the live motion.
+      const motion = motionForDebate(undefined, MOTION);
+      expect(motion).toBe(MOTION);
+      created.length = 0;
+      await callJudgeModel(motion, school, ARGUMENT);
+      expect(created).toHaveLength(1);
+      compare(school, created[0]);
+    });
+
+    it(`a revision is byte-identical for ${school}`, async () => {
+      // A revision takes the parent's stored wording, and is given the
+      // original and the objection alongside it.
+      const motion = motionForDebate(MOTION, REWORDED_TO);
+      expect(motion).toBe(MOTION);
+      created.length = 0;
+      await callJudgeModel(motion, school, ARGUMENT, REVISION);
+      expect(created).toHaveLength(1);
+      compare(`${school}.revision`, created[0]);
+      expect(userTurnOf(created[0])).not.toContain(REWORDED_TO);
+    });
+
+    it(`a pending row is judged under its own wording for ${school}`, async () => {
+      // The sharper half of the problem: submitted before a reword, judged
+      // after it. The row holds what its author read, and that is what the
+      // model gets, so the request is still the pre-2D one.
+      const motion = motionForDebate(MOTION, REWORDED_TO);
+      created.length = 0;
+      await callJudgeModel(motion, school, ARGUMENT);
+      expect(created).toHaveLength(1);
+      compare(school, created[0]);
+      const userTurn = userTurnOf(created[0]);
+      expect(userTurn).toContain(MOTION);
+      expect(userTurn).not.toContain(REWORDED_TO);
+    });
+  }
+
+  it("would have sent the reworded motion without the selector", () => {
+    // The counter-case, so the three blocks above are known to be testing
+    // something: reading the live motion the way the route used to is what
+    // produces the wrong words.
+    expect(REWORDED_TO).not.toBe(MOTION);
+    expect(motionForDebate(null, REWORDED_TO)).toBe(REWORDED_TO);
   });
 });
