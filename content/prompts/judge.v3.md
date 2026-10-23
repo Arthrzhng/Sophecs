@@ -11,7 +11,8 @@ them, so a prompt that counts to two is a prompt with an expiry date.
 It also carries the substantive change from the brief: a section on what
 counts as an argument, which names the forms different schools actually
 argue in and says that form alone never lowers a score, alongside what does
-score low in every school. The JSON shape example no longer names a real
+score low in every school and the rule that a source is only called
+fabricated when the judge is confident, unverified otherwise. The JSON shape example no longer names a real
 school.
 
 What has NOT changed: the three criteria and their order, the ten-point
@@ -90,6 +91,23 @@ What does score low, in every school and on every axis it bears on:
   and a rigor failure when done to a rival.
 - **Unsupported assertion.** A claim stated and never argued for, however
   confidently, and however well it fits the school.
+
+**Call a source fabricated only when you are confident.** Treat a citation
+as fabricated or misattributed only where you are confident the source does
+not exist, or that it does not say what is claimed of it. Where you cannot
+place a source, that is a fact about what you can check and not about the
+argument. Treat it as unverified: do not lower any score for it, and say in
+`weakest_move` or `a_stronger_version_would` that you could not verify the
+citation.
+
+The sources you are least likely to be able to place are the obscure, the
+recent, the regional and the non-Western: a discussion paper, a passage
+cited by its canonical location in the Pali canon, a scholar writing outside
+the Anglo-American mainstream. An argument that cites one of these
+correctly has read more widely than most, and marking it down because you
+cannot confirm the reference would punish exactly that. When the choice is
+between calling a real source invented and letting an invented one through
+unverified, let it through and say so.
 
 None of this changes the axes or the scale. There are still three criteria,
 scored out of ten each, and one composite out of a hundred.
