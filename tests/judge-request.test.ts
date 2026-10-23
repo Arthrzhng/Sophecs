@@ -48,6 +48,7 @@ vi.mock("@anthropic-ai/sdk", () => {
 });
 
 const { callJudgeModel } = await import("../src/lib/anthropic");
+const { motionForDebate } = await import("../src/lib/motion-text");
 
 // The three schools with rows in production. Written out rather than read
 // from the registry on purpose: if the registry ever stopped listing one
@@ -105,5 +106,48 @@ describe("the request sent to the judge", () => {
     expect(new Set(systems).size).toBe(LIVE_IN_PRODUCTION.length);
     // No template placeholder survives into the request.
     for (const system of systems) expect(system).not.toContain("{{RUBRIC}}");
+  });
+});
+
+describe("2D: the motion the route now passes", () => {
+  // /api/judge used to pass `topic.motion`. It now passes
+  // `motionForDebate(stored, topic.motion)`. These compose the selector
+  // with the capture above, so the claim "a new debate is judged exactly
+  // as before" is checked rather than argued.
+  for (const school of LIVE_IN_PRODUCTION) {
+    it(`leaves a new debate's request byte-identical for ${school}`, async () => {
+      // A new row has nothing stored yet, so the selector returns the live
+      // motion and the request is the one the fixture already holds.
+      const motion = motionForDebate(undefined, MOTION);
+      expect(motion).toBe(MOTION);
+
+      created.length = 0;
+      await callJudgeModel(motion, school, ARGUMENT);
+      expect(created).toHaveLength(1);
+      compare(school, created[0]);
+    });
+  }
+
+  it("judges a pending debate against the wording it was submitted under", async () => {
+    // The sharper half of the problem: an argument submitted before a
+    // reword and judged after it. The row holds what its author read, and
+    // that is what the model has to be given.
+    const submittedUnder = MOTION;
+    const rewordedTo =
+      "An AI system that reliably reduces suffering should be deployed even where the people it decides about cannot be told why.";
+    expect(rewordedTo).not.toBe(submittedUnder);
+
+    const motion = motionForDebate(submittedUnder, rewordedTo);
+    created.length = 0;
+    await callJudgeModel(motion, "stoicism", ARGUMENT);
+
+    const userTurn = String(
+      (created[0].messages as { content: string }[])[0].content
+    );
+    expect(userTurn).toContain(submittedUnder);
+    expect(userTurn).not.toContain(rewordedTo);
+    // And byte-identical to the fixture for that school, because the
+    // fixture was captured under the same wording.
+    compare("stoicism", created[0]);
   });
 });

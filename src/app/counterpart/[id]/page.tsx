@@ -7,6 +7,7 @@ import {
 } from "@/components/counterpart/ExchangeView";
 import { isLapsed, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
 import type { SchoolId } from "@/lib/types";
+import { motionForDebate } from "@/lib/motion-text";
 
 export const metadata = { title: "Counterpart · Sophecs" };
 
@@ -65,7 +66,10 @@ export default async function CounterpartPage({
 
   const [{ data: topic }, { data: debates }, { data: turnRows }] = await Promise.all([
     admin.from("debate_topics").select("motion, title").eq("slug", exchange.topic_slug).maybeSingle(),
-    admin.from("debates").select("id, argument").in("id", [myDebateId, theirDebateId]),
+    admin
+      .from("debates")
+      .select("id, argument, motion_text")
+      .in("id", [myDebateId, theirDebateId]),
     admin
       .from("turns")
       .select("id, author_id, seq, quoted_claim, body, screen_result")
@@ -75,6 +79,18 @@ export default async function CounterpartPage({
   if (!topic) notFound();
 
   const argumentById = new Map((debates ?? []).map((d) => [d.id as string, d.argument as string]));
+
+  // The opener's wording, not the viewer's own. Both sides argued the same
+  // topic, and if it was reworded between their two submissions they would
+  // otherwise read different motions above the same exchange. The exchange
+  // is anchored to the opener's claim, so the opener's words win.
+  const motionTextById = new Map(
+    (debates ?? []).map((d) => [d.id as string, (d.motion_text as string | null) ?? null])
+  );
+  const motion = motionForDebate(
+    motionTextById.get(exchange.debate_a as string) ?? null,
+    topic.motion as string
+  );
   const turns = (turnRows as TurnRow[] | null) ?? [];
 
   // What each party may read. The admin client bypasses RLS, so the same
@@ -112,7 +128,7 @@ export default async function CounterpartPage({
         userId={user.id}
         topicSlug={exchange.topic_slug as string}
         myDebateId={myDebateId as string}
-        motion={topic.motion as string}
+        motion={motion}
         mySchool={mySchool}
         theirSchool={theirSchool}
         myArgument={argumentById.get(myDebateId as string) ?? ""}

@@ -962,3 +962,24 @@ plan offers no alternative, and it should not outlive the reason for it.
 Nothing in the repository holds any of it: the committed snapshot,
 `docs/seed-snapshots/2026-10-21-phase2c-pre-migration.json`, is schema and
 shape only, because this repository is public.
+
+### Open pre-pilot item: there is no restorable backup
+
+The project is on Supabase's free plan, which has no daily backups and no
+Point-in-Time Recovery; both start at Pro. Phase 2C worked around it by
+taking its own copy into `backup_20261022` before applying, by hand, once.
+That is adequate for one migration Arthur is watching. It is not adequate
+for a term's worth of student work.
+
+**Decide before the Winchester pilot puts student data in**, because the
+choice changes what a bad afternoon costs:
+
+- **Pro upgrade.** Daily backups for the last 7 days, with PITR available
+  as a paid add-on on top. Nothing to build and nothing to remember.
+- **A scheduled private export.** `supabase db dump` on a timer into
+  storage Arthur controls, which is what Supabase themselves recommend to
+  free projects. Cheaper, and it is one more thing that can silently stop
+  working.
+
+Either way it needs settling while the only rows at risk are Arthur's own.
+A pilot turns "we lost a day" from an annoyance into a letter to a school.

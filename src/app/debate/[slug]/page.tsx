@@ -6,6 +6,7 @@ import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
 import { DebateFlow } from "@/components/debate/DebateFlow";
 import { Page } from "@/components/layout/Page";
 import type { SchoolId } from "@/lib/types";
+import { motionForDebate } from "@/lib/motion-text";
 
 export const metadata = { title: "Debate · Sophecs" };
 
@@ -37,7 +38,8 @@ export default async function DebateTopicPage({
   // One batch, not a waterfall: the judged-debate count is only needed to
   // decide whether to show the first-argument scaffold, and it must not cost
   // this route an extra round trip.
-  const [{ data: profile }, { data: topic }, { count: judgedCount }] = await Promise.all([
+  const [{ data: profile }, { data: topic }, { count: judgedCount }, { data: pending }] =
+    await Promise.all([
     admin.from("profiles").select("school").eq("id", user.id).maybeSingle(),
     admin
       .from("debate_topics")
@@ -49,6 +51,21 @@ export default async function DebateTopicPage({
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
       .not("verdict", "is", null),
+    // An unjudged original on this topic, which /api/judge reuses rather
+    // than inserting a second row. It already holds the wording it was
+    // created against, and the editor has to show that rather than the
+    // live motion: otherwise an author returning after a reword writes
+    // against one motion and is marked against another.
+    admin
+      .from("debates")
+      .select("motion_text")
+      .eq("user_id", user.id)
+      .eq("topic_slug", slug)
+      .eq("kind", "original")
+      .is("verdict", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   if (!profile?.school) {
@@ -57,6 +74,7 @@ export default async function DebateTopicPage({
   if (!topic || !topic.active) notFound();
 
   const microBefore = getMicroLesson(topic.micro_before);
+  const motion = motionForDebate(pending?.motion_text as string | null, topic.motion);
 
   // Answers from an earlier visit, so re-entering a lesson shows what was
   // already written instead of asking for it again. Keyed by chunk index,
@@ -77,7 +95,7 @@ export default async function DebateTopicPage({
     <Page width="ui">
       <DebateFlow
         topicSlug={topic.slug}
-        motion={topic.motion}
+        motion={motion}
         school={profile.school as SchoolId}
         microBefore={microBefore}
         userId={user.id}
