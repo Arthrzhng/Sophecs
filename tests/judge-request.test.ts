@@ -111,43 +111,61 @@ describe("the request sent to the judge", () => {
 
 describe("2D: the motion the route now passes", () => {
   // /api/judge used to pass `topic.motion`. It now passes
-  // `motionForDebate(stored, topic.motion)`. These compose the selector
-  // with the capture above, so the claim "a new debate is judged exactly
-  // as before" is checked rather than argued.
+  // `motionForDebate(stored, topic.motion)`. Judging is live, so every
+  // shape a submission can take is composed through the selector and
+  // compared against the fixtures captured before 2D existed. A fixture
+  // that changed would fail here, and none of them is in this branch's
+  // diff.
+  const REWORDED_TO =
+    "An AI system that reliably reduces suffering should be deployed even where the people it decides about cannot be told why.";
+
+  function userTurnOf(params: Record<string, unknown>): string {
+    return String((params.messages as { content: string }[])[0].content);
+  }
+
   for (const school of LIVE_IN_PRODUCTION) {
-    it(`leaves a new debate's request byte-identical for ${school}`, async () => {
-      // A new row has nothing stored yet, so the selector returns the live
-      // motion and the request is the one the fixture already holds.
+    it(`an original on a fresh row is byte-identical for ${school}`, async () => {
+      // Nothing stored yet, so the selector returns the live motion.
       const motion = motionForDebate(undefined, MOTION);
       expect(motion).toBe(MOTION);
-
       created.length = 0;
       await callJudgeModel(motion, school, ARGUMENT);
       expect(created).toHaveLength(1);
       compare(school, created[0]);
     });
+
+    it(`a revision is byte-identical for ${school}`, async () => {
+      // A revision takes the parent's stored wording, and is given the
+      // original and the objection alongside it.
+      const motion = motionForDebate(MOTION, REWORDED_TO);
+      expect(motion).toBe(MOTION);
+      created.length = 0;
+      await callJudgeModel(motion, school, ARGUMENT, REVISION);
+      expect(created).toHaveLength(1);
+      compare(`${school}.revision`, created[0]);
+      expect(userTurnOf(created[0])).not.toContain(REWORDED_TO);
+    });
+
+    it(`a pending row is judged under its own wording for ${school}`, async () => {
+      // The sharper half of the problem: submitted before a reword, judged
+      // after it. The row holds what its author read, and that is what the
+      // model gets, so the request is still the pre-2D one.
+      const motion = motionForDebate(MOTION, REWORDED_TO);
+      created.length = 0;
+      await callJudgeModel(motion, school, ARGUMENT);
+      expect(created).toHaveLength(1);
+      compare(school, created[0]);
+      const userTurn = userTurnOf(created[0]);
+      expect(userTurn).toContain(MOTION);
+      expect(userTurn).not.toContain(REWORDED_TO);
+    });
   }
 
-  it("judges a pending debate against the wording it was submitted under", async () => {
-    // The sharper half of the problem: an argument submitted before a
-    // reword and judged after it. The row holds what its author read, and
-    // that is what the model has to be given.
-    const submittedUnder = MOTION;
-    const rewordedTo =
-      "An AI system that reliably reduces suffering should be deployed even where the people it decides about cannot be told why.";
-    expect(rewordedTo).not.toBe(submittedUnder);
-
-    const motion = motionForDebate(submittedUnder, rewordedTo);
-    created.length = 0;
-    await callJudgeModel(motion, "stoicism", ARGUMENT);
-
-    const userTurn = String(
-      (created[0].messages as { content: string }[])[0].content
-    );
-    expect(userTurn).toContain(submittedUnder);
-    expect(userTurn).not.toContain(rewordedTo);
-    // And byte-identical to the fixture for that school, because the
-    // fixture was captured under the same wording.
-    compare("stoicism", created[0]);
+  it("would have sent the reworded motion without the selector", () => {
+    // The counter-case, so the three blocks above are known to be testing
+    // something: reading the live motion the way the route used to is what
+    // produces the wrong words.
+    expect(REWORDED_TO).not.toBe(MOTION);
+    expect(motionForDebate(null, REWORDED_TO)).toBe(REWORDED_TO);
   });
 });

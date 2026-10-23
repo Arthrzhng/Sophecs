@@ -983,3 +983,34 @@ choice changes what a bad afternoon costs:
 
 Either way it needs settling while the only rows at risk are Arthur's own.
 A pilot turns "we lost a day" from an annoyance into a letter to a school.
+
+### Phase 3 item: move `motion_text` into `debates_public`
+
+2D reads `debates.motion_text` with the admin client on the verdict page
+and on the verdict OG image, in parallel with the topic read. It is one
+column, keyed to the debate the page is already rendering, and it costs no
+extra round trip. It is also the second read of a table those two surfaces
+otherwise reach only through the view.
+
+The tidier shape is the column on `debates_public`, where every other
+public field on those pages comes from, and no admin read of `debates` at
+all. 2D did not do it because of the order it forces: the view has to be
+widened in production **before** the code that selects the new column can
+deploy, or both pages ask the view for a column it does not have and
+`notFound()`. That is a migration gating a deploy, on a branch whose point
+was the readers.
+
+So, in Phase 3, in this order:
+
+1. A migration adding `motion_text` to `debates_public`, by
+   `create or replace view` with the column appended, which keeps the
+   grants and needs no drop. Applied and confirmed on its own.
+2. Then the code: `motion_text` moves into the existing
+   `debates_public` select on both surfaces, and the `admin.from("debates")`
+   read for it goes away.
+
+Worth knowing before step 1: `anon` and `authenticated` hold SELECT on
+that view, so the column becomes readable through the Data API. That grants
+no new private data, since the motion is public content and the page it
+feeds has always been public, but it is a deliberate widening rather than
+an incidental one.

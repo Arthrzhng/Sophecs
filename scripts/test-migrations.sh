@@ -93,9 +93,33 @@ psql -At -d "$DB" -c "
   insert into quiz_results (id, school, secondary, vector, answers, anon_id)
   values ('probe-conf','confucian','ubuntu','{}'::jsonb,'[]'::jsonb, gen_random_uuid())
   returning 'accepted ' || school || '/' || secondary"
-psql -d "$DB" -c "
+# This insert is meant to fail, so its exit status is captured rather than
+# piped: under `set -e` with `pipefail` a failing psql in a pipeline killed
+# the script here, and every step after it silently never ran.
+rejected=$(psql -d "$DB" -c "
   insert into quiz_results (id, school, secondary, vector, answers, anon_id)
-  values ('probe-moh','mohism',null,'{}'::jsonb,'[]'::jsonb, gen_random_uuid())" 2>&1 \
-  | grep -o 'violates check constraint "[^"]*"' | sed 's/^/  rejected, /'
+  values ('probe-moh','mohism',null,'{}'::jsonb,'[]'::jsonb, gen_random_uuid())" 2>&1 || true)
+printf '%s\n' "$rejected" | grep -o 'violates check constraint "[^"]*"' | sed 's/^/  rejected, /'
+
+say "debates_public still hides an unpublished argument"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" >/dev/null <<'PRIV'
+insert into auth.users (id) values ('22222222-2222-2222-2222-222222222222');
+insert into debate_topics (slug,title,motion,stances,micro_before,micro_after,sort,active)
+  values ('priv','Priv','A motion.','{}'::jsonb,'a','b',99,true);
+insert into debates (id,user_id,topic_slug,school,argument,argument_public,motion_text)
+  values ('privNo','22222222-2222-2222-2222-222222222222','priv','stoicism','secret words',false,'stored wording'),
+         ('privYes','22222222-2222-2222-2222-222222222222','priv','stoicism','open words',true,'stored wording');
+PRIV
+# The privacy rule the verdict page depends on, at the boundary that
+# decides it. 2D added a second read to that page for motion_text, and
+# this is the thing that must not have moved: the view nulls `argument`
+# unless argument_public, whatever else the page reads.
+psql -At -d "$DB" -c "
+  select '  ' || id || ': argument ' || coalesce('= ' || quote_literal(argument), 'hidden')
+  from debates_public where topic_slug = 'priv' order by id"
+psql -At -d "$DB" -c "
+  select '  motion_text is readable for both: ' ||
+         (count(*) filter (where motion_text = 'stored wording'))::text || ' of 2'
+  from debates where topic_slug = 'priv'"
 
 say "done"
