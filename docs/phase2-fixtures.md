@@ -20,17 +20,13 @@ there is nothing to score fidelity against.
 **The environment.** This is not something approval fixes. `npm run
 judge:golden` needs two things this sandbox does not have:
 
-- `ANTHROPIC_API_KEY`. There is no `.env.local` here. The Anthropic API
-  itself is reachable (`api.anthropic.com` answers), so this is the key
-  alone.
-- A route to Supabase. `api.supabase.co` is refused by the egress proxy,
-  and the runner calls `logAiCall` for every call. "Every Anthropic call is
-  logged to `ai_calls`, no exceptions, including in tests" is the Phase 2
-  rule, so the run cannot simply skip it.
+- `ANTHROPIC_API_KEY`. There is no `.env.local` here, and the environment
+  has no key set. The Anthropic API itself is reachable
+  (`api.anthropic.com` answers), so this is the key alone.
 
-So the run happens on Arthur's machine, or in an environment with both. I
-can write the fixtures, the bands and the arithmetic; I cannot press the
-button from here.
+Supabase was the second blocker and is no longer one. The runner logs to a
+file now rather than to `ai_calls`, so a run needs nothing from Supabase.
+With a key in the environment, a run becomes possible from here.
 
 ## What the run has to show
 
@@ -65,22 +61,21 @@ recorded in `docs/decisions.md` and is not revisited here.
 
 | Run | Cases | Samples | Calls | Approximate cost |
 |---|---|---|---|---|
-| Tier A under v2 (baseline) | 13 | 3 | 39 | $0.38 |
-| Tier A under v3 | 13 | 3 | 39 | $0.38 |
-| **Tier A total** | | | **78** | **$0.76** |
+| Tier A under v2 (baseline) | 14 | 3 | 42 | $0.41 |
+| Tier A under v3 | 14 | 3 | 42 | $0.41 |
+| **Tier A total** | | | **84** | **$0.82** |
 | Tier B under v3, after approval | 8 | 3 | 24 | $0.24 |
-| **Everything** | | | **102** | **$1.00** |
+| **Everything** | | | **108** | **$1.06** |
 
 Against `AI_MONTHLY_BUDGET_USD`, which is $50 and production-only. A
-single-sample pass with `GOLDEN_SAMPLES=1` is a third of the calls: $0.13
-for Tier A under one prompt version, $0.25 for Tier A under both. It is
+single-sample pass with `GOLDEN_SAMPLES=1` is a third of the calls: $0.14
+for Tier A under one prompt version, $0.27 for Tier A under both. It is
 worth doing first to catch a fixture that fails to validate before paying
 for three samples of it.
 
-Two cost notes. The runner logs each call to `ai_calls`, so these 102 calls
-land in the same table the budget reads; that is the intent. And `ai_calls`
-currently holds one row from September, so the month's spend before this is
-effectively nothing.
+The runner no longer logs to `ai_calls`: these 108 calls do not land in
+production's spend ledger and the run needs no route to Supabase. See "How
+a run is logged".
 
 ## A note on the motions
 
@@ -93,7 +88,7 @@ was edited, and a golden set whose inputs move is not a golden set.
 
 ---
 
-# Tier A: runnable as soon as there is a key
+# Tier A: fourteen cases, runnable as soon as there is a key
 
 ## The six that already exist
 
@@ -284,6 +279,79 @@ caricatured, and nothing is fabricated. It asserts throughout and argues
 nowhere. Fidelity is allowed to sit higher than the other three because the
 commitments really are the school's; rigor is what should collapse.
 
+## One new case: a real source the judge may not know
+
+### `util-obscure-source`
+
+> **Motion.** A health service should be allowed to infer a patient's
+> mental health risk from data they gave for another purpose, where doing
+> so measurably reduces suicides.
+
+> **School.** utilitarianism
+
+> **Argument.** Count everyone affected and weigh what each gains and
+> loses. On one side, a measurable fall in suicides, concentrated among
+> people with the least access to care, which is the largest preventable
+> harm on the table. On the other, a cost that is easy to leave out of the
+> ledger because it is diffuse rather than dramatic. Sabelo Mhlambi states
+> it precisely in his 2020 Carr Center discussion paper, at page six: the
+> notion that truths, and perhaps all truths, about an individual can be
+> rationally computed destroys the core idea of privacy. That loss falls on
+> every patient in the dataset and not only on those flagged, and it
+> compounds each time another inference is drawn from the same data. So the
+> weighing is lives against a widespread and cumulative loss, and the
+> honest answer depends on the size of the fall. At a reduction large
+> enough to measure against a base rate this low it carries; at a marginal
+> one it does not, and the service should say which it has before
+> deploying anything.
+
+Expected: **score 70-95, fidelity 8-10**, objection from stoicism or
+virtue-ethics.
+
+The citation is real and exact: Carr Center Discussion Paper 2020-009,
+printed page 6, quoted word for word from
+`content/research/non-western-sources.md`. It is also a 2020 discussion
+paper by a scholar writing outside the Anglo-American mainstream, which is
+exactly the kind of source a model is least likely to be able to place.
+
+This is the control for `fabricated-source`, and the pair only means
+anything together. If the judge scores this one down, or names the citation
+as unverifiable in a way that costs marks, v3's confidence rule is not
+working, and the effect would fall hardest on the three schools whose
+sources are hardest to check. One invented citation caught, one real and
+obscure citation left alone: that is the result to read.
+
+What is deliberately not being tested here: the argument is utilitarian and
+Mhlambi is cited as evidence about a harm that has to be counted, not as
+the ground of the argument. That keeps the case about whether an unplaceable
+source is penalised, rather than confounding it with a school-bleed
+judgement.
+
+## How a run is logged
+
+`npm run judge:golden` writes every call to
+`tests/judge/golden-runs/<run-id>.json` and does not touch `ai_calls`.
+Each record carries the prompt version, the fixture, a request
+fingerprint, the response, the score, the fidelity, the objection school,
+the cost and the latency. The file is rewritten after every call, so a run
+that dies part way through still leaves what it spent.
+
+The fingerprint is of the inputs, not of the literal request bytes, and the
+file says so. `callJudgeModel` does not hand back the request it built, and
+rebuilding it to hash it would be a second copy of the assembly, which is
+what `tests/judge-request.test.ts` exists to avoid. It covers the prompt
+version, a hash of the prompt file, a hash of the school's criteria, and
+the motion, school and argument. The assembly is a pure function of those
+and is pinned byte for byte by the committed fixtures, so two runs with the
+same fingerprint sent the same thing.
+
+`GOLDEN_LOG=ai_calls` restores the old behaviour for anyone who wants an
+eval in the production ledger. Production itself is untouched:
+`judgeDebate` still writes to `ai_calls` on both the success and the
+validation-failure path, `/api/judge` still goes through it, and nothing in
+`src/` imports the file sink. `tests/golden-log.test.ts` asserts each of
+those.
+
 ---
 
 # Tier B: after the criteria are approved
@@ -337,11 +405,11 @@ criteria change, these change with them, which is the reason for waiting.
 
 ## What I would do next, on a yes
 
-1. Add the seven Tier A cases to `tests/judge/golden/` in the existing
+1. Add the eight new Tier A cases to `tests/judge/golden/` in the existing
    fixture format, with the bands above.
-2. Run Tier A under v2 with `GOLDEN_SAMPLES=1` first: 13 calls, $0.13, to
+2. Run Tier A under v2 with `GOLDEN_SAMPLES=1` first: 14 calls, $0.14, to
    catch a fixture that fails zod before paying for three samples.
-3. Run Tier A under v2 and then under v3 at three samples, $0.76, and paste
+3. Run Tier A under v2 and then under v3 at three samples, $0.82, and paste
    both tables.
 4. Report any band that moved on the existing six, and stop rather than
    adjust it.

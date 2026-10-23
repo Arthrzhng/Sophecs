@@ -133,6 +133,16 @@ describe("judge.v3.md", () => {
     expect(v3body).toContain("RIVAL_SCHOOL");
   });
 
+  it("only calls a source fabricated when the judge is confident", () => {
+    // Without this the fabrication rule falls hardest on the schools whose
+    // sources a model is least able to place, which is the three being
+    // added.
+    expect(v3body).toContain("Call a source fabricated only when you are confident");
+    expect(v3body).toContain("Treat it as unverified: do not lower any score for it");
+    expect(v3body).toContain("obscure, the\nrecent, the regional and the non-Western");
+    expect(v2, "v2 has no such rule, which is why v3 needs one").not.toContain("unverified");
+  });
+
   it("no longer counts the schools", () => {
     // v2 says the objection comes from "one of the two schools the argument
     // was not assigned", which is true of three schools and nothing else.
