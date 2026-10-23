@@ -9,6 +9,7 @@ import { applyStreakDay, isStreakEligible } from "@/lib/streak";
 import { recordChallengeDebate, resolveChallengeSide } from "@/lib/challenge";
 import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
 import { MIN_ARGUMENT_WORDS, MAX_ARGUMENT_WORDS, wordCount } from "@/lib/debate-limits";
+import { hasFidelityCriteria } from "@/lib/judge/rubric";
 import { motionForDebate } from "@/lib/motion-text";
 import type { SchoolId } from "@/lib/types";
 
@@ -16,7 +17,13 @@ const DAILY_CAP = 5;
 const TOPIC_LOCK_DAYS = 7;
 const PAR_ELO_WINDOW = 50;
 
-type PauseReason = "kill_switch" | "budget" | "daily_cap" | "topic_lock" | "already_revised";
+type PauseReason =
+  | "kill_switch"
+  | "budget"
+  | "daily_cap"
+  | "topic_lock"
+  | "already_revised"
+  | "no_criteria";
 
 function paused(reason: PauseReason) {
   return NextResponse.json({ ok: false, paused: true, reason });
@@ -66,6 +73,22 @@ export async function POST(request: Request) {
     .maybeSingle();
   if (!profile?.school) {
     return NextResponse.json({ ok: false, error: "Take the quiz first." }, { status: 400 });
+  }
+
+  // A school with no fidelity criteria cannot be judged, and this is where
+  // that is said rather than discovered.
+  //
+  // Phase 2C widened the school CHECK constraints, so a profile can now
+  // hold a school whose criteria nobody has written. Reading them throws,
+  // on purpose: judging against no criteria, or against the literal string
+  // "undefined", would produce a verdict with nothing behind it. But a
+  // throw here is a 500 at a reader who did nothing wrong, so the route
+  // asks first and refuses the way it refuses the kill switch.
+  //
+  // Before the topic lookup, the daily cap and any insert: this is not the
+  // reader's doing and must not cost them a cap slot or leave a row.
+  if (!hasFidelityCriteria(profile.school as SchoolId)) {
+    return paused("no_criteria");
   }
 
   const { data: topic } = await admin

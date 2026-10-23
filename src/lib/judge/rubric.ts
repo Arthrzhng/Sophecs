@@ -89,6 +89,18 @@ export const FIDELITY_CRITERIA: Record<SchoolId, string> = new Proxy(
   }
 );
 
+/**
+ * Whether this school has fidelity criteria, asked without reading them.
+ *
+ * Reading `FIDELITY_CRITERIA[school]` for a school that has none throws,
+ * which is right at the point of use and wrong as a way to find out. The
+ * route asks this first so it can refuse the submission cleanly instead of
+ * failing.
+ */
+export function hasFidelityCriteria(id: SchoolId): boolean {
+  return CRITERIA_BY_SCHOOL[id] !== undefined;
+}
+
 /** The schools that can be judged: published, and with criteria written. */
 export function judgeableSchools(): SchoolId[] {
   return PUBLISHED_SCHOOL_IDS.filter((id) => CRITERIA_BY_SCHOOL[id] !== undefined);

@@ -77,6 +77,14 @@ const PAUSE_COPY: Record<string, { title: string; body: string }> = {
     title: "This argument has already been revised.",
     body: "One revision per argument. The objection the judge left standing is worth carrying into your next motion instead.",
   },
+  // Not "send it again once judging resumes", which the generic fallback
+  // says and which would be a lie: nothing about waiting fixes this. The
+  // school has no marking criteria yet, so there is nothing to mark
+  // against, and that is ours to finish rather than theirs to retry.
+  no_criteria: {
+    title: "This school cannot be marked yet.",
+    body: "Your school is in the product but the marking criteria for it are still being written, so there is nothing to judge your argument against. Your draft stays in this browser. Take a motion as another school, or come back once the criteria are in.",
+  },
 };
 
 function pauseCopy(reason: string) {
