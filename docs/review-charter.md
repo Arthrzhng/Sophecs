@@ -170,9 +170,16 @@ writer is unsure of is listed for Arthur rather than asserted, in the file
 it would have gone into.
 
 A reviewer checks that the list exists and that nothing in the body is a
-claim that should have been on it. Today it is the numbered list at the foot
-of `content/prompts/fidelity-criteria.draft.md`, and a new criteria file
-carries its own.
+claim that should have been on it.
+
+Where to look: the numbered list at the foot of
+`content/prompts/fidelity-criteria.draft.md`. **It is not on `main`** — it
+arrives with the revised criteria on the unmerged branch
+`docs/phase2-fixtures`, and on `main` that file has no list at all, because
+the amendment that requires one is newer than the file. A re-review caught
+this sentence claiming otherwise, which is the same defect as the three
+above: the charter describing the branch it was written alongside as though
+it were the repository.
 
 ## 6. Claims in reports are verified, not asserted
 
@@ -263,10 +270,11 @@ because it reports success.
   `{{RUBRIC}}` twice, once in its own header comment and once as the real
   placeholder, and the whole file is sent to the model, so pointing the
   judge at v3 asks the model to score against a template. On `main` there
-  is no guard. A `fillOnce` that throws on a second occurrence exists on
-  the unmerged branch `docs/phase2-fixtures`; `src/lib/anthropic.ts` is
-  frozen, so landing it is Arthur's call, and until it lands this is a live
-  hazard for anything that runs a non-default prompt version.
+  is no guard. `fillPlaceholders` in `src/lib/judge/fill-placeholder.ts`
+  throws on a second occurrence and exists on the unmerged branch
+  `docs/phase2-fixtures`; `src/lib/anthropic.ts` is frozen, so landing it
+  is Arthur's call, and until it lands this is a live hazard for anything
+  that runs a non-default prompt version.
 - A source guard matched school ids quoted inside comments
   (`withoutComments` in `tests/school-registry-guard.test.ts`, which has its
   own regression test for a school id inside a comment). A different guard
