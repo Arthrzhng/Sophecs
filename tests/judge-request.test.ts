@@ -47,8 +47,18 @@ vi.mock("@anthropic-ai/sdk", () => {
   return { default: MockAnthropic };
 });
 
-const { callJudgeModel } = await import("../src/lib/anthropic");
+// judgeDebate logs every call, and the point of exercising it here is to
+// prove production cannot reach a non-default prompt. The ledger write is
+// not the subject, so it is stubbed rather than reached.
+vi.mock("@/lib/supabase/admin", () => ({
+  createAdminClient: () => ({
+    from: () => ({ insert: async () => ({ error: null }) }),
+  }),
+}));
+
+const { callJudgeModel, judgeDebate, PROMPT_VERSION } = await import("../src/lib/anthropic");
 const { motionForDebate } = await import("../src/lib/motion-text");
+const { PUBLISHED_SCHOOL_IDS } = await import("../src/lib/school-registry");
 
 // The three schools with rows in production. Written out rather than read
 // from the registry on purpose: if the registry ever stopped listing one
@@ -168,4 +178,105 @@ describe("2D: the motion the route now passes", () => {
     expect(REWORDED_TO).not.toBe(MOTION);
     expect(motionForDebate(null, REWORDED_TO)).toBe(REWORDED_TO);
   });
+});
+
+describe("the prompt version override", () => {
+  // Added so the golden set can measure a draft prompt before it becomes
+  // the default. The whole value of it depends on production being unable
+  // to reach one, which is what the first two tests here are for.
+  function systemOf(params: Record<string, unknown>): string {
+    return String(params.system);
+  }
+
+  it("defaults to the production version, byte for byte", async () => {
+    expect(PROMPT_VERSION).toBe("v2");
+    for (const school of LIVE_IN_PRODUCTION) {
+      created.length = 0;
+      await callJudgeModel(MOTION, school, ARGUMENT, undefined, PROMPT_VERSION);
+      expect(created).toHaveLength(1);
+      // The same fixture the no-argument call is compared against above,
+      // so passing the default explicitly and passing nothing are the
+      // same request.
+      compare(school, created[0]);
+    }
+  });
+
+  it("is not reachable through judgeDebate, which is what production calls", async () => {
+    for (const school of LIVE_IN_PRODUCTION) {
+      created.length = 0;
+      await judgeDebate({
+        motion: MOTION,
+        school,
+        argument: ARGUMENT,
+        userId: "fixture-user",
+        debateId: "fixture-debate",
+      });
+      expect(created).toHaveLength(1);
+      compare(school, created[0]);
+    }
+  });
+
+  it("sends a different prompt for v3, with the rival schools substituted", async () => {
+    created.length = 0;
+    await callJudgeModel(MOTION, "stoicism", ARGUMENT);
+    const v2System = systemOf(created[0]);
+
+    created.length = 0;
+    await callJudgeModel(MOTION, "stoicism", ARGUMENT, undefined, "v3");
+    expect(created).toHaveLength(1);
+    const v3System = systemOf(created[0]);
+
+    expect(v3System).not.toBe(v2System);
+    // No placeholder survives into the request, in either direction: v3's
+    // is filled, and v2 never had one to leave behind.
+    expect(v3System).not.toContain("{{RIVAL_SCHOOLS}}");
+    expect(v3System).not.toContain("{{RUBRIC}}");
+    expect(v2System).not.toContain("{{RIVAL_SCHOOLS}}");
+
+    // The list the model is offered is the list zod will accept.
+    for (const id of PUBLISHED_SCHOOL_IDS) expect(v3System).toContain(`- \`${id}\``);
+  });
+
+  it("refuses to carry a school's criteria into another school's prompt", async () => {
+    const systems: string[] = [];
+    for (const school of LIVE_IN_PRODUCTION) {
+      created.length = 0;
+      await callJudgeModel(MOTION, school, ARGUMENT, undefined, "v3");
+      systems.push(systemOf(created[0]));
+    }
+    expect(new Set(systems).size).toBe(LIVE_IN_PRODUCTION.length);
+  });
+});
+
+describe("every judge prompt file", () => {
+  // The invariant `fillOnce` enforces at call time, checked here at the
+  // file level so it fails on the prompt rather than on a run.
+  //
+  // This is the test that would have caught judge.v3.md naming both of its
+  // placeholders in its own header comment: the comment is sent to the
+  // model with the rest of the file, and filling a placeholder by name
+  // filled the mention instead of the placeholder.
+  const dir = path.join(process.cwd(), "content", "prompts");
+  const versions = fs
+    .readdirSync(dir)
+    .filter((f) => /^judge\.v\d+\.md$/.test(f))
+    .sort();
+
+  it("exists", () => {
+    expect(versions.length).toBeGreaterThanOrEqual(3);
+  });
+
+  for (const file of versions) {
+    it(`${file} names each placeholder at most once`, () => {
+      const text = fs.readFileSync(path.join(dir, file), "utf-8");
+      const placeholders = [...text.matchAll(/\{\{[A-Z_]+\}\}/g)].map((m) => m[0]);
+      const counts = new Map<string, number>();
+      for (const name of placeholders) counts.set(name, (counts.get(name) ?? 0) + 1);
+      expect(Object.fromEntries(counts)).toEqual(
+        Object.fromEntries([...counts.keys()].map((k) => [k, 1]))
+      );
+      // And the rubric is in every version, since fillOnce requires it.
+      expect(counts.get("{{RUBRIC}}")).toBe(1);
+    });
+  }
 });

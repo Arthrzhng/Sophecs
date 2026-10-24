@@ -89,13 +89,32 @@ describe("judge.v3.md", () => {
   const v3body = bodyOf(v3);
 
   it("is not the production default", () => {
-    // Arthur's rule for this phase. Switching it also needs criteria for
-    // whatever is being published and a second substitution in the frozen
-    // anthropic.ts, so this is a deliberate step and not a side effect.
+    // Arthur's rule for this phase. Switching it still needs criteria for
+    // whatever is being published, so it stays a deliberate step.
+    //
+    // This used to also assert that anthropic.ts contained no
+    // RIVAL_SCHOOLS substitution, as the thing standing between v3 and
+    // production. Arthur approved that substitution on 2026-10-24, so it
+    // exists, and what keeps production on v2 is now the version argument
+    // itself: `callJudgeModel` defaults to PROMPT_VERSION and neither
+    // /api/judge nor judgeDebate passes one. Asserted here by reading the
+    // route and the wrapper, and behaviourally in
+    // tests/judge-request.test.ts, which compares what judgeDebate sends
+    // against the six committed v2 fixtures.
     expect(PROMPT_VERSION).toBe("v2");
-    expect(read(path.join(process.cwd(), "src", "lib", "anthropic.ts"))).not.toContain(
-      "RIVAL_SCHOOLS"
+
+    const route = read(path.join(process.cwd(), "src", "app", "api", "judge", "route.ts"));
+    expect(route).not.toContain("v3");
+    expect(route).not.toContain("promptVersion");
+
+    const anthropic = read(path.join(process.cwd(), "src", "lib", "anthropic.ts"));
+    // judgeDebate is the only thing the route calls, and it forwards four
+    // arguments. A fifth would be a prompt version reaching production.
+    const judgeDebateBody = anthropic.slice(anthropic.indexOf("export async function judgeDebate"));
+    expect(judgeDebateBody).toContain(
+      "await callJudgeModel(\n      params.motion,\n      params.school,\n      params.argument,\n      params.revisionOf\n    )"
     );
+    expect(judgeDebateBody).not.toContain("v3");
   });
 
   it("still interpolates the fidelity criteria the same way", () => {
@@ -133,6 +152,16 @@ describe("judge.v3.md", () => {
     expect(v3body).toContain("RIVAL_SCHOOL");
   });
 
+  it("only calls a source fabricated when the judge is confident", () => {
+    // Without this the fabrication rule falls hardest on the schools whose
+    // sources a model is least able to place, which is the three being
+    // added.
+    expect(v3body).toContain("Call a source fabricated only when you are confident");
+    expect(v3body).toContain("Treat it as unverified: do not lower any score for it");
+    expect(v3body).toContain("obscure, the\nrecent, the regional and the non-Western");
+    expect(v2, "v2 has no such rule, which is why v3 needs one").not.toContain("unverified");
+  });
+
   it("no longer counts the schools", () => {
     // v2 says the objection comes from "one of the two schools the argument
     // was not assigned", which is true of three schools and nothing else.
@@ -160,7 +189,16 @@ describe("judge.v3.md", () => {
   it("says in the file why it exists and that it is a draft", () => {
     const header = v3.slice(0, v3.indexOf("-->"));
     expect(header).toContain("not the production default");
-    expect(header).toContain("RIVAL_SCHOOLS");
+    expect(header).toContain("rival-schools substitution");
+
+    // And it must NOT write either placeholder out in full. The whole file
+    // is sent to the model, comment included, and anthropic.ts fills a
+    // placeholder by name: a header that named one would have the mention
+    // filled and the real placeholder left standing in the prompt. That is
+    // exactly what happened when the substitution was first added. See
+    // tests/judge-request.test.ts, which checks every version.
+    expect(header).not.toContain("{{RUBRIC}}");
+    expect(header).not.toContain("{{RIVAL_SCHOOLS}}");
   });
 });
 

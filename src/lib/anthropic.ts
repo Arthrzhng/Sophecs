@@ -4,8 +4,14 @@ import { join } from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { newId } from "@/lib/ids";
-import { VerdictSchema, PROMPT_VERSION, type ModelVerdict } from "@/lib/judge/schema";
+import {
+  VerdictSchema,
+  PROMPT_VERSION,
+  type ModelVerdict,
+  type PromptVersion,
+} from "@/lib/judge/schema";
 import { FIDELITY_CRITERIA } from "@/lib/judge/rubric";
+import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
 import type { SchoolId } from "@/lib/types";
 
 // COST: model=claude-sonnet-5 | trigger=debate submission | est_in=1700 est_out=650
@@ -20,11 +26,82 @@ function getClient(): Anthropic {
   return client;
 }
 
-// Read once at module scope, not per call.
-const promptTemplate = readFileSync(
-  join(process.cwd(), `content/prompts/judge.${PROMPT_VERSION}.md`),
-  "utf-8"
-);
+/**
+ * The prompt versions a call can run against.
+ *
+ * Deliberately not `PromptVersion` from judge/schema.ts: that type is every
+ * version a verdict has ever been *stored* under, and v3 has never been
+ * stored. This is every version that has a file to read.
+ */
+export type RunnablePromptVersion = PromptVersion | "v3";
+
+// Read once per version, not per call. The default is still read at module
+// scope, so production's path is exactly what it was; any other version is
+// read on first use and cached beside it. Only tests/judge/run-golden.ts
+// ever asks for another, and only so a prompt can be measured before it
+// becomes the default — see the golden-set discipline in CONTRIBUTING.md.
+const promptTemplates = new Map<string, string>([
+  [
+    PROMPT_VERSION,
+    readFileSync(join(process.cwd(), `content/prompts/judge.${PROMPT_VERSION}.md`), "utf-8"),
+  ],
+]);
+
+function promptTemplateFor(version: RunnablePromptVersion): string {
+  const cached = promptTemplates.get(version);
+  if (cached !== undefined) return cached;
+  const template = readFileSync(
+    join(process.cwd(), `content/prompts/judge.${version}.md`),
+    "utf-8"
+  );
+  promptTemplates.set(version, template);
+  return template;
+}
+
+// The schools an `unanswered_objection` may name, for v3's
+// `{{RIVAL_SCHOOLS}}`. Built from the same list the verdict schema's enum
+// is built from, so the prompt cannot offer the model a school zod would
+// then reject.
+//
+// v2 contains no such placeholder, so this substitution is a no-op there
+// and the v2 request stays byte for byte what it was. That is pinned by
+// the six fixtures in tests/judge-request.test.ts, which is the test the
+// brief cares about most while judging is live.
+const RIVAL_SCHOOLS_BLOCK = PUBLISHED_SCHOOL_IDS.map((id) => `- \`${id}\``).join("\n");
+
+/**
+ * Fill a placeholder that must appear at most once in the prompt.
+ *
+ * `String.prototype.replace` with a string pattern fills the FIRST
+ * occurrence and says nothing about the rest, and a prompt file is sent to
+ * the model whole, header comment included. judge.v3.md named both of its
+ * placeholders in that comment before using them, so the naive call filled
+ * the mention in the comment and left the real placeholder standing: the
+ * model would have been asked to score against a rubric that was still a
+ * template, and nothing would have said so.
+ *
+ * Throwing is the fix rather than `replaceAll`, which would send the
+ * criteria twice. Caught by tests/judge-request.test.ts, which is also
+ * what stops it coming back.
+ */
+function fillOnce(
+  template: string,
+  placeholder: string,
+  value: string,
+  required: boolean
+): string {
+  const occurrences = template.split(placeholder).length - 1;
+  if (occurrences > 1) {
+    throw new Error(
+      `judge prompt names ${placeholder} ${occurrences} times; it must appear at most once`
+    );
+  }
+  if (occurrences === 0) {
+    if (required) throw new Error(`judge prompt is missing ${placeholder}`);
+    return template;
+  }
+  return template.replace(placeholder, value);
+}
 
 // Carries cost/latency even on failure — the tokens were still billed by
 // Anthropic even if the response didn't parse, and "every call is logged,
@@ -58,9 +135,19 @@ export async function callJudgeModel(
   motion: string,
   school: SchoolId,
   argument: string,
-  revisionOf?: RevisionContext
+  revisionOf?: RevisionContext,
+  // Production never passes this. `/api/judge` and `judgeDebate` leave it
+  // alone, so the only version they can reach is `PROMPT_VERSION`.
+  promptVersion: RunnablePromptVersion = PROMPT_VERSION
 ): Promise<JudgeCallResult> {
-  const system = promptTemplate.replace("{{RUBRIC}}", FIDELITY_CRITERIA[school]);
+  // {{RUBRIC}} is in every version. {{RIVAL_SCHOOLS}} is v3 and later, so
+  // it is optional and its absence leaves v2 byte for byte what it was.
+  const system = fillOnce(
+    fillOnce(promptTemplateFor(promptVersion), "{{RUBRIC}}", FIDELITY_CRITERIA[school], true),
+    "{{RIVAL_SCHOOLS}}",
+    RIVAL_SCHOOLS_BLOCK,
+    false
+  );
   // The v2 prompt keys its revision instructions off the presence of these
   // two tags, so they are only emitted for an actual revision.
   const revisionBlock = revisionOf
