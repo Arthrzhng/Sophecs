@@ -11,6 +11,7 @@ import {
   type PromptVersion,
 } from "@/lib/judge/schema";
 import { FIDELITY_CRITERIA } from "@/lib/judge/rubric";
+import { fillPlaceholders } from "@/lib/judge/fill-placeholder";
 import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
 import type { SchoolId } from "@/lib/types";
 
@@ -69,40 +70,6 @@ function promptTemplateFor(version: RunnablePromptVersion): string {
 // brief cares about most while judging is live.
 const RIVAL_SCHOOLS_BLOCK = PUBLISHED_SCHOOL_IDS.map((id) => `- \`${id}\``).join("\n");
 
-/**
- * Fill a placeholder that must appear at most once in the prompt.
- *
- * `String.prototype.replace` with a string pattern fills the FIRST
- * occurrence and says nothing about the rest, and a prompt file is sent to
- * the model whole, header comment included. judge.v3.md named both of its
- * placeholders in that comment before using them, so the naive call filled
- * the mention in the comment and left the real placeholder standing: the
- * model would have been asked to score against a rubric that was still a
- * template, and nothing would have said so.
- *
- * Throwing is the fix rather than `replaceAll`, which would send the
- * criteria twice. Caught by tests/judge-request.test.ts, which is also
- * what stops it coming back.
- */
-function fillOnce(
-  template: string,
-  placeholder: string,
-  value: string,
-  required: boolean
-): string {
-  const occurrences = template.split(placeholder).length - 1;
-  if (occurrences > 1) {
-    throw new Error(
-      `judge prompt names ${placeholder} ${occurrences} times; it must appear at most once`
-    );
-  }
-  if (occurrences === 0) {
-    if (required) throw new Error(`judge prompt is missing ${placeholder}`);
-    return template;
-  }
-  return template.replace(placeholder, value);
-}
-
 // Carries cost/latency even on failure — the tokens were still billed by
 // Anthropic even if the response didn't parse, and "every call is logged,
 // no exceptions" (see judgeDebate below) means this must be logged too.
@@ -122,10 +89,12 @@ export interface JudgeCallResult {
   costUsd: number;
 }
 
-// The only two call sites for the Anthropic API in this repo: /api/judge
-// (via judgeDebate below) and tests/judge/run-golden.ts, which calls this
-// function directly rather than going through HTTP — see the Phase 2
-// checklist's `grep -rn "anthropic"` requirement.
+// Three call sites for the Anthropic API in this repo, not two as this
+// comment said: /api/judge (via judgeDebate below), tests/judge/run-golden.ts,
+// which calls this function directly rather than going through HTTP, and
+// src/lib/screen.ts, which screens counterpart replies on a different
+// model — see the Phase 2 checklist's `grep -rn "anthropic"` requirement,
+// which is what found the third.
 export interface RevisionContext {
   originalArgument: string;
   objectionClaim: string;
@@ -141,13 +110,13 @@ export async function callJudgeModel(
   promptVersion: RunnablePromptVersion = PROMPT_VERSION
 ): Promise<JudgeCallResult> {
   // {{RUBRIC}} is in every version. {{RIVAL_SCHOOLS}} is v3 and later, so
-  // it is optional and its absence leaves v2 byte for byte what it was.
-  const system = fillOnce(
-    fillOnce(promptTemplateFor(promptVersion), "{{RUBRIC}}", FIDELITY_CRITERIA[school], true),
-    "{{RIVAL_SCHOOLS}}",
-    RIVAL_SCHOOLS_BLOCK,
-    false
-  );
+  // it is optional, and its absence leaves v2 byte for byte what it was.
+  // Both are filled in one pass over the raw template: see
+  // src/lib/judge/fill-placeholder.ts for the three defects that shape.
+  const system = fillPlaceholders(promptTemplateFor(promptVersion), {
+    "{{RUBRIC}}": { value: FIDELITY_CRITERIA[school], required: true },
+    "{{RIVAL_SCHOOLS}}": { value: RIVAL_SCHOOLS_BLOCK, required: false },
+  });
   // The v2 prompt keys its revision instructions off the presence of these
   // two tags, so they are only emitted for an actual revision.
   const revisionBlock = revisionOf

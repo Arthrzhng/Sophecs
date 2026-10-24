@@ -77,7 +77,13 @@ consecutive single-sample runs against a band of 8 to 10. That is already
 recorded in `docs/decisions.md` and is not revisited here.
 
 `src/lib/anthropic.ts` carries `est_usd_per_call=0.0098` for
-`est_in=1700 est_out=650` at $2/M in and $10/M out.
+`est_in=1700 est_out=650` at $2/M in and $10/M out. Its own figures give
+1700 x $2/M + 650 x $10/M = $0.0034 + $0.0065 = **$0.0099**, so the
+recorded per-call estimate is a hundredth of a cent low and the whole run
+is nearer $1.10 than $1.09. The table below uses the recorded 0.0098,
+because that is the number the repository states; the arithmetic is noted
+here rather than silently corrected, since the constant lives in a frozen
+file. A reviewer found this.
 
 | Run | Cases | Samples | Calls | Approximate cost |
 |---|---|---|---|---|
@@ -85,7 +91,7 @@ recorded in `docs/decisions.md` and is not revisited here.
 | Tier A under v3 | 14 | 3 | 42 | $0.41 |
 | **Tier A total** | | | **84** | **$0.82** |
 | Tier B under v3, after approval | 9 | 3 | 27 | $0.26 |
-| **Everything** | | | **111** | **$1.08** |
+| **Everything** | | | **111** | **$1.09** |
 
 Against `AI_MONTHLY_BUDGET_USD`, which is $50 and production-only. A
 single-sample pass with `GOLDEN_SAMPLES=1` is a third of the calls: $0.14

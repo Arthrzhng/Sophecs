@@ -21,8 +21,15 @@ listed at the bottom instead of being asserted in the criteria.
 Structure and length follow the three in rubric.ts: a paragraph on what the
 school's reasoning commits to, then a paragraph naming the ways an argument
 fails fidelity, including the bleeds from rival schools. The existing three
-run 729 to 892 characters and 114 to 142 words, in two paragraphs; these
-run 838 to 887 and 133 to 137.
+run 730 to 893 characters and 114 to 142 words, in two paragraphs; these
+run 839 to 888 and 133 to 137.
+
+Those are `.length` of the stored string, which is what
+tests/judge-v3-and-refusal.test.ts asserts. An earlier revision of this
+file said 729 to 892 and 838 to 887, having measured a copy with its
+whitespace flattened: each criterion's one blank line turned two
+characters into one, so every bound came out one low. All three still sit
+inside the band either way.
 
 The axes and the scale are untouched. Three criteria scored out of ten
 each, one composite out of a hundred.

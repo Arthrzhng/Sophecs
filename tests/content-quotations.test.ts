@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, it, expect } from "vitest";
 import {
   cueSentences,
+  quotedSpans,
   normalise,
   quoteProblems,
   applyExceptions,
@@ -94,6 +95,23 @@ describe("non-Western content quotations", () => {
     const body = searchableContent(read(file), declared);
     const unaccounted = cueSentences(body).filter(
       (sentence) => !covered.some((c) => sentence.includes(c))
+    );
+    expect(unaccounted).toEqual([]);
+  });
+
+  it.each(files)("%s declares every span it puts in quotation marks", (file) => {
+    // The half cueSentences cannot see. Five verbatim spans of the
+    // research file sat undeclared in the draft criteria file because
+    // their reporting cues were not on the fixed cue list.
+    const declared = DECLARED[file];
+    const covered = [
+      ...declared.quotes.map(expected),
+      ...declared.quotes.map((q) => normalise(q.source)),
+      ...(declared.paraphrases ?? []).map((p) => normalise(p.text)),
+    ];
+    const body = searchableContent(read(file), declared);
+    const unaccounted = quotedSpans(body).filter(
+      (span) => !covered.some((c) => c.includes(span) || span.includes(c))
     );
     expect(unaccounted).toEqual([]);
   });

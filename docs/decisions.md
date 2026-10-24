@@ -1028,7 +1028,11 @@ What keeps production on v2 is the default: the parameter defaults to
 That is asserted twice. `tests/judge-v3-and-refusal.test.ts` reads the
 route and `judgeDebate` and checks neither names a version;
 `tests/judge-request.test.ts` calls `judgeDebate` and compares what it
-sends against the same six committed v2 fixtures. Those six are unchanged
+sends against the same six committed v2 fixtures, for an original and for
+a revision. It covered only originals when first written, which reached
+three of the six: dropping `params.revisionOf` from the forwarded call
+would have left every assertion green while production revisions lost
+their objection block. Those six are unchanged
 in this branch's diff, which is the test Arthur cares about most while
 judging is live.
 
@@ -1053,7 +1057,10 @@ Three changes, rather than the one that would have been enough:
   there is nothing for the guard to catch.
 - `tests/judge-request.test.ts` checks the invariant at the file level, for
   every `judge.v*.md`. Confirmed by re-introducing the duplicate and
-  watching three tests fail.
+  watching four tests fail. Three were the point; the fourth was a test
+  of something else that died on the unexpected exception, which is worth
+  knowing because an exception escaping into an unrelated test is how a
+  guard's blast radius gets misread.
 
 ### 2F: four bands, not two, and an unconstrained one
 

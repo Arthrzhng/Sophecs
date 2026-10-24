@@ -180,3 +180,33 @@ export function cueSentences(body: string): string[] {
     .split(/(?<=\.)\s+/)
     .filter((sentence) => CUES.some((cue) => sentence.includes(cue)));
 }
+
+/**
+ * Spans the content itself puts in quotation marks.
+ *
+ * `CUES` above is seven fixed phrases, which is why five verbatim spans of
+ * the research file sat undeclared in a content file until a reviewer read
+ * it by hand: the cues they actually used ("is that", "reads", "prints",
+ * "guidance says") were not on the list, and a fixed list never will be
+ * complete. Quotation marks are not a complete signal either, but they are
+ * an unambiguous one, and they cost nothing to check.
+ *
+ * The house style for the school pages is no quotation marks at all, so
+ * this finds nothing in them and everything in a file that quotes openly.
+ */
+export function quotedSpans(body: string, minimumLength = 12): string[] {
+  const text = normalise(body);
+  const spans: string[] = [];
+  for (const match of text.matchAll(/"([^"]+)"/g)) {
+    const span = match[1].trim();
+    if (span.length < minimumLength) continue;
+    // Skip a YAML scalar: in `section: "I.6.38, printed p. 100"` the quote
+    // marks are syntax, not quotation. Front matter carries citations in
+    // exactly that shape, and reporting them as undeclared quotations is a
+    // false finding, which is its own kind of broken guard.
+    const before = text.slice(0, match.index);
+    if (/[A-Za-z_][\w-]*:\s*$/.test(before)) continue;
+    spans.push(span);
+  }
+  return spans;
+}

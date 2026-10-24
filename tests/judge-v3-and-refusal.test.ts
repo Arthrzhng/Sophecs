@@ -107,14 +107,21 @@ describe("judge.v3.md", () => {
     expect(route).not.toContain("v3");
     expect(route).not.toContain("promptVersion");
 
-    const anthropic = read(path.join(process.cwd(), "src", "lib", "anthropic.ts"));
-    // judgeDebate is the only thing the route calls, and it forwards four
-    // arguments. A fifth would be a prompt version reaching production.
-    const judgeDebateBody = anthropic.slice(anthropic.indexOf("export async function judgeDebate"));
-    expect(judgeDebateBody).toContain(
-      "await callJudgeModel(\n      params.motion,\n      params.school,\n      params.argument,\n      params.revisionOf\n    )"
-    );
-    expect(judgeDebateBody).not.toContain("v3");
+    // What this does NOT do any more: match the literal source of
+    // judgeDebate's call to callJudgeModel. A reviewer broke that
+    // assertion with a behaviour-preserving reformat of the call and
+    // watched it fail while every behavioural test, all six fixture
+    // comparisons included, stayed green. An assertion that fails on a
+    // reformat and cannot fail on a changed verdict is the shape that gets
+    // deleted rather than understood.
+    //
+    // The behavioural proof lives in tests/judge-request.test.ts: it
+    // drives judgeDebate itself, for originals and revisions, and compares
+    // what reaches the SDK against the six committed fixtures. It also
+    // proves that comparison discriminates, by showing a v3 request does
+    // not match them.
+    // No assertion about judgeDebate's source here on purpose. A filler
+    // one that cannot fail would be worse than none.
   });
 
   it("still interpolates the fidelity criteria the same way", () => {

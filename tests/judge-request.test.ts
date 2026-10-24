@@ -201,7 +201,21 @@ describe("the prompt version override", () => {
     }
   });
 
-  it("is not reachable through judgeDebate, which is what production calls", async () => {
+  it("has a defaulted fifth parameter, so a four-argument call is v2", () => {
+    // Function.length counts parameters before the first default, so 4
+    // here means promptVersion is defaulted and judgeDebate's
+    // four-argument call cannot be passing one. tsc covers the other half:
+    // judgeDebate's parameter object has no promptVersion key.
+    expect(callJudgeModel.length).toBe(4);
+  });
+
+  it("is not reachable through judgeDebate, for an original or a revision", async () => {
+    // Both paths, because /api/judge passes revisionOf and the earlier
+    // version of this test only covered originals: dropping
+    // params.revisionOf from the forwarded call would have left every
+    // assertion green while production revisions silently lost their
+    // <original_argument> and <objection> block. That is a changed live
+    // verdict, which is the one thing this phase cannot do.
     for (const school of LIVE_IN_PRODUCTION) {
       created.length = 0;
       await judgeDebate({
@@ -213,7 +227,31 @@ describe("the prompt version override", () => {
       });
       expect(created).toHaveLength(1);
       compare(school, created[0]);
+
+      created.length = 0;
+      await judgeDebate({
+        motion: MOTION,
+        school,
+        argument: ARGUMENT,
+        userId: "fixture-user",
+        debateId: "fixture-debate",
+        revisionOf: REVISION,
+      });
+      expect(created).toHaveLength(1);
+      compare(`${school}.revision`, created[0]);
     }
+  });
+
+  it("would fail that comparison for a non-default version", async () => {
+    // Without this, the green above could mean the fixtures match
+    // everything. It has to be possible for them not to match.
+    created.length = 0;
+    await callJudgeModel(MOTION, "stoicism", ARGUMENT, undefined, "v3");
+    const v3 = created[0];
+    const fixture = JSON.parse(
+      fs.readFileSync(path.join(DIR, "stoicism.json"), "utf-8")
+    ) as Record<string, unknown>;
+    expect(v3.system).not.toBe(fixture.system);
   });
 
   it("sends a different prompt for v3, with the rival schools substituted", async () => {

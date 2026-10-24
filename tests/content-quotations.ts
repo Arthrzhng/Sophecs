@@ -47,6 +47,35 @@ export const DECLARED: Record<string, FileQuotes> = {
         exceptions: [{ kind: "lowercase-first" }, { kind: "drop-full-stop" }],
         note: "the Ubuntu criteria, which run the maxim on after a colon",
       },
+      // The five below were found undeclared by a reviewer, which is the
+      // whole point of a manifest: the file claims to be checkable and was
+      // not, for these. All five are verbatim; none was fabricated. The
+      // first is the one that matters, because it is in the criteria the
+      // judge would read rather than in the notes underneath them.
+      {
+        source:
+          "Right action honours capacities for relationships of shared identity and solidarity",
+        exceptions: [{ kind: "lowercase-first" }],
+        note: "the Ubuntu criteria, which run Metz's principle on after \"is that\"",
+      },
+      {
+        source:
+          "Right action honours capacities for relationships of shared identity and solidarity",
+        note: "the disclosure list, quoting the research row it took the wording from",
+      },
+      {
+        source:
+          "cultivated qualities such as humaneness, justice, honesty and practical wisdom",
+        note: "the disclosure list, on ren and li being absent from the research file",
+      },
+      {
+        source: "lead to harm and suffering",
+        note: "the disclosure list, on dukkha as suffering",
+      },
+      {
+        source: "reducing suffering",
+        note: "the disclosure list, quoting the research file's own caution",
+      },
     ],
   },
 

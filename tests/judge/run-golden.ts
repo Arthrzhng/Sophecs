@@ -11,10 +11,14 @@
 // Node's --env-file, because an eval box holds the key as an environment
 // secret and a file that is not there made the command fail before it
 // could say what was missing. SUPABASE_SERVICE_ROLE_KEY is only needed
-// under GOLDEN_LOG=ai_calls. This is one of exactly two call sites for the
-// Anthropic API in this repo — the other is /api/judge.
+// under GOLDEN_LOG=ai_calls. One of three call sites for the Anthropic API
+// in this repo: the others are /api/judge, through judgeDebate, and
+// src/lib/screen.ts, which screens counterpart replies on
+// claude-haiku-4-5. Two comments in this repository said two, including
+// this one.
 import fs from "node:fs";
 import path from "node:path";
+import { z } from "zod";
 import {
   callJudgeModel,
   logAiCall,
@@ -105,12 +109,49 @@ interface Sample {
   objectionSchool: SchoolId;
 }
 
+// A band is two numbers, low then high.
+const Band = z.tuple([z.number(), z.number()]).refine(([lo, hi]) => lo <= hi, {
+  message: "band's low bound is above its high bound",
+});
+
+// `strict()` is the point of this, not the types. An absent band now means
+// "unconstrained", so a misspelled key would silently switch an axis off
+// rather than fail: `expected_rigour_band` is a live risk in a repository
+// that writes `normalise`, `behaviour` and `colourToken` everywhere else,
+// and `fabricated-source` exists precisely to pin rigor. Passing the most
+// important case in the set vacuously, after paying for three samples of
+// it, is the failure this prevents.
+const GoldenCaseSchema = z
+  .object({
+    name: z.string().min(1),
+    motion: z.string().min(1),
+    school: z.string().min(1),
+    argument: z.string().min(1),
+    expected_score_band: Band,
+    expected_fidelity_band: Band.optional(),
+    expected_rigor_band: Band.optional(),
+    expected_engagement_band: Band.optional(),
+    expected_objection_school: z.array(z.string().min(1)).min(1),
+  })
+  .strict();
+
 function loadCases(): GoldenCase[] {
   const dir = path.join(process.cwd(), "tests", "judge", "golden");
   return fs
     .readdirSync(dir)
     .filter((f) => f.endsWith(".json"))
-    .map((f) => JSON.parse(fs.readFileSync(path.join(dir, f), "utf-8")) as GoldenCase);
+    .map((f) => {
+      const parsed = GoldenCaseSchema.safeParse(
+        JSON.parse(fs.readFileSync(path.join(dir, f), "utf-8"))
+      );
+      if (!parsed.success) {
+        const detail = parsed.error.issues
+          .map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`)
+          .join("; ");
+        throw new Error(`golden fixture ${f} is malformed: ${detail}`);
+      }
+      return parsed.data as GoldenCase;
+    });
 }
 
 // An absent band is unconstrained: the axis is still measured and still
@@ -156,6 +197,12 @@ async function logCall(
     await logAiCall({ userId: null, debateId: null, kind: "golden", costUsd, latencyMs });
     return;
   }
+  // Unreachable at runtime: `run` is non-null exactly when LOG_TO ===
+  // "file", and the ai_calls branch above has already returned. It stays
+  // because it is what narrows GoldenRun | null to GoldenRun for tsc, and
+  // the alternative is a non-null assertion that would hide a real null if
+  // the two conditions ever drifted apart. A reviewer called it dead code,
+  // which it is, and removing it fails the typecheck.
   if (!run) return;
   record(run, {
     sample,
@@ -187,11 +234,18 @@ async function logCall(
   flush(run);
 }
 
+// Read once. It used to be re-read on every logged call while
+// callJudgeModel used its own module-scope cache, so a prompt edited
+// mid-run would have been fingerprinted against something other than what
+// was sent.
+let promptTextCache: string | null = null;
+
 function promptText(): string {
-  return fs.readFileSync(
+  promptTextCache ??= fs.readFileSync(
     path.join(process.cwd(), "content", "prompts", `judge.${VERSION}.md`),
     "utf-8"
   );
+  return promptTextCache;
 }
 
 async function sampleCase(
@@ -278,10 +332,13 @@ async function main() {
         scorePass: false,
         fidelity: `- (${bandLabel(c.expected_fidelity_band)})`,
         fidelityPass: false,
+        // Not `false`: the case already fails on score and sets anyFail,
+        // and printing a cross against a band of "any" contradicts what an
+        // absent band means.
         rigor: `- (${bandLabel(c.expected_rigor_band)})`,
-        rigorPass: false,
+        rigorPass: true,
         engagement: `- (${bandLabel(c.expected_engagement_band)})`,
-        engagementPass: false,
+        engagementPass: true,
         objection: "-",
         objectionPass: false,
         notes: [`${failures.length}/${SAMPLES} samples failed`, ...new Set(failures)],
