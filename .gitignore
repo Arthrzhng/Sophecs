@@ -9,3 +9,8 @@ build/
 next-env.d.ts
 .DS_Store
 .vercel
+
+# Scratch checkouts for reviewer agents, created by the review loop in
+# CONTRIBUTING.md. Each is a full nested git worktree and is removed when
+# its agent finishes. Project config under .claude/ stays trackable.
+.claude/worktrees/

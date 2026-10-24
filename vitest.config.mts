@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
 
 // The defaults picked the whole suite up fine until a test needed to
@@ -10,6 +10,17 @@ import { fileURLToPath } from "node:url";
 // requires); without it, importing src/lib/anthropic.ts throws at module
 // load, because the real package exists only to throw.
 export default defineConfig({
+  test: {
+    // The reviewer agents in CONTRIBUTING.md's review loop work in git
+    // worktrees under .claude/worktrees/, each a full copy of the
+    // repository on its own branch. Without this the suite globbed into
+    // them and ran three copies of itself at once: 85 files and 1007
+    // tests where this repository has 29 and 327, with failures that were
+    // only two branches disagreeing with each other. A run that reported
+    // green off a stale agent checkout is the same bug with the opposite
+    // sign.
+    exclude: [...configDefaults.exclude, ".claude/**"],
+  },
   // tsconfig sets `jsx: "preserve"`, which is right for Next and leaves
   // vitest unable to parse a component on its own. Vite 8 transforms with
   // Oxc rather than esbuild, so this is where that is overridden, and only
