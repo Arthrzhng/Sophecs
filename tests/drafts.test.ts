@@ -103,3 +103,33 @@ describe("content on disk", () => {
     expect(published.filter((l) => l.position === "after")).toHaveLength(6);
   });
 });
+
+// Added after a reviewer pointed out that dropping `.claude/**` from any
+// of the three tool configs would break nothing in the suite, against the
+// charter's own rule that a guard is proved by breaking it. The configs
+// exist because reviewer agents work in git worktrees under
+// .claude/worktrees/, each a full copy of this repository on its own
+// branch, and all three tools globbed into them.
+describe("the reviewer worktrees stay out of the toolchain", () => {
+  const read = (f: string) => fs.readFileSync(path.join(process.cwd(), f), "utf-8");
+
+  it("vitest excludes them, and keeps its own defaults", () => {
+    const config = read("vitest.config.mts");
+    expect(config).toContain('".claude/**"');
+    // Spread, not replaced: dropping configDefaults would start running
+    // node_modules' own tests instead.
+    expect(config).toContain("...configDefaults.exclude");
+  });
+
+  it("tsc excludes them", () => {
+    expect(JSON.parse(read("tsconfig.json")).exclude).toContain(".claude");
+  });
+
+  it("eslint ignores them", () => {
+    expect(read("eslint.config.mjs")).toContain('".claude/**"');
+  });
+
+  it("git ignores them", () => {
+    expect(read(".gitignore")).toContain(".claude/worktrees/");
+  });
+});

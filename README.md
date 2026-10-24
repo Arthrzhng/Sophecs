@@ -30,18 +30,32 @@ schema, applied in order. `npm run seed:topics` upserts `content/topics/`
 into the `debate_topics` table; the other content directories are read off
 disk at build or request time and need no seed step.
 
-Checks, all of which must pass before a push:
+Checks, all five of which must pass before a push:
 
 ```
-npx tsc --noEmit && npm run lint && npm run test && npm run build
+npx tsc --noEmit && npm run lint && npm run test && npm run build && npm run check:bundle
 ```
 
-## Judging is deliberately paused
+`npm run check:bundle` reads the build and fails if a draft school's id or
+name is in any client chunk. `CONTRIBUTING.md` says why, and
+`docs/review-charter.md` is the standard a step is reviewed against.
 
-`KILL_SWITCH_JUDGE=true` is the default in `.env.example`, and it is on in
-production. Arguments are not sent to the judge while it is on, and the
-debate screens say so. The switch stays on until a batch of real verdicts
-has been reviewed for quality.
+## Judging is live, deliberately
+
+`KILL_SWITCH_JUDGE=true` is still the default in `.env.example`, and while
+it is on no argument is sent to the judge and the debate screens say so.
+Arthur has turned it off in production, having reviewed a batch of real
+verdicts for quality himself. He said so directly, and that instruction is
+the only record: the production value is not in this repository and no
+commit here changed it. `docs/decisions.md` carries the entry.
+
+**Do not change the switch or `JUDGE_ALLOWLIST_USER_IDS`.** Real
+submissions are being scored, so the standing rule is that no production
+verdict may change: any change to what the judge receives needs Arthur's
+yes, and proof that the request is byte-identical for the three live
+schools where a fixture covers it. The six fixtures cover the v2 path for
+those three and nothing else, so unchanged fixtures do not by themselves
+clear this. `docs/review-charter.md` rule 2 says what else counts.
 
 The judge itself is a real model call, not a stub: `src/lib/anthropic.ts`
 sends the prompt in `content/prompts/judge.v2.md` (the active version) to
@@ -59,12 +73,12 @@ score does and does not mean is at `/method`.
   motion, each with one primary source. Read by `src/lib/micro-lessons.ts`.
 - `content/schools/`: the three school pages behind `/s/[school]`.
 - `content/quiz/questions.ts`: the ten diagnostic questions.
-- `content/prompts/`: the judge prompts (`judge.v1.md`, `judge.v2.md`) and
-  the counterpart screening prompt.
-- `content/modules/`: **empty.** Longer teaching units slot in here and
-  `/lessons` grows a Modules section the moment a file lands. The schema is
-  documented in that directory's README. The lessons index is complete
-  without them.
+- `content/prompts/`: the judge prompts (`judge.v1.md`, `judge.v2.md`,
+  and `judge.v3.md`, which is a draft nothing loads) and the counterpart
+  screening prompt.
+- `content/modules/`: six longer teaching units, one per school, plus a
+  README documenting the schema. `/lessons` grows a Modules section from
+  them. It was empty when this section was written.
 - `src/lib/supabase/`: the Supabase clients. There is no fixtures fallback;
   without credentials the backed features degrade as listed above.
 - `src/lib/elo.ts`: Elo, K=32.
@@ -88,4 +102,7 @@ improves anyone's reasoning, and the site makes no such claim. A fourth
 school is a content change rather than a code change: everything is keyed by
 school id.
 
-Contributor rules, including the frozen paths, are in `CONTRIBUTING.md`.
+Contributor rules, including the frozen paths and the review loop, are in
+`CONTRIBUTING.md`. The standard a step of work is reviewed against is
+`docs/review-charter.md`, and the decisions already taken and why are in
+`docs/decisions.md`.

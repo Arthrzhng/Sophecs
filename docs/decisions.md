@@ -1014,3 +1014,32 @@ that view, so the column becomes readable through the Data API. That grants
 no new private data, since the motion is public content and the page it
 feeds has always been public, but it is a deliberate widening rather than
 an incidental one.
+
+### Judging is live, and where that fact is recorded
+
+Arthur turned `KILL_SWITCH_JUDGE` off in production himself, having
+reviewed a batch of real verdicts for quality. He replaced the Phase 2
+rule "the kill switch stays ON" with a different one: **no production
+verdict may change**, and every sub-phase touching the judge path proves
+the exact request is byte-identical for the three live schools, with a
+snapshot test that stays in the suite. He also said not to change the
+switch or the allowlist.
+
+This entry exists because a reviewer went looking for that fact in the
+repository and could not find it. `README.md` described judging as
+deliberately paused for two days after it was not, and when that was
+corrected the correction carried a date, 2026-10-22, that is recorded
+nowhere and that nobody had given. The date was invented to make the
+sentence concrete.
+
+What is true and checkable: `KILL_SWITCH_JUDGE=true` is still the default
+in `.env.example`, the switch still gates the model call in
+`src/app/api/judge/route.ts` and still drives the paused copy on the
+debate, table and today screens. What is not in this repository: the
+production value. No commit here changed it and none can; it is a Vercel
+environment variable. So the only record of the live state is Arthur's own
+instruction, and this entry is it.
+
+The practical consequence for a reviewer: do not try to verify the live
+state from the repository, and do not report it as unverified either.
+Read it here, and treat the (b) stop condition as live.

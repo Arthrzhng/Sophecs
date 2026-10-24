@@ -2,16 +2,81 @@
 
 ## Branching and deploys
 
-**`main` is production. Nothing reaches it except by Arthur's merge.**
+**`main` is production. A merge into it is a deploy.**
 
 - Start every piece of work on a new branch cut from `main`:
   `git fetch origin main && git checkout -b <short-name> origin/main`
 - Push that branch. Vercel builds it as a **preview** deployment, with its
   own URL, and production is untouched.
-- Open a pull request into `main`. Arthur merges it. The merge is what
-  deploys.
+- Open a pull request into `main`. Review it as **The review loop** below
+  says, then merge it yourself and confirm the merge commit against
+  `git ls-remote origin main` and the production deploy as Ready.
 - Never push to `main` directly, and never change the Vercel production
   branch setting.
+
+Until 2026-10-24 Arthur merged every pull request himself. He now merges
+nothing. He **decides** the five things listed below, and every pull
+request is merged by the agent that opened it, including the ones that
+waited on one of those decisions. Everything not on that list you review,
+fix, merge and confirm without asking.
+
+## The review loop
+
+Replaced the old loop on 2026-10-24, to cut round trips. Per step of work:
+
+1. Do the work and get the five gates green.
+2. Push the branch and open the pull request.
+3. **Spawn a fresh reviewer that has not seen the work.** Give it the diff
+   and `docs/review-charter.md`, and ask for findings against the charter.
+   A reviewer that inherits the context of whoever wrote the code is not a
+   reviewer; it agrees.
+4. Fix what it finds. Re-review. Repeat until the findings are either fixed
+   or answered.
+5. Put the findings and the fixes in the pull request body, including the
+   ones you disagreed with and why.
+6. Merge, confirm the SHA, confirm the deploy is Ready.
+
+`docs/review-charter.md` is the standard the review runs against. It grows
+whenever Arthur or a reviewer catches something the charter would have
+missed; adding the rule is part of fixing the finding.
+
+### What still stops for Arthur
+
+Five decisions. They are things he rules on, not pull requests he
+merges: once he has ruled, the merge is still yours. Everything not on this
+list you finish and merge without asking.
+
+- **(a) Production database writes.** Any migration, DDL or write to a
+  production table. Reading is fine.
+- **(b) Changes to what the judge receives.** The system prompt, the
+  fidelity criteria, the motion, the stance, the argument. Judging is live
+  and no production verdict may change, so any of these needs his yes, and
+  the six request fixtures proved byte-identical either side of it.
+  **Unchanged fixtures are not on their own enough.** They cover the v2
+  path for the three live schools, so a change to `judge.v3.md`, to
+  `src/lib/judge/rubric.ts`, or to a draft school's criteria moves no
+  fixture and still changes what the judge receives. This condition holds
+  even when no fixture moves; `docs/review-charter.md` rule 2 has the
+  detail.
+- **(c) Publishing a draft.** A school, a lesson or a motion becoming
+  visible.
+- **(d) Spending money.** Any run that bills an API, and any change to a
+  cost cap, a rate limit, a model or a budget.
+- **(e) Philosophy and content judgements.** School criteria, fixture
+  bands, school text, which tradition says what.
+
+(e) items are **batched into one decision list per phase**, with the file
+each one lives in, rather than raised one at a time. A step whose only
+blocker is an (e) item is finished up to that point, pushed, reviewed, and
+left open with the list.
+
+**The phase briefs in `docs/` predate this.** `docs/phase2-brief.md` and
+`docs/phase3-brief.md` both say to restate each numbered task and wait for a
+yes before starting it, and phase 3 has not begun, so an agent reading its
+brief would stop on every task. Those lines are a record of what Arthur
+asked at the time and are superseded by the five conditions above: the
+briefs are not edited, and the five conditions win. Nothing else in them is
+superseded.
 
 ### Why this file exists
 
