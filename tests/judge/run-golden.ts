@@ -27,7 +27,7 @@ import {
   PROMPT_VERSION,
   type RunnablePromptVersion,
 } from "../../src/lib/anthropic";
-import { FIDELITY_CRITERIA } from "../../src/lib/judge/rubric";
+import { FIDELITY_CRITERIA, hasFidelityCriteria } from "../../src/lib/judge/rubric";
 import { flush, record, requestFingerprint, startRun, type GoldenRun } from "./golden-log";
 import type { SchoolId } from "../../src/lib/types";
 
@@ -318,8 +318,21 @@ async function main() {
   }[] = [];
 
   let anyFail = false;
+  const skipped: string[] = [];
 
   for (const c of cases) {
+    // A Tier B fixture is committed before its school's criteria move into
+    // src/lib/judge/rubric.ts, because the criteria are Arthur's to approve
+    // and moving them is a separate decision: it also stops /api/judge
+    // refusing that school. Reading FIDELITY_CRITERIA for a school that has
+    // none throws, by design, so the case is skipped here rather than
+    // crashing the run on its first call. Not a failure, and not silent:
+    // the table shows it and the summary counts it.
+    if (!hasFidelityCriteria(c.school)) {
+      skipped.push(`${c.name} (${c.school})`);
+      continue;
+    }
+
     const { samples, failures } = await sampleCase(c, run);
 
     // Fewer than half the samples usable means the case has no measurable
@@ -434,9 +447,25 @@ async function main() {
     );
   }
 
+  if (skipped.length) {
+    console.log(
+      `\n${skipped.length} case(s) skipped: no fidelity criteria for the ` +
+        `school, so nothing to score against. These did not run and cost ` +
+        `nothing.`
+    );
+    for (const name of skipped) console.log(`  - ${name}`);
+    console.log(
+      "  Moving a school's criteria into src/lib/judge/rubric.ts is what " +
+        "makes these runnable, and that is Arthur's call: it also stops " +
+        "/api/judge refusing submissions from that school."
+    );
+  }
+
   if (anyFail) {
     console.error("\nOne or more golden cases fell outside its expected band.");
     process.exitCode = 1;
+  } else if (skipped.length) {
+    console.log("\nEvery case that ran was within its expected bands.");
   } else {
     console.log("\nAll golden cases within their expected bands.");
   }

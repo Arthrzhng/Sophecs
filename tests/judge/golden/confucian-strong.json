@@ -1,0 +1,19 @@
+{
+  "name": "confucian-strong",
+  "motion": "A council should be allowed to use an AI system to decide which families are visited by a social worker first, even where the ordering cannot be explained to them.",
+  "school": "confucian",
+  "argument": "Ask what the social worker and the family are to each other, because that is the question, and it is not answered by how accurate the ordering is. Ren is not a warm feeling she brings to the visit. It is the humaneness that the relationship between them realises when each can meet what the position requires. And it is realised through li, through the forms the work is conducted in: that she knows their circumstances before she arrives, that she can account for why she came to them first, that she can be held to it when she was wrong. Those forms are not decoration on the relationship. They are how it is learned and how it is kept. A system that orders the queue and cannot say why does not remove the obligations; it removes the form in which they were met, and a relationship whose forms have gone is degraded whatever the throughput figures say. Worse, calling it a triage tool names it as something that assists her judgement when it has replaced it. The name has done work the system has not.",
+  "expected_score_band": [
+    65,
+    95
+  ],
+  "expected_fidelity_band": [
+    8,
+    10
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "utilitarianism",
+    "virtue-ethics"
+  ]
+}

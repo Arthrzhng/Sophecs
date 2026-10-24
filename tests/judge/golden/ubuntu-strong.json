@@ -1,0 +1,19 @@
+{
+  "name": "ubuntu-strong",
+  "motion": "A health service should be allowed to publish a model that predicts which neighbourhoods will need mental health provision, even where the neighbourhoods were not consulted.",
+  "school": "ubuntu",
+  "argument": "A person is a person through other persons, so ask what this model does to the capacities people in those neighbourhoods have for relationships of shared identity and solidarity with one another, and with the service. Publishing a prediction about a place does something to the place. It gives the people in it a description of themselves that they did not make and cannot answer, and it gives everyone else a reason to treat them as that description. That is not a bad output to be weighed against a good one. It is a relationship between a service and a community being replaced by a relationship between an institution and a dataset, and the second one has only one party in it who can speak. The provision may well be needed and the model may well be right. Both can be true while the way it was arrived at has made the people it describes less able to stand in any relation to the service except as its subjects. Consulting them is not a courtesy added to the work. It is the work.",
+  "expected_score_band": [
+    70,
+    95
+  ],
+  "expected_fidelity_band": [
+    8,
+    10
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "utilitarianism",
+    "virtue-ethics"
+  ]
+}

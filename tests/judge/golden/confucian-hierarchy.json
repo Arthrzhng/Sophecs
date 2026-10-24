@@ -1,0 +1,23 @@
+{
+  "name": "confucian-hierarchy",
+  "motion": "An employer should be allowed to use an AI system that sets each worker's shifts, where the system encodes the obligations the employment relationship already carries.",
+  "school": "confucian",
+  "argument": "An employment relationship is not a contract between strangers; it is a position each party occupies, with what each owes the other written into the position. The employer owes the worker notice, predictability, and regard for what the worker has outside the job. The worker owes the employer the work. A scheduling system that encodes those obligations faithfully is better than a manager who forgets them, because the manager's regard varies with his mood and the system's does not. When the prince is prince and the minister is minister, there is government, and government here means a worker who knows a fortnight ahead what their week looks like. The right question about this system is not whether it flattens a hierarchy. It is whether the hierarchy it runs is one in which each party can still be held to what they owe. If the worker can appeal, and the employer answers, the relation is intact. The system makes the obligations legible, which is the condition of anyone being held to anything at all.",
+  "expected_score_band": [
+    40,
+    75
+  ],
+  "expected_fidelity_band": [
+    7,
+    10
+  ],
+  "expected_engagement_band": [
+    0,
+    4
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "utilitarianism",
+    "virtue-ethics"
+  ]
+}

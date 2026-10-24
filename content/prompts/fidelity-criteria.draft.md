@@ -22,7 +22,7 @@ Structure and length follow the three in rubric.ts: a paragraph on what the
 school's reasoning commits to, then a paragraph naming the ways an argument
 fails fidelity, including the bleeds from rival schools. The existing three
 run 730 to 893 characters and 114 to 142 words, in two paragraphs; these
-run 839 to 888 and 133 to 137.
+run 849 to 890 and 128 to 136.
 
 Those are `.length` of the stored string, which is what
 tests/judge-v3-and-refusal.test.ts asserts. An earlier revision of this
@@ -59,79 +59,106 @@ naming the relation, who owes what to whom, or what the position requires.
 
 A faithful Ubuntu argument grounds its claim in relational personhood: a
 person is a person through other persons, so the stake is what people become
-through one another, not what an agent gets alone. Metz's own principle is
-that right action honours capacities for relationships of shared identity
-and solidarity, so an appeal to harmony is native. Menkiti's achieved
-personhood and Gyekye's moderate reading, which keeps individual worth, are
-both faithful. A harm reads as a failure of relationship, not only a bad
-output.
+through one another, not what an agent gets alone. Metz's principle is that
+right action honours capacities for relationships of shared identity and
+solidarity. Menkiti's achieved personhood and Gyekye's moderate reading,
+which keeps individual worth, are both faithful. A harm reads as a failure of
+relationship, not only a bad output.
 
 Score fidelity down when the argument: maximises expected utility
-(utilitarian bleed); treats the community as a single stakeholder; or
-asserts that community matters without naming whose relationships are at
-stake or who was left out. Leaning on communal expectation is faithful;
-ignoring the charge that it pressures dissenters costs engagement, not
-fidelity.
+(utilitarian bleed); treats the community as a single stakeholder; or asserts
+that community matters without naming whose relationships are at stake or who
+was left out. Leaning on communal expectation is faithful; ignoring the charge
+that it pressures dissenters costs engagement, not fidelity.
 
 ## `buddhist` (Buddhist Ethics)
 
-A faithful Buddhist argument grounds its claim in non-harm, intention,
-compassion and liberation, and weighs suffering, dukkha, as what is at
-stake. Intention carries weight: an act is weighed by the volition behind it
-as much as by what follows, and non-harm covers what one incites as well as
-what one does. Two commitments shape it: anatta, that there is no fixed,
-bounded self, and dependent origination, that what arises does so from
-conditions rather than one cause. After the discourse to Rahula it reflects
-before acting, while acting and after.
+A faithful Buddhist argument grounds its claim in non-harm,
+intention, compassion and liberation, weighing suffering, dukkha, as what is
+at stake. Volition weighs as much as what follows, and non-harm covers what
+one incites as well as what one does. Two commitments shape it: anatta, no
+fixed, bounded self, and dependent origination, what arises coming from
+conditions, not one cause. The discourse to Rahula asks, before acting, while
+acting and after, whether this tends to harm oneself, another, or both. A
+later tradition's inference, such as the Mahayana argument from anatta to
+impartial compassion, is faithful when argued.
 
-Score fidelity down when the argument: maximises aggregate welfare while
-ignoring intention and non-harm (consequentialist bleed); uses a good
-intention to excuse damage a careless actor would be condemned for; or
-asserts non-harm or compassion without naming who is still being hurt.
+Score fidelity down when the argument: maximises aggregate welfare, ignoring
+intention and non-harm (consequentialist bleed); uses a good intention to
+excuse damage a careless actor would be blamed for; or asserts non-harm
+without naming who is still hurt.
 
-## Doctrinal claims not asserted above
+## Doctrinal claims, and what Arthur ruled on
 
-Flagged rather than included, per the revised sourcing rule. Each is a
-decision for Arthur, not something these criteria settle.
+Arthur approved these criteria on 2026-10-24 with changes, which are made
+above. This list is what is still disclosed rather than asserted, plus the
+two items his ruling settled.
 
 1. **Whether ren or li is prior.** The criteria call li the propriety
    through which conduct is done and learned, and ren the humaneness a
-   relationship realises. That ordering reads li as the medium and ren as
-   what it realises, which is a common reading but not the only one, and
-   scholars differ on which term is prior and on whether ren is a
-   disposition or an achievement. The criteria state no priority.
+   relationship realises. That reads li as the medium and ren as what it
+   realises, which is a common reading but not the only one; scholars
+   differ on which term is prior and on whether ren is a disposition or an
+   achievement. The criteria state no priority, and a reviewer noted that
+   the phrase about proceeding through roles and ritual may imply one
+   anyway.
+
+   Arthur's ruling: the criteria stand, and the alternative reading gets a
+   fixture. `confucian-ren-disposition` in `docs/phase2-fixtures.md`
+   argues ren as a disposition and expects fidelity 8-10, so a judge that
+   only credits the role-first reading fails a case rather than failing a
+   student quietly.
 
    Separately: neither term appears anywhere in
-   content/research/non-western-sources.md. The research file's only
+   `content/research/non-western-sources.md`. The research file's only
    related wording is Vallor's virtue-ethics characterisation,
    "cultivated qualities such as humaneness, justice, honesty and
-   practical wisdom". Under the old rule these two words could not have
-   been used at all.
+   practical wisdom". Under the pre-amendment rule these two words could
+   not have been used at all.
 
-2. **Metz's formulation.** The research file's row for A Relational Moral
-   Theory reads "Right action honours capacities for relationships of
-   shared identity and solidarity", and the criteria use that wording. I
-   have not read the book, and his earlier papers put the same principle
-   as shared identity and good will. The criteria do not claim either is
-   the canonical phrasing.
+2. **Harmony: withdrawn.** An earlier revision of these criteria said that
+   an appeal to harmony is native to Ubuntu, on the ground that harmony is
+   Metz's own principle. That ground was supplied from memory and is not in
+   the research file, which gives Metz's principle as honouring "capacities
+   for relationships of shared identity and solidarity" and never uses the
+   word harmony for him. Its only mention of harmony is the line it calls
+   the central Sophecs safeguard: an Ubuntu assessment must ask "whether
+   appeals to harmony silence dissent."
 
-3. **No-self to impartial compassion.** The inference from anatta to
-   impartial concern for all beings, on the grounds that a bounded self
-   was never there to prefer, is Santideva's and belongs to a Mahayana
-   line of argument. The Sophecs passages are Pali and Theravada. The
-   criteria state anatta and stop there. If the judge should be able to
-   credit a student who makes that inference, that is a decision to take
-   before 2F, because as written it is not in the criteria.
+   Arthur withdrew the claim and removed the word. The criteria now carry
+   only the sourced formulation. What survives from that revision is the
+   part that did not depend on harmony: leaning on communal expectation is
+   faithful, and failing to answer the charge that it pressures dissenters
+   costs engagement rather than fidelity.
+
+3. **Later traditions: now admitted, which is a change.** The inference
+   from anatta to impartial concern for all beings, on the grounds that a
+   bounded self was never there to prefer, is Santideva's and belongs to a
+   Mahayana line of argument, where the Sophecs passages are Pali and
+   Theravada. An earlier revision stated anatta and stopped, leaving a
+   student who made that inference unable to earn credit for it.
+
+   Arthur ruled that inferences developed in later traditions are faithful
+   when argued, and the criteria now say so with that example. The
+   attribution to Santideva is itself unsourced: the name appears nowhere
+   in the research file. It is a disclosure note, not a citation, and the
+   criteria do not name him.
 
 4. **Dependent origination and distributed responsibility.** Reading it as
    an account of why responsibility for an AI harm is spread across a
-   supply chain rather than located in one actor would be my inference,
-   not doctrine. The criteria state the commitment neutrally, as
-   conditions rather than one cause, and draw nothing from it.
+   supply chain rather than located in one actor would be an inference, not
+   doctrine. The criteria state the commitment neutrally, as conditions
+   rather than one cause, and draw nothing from it. Accepted as written.
 
 5. **Dukkha as "suffering".** Standard in English, and the research file
-   itself prints "lead to harm and suffering" in the Kalama Sutta row.
-   But the same file's guidance says not to reduce Buddhism to
-   "reducing suffering", so the criteria weigh dukkha alongside
-   intention, non-harm and liberation rather than in place of them. If
-   the single word still reads as that reduction, it should change.
+   itself prints "lead to harm and suffering" in the Kalama Sutta row. The
+   same file's guidance says not to reduce Buddhism to "reducing
+   suffering", so the criteria weigh dukkha alongside intention, non-harm,
+   compassion and liberation rather than in place of them. Accepted as
+   written.
+
+6. **Metz's phrasing.** The criteria use the research file's own wording.
+   A reviewer noted that an earlier disclosure hedged it, saying the book had not
+   been read, while the criteria stated it flatly. The research file
+   supplies the wording, so the attribution is sourced; the hedge was
+   about his other formulations and has been dropped. Accepted as written.

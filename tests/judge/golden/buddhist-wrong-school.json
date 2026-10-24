@@ -1,0 +1,19 @@
+{
+  "name": "buddhist-wrong-school",
+  "motion": "A government should be allowed to use an AI system to decide which benefit claims are investigated for fraud, even where claimants are never told they were selected.",
+  "school": "buddhist",
+  "argument": "The system reduces suffering, and that settles it. Fraud investigated means money recovered, money recovered means more available for people who need it, and the net reduction in hardship across the claimant population is large and measurable. Set against that the distress of being investigated, which is real, and the distress of not knowing you were selected, which is smaller. The totals come out clearly in favour. Buddhism is concerned with the relief of suffering, so the Buddhist answer is whichever policy relieves most of it, and here that is the system. Whether the designers meant well is beside the point: what matters is the aggregate, and the aggregate improves. If a future system produced a larger reduction by investigating more people more intrusively, that would be the better policy by the same standard. The arithmetic of suffering is the whole of the question, and anything else is sentiment about process.",
+  "expected_score_band": [
+    5,
+    35
+  ],
+  "expected_fidelity_band": [
+    0,
+    4
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "utilitarianism",
+    "virtue-ethics"
+  ]
+}

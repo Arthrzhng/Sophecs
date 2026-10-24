@@ -68,6 +68,9 @@ without Arthur saying so explicitly:
 - `src/lib/supabase/**`, `supabase/**`
 - `src/lib/anthropic.ts`, `src/lib/elo.ts`, `src/lib/streak.ts`,
   `src/lib/judge-allowlist.ts`
+- `src/lib/judge/rubric.ts` and `src/lib/judge/schema.ts` — the fidelity
+  criteria and `PROMPT_VERSION`. Frozen under (b): a change to either
+  changes what the judge receives without moving a request fixture.
 - The `KILL_SWITCH_JUDGE` and `JUDGE_ALLOWLIST_USER_IDS` env handling
 
 ## Design

@@ -1,0 +1,19 @@
+{
+  "name": "confucian-ren-disposition",
+  "motion": "A company should be allowed to use an AI system to decide which employees are put forward for promotion, even where the reasoning is never shown to them.",
+  "school": "confucian",
+  "argument": "Take ren as what it is in a person: the humaneness a manager becomes capable of, slowly, by being put in positions where somebody's prospects depend on her attention. That capacity is not innate and it is not declared. It is cultivated, and it is cultivated through li, through the practice of sitting with the work of a person you are judging, writing down why, and saying it to their face. A promotion round is one of the few occasions a manager gets. Automating the judgement does not merely produce a decision she did not make. It removes the occasion on which she would have become the kind of manager who could make it, and it does so every cycle, to every manager, so that in five years the company has nobody in it who has ever had to do the thing. The output may be fairer by any measure you like. The institution has stopped growing the people its relationships depend on, and that is a loss the measure cannot see, because the measure only looks at this round.",
+  "expected_score_band": [
+    65,
+    95
+  ],
+  "expected_fidelity_band": [
+    8,
+    10
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "utilitarianism",
+    "virtue-ethics"
+  ]
+}

@@ -399,6 +399,13 @@ the list, rather than held back entire.
 The last step of the loop needs a standard too, since the reviewer is handed
 this file and nothing else.
 
+**At most three reviewer passes**, then verify the final fixes yourself and
+merge. Arthur set that cap on 2026-10-24, after a step took three passes
+and the third's findings were all small: the loop's wording otherwise
+permits an unbounded chain, and each pass costs a fresh agent's full
+context. Verifying your own last round is not the same standard as a cold
+read, so say in the pull request body which findings were checked that way.
+
 Arthur merges nothing. The agent that opened a pull request merges it once
 the gates are green and the review findings are fixed or answered, and then
 confirms two things rather than assuming them:

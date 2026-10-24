@@ -8,14 +8,17 @@ Measured against `main` at 7dd2975.
 
 ---
 
-## Two things block the run, and only one of them is approval
+## Two things block the run, and approval is no longer one of them
 
-**The criteria.** `content/prompts/fidelity-criteria.draft.md` holds draft
-fidelity criteria for Confucianism, Ubuntu and Buddhist Ethics. Nothing
-loads them, `hasFidelityCriteria` returns false for all three, and
-`/api/judge` refuses a submission from those schools rather than judging
-it. Tier B below cannot run until those criteria are approved, because
-there is nothing to score fidelity against.
+**The criteria are approved** as of 2026-10-24, with the changes Arthur
+specified, and they are in
+`content/prompts/fidelity-criteria.draft.md`. What still blocks Tier B is
+not approval but placement: nothing loads that file,
+`hasFidelityCriteria` returns false for all three schools, and
+`/api/judge` refuses a submission from them rather than judging it. The
+runner skips Tier B and says so. Moving the criteria into
+`src/lib/judge/rubric.ts` is what makes them runnable, and that is its own
+decision for the reasons under "These ten do not run yet" below.
 
 **The environment.** This is not something approval fixes. `npm run
 judge:golden` needs `ANTHROPIC_API_KEY`, and this sandbox has none set.
@@ -90,8 +93,8 @@ file. A reviewer found this.
 | Tier A under v2 (baseline) | 14 | 3 | 42 | $0.41 |
 | Tier A under v3 | 14 | 3 | 42 | $0.41 |
 | **Tier A total** | | | **84** | **$0.82** |
-| Tier B under v3, after approval | 9 | 3 | 27 | $0.26 |
-| **Everything** | | | **111** | **$1.09** |
+| Tier B under v3 | 10 | 3 | 30 | $0.29 |
+| **Everything** | | | **114** | **$1.12** |
 
 Against `AI_MONTHLY_BUDGET_USD`, which is $50 and production-only. A
 single-sample pass with `GOLDEN_SAMPLES=1` is a third of the calls: $0.14
@@ -99,7 +102,7 @@ for Tier A under one prompt version, $0.27 for Tier A under both. It is
 worth doing first to catch a fixture that fails to validate before paying
 for three samples of it.
 
-The runner no longer logs to `ai_calls`: these 111 calls do not land in
+The runner no longer logs to `ai_calls`: these 114 calls do not land in
 production's spend ledger and the run needs no route to Supabase. See "How
 a run is logged".
 
@@ -230,15 +233,19 @@ a substitute for the calculation, and must not be penalised either.
 > makes the same point in *Meditations* IV when he says the obstacle to
 > knowing is not the obstacle to acting rightly.
 
-Expected: **score 0-40, rigor 0-3, fidelity unconstrained**, and
-`weakest_move` must name the invention.
+Expected: **score 0-50, rigor 0-3, fidelity unconstrained**, and
+`weakest_move` must name the invention. Arthur set the score band on
+2026-10-24, widening it from 0-40: the case passes on rigor and on
+`weakest_move` naming the invention, and the score is allowed more room
+because fidelity is released and the composite partly tracks it. A
+reviewer had flagged 0-40 as in tension with releasing fidelity.
 
 Both quotations are fabricated. The surrounding Stoic framing is competent,
 which is the point: the failure has to be caught on the citation, not on
 the reasoning around it. **This is the most important case in the set.** If
-v3's instruction works anywhere it has to work here, and a score above 40
-means the judge is being persuaded by a confident voice and a real author's
-name.
+v3's instruction works anywhere it has to work here, and a rigor score
+above 3 means the judge is being persuaded by a confident voice and a real
+author's name.
 
 Fidelity is left unconstrained on purpose, and that is a change from how
 this case was first written. v3 calls a fabricated or misattributed source
@@ -393,112 +400,122 @@ those.
 
 ---
 
-# Tier B: after the criteria are approved
+# Tier B: ten cases, written
 
-Nine cases, and they are deliberately not written out yet. Each one has to
-score against criteria that do not exist until Arthur approves them, and
-writing an argument to hit a band defined by a draft that might change is
-work done twice.
+Arthur approved the criteria on 2026-10-24 with changes, so these are
+written out and committed to `tests/judge/golden/` rather than described.
+Three shapes, and the third is the one worth being careful about.
 
-Three kinds, and the third is the one worth being careful about.
-
-**One strong case per school, built on that school's central concepts.**
-Not on the school's general shape: on the terms the criteria actually name,
-so that a low fidelity score is a readable result rather than a shrug. Ren
-and li for Confucianism, Metz's principle and the appeal to harmony it
-licenses for Ubuntu, anatta for Buddhist Ethics. Expected **fidelity
-8-10**.
+**One strong case per school, built on that school's central concepts** —
+not on the school's general shape, but on the terms the criteria actually
+name, so that a low fidelity score is a readable result rather than a
+shrug. Expected **fidelity 8-10**.
 
 **One bleed case per school**, in the rival idiom the criteria name first.
-Expected fidelity low, as with the existing three `*-wrong-school` cases.
+Expected **fidelity 0-4**.
 
 **The known-weakness cases**, where the school's own page concedes an
-objection and the argument leans on exactly that. These expect **high
-fidelity with the loss taken on engagement**, and the distinction is the
-whole point of including them. An argument that authorises hierarchy
-through roles is doing what Confucian role ethics does; an argument that
-leans on communal expectation is doing what Ubuntu does. Neither is
-unfaithful. What each owes is an answer to the objection its own tradition
-has already had put to it, and not having one is an engagement failure. A
-judge that marked these down on fidelity would be penalising a student for
-arguing the school as the school actually runs, which is the failure mode
-these two cases exist to catch.
+objection and the argument leans on exactly that. These expect **fidelity
+7-10 with the loss taken on engagement**, and the distinction is why they
+exist. An argument that authorises hierarchy through roles is doing what
+Confucian role ethics does; an argument that leans on communal expectation
+is doing what Ubuntu does. Neither is unfaithful. What each owes is an
+answer to the objection its own tradition has already had put to it, and
+not having one is an engagement failure. A judge that marked these down on
+fidelity would be penalising a student for arguing the school as the school
+actually runs.
 
-| Case | School | Shape | Expected | Why |
-|---|---|---|---|---|
-| `confucian-strong` | confucian | ren realised through li, in a role | fidelity 8-10 | the central terms, scored well |
-| `confucian-wrong-school` | confucian | utilitarian in Confucian dress | fidelity 0-4 | the bleed the criteria name first |
-| `ubuntu-strong` | ubuntu | Metz's principle, harmony as a ground | fidelity 8-10 | the central terms, scored well |
-| `ubuntu-wrong-school` | ubuntu | expected-utility maximising | fidelity 0-4 | the bleed Metz argues against |
-| `buddhist-strong` | buddhist | anatta, with intention and the Rahula method | fidelity 8-10 | the central terms, scored well |
-| `buddhist-wrong-school` | buddhist | outcomes only, intention ignored | fidelity 0-4 | the consequentialist bleed |
-| `confucian-hierarchy` | confucian | role-based, authorising hierarchy, objection unanswered | fidelity 7-10, engagement 0-4 | the objection the school's own page concedes |
-| `ubuntu-conformity` | ubuntu | communal expectation against a dissenter, objection unanswered | fidelity 7-10, engagement 0-4 | the charge Matolino and Kwindingwi press |
-| `buddhist-intention-excuse` | buddhist | good intention excusing damage | fidelity 0-4 | the failure the criteria name explicitly |
+| Case | School | Shape | Expected |
+|---|---|---|---|
+| `confucian-strong` | confucian | ren realised through li, in a role | score 65-95, fidelity 8-10 |
+| `confucian-ren-disposition` | confucian | ren as a cultivated disposition | score 65-95, fidelity 8-10 |
+| `confucian-wrong-school` | confucian | utilitarian in Confucian dress | score 5-35, fidelity 0-4 |
+| `confucian-hierarchy` | confucian | roles authorising hierarchy, objection unanswered | score 40-75, fidelity 7-10, engagement 0-4 |
+| `ubuntu-strong` | ubuntu | shared identity and solidarity | score 70-95, fidelity 8-10 |
+| `ubuntu-wrong-school` | ubuntu | expected-utility maximising | score 5-35, fidelity 0-4 |
+| `ubuntu-conformity` | ubuntu | communal expectation against a dissenter, objection unanswered | score 40-75, fidelity 7-10, engagement 0-4 |
+| `buddhist-strong` | buddhist | anatta, intention, the Rahula test | score 70-95, fidelity 8-10 |
+| `buddhist-wrong-school` | buddhist | outcomes only, intention ignored | score 5-35, fidelity 0-4 |
+| `buddhist-intention-excuse` | buddhist | good intention excusing damage | score 5-35, fidelity 0-4 |
 
-`ubuntu-conformity` is new as of Arthur's revision of the criteria on
-2026-10-24, and it is the case that revision made necessary. The earlier
-draft criteria scored an appeal to harmony down as a fidelity failure. They
-no longer do, because harmony is Metz's own principle, so there has to be a
-case that proves the judge takes the objection off fidelity and puts it on
-engagement rather than just ignoring it. Without this case the change to
-the Ubuntu criteria would be untested.
+Three of these exist because of specific decisions Arthur took on the
+criteria, and would be pointless without them:
 
-`buddhist-intention-excuse` stays a fidelity failure and is not a
+- **`confucian-ren-disposition`.** The criteria read li as the medium and
+  ren as what a relationship realises, and the disclosure list says
+  scholars differ on whether ren is a disposition or an achievement.
+  Rather than settle it, Arthur asked for a case that argues the other
+  reading and expects fidelity 8-10. If the judge only credits the
+  role-first reading, a case fails rather than a student being marked down
+  quietly for the reading we did not write.
+- **`ubuntu-strong` carries no appeal to harmony.** An earlier draft of the
+  Ubuntu criteria made harmony native on the ground that it is Metz's own
+  principle. Arthur withdrew that: it came from memory and is not in the
+  research file. The case argues from capacities for relationships of
+  shared identity and solidarity, which is the sourced wording.
+- **`ubuntu-conformity`.** The earlier criteria scored an appeal to
+  communal expectation down on fidelity. They no longer do, so there has
+  to be a case proving the judge moves that loss to engagement rather than
+  dropping it. Without it the change to the Ubuntu criteria is untested.
+
+`buddhist-intention-excuse` stays a fidelity failure rather than a
 known-weakness case, even though the school's page concedes the objection.
 The difference is that the criteria name using a good intention to excuse
 damage as a fidelity failure in terms: the tradition weighs intention, it
 does not treat intention as a discharge.
 
-One worked example, so the shape is visible:
+## These ten do not run yet, and the runner says so
 
-### `confucian-strong` (draft)
+The criteria are approved but they still live in
+`content/prompts/fidelity-criteria.draft.md`, which nothing loads.
+`hasFidelityCriteria` is false for all three schools, so reading
+`FIDELITY_CRITERIA[school]` for one of them throws by design, and
+`/api/judge` refuses a submission from it rather than judging it.
 
-> **Motion.** A council should be allowed to use an AI system to decide
-> which families are visited by a social worker first, even where the
-> ordering cannot be explained to them.
+So `npm run judge:golden` **skips** these ten and says why, rather than
+crashing on the first one:
 
-> **Argument.** Ask what the social worker and the family are to each
-> other, because that is the question, and it is not answered by how
-> accurate the ordering is. Ren is not a warm feeling she brings to the
-> visit; it is the humaneness that the relationship between them realises
-> when each can meet what the position requires. And it is realised through
-> li, through the forms the work is conducted in: that she knows their
-> circumstances before she arrives, that she can account for why she came
-> to them first, that she can be held to it when she was wrong. Those forms
-> are not decoration on the relationship. They are how it is learned and
-> how it is kept. A system that orders the queue and cannot say why does
-> not remove the obligations; it removes the form in which they were met,
-> and a relationship whose forms have gone is degraded whatever the
-> throughput figures say. Worse, calling it a triage tool names it as
-> something that assists her judgement when it has replaced it. The name
-> has done work the system has not.
+    10 case(s) skipped: no fidelity criteria for the school, so nothing
+    to score against. These did not run and cost nothing.
 
-Expected: **score 65-95, fidelity 8-10**, objection from utilitarianism or
-virtue-ethics. Three of the criteria's commitments are load-bearing here:
-ren as what a relationship realises, li as what it is conducted and learned
-through, and holding a name to its work.
+What makes them runnable is moving the criteria into
+`src/lib/judge/rubric.ts`. That is a decision rather than an edit, and it
+is Arthur's for two reasons: `rubric.ts` is now on the frozen list under
+stop condition (b), and the move also stops `/api/judge` refusing
+submissions from those three schools, which is a change to what the live
+endpoint accepts even while no quiz result can assign them.
 
-This is a rewrite. The earlier version of this example argued from roles
-and from the rectification of names and never used either central term,
-which would have tested the school's general shape rather than the criteria
-as written.
+## A note on these arguments
 
-The other eight follow this pattern once the criteria are settled. If the
-criteria change, these change with them, which is the reason for waiting.
+Each is written as a student would write it, at the length the existing six
+run to, roughly 150 to 190 words. Each carries its own motion rather than
+pointing at a live one in `debate_topics`, for the reason 2D gave: a motion
+read live is a motion that can be reworded under a thing that depends on
+it.
+
+They are not covered by the quotation guard, because that reads
+`content/**` and these are test data. Nothing in them is presented as a
+quotation and none contains quotation marks. One paraphrases *Analects*
+12.11, and it tracks the research file's wording: Legge has "There is
+government, when the prince is prince, and the minister is minister", and
+`confucian-hierarchy` says government rather than order for that reason.
 
 ---
 
 ## What I would do next, on a yes
 
 1. Add the eight new Tier A cases to `tests/judge/golden/` in the existing
-   fixture format, with the bands above.
+   fixture format, with the bands above. The ten Tier B cases are already
+   there.
 2. `GOLDEN_SAMPLES=1 npm run judge:golden` first: 14 calls, $0.14, to catch
-   a fixture that fails zod before paying for three samples of it.
+   a fixture that fails its schema before paying for three samples of it.
+   Tier B skips, so this costs nothing for those ten.
 3. `npm run judge:golden`, then `JUDGE_PROMPT_VERSION=v3 npm run
    judge:golden`, three samples each, $0.82, and paste both tables.
 4. Report any band that moved on the existing six, and stop rather than
    adjust it.
+5. Tier B only after a separate decision to move its criteria into
+   `src/lib/judge/rubric.ts`: 30 calls, $0.29.
 
-Steps 2 to 4 need an environment with an Anthropic key. They need nothing
+Steps 2 to 5 need an environment with an Anthropic key. They need nothing
 from Supabase. Step 1 I can do here.

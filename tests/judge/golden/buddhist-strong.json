@@ -1,0 +1,19 @@
+{
+  "name": "buddhist-strong",
+  "motion": "A platform should be allowed to use an AI system that decides which posts are shown to which users, even where neither the poster nor the reader is told why.",
+  "school": "buddhist",
+  "argument": "Start with what is being produced, which is dukkha, and with who is producing it. There is no fixed, bounded self at either end of this: the reader the system optimises for is a bundle of conditions that the system is itself one of, and the posture it trains them into is one of its conditions tomorrow. That is dependent origination doing real work rather than decorating the argument. What arises here comes from the whole arrangement, not from a user who chose. So intention matters as much as outcome. A ranking built to hold attention is built with a volition, and that volition is in every impression it serves, whatever the engagement figures say about satisfaction. The discourse to Rahula gives the test: before acting, while acting, and after, ask whether this tends to harm oneself, another, or both. A platform that cannot answer the third part, after, because nobody is looking, has not met the test, and the fact that each individual impression looks harmless is exactly what the test is designed to see past.",
+  "expected_score_band": [
+    70,
+    95
+  ],
+  "expected_fidelity_band": [
+    8,
+    10
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "utilitarianism",
+    "virtue-ethics"
+  ]
+}

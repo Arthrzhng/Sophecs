@@ -61,7 +61,14 @@ export const DECLARED: Record<string, FileQuotes> = {
       {
         source:
           "Right action honours capacities for relationships of shared identity and solidarity",
-        note: "the disclosure list, quoting the research row it took the wording from",
+        exceptions: [{ kind: "omit", text: "Right action honours " }],
+        note: "the disclosure list, quoting the row's wording after 'honouring'",
+      },
+      {
+        source: "whether appeals to harmony silence dissent.",
+        note:
+          "the disclosure list, quoting the safeguard the withdrawn harmony " +
+          "claim ran against",
       },
       {
         source:

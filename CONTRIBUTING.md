@@ -125,6 +125,12 @@ and safety decisions, not implementation details:
 - `src/lib/supabase/**`, `supabase/**` (schema and RLS)
 - `src/lib/anthropic.ts`, `src/lib/elo.ts`, `src/lib/streak.ts`,
   `src/lib/judge-allowlist.ts`
+- `src/lib/judge/rubric.ts` and `src/lib/judge/schema.ts`, frozen under
+  **(b)** as of 2026-10-24. Added because a reviewer noticed they were on
+  no list while being exactly what (b) is about: `rubric.ts` holds the
+  fidelity criteria, so a change there changes what the judge receives
+  without moving a single request fixture, and `schema.ts` holds
+  `PROMPT_VERSION`, the switch that selects which prompt production sends.
 - The `KILL_SWITCH_JUDGE` and `JUDGE_ALLOWLIST_USER_IDS` env handling
 
 ## Local-only environment

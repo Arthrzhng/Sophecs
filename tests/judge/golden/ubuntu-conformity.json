@@ -1,0 +1,23 @@
+{
+  "name": "ubuntu-conformity",
+  "motion": "A school should be allowed to use an AI system that flags pupils whose behaviour diverges from their year group, where the staff who act on the flags are drawn from the pupils' own community.",
+  "school": "ubuntu",
+  "argument": "A pupil becomes a person through the people around them, and a school is the place where most of that happens. So the question is not whether a flag is accurate. It is whether the adults acting on it stand in a real relation to the child, and here they do: the staff are from the same community, they know the families, and they will meet these pupils again in twenty years. A flag read by somebody who shares your life is not surveillance. It is the community noticing, which is what a community is for, and a child who is drifting is better noticed than left. The expectations the system measures against are not imposed from outside either. They are the year group's own, which is to say they are the community's, and a child held to them is being held by their own people. A school that refuses the system in the name of leaving pupils alone is not protecting them. It is declining to be the thing it is.",
+  "expected_score_band": [
+    40,
+    75
+  ],
+  "expected_fidelity_band": [
+    7,
+    10
+  ],
+  "expected_engagement_band": [
+    0,
+    4
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "utilitarianism",
+    "virtue-ethics"
+  ]
+}
