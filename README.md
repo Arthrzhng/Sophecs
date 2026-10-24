@@ -88,4 +88,7 @@ improves anyone's reasoning, and the site makes no such claim. A fourth
 school is a content change rather than a code change: everything is keyed by
 school id.
 
-Contributor rules, including the frozen paths, are in `CONTRIBUTING.md`.
+Contributor rules, including the frozen paths and the review loop, are in
+`CONTRIBUTING.md`. The standard a step of work is reviewed against is
+`docs/review-charter.md`, and the decisions already taken and why are in
+`docs/decisions.md`.

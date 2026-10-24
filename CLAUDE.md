@@ -27,8 +27,19 @@ through other custom properties.
 `main` is production. Never push to it directly, and never change the Vercel
 production branch setting.
 
-Cut every branch from `main`, push it, and hand Arthur the Vercel preview
-URL. He merges; the merge is the deploy.
+Cut every branch from `main` and push it. Then review it the way
+`CONTRIBUTING.md` says: a fresh reviewer that has not seen the work, given
+the diff and `docs/review-charter.md`. Fix what it finds, put the findings
+and the fixes in the pull request body, then **merge it yourself and
+confirm the SHA and that the production deploy is Ready**. The merge is the
+deploy.
+
+Arthur merges nothing now. Five things stop for him and the rest is yours
+to finish: **(a)** production database writes, **(b)** changes to what the
+judge receives, **(c)** publishing a draft, **(d)** spending money, and
+**(e)** philosophy or content judgements. (e) items are batched into one
+decision list per phase, with the file each lives in, not raised one at a
+time. `CONTRIBUTING.md` has the long version of all of this.
 
     git fetch origin main && git checkout -b <short-name> origin/main
 
