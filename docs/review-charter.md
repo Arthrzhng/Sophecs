@@ -32,6 +32,27 @@ that says the gates pass has to have run them.
 the image routes and the `server-only` boundary, neither of which is a type
 error.
 
+### A gate must be scoped to the repository
+
+Check what a gate actually ran on, not just what it said. A test count,
+file count or lint target that does not match the repository is the gate
+reporting on something else.
+
+Caught on the first run of this loop, by a stop hook rather than by a
+reviewer. The reviewer agents work in git worktrees under
+`.claude/worktrees/`, each a full copy of the repository on its own branch,
+and `vitest`, `tsc` and `eslint` all globbed into them: 85 test files and
+1007 tests where this repository has 28 and 327, failing because two
+branches disagreed with each other. The failures looked like the work's and
+were not.
+
+The opposite sign is the dangerous one. The same hole would let a gate
+report green off a stale agent checkout, and nothing in the output would
+say so. All three tools now exclude `.claude/`, and `.gitignore` keeps the
+worktrees out of a commit.
+
+So: when a suite's numbers move, find out why before reading the result.
+
 ## 2. The judge request fixtures are byte-identical
 
 `tests/judge-request/` holds six fixtures: the exact request
