@@ -50,8 +50,14 @@ list you finish and merge without asking.
   production table. Reading is fine.
 - **(b) Changes to what the judge receives.** The system prompt, the
   fidelity criteria, the motion, the stance, the argument. Judging is live
-  and no production verdict may change, so any of these needs his yes and
+  and no production verdict may change, so any of these needs his yes, and
   the six request fixtures proved byte-identical either side of it.
+  **Unchanged fixtures are not on their own enough.** They cover the v2
+  path for the three live schools, so a change to `judge.v3.md`, to
+  `src/lib/judge/rubric.ts`, or to a draft school's criteria moves no
+  fixture and still changes what the judge receives. This condition holds
+  even when no fixture moves; `docs/review-charter.md` rule 2 has the
+  detail.
 - **(c) Publishing a draft.** A school, a lesson or a motion becoming
   visible.
 - **(d) Spending money.** Any run that bills an API, and any change to a

@@ -44,14 +44,18 @@ name is in any client chunk. `CONTRIBUTING.md` says why, and
 
 `KILL_SWITCH_JUDGE=true` is still the default in `.env.example`, and while
 it is on no argument is sent to the judge and the debate screens say so.
-Arthur turned it off in production on 2026-10-22, having reviewed a batch of
-real verdicts for quality himself.
+Arthur has turned it off in production, having reviewed a batch of real
+verdicts for quality himself. He said so directly, and that instruction is
+the only record: the production value is not in this repository and no
+commit here changed it. `docs/decisions.md` carries the entry.
 
 **Do not change the switch or `JUDGE_ALLOWLIST_USER_IDS`.** Real
 submissions are being scored, so the standing rule is that no production
 verdict may change: any change to what the judge receives needs Arthur's
-yes and proof that the request is byte-identical for the three live
-schools. `docs/review-charter.md` has the check.
+yes, and proof that the request is byte-identical for the three live
+schools where a fixture covers it. The six fixtures cover the v2 path for
+those three and nothing else, so unchanged fixtures do not by themselves
+clear this. `docs/review-charter.md` rule 2 says what else counts.
 
 The judge itself is a real model call, not a stub: `src/lib/anthropic.ts`
 sends the prompt in `content/prompts/judge.v2.md` (the active version) to

@@ -134,8 +134,11 @@ most needs Arthur's yes.
 
 The check is the diff, not the gate: `git diff origin/main...HEAD --
 src/lib/school-registry.drafts.ts src/lib/school-registry.ts
-content/schools/` plus the `status:` front matter in the school files. A
-school moving from `draft` to published also needs fidelity criteria to
+content/schools/` plus the `status:` front matter in the school files. Note the shape of that
+front-matter diff: only the drafts carry a `status:` field at all, so
+publishing shows up as a **removed** line rather than a changed value.
+
+A school moving from draft to published also needs fidelity criteria to
 exist for it, or `/api/judge` refuses every submission from it
 (`hasFidelityCriteria` in `src/lib/judge/rubric.ts`).
 
@@ -151,14 +154,18 @@ predate the research file, and the test reports on them without failing. A
 slot with no verified source gets `TODO-SOURCE` and a note to Arthur, never
 a quotation from memory.
 
-What `UNVERIFIED` bars is narrower than "not used", and the charter said the
-broad thing first. An `UNVERIFIED` item may not be a **citation or an
+What `UNVERIFIED` bars may be narrower than "not used", **and this is not
+settled.** The frozen research file states the broad rule twice in its own
+words ("UNVERIFIED below is not to be used"), so narrowing it is an (e)
+judgement against a frozen file and Arthur has not ruled on it. It is on
+the Phase 2 decision list. What follows is the reading the content
+currently implies, not a licence: An `UNVERIFIED` item may not be a **citation or an
 attribution**, because an attribution has to be a citable text; the Nguni
 maxim's English gloss has an UNVERIFIED translator and date and is still the
 `one_line` of `content/schools/ubuntu.md`, quoted from the philosopher who
 reports it rather than from a translator. The check is a read of the
-research row, not a test: `quoteProblems` checks verbatim presence and never
-reads the markers.
+research row, not a test: `quoteProblems` in `src/lib/quote-check.ts`
+checks verbatim presence and never reads the markers.
 
 **Doctrinal description is not under this rule.** Arthur amended it on
 2026-10-24: the live Stoic criteria describe indifferents without quoting
@@ -200,7 +207,11 @@ Three that got through before this rule existed:
   not exist yet.
 - A report said rewording a motion would change a debate's share text. The
   two real wordings are identical in their first 57 characters and the
-  share text is 60, so it would not have. Found by comparing the strings.
+  share text is 60, so it would not have. The mechanism is checkable,
+  `SHARE_MOTION_MAX` and `shortMotionForShare` in
+  `src/lib/motion-text.ts`, but the two wordings are recorded nowhere, so
+  this bullet is recollection about a conversation and not something a
+  reviewer can verify.
 - A claim about Supabase backup availability was going to be answered from
   memory. The free plan's actual terms came from Supabase's own
   documentation.
@@ -235,10 +246,19 @@ Specifically:
   document with it, because the measuring script had flattened whitespace
   first and each criterion's one blank line turned two characters into
   one. Every bound was off by exactly one, and the new figure contradicted
-  `tests/judge-v3-and-refusal.test.ts`, which asserts the real band. The
+  `tests/judge-v3-and-refusal.test.ts`, which hard-codes 730 and 893. The
   conclusion the figures supported was still true; the figures were not.
-  When a document and a test disagree about a number, the test is the one
+  When a document and a test disagree about a number, start with the one
   that runs.
+
+  With a caveat a reviewer had to supply, because it weakens the lesson:
+  that test applies the band to the **draft** criteria, and its bounds are
+  literals rather than derived from `src/lib/judge/rubric.ts`. Nothing in
+  the suite measures the live criteria, so if one of them changed length
+  the test would stay green while its own comment went false. "The test is
+  the one that runs" only holds where the test measures the thing.
+  Deriving the band from the live criteria belongs on the branch that owns
+  that test.
 
 The check: for every assertion that names a prompt, a document or a cap,
 open the named file and confirm it still holds. A test that names a file in
@@ -326,13 +346,23 @@ Postgres, not reasoned about.
 
 Migrations do not open their own transaction. The Supabase runner wraps the
 file, so an inner `commit` ends the runner's transaction early; by hand it
-is `psql --single-transaction`. Each migration says so in its own header.
+is `psql --single-transaction`. The migrations stating this in their own
+header are 0014 and 0015; 0001 to 0013 predate the convention and do not
+mention it. Read it as the rule for a new migration, not as something
+every file already documents.
 
-Grepping for it needs care, and a reviewer has already been tripped by it:
-`grep -niE '^[[:space:]]*(begin|commit)' supabase/migrations/*.sql` hits
-`0015_debates_motion_text.sql` and both rollback files, and every hit is the
-`begin` of a `do $$ ... end $$;` PL/pgSQL block, not transaction control.
-Read each hit before calling it a breach.
+Grepping for it needs care, and a reviewer has already been tripped by it.
+The command has to reach both directories:
+
+    grep -niE '^[[:space:]]*(begin|commit)' supabase/migrations/*.sql supabase/rollback/*.sql
+
+That returns three hits, `0015_debates_motion_text.sql` and both rollback
+files, and every one is the `begin` of a `do $$ ... end $$;` PL/pgSQL
+block rather than transaction control. Read each before calling it a
+breach. An earlier version of this rule gave the command without
+`supabase/rollback/*.sql` while promising the rollback files among its
+hits: it returns one hit, and a rule whose purpose is stopping a reviewer
+mis-reading a grep is the worst place to put an unrunnable command.
 
 ## 11. Money is not spent without Arthur's yes
 
