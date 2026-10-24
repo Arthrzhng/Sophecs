@@ -18,16 +18,26 @@ school.
 What has NOT changed: the three criteria and their order, the ten-point
 scale and the composite out of a hundred, the rejection rule, the word caps,
 the revision rules, and the response format. The
-fidelity criteria themselves are interpolated at `{{RUBRIC}}` exactly as in
-v2, and they remain Arthur's to write — this file is the surrounding
-prompt.
+fidelity criteria themselves are interpolated at the RUBRIC placeholder
+exactly as in v2, and they remain Arthur's to write — this file is the
+surrounding prompt.
+
+Neither placeholder is written out in full anywhere in this comment, and
+that is not a style choice. The whole file is sent to the model, comment
+included, and src/lib/anthropic.ts fills a placeholder by name. A version
+that named one here and used it below would have the mention filled and the
+real placeholder left standing. `fillOnce` now refuses a prompt that names
+one twice, so this would fail loudly rather than quietly; the comment still
+avoids it so there is nothing to fail on.
 
 v3 is not the production default. `PROMPT_VERSION` in
-src/lib/judge/schema.ts is still "v2", and switching it needs two things
-this file cannot supply: fidelity criteria for any school being published,
-and a second substitution in src/lib/anthropic.ts for `{{RIVAL_SCHOOLS}}`,
-which is on the frozen list. Both are decisions, not edits. Until then
-this file is a draft to run the golden set against.
+src/lib/judge/schema.ts is still "v2", and switching it needs fidelity
+criteria for any school being published, which this file cannot supply.
+The rival-schools substitution it needs does now exist in
+src/lib/anthropic.ts, added with Arthur's explicit permission to touch a
+frozen file, and reaching it takes a prompt version the production path
+never passes. Until the criteria exist this file is a draft to run the
+golden set against.
 -->
 
 You are a philosophy tutor marking a short written defence of a position in

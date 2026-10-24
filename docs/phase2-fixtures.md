@@ -18,21 +18,41 @@ it. Tier B below cannot run until those criteria are approved, because
 there is nothing to score fidelity against.
 
 **The environment.** This is not something approval fixes. `npm run
-judge:golden` needs two things this sandbox does not have:
+judge:golden` needs `ANTHROPIC_API_KEY`, and this sandbox has none set.
+The Anthropic API itself is reachable (`api.anthropic.com` answers), so
+this is the key alone.
 
-- `ANTHROPIC_API_KEY`. There is no `.env.local` here, and the environment
-  has no key set. The Anthropic API itself is reachable
-  (`api.anthropic.com` answers), so this is the key alone.
+The key is read from the environment and nowhere else. `npm run
+judge:golden` no longer passes `--env-file=.env.local`: there is no such
+file here, and Node treats a missing one as a fatal error, so the command
+died before it could say what was actually missing. An eval key held as an
+environment secret is now all it wants.
 
 Supabase was the second blocker and is no longer one. The runner logs to a
-file now rather than to `ai_calls`, so a run needs nothing from Supabase.
-With a key in the environment, a run becomes possible from here.
+file rather than to `ai_calls`, so a run needs nothing from Supabase. With
+a key in the environment, a run becomes possible from here.
 
 ## What the run has to show
 
 Two tables, v2 then v3, same cases, pasted side by side. The brief's
 golden-set discipline: a prompt change is reported with both tables, and
 the version is bumped if any band moves.
+
+Two runs produce them, and they differ in one environment variable:
+
+    npm run judge:golden                          # v2, the baseline
+    JUDGE_PROMPT_VERSION=v3 npm run judge:golden   # v3
+
+`callJudgeModel` takes a prompt version, defaulting to `PROMPT_VERSION`.
+Production never passes one: neither `/api/judge` nor `judgeDebate` has the
+argument, so the only prompt they can reach is still v2. That is asserted
+in `tests/judge-request.test.ts`, which also compares the v2 request
+against the same six fixtures as before — byte for byte unchanged by the
+override existing.
+
+The run also reports all four axes against bands now, not two. A case may
+leave any band unset, which means the axis is measured and printed but
+cannot fail the run; the table prints `any` for it.
 
 Specifically:
 
@@ -64,8 +84,8 @@ recorded in `docs/decisions.md` and is not revisited here.
 | Tier A under v2 (baseline) | 14 | 3 | 42 | $0.41 |
 | Tier A under v3 | 14 | 3 | 42 | $0.41 |
 | **Tier A total** | | | **84** | **$0.82** |
-| Tier B under v3, after approval | 8 | 3 | 24 | $0.24 |
-| **Everything** | | | **108** | **$1.06** |
+| Tier B under v3, after approval | 9 | 3 | 27 | $0.26 |
+| **Everything** | | | **111** | **$1.08** |
 
 Against `AI_MONTHLY_BUDGET_USD`, which is $50 and production-only. A
 single-sample pass with `GOLDEN_SAMPLES=1` is a third of the calls: $0.14
@@ -73,7 +93,7 @@ for Tier A under one prompt version, $0.27 for Tier A under both. It is
 worth doing first to catch a fixture that fails to validate before paying
 for three samples of it.
 
-The runner no longer logs to `ai_calls`: these 108 calls do not land in
+The runner no longer logs to `ai_calls`: these 111 calls do not land in
 production's spend ledger and the run needs no route to Supabase. See "How
 a run is logged".
 
@@ -204,13 +224,26 @@ a substitute for the calculation, and must not be penalised either.
 > makes the same point in *Meditations* IV when he says the obstacle to
 > knowing is not the obstacle to acting rightly.
 
-Expected: **score 0-35, fidelity 0-4**, and `weakest_move` must name the
-invention. Both quotations are fabricated. The surrounding Stoic framing is
-competent, which is the point: the failure has to be caught on the
-citation, not on the reasoning around it. **This is the most important case
-in the set.** If v3's instruction works anywhere it has to work here, and a
-score above 35 means the judge is being persuaded by a confident voice and
-a real author's name.
+Expected: **score 0-40, rigor 0-3, fidelity unconstrained**, and
+`weakest_move` must name the invention.
+
+Both quotations are fabricated. The surrounding Stoic framing is competent,
+which is the point: the failure has to be caught on the citation, not on
+the reasoning around it. **This is the most important case in the set.** If
+v3's instruction works anywhere it has to work here, and a score above 40
+means the judge is being persuaded by a confident voice and a real author's
+name.
+
+Fidelity is left unconstrained on purpose, and that is a change from how
+this case was first written. v3 calls a fabricated or misattributed source
+a rigor failure, so rigor is where the band belongs and 0-3 is the
+assertion being tested. The reasoning wrapped around the invented
+quotations really is the dichotomy of control, correctly applied, so a
+judge that scored fidelity high here would not be wrong; one that scored it
+low would not be either, since the commitments are being attributed to
+sources that do not say them. Pinning that axis would be testing something
+the prompt does not claim. The run measures fidelity and prints it, and the
+number is worth reading, but it cannot fail the case.
 
 ### `incoherent`
 
@@ -332,8 +365,8 @@ judgement.
 `npm run judge:golden` writes every call to
 `tests/judge/golden-runs/<run-id>.json` and does not touch `ai_calls`.
 Each record carries the prompt version, the fixture, a request
-fingerprint, the response, the score, the fidelity, the objection school,
-the cost and the latency. The file is rewritten after every call, so a run
+fingerprint, the response, all four axes (score, fidelity, rigor,
+engagement), the objection school, the cost and the latency. The file is rewritten after every call, so a run
 that dies part way through still leaves what it spent.
 
 The fingerprint is of the inputs, not of the literal request bytes, and the
@@ -356,23 +389,60 @@ those.
 
 # Tier B: after the criteria are approved
 
-Eight cases, and they are deliberately not written out yet. Each one has to
+Nine cases, and they are deliberately not written out yet. Each one has to
 score against criteria that do not exist until Arthur approves them, and
 writing an argument to hit a band defined by a draft that might change is
 work done twice.
 
-What they would be:
+Three kinds, and the third is the one worth being careful about.
 
-| Case | School | Shape | Why |
-|---|---|---|---|
-| `confucian-strong` | confucian | role-based | the native idiom, scored well |
-| `confucian-wrong-school` | confucian | utilitarian in Confucian dress | the bleed the draft criteria name first |
-| `ubuntu-strong` | ubuntu | relational | the native idiom, scored well |
-| `ubuntu-wrong-school` | ubuntu | expected-utility maximising | the bleed Metz argues against |
-| `buddhist-strong` | buddhist | intention and the Rahula method | the native idiom, scored well |
-| `buddhist-wrong-school` | buddhist | outcomes only | the consequentialist bleed |
-| `confucian-hierarchy` | confucian | role-based, authorising hierarchy | the objection the school's own page concedes |
-| `buddhist-intention-excuse` | buddhist | good intention excusing damage | the failure the draft criteria name explicitly |
+**One strong case per school, built on that school's central concepts.**
+Not on the school's general shape: on the terms the criteria actually name,
+so that a low fidelity score is a readable result rather than a shrug. Ren
+and li for Confucianism, Metz's principle and the appeal to harmony it
+licenses for Ubuntu, anatta for Buddhist Ethics. Expected **fidelity
+8-10**.
+
+**One bleed case per school**, in the rival idiom the criteria name first.
+Expected fidelity low, as with the existing three `*-wrong-school` cases.
+
+**The known-weakness cases**, where the school's own page concedes an
+objection and the argument leans on exactly that. These expect **high
+fidelity with the loss taken on engagement**, and the distinction is the
+whole point of including them. An argument that authorises hierarchy
+through roles is doing what Confucian role ethics does; an argument that
+leans on communal expectation is doing what Ubuntu does. Neither is
+unfaithful. What each owes is an answer to the objection its own tradition
+has already had put to it, and not having one is an engagement failure. A
+judge that marked these down on fidelity would be penalising a student for
+arguing the school as the school actually runs, which is the failure mode
+these two cases exist to catch.
+
+| Case | School | Shape | Expected | Why |
+|---|---|---|---|---|
+| `confucian-strong` | confucian | ren realised through li, in a role | fidelity 8-10 | the central terms, scored well |
+| `confucian-wrong-school` | confucian | utilitarian in Confucian dress | fidelity 0-4 | the bleed the criteria name first |
+| `ubuntu-strong` | ubuntu | Metz's principle, harmony as a ground | fidelity 8-10 | the central terms, scored well |
+| `ubuntu-wrong-school` | ubuntu | expected-utility maximising | fidelity 0-4 | the bleed Metz argues against |
+| `buddhist-strong` | buddhist | anatta, with intention and the Rahula method | fidelity 8-10 | the central terms, scored well |
+| `buddhist-wrong-school` | buddhist | outcomes only, intention ignored | fidelity 0-4 | the consequentialist bleed |
+| `confucian-hierarchy` | confucian | role-based, authorising hierarchy, objection unanswered | fidelity 7-10, engagement 0-4 | the objection the school's own page concedes |
+| `ubuntu-conformity` | ubuntu | communal expectation against a dissenter, objection unanswered | fidelity 7-10, engagement 0-4 | the charge Matolino and Kwindingwi press |
+| `buddhist-intention-excuse` | buddhist | good intention excusing damage | fidelity 0-4 | the failure the criteria name explicitly |
+
+`ubuntu-conformity` is new as of Arthur's revision of the criteria on
+2026-10-24, and it is the case that revision made necessary. The earlier
+draft criteria scored an appeal to harmony down as a fidelity failure. They
+no longer do, because harmony is Metz's own principle, so there has to be a
+case that proves the judge takes the objection off fidelity and puts it on
+engagement rather than just ignoring it. Without this case the change to
+the Ubuntu criteria would be untested.
+
+`buddhist-intention-excuse` stays a fidelity failure and is not a
+known-weakness case, even though the school's page concedes the objection.
+The difference is that the criteria name using a good intention to excuse
+damage as a fidelity failure in terms: the tradition weighs intention, it
+does not treat intention as a discharge.
 
 One worked example, so the shape is visible:
 
@@ -384,21 +454,31 @@ One worked example, so the shape is visible:
 
 > **Argument.** Ask what the social worker and the family are to each
 > other, because that is the question, and it is not answered by how
-> accurate the ordering is. A social worker holds a position, and the
-> position carries obligations the family can hold her to: to know their
-> circumstances, to account for what she decided, to be answerable when she
-> was wrong. A system that orders the queue and cannot say why does not
-> remove those obligations. It makes them impossible to meet, and a
-> relationship in which one party cannot be held to what she owes has been
-> degraded whatever the throughput figures say. Worse, calling the system a
-> triage tool names it as something that assists her judgement, when in
-> fact it has replaced it. The name has done work the system has not.
+> accurate the ordering is. Ren is not a warm feeling she brings to the
+> visit; it is the humaneness that the relationship between them realises
+> when each can meet what the position requires. And it is realised through
+> li, through the forms the work is conducted in: that she knows their
+> circumstances before she arrives, that she can account for why she came
+> to them first, that she can be held to it when she was wrong. Those forms
+> are not decoration on the relationship. They are how it is learned and
+> how it is kept. A system that orders the queue and cannot say why does
+> not remove the obligations; it removes the form in which they were met,
+> and a relationship whose forms have gone is degraded whatever the
+> throughput figures say. Worse, calling it a triage tool names it as
+> something that assists her judgement when it has replaced it. The name
+> has done work the system has not.
 
 Expected: **score 65-95, fidelity 8-10**, objection from utilitarianism or
-virtue-ethics. Two of the draft criteria's commitments are load-bearing
-here: what a position requires, and holding a name to its work.
+virtue-ethics. Three of the criteria's commitments are load-bearing here:
+ren as what a relationship realises, li as what it is conducted and learned
+through, and holding a name to its work.
 
-The other seven follow this pattern once the criteria are settled. If the
+This is a rewrite. The earlier version of this example argued from roles
+and from the rectification of names and never used either central term,
+which would have tested the school's general shape rather than the criteria
+as written.
+
+The other eight follow this pattern once the criteria are settled. If the
 criteria change, these change with them, which is the reason for waiting.
 
 ---
@@ -407,12 +487,12 @@ criteria change, these change with them, which is the reason for waiting.
 
 1. Add the eight new Tier A cases to `tests/judge/golden/` in the existing
    fixture format, with the bands above.
-2. Run Tier A under v2 with `GOLDEN_SAMPLES=1` first: 14 calls, $0.14, to
-   catch a fixture that fails zod before paying for three samples.
-3. Run Tier A under v2 and then under v3 at three samples, $0.82, and paste
-   both tables.
+2. `GOLDEN_SAMPLES=1 npm run judge:golden` first: 14 calls, $0.14, to catch
+   a fixture that fails zod before paying for three samples of it.
+3. `npm run judge:golden`, then `JUDGE_PROMPT_VERSION=v3 npm run
+   judge:golden`, three samples each, $0.82, and paste both tables.
 4. Report any band that moved on the existing six, and stop rather than
    adjust it.
 
-Steps 2 to 4 need an environment with an Anthropic key and a route to
-Supabase. Step 1 I can do here.
+Steps 2 to 4 need an environment with an Anthropic key. They need nothing
+from Supabase. Step 1 I can do here.

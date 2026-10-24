@@ -7,17 +7,22 @@ three until somebody moves them there. /api/judge refuses a submission
 from a school with no criteria rather than judging it, so this file sitting
 here changes nothing about what a reader gets.
 
-These need Arthur's approval before 2F uses them. They were written only
-from content/schools/{confucian,ubuntu,buddhist}.md and, through those,
-content/research/non-western-sources.md. Nothing here comes from anywhere
-else, and tests/content-quotations.ts declares the one quotation so the
-guard checks it like any other.
+These need Arthur's approval before 2F uses them.
+
+Sourcing, per Arthur's revision of 2026-10-24: quotations come only from
+content/research/non-western-sources.md, and tests/content-quotations.ts
+declares the one quotation here so the guard checks it like any other.
+Doctrinal description does not carry that restriction, because the live
+Stoic criteria describe indifferents without quoting anyone. So these
+describe each school's central commitments rather than only the passages
+the research file verified. Every doctrinal claim I was not sure of is
+listed at the bottom instead of being asserted in the criteria.
 
 Structure and length follow the three in rubric.ts: a paragraph on what the
-school's reasoning actually commits to, then a paragraph naming the ways an
-argument fails fidelity, including the bleeds from rival schools. The
-existing three run 730 to 893 characters and 114 to 142 words; these run
-841 to 885 and 140 to 142.
+school's reasoning commits to, then a paragraph naming the ways an argument
+fails fidelity, including the bleeds from rival schools. The existing three
+run 729 to 892 characters and 114 to 142 words, in two paragraphs; these
+run 838 to 887 and 133 to 137.
 
 The axes and the scale are untouched. Three criteria scored out of ten
 each, one composite out of a hundred.
@@ -31,49 +36,95 @@ Pending approval. The judge does not read this file.
 
 A faithful Confucian argument grounds its claim in roles and the
 relationships that constitute them: you do not enter a relationship as a
-finished individual, and what you owe is never owed in the abstract but
-attaches to a position. Asked what government is, Book 12 answers with
-relations rather than a principle, order consisting in each party being what
-their position requires. After Book 13 it should hold a name to its work:
-call a system fair or explainable and the word has done work the system has
-not.
+finished individual, and what you owe attaches to a position rather than
+being owed in the abstract. Its central terms are ren, the humaneness a
+relationship realises, and li, the ritual propriety through which conduct is
+done and learned. Cultivating oneself is native here, and proceeds through
+roles and ritual rather than apart from them. Holding a name to its work,
+after Book 13, is a strength where it appears.
 
 Score fidelity down when the argument: reduces to what the system maximises
-(utilitarian bleed); treats the virtue as a quality a lone agent cultivates
-rather than as what a role requires (virtue-ethics bleed); or asserts that
-relationships matter without naming the relation, who owes what to whom, or
-what the position requires.
+(utilitarian bleed); treats virtue as detached from roles, relationships and
+ritual (virtue-ethics bleed); or asserts that relationships matter without
+naming the relation, who owes what to whom, or what the position requires.
 
 ## `ubuntu` (Ubuntu)
 
 A faithful Ubuntu argument grounds its claim in relational personhood: a
-person is a person through other persons, so what is at stake is what people
-become through one another rather than what an isolated agent gets. It
-should treat a harm as a failure of relationship and not only as a bad
-output, and should notice that data is rarely only yours: it carries family
-and neighbours nobody asked. Individuals keep their own worth; the community
-does not confer personhood once its demands are met.
+person is a person through other persons, so the stake is what people become
+through one another, not what an agent gets alone. Metz's own principle is
+that right action honours capacities for relationships of shared identity
+and solidarity, so an appeal to harmony is native. Menkiti's achieved
+personhood and Gyekye's moderate reading, which keeps individual worth, are
+both faithful. A harm reads as a failure of relationship, not only a bad
+output.
 
-Score fidelity down when the argument: argues from maximising expected
-utility (utilitarian bleed), which Metz argues against; treats the
-community as a single stakeholder, or appeals to harmony in a way that makes
-a dissenter the problem; or asserts that community matters without
-naming whose relationships are at stake or who was left out.
+Score fidelity down when the argument: maximises expected utility
+(utilitarian bleed); treats the community as a single stakeholder; or
+asserts that community matters without naming whose relationships are at
+stake or who was left out. Leaning on communal expectation is faithful;
+ignoring the charge that it pressures dissenters costs engagement, not
+fidelity.
 
 ## `buddhist` (Buddhist Ethics)
 
 A faithful Buddhist argument grounds its claim in non-harm, intention,
-compassion and liberation, taken on the tradition's own terms rather than
-translated into a Western category. Intention carries real weight: an act is
-weighed by the volition behind it as much as by what follows from it, and
-non-harm covers what one incites as well as what one does. After the
-discourse to Rahula it should reflect before acting, while acting and after
-on whether this tends toward one's own harm, another's, or both, which makes
-assessment continuing rather than a launch review.
+compassion and liberation, and weighs suffering, dukkha, as what is at
+stake. Intention carries weight: an act is weighed by the volition behind it
+as much as by what follows, and non-harm covers what one incites as well as
+what one does. Two commitments shape it: anatta, that there is no fixed,
+bounded self, and dependent origination, that what arises does so from
+conditions rather than one cause. After the discourse to Rahula it reflects
+before acting, while acting and after.
 
-Score fidelity down when the argument: weighs only outcomes with intention
-mentioned in passing (consequentialist bleed); names a virtue and stops
-there (virtue-ethics bleed); uses a good intention to excuse damage a
-careless actor would be condemned for; or asserts non-harm without naming
-who is still being hurt.
+Score fidelity down when the argument: maximises aggregate welfare while
+ignoring intention and non-harm (consequentialist bleed); uses a good
+intention to excuse damage a careless actor would be condemned for; or
+asserts non-harm or compassion without naming who is still being hurt.
 
+## Doctrinal claims not asserted above
+
+Flagged rather than included, per the revised sourcing rule. Each is a
+decision for Arthur, not something these criteria settle.
+
+1. **Whether ren or li is prior.** The criteria call li the propriety
+   through which conduct is done and learned, and ren the humaneness a
+   relationship realises. That ordering reads li as the medium and ren as
+   what it realises, which is a common reading but not the only one, and
+   scholars differ on which term is prior and on whether ren is a
+   disposition or an achievement. The criteria state no priority.
+
+   Separately: neither term appears anywhere in
+   content/research/non-western-sources.md. The research file's only
+   related wording is Vallor's virtue-ethics characterisation,
+   "cultivated qualities such as humaneness, justice, honesty and
+   practical wisdom". Under the old rule these two words could not have
+   been used at all.
+
+2. **Metz's formulation.** The research file's row for A Relational Moral
+   Theory reads "Right action honours capacities for relationships of
+   shared identity and solidarity", and the criteria use that wording. I
+   have not read the book, and his earlier papers put the same principle
+   as shared identity and good will. The criteria do not claim either is
+   the canonical phrasing.
+
+3. **No-self to impartial compassion.** The inference from anatta to
+   impartial concern for all beings, on the grounds that a bounded self
+   was never there to prefer, is Santideva's and belongs to a Mahayana
+   line of argument. The Sophecs passages are Pali and Theravada. The
+   criteria state anatta and stop there. If the judge should be able to
+   credit a student who makes that inference, that is a decision to take
+   before 2F, because as written it is not in the criteria.
+
+4. **Dependent origination and distributed responsibility.** Reading it as
+   an account of why responsibility for an AI harm is spread across a
+   supply chain rather than located in one actor would be my inference,
+   not doctrine. The criteria state the commitment neutrally, as
+   conditions rather than one cause, and draw nothing from it.
+
+5. **Dukkha as "suffering".** Standard in English, and the research file
+   itself prints "lead to harm and suffering" in the Kalama Sutta row.
+   But the same file's guidance says not to reduce Buddhism to
+   "reducing suffering", so the criteria weigh dukkha alongside
+   intention, non-harm and liberation rather than in place of them. If
+   the single word still reads as that reduction, it should change.

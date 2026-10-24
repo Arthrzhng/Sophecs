@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "check:bundle": "tsx --require ./scripts/preload-server-only-shim.cjs scripts/check-client-bundle.ts",
-    "judge:golden": "tsx --require ./scripts/preload-server-only-shim.cjs --env-file=.env.local tests/judge/run-golden.ts",
+    "judge:golden": "tsx --require ./scripts/preload-server-only-shim.cjs tests/judge/run-golden.ts",
     "seed:topics": "tsx --require ./scripts/preload-server-only-shim.cjs --env-file=.env.local scripts/seed-topics.ts",
     "seed:topics:dryrun": "tsx --require ./scripts/preload-server-only-shim.cjs --env-file=.env.local scripts/seed-topics-dryrun.ts",
     "review:verdicts": "tsx --env-file=.env.local scripts/review-verdicts.ts",

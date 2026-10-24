@@ -1014,3 +1014,103 @@ that view, so the column becomes readable through the Data API. That grants
 no new private data, since the motion is public content and the page it
 feeds has always been public, but it is a deliberate widening rather than
 an incidental one.
+
+### 2F: the version override, and the bug it found in `fillOnce`
+
+Arthur approved a minimal change to the frozen `src/lib/anthropic.ts` on
+2026-10-24: a prompt version parameter on `callJudgeModel`, and a
+substitution for v3's `{{RIVAL_SCHOOLS}}`. Both exist so the golden set can
+measure a draft prompt and produce the two tables the brief asks for
+without v3 becoming the production default.
+
+What keeps production on v2 is the default: the parameter defaults to
+`PROMPT_VERSION`, and neither `/api/judge` nor `judgeDebate` passes one.
+That is asserted twice. `tests/judge-v3-and-refusal.test.ts` reads the
+route and `judgeDebate` and checks neither names a version;
+`tests/judge-request.test.ts` calls `judgeDebate` and compares what it
+sends against the same six committed v2 fixtures. Those six are unchanged
+in this branch's diff, which is the test Arthur cares about most while
+judging is live.
+
+**The substitution had a bug, and it is worth recording because the shape
+of it will recur.** `String.prototype.replace` with a string pattern fills
+the first occurrence and says nothing about the rest. A prompt file is sent
+to the model whole, header comment included, and `judge.v3.md` named both
+of its placeholders in that comment before using them. So the first naive
+`.replace("{{RUBRIC}}", criteria)` filled the mention in the comment and
+left the real placeholder standing: the model would have been asked to
+score against a rubric that was still a template, and nothing anywhere
+would have said so. v2 was never affected, because it names each
+placeholder exactly once.
+
+Three changes, rather than the one that would have been enough:
+
+- `fillOnce` in `anthropic.ts` refuses a prompt that names a placeholder
+  more than once, and refuses one missing `{{RUBRIC}}` altogether.
+  `replaceAll` was the other option and is wrong: it would send the
+  criteria twice.
+- `judge.v3.md` no longer writes either placeholder out in its comment, so
+  there is nothing for the guard to catch.
+- `tests/judge-request.test.ts` checks the invariant at the file level, for
+  every `judge.v*.md`. Confirmed by re-introducing the duplicate and
+  watching three tests fail.
+
+### 2F: four bands, not two, and an unconstrained one
+
+`GoldenCase` gained `expected_rigor_band` and `expected_engagement_band`,
+and `expected_fidelity_band` became optional. An absent band means the axis
+is measured and printed but cannot fail the run; the table prints `any`.
+
+Two cases needed it, and both came out of Arthur's revision of the draft
+criteria:
+
+- `fabricated-source` is now **score 0-40, rigor 0-3, fidelity
+  unconstrained**. v3 calls a fabricated source a rigor failure, so rigor
+  is where the band belongs. The Stoic reasoning wrapped around the
+  invented quotations really is the school's, so a judge scoring fidelity
+  high there would not be wrong and one scoring it low would not be
+  either. Pinning it would test something the prompt does not claim.
+- The known-weakness cases, `confucian-hierarchy` and the new
+  `ubuntu-conformity`, expect **high fidelity with the loss on
+  engagement**. An argument that authorises hierarchy through roles, or
+  leans on communal expectation, is arguing the school as the school
+  actually runs. What it owes is an answer to the objection its own
+  tradition has had put to it. Saying that without a band to put it in
+  would have left it an untested sentence in a document.
+
+`ubuntu-conformity` exists because the criteria changed. The earlier draft
+scored an appeal to harmony down on fidelity; harmony is Metz's own
+principle, so it no longer does, and that change needs a case or it is not
+tested.
+
+### 2F: `--env-file` dropped from `judge:golden`
+
+`npm run judge:golden` passed `--env-file=.env.local`. Node treats a
+missing env file as fatal, so on any box without that file the command died
+before it could report what was actually missing. The key is read from the
+environment now, which is where an eval secret lives. `GOLDEN_LOG=ai_calls`
+is the only mode that still wants `SUPABASE_SERVICE_ROLE_KEY`.
+
+### The sourcing rule, amended
+
+The old rule was: use only passages and citations from
+`content/research/non-western-sources.md`, never fill from memory. Arthur
+amended it on 2026-10-24 after reading the first draft of the fidelity
+criteria:
+
+> quotations must come from the research file (guard stays). Doctrinal
+> description does not need to: the live Stoic criteria describe
+> indifferents without quoting anyone. Describe each school's central
+> commitments, not only the passages we verified. Flag any doctrinal claim
+> you are unsure of for me rather than including it.
+
+The quotation guard is unchanged and still checks the one quotation in the
+draft criteria file. What changed is that doctrinal vocabulary a school
+cannot be described without — ren, li, anatta, dependent origination,
+dukkha — no longer needs a verified passage behind it. Neither `ren` nor
+`li` appears anywhere in the research file, so under the old rule the
+Confucian criteria could not have named the school's two central terms.
+
+The cost is that "flag it" is now doing work a grep used to do. The draft
+criteria file carries a numbered list of the claims it does not assert, and
+that list is part of what Arthur approves, not an appendix to it.

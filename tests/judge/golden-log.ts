@@ -38,6 +38,8 @@ export interface GoldenCallRecord {
   response: unknown;
   score: number | null;
   fidelity: number | null;
+  rigor: number | null;
+  engagement: number | null;
   objection_school: string | null;
   cost_usd: number;
   latency_ms: number;
