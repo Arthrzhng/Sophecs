@@ -15,9 +15,10 @@
   branch setting.
 
 Until 2026-10-24 Arthur merged every pull request himself. He now merges
-only what the review loop sends him, which is the list below and nothing
-else. Everything that is not on that list, you review, fix, merge and
-confirm.
+nothing. He **decides** the five things listed below, and every pull
+request is merged by the agent that opened it, including the ones that
+waited on one of those decisions. Everything not on that list you review,
+fix, merge and confirm without asking.
 
 ## The review loop
 
@@ -41,7 +42,9 @@ missed; adding the rule is part of fixing the finding.
 
 ### What still stops for Arthur
 
-Five things. Everything else you finish and merge.
+Five decisions. They are things he rules on, not pull requests he
+merges: once he has ruled, the merge is still yours. Everything not on this
+list you finish and merge without asking.
 
 - **(a) Production database writes.** Any migration, DDL or write to a
   production table. Reading is fine.
@@ -52,14 +55,22 @@ Five things. Everything else you finish and merge.
 - **(c) Publishing a draft.** A school, a lesson or a motion becoming
   visible.
 - **(d) Spending money.** Any run that bills an API, and any change to a
-  cost cap, model or budget.
+  cost cap, a rate limit, a model or a budget.
 - **(e) Philosophy and content judgements.** School criteria, fixture
   bands, school text, which tradition says what.
 
 (e) items are **batched into one decision list per phase**, with the file
 each one lives in, rather than raised one at a time. A step whose only
-blocker is an (e) item is finished up to that point, pushed, and left open
-with the list.
+blocker is an (e) item is finished up to that point, pushed, reviewed, and
+left open with the list.
+
+**The phase briefs in `docs/` predate this.** `docs/phase2-brief.md` and
+`docs/phase3-brief.md` both say to restate each numbered task and wait for a
+yes before starting it, and phase 3 has not begun, so an agent reading its
+brief would stop on every task. Those lines are a record of what Arthur
+asked at the time and are superseded by the five conditions above: the
+briefs are not edited, and the five conditions win. Nothing else in them is
+superseded.
 
 ### Why this file exists
 

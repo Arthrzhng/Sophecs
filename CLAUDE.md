@@ -36,14 +36,14 @@ deploy.
 
 Arthur merges nothing now. Five things stop for him and the rest is yours
 to finish: **(a)** production database writes, **(b)** changes to what the
-judge receives, **(c)** publishing a draft, **(d)** spending money, and
-**(e)** philosophy or content judgements. (e) items are batched into one
+judge receives, **(c)** publishing a draft, **(d)** spending money (a billed run, or a change to a cost cap, rate
+limit, model or budget), and **(e)** philosophy or content judgements. (e) items are batched into one
 decision list per phase, with the file each lives in, not raised one at a
 time. `CONTRIBUTING.md` has the long version of all of this.
 
     git fetch origin main && git checkout -b <short-name> origin/main
 
-As of 2026-09-19 `main` is at 177c5cb. Confirm with `git ls-remote origin main`
+As of 2026-10-24 `main` is at 7dd2975. Confirm with `git ls-remote origin main`
 rather than trusting that number — it goes stale on the next merge.
 
 ## Before pushing
