@@ -1049,10 +1049,23 @@ placeholder exactly once.
 
 Three changes, rather than the one that would have been enough:
 
-- `fillOnce` in `anthropic.ts` refuses a prompt that names a placeholder
-  more than once, and refuses one missing `{{RUBRIC}}` altogether.
-  `replaceAll` was the other option and is wrong: it would send the
-  criteria twice.
+- A guard refuses a prompt that names a placeholder more than once, and
+  refuses one missing `{{RUBRIC}}` altogether. `replaceAll` was the other
+  option and is wrong: it would send the criteria twice. It began as
+  `fillOnce` inside `anthropic.ts` and is now `fillPlaceholders` in
+  `src/lib/judge/fill-placeholder.ts`, because a reviewer showed it could
+  be reverted to a silent `replace` with the whole suite still green: it
+  had no test of its own, and testing it in place meant building a model
+  request. Out of the frozen file it is callable directly, and reverting
+  it now fails five of its nine tests.
+
+  That review also found two defects in the substitution itself, neither
+  of which had failed anything. It filled placeholders one after another
+  over the growing string, so a criteria string containing
+  `{{RIVAL_SCHOOLS}}` would have had the school list substituted into the
+  middle of the criteria. And `replace(needle, value)` reads `$&`, `$1`
+  and `$$` inside the value, which is content somebody writes. It is one
+  pass over the raw template with a function replacer now.
 - `judge.v3.md` no longer writes either placeholder out in its comment, so
   there is nothing for the guard to catch.
 - `tests/judge-request.test.ts` checks the invariant at the file level, for
@@ -1121,3 +1134,31 @@ Confucian criteria could not have named the school's two central terms.
 The cost is that "flag it" is now doing work a grep used to do. The draft
 criteria file carries a numbered list of the claims it does not assert, and
 that list is part of what Arthur approves, not an appendix to it.
+### Judging is live, and where that fact is recorded
+
+Arthur turned `KILL_SWITCH_JUDGE` off in production himself, having
+reviewed a batch of real verdicts for quality. He replaced the Phase 2
+rule "the kill switch stays ON" with a different one: **no production
+verdict may change**, and every sub-phase touching the judge path proves
+the exact request is byte-identical for the three live schools, with a
+snapshot test that stays in the suite. He also said not to change the
+switch or the allowlist.
+
+This entry exists because a reviewer went looking for that fact in the
+repository and could not find it. `README.md` described judging as
+deliberately paused for two days after it was not, and when that was
+corrected the correction carried a date, 2026-10-22, that is recorded
+nowhere and that nobody had given. The date was invented to make the
+sentence concrete.
+
+What is true and checkable: `KILL_SWITCH_JUDGE=true` is still the default
+in `.env.example`, the switch still gates the model call in
+`src/app/api/judge/route.ts` and still drives the paused copy on the
+debate, table and today screens. What is not in this repository: the
+production value. No commit here changed it and none can; it is a Vercel
+environment variable. So the only record of the live state is Arthur's own
+instruction, and this entry is it.
+
+The practical consequence for a reviewer: do not try to verify the live
+state from the repository, and do not report it as unverified either.
+Read it here, and treat the (b) stop condition as live.

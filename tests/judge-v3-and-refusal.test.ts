@@ -212,6 +212,30 @@ describe("judge.v3.md", () => {
 describe("the draft fidelity criteria", () => {
   const DRAFT = path.join(PROMPTS, "fidelity-criteria.draft.md");
 
+  // Derived from the live criteria, so the band cannot drift away from
+  // the thing it describes. `.length` of the stored string, which is also
+  // what the draft file quotes: measuring a whitespace-flattened copy
+  // instead gave figures one character low at each bound, and that wrong
+  // figure was written into the draft file before this test caught it.
+  const LIVE_BAND = (() => {
+    const lengths = PUBLISHED_SCHOOL_IDS.map((id) => FIDELITY_CRITERIA[id].length);
+    const words = PUBLISHED_SCHOOL_IDS.map(
+      (id) => FIDELITY_CRITERIA[id].split(/\s+/).length
+    );
+    return {
+      chars: [Math.min(...lengths), Math.max(...lengths)] as const,
+      words: [Math.min(...words), Math.max(...words)] as const,
+    };
+  })();
+
+  it("takes its band from the live criteria, which are 730 to 893 characters", () => {
+    // Pins the derivation itself: if this changes, the draft file's own
+    // stated figures need changing with it, and that is the whole reason
+    // the band is derived.
+    expect(LIVE_BAND.chars).toEqual([730, 893]);
+    expect(LIVE_BAND.words).toEqual([114, 142]);
+  });
+
   it("exists and says it is a draft the judge does not read", () => {
     const draft = read(DRAFT);
     expect(draft).toContain("NOT LOADED BY ANYTHING");
@@ -241,12 +265,17 @@ describe("the draft fidelity criteria", () => {
       expect(body.split("\n\n").length).toBe(2);
       expect(body).toMatch(/^A faithful /);
       expect(body).toContain("Score fidelity down when the argument:");
-      // The band the three live ones occupy.
-      expect(body.length).toBeGreaterThanOrEqual(730);
-      expect(body.length).toBeLessThanOrEqual(893);
+      // The band the three live ones occupy, measured from them rather
+      // than written down. A reviewer pointed out that these bounds were
+      // literals: nothing in the suite measured the live criteria, so one
+      // of them changing length would leave this green while the comment
+      // above it went false. The numbers are 730 to 893 characters and 114
+      // to 142 words today, and if that moves this test moves with it.
+      expect(body.length).toBeGreaterThanOrEqual(LIVE_BAND.chars[0]);
+      expect(body.length).toBeLessThanOrEqual(LIVE_BAND.chars[1]);
       const words = body.split(/\s+/).length;
-      expect(words).toBeGreaterThanOrEqual(114);
-      expect(words).toBeLessThanOrEqual(142);
+      expect(words).toBeGreaterThanOrEqual(LIVE_BAND.words[0]);
+      expect(words).toBeLessThanOrEqual(LIVE_BAND.words[1]);
     }
   });
 });
