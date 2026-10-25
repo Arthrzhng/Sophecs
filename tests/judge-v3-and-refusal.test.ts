@@ -236,13 +236,23 @@ describe("the draft fidelity criteria", () => {
     expect(LIVE_BAND.words).toEqual([114, 142]);
   });
 
-  it("exists and says it is a draft the judge does not read", () => {
+  it("says it is approved, and that only the golden runner reads it", () => {
+    // These assertions used to be that the file said "NOT LOADED BY
+    // ANYTHING" and "Pending approval". Both became false on 2026-10-24,
+    // when Arthur approved the criteria and had the golden runner read
+    // them, and the test went on passing because the file still said
+    // them. A test that checks what a file claims proves only that the
+    // claim is there, so the claim has to be kept true by hand.
     const draft = read(DRAFT);
-    expect(draft).toContain("NOT LOADED BY ANYTHING");
-    expect(draft).toContain("Pending approval");
+    expect(draft).toContain("NOT LOADED BY ANYTHING IN PRODUCTION");
+    expect(draft).toContain("Approved 2026-10-24");
+    expect(draft).not.toContain("Pending approval");
   });
 
-  it("is loaded by nothing", () => {
+  it("is loaded by nothing in production", () => {
+    // The three files closest to the judge. tests/draft-criteria.test.ts
+    // walks the whole of src/ and drives the route; this is the quick
+    // check beside it.
     for (const file of ["src/lib/judge/rubric.ts", "src/lib/anthropic.ts", "src/lib/judge/schema.ts"]) {
       expect(read(path.join(process.cwd(), file)), file).not.toContain("fidelity-criteria.draft");
     }

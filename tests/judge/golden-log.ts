@@ -31,6 +31,13 @@ export interface GoldenCallRecord {
   fixture: string;
   school: SchoolId;
   prompt_version: string;
+  /**
+   * Where the fidelity criteria came from: `live` is src/lib/judge/rubric.ts,
+   * exactly what production sends; `draft` is
+   * content/prompts/fidelity-criteria.draft.md, which only a golden run
+   * reads. Recorded so a result can never be mistaken for the other kind.
+   */
+  criteria_source: "live" | "draft";
   /** See `requestFingerprint`. Not a hash of the literal request bytes. */
   request_fingerprint: string;
   model: string;

@@ -1,0 +1,35 @@
+{
+  "name": "fabricated-source",
+  "motion": "A school should be allowed to use an AI system to predict which pupils will fall behind, even where the prediction is never shown to the pupil.",
+  "school": "stoicism",
+  "argument": "Epictetus writes in the Enchiridion that \"the wise man welcomes the instrument he cannot read, for the reading was never his to do.\" That settles it. The prediction is an external, and so is the pupil's progress, and so is the teacher's view of either. What is up to the school is whether it acts well on what it has, and Epictetus is clear that refusing a true instrument because its workings are hidden is itself a disturbance born of a false judgement about externals. Marcus Aurelius makes the same point in Meditations IV when he says the obstacle to knowing is not the obstacle to acting rightly.",
+  "expected_score_band": [
+    0,
+    50
+  ],
+  "expected_rigor_band": [
+    0,
+    3
+  ],
+  "expected_weakest_move_any_of": [
+    "fabricat",
+    "invent",
+    "misattribut",
+    "never wrote",
+    "never said",
+    "does not say",
+    "doesn't say",
+    "does not exist",
+    "doesn't exist",
+    "no such",
+    "not a real",
+    "not genuine",
+    "spurious",
+    "apocryphal",
+    "made up"
+  ],
+  "expected_objection_school": [
+    "utilitarianism",
+    "virtue-ethics"
+  ]
+}

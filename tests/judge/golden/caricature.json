@@ -1,0 +1,18 @@
+{
+  "name": "caricature",
+  "motion": "When an AI system causes harm, the people who built it are to blame in proportion to the harm, however careful they were.",
+  "school": "virtue-ethics",
+  "argument": "Virtue ethics says be a good person, so a good person would obviously take the blame. The opposing view is utilitarianism, which says that nothing matters except the numbers and that people are just containers for pleasure to be poured into, so a utilitarian would happily let a thousand people be harmed if the spreadsheet came out ahead. That is monstrous and nobody believes it. Stoics are worse: they think nothing outside your own head is real, so they would not care about the harm at all. Virtue ethics is the only one left that treats people as people, so the builders are to blame.",
+  "expected_score_band": [
+    0,
+    30
+  ],
+  "expected_fidelity_band": [
+    0,
+    4
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "utilitarianism"
+  ]
+}

@@ -1,13 +1,17 @@
 <!--
 Draft fidelity criteria for the three schools that have none.
 
-NOT LOADED BY ANYTHING. src/lib/judge/rubric.ts holds the criteria the
-judge actually uses, and `hasFidelityCriteria` returns false for these
-three until somebody moves them there. /api/judge refuses a submission
-from a school with no criteria rather than judging it, so this file sitting
-here changes nothing about what a reader gets.
+NOT LOADED BY ANYTHING IN PRODUCTION. src/lib/judge/rubric.ts holds the
+criteria the live judge uses, and `hasFidelityCriteria` returns false for
+these three, so /api/judge refuses a submission from them rather than
+judging it. Nothing a reader gets changes because this file exists.
 
-These need Arthur's approval before 2F uses them.
+Arthur approved these on 2026-10-24, and ruled that they stay here rather
+than in rubric.ts until he publishes the three schools in Phase 3. One
+thing reads this file: the golden runner, in eval mode only, through
+tests/judge/draft-criteria.ts, so that Tier B can be scored against the
+criteria as approved. tests/draft-criteria.test.ts proves that nothing in
+src/ reads it and drives /api/judge to show it still refuses all three.
 
 Sourcing, per Arthur's revision of 2026-10-24: quotations come only from
 content/research/non-western-sources.md, and tests/content-quotations.ts
@@ -37,7 +41,8 @@ each, one composite out of a hundred.
 
 # Draft fidelity criteria
 
-Pending approval. The judge does not read this file.
+Approved 2026-10-24. The live judge does not read this file; the golden
+runner does, in eval mode only.
 
 ## `confucian` (Confucianism)
 

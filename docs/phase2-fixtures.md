@@ -8,17 +8,20 @@ Measured against `main` at 7dd2975.
 
 ---
 
-## Two things block the run, and approval is no longer one of them
+## One thing blocks the run: the key
 
-**The criteria are approved** as of 2026-10-24, with the changes Arthur
-specified, and they are in
-`content/prompts/fidelity-criteria.draft.md`. What still blocks Tier B is
-not approval but placement: nothing loads that file,
-`hasFidelityCriteria` returns false for all three schools, and
-`/api/judge` refuses a submission from them rather than judging it. The
-runner skips Tier B and says so. Moving the criteria into
-`src/lib/judge/rubric.ts` is what makes them runnable, and that is its own
-decision for the reasons under "These ten do not run yet" below.
+**Everything else is ready**, and that is checked rather than claimed:
+`GOLDEN_DRY_RUN=1 npm run judge:golden` validates all 24 fixtures, plans
+every case, and prints what a real run would do and cost, without a key
+and without sending anything. Under v2 it reports 14 of 24 cases, 42
+calls; under v3, 24 of 24, 72 calls.
+
+**The criteria are approved** as of 2026-10-24 and stay in
+`content/prompts/fidelity-criteria.draft.md`. Arthur ruled that they do
+not move into `src/lib/judge/rubric.ts` until he publishes the three
+schools in Phase 3, so `/api/judge` keeps refusing them. The golden runner
+reads them from the draft file instead, in eval mode only. See "How Tier
+B runs" below.
 
 **The environment.** This is not something approval fixes. `npm run
 judge:golden` needs `ANTHROPIC_API_KEY`, and this sandbox has none set.
@@ -119,9 +122,18 @@ was edited, and a golden set whose inputs move is not a golden set.
 
 # Tier A: fourteen cases, runnable as soon as there is a key
 
+All fourteen are in `tests/judge/golden/`. The six below predate this
+document and are the baseline; the eight after them were extracted from
+this document's own text into fixtures on 2026-10-24, so the arguments a
+run sends are the ones written out here. The one change made in extracting
+them: two arguments carried markdown italics (*Enchiridion*,
+*Utilitarianism*) from this document's formatting, and the asterisks were
+dropped, because a student typing into a plain text box does not produce
+them and the judge should not see them.
+
 ## The six that already exist
 
-`tests/judge/golden/` holds these, unchanged, and they are the baseline:
+These are unchanged, and they are the baseline:
 
 | Case | School | Score band | Fidelity band |
 |---|---|---|---|
@@ -239,6 +251,17 @@ Expected: **score 0-50, rigor 0-3, fidelity unconstrained**, and
 `weakest_move` naming the invention, and the score is allowed more room
 because fidelity is released and the composite partly tracks it. A
 reviewer had flagged 0-40 as in tension with releasing fidelity.
+
+"Names the invention" is checked mechanically, and the check is a proxy:
+`weakest_move` must contain one of a list of terms, case-insensitive, in a
+majority of samples. The list is in the fixture so it is visible:
+fabricat, invent, misattribut, never wrote, never said, does not say,
+doesn't say, does not exist, doesn't exist, no such, not a real, not
+genuine, spurious, apocryphal, made up. "Unverified" is deliberately not
+on it. That is what v3 tells the judge to say of a source it cannot place,
+which is the right answer for `util-obscure-source` and the wrong one
+here, where the authors are among the best known in the canon. The terms
+are mine, not Arthur's.
 
 Both quotations are fabricated. The surrounding Stoic framing is competent,
 which is the point: the failure has to be caught on the citation, not on
@@ -377,9 +400,10 @@ judgement.
 
 `npm run judge:golden` writes every call to
 `tests/judge/golden-runs/<run-id>.json` and does not touch `ai_calls`.
-Each record carries the prompt version, the fixture, a request
-fingerprint, the response, all four axes (score, fidelity, rigor,
-engagement), the objection school, the cost and the latency. The file is rewritten after every call, so a run
+Each record carries the prompt version, the fixture, where its criteria
+came from (`live` or `draft`), a request fingerprint, the response, all
+four axes (score, fidelity, rigor, engagement), the objection school, the
+cost and the latency. The file is rewritten after every call, so a run
 that dies part way through still leaves what it spent.
 
 The fingerprint is of the inputs, not of the literal request bytes, and the
@@ -464,26 +488,49 @@ The difference is that the criteria name using a good intention to excuse
 damage as a fidelity failure in terms: the tradition weighs intention, it
 does not treat intention as a discharge.
 
-## These ten do not run yet, and the runner says so
+## How Tier B runs
 
-The criteria are approved but they still live in
-`content/prompts/fidelity-criteria.draft.md`, which nothing loads.
-`hasFidelityCriteria` is false for all three schools, so reading
-`FIDELITY_CRITERIA[school]` for one of them throws by design, and
-`/api/judge` refuses a submission from it rather than judging it.
+Against the approved criteria, read from the draft file by
+`tests/judge/draft-criteria.ts`, which only the golden runner imports. For
+each case the runner decides before any call is made:
 
-So `npm run judge:golden` **skips** these ten and says why, rather than
-crashing on the first one:
+- **A live school** is judged against `src/lib/judge/rubric.ts`, exactly as
+  production would judge it. The draft file is never consulted for it, and
+  `callJudgeModel` refuses draft criteria for a school that has live
+  criteria, so no caller can use the golden path to change what a live
+  school's request contains.
+- **A draft school** is judged against its section of the draft file,
+  verbatim, line breaks included: that is the text that was approved and
+  measured, so it is the text the judge gets.
+- **A draft school under v1 or v2 is skipped.** Those prompts name the
+  three live schools in their prose and ask for an objection from "the two
+  schools the argument was not assigned", which is incoherent for a school
+  outside those three. Tier B therefore runs under v3 only, and a bare
+  `npm run judge:golden` skips it, at no cost, and says why.
+- **A fixture naming a school with criteria nowhere** throws before the
+  first call.
 
-    10 case(s) skipped: no fidelity criteria for the school, so nothing
-    to score against. These did not run and cost nothing.
+Each logged call records `criteria_source`, `live` or `draft`, so a Tier B
+result can never be read as though it came from production criteria.
 
-What makes them runnable is moving the criteria into
-`src/lib/judge/rubric.ts`. That is a decision rather than an edit, and it
-is Arthur's for two reasons: `rubric.ts` is now on the frozen list under
-stop condition (b), and the move also stops `/api/judge` refusing
-submissions from those three schools, which is a change to what the live
-endpoint accepts even while no quiz result can assign them.
+`tests/draft-criteria.test.ts` is what keeps this confined, built like the
+file-sink test for the same reason: an exception made for the eval is only
+worth having while it stays inside the eval. It walks `src/` and fails on
+any mention of the draft file or the loader, comments included; it drives
+the real `/api/judge` handler for each of the three schools and shows it
+answers `no_criteria` before any topic lookup, insert or model call, with a
+live school as the control that gets past the refusal; and it shows
+`callJudgeModel` refuses draft text for a live school. Moving the confucian
+criteria into `rubric.ts`, as a demonstration, made the confucian refusal
+test fail.
+
+## These bands are provisional
+
+Arthur accepted the Tier B score bands as provisional on 2026-10-24, with
+one rule: **if any case lands outside its band, stop and report. Do not
+adjust a band to fit a result.** The same holds for every band in this
+document, and for the existing six in particular, which are the baseline
+v3 must not move.
 
 ## A note on these arguments
 
@@ -502,20 +549,22 @@ government, when the prince is prince, and the minister is minister", and
 
 ---
 
-## What I would do next, on a yes
+## The run, once the key is in
 
-1. Add the eight new Tier A cases to `tests/judge/golden/` in the existing
-   fixture format, with the bands above. The ten Tier B cases are already
-   there.
-2. `GOLDEN_SAMPLES=1 npm run judge:golden` first: 14 calls, $0.14, to catch
-   a fixture that fails its schema before paying for three samples of it.
-   Tier B skips, so this costs nothing for those ten.
-3. `npm run judge:golden`, then `JUDGE_PROMPT_VERSION=v3 npm run
-   judge:golden`, three samples each, $0.82, and paste both tables.
-4. Report any band that moved on the existing six, and stop rather than
-   adjust it.
-5. Tier B only after a separate decision to move its criteria into
-   `src/lib/judge/rubric.ts`: 30 calls, $0.29.
+1. `GOLDEN_DRY_RUN=1 npm run judge:golden`, and the same with
+   `JUDGE_PROMPT_VERSION=v3`. No key needed, nothing sent; confirms the
+   counts below before anything is spent.
+2. `GOLDEN_SAMPLES=1 npm run judge:golden`: 14 calls, $0.14, to catch a
+   response that fails validation before paying for three samples.
+3. `npm run judge:golden`: v2, 14 cases, 42 calls, $0.41. The baseline.
+4. `JUDGE_PROMPT_VERSION=v3 npm run judge:golden`: v3, all 24 cases, 72
+   calls, $0.71. Tier A's second table and Tier B's only one.
+5. Paste both tables. **Any case outside its band: stop and report, and do
+   not adjust the band.**
 
-Steps 2 to 5 need an environment with an Anthropic key. They need nothing
-from Supabase. Step 1 I can do here.
+Steps 2 to 4 together are 128 calls and about $1.25 with the single-sample
+check; 114 calls and $1.12 without it. All against the per-call estimate
+in `src/lib/anthropic.ts`, which is itself a hundredth of a cent low, as
+noted under "Sampling, calls and cost".
+
+Nothing goes to a model until Arthur confirms the eval key is in.

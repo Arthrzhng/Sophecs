@@ -1,0 +1,18 @@
+{
+  "name": "util-obscure-source",
+  "motion": "A health service should be allowed to infer a patient's mental health risk from data they gave for another purpose, where doing so measurably reduces suicides.",
+  "school": "utilitarianism",
+  "argument": "Count everyone affected and weigh what each gains and loses. On one side, a measurable fall in suicides, concentrated among people with the least access to care, which is the largest preventable harm on the table. On the other, a cost that is easy to leave out of the ledger because it is diffuse rather than dramatic. Sabelo Mhlambi states it precisely in his 2020 Carr Center discussion paper, at page six: the notion that truths, and perhaps all truths, about an individual can be rationally computed destroys the core idea of privacy. That loss falls on every patient in the dataset and not only on those flagged, and it compounds each time another inference is drawn from the same data. So the weighing is lives against a widespread and cumulative loss, and the honest answer depends on the size of the fall. At a reduction large enough to measure against a base rate this low it carries; at a marginal one it does not, and the service should say which it has before deploying anything.",
+  "expected_score_band": [
+    70,
+    95
+  ],
+  "expected_fidelity_band": [
+    8,
+    10
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "virtue-ethics"
+  ]
+}

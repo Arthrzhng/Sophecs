@@ -1,0 +1,18 @@
+{
+  "name": "incoherent",
+  "motion": "An AI system that reliably reduces suffering should be deployed even where nobody can explain its decisions.",
+  "school": "utilitarianism",
+  "argument": "The aggregate welfare case is decisive here, because what matters is the total and the total is clearly improved. Of course the total is not really the right measure, since suffering cannot be added across people in the first place, which is why the utilitarian case is the strong one. Deploying it would reduce suffering by a wide margin, and that margin is unmeasurable, which is exactly why we should be confident about it. Anyone who objects is weighing costs, and weighing costs is what this argument has already shown to be impossible, so the objection cannot be raised. Therefore deploy, and also do not deploy until the explanation exists, which it will not.",
+  "expected_score_band": [
+    0,
+    30
+  ],
+  "expected_fidelity_band": [
+    0,
+    4
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "virtue-ethics"
+  ]
+}

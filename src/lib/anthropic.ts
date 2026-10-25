@@ -10,7 +10,7 @@ import {
   type ModelVerdict,
   type PromptVersion,
 } from "@/lib/judge/schema";
-import { FIDELITY_CRITERIA } from "@/lib/judge/rubric";
+import { FIDELITY_CRITERIA, hasFidelityCriteria } from "@/lib/judge/rubric";
 import { fillPlaceholders } from "@/lib/judge/fill-placeholder";
 import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
 import type { SchoolId } from "@/lib/types";
@@ -107,14 +107,38 @@ export async function callJudgeModel(
   revisionOf?: RevisionContext,
   // Production never passes this. `/api/judge` and `judgeDebate` leave it
   // alone, so the only version they can reach is `PROMPT_VERSION`.
-  promptVersion: RunnablePromptVersion = PROMPT_VERSION
+  promptVersion: RunnablePromptVersion = PROMPT_VERSION,
+  // Golden runs only, and production never passes it either. Criteria for
+  // a draft school, which the golden runner reads from the draft criteria
+  // file in content/prompts, because Arthur ruled that the approved draft
+  // criteria stay out of rubric.ts until he publishes those schools:
+  // /api/judge keeps refusing them meanwhile. Neither the file nor the
+  // runner's loader is named here: a confinement test fails on any mention
+  // of either anywhere in src/, comments included, so that a read cannot
+  // hide inside something that looks like a comment.
+  //
+  // It can only fill a gap, never replace live criteria. A school that has
+  // criteria in rubric.ts is always judged against them, and passing this
+  // for one throws, so no caller can use it to change what a live school's
+  // request contains.
+  draftCriteria?: string
 ): Promise<JudgeCallResult> {
+  if (draftCriteria !== undefined && hasFidelityCriteria(school)) {
+    throw new Error(
+      `draft criteria refused for "${school}": it has live criteria, and a ` +
+        `live school is always judged against them`
+    );
+  }
+  // Reading FIDELITY_CRITERIA for a school with none still throws, by
+  // design, so without draftCriteria a draft school fails exactly as before.
+  const criteria = draftCriteria ?? FIDELITY_CRITERIA[school];
+
   // {{RUBRIC}} is in every version. {{RIVAL_SCHOOLS}} is v3 and later, so
   // it is optional, and its absence leaves v2 byte for byte what it was.
   // Both are filled in one pass over the raw template: see
   // src/lib/judge/fill-placeholder.ts for the three defects that shape.
   const system = fillPlaceholders(promptTemplateFor(promptVersion), {
-    "{{RUBRIC}}": { value: FIDELITY_CRITERIA[school], required: true },
+    "{{RUBRIC}}": { value: criteria, required: true },
     "{{RIVAL_SCHOOLS}}": { value: RIVAL_SCHOOLS_BLOCK, required: false },
   });
   // The v2 prompt keys its revision instructions off the presence of these

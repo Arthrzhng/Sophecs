@@ -1162,3 +1162,65 @@ instruction, and this entry is it.
 The practical consequence for a reviewer: do not try to verify the live
 state from the repository, and do not report it as unverified either.
 Read it here, and treat the (b) stop condition as live.
+
+### 2F: draft criteria reach the golden run and nothing else
+
+Arthur ruled on 2026-10-24 that the approved criteria for the three draft
+schools do **not** move into `src/lib/judge/rubric.ts`. `/api/judge` keeps
+refusing those schools until he publishes them in Phase 3, which is stop
+condition (c). Instead, in golden-run mode only, the runner reads them
+from `content/prompts/fidelity-criteria.draft.md`.
+
+How that is built, and why each part:
+
+- **`tests/judge/draft-criteria.ts`** reads the draft file and plans each
+  case before any call: a live school against `rubric.ts`, a draft school
+  against its section of the draft file verbatim, a draft school skipped
+  under v1 or v2 because those prompts count the rivals as two, and a
+  fixture naming a school with criteria nowhere thrown out before anything
+  is spent. It is its own module so the planning is testable; the runner
+  cannot be imported by a test, because it calls the model at load.
+- **`callJudgeModel` gained a sixth parameter, `draftCriteria`.** This is a
+  change to a frozen file, made to implement Arthur's instruction, and it
+  is kept as narrow as the prompt-version parameter he approved before it:
+  optional, never passed by `/api/judge` or `judgeDebate`, and placed after
+  the defaulted parameter so `callJudgeModel.length` is still 4. **It can
+  only fill a gap.** Passing it for a school that has live criteria throws,
+  so no caller can use the golden path to change what a live school's
+  request contains. Without it, a draft school throws exactly as before.
+  The six request fixtures are byte-identical either side of it.
+- **`tests/draft-criteria.test.ts`** keeps it confined, like the file-sink
+  test. It walks `src/` and fails on any mention of the draft file or the
+  loader, comments included; the strictness cost `anthropic.ts` two
+  comment rewrites on the first run, which is the point. It drives the real
+  `/api/judge` handler for all three draft schools and shows each answered
+  with `no_criteria` before any topic lookup, insert or model call, with a
+  live school as the control that gets past the refusal. Demonstrated by
+  breaking it twice: a `src/` file reading the draft file failed the walk,
+  and moving the confucian criteria into `rubric.ts` failed the confucian
+  refusal.
+
+Two more things came with it. A **dry run**, `GOLDEN_DRY_RUN=1`, validates
+every fixture, plans every case, and prints the call count and cost before
+anything is sent; it needs no key, so readiness can be shown rather than
+asserted. It reads the per-call estimate from `anthropic.ts`'s COST comment
+instead of copying it. And **`weakest_move` is checked** for
+`fabricated-source`, which Arthur ruled passes on rigor 0-3 and on
+`weakest_move` naming the invention: a case-insensitive term list in the
+fixture, majority of samples, with "unverified" deliberately excluded
+because that is the right answer for an obscure real source and the wrong
+one for an invented quotation from Epictetus.
+
+The draft file's own header said "NOT LOADED BY ANYTHING" and "Pending
+approval" until this change, and the test checking it went on passing,
+because it checked that the file said so. Both claims are now true as
+written, and the test says why it was not enough.
+
+### 2F: the Tier B bands are provisional
+
+Accepted as provisional on 2026-10-24, with one rule from Arthur: **if any
+case lands outside its band, stop and report; do not adjust a band to fit a
+result.** The score bands for nine of the ten were derived by parallel to
+Tier A rather than ruled on individually, and the 40-75 given to the two
+known-weakness cases is the least grounded of them, since no existing case
+combines high fidelity with low engagement.

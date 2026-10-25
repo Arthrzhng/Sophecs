@@ -5,6 +5,7 @@
 //   npm run judge:golden
 //   GOLDEN_SAMPLES=1 npm run judge:golden         (quick, single-sample)
 //   JUDGE_PROMPT_VERSION=v3 npm run judge:golden  (run a draft prompt)
+//   GOLDEN_DRY_RUN=1 npm run judge:golden         (plan and cost it; no calls)
 //
 // Requires ANTHROPIC_API_KEY in the environment. It is read from the
 // environment and nowhere else: the script no longer loads .env.local via
@@ -27,7 +28,7 @@ import {
   PROMPT_VERSION,
   type RunnablePromptVersion,
 } from "../../src/lib/anthropic";
-import { FIDELITY_CRITERIA, hasFidelityCriteria } from "../../src/lib/judge/rubric";
+import { planCase, readDraftCriteria, type CasePlan } from "./draft-criteria";
 import { flush, record, requestFingerprint, startRun, type GoldenRun } from "./golden-log";
 import type { SchoolId } from "../../src/lib/types";
 
@@ -94,6 +95,12 @@ interface GoldenCase {
   // is an answer to the objection. Saying that without a band to put it in
   // would make it an untested sentence in a document.
   expected_engagement_band?: [number, number];
+  // Case-insensitive terms, any one of which must appear in `weakest_move`
+  // for a majority of samples. Added for `fabricated-source`, which Arthur
+  // ruled passes on rigor 0-3 AND on weakest_move naming the invention. A
+  // substring match is a proxy for "names it" and the terms are listed in
+  // the fixture, so what counts is visible rather than buried here.
+  expected_weakest_move_any_of?: string[];
   // The schools whose objection would be a legitimate one to raise against
   // this argument — always the two it was not written from. A set rather
   // than a single value on purpose: either rival is a defensible pick, so
@@ -106,6 +113,7 @@ interface Sample {
   fidelity: number;
   rigor: number;
   engagement: number;
+  weakestMove: string;
   objectionSchool: SchoolId;
 }
 
@@ -131,6 +139,7 @@ const GoldenCaseSchema = z
     expected_fidelity_band: Band.optional(),
     expected_rigor_band: Band.optional(),
     expected_engagement_band: Band.optional(),
+    expected_weakest_move_any_of: z.array(z.string().min(1)).min(1).optional(),
     expected_objection_school: z.array(z.string().min(1)).min(1),
   })
   .strict();
@@ -177,9 +186,12 @@ function spread(values: number[]): string {
   return min === max ? `${min}` : `${min}-${max}`;
 }
 
+type RunnablePlan = Extract<CasePlan, { run: true }>;
+
 async function logCall(
   run: GoldenRun | null,
   c: GoldenCase,
+  plan: RunnablePlan,
   sample: number,
   costUsd: number,
   latencyMs: number,
@@ -209,10 +221,11 @@ async function logCall(
     fixture: c.name,
     school: c.school,
     prompt_version: VERSION,
+    criteria_source: plan.source,
     request_fingerprint: requestFingerprint({
       promptVersion: VERSION,
       promptText: promptText(),
-      criteria: FIDELITY_CRITERIA[c.school],
+      criteria: plan.criteria,
       motion: c.motion,
       school: c.school,
       argument: c.argument,
@@ -250,6 +263,7 @@ function promptText(): string {
 
 async function sampleCase(
   c: GoldenCase,
+  plan: RunnablePlan,
   run: GoldenRun | null
 ): Promise<{ samples: Sample[]; failures: string[] }> {
   const samples: Sample[] = [];
@@ -262,27 +276,33 @@ async function sampleCase(
         c.school,
         c.argument,
         undefined,
-        VERSION
+        VERSION,
+        // undefined for a live school, so it is judged against rubric.ts
+        // exactly as production would; the draft file's text for a draft
+        // school, which callJudgeModel accepts only for a school with no
+        // live criteria.
+        plan.draftCriteria
       );
 
       if (verdict.rejected) {
-        await logCall(run, c, i + 1, costUsd, latencyMs, null, verdict, "model rejected the submission");
+        await logCall(run, c, plan, i + 1, costUsd, latencyMs, null, verdict, "model rejected the submission");
         failures.push("model rejected the submission");
         continue;
       }
-      await logCall(run, c, i + 1, costUsd, latencyMs, verdict, verdict, null);
+      await logCall(run, c, plan, i + 1, costUsd, latencyMs, verdict, verdict, null);
       samples.push({
         score: verdict.score,
         fidelity: verdict.fidelity,
         rigor: verdict.rigor,
         engagement: verdict.engagement,
+        weakestMove: verdict.weakest_move,
         objectionSchool: verdict.unanswered_objection.school,
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       // A billed call still counts even when the response didn't validate.
       if (err instanceof JudgeValidationError) {
-        await logCall(run, c, i + 1, err.costUsd, err.latencyMs, null, null, message);
+        await logCall(run, c, plan, i + 1, err.costUsd, err.latencyMs, null, null, message);
       }
       failures.push(message);
     }
@@ -291,8 +311,55 @@ async function sampleCase(
   return { samples, failures };
 }
 
+// The per-call estimate is read from the COST comment in
+// src/lib/anthropic.ts rather than copied here, so it cannot drift from the
+// number the repository states.
+function estimatedUsdPerCall(): number {
+  const source = fs.readFileSync(path.join(process.cwd(), "src", "lib", "anthropic.ts"), "utf-8");
+  const match = /est_usd_per_call=([\d.]+)/.exec(source);
+  if (!match) throw new Error("no est_usd_per_call in src/lib/anthropic.ts's COST comment");
+  return Number(match[1]);
+}
+
+function dryRun(cases: GoldenCase[], plans: Map<string, CasePlan>): void {
+  const rows = cases.map((c) => {
+    const plan = plans.get(c.name)!;
+    return {
+      case: c.name,
+      school: c.school,
+      criteria: plan.run ? plan.source : "-",
+      runs: plan.run ? "yes" : `no: ${plan.reason}`,
+    };
+  });
+  const running = rows.filter((r) => r.runs === "yes").length;
+  const calls = running * SAMPLES;
+  const perCall = estimatedUsdPerCall();
+  console.log(`\nDry run, prompt ${VERSION}, ${SAMPLES} sample(s) per case. Nothing was sent.\n`);
+  console.table(rows);
+  console.log(
+    `\n${running} of ${cases.length} case(s) would run: ${calls} call(s), ` +
+      `about $${(calls * perCall).toFixed(2)} at the $${perCall} per call ` +
+      `recorded in src/lib/anthropic.ts.`
+  );
+}
+
 async function main() {
   const cases = loadCases();
+  // Every case is planned before the first call, so a fixture naming a
+  // school with criteria nowhere throws here, at no cost, rather than
+  // three billed cases into the run.
+  const draft = readDraftCriteria();
+  const plans = new Map(cases.map((c) => [c.name, planCase(c.school, promptText(), draft)]));
+
+  // Everything up to here costs nothing: the fixtures are validated, every
+  // case is planned, and a broken one has already thrown. A dry run stops
+  // here and says what a real run would do and spend, so the bill is seen
+  // before it is incurred. It needs no API key, because the client is only
+  // built on the first call.
+  if (process.env.GOLDEN_DRY_RUN === "1") {
+    dryRun(cases, plans);
+    return;
+  }
   const run =
     LOG_TO === "file"
       ? startRun({
@@ -312,6 +379,8 @@ async function main() {
     rigorPass: boolean;
     engagement: string;
     engagementPass: boolean;
+    weakestMove: string;
+    weakestMovePass: boolean;
     objection: string;
     objectionPass: boolean;
     notes: string[];
@@ -321,19 +390,17 @@ async function main() {
   const skipped: string[] = [];
 
   for (const c of cases) {
-    // A Tier B fixture is committed before its school's criteria move into
-    // src/lib/judge/rubric.ts, because the criteria are Arthur's to approve
-    // and moving them is a separate decision: it also stops /api/judge
-    // refusing that school. Reading FIDELITY_CRITERIA for a school that has
-    // none throws, by design, so the case is skipped here rather than
-    // crashing the run on its first call. Not a failure, and not silent:
-    // the table shows it and the summary counts it.
-    if (!hasFidelityCriteria(c.school)) {
-      skipped.push(`${c.name} (${c.school})`);
+    // A draft school runs against the draft file's criteria, under a prompt
+    // that can list rival schools. Under v1 or v2 it is skipped, because
+    // those prompts count the rivals as two. Not a failure and not silent:
+    // the summary names each skipped case and why.
+    const plan = plans.get(c.name)!;
+    if (!plan.run) {
+      skipped.push(`${c.name} (${c.school}): ${plan.reason}`);
       continue;
     }
 
-    const { samples, failures } = await sampleCase(c, run);
+    const { samples, failures } = await sampleCase(c, plan, run);
 
     // Fewer than half the samples usable means the case has no measurable
     // result, not a low one — reporting a median of one sample would hide
@@ -352,6 +419,8 @@ async function main() {
         rigorPass: true,
         engagement: `- (${bandLabel(c.expected_engagement_band)})`,
         engagementPass: true,
+        weakestMove: "-",
+        weakestMovePass: true,
         objection: "-",
         objectionPass: false,
         notes: [`${failures.length}/${SAMPLES} samples failed`, ...new Set(failures)],
@@ -386,13 +455,37 @@ async function main() {
     const objectionPass = rivals.length * 2 > samples.length;
     const objectionSchools = [...new Set(samples.map((s) => s.objectionSchool))].join(", ");
 
-    if (!scorePass || !fidelityPass || !rigorPass || !engagementPass || !objectionPass) {
+    // Majority rule, as for the objection, and for the same reason: one
+    // sample in three missing the point is a reading to report, not a
+    // prompt that has stopped working.
+    const terms = c.expected_weakest_move_any_of;
+    const naming = terms
+      ? samples.filter((s) =>
+          terms.some((t) => s.weakestMove.toLowerCase().includes(t.toLowerCase()))
+        ).length
+      : samples.length;
+    const weakestMovePass = naming * 2 > samples.length;
+
+    if (
+      !scorePass ||
+      !fidelityPass ||
+      !rigorPass ||
+      !engagementPass ||
+      !weakestMovePass ||
+      !objectionPass
+    ) {
       anyFail = true;
     }
 
     const notes: string[] = [];
     if (failures.length) notes.push(`${failures.length}/${SAMPLES} samples failed`, ...new Set(failures));
     if (!objectionPass) notes.push(`objection from argued school in ${samples.length - rivals.length} sample(s)`);
+    if (terms && !weakestMovePass) {
+      notes.push(
+        `weakest_move named the invention in ${naming} of ${samples.length} sample(s); ` +
+          `looked for any of: ${terms.join(", ")}`
+      );
+    }
 
     rows.push({
       name: c.name,
@@ -406,6 +499,8 @@ async function main() {
         c.expected_engagement_band
       )})`,
       engagementPass,
+      weakestMove: terms ? `${naming}/${samples.length}` : "-",
+      weakestMovePass,
       objection: objectionSchools,
       objectionPass,
       notes,
@@ -427,6 +522,8 @@ async function main() {
       rigor_ok: r.rigorPass ? "✓" : "✗",
       "engagement median [spread] (band)": r.engagement,
       eng_ok: r.engagementPass ? "✓" : "✗",
+      "weakest_move names it": r.weakestMove,
+      wm_ok: r.weakestMove === "-" ? "-" : r.weakestMovePass ? "✓" : "✗",
       objection: r.objection,
       obj_ok: r.objectionPass ? "✓" : "✗",
     }))
@@ -449,16 +546,10 @@ async function main() {
 
   if (skipped.length) {
     console.log(
-      `\n${skipped.length} case(s) skipped: no fidelity criteria for the ` +
-        `school, so nothing to score against. These did not run and cost ` +
-        `nothing.`
+      `\n${skipped.length} case(s) skipped under prompt ${VERSION}. ` +
+        `These did not run and cost nothing.`
     );
-    for (const name of skipped) console.log(`  - ${name}`);
-    console.log(
-      "  Moving a school's criteria into src/lib/judge/rubric.ts is what " +
-        "makes these runnable, and that is Arthur's call: it also stops " +
-        "/api/judge refusing submissions from that school."
-    );
+    for (const line of skipped) console.log(`  - ${line}`);
   }
 
   if (anyFail) {
