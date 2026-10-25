@@ -76,19 +76,30 @@ describe("the golden run's file log", () => {
 
   it("is the function the runner actually uses, fed the environment untouched", () => {
     // Still a source check, because the runner calls the model when it is
-    // imported and so cannot be imported by a test. It can fail, which the
-    // first version of it could not, but it is narrower than a behavioural
-    // test and is the place to look first if the default ever moves.
-    expect(runner).toContain("const LOG_TO = logTarget(process.env.GOLDEN_LOG);");
-    expect(runner).not.toMatch(/process\.env\.GOLDEN_LOG\s*===/);
-    // A second reviewer flipped it anyway, by writing the variable before
-    // the call: process.env.GOLDEN_LOG ??= "ai_calls". Nothing in the
-    // runner may assign it, by any operator or either syntax.
-    const code = runner.replace(/^\s*\/\/.*$/gm, "");
+    // imported and so cannot be imported by a test. The behavioural test
+    // above guards the function itself; this guards the one line that
+    // connects the runner to it, and it is the place to look first if the
+    // default ever moves. Three reviewers between them have beaten four
+    // versions of it, so it checks code with comments removed, both kinds,
+    // and refuses every route to the variable they found.
+    const code = runner.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+
+    // The connection, in code rather than in a comment: moving this line
+    // into a comment and writing logTarget("ai_calls") passed before.
+    const assignments = code.match(/\bconst\s+LOG_TO\s*=[^;]*;/g) ?? [];
+    expect(assignments).toEqual(["const LOG_TO = logTarget(process.env.GOLDEN_LOG);"]);
+    expect(code).not.toMatch(/process\.env\.GOLDEN_LOG\s*===/);
+
+    // No write to the variable, by any operator or either syntax.
     expect(code).not.toMatch(/process\.env\.GOLDEN_LOG\s*(\?\?|\|\||&&)?=(?!=)/);
     expect(code).not.toMatch(/process\.env\[\s*["'`]GOLDEN_LOG["'`]\s*\]/);
-    expect(code).not.toMatch(/delete\s+process\.env\.GOLDEN_LOG/);
-    expect(code).not.toMatch(/Object\.assign\(\s*process\.env/);
+    expect(code).not.toMatch(/delete\s+process\.env/);
+    // Nor through the reflection and aliasing a reviewer used instead.
+    expect(code).not.toMatch(/Object\.(assign|defineProperty)\(\s*process\.env/);
+    expect(code).not.toMatch(/Reflect\.(set|defineProperty)\(\s*process\.env/);
+    expect(code, "process.env may not be aliased, since an alias can be written").not.toMatch(
+      /=\s*process\.env\s*[;,)\n]/
+    );
   });
 
   const sample = (n: number): GoldenCallRecord => ({

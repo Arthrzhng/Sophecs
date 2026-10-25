@@ -101,8 +101,10 @@ without naming who is still hurt.
 ## Doctrinal claims, and what Arthur ruled on
 
 Arthur approved these criteria on 2026-10-24 with changes, which are made
-above. This list is what is still disclosed rather than asserted, plus the
-two items his ruling settled.
+above. Each item below is a claim disclosed rather than asserted, with what
+he ruled on it. His words are quoted in docs/decisions.md, under his
+rulings of 2026-10-24; wherever this list goes further than he did, that
+is marked.
 
 1. **Whether ren or li is prior.** The criteria call li the propriety
    through which conduct is done and learned, and ren the humaneness a
@@ -162,10 +164,11 @@ two items his ruling settled.
    criteria decline to choose where the sources record a real
    disagreement.
 
-   Arthur's ruling: accepted as written. A student arguing from either
-   reading is arguing Ubuntu. This item was left off the earlier version
-   of this list although the decision list on pull request #44 said it
-   should have been on it.
+   Arthur's ruling: accepted as written. What that means in practice,
+   which is this file's reading and not his words, is that a student
+   arguing from either Menkiti's or Gyekye's reading is arguing Ubuntu.
+   This item was left off the earlier version of this list although the
+   Phase 2 decision list said it should have been on it.
 
 5. **Dependent origination and distributed responsibility.** Reading it as
    an account of why responsibility for an AI harm is spread across a

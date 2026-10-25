@@ -1225,8 +1225,13 @@ How that is built, and why each part:
   of those paths returns, and uses Node's `syncBuiltinESMExports()` to
   push the patch through to named imports. All three evasions, each placed
   at module scope in a file the route imports, pass the walk and fail the
-  recorder. The residual: a read in a `src/` file that is not on the
-  route's path at all.
+  recorder. A third reviewer found three more: copying the file and
+  reading the copy, `fs.openAsBlob`, and shelling out to `cat`. The
+  recorder now watches copies and blob opens as well, and `child_process`
+  and `worker_threads` are refused anywhere in `src/` as a tripwire, since
+  no recorder in this process can see a read made by another. The
+  residual: a constructed read in a `src/` file the route never loads, or
+  through a filesystem call not on the watched list.
 
 Two more things came with it. A **dry run**, `GOLDEN_DRY_RUN=1`, validates
 every fixture, plans every case, and prints the call count and cost before
@@ -1308,6 +1313,62 @@ On the golden run:
 > 2. Tier B score bands accepted as provisional. If any case lands outside
 >    its band, stop and report; do not adjust a band to fit a result.
 
+Earlier the same day, on the first draft of the criteria and the run:
+
+> Yes to the minimal anthropic.ts change for a version override and the
+> RIVAL_SCHOOLS substitution: v2 stays default, all six judge request
+> fixtures byte-identical. Yes to dropping --env-file.
+
+> Tier B, when written: one strong case per new school built on its central
+> concepts (ren/li; Metz's harmony; anatta), expected fidelity 8-10; and the
+> known-weakness cases (confucian-hierarchy, plus an ubuntu conformity case)
+> expect high fidelity with the loss on engagement.
+
+The second names "Metz's harmony", which Arthur withdrew in the later
+ruling above; `ubuntu-strong` is built on shared identity and solidarity
+instead. The first is the authority for changing the frozen
+`src/lib/anthropic.ts` to add a prompt version and the rival-schools
+substitution. The `draftCriteria` parameter added later rests on his
+golden-run ruling, which needs some route for draft criteria to reach the
+request without going through `rubric.ts`; he did not name the mechanism,
+and that is listed for his confirmation on pull request #44.
+
+And on `judge.v3.md`, before the decision list existed, which is what item
+16 below refers to:
+
+> v3 text accepted, with one addition. The fabrication rule depends on the
+> judge knowing a source exists, and the model knows Western sources far
+> better than Menkiti, Metz, Mhlambi or specific Pali canon sections. Add:
+> treat a source as fabricated or misattributed only when confident it does
+> not exist or does not say what is claimed; if the source cannot be
+> placed, treat it as unverified, do not penalise it, and note that in the
+> feedback.
+
+**The decision list he was answering**, as it stood, so the numbers can be
+checked. These are its sixteen headings, verbatim:
+
+1. The three revised criteria.
+2. Harmony, and this is the load-bearing one.
+3. Menkiti and Gyekye both faithful.
+4. The Buddhist criteria now name one bleed where the other two name two.
+5. "weighs suffering, dukkha, as what is at stake."
+6. "High fidelity" as a number.
+7. `fabricated-source`'s band combination.
+8. The Tier A bands you have not ruled on individually.
+9. Two fixture judgements that are mine.
+10. The `confucian-strong` worked example, rewritten on ren and li.
+11. Whether ren or li is prior.
+12. anatta to impartial compassion.
+13. Dependent origination and distributed responsibility.
+14. The Śāntideva attribution itself
+15. Metz's phrasing.
+16. `judge.v3.md`'s confidence section.
+
+Items 1 to 10 were "Needs a decision", 11 to 15 "Disclosed, no decision
+needed unless you want a change", and 16 "Settled, recorded here so it is
+not reopened". The pull request's body has since been rewritten, so this
+is now the only copy.
+
 **The key to the item numbers**, so the three attributions a reviewer
 queried can be traced:
 
@@ -1328,11 +1389,11 @@ queried can be traced:
 | 13 | Dependent origination | accepted as written |
 | 14 | The Santideva attribution | fine as a disclosure note |
 | 15 | Metz's phrasing | accepted as written |
-| 16 | `judge.v3.md`'s confidence section | settled before this list |
+| 16 | `judge.v3.md`'s confidence section | "v3 text accepted, with one addition", quoted above |
 
-So "Menkiti and Gyekye: accepted as written" is item 3; "Arthur ruled on
-the fidelity and engagement bands" is item 6, with the Tier B fidelity
-bands also set in his earlier instruction that strong cases expect 8-10 and
-known-weakness cases high fidelity with the loss on engagement; and
-"whether it tends" is his wording in the Buddhist ruling. Item 4's first
+So "Menkiti and Gyekye: accepted as written" is item 3. "Arthur ruled on
+the fidelity and engagement bands" is item 6, which accepted fidelity 7-10
+and engagement 0-4 for the known-weakness cases, together with the Tier B
+instruction quoted above, which set fidelity 8-10 for the strong cases.
+"Whether it tends" is his wording in the Buddhist ruling. Item 4's first
 half is the one thing on the list he did not rule on.

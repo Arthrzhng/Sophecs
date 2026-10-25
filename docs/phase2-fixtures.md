@@ -119,8 +119,9 @@ rounded, so they sum to $1.35 where the unrounded total is $1.34.
 **The ceiling.** Output is capped at `max_tokens: 850` in
 `src/lib/anthropic.ts`. If every call ran to the cap rather than to the
 650-token estimate, the 114 calls would cost about $1.57, and $1.74 with
-the single-sample check. That is the most this run can cost at three
-samples a case.
+the single-sample check. That is about the most this run can cost at three
+samples a case: output is capped, but input is still the four-bytes-a-token
+estimate, so the ceiling is approximate too.
 
 Against `AI_MONTHLY_BUDGET_USD`, which is $50 and production-only. A
 single-sample pass with `GOLDEN_SAMPLES=1` is a third of the calls: $0.14
@@ -554,8 +555,12 @@ request from a live school and from each draft school, by patching the
 real `fs` object rather than mocking an import, so a read through
 `node:fs/promises` or through `createRequire` is recorded too. Three
 evasions, each placed in a file the route imports, pass the walk and fail
-the recorder. What neither would catch is a constructed read in a `src/`
-file that the route never loads.
+the recorder. What neither catches is a constructed read in a `src/` file that the route
+never loads, or one through a filesystem call the recorder does not watch.
+It watches the reads, opens, copies and blob opens; a read by another
+process it cannot see at all, which is why `child_process` and
+`worker_threads` are refused anywhere in `src/`, as a tripwire rather than
+a proof.
 
 ## These bands are provisional
 

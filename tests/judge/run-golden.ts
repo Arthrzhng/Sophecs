@@ -97,7 +97,10 @@ const SAMPLES = parseSamples(process.env.GOLDEN_SAMPLES);
 function parseSamples(value: string | undefined): number {
   if (value === undefined || value === "") return 3;
   if (!/^[1-9]\d*$/.test(value)) {
-    throw new Error(`GOLDEN_SAMPLES="${value}" must be a whole number of at least 1, in digits`);
+    throw new Error(
+      `GOLDEN_SAMPLES="${value}" must be a whole number of at least 1, ` +
+        `written in digits with no leading zero or spaces`
+    );
   }
   return Number(value);
 }

@@ -160,6 +160,22 @@ describe("nothing in src/ reads the draft criteria", () => {
     expect(offenders, "nothing in src/ may import tests/judge/draft-criteria").toEqual([]);
   });
 
+  // A tripwire rather than a proof. tests/draft-criteria-reads.test.ts
+  // records every read in this process, but a child process or a worker
+  // thread reads outside it, and a third reviewer used `cat` through
+  // execFileSync to show it. Neither module has any use in a Next app that
+  // reads content, so its appearance in src/ is reason enough to stop and
+  // extend the guards first.
+  it("uses no child process or worker thread anywhere in src/", () => {
+    const offenders = sources
+      .filter((s) => /\b(?:node:)?(?:child_process|worker_threads)\b/.test(s.text))
+      .map((s) => s.file);
+    expect(
+      offenders,
+      "a read in another process is invisible to the read recorder; extend the guards before adding this"
+    ).toEqual([]);
+  });
+
   it("leaves rubric.ts holding the three live schools and nothing else", () => {
     for (const id of PUBLISHED_SCHOOL_IDS) expect(() => FIDELITY_CRITERIA[id]).not.toThrow();
     for (const id of DRAFT_SCHOOL_IDS) expect(() => FIDELITY_CRITERIA[id]).toThrow();

@@ -31,10 +31,17 @@ import { afterAll, describe, it, expect, vi } from "vitest";
  * Vitest gives each test file its own worker, so the patch reaches no
  * other test file, and it is undone after this one.
  *
- * Covered: readFileSync, readFile, openSync, open and createReadStream on
- * fs, and readFile and open on fs.promises. Every content read by path
- * goes through one of those. The residual is a read by a file descriptor
- * opened before the patch, which nothing on the route's path does.
+ * Covered on fs: readFileSync, readFile, openSync, open, createReadStream,
+ * openAsBlob, and the copies, copyFileSync, copyFile, cpSync and cp, since
+ * copying the file somewhere else and reading the copy was a third
+ * reviewer's way past the first version of this list. On fs.promises:
+ * readFile, open, copyFile and cp.
+ *
+ * What it cannot see is a read done by another process: shelling out to
+ * `cat`, or a worker thread with its own module state. A recorder in this
+ * process cannot follow those, so tests/draft-criteria.test.ts refuses
+ * `child_process` and `worker_threads` anywhere in src/ instead. Neither is
+ * used there, and a Next app reading content has no need of either.
  */
 
 const reads: string[] = [];
@@ -51,10 +58,21 @@ function watch(target: Record<string, unknown>, name: string): void {
   });
 }
 
-for (const name of ["readFileSync", "readFile", "openSync", "open", "createReadStream"]) {
+for (const name of [
+  "readFileSync",
+  "readFile",
+  "openSync",
+  "open",
+  "createReadStream",
+  "openAsBlob",
+  "copyFileSync",
+  "copyFile",
+  "cpSync",
+  "cp",
+]) {
   watch(fs as unknown as Record<string, unknown>, name);
 }
-for (const name of ["readFile", "open"]) {
+for (const name of ["readFile", "open", "copyFile", "cp"]) {
   watch(fs.promises as unknown as Record<string, unknown>, name);
 }
 syncBuiltinESMExports();
