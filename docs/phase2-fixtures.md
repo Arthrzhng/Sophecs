@@ -26,9 +26,12 @@ reads them from the draft file instead, in eval mode only. See "How Tier
 B runs" below.
 
 **The environment.** This is not something approval fixes. `npm run
-judge:golden` needs `ANTHROPIC_API_KEY`, and this sandbox has none set.
-The Anthropic API itself is reachable (`api.anthropic.com` answers), so
-this is the key alone.
+judge:golden` needs an Anthropic API key, **set as `SOPHECS_EVAL_KEY`** in
+the environment's variables. Not as `ANTHROPIC_API_KEY`: Claude Code's
+cloud sessions withhold any variable by that name, which was found the
+hard way on 2026-10-25 (see `docs/decisions.md`). The Anthropic API itself
+is reachable from a session: a request with no key comes back refused
+rather than blocked, which costs nothing and proves the route.
 
 The key is read from the environment and nowhere else. `npm run
 judge:golden` no longer passes `--env-file=.env.local`: there is no such
@@ -609,8 +612,11 @@ government, when the prince is prince, and the minister is minister", and
 ## The run, once the key is in
 
 1. `GOLDEN_DRY_RUN=1 npm run judge:golden`, and the same with
-   `JUDGE_PROMPT_VERSION=v3`. No key needed, nothing sent; confirms the
-   counts below before anything is spent.
+   `JUDGE_PROMPT_VERSION=v3`. Nothing sent; confirms the counts below
+   before anything is spent. Its last line says whether a key is visible,
+   under which name, and whether it is shaped like an Anthropic key,
+   without printing it. It should read "found in SOPHECS_EVAL_KEY". A
+   real run refuses to start if it does not.
 2. `GOLDEN_SAMPLES=1 npm run judge:golden`: 14 calls, about $0.14, to catch a
    response that fails validation before paying for three samples.
 3. `npm run judge:golden`: v2, 14 cases, 42 calls, about $0.42. The
