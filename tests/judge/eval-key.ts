@@ -105,12 +105,19 @@ export const ANTHROPIC_API_ORIGIN = "https://api.anthropic.com";
 export function endpointProblem(env: Readonly<Record<string, string | undefined>>): string | null {
   const base = env.ANTHROPIC_BASE_URL?.trim();
   if (base) {
-    let origin: string;
+    let url: URL;
     try {
-      origin = new URL(base).origin;
+      url = new URL(base);
     } catch {
       return "ANTHROPIC_BASE_URL is set to something that is not a URL";
     }
+    // A username or password in the URL is never needed here, and Node's
+    // fetch, refusing it, repeats the whole URL, password included, in its
+    // error. Refused before that can happen, without echoing either.
+    if (url.username || url.password) {
+      return "ANTHROPIC_BASE_URL carries a username or password, which it never should";
+    }
+    const origin = url.origin;
     if (origin !== ANTHROPIC_API_ORIGIN) {
       return `ANTHROPIC_BASE_URL points at ${origin}, not ${ANTHROPIC_API_ORIGIN}, and the key would go there`;
     }

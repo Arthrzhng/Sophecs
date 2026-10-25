@@ -98,6 +98,8 @@ describe("where the key would be sent", () => {
     ["http://api.anthropic.com", "points at http://api.anthropic.com"],
     ["https://api.anthropic.com.evil.example", "points at"],
     ["not a url", "not a URL"],
+    ["https://user@api.anthropic.com", "username or password"],
+    ["https://user:pw-secret@api.anthropic.com", "username or password"],
   ])("refuses a base URL of %j", (base, says) => {
     expect(endpointProblem({ ANTHROPIC_BASE_URL: base })).toContain(says);
   });
@@ -113,6 +115,9 @@ describe("where the key would be sent", () => {
     expect(describeEndpoint({ ANTHROPIC_AUTH_TOKEN: "secret-token-value" })).not.toContain(
       "secret-token-value"
     );
+    expect(
+      describeEndpoint({ ANTHROPIC_BASE_URL: "https://user:pw-secret@api.anthropic.com" })
+    ).not.toContain("pw-secret");
   });
 });
 
@@ -153,6 +158,15 @@ describe("the eval key's name stays out of production", () => {
     const assign = runner.indexOf("process.env.ANTHROPIC_API_KEY = evalKey.key;");
     expect(refuse).toBeGreaterThan(-1);
     expect(assign, "the key is set only once a valid one was found").toBeGreaterThan(refuse);
+    // Both checks must be there, not merely one of them. A reviewer deleted
+    // the endpoint check and every test still passed, because the order
+    // check above only needs some refusal before the assignment.
+    const keyCheck = runner.indexOf("if (!evalKey.ok)");
+    const endpointCheck = runner.indexOf("endpointProblem(process.env)");
+    expect(keyCheck, "the runner must refuse a missing or malformed key").toBeGreaterThan(-1);
+    expect(endpointCheck, "the runner must refuse a wrong endpoint").toBeGreaterThan(-1);
+    expect(assign).toBeGreaterThan(keyCheck);
+    expect(assign).toBeGreaterThan(endpointCheck);
     // And set nowhere else in the runner, in either syntax, or by reflection.
     // A reviewer showed the dot-form count alone missed
     // process.env["ANTHROPIC_API_KEY"] = ...

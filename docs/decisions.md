@@ -1416,10 +1416,27 @@ builds its client lazily, on the first call, from that variable; the frozen
 file is untouched, and production on Vercel reads `ANTHROPIC_API_KEY`
 exactly as before. `tests/eval-key.test.ts` refuses any mention of
 `SOPHECS_EVAL_KEY` in `src/`, and checks the runner sets the key in one
-place, after the check that refuses a real run with no valid key.
+place, after both refusal checks: the one for the key and the one for the
+endpoint. That check is a tripwire on the runner's text, not a proof: an
+aliased write such as `const e = process.env; e.ANTHROPIC_API_KEY = …`
+gets past it.
+
+**A real run also refuses unless the key is going to Anthropic.** The
+library sends the key wherever `ANTHROPIC_BASE_URL` points, read when the
+client is built. In these sessions that is `https://api.anthropic.com`,
+but a session that pointed it at a gateway would have handed the eval key
+to the gateway. So a real run refuses unless the base URL's origin is
+exactly `https://api.anthropic.com`, refuses a username or password in it,
+and refuses if `ANTHROPIC_AUTH_TOKEN` or `ANTHROPIC_CUSTOM_HEADERS` is set,
+since the library would add a second credential or arbitrary headers to
+every request. The dry run prints the endpoint above the key line.
 
 The runner also checks the key's shape before any call: a leading "Bearer",
-quote marks, a space, or no `sk-ant-` prefix each refuse the run by name.
+quote marks, a space, no `sk-ant-` prefix, or any character after it other
+than letters, digits, hyphens and underscores each refuse the run by name.
+The last catches an invisible character pasted along with the key, so it is
+refused here rather than left to the HTTP layer, whose error might repeat
+the value.
 This session came within one click of saving the key as a Bearer token,
 which Anthropic's API does not take; it wants the key alone, in a header
 called `x-api-key`. Nothing in the module ever prints, returns in a message,
