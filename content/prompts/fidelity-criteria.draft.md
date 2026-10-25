@@ -15,7 +15,9 @@ src/ reads it and drives /api/judge to show it still refuses all three.
 
 Sourcing, per Arthur's revision of 2026-10-24: quotations come only from
 content/research/non-western-sources.md, and tests/content-quotations.ts
-declares the one quotation here so the guard checks it like any other.
+declares every quotation here so the guard checks it like any other:
+eight, two in the criteria themselves (the Nguni maxim and Metz's
+principle) and six in the notes below.
 Doctrinal description does not carry that restriction, because the live
 Stoic criteria describe indifferents without quoting anyone. So these
 describe each school's central commitments rather than only the passages
@@ -26,7 +28,7 @@ Structure and length follow the three in rubric.ts: a paragraph on what the
 school's reasoning commits to, then a paragraph naming the ways an argument
 fails fidelity, including the bleeds from rival schools. The existing three
 run 730 to 893 characters and 114 to 142 words, in two paragraphs; these
-run 849 to 890 and 128 to 136.
+run 849 to 888 and 128 to 137.
 
 Those are `.length` of the stored string, which is what
 tests/judge-v3-and-refusal.test.ts asserts. An earlier revision of this
@@ -84,7 +86,7 @@ at stake. Volition weighs as much as what follows, and non-harm covers what
 one incites as well as what one does. Two commitments shape it: anatta, no
 fixed, bounded self, and dependent origination, what arises coming from
 conditions, not one cause. The discourse to Rahula asks, before acting, while
-acting and after, whether this tends to harm oneself, another, or both. A
+acting and after, whether it tends to harm oneself, another, or both. A
 later tradition's inference, such as the Mahayana argument from anatta to
 impartial compassion, is faithful when argued.
 
@@ -149,20 +151,33 @@ two items his ruling settled.
    in the research file. It is a disclosure note, not a citation, and the
    criteria do not name him.
 
-4. **Dependent origination and distributed responsibility.** Reading it as
+4. **Menkiti and Gyekye both faithful.** The criteria count Menkiti's
+   reading, on which personhood is achieved through communal obligation,
+   and Gyekye's moderate one, on which individuals keep inherent worth, as
+   equally faithful. The research file sets them out as opposed positions
+   and says the readings "overlap but are not interchangeable". So the
+   criteria decline to choose where the sources record a real
+   disagreement.
+
+   Arthur's ruling: accepted as written. A student arguing from either
+   reading is arguing Ubuntu. This item was left off the earlier version
+   of this list although the decision list on pull request #44 said it
+   should have been on it.
+
+5. **Dependent origination and distributed responsibility.** Reading it as
    an account of why responsibility for an AI harm is spread across a
    supply chain rather than located in one actor would be an inference, not
    doctrine. The criteria state the commitment neutrally, as conditions
    rather than one cause, and draw nothing from it. Accepted as written.
 
-5. **Dukkha as "suffering".** Standard in English, and the research file
+6. **Dukkha as "suffering".** Standard in English, and the research file
    itself prints "lead to harm and suffering" in the Kalama Sutta row. The
    same file's guidance says not to reduce Buddhism to "reducing
    suffering", so the criteria weigh dukkha alongside intention, non-harm,
    compassion and liberation rather than in place of them. Accepted as
    written.
 
-6. **Metz's phrasing.** The criteria use the research file's own wording.
+7. **Metz's phrasing.** The criteria use the research file's own wording.
    A reviewer noted that an earlier disclosure hedged it, saying the book had not
    been read, while the criteria stated it flatly. The research file
    supplies the wording, so the attribution is sourced; the hedge was

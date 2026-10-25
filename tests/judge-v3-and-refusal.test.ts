@@ -98,9 +98,10 @@ describe("judge.v3.md", () => {
     // exists, and what keeps production on v2 is now the version argument
     // itself: `callJudgeModel` defaults to PROMPT_VERSION and neither
     // /api/judge nor judgeDebate passes one. Asserted here by reading the
-    // route and the wrapper, and behaviourally in
-    // tests/judge-request.test.ts, which compares what judgeDebate sends
-    // against the six committed v2 fixtures.
+    // route only, and behaviourally in tests/judge-request.test.ts, which
+    // drives judgeDebate and compares what it sends against the six
+    // committed v2 fixtures. tests/draft-criteria.test.ts drives the route
+    // itself.
     expect(PROMPT_VERSION).toBe("v2");
 
     const route = read(path.join(process.cwd(), "src", "app", "api", "judge", "route.ts"));

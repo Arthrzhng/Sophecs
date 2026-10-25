@@ -1026,7 +1026,9 @@ without v3 becoming the production default.
 What keeps production on v2 is the default: the parameter defaults to
 `PROMPT_VERSION`, and neither `/api/judge` nor `judgeDebate` passes one.
 That is asserted twice. `tests/judge-v3-and-refusal.test.ts` reads the
-route and `judgeDebate` and checks neither names a version;
+route and checks it names no version (it deliberately makes no assertion
+about `judgeDebate`'s source, after a reviewer showed a literal match on it
+failed on a reformat and on nothing else);
 `tests/judge-request.test.ts` calls `judgeDebate` and compares what it
 sends against the same six committed v2 fixtures, for an original and for
 a revision. It covered only originals when first written, which reached
@@ -1084,8 +1086,10 @@ is measured and printed but cannot fail the run; the table prints `any`.
 Two cases needed it, and both came out of Arthur's revision of the draft
 criteria:
 
-- `fabricated-source` is now **score 0-40, rigor 0-3, fidelity
-  unconstrained**. v3 calls a fabricated source a rigor failure, so rigor
+- `fabricated-source` is now **score 0-50, rigor 0-3, fidelity
+  unconstrained**, and it must also have `weakest_move` name the
+  invention. Arthur widened the score band from 0-40 on 2026-10-24. v3
+  calls a fabricated source a rigor failure, so rigor
   is where the band belongs. The Stoic reasoning wrapped around the
   invented quotations really is the school's, so a judge scoring fidelity
   high there would not be wrong and one scoring it low would not be
@@ -1098,10 +1102,16 @@ criteria:
   tradition has had put to it. Saying that without a band to put it in
   would have left it an untested sentence in a document.
 
-`ubuntu-conformity` exists because the criteria changed. The earlier draft
-scored an appeal to harmony down on fidelity; harmony is Metz's own
-principle, so it no longer does, and that change needs a case or it is not
-tested.
+`ubuntu-conformity` exists because the criteria changed. The earliest
+draft scored leaning on communal expectation down on fidelity. The
+approved criteria call it faithful and put the cost of not answering the
+dissent objection on engagement instead, and that change needs a case or it
+is not tested.
+
+An intermediate draft justified the change by saying harmony is Metz's own
+principle. That came from memory, is not in the research file, and Arthur
+withdrew it; the word harmony is gone from the criteria. The change it was
+used to justify survives on its own terms.
 
 ### 2F: `--env-file` dropped from `judge:golden`
 
@@ -1124,10 +1134,14 @@ criteria:
 > commitments, not only the passages we verified. Flag any doctrinal claim
 > you are unsure of for me rather than including it.
 
-The quotation guard is unchanged and still checks the one quotation in the
-draft criteria file. What changed is that doctrinal vocabulary a school
-cannot be described without — ren, li, anatta, dependent origination,
-dukkha — no longer needs a verified passage behind it. Neither `ren` nor
+The rule for quotations is unchanged, and the guard enforcing it got
+stronger: it now also scans text in quotation marks, after a reviewer
+found five verbatim spans of the research file sitting undeclared because
+their reporting cues were not on its fixed list. The draft criteria file
+now declares eight quotations, two in the criteria and six in the notes.
+What changed in the rule is that doctrinal vocabulary a school cannot be
+described without (ren, li, anatta, dependent origination, dukkha) no
+longer needs a verified passage behind it. Neither `ren` nor
 `li` appears anywhere in the research file, so under the old rule the
 Confucian criteria could not have named the school's two central terms.
 
@@ -1220,7 +1234,9 @@ written, and the test says why it was not enough.
 
 Accepted as provisional on 2026-10-24, with one rule from Arthur: **if any
 case lands outside its band, stop and report; do not adjust a band to fit a
-result.** The score bands for nine of the ten were derived by parallel to
-Tier A rather than ruled on individually, and the 40-75 given to the two
-known-weakness cases is the least grounded of them, since no existing case
-combines high fidelity with low engagement.
+result.** Arthur ruled on the fidelity and engagement bands. The score
+bands are mine: nine were derived by parallel to Tier A, and
+`confucian-strong`'s 65-95 came from the worked example he accepted as
+written. None was ruled on individually. The 40-75 given to the two
+known-weakness cases is the least grounded, since no existing case combines
+high fidelity with low engagement.

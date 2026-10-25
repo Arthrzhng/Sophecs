@@ -47,7 +47,7 @@ function query(table: string) {
         : null,
   });
   builder.single = builder.maybeSingle;
-  builder.insert = (..._args: unknown[]) => {
+  builder.insert = () => {
     inserts.push(table);
     return builder;
   };
@@ -212,6 +212,14 @@ describe("the golden run's draft criteria", () => {
       const plan = planCase(id, v2, draft);
       expect(plan.run).toBe(false);
       if (!plan.run) expect(plan.reason).toContain("counts them as two");
+    }
+  });
+
+  it("throws, before any call, for an empty section", () => {
+    for (const empty of ["", "   ", "\n\n"]) {
+      expect(() => planCase("ubuntu", v3, { ubuntu: empty })).toThrow(
+        'the draft criteria for "ubuntu" are empty'
+      );
     }
   });
 

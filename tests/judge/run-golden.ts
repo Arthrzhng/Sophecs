@@ -6,6 +6,7 @@
 //   GOLDEN_SAMPLES=1 npm run judge:golden         (quick, single-sample)
 //   JUDGE_PROMPT_VERSION=v3 npm run judge:golden  (run a draft prompt)
 //   GOLDEN_DRY_RUN=1 npm run judge:golden         (plan and cost it; no calls)
+//                                                 (1/true/yes; anything unclear refuses)
 //
 // Requires ANTHROPIC_API_KEY in the environment. It is read from the
 // environment and nowhere else: the script no longer loads .env.local via
@@ -29,7 +30,14 @@ import {
   type RunnablePromptVersion,
 } from "../../src/lib/anthropic";
 import { planCase, readDraftCriteria, type CasePlan } from "./draft-criteria";
-import { flush, record, requestFingerprint, startRun, type GoldenRun } from "./golden-log";
+import {
+  flush,
+  logTarget,
+  recordCall,
+  requestFingerprint,
+  startRun,
+  type GoldenRun,
+} from "./golden-log";
 import type { SchoolId } from "../../src/lib/types";
 
 // Where a run logs. `file` writes tests/judge/golden-runs/<run>.json and
@@ -41,7 +49,7 @@ import type { SchoolId } from "../../src/lib/types";
 // eval box has no other reason to have. Production logging is unchanged:
 // judgeDebate still writes to ai_calls and nothing in src/ imports the
 // file sink. See tests/golden-log.test.ts.
-const LOG_TO = process.env.GOLDEN_LOG === "ai_calls" ? "ai_calls" : "file";
+const LOG_TO = logTarget(process.env.GOLDEN_LOG);
 
 // Which prompt the run measures. The default is production's, so a bare
 // `npm run judge:golden` is the baseline table; `JUDGE_PROMPT_VERSION=v3`
@@ -73,7 +81,35 @@ const VERSION = resolveVersion();
 // single-sample runs against a band of 8-10. Three samples and a median
 // measure the distribution instead of pretending it's a point value, at 3x
 // the cost (~18p a run). See docs/decisions.md.
-const SAMPLES = Math.max(1, Number(process.env.GOLDEN_SAMPLES ?? "3"));
+const SAMPLES = parseSamples(process.env.GOLDEN_SAMPLES);
+
+// A whole number of at least 1, or the run refuses to start. It used to be
+// Math.max(1, Number(value)), which turned "abc" into NaN and a loop that
+// silently never ran. There is no upper cap: how much one run may spend is
+// Arthur's decision, so the run prints its planned cost before the first
+// call instead.
+function parseSamples(value: string | undefined): number {
+  if (value === undefined || value === "") return 3;
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < 1) {
+    throw new Error(`GOLDEN_SAMPLES="${value}" must be a whole number of at least 1`);
+  }
+  return n;
+}
+
+// Whether to stop before the first call. It used to be true only for the
+// exact string "1", so GOLDEN_DRY_RUN=true, with a key present, would have
+// made a real and billed run. A value that is clearly yes or clearly no is
+// accepted; anything else refuses to start, because an unclear answer to
+// "should this spend money" must not default to yes.
+function parseDryRun(value: string | undefined): boolean {
+  const v = (value ?? "").trim().toLowerCase();
+  if (v === "" || v === "0" || v === "false" || v === "no") return false;
+  if (v === "1" || v === "true" || v === "yes") return true;
+  throw new Error(`GOLDEN_DRY_RUN="${value}" is neither yes nor no; refusing to guess`);
+}
+
+const DRY_RUN = parseDryRun(process.env.GOLDEN_DRY_RUN);
 
 interface GoldenCase {
   name: string;
@@ -216,7 +252,8 @@ async function logCall(
   // the two conditions ever drifted apart. A reviewer called it dead code,
   // which it is, and removing it fails the typecheck.
   if (!run) return;
-  record(run, {
+  // Records and writes in one step, so the run survives a crash mid-way.
+  recordCall(run, {
     sample,
     fixture: c.name,
     school: c.school,
@@ -242,9 +279,6 @@ async function logCall(
     error,
     at: new Date().toISOString(),
   });
-  // Written after every call, so a run that dies part way through still
-  // leaves a record of what it spent.
-  flush(run);
 }
 
 // Read once. It used to be re-read on every logged call while
@@ -311,14 +345,57 @@ async function sampleCase(
   return { samples, failures };
 }
 
-// The per-call estimate is read from the COST comment in
-// src/lib/anthropic.ts rather than copied here, so it cannot drift from the
-// number the repository states.
-function estimatedUsdPerCall(): number {
+// What one call is expected to cost under the prompt version being run.
+//
+// Derived, not copied, from src/lib/anthropic.ts: the token estimates in
+// its COST comment and its two per-token rates. Two corrections to the
+// obvious approach, both found in review:
+//
+// - est_in=1700 was measured for v2. The whole prompt file is sent, header
+//   comment included, and v3 is more than twice v2's size, so a v3 run
+//   priced at v2's figure understated it by about a third. The difference
+//   in file size is added at roughly four bytes a token. That is a rule of
+//   thumb rather than a count, which would need an API call.
+// - The COST comment's own est_usd_per_call=0.0098 does not follow from
+//   its est_in and est_out at those rates, which give 0.0099. The frozen
+//   file is left alone and the figure is computed here instead.
+function estimatedUsdPerCall(): { usd: number; inputTokens: number; outputTokens: number } {
   const source = fs.readFileSync(path.join(process.cwd(), "src", "lib", "anthropic.ts"), "utf-8");
-  const match = /est_usd_per_call=([\d.]+)/.exec(source);
-  if (!match) throw new Error("no est_usd_per_call in src/lib/anthropic.ts's COST comment");
-  return Number(match[1]);
+  const num = (re: RegExp, what: string): number => {
+    const m = re.exec(source);
+    if (!m) throw new Error(`could not read ${what} from src/lib/anthropic.ts`);
+    return Number(m[1].replace(/_/g, "")) / (m[2] ? Number(m[2].replace(/_/g, "")) : 1);
+  };
+  const estIn = num(/est_in=(\d+)()/, "est_in");
+  const estOut = num(/est_out=(\d+)()/, "est_out");
+  const inRate = num(/INPUT_COST_PER_TOKEN = ([\d_]+) \/ ([\d_]+);/, "INPUT_COST_PER_TOKEN");
+  const outRate = num(/OUTPUT_COST_PER_TOKEN = ([\d_]+) \/ ([\d_]+);/, "OUTPUT_COST_PER_TOKEN");
+
+  const bytes = (v: string) =>
+    fs.statSync(path.join(process.cwd(), "content", "prompts", `judge.${v}.md`)).size;
+  const inputTokens = Math.round(estIn + (bytes(VERSION) - bytes("v2")) / 4);
+  return {
+    usd: inputTokens * inRate + estOut * outRate,
+    inputTokens,
+    outputTokens: estOut,
+  };
+}
+
+function planSummary(cases: GoldenCase[], plans: Map<string, CasePlan>): string {
+  const running = cases.filter((c) => plans.get(c.name)!.run).length;
+  const calls = running * SAMPLES;
+  const est = estimatedUsdPerCall();
+  return (
+    `${running} of ${cases.length} case(s) would run: ${calls} call(s), ` +
+    `about $${(calls * est.usd).toFixed(2)}, at an estimated ` +
+    `$${est.usd.toFixed(4)} a call (~${est.inputTokens} tokens in, ` +
+    `~${est.outputTokens} out, priced at src/lib/anthropic.ts's rates). ` +
+    `An estimate: the real run reports what was billed.`
+  );
+}
+
+function printPlan(cases: GoldenCase[], plans: Map<string, CasePlan>): void {
+  console.log(`\nPrompt ${VERSION}, ${SAMPLES} sample(s) per case. ${planSummary(cases, plans)}\n`);
 }
 
 function dryRun(cases: GoldenCase[], plans: Map<string, CasePlan>): void {
@@ -331,16 +408,9 @@ function dryRun(cases: GoldenCase[], plans: Map<string, CasePlan>): void {
       runs: plan.run ? "yes" : `no: ${plan.reason}`,
     };
   });
-  const running = rows.filter((r) => r.runs === "yes").length;
-  const calls = running * SAMPLES;
-  const perCall = estimatedUsdPerCall();
   console.log(`\nDry run, prompt ${VERSION}, ${SAMPLES} sample(s) per case. Nothing was sent.\n`);
   console.table(rows);
-  console.log(
-    `\n${running} of ${cases.length} case(s) would run: ${calls} call(s), ` +
-      `about $${(calls * perCall).toFixed(2)} at the $${perCall} per call ` +
-      `recorded in src/lib/anthropic.ts.`
-  );
+  console.log(`\n${planSummary(cases, plans)}`);
 }
 
 async function main() {
@@ -356,10 +426,12 @@ async function main() {
   // here and says what a real run would do and spend, so the bill is seen
   // before it is incurred. It needs no API key, because the client is only
   // built on the first call.
-  if (process.env.GOLDEN_DRY_RUN === "1") {
+  if (DRY_RUN) {
     dryRun(cases, plans);
     return;
   }
+  // A real run says what it is about to spend before it spends it.
+  printPlan(cases, plans);
   const run =
     LOG_TO === "file"
       ? startRun({

@@ -287,7 +287,7 @@ describe("the prompt version override", () => {
 });
 
 describe("every judge prompt file", () => {
-  // The invariant `fillOnce` enforces at call time, checked here at the
+  // The invariant `fillPlaceholders` enforces at call time, checked here at the
   // file level so it fails on the prompt rather than on a run.
   //
   // This is the test that would have caught judge.v3.md naming both of its
@@ -313,7 +313,7 @@ describe("every judge prompt file", () => {
       expect(Object.fromEntries(counts)).toEqual(
         Object.fromEntries([...counts.keys()].map((k) => [k, 1]))
       );
-      // And the rubric is in every version, since fillOnce requires it.
+      // And the rubric is in every version, since fillPlaceholders requires it.
       expect(counts.get("{{RUBRIC}}")).toBe(1);
     });
   }

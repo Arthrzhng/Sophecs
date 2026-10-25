@@ -1,7 +1,16 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, it, expect } from "vitest";
-import { requestFingerprint, sha256, RUNS_DIR } from "./judge/golden-log";
+import os from "node:os";
+import {
+  logTarget,
+  recordCall,
+  requestFingerprint,
+  sha256,
+  startRun,
+  RUNS_DIR,
+  type GoldenCallRecord,
+} from "./judge/golden-log";
 
 const read = (f: string) => fs.readFileSync(path.join(process.cwd(), f), "utf-8");
 
@@ -50,30 +59,93 @@ describe("production logging", () => {
 describe("the golden run's file log", () => {
   const runner = read("tests/judge/run-golden.ts");
 
-  it("writes to a file by default and to ai_calls only on request", () => {
-    expect(runner).toContain('process.env.GOLDEN_LOG === "ai_calls"');
-    expect(runner).toContain('startRun(');
-    expect(runner).toContain("flush(run, true)");
+  // These three used to read the runner's source for strings. A reviewer
+  // flipped the default so every golden run wrote to the production ledger
+  // and all three stayed green. They now test what the code does.
+
+  it("logs to a file unless asked, in exactly one spelling, for ai_calls", () => {
+    expect(logTarget(undefined)).toBe("file");
+    expect(logTarget("")).toBe("file");
+    expect(logTarget("file")).toBe("file");
+    // A typo or a near miss has to fail safe, into the file.
+    for (const near of ["AI_CALLS", "ai-calls", "aicalls", "ai_calls ", "true", "1"]) {
+      expect(logTarget(near), near).toBe("file");
+    }
+    expect(logTarget("ai_calls")).toBe("ai_calls");
   });
 
-  it("records everything the amendment asked for", () => {
-    const sink = read("tests/judge/golden-log.ts");
-    for (const field of [
-      "prompt_version",
-      "fixture",
-      "request_fingerprint",
-      "response",
-      "score",
-      "cost_usd",
-    ]) {
-      expect(sink, `GoldenCallRecord should carry ${field}`).toContain(`${field}:`);
+  it("is the function the runner actually uses", () => {
+    // The one source check left, and it can fail: inlining a flipped
+    // default would remove this call.
+    expect(runner).toContain("const LOG_TO = logTarget(process.env.GOLDEN_LOG);");
+    expect(runner).not.toMatch(/process\.env\.GOLDEN_LOG\s*===/);
+  });
+
+  const sample = (n: number): GoldenCallRecord => ({
+    sample: n,
+    fixture: "stoic-strong",
+    school: "stoicism",
+    prompt_version: "v2",
+    criteria_source: "live",
+    request_fingerprint: "f",
+    model: "m",
+    response: { rejected: false },
+    score: 80,
+    fidelity: 9,
+    rigor: 8,
+    engagement: 7,
+    objection_school: "utilitarianism",
+    cost_usd: 0.01,
+    latency_ms: 10,
+    error: null,
+    at: "2026-10-25T00:00:00.000Z",
+  });
+
+  it("writes the run to disk after every call, not only at the end", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "golden-"));
+    try {
+      const run = startRun({ promptVersion: "v2", promptText: "p", model: "m", samplesPerCase: 3 });
+      const file = recordCall(run, sample(1), dir);
+      // On disk after one call, before anything says the run is finished:
+      // a run that dies here still leaves what it spent.
+      const afterOne = JSON.parse(fs.readFileSync(file, "utf-8"));
+      expect(afterOne.records).toHaveLength(1);
+      expect(afterOne.finished_at).toBeNull();
+      expect(afterOne.total_cost_usd).toBeCloseTo(0.01);
+
+      recordCall(run, sample(2), dir);
+      expect(JSON.parse(fs.readFileSync(file, "utf-8")).records).toHaveLength(2);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
     }
   });
 
-  it("flushes after every call, not only at the end", () => {
-    // A run that dies part way through still has to leave what it spent.
+  it("records everything the amendment asked for, and where the criteria came from", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "golden-"));
+    try {
+      const run = startRun({ promptVersion: "v2", promptText: "p", model: "m", samplesPerCase: 1 });
+      const written = JSON.parse(fs.readFileSync(recordCall(run, sample(1), dir), "utf-8"));
+      for (const field of [
+        "prompt_version",
+        "criteria_source",
+        "fixture",
+        "request_fingerprint",
+        "response",
+        "score",
+        "rigor",
+        "engagement",
+        "cost_usd",
+      ]) {
+        expect(written.records[0], `a record should carry ${field}`).toHaveProperty(field);
+      }
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("goes through recordCall, so the per-call write is not a separate line to forget", () => {
     const logCall = runner.slice(runner.indexOf("async function logCall"));
-    expect(logCall.slice(0, logCall.indexOf("\n}"))).toContain("flush(run)");
+    expect(logCall.slice(0, logCall.indexOf("\n}"))).toContain("recordCall(run,");
   });
 });
 

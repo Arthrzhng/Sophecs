@@ -4,7 +4,7 @@ What a judge run would consist of, written down before one happens. Arthur
 reads this and the draft criteria first; nothing here has been sent to a
 model.
 
-Measured against `main` at 7dd2975.
+Measured against `main` at efa2173.
 
 ---
 
@@ -14,7 +14,9 @@ Measured against `main` at 7dd2975.
 `GOLDEN_DRY_RUN=1 npm run judge:golden` validates all 24 fixtures, plans
 every case, and prints what a real run would do and cost, without a key
 and without sending anything. Under v2 it reports 14 of 24 cases, 42
-calls; under v3, 24 of 24, 72 calls.
+calls, about $0.42; under v3, 24 of 24, 72 calls, about $0.93. Any value of
+`GOLDEN_DRY_RUN` that is not clearly yes or no refuses to start, because
+`GOLDEN_DRY_RUN=true` used to make a real, billed run.
 
 **The criteria are approved** as of 2026-10-24 and stay in
 `content/prompts/fidelity-criteria.draft.md`. Arthur ruled that they do
@@ -82,28 +84,39 @@ near a band edge: `stoic-strong` returned fidelity 7, 8, 8 on three
 consecutive single-sample runs against a band of 8 to 10. That is already
 recorded in `docs/decisions.md` and is not revisited here.
 
-`src/lib/anthropic.ts` carries `est_usd_per_call=0.0098` for
-`est_in=1700 est_out=650` at $2/M in and $10/M out. Its own figures give
-1700 x $2/M + 650 x $10/M = $0.0034 + $0.0065 = **$0.0099**, so the
-recorded per-call estimate is a hundredth of a cent low and the whole run
-is nearer $1.10 than $1.09. The table below uses the recorded 0.0098,
-because that is the number the repository states; the arithmetic is noted
-here rather than silently corrected, since the constant lives in a frozen
-file. A reviewer found this.
+**These figures were wrong in an earlier version of this document, and
+low by about a sixth.** They priced every call at v2's size. The whole
+prompt file is sent, header comment included, and `judge.v3.md` is 10,701
+bytes against v2's 4,794, so a v3 call carries roughly 1,480 more input
+tokens. A reviewer found it. The estimate is now computed per version:
+
+- `src/lib/anthropic.ts` gives `est_in=1700 est_out=650` for v2, at $2/M
+  in and $10/M out. That is **$0.0099** a call. (Its own recorded
+  `est_usd_per_call=0.0098` does not follow from those figures; the frozen
+  file is left alone and the arithmetic is done here.)
+- v3 adds the difference in file size at roughly four bytes a token, about
+  3,180 tokens in: **$0.0129** a call. Four bytes a token is a rule of
+  thumb; a real count needs an API call. The run reports what was actually
+  billed.
 
 | Run | Cases | Samples | Calls | Approximate cost |
 |---|---|---|---|---|
-| Tier A under v2 (baseline) | 14 | 3 | 42 | $0.41 |
-| Tier A under v3 | 14 | 3 | 42 | $0.41 |
-| **Tier A total** | | | **84** | **$0.82** |
-| Tier B under v3 | 10 | 3 | 30 | $0.29 |
-| **Everything** | | | **114** | **$1.12** |
+| Tier A under v2 (baseline) | 14 | 3 | 42 | $0.42 |
+| Tier A under v3 | 14 | 3 | 42 | $0.54 |
+| Tier B under v3 | 10 | 3 | 30 | $0.39 |
+| **Everything** | | | **114** | **$1.34** |
+
+Tier A and Tier B under v3 are one run of 24 cases, 72 calls, $0.93. Before
+the correction this table said $1.12 for everything, and v3's run $0.71.
+
+`GOLDEN_DRY_RUN=1 npm run judge:golden` prints these same figures for the
+version it is given, from the same source, without a key and without
+sending anything. It is what produced the numbers above.
 
 Against `AI_MONTHLY_BUDGET_USD`, which is $50 and production-only. A
 single-sample pass with `GOLDEN_SAMPLES=1` is a third of the calls: $0.14
-for Tier A under one prompt version, $0.27 for Tier A under both. It is
-worth doing first to catch a fixture that fails to validate before paying
-for three samples of it.
+under v2, $0.31 for all 24 cases under v3. The v2 one is worth doing first,
+to catch a response that fails validation before paying for three samples.
 
 The runner no longer logs to `ai_calls`: these 114 calls do not land in
 production's spend ledger and the run needs no route to Supabase. See "How
@@ -535,10 +548,29 @@ v3 must not move.
 ## A note on these arguments
 
 Each is written as a student would write it, at the length the existing six
-run to, roughly 150 to 190 words. Each carries its own motion rather than
+run to: these ten are 151 to 186 words, against 121 to 205 for the
+existing six. Each carries its own motion rather than
 pointing at a live one in `debate_topics`, for the reason 2D gave: a motion
 read live is a motion that can be reworded under a thing that depends on
 it.
+
+Two were rewritten after review, before any run, because they did not
+exhibit the shape their rows claim. Neither band changed.
+
+- `confucian-hierarchy` was meant to leave the conceded objection
+  unanswered, and answered it: "If the worker can appeal, and the employer
+  answers, the relation is intact." That is engagement, and would have
+  scored as such. It now argues the reciprocity of the roles and never
+  meets the power between them. Nothing unfaithful was added to make it
+  lean harder; in particular it does not tell the worker not to question
+  the employer, since the Analects endorses remonstrance and that would
+  have lowered fidelity and muddied the case.
+- `ubuntu-conformity` committed a fidelity failure the criteria name:
+  "they are the year group's own, which is to say they are the
+  community's", which treats the community as a single stakeholder. It
+  now leans on the expectations of named relationships, the pupils' year
+  group, their families and their teachers, and still says nothing about
+  the pressure that puts on a pupil who differs.
 
 They are not covered by the quotation guard, because that reads
 `content/**` and these are test data. Nothing in them is presented as a
@@ -554,17 +586,18 @@ government, when the prince is prince, and the minister is minister", and
 1. `GOLDEN_DRY_RUN=1 npm run judge:golden`, and the same with
    `JUDGE_PROMPT_VERSION=v3`. No key needed, nothing sent; confirms the
    counts below before anything is spent.
-2. `GOLDEN_SAMPLES=1 npm run judge:golden`: 14 calls, $0.14, to catch a
+2. `GOLDEN_SAMPLES=1 npm run judge:golden`: 14 calls, about $0.14, to catch a
    response that fails validation before paying for three samples.
-3. `npm run judge:golden`: v2, 14 cases, 42 calls, $0.41. The baseline.
+3. `npm run judge:golden`: v2, 14 cases, 42 calls, about $0.42. The
+   baseline.
 4. `JUDGE_PROMPT_VERSION=v3 npm run judge:golden`: v3, all 24 cases, 72
-   calls, $0.71. Tier A's second table and Tier B's only one.
+   calls, about $0.93. Tier A's second table and Tier B's only one.
 5. Paste both tables. **Any case outside its band: stop and report, and do
    not adjust the band.**
 
-Steps 2 to 4 together are 128 calls and about $1.25 with the single-sample
-check; 114 calls and $1.12 without it. All against the per-call estimate
-in `src/lib/anthropic.ts`, which is itself a hundredth of a cent low, as
-noted under "Sampling, calls and cost".
+Steps 2 to 4 together are 128 calls and about $1.48 with the single-sample
+check; 114 calls and about $1.34 without it. Both are estimates, computed
+per prompt version as "Sampling, calls and cost" describes, and both were
+understated in an earlier version of this document at $1.25 and $1.12.
 
 Nothing goes to a model until Arthur confirms the eval key is in.

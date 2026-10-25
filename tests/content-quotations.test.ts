@@ -136,3 +136,17 @@ describe("original schools, report only", () => {
     expect(untraceable.length).toBeLessThanOrEqual(REPORT_ONLY.length);
   });
 });
+
+// The draft criteria file states how many quotations it declares. That
+// number went stale twice in one sitting while the list was being edited,
+// so it is checked against the manifest rather than trusted.
+describe("the draft criteria file's own count of its quotations", () => {
+  it("matches the manifest", () => {
+    const file = "content/prompts/fidelity-criteria.draft.md";
+    const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+      "nine", "ten", "eleven", "twelve"];
+    const stated = /declares every quotation here[^:]*:\s*(\w+),/.exec(read(file))?.[1];
+    expect(stated, "the header should state a count").toBeDefined();
+    expect(words.indexOf(stated as string)).toBe(DECLARED[file].quotes.length);
+  });
+});

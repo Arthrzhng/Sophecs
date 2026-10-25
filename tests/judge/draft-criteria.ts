@@ -84,6 +84,13 @@ export function planCase(
         `src/lib/judge/rubric.ts or in content/prompts/fidelity-criteria.draft.md`
     );
   }
+  // An empty section is not criteria. Judging against nothing is the
+  // failure the rubric Proxy exists to prevent for live schools, and an
+  // empty string would pass straight through the `??` in callJudgeModel,
+  // so it is refused here, before anything is spent.
+  if (criteria.trim() === "") {
+    throw new Error(`the draft criteria for "${school}" are empty`);
+  }
   if (!promptTemplate.includes("{{RIVAL_SCHOOLS}}")) {
     return {
       run: false,

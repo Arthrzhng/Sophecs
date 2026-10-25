@@ -36,10 +36,11 @@ export const DECLARED: Record<string, FileQuotes> = {
     ],
   },
 
-  // Not content a reader sees: the draft fidelity criteria, pending
-  // approval and loaded by nothing. Declared anyway, because the claim
-  // made for them is that they came only from the school files and the
-  // research file, and this is what makes that checkable.
+  // Not content a reader sees: the draft fidelity criteria, approved by
+  // Arthur on 2026-10-24 and read by the golden runner only, never by
+  // anything in src/. Declared anyway, because the claim made for them is
+  // that their quotations come only from the research file, and this is
+  // what makes that checkable.
   "content/prompts/fidelity-criteria.draft.md": {
     quotes: [
       {
@@ -47,11 +48,12 @@ export const DECLARED: Record<string, FileQuotes> = {
         exceptions: [{ kind: "lowercase-first" }, { kind: "drop-full-stop" }],
         note: "the Ubuntu criteria, which run the maxim on after a colon",
       },
-      // The five below were found undeclared by a reviewer, which is the
-      // whole point of a manifest: the file claims to be checkable and was
-      // not, for these. All five are verbatim; none was fabricated. The
-      // first is the one that matters, because it is in the criteria the
-      // judge would read rather than in the notes underneath them.
+      // Five of the entries below were found undeclared by a reviewer,
+      // which is the whole point of a manifest: the file claimed to be
+      // checkable and was not, for these. All were verbatim; none was
+      // fabricated. The two after them were added as the disclosure list
+      // grew. The first below is the one that matters, because it is in
+      // the criteria the judge reads rather than in the notes under them.
       {
         source:
           "Right action honours capacities for relationships of shared identity and solidarity",
@@ -63,6 +65,10 @@ export const DECLARED: Record<string, FileQuotes> = {
           "Right action honours capacities for relationships of shared identity and solidarity",
         exceptions: [{ kind: "omit", text: "Right action honours " }],
         note: "the disclosure list, quoting the row's wording after 'honouring'",
+      },
+      {
+        source: "overlap but are not interchangeable",
+        note: "the disclosure list, on the research file setting Menkiti and Gyekye apart",
       },
       {
         source: "whether appeals to harmony silence dissent.",

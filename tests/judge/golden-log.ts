@@ -111,6 +111,21 @@ export function requestFingerprint(input: {
 
 export const RUNS_DIR = path.join(process.cwd(), "tests", "judge", "golden-runs");
 
+/**
+ * Where a golden run logs, from the value of GOLDEN_LOG.
+ *
+ * `file` unless asked, in exactly one spelling, for `ai_calls`. A function
+ * rather than an inline expression in the runner so the default can be
+ * tested by what it returns: a reviewer flipped the inline version so that
+ * every golden run wrote to the production ledger, which is a stop-(a)
+ * database write, and the source-reading test that was meant to guard it
+ * stayed green. Anything that is not exactly "ai_calls" means the file,
+ * so a typo can only ever fail safe.
+ */
+export function logTarget(value: string | undefined): "file" | "ai_calls" {
+  return value === "ai_calls" ? "ai_calls" : "file";
+}
+
 export function startRun(meta: {
   promptVersion: string;
   promptText: string;
@@ -138,12 +153,25 @@ export function record(run: GoldenRun, r: GoldenCallRecord): void {
   run.total_cost_usd = Number((run.total_cost_usd + r.cost_usd).toFixed(6));
 }
 
-/** Writes the run and returns where it went. Written after every call, so
- *  a run that dies part way through still leaves what it had. */
-export function flush(run: GoldenRun, finished = false): string {
-  fs.mkdirSync(RUNS_DIR, { recursive: true });
+/** Writes the run and returns where it went. `dir` exists so a test can
+ *  write somewhere other than the repository. */
+export function flush(run: GoldenRun, finished = false, dir: string = RUNS_DIR): string {
+  fs.mkdirSync(dir, { recursive: true });
   if (finished) run.finished_at = new Date().toISOString();
-  const file = path.join(RUNS_DIR, `${run.run_id}.json`);
+  const file = path.join(dir, `${run.run_id}.json`);
   fs.writeFileSync(file, `${JSON.stringify(run, null, 2)}\n`, "utf-8");
   return file;
+}
+
+/**
+ * Record one call and write the run to disk at once.
+ *
+ * The runner calls this rather than `record` and `flush` separately, so
+ * that "written after every call" is a property of one function that a
+ * test can exercise, instead of a line in the runner that a test can only
+ * read. A run that dies part way through leaves everything it spent.
+ */
+export function recordCall(run: GoldenRun, r: GoldenCallRecord, dir: string = RUNS_DIR): string {
+  record(run, r);
+  return flush(run, false, dir);
 }
