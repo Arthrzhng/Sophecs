@@ -1,4 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
+import fs from "node:fs";
+import { syncBuiltinESMExports } from "node:module";
+import { afterAll, describe, it, expect, vi } from "vitest";
 
 /**
  * What /api/judge actually reads from disk.
@@ -7,45 +9,60 @@ import { describe, it, expect, vi } from "vitest";
  * reviewer showed that is not enough: building the path from pieces,
  * ["content/prompts/fidelity-criteria", "draft", "md"].join("."), put a
  * real read past it with every test green. A search for a name cannot see
- * a name that is assembled at runtime.
+ * a name assembled at runtime.
  *
- * So this records every file the filesystem is asked for while the route
- * is imported and while it handles a request from each draft school, and
- * fails if the draft criteria are among them, however the path was built.
- * It lives in its own file so that nothing else here reads the draft file
- * for a legitimate reason and muddies the record.
+ * So this records every path the filesystem is asked for while the route
+ * is imported and while it handles requests, and fails if the draft
+ * criteria are among them, however the path was built.
+ *
+ * **How it records, and why this way.** The first version mocked the
+ * `node:fs` and `fs` specifiers, and a second reviewer got past it twice:
+ * through `node:fs/promises`, and through `createRequire(...)("node:fs")`,
+ * which is a CommonJS require that a module mock never sees. Mocking
+ * specifiers will always leave one out. Instead this patches the real fs
+ * module object in place. That one object is what `require("node:fs")`,
+ * `createRequire(...)("node:fs")` and the default ESM import all return,
+ * and `fs.promises` is what `node:fs/promises` returns; Node's
+ * `syncBuiltinESMExports()` then pushes the patched functions through to
+ * every named ESM import, `import { readFileSync } from "node:fs"`
+ * included. Every read passes through unchanged: the route still loads its
+ * prompt, and this only watches.
+ *
+ * Vitest gives each test file its own worker, so the patch reaches no
+ * other test file, and it is undone after this one.
+ *
+ * Covered: readFileSync, readFile, openSync, open and createReadStream on
+ * fs, and readFile and open on fs.promises. Every content read by path
+ * goes through one of those. The residual is a read by a file descriptor
+ * opened before the patch, which nothing on the route's path does.
  */
 
-// vi.mock is hoisted above everything else in the file, so the recorder
-// and the factory are hoisted with it. Both specifiers, so a module that
-// imports "fs" rather than "node:fs" is recorded too. Every read passes
-// through to the real filesystem: the route still loads its prompt, and
-// this only watches.
-const { reads, recordingFs } = vi.hoisted(() => {
-  const reads: string[] = [];
-  const recordingFs = async (importOriginal: () => Promise<unknown>) => {
-    const actual = (await importOriginal()) as typeof import("node:fs");
-    const watch =
-      <F extends (...a: never[]) => unknown>(fn: F) =>
-      (...args: unknown[]) => {
-        reads.push(String(args[0]));
-        return (fn as unknown as (...a: unknown[]) => unknown)(...args);
-      };
-    const wrapped = {
-      ...actual,
-      readFileSync: watch(actual.readFileSync),
-      readFile: watch(actual.readFile),
-      openSync: watch(actual.openSync),
-      createReadStream: watch(actual.createReadStream),
-      promises: { ...actual.promises, readFile: watch(actual.promises.readFile) },
-    };
-    return { ...wrapped, default: wrapped };
-  };
-  return { reads, recordingFs };
-});
+const reads: string[] = [];
+const restore: (() => void)[] = [];
 
-vi.mock("node:fs", recordingFs);
-vi.mock("fs", recordingFs);
+function watch(target: Record<string, unknown>, name: string): void {
+  const original = target[name] as (...args: unknown[]) => unknown;
+  target[name] = function (this: unknown, ...args: unknown[]) {
+    reads.push(String(args[0]));
+    return original.apply(this, args);
+  };
+  restore.push(() => {
+    target[name] = original;
+  });
+}
+
+for (const name of ["readFileSync", "readFile", "openSync", "open", "createReadStream"]) {
+  watch(fs as unknown as Record<string, unknown>, name);
+}
+for (const name of ["readFile", "open"]) {
+  watch(fs.promises as unknown as Record<string, unknown>, name);
+}
+syncBuiltinESMExports();
+
+afterAll(() => {
+  for (const undo of restore) undo();
+  syncBuiltinESMExports();
+});
 
 vi.mock("@anthropic-ai/sdk", () => ({
   default: class {
@@ -92,6 +109,24 @@ describe("/api/judge's reads from disk", () => {
 
   it("never touches the draft criteria while loading", () => {
     expect(reads.filter((p) => p.includes(DRAFT_FILE))).toEqual([]);
+  });
+
+  it("never touches the draft criteria while handling a live school either", async () => {
+    // A read added lazily on the path a live school takes would not run
+    // for a draft school, which stops at the criteria check. A live school
+    // gets past it, to the topic lookup, which this stub answers with no
+    // topic.
+    process.env.KILL_SWITCH_JUDGE = "false";
+    profileSchool = "stoicism";
+    const before = reads.length;
+    const res = await POST(
+      new Request("http://localhost/api/judge", {
+        method: "POST",
+        body: JSON.stringify({ topicSlug: "t", argument: "An argument." }),
+      })
+    );
+    expect(res.status).toBe(404);
+    expect(reads.slice(before).filter((p) => p.includes(DRAFT_FILE))).toEqual([]);
   });
 
   for (const school of ["confucian", "ubuntu", "buddhist"]) {

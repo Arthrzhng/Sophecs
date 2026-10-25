@@ -74,11 +74,21 @@ describe("the golden run's file log", () => {
     expect(logTarget("ai_calls")).toBe("ai_calls");
   });
 
-  it("is the function the runner actually uses", () => {
-    // The one source check left, and it can fail: inlining a flipped
-    // default would remove this call.
+  it("is the function the runner actually uses, fed the environment untouched", () => {
+    // Still a source check, because the runner calls the model when it is
+    // imported and so cannot be imported by a test. It can fail, which the
+    // first version of it could not, but it is narrower than a behavioural
+    // test and is the place to look first if the default ever moves.
     expect(runner).toContain("const LOG_TO = logTarget(process.env.GOLDEN_LOG);");
     expect(runner).not.toMatch(/process\.env\.GOLDEN_LOG\s*===/);
+    // A second reviewer flipped it anyway, by writing the variable before
+    // the call: process.env.GOLDEN_LOG ??= "ai_calls". Nothing in the
+    // runner may assign it, by any operator or either syntax.
+    const code = runner.replace(/^\s*\/\/.*$/gm, "");
+    expect(code).not.toMatch(/process\.env\.GOLDEN_LOG\s*(\?\?|\|\||&&)?=(?!=)/);
+    expect(code).not.toMatch(/process\.env\[\s*["'`]GOLDEN_LOG["'`]\s*\]/);
+    expect(code).not.toMatch(/delete\s+process\.env\.GOLDEN_LOG/);
+    expect(code).not.toMatch(/Object\.assign\(\s*process\.env/);
   });
 
   const sample = (n: number): GoldenCallRecord => ({
@@ -120,6 +130,11 @@ describe("the golden run's file log", () => {
     }
   });
 
+  // This round-trips a record the test builds itself, so it shows the
+  // sink keeps every field it is given, not that the runner gives it every
+  // field. What catches a runner that stopped filling one is tsc: every
+  // field of GoldenCallRecord is required, and the runner passes an object
+  // literal, so a missing field is a type error and fails the first gate.
   it("records everything the amendment asked for, and where the criteria came from", () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "golden-"));
     try {

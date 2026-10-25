@@ -1213,12 +1213,31 @@ How that is built, and why each part:
   breaking it twice: a `src/` file reading the draft file failed the walk,
   and moving the confucian criteria into `rubric.ts` failed the confucian
   refusal.
+- **The walk is not enough on its own, and two reviewers showed it.** It
+  searches for a name, and a path assembled at runtime,
+  `["content/prompts/fidelity-criteria", "draft", "md"].join(".")`, has no
+  name to find. `tests/draft-criteria-reads.test.ts` records every path the
+  filesystem is asked for while the route loads and handles a live-school
+  request and a refusal for each draft school. Its first version mocked the
+  `node:fs` and `fs` specifiers, and the second reviewer got past it
+  through `node:fs/promises` and through `createRequire`, neither of which
+  a module mock sees. It now patches the real `fs` object, which every one
+  of those paths returns, and uses Node's `syncBuiltinESMExports()` to
+  push the patch through to named imports. All three evasions, each placed
+  at module scope in a file the route imports, pass the walk and fail the
+  recorder. The residual: a read in a `src/` file that is not on the
+  route's path at all.
 
 Two more things came with it. A **dry run**, `GOLDEN_DRY_RUN=1`, validates
 every fixture, plans every case, and prints the call count and cost before
 anything is sent; it needs no key, so readiness can be shown rather than
-asserted. It reads the per-call estimate from `anthropic.ts`'s COST comment
-instead of copying it. And **`weakest_move` is checked** for
+asserted. It computes the per-call estimate per prompt version, from the
+token estimates in `anthropic.ts`'s COST comment and the two rate
+constants, plus the difference in the prompt file's size at about four
+bytes a token. It reads each figure from the one declaration that holds it
+and refuses to guess if there are two. It deliberately does not read the
+COST comment's own `est_usd_per_call=0.0098`, which does not follow from
+the figures beside it. And **`weakest_move` is checked** for
 `fabricated-source`, which Arthur ruled passes on rigor 0-3 and on
 `weakest_move` naming the invention: a case-insensitive term list in the
 fixture, majority of samples, with "unverified" deliberately excluded
@@ -1235,8 +1254,85 @@ written, and the test says why it was not enough.
 Accepted as provisional on 2026-10-24, with one rule from Arthur: **if any
 case lands outside its band, stop and report; do not adjust a band to fit a
 result.** Arthur ruled on the fidelity and engagement bands. The score
-bands are mine: nine were derived by parallel to Tier A, and
-`confucian-strong`'s 65-95 came from the worked example he accepted as
-written. None was ruled on individually. The 40-75 given to the two
+bands are mine. The strong and bleed cases parallel Tier A's strong and
+wrong-school bands; `confucian-strong`'s 65-95 came from the worked
+example he accepted as written, and `confucian-ren-disposition` takes the
+same band as `confucian-strong`; the two known-weakness cases' 40-75 has
+no Tier A parallel at all, since no Tier A case combines high fidelity
+with low engagement. None was ruled on individually. The 40-75 given to the two
 known-weakness cases is the least grounded, since no existing case combines
 high fidelity with low engagement.
+
+### Arthur's rulings of 2026-10-24, verbatim
+
+Recorded here because a reviewer, able to see only a stale pull request
+body, found three rulings attributed to Arthur in this branch that it could
+not trace to him. Each one can now be checked against his words rather than
+taken on trust. The item numbers refer to the Phase 2 decision list on pull
+request #44.
+
+On the decision list:
+
+> Criteria approved with changes:
+> - Ubuntu: remove "harmony" entirely. My claim that harmony is Metz's
+>   principle was from memory and is not in the research file. Use only the
+>   sourced "shared identity and solidarity". Keep the rest of the Ubuntu
+>   revision (communal expectation faithful; ignoring the dissent objection
+>   costs engagement).
+> - Buddhist: restore the Rahula object ("whether it tends to harm oneself,
+>   another, or both"). Add: inferences developed in later traditions, such
+>   as the Mahayana argument from no-self to impartial compassion, are
+>   faithful when argued.
+> - Keep within the length band.
+>
+> Items 3, 5, 6, 8, 9, 10, 13, 15: accepted as written.
+> Item 7: fabricated-source passes on rigor 0-3 and weakest_move naming the
+> invention; score band 0-50; fidelity unconstrained.
+> Item 11: add a Tier B case arguing ren as a disposition, expected fidelity
+> 8-10.
+> Item 14: fine as a disclosure note.
+>
+> Add src/lib/judge/rubric.ts and src/lib/judge/schema.ts to the frozen list
+> under the judge rule (b).
+> Review loop: at most three reviewer passes, then verify the final fixes
+> yourself. Record it in the charter.
+
+On the golden run:
+
+> 1. Do not move the draft criteria into rubric.ts. The live endpoint keeps
+>    refusing the three schools until I publish them in Phase 3 (exception
+>    c). Instead: in golden-run mode only, the runner reads criteria for
+>    draft schools from content/prompts/fidelity-criteria.draft.md. Add a
+>    test, like the file-sink one, proving nothing in src/ reads the draft
+>    file and /api/judge still refuses all three.
+> 2. Tier B score bands accepted as provisional. If any case lands outside
+>    its band, stop and report; do not adjust a band to fit a result.
+
+**The key to the item numbers**, so the three attributions a reviewer
+queried can be traced:
+
+| Item | What it was | Ruling |
+|---|---|---|
+| 1 | The three revised criteria | approved with the changes above |
+| 2 | Harmony | removed entirely |
+| 3 | Menkiti and Gyekye both faithful | accepted as written |
+| 4 | Buddhist criteria naming one bleed, and the Rahula object | Rahula object restored; **the one-bleed asymmetry was not ruled on** |
+| 5 | Dukkha as "suffering" | accepted as written |
+| 6 | "High fidelity" as fidelity 7-10, engagement 0-4 | accepted as written |
+| 7 | `fabricated-source`'s band | score 0-50, rigor 0-3, weakest_move, fidelity unconstrained |
+| 8 | The Tier A bands | accepted as written |
+| 9 | `ubuntu-conformity`; `buddhist-intention-excuse` as a fidelity failure | accepted as written |
+| 10 | The `confucian-strong` worked example | accepted as written |
+| 11 | Whether ren or li is prior | a Tier B case for ren as a disposition |
+| 12 | Anatta to impartial compassion | admitted, by the Buddhist addition |
+| 13 | Dependent origination | accepted as written |
+| 14 | The Santideva attribution | fine as a disclosure note |
+| 15 | Metz's phrasing | accepted as written |
+| 16 | `judge.v3.md`'s confidence section | settled before this list |
+
+So "Menkiti and Gyekye: accepted as written" is item 3; "Arthur ruled on
+the fidelity and engagement bands" is item 6, with the Tier B fidelity
+bands also set in his earlier instruction that strong cases expect 8-10 and
+known-weakness cases high fidelity with the loss on engagement; and
+"whether it tends" is his wording in the Buddhist ruling. Item 4's first
+half is the one thing on the list he did not rule on.

@@ -79,8 +79,10 @@ const VERSION = resolveVersion();
 // single sample per case is a coin flip on any argument sitting near a band
 // edge — stoic-strong returned fidelity 7, 8, 8 on three consecutive
 // single-sample runs against a band of 8-10. Three samples and a median
-// measure the distribution instead of pretending it's a point value, at 3x
-// the cost (~18p a run). See docs/decisions.md.
+// measure the distribution instead of pretending it's a point value, at
+// three times the cost. That was about 18p a run when the set was six
+// cases; it is about $0.42 for the v2 run and $0.93 for v3 now, and the dry
+// run prints the current figure. See docs/decisions.md.
 const SAMPLES = parseSamples(process.env.GOLDEN_SAMPLES);
 
 // A whole number of at least 1, or the run refuses to start. It used to be
@@ -88,13 +90,16 @@ const SAMPLES = parseSamples(process.env.GOLDEN_SAMPLES);
 // silently never ran. There is no upper cap: how much one run may spend is
 // Arthur's decision, so the run prints its planned cost before the first
 // call instead.
+//
+// Digits only. Number() accepted "1e1" as 10, "0x2" as 2 and " 2 " as 2, so
+// GOLDEN_SAMPLES=1e3 would have planned 14,000 calls, about $139, and
+// started straight after printing it.
 function parseSamples(value: string | undefined): number {
   if (value === undefined || value === "") return 3;
-  const n = Number(value);
-  if (!Number.isInteger(n) || n < 1) {
-    throw new Error(`GOLDEN_SAMPLES="${value}" must be a whole number of at least 1`);
+  if (!/^[1-9]\d*$/.test(value)) {
+    throw new Error(`GOLDEN_SAMPLES="${value}" must be a whole number of at least 1, in digits`);
   }
-  return n;
+  return Number(value);
 }
 
 // Whether to stop before the first call. It used to be true only for the
@@ -353,7 +358,7 @@ async function sampleCase(
 //
 // - est_in=1700 was measured for v2. The whole prompt file is sent, header
 //   comment included, and v3 is more than twice v2's size, so a v3 run
-//   priced at v2's figure understated it by about a third. The difference
+//   priced at v2's figure understated it by about a quarter. The difference
 //   in file size is added at roughly four bytes a token. That is a rule of
 //   thumb rather than a count, which would need an API call.
 // - The COST comment's own est_usd_per_call=0.0098 does not follow from
@@ -361,21 +366,38 @@ async function sampleCase(
 //   file is left alone and the figure is computed here instead.
 function estimatedUsdPerCall(): { usd: number; inputTokens: number; outputTokens: number } {
   const source = fs.readFileSync(path.join(process.cwd(), "src", "lib", "anthropic.ts"), "utf-8");
-  const num = (re: RegExp, what: string): number => {
-    const m = re.exec(source);
-    if (!m) throw new Error(`could not read ${what} from src/lib/anthropic.ts`);
-    return Number(m[1].replace(/_/g, "")) / (m[2] ? Number(m[2].replace(/_/g, "")) : 1);
+
+  // Each figure must match exactly once, anchored to the declaration that
+  // holds it, so a second declaration (a SCREEN_INPUT_COST_PER_TOKEN above
+  // this one, say) cannot be read in its place. Digit separators allowed,
+  // since `1_700` is how this repository writes numbers elsewhere.
+  const one = (re: RegExp, what: string): RegExpExecArray => {
+    const hits = [...source.matchAll(new RegExp(re.source, "gm"))];
+    if (hits.length !== 1) {
+      throw new Error(
+        `expected exactly one ${what} in src/lib/anthropic.ts, found ${hits.length}`
+      );
+    }
+    return hits[0];
   };
-  const estIn = num(/est_in=(\d+)()/, "est_in");
-  const estOut = num(/est_out=(\d+)()/, "est_out");
-  const inRate = num(/INPUT_COST_PER_TOKEN = ([\d_]+) \/ ([\d_]+);/, "INPUT_COST_PER_TOKEN");
-  const outRate = num(/OUTPUT_COST_PER_TOKEN = ([\d_]+) \/ ([\d_]+);/, "OUTPUT_COST_PER_TOKEN");
+  const int = (s: string) => Number(s.replace(/_/g, ""));
+
+  // The COST comment has to be the one for the model this runner calls.
+  const cost = one(
+    new RegExp(`^// COST: model=${MODEL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} .*est_in=([\\d_]+) est_out=([\\d_]+)`),
+    `COST comment for ${MODEL}`
+  );
+  const estIn = int(cost[1]);
+  const estOut = int(cost[2]);
+  const inRate = one(/^const INPUT_COST_PER_TOKEN = ([\d_]+) \/ ([\d_]+);/, "INPUT_COST_PER_TOKEN");
+  const outRate = one(/^const OUTPUT_COST_PER_TOKEN = ([\d_]+) \/ ([\d_]+);/, "OUTPUT_COST_PER_TOKEN");
+  const rate = (m: RegExpExecArray) => int(m[1]) / int(m[2]);
 
   const bytes = (v: string) =>
     fs.statSync(path.join(process.cwd(), "content", "prompts", `judge.${v}.md`)).size;
   const inputTokens = Math.round(estIn + (bytes(VERSION) - bytes("v2")) / 4);
   return {
-    usd: inputTokens * inRate + estOut * outRate,
+    usd: inputTokens * rate(inRate) + estOut * rate(outRate),
     inputTokens,
     outputTokens: estOut,
   };

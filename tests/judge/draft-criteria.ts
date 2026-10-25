@@ -15,8 +15,11 @@ import type { SchoolId } from "../../src/lib/types";
  *
  * **Nothing in `src/` may import this or read that file.**
  * `tests/draft-criteria.test.ts` walks `src/` for both and drives
- * `/api/judge` itself to show it still refuses all three. If either ever
- * failed, the eval's exception would have reached production.
+ * `/api/judge` itself to show it still refuses all three.
+ * `tests/draft-criteria-reads.test.ts` records every path the filesystem is
+ * asked for while the route runs, because a path assembled at runtime has
+ * no name for the walk to find. If either ever failed, the eval's
+ * exception would have reached production.
  */
 
 export const DRAFT_CRITERIA_FILE = path.join(

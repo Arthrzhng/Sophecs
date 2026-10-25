@@ -109,9 +109,18 @@ tokens. A reviewer found it. The estimate is now computed per version:
 Tier A and Tier B under v3 are one run of 24 cases, 72 calls, $0.93. Before
 the correction this table said $1.12 for everything, and v3's run $0.71.
 
-`GOLDEN_DRY_RUN=1 npm run judge:golden` prints these same figures for the
-version it is given, from the same source, without a key and without
-sending anything. It is what produced the numbers above.
+`GOLDEN_DRY_RUN=1 npm run judge:golden` prints the per-call estimate and
+the run's total for the version it is given, without a key and without
+sending anything: about $0.42 for v2 and $0.93 for v3, or $0.14 and $0.31
+with `GOLDEN_SAMPLES=1`. The Tier A and Tier B split within v3, and the
+totals, are those figures added up by hand. The rows above are each
+rounded, so they sum to $1.35 where the unrounded total is $1.34.
+
+**The ceiling.** Output is capped at `max_tokens: 850` in
+`src/lib/anthropic.ts`. If every call ran to the cap rather than to the
+650-token estimate, the 114 calls would cost about $1.57, and $1.74 with
+the single-sample check. That is the most this run can cost at three
+samples a case.
 
 Against `AI_MONTHLY_BUDGET_USD`, which is $50 and production-only. A
 single-sample pass with `GOLDEN_SAMPLES=1` is a third of the calls: $0.14
@@ -536,6 +545,17 @@ live school as the control that gets past the refusal; and it shows
 `callJudgeModel` refuses draft text for a live school. Moving the confucian
 criteria into `rubric.ts`, as a demonstration, made the confucian refusal
 test fail.
+
+**The walk searches for a name, so on its own it is not proof**, and two
+reviewers showed it: a path assembled at runtime has no name to find.
+`tests/draft-criteria-reads.test.ts` is the other half. It records every
+path the filesystem is asked for while the route loads and handles a
+request from a live school and from each draft school, by patching the
+real `fs` object rather than mocking an import, so a read through
+`node:fs/promises` or through `createRequire` is recorded too. Three
+evasions, each placed in a file the route imports, pass the walk and fail
+the recorder. What neither would catch is a constructed read in a `src/`
+file that the route never loads.
 
 ## These bands are provisional
 

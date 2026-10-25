@@ -10,8 +10,11 @@ Arthur approved these on 2026-10-24, and ruled that they stay here rather
 than in rubric.ts until he publishes the three schools in Phase 3. One
 thing reads this file: the golden runner, in eval mode only, through
 tests/judge/draft-criteria.ts, so that Tier B can be scored against the
-criteria as approved. tests/draft-criteria.test.ts proves that nothing in
-src/ reads it and drives /api/judge to show it still refuses all three.
+criteria as approved. Two tests keep that true. tests/draft-criteria.test.ts
+walks src/ for any mention of this file and drives /api/judge to show it
+still refuses all three schools. tests/draft-criteria-reads.test.ts records
+every path the filesystem is asked for while the route runs, which catches
+a read whose path is assembled at runtime and so has no name to search for.
 
 Sourcing, per Arthur's revision of 2026-10-24: quotations come only from
 content/research/non-western-sources.md, and tests/content-quotations.ts
