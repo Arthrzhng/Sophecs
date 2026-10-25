@@ -615,8 +615,11 @@ government, when the prince is prince, and the minister is minister", and
    `JUDGE_PROMPT_VERSION=v3`. Nothing sent; confirms the counts below
    before anything is spent. Its last line says whether a key is visible,
    under which name, and whether it is shaped like an Anthropic key,
-   without printing it. It should read "found in SOPHECS_EVAL_KEY". A
-   real run refuses to start if it does not.
+   without printing it, and the line before it where requests would go.
+   They should read "found in SOPHECS_EVAL_KEY" and
+   "endpoint: https://api.anthropic.com". A real run refuses to start if no
+   well-shaped key is found under either name, or if requests would go
+   anywhere but Anthropic's API.
 2. `GOLDEN_SAMPLES=1 npm run judge:golden`: 14 calls, about $0.14, to catch a
    response that fails validation before paying for three samples.
 3. `npm run judge:golden`: v2, 14 cases, 42 calls, about $0.42. The

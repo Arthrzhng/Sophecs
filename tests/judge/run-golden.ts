@@ -33,7 +33,7 @@ import {
   type RunnablePromptVersion,
 } from "../../src/lib/anthropic";
 import { planCase, readDraftCriteria, type CasePlan } from "./draft-criteria";
-import { describeEvalKey, resolveEvalKey } from "./eval-key";
+import { describeEndpoint, describeEvalKey, endpointProblem, resolveEvalKey } from "./eval-key";
 import {
   flush,
   logTarget,
@@ -463,11 +463,16 @@ async function main() {
 
   if (DRY_RUN) {
     dryRun(cases, plans);
+    console.log(describeEndpoint(process.env));
     console.log(describeEvalKey(evalKey));
     return;
   }
   if (!evalKey.ok) {
     throw new Error(`refusing to start a real run: ${evalKey.reason}`);
+  }
+  const endpoint = endpointProblem(process.env);
+  if (endpoint) {
+    throw new Error(`refusing to start a real run: ${endpoint}`);
   }
   // src/lib/anthropic.ts builds its client on the first call, from this
   // variable, so setting it here, in this process only, is all it takes.

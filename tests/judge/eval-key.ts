@@ -13,7 +13,7 @@
  * call, from ANTHROPIC_API_KEY, so setting that inside the runner's own
  * process before the first call is enough and the frozen file is untouched.
  * Production on Vercel reads ANTHROPIC_API_KEY as it always has, and
- * nothing in src/ may mention SOPHECS_EVAL_KEY; tests/draft-criteria.test.ts
+ * nothing in src/ may mention SOPHECS_EVAL_KEY; tests/eval-key.test.ts
  * checks that.
  *
  * ANTHROPIC_API_KEY is still accepted where it is not withheld, for a run on
@@ -49,6 +49,13 @@ export function keyShapeProblem(value: string): string | null {
   if (!value.trim().startsWith("sk-ant-")) {
     return "it does not start with sk-ant-, as an Anthropic API key does";
   }
+  // Letters, digits, hyphens and underscores only after the prefix. Without
+  // this, a zero-width or control character pasted with the key would pass
+  // here and be left to the HTTP layer to reject, and whether that rejection
+  // repeats the value in its message would depend on that layer.
+  if (!/^sk-ant-[A-Za-z0-9_-]+$/.test(value.trim())) {
+    return "it contains a character an Anthropic key does not, often an invisible one from a paste";
+  }
   return null;
 }
 
@@ -78,4 +85,47 @@ export function describeEvalKey(found: EvalKey): string {
   return found.ok
     ? `key: found in ${found.from}, ${found.key.length} characters, shaped like an Anthropic key`
     : `key: ${found.reason}`;
+}
+
+/**
+ * Where the key would be sent, and anything else that would change the
+ * request.
+ *
+ * The Anthropic library reads ANTHROPIC_BASE_URL when the client is built,
+ * so the eval key goes wherever that points. In Claude Code's cloud
+ * sessions it is set, to https://api.anthropic.com. If a session ever
+ * pointed it at a gateway or a proxy, the key would go there instead. It
+ * also reads ANTHROPIC_AUTH_TOKEN, which adds an Authorization header with
+ * a different credential, and ANTHROPIC_CUSTOM_HEADERS, which adds arbitrary
+ * ones. A real run refuses unless the key is going to Anthropic and nothing
+ * else rides along with it.
+ */
+export const ANTHROPIC_API_ORIGIN = "https://api.anthropic.com";
+
+export function endpointProblem(env: Readonly<Record<string, string | undefined>>): string | null {
+  const base = env.ANTHROPIC_BASE_URL?.trim();
+  if (base) {
+    let origin: string;
+    try {
+      origin = new URL(base).origin;
+    } catch {
+      return "ANTHROPIC_BASE_URL is set to something that is not a URL";
+    }
+    if (origin !== ANTHROPIC_API_ORIGIN) {
+      return `ANTHROPIC_BASE_URL points at ${origin}, not ${ANTHROPIC_API_ORIGIN}, and the key would go there`;
+    }
+  }
+  for (const name of ["ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_CUSTOM_HEADERS"]) {
+    if (env[name]?.trim()) {
+      return `${name} is set, and would add a credential or headers to every request`;
+    }
+  }
+  return null;
+}
+
+/** One line for a report: where requests would go, never any credential. */
+export function describeEndpoint(env: Readonly<Record<string, string | undefined>>): string {
+  const problem = endpointProblem(env);
+  if (problem) return `endpoint: ${problem}`;
+  return `endpoint: ${ANTHROPIC_API_ORIGIN}`;
 }
