@@ -180,13 +180,15 @@ A reviewer checks that the list exists and that nothing in the body is a
 claim that should have been on it.
 
 Where to look: the numbered list at the foot of
-`content/prompts/fidelity-criteria.draft.md`. **It is not on `main`** — it
-arrives with the revised criteria on the unmerged branch
-`docs/phase2-fixtures`, and on `main` that file has no list at all, because
-the amendment that requires one is newer than the file. A re-review caught
-this sentence claiming otherwise, which is the same defect as the three
-above: the charter describing the branch it was written alongside as though
-it were the repository.
+`content/prompts/fidelity-criteria.draft.md`, headed "Doctrinal claims, and
+what Arthur ruled on". A new criteria file carries its own.
+
+An earlier version of this paragraph said the list was on `main` while it
+was still only on an unmerged branch, and a later one said it was not on
+`main` in a sentence that would go false the moment that branch merged.
+Both are the same defect, with opposite signs: a charter describing a
+branch rather than the repository. A citation to unmerged work names the
+branch; a citation to merged work is written to stay true after the merge.
 
 ## 6. Claims in reports are verified, not asserted
 
@@ -196,12 +198,11 @@ file read, or a test. A claim with no Y is a guess with a confident tone.
 
 Three that got through before this rule existed:
 
-- Three of six golden-set bands were wrong in a document, generalised from
-  the one fixture that had actually been read. The file is
-  `docs/phase2-fixtures.md`, which is on the unmerged branch
-  `docs/phase2-fixtures` and not on `main`. The numbers were corrected by
-  reading each fixture; **there is no generator**, and an earlier version of
-  this rule claimed there was. The check is to open each JSON file in
+- Three of six golden-set bands were wrong in a document,
+  `docs/phase2-fixtures.md`, generalised from the one fixture that had
+  actually been read. The numbers were corrected by reading each fixture;
+  **there is no generator**, and an earlier version of this rule claimed
+  there was. The check is to open each JSON file in
   `tests/judge/golden/` and compare it to the row. A test that parses the
   table and compares it to the fixtures would make this enforceable and does
   not exist yet.
@@ -231,10 +232,11 @@ Specifically:
   assert that `anthropic.ts` contains no rival-schools substitution and that
   `judge.v3.md` names it in its header comment
   (`tests/judge-v3-and-refusal.test.ts`). Both became false the moment
-  Arthur approved that substitution. **On `main` they are still the
-  pre-approval versions**; they are rewritten rather than deleted on the
-  unmerged branch `docs/phase2-fixtures`, and that rewrite is part of what
-  Arthur has yet to approve.
+  Arthur approved that substitution, and both were rewritten rather than
+  deleted to match it. The approval of the substitution is what carries the
+  rewrite: a test that asserts approved code is absent is wrong, and fixing
+  it needs no separate ruling. His words are in `docs/decisions.md`, under
+  his rulings of 2026-10-24.
 - An expected value that contradicts a rule the prompt states is a bug in
   the test. A JSON example was about to use `ASSIGNED_SCHOOL` as the value
   of a field the prompt says must never hold the assigned school.
@@ -252,13 +254,13 @@ Specifically:
   that runs.
 
   With a caveat a reviewer had to supply, because it weakens the lesson:
-  that test applies the band to the **draft** criteria, and its bounds are
-  literals rather than derived from `src/lib/judge/rubric.ts`. Nothing in
-  the suite measures the live criteria, so if one of them changed length
-  the test would stay green while its own comment went false. "The test is
-  the one that runs" only holds where the test measures the thing.
-  Deriving the band from the live criteria belongs on the branch that owns
-  that test.
+  that test applied the band to the **draft** criteria, with bounds written
+  as literals. Nothing measured the live criteria, so if one had changed
+  length the test would have stayed green while its own comment went
+  false. "The test is the one that runs" only holds where the test measures
+  the thing. It now derives the band from `src/lib/judge/rubric.ts`, and a
+  second test pins the derivation at 730 to 893, so a change there has to
+  be acknowledged rather than absorbed.
 
 The check: for every assertion that names a prompt, a document or a cap,
 open the named file and confirm it still holds. A test that names a file in
@@ -284,17 +286,18 @@ because it reports success.
   that pipeline today was added by the same commit that fixed the bug.
   "Nothing looked wrong" was also too strong. Something did: a non-zero
   exit nobody read.
-- **Open hazard, not a fixed one.** A substitution in
-  `src/lib/anthropic.ts` fills the first occurrence of a placeholder with
-  `String.prototype.replace`. `content/prompts/judge.v3.md` names
-  `{{RUBRIC}}` twice, once in its own header comment and once as the real
-  placeholder, and the whole file is sent to the model, so pointing the
-  judge at v3 asks the model to score against a template. On `main` there
-  is no guard. `fillPlaceholders` in `src/lib/judge/fill-placeholder.ts`
-  throws on a second occurrence and exists on the unmerged branch
-  `docs/phase2-fixtures`; `src/lib/anthropic.ts` is frozen, so landing it
-  is Arthur's call, and until it lands this is a live hazard for anything
-  that runs a non-default prompt version.
+- A substitution in `src/lib/anthropic.ts` filled the first occurrence of
+  a placeholder with `String.prototype.replace`. `content/prompts/judge.v3.md`
+  named `{{RUBRIC}}` twice, once in its own header comment and once as the
+  real placeholder, and the whole file is sent to the model, so pointing
+  the judge at v3 would have asked it to score against a template, with
+  nothing to say so. For a while this was an open hazard on `main` while
+  the fix sat on a branch. It is closed: `fillPlaceholders` in
+  `src/lib/judge/fill-placeholder.ts` throws on a second occurrence, fills
+  every placeholder in one pass so inserted text is never rescanned, and
+  treats `$` in a value as text. Reverting it to a naive `replace` fails
+  five of its nine tests, and every `judge.v*.md` is checked for the
+  invariant at the file level.
 - A source guard matched school ids quoted inside comments
   (`withoutComments` in `tests/school-registry-guard.test.ts`, which has its
   own regression test for a school id inside a comment). A different guard
@@ -398,6 +401,14 @@ the list, rather than held back entire.
 
 The last step of the loop needs a standard too, since the reviewer is handed
 this file and nothing else.
+
+**At most three reviewer passes**, then verify the final fixes yourself and
+merge. Arthur set that cap on 2026-10-24: "Review loop: at most three
+reviewer passes, then verify the final fixes yourself. Record it in the
+charter." He gave no reason. The one this charter infers, and it is an
+inference, is that the loop's wording otherwise permits an unbounded chain
+and each pass costs a fresh agent's full context. Verifying your own last round is not the same standard as a cold
+read, so say in the pull request body which findings were checked that way.
 
 Arthur merges nothing. The agent that opened a pull request merges it once
 the gates are green and the review findings are fixed or answered, and then

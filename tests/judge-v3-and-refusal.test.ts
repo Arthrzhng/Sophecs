@@ -89,13 +89,40 @@ describe("judge.v3.md", () => {
   const v3body = bodyOf(v3);
 
   it("is not the production default", () => {
-    // Arthur's rule for this phase. Switching it also needs criteria for
-    // whatever is being published and a second substitution in the frozen
-    // anthropic.ts, so this is a deliberate step and not a side effect.
+    // Arthur's rule for this phase. Switching it still needs criteria for
+    // whatever is being published, so it stays a deliberate step.
+    //
+    // This used to also assert that anthropic.ts contained no
+    // RIVAL_SCHOOLS substitution, as the thing standing between v3 and
+    // production. Arthur approved that substitution on 2026-10-24, so it
+    // exists, and what keeps production on v2 is now the version argument
+    // itself: `callJudgeModel` defaults to PROMPT_VERSION and neither
+    // /api/judge nor judgeDebate passes one. Asserted here by reading the
+    // route only, and behaviourally in tests/judge-request.test.ts, which
+    // drives judgeDebate and compares what it sends against the six
+    // committed v2 fixtures. tests/draft-criteria.test.ts drives the route
+    // itself.
     expect(PROMPT_VERSION).toBe("v2");
-    expect(read(path.join(process.cwd(), "src", "lib", "anthropic.ts"))).not.toContain(
-      "RIVAL_SCHOOLS"
-    );
+
+    const route = read(path.join(process.cwd(), "src", "app", "api", "judge", "route.ts"));
+    expect(route).not.toContain("v3");
+    expect(route).not.toContain("promptVersion");
+
+    // What this does NOT do any more: match the literal source of
+    // judgeDebate's call to callJudgeModel. A reviewer broke that
+    // assertion with a behaviour-preserving reformat of the call and
+    // watched it fail while every behavioural test, all six fixture
+    // comparisons included, stayed green. An assertion that fails on a
+    // reformat and cannot fail on a changed verdict is the shape that gets
+    // deleted rather than understood.
+    //
+    // The behavioural proof lives in tests/judge-request.test.ts: it
+    // drives judgeDebate itself, for originals and revisions, and compares
+    // what reaches the SDK against the six committed fixtures. It also
+    // proves that comparison discriminates, by showing a v3 request does
+    // not match them.
+    // No assertion about judgeDebate's source here on purpose. A filler
+    // one that cannot fail would be worse than none.
   });
 
   it("still interpolates the fidelity criteria the same way", () => {
@@ -133,6 +160,16 @@ describe("judge.v3.md", () => {
     expect(v3body).toContain("RIVAL_SCHOOL");
   });
 
+  it("only calls a source fabricated when the judge is confident", () => {
+    // Without this the fabrication rule falls hardest on the schools whose
+    // sources a model is least able to place, which is the three being
+    // added.
+    expect(v3body).toContain("Call a source fabricated only when you are confident");
+    expect(v3body).toContain("Treat it as unverified: do not lower any score for it");
+    expect(v3body).toContain("obscure, the\nrecent, the regional and the non-Western");
+    expect(v2, "v2 has no such rule, which is why v3 needs one").not.toContain("unverified");
+  });
+
   it("no longer counts the schools", () => {
     // v2 says the objection comes from "one of the two schools the argument
     // was not assigned", which is true of three schools and nothing else.
@@ -160,20 +197,63 @@ describe("judge.v3.md", () => {
   it("says in the file why it exists and that it is a draft", () => {
     const header = v3.slice(0, v3.indexOf("-->"));
     expect(header).toContain("not the production default");
-    expect(header).toContain("RIVAL_SCHOOLS");
+    expect(header).toContain("rival-schools substitution");
+
+    // And it must NOT write either placeholder out in full. The whole file
+    // is sent to the model, comment included, and anthropic.ts fills a
+    // placeholder by name: a header that named one would have the mention
+    // filled and the real placeholder left standing in the prompt. That is
+    // exactly what happened when the substitution was first added. See
+    // tests/judge-request.test.ts, which checks every version.
+    expect(header).not.toContain("{{RUBRIC}}");
+    expect(header).not.toContain("{{RIVAL_SCHOOLS}}");
   });
 });
 
 describe("the draft fidelity criteria", () => {
   const DRAFT = path.join(PROMPTS, "fidelity-criteria.draft.md");
 
-  it("exists and says it is a draft the judge does not read", () => {
-    const draft = read(DRAFT);
-    expect(draft).toContain("NOT LOADED BY ANYTHING");
-    expect(draft).toContain("Pending approval");
+  // Derived from the live criteria, so the band cannot drift away from
+  // the thing it describes. `.length` of the stored string, which is also
+  // what the draft file quotes: measuring a whitespace-flattened copy
+  // instead gave figures one character low at each bound, and that wrong
+  // figure was written into the draft file before this test caught it.
+  const LIVE_BAND = (() => {
+    const lengths = PUBLISHED_SCHOOL_IDS.map((id) => FIDELITY_CRITERIA[id].length);
+    const words = PUBLISHED_SCHOOL_IDS.map(
+      (id) => FIDELITY_CRITERIA[id].split(/\s+/).length
+    );
+    return {
+      chars: [Math.min(...lengths), Math.max(...lengths)] as const,
+      words: [Math.min(...words), Math.max(...words)] as const,
+    };
+  })();
+
+  it("takes its band from the live criteria, which are 730 to 893 characters", () => {
+    // Pins the derivation itself: if this changes, the draft file's own
+    // stated figures need changing with it, and that is the whole reason
+    // the band is derived.
+    expect(LIVE_BAND.chars).toEqual([730, 893]);
+    expect(LIVE_BAND.words).toEqual([114, 142]);
   });
 
-  it("is loaded by nothing", () => {
+  it("says it is approved, and that only the golden runner reads it", () => {
+    // These assertions used to be that the file said "NOT LOADED BY
+    // ANYTHING" and "Pending approval". Both became false on 2026-10-24,
+    // when Arthur approved the criteria and had the golden runner read
+    // them, and the test went on passing because the file still said
+    // them. A test that checks what a file claims proves only that the
+    // claim is there, so the claim has to be kept true by hand.
+    const draft = read(DRAFT);
+    expect(draft).toContain("NOT LOADED BY ANYTHING IN PRODUCTION");
+    expect(draft).toContain("Approved 2026-10-24");
+    expect(draft).not.toContain("Pending approval");
+  });
+
+  it("is loaded by nothing in production", () => {
+    // The three files closest to the judge. tests/draft-criteria.test.ts
+    // walks the whole of src/ and drives the route; this is the quick
+    // check beside it.
     for (const file of ["src/lib/judge/rubric.ts", "src/lib/anthropic.ts", "src/lib/judge/schema.ts"]) {
       expect(read(path.join(process.cwd(), file)), file).not.toContain("fidelity-criteria.draft");
     }
@@ -196,12 +276,17 @@ describe("the draft fidelity criteria", () => {
       expect(body.split("\n\n").length).toBe(2);
       expect(body).toMatch(/^A faithful /);
       expect(body).toContain("Score fidelity down when the argument:");
-      // The band the three live ones occupy.
-      expect(body.length).toBeGreaterThanOrEqual(730);
-      expect(body.length).toBeLessThanOrEqual(893);
+      // The band the three live ones occupy, measured from them rather
+      // than written down. A reviewer pointed out that these bounds were
+      // literals: nothing in the suite measured the live criteria, so one
+      // of them changing length would leave this green while the comment
+      // above it went false. The numbers are 730 to 893 characters and 114
+      // to 142 words today, and if that moves this test moves with it.
+      expect(body.length).toBeGreaterThanOrEqual(LIVE_BAND.chars[0]);
+      expect(body.length).toBeLessThanOrEqual(LIVE_BAND.chars[1]);
       const words = body.split(/\s+/).length;
-      expect(words).toBeGreaterThanOrEqual(114);
-      expect(words).toBeLessThanOrEqual(142);
+      expect(words).toBeGreaterThanOrEqual(LIVE_BAND.words[0]);
+      expect(words).toBeLessThanOrEqual(LIVE_BAND.words[1]);
     }
   });
 });

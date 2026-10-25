@@ -4,8 +4,15 @@ import { join } from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { newId } from "@/lib/ids";
-import { VerdictSchema, PROMPT_VERSION, type ModelVerdict } from "@/lib/judge/schema";
-import { FIDELITY_CRITERIA } from "@/lib/judge/rubric";
+import {
+  VerdictSchema,
+  PROMPT_VERSION,
+  type ModelVerdict,
+  type PromptVersion,
+} from "@/lib/judge/schema";
+import { FIDELITY_CRITERIA, hasFidelityCriteria } from "@/lib/judge/rubric";
+import { fillPlaceholders } from "@/lib/judge/fill-placeholder";
+import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
 import type { SchoolId } from "@/lib/types";
 
 // COST: model=claude-sonnet-5 | trigger=debate submission | est_in=1700 est_out=650
@@ -20,11 +27,48 @@ function getClient(): Anthropic {
   return client;
 }
 
-// Read once at module scope, not per call.
-const promptTemplate = readFileSync(
-  join(process.cwd(), `content/prompts/judge.${PROMPT_VERSION}.md`),
-  "utf-8"
-);
+/**
+ * The prompt versions a call can run against.
+ *
+ * Deliberately not `PromptVersion` from judge/schema.ts: that type is every
+ * version a verdict has ever been *stored* under, and v3 has never been
+ * stored. This is every version that has a file to read.
+ */
+export type RunnablePromptVersion = PromptVersion | "v3";
+
+// Read once per version, not per call. The default is still read at module
+// scope, so production's path is exactly what it was; any other version is
+// read on first use and cached beside it. Only tests/judge/run-golden.ts
+// ever asks for another, and only so a prompt can be measured before it
+// becomes the default — see the golden-set discipline in CONTRIBUTING.md.
+const promptTemplates = new Map<string, string>([
+  [
+    PROMPT_VERSION,
+    readFileSync(join(process.cwd(), `content/prompts/judge.${PROMPT_VERSION}.md`), "utf-8"),
+  ],
+]);
+
+function promptTemplateFor(version: RunnablePromptVersion): string {
+  const cached = promptTemplates.get(version);
+  if (cached !== undefined) return cached;
+  const template = readFileSync(
+    join(process.cwd(), `content/prompts/judge.${version}.md`),
+    "utf-8"
+  );
+  promptTemplates.set(version, template);
+  return template;
+}
+
+// The schools an `unanswered_objection` may name, for v3's
+// `{{RIVAL_SCHOOLS}}`. Built from the same list the verdict schema's enum
+// is built from, so the prompt cannot offer the model a school zod would
+// then reject.
+//
+// v2 contains no such placeholder, so this substitution is a no-op there
+// and the v2 request stays byte for byte what it was. That is pinned by
+// the six fixtures in tests/judge-request.test.ts, which is the test the
+// brief cares about most while judging is live.
+const RIVAL_SCHOOLS_BLOCK = PUBLISHED_SCHOOL_IDS.map((id) => `- \`${id}\``).join("\n");
 
 // Carries cost/latency even on failure — the tokens were still billed by
 // Anthropic even if the response didn't parse, and "every call is logged,
@@ -45,10 +89,12 @@ export interface JudgeCallResult {
   costUsd: number;
 }
 
-// The only two call sites for the Anthropic API in this repo: /api/judge
-// (via judgeDebate below) and tests/judge/run-golden.ts, which calls this
-// function directly rather than going through HTTP — see the Phase 2
-// checklist's `grep -rn "anthropic"` requirement.
+// Three call sites for the Anthropic API in this repo, not two as this
+// comment said: /api/judge (via judgeDebate below), tests/judge/run-golden.ts,
+// which calls this function directly rather than going through HTTP, and
+// src/lib/screen.ts, which screens counterpart replies on a different
+// model — see the Phase 2 checklist's `grep -rn "anthropic"` requirement,
+// which is what found the third.
 export interface RevisionContext {
   originalArgument: string;
   objectionClaim: string;
@@ -58,9 +104,43 @@ export async function callJudgeModel(
   motion: string,
   school: SchoolId,
   argument: string,
-  revisionOf?: RevisionContext
+  revisionOf?: RevisionContext,
+  // Production never passes this. `/api/judge` and `judgeDebate` leave it
+  // alone, so the only version they can reach is `PROMPT_VERSION`.
+  promptVersion: RunnablePromptVersion = PROMPT_VERSION,
+  // Golden runs only, and production never passes it either. Criteria for
+  // a draft school, which the golden runner reads from the draft criteria
+  // file in content/prompts, because Arthur ruled that the approved draft
+  // criteria stay out of rubric.ts until he publishes those schools:
+  // /api/judge keeps refusing them meanwhile. Neither the file nor the
+  // runner's loader is named here: a confinement test fails on any mention
+  // of either anywhere in src/, comments included, so that a read cannot
+  // hide inside something that looks like a comment.
+  //
+  // It can only fill a gap, never replace live criteria. A school that has
+  // criteria in rubric.ts is always judged against them, and passing this
+  // for one throws, so no caller can use it to change what a live school's
+  // request contains.
+  draftCriteria?: string
 ): Promise<JudgeCallResult> {
-  const system = promptTemplate.replace("{{RUBRIC}}", FIDELITY_CRITERIA[school]);
+  if (draftCriteria !== undefined && hasFidelityCriteria(school)) {
+    throw new Error(
+      `draft criteria refused for "${school}": it has live criteria, and a ` +
+        `live school is always judged against them`
+    );
+  }
+  // Reading FIDELITY_CRITERIA for a school with none still throws, by
+  // design, so without draftCriteria a draft school fails exactly as before.
+  const criteria = draftCriteria ?? FIDELITY_CRITERIA[school];
+
+  // {{RUBRIC}} is in every version. {{RIVAL_SCHOOLS}} is v3 and later, so
+  // it is optional, and its absence leaves v2 byte for byte what it was.
+  // Both are filled in one pass over the raw template: see
+  // src/lib/judge/fill-placeholder.ts for the three defects that shape.
+  const system = fillPlaceholders(promptTemplateFor(promptVersion), {
+    "{{RUBRIC}}": { value: criteria, required: true },
+    "{{RIVAL_SCHOOLS}}": { value: RIVAL_SCHOOLS_BLOCK, required: false },
+  });
   // The v2 prompt keys its revision instructions off the presence of these
   // two tags, so they are only emitted for an actual revision.
   const revisionBlock = revisionOf

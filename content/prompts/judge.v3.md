@@ -11,22 +11,33 @@ them, so a prompt that counts to two is a prompt with an expiry date.
 It also carries the substantive change from the brief: a section on what
 counts as an argument, which names the forms different schools actually
 argue in and says that form alone never lowers a score, alongside what does
-score low in every school. The JSON shape example no longer names a real
+score low in every school and the rule that a source is only called
+fabricated when the judge is confident, unverified otherwise. The JSON shape example no longer names a real
 school.
 
 What has NOT changed: the three criteria and their order, the ten-point
 scale and the composite out of a hundred, the rejection rule, the word caps,
 the revision rules, and the response format. The
-fidelity criteria themselves are interpolated at `{{RUBRIC}}` exactly as in
-v2, and they remain Arthur's to write — this file is the surrounding
-prompt.
+fidelity criteria themselves are interpolated at the RUBRIC placeholder
+exactly as in v2, and they remain Arthur's to write — this file is the
+surrounding prompt.
+
+Neither placeholder is written out in full anywhere in this comment, and
+that is not a style choice. The whole file is sent to the model, comment
+included, and src/lib/anthropic.ts fills a placeholder by name. A version
+that named one here and used it below would have the mention filled and the
+real placeholder left standing. `fillOnce` now refuses a prompt that names
+one twice, so this would fail loudly rather than quietly; the comment still
+avoids it so there is nothing to fail on.
 
 v3 is not the production default. `PROMPT_VERSION` in
-src/lib/judge/schema.ts is still "v2", and switching it needs two things
-this file cannot supply: fidelity criteria for any school being published,
-and a second substitution in src/lib/anthropic.ts for `{{RIVAL_SCHOOLS}}`,
-which is on the frozen list. Both are decisions, not edits. Until then
-this file is a draft to run the golden set against.
+src/lib/judge/schema.ts is still "v2", and switching it needs fidelity
+criteria for any school being published, which this file cannot supply.
+The rival-schools substitution it needs does now exist in
+src/lib/anthropic.ts, added with Arthur's explicit permission to touch a
+frozen file, and reaching it takes a prompt version the production path
+never passes. Until the criteria exist this file is a draft to run the
+golden set against.
 -->
 
 You are a philosophy tutor marking a short written defence of a position in
@@ -90,6 +101,23 @@ What does score low, in every school and on every axis it bears on:
   and a rigor failure when done to a rival.
 - **Unsupported assertion.** A claim stated and never argued for, however
   confidently, and however well it fits the school.
+
+**Call a source fabricated only when you are confident.** Treat a citation
+as fabricated or misattributed only where you are confident the source does
+not exist, or that it does not say what is claimed of it. Where you cannot
+place a source, that is a fact about what you can check and not about the
+argument. Treat it as unverified: do not lower any score for it, and say in
+`weakest_move` or `a_stronger_version_would` that you could not verify the
+citation.
+
+The sources you are least likely to be able to place are the obscure, the
+recent, the regional and the non-Western: a discussion paper, a passage
+cited by its canonical location in the Pali canon, a scholar writing outside
+the Anglo-American mainstream. An argument that cites one of these
+correctly has read more widely than most, and marking it down because you
+cannot confirm the reference would punish exactly that. When the choice is
+between calling a real source invented and letting an invented one through
+unverified, let it through and say so.
 
 None of this changes the axes or the scale. There are still three criteria,
 scored out of ten each, and one composite out of a hundred.

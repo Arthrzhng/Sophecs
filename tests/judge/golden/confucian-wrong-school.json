@@ -1,0 +1,19 @@
+{
+  "name": "confucian-wrong-school",
+  "motion": "A hospital should be allowed to use an AI system to allocate intensive care beds, even where the patients affected cannot be told how the allocation was reached.",
+  "school": "confucian",
+  "argument": "The question is which allocation produces the best outcome across everyone who needs a bed. The system places more patients correctly than the rota it replaces, the error rate is lower, and the lives saved are the measure that matters. Weigh the distress of not being told against the deaths avoided and it is not close. Relationships between clinicians and patients matter too, of course, and the Confucian tradition values them, but they have to be weighed like anything else, and what they weigh here is less than the mortality difference. A system that saves more lives is the one a council of reasonable people would choose, and the fact that it cannot explain itself is a cost to be priced rather than a reason to refuse. If the figures changed and the rota saved more lives, the rota would be right. That is the test, and the tradition is a way of talking about it rather than a different test.",
+  "expected_score_band": [
+    5,
+    35
+  ],
+  "expected_fidelity_band": [
+    0,
+    4
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "utilitarianism",
+    "virtue-ethics"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "virtue-exemplar",
+  "motion": "A company should publish the error rate of a model it uses to approve loans, even where publishing it would let applicants game the system.",
+  "school": "virtue-ethics",
+  "argument": "Think of the engineer everyone on a team quietly trusts: the one who says the number is worse than the slide claims, in the meeting, while the slide is still up. Not the one who says nothing and is technically correct, and not the one who says it loudly afterwards to whoever will listen. What she has is the virtue standing between cowardice and recklessness about speaking, and the practical wisdom to know that this room, now, is where it matters. Publishing the error rate is what she would do, and the gaming is real but it is the cost of being the kind of company that can be believed at all. A company that withholds it becomes, over many such decisions, one nobody has reason to trust, and that is a worse thing to be than gamed.",
+  "expected_score_band": [
+    70,
+    95
+  ],
+  "expected_fidelity_band": [
+    8,
+    10
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "utilitarianism"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "stoic-analogy",
+  "motion": "A hospital should be allowed to let an AI triage system decide which patients are seen first, even where no clinician can explain a given ordering.",
+  "school": "stoicism",
+  "argument": "A ship's captain in a storm does not get to choose the weather. He chooses the set of the sail, and he is judged on that choice and on nothing else. Hand him a chart he cannot read and he is still judged on the set of the sail, because that is still what is his. The triage system is the weather. Whether it orders the queue well is not up to the clinician standing beside it; what is up to her is whether she consented to stand there, whether she said plainly that she cannot account for the ordering, and whether she keeps looking. A clinician who uses the system and tells the truth about it has done the part that was hers. A clinician who hides behind it has not, and no accuracy figure repairs that, because the figure was never the thing she was answerable for.",
+  "expected_score_band": [
+    60,
+    95
+  ],
+  "expected_fidelity_band": [
+    8,
+    10
+  ],
+  "expected_objection_school": [
+    "utilitarianism",
+    "virtue-ethics"
+  ]
+}

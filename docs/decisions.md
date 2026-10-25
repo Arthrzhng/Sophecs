@@ -1015,6 +1015,139 @@ no new private data, since the motion is public content and the page it
 feeds has always been public, but it is a deliberate widening rather than
 an incidental one.
 
+### 2F: the version override, and the bug it found in `fillOnce`
+
+Arthur approved a minimal change to the frozen `src/lib/anthropic.ts` on
+2026-10-24: a prompt version parameter on `callJudgeModel`, and a
+substitution for v3's `{{RIVAL_SCHOOLS}}`. Both exist so the golden set can
+measure a draft prompt and produce the two tables the brief asks for
+without v3 becoming the production default.
+
+What keeps production on v2 is the default: the parameter defaults to
+`PROMPT_VERSION`, and neither `/api/judge` nor `judgeDebate` passes one.
+That is asserted twice. `tests/judge-v3-and-refusal.test.ts` reads the
+route and checks it names no version (it deliberately makes no assertion
+about `judgeDebate`'s source, after a reviewer showed a literal match on it
+failed on a reformat and on nothing else);
+`tests/judge-request.test.ts` calls `judgeDebate` and compares what it
+sends against the same six committed v2 fixtures, for an original and for
+a revision. It covered only originals when first written, which reached
+three of the six: dropping `params.revisionOf` from the forwarded call
+would have left every assertion green while production revisions lost
+their objection block. Those six are unchanged
+in this branch's diff, which is the test Arthur cares about most while
+judging is live.
+
+**The substitution had a bug, and it is worth recording because the shape
+of it will recur.** `String.prototype.replace` with a string pattern fills
+the first occurrence and says nothing about the rest. A prompt file is sent
+to the model whole, header comment included, and `judge.v3.md` named both
+of its placeholders in that comment before using them. So the first naive
+`.replace("{{RUBRIC}}", criteria)` filled the mention in the comment and
+left the real placeholder standing: the model would have been asked to
+score against a rubric that was still a template, and nothing anywhere
+would have said so. v2 was never affected, because it names each
+placeholder exactly once.
+
+Three changes, rather than the one that would have been enough:
+
+- A guard refuses a prompt that names a placeholder more than once, and
+  refuses one missing `{{RUBRIC}}` altogether. `replaceAll` was the other
+  option and is wrong: it would send the criteria twice. It began as
+  `fillOnce` inside `anthropic.ts` and is now `fillPlaceholders` in
+  `src/lib/judge/fill-placeholder.ts`, because a reviewer showed it could
+  be reverted to a silent `replace` with the whole suite still green: it
+  had no test of its own, and testing it in place meant building a model
+  request. Out of the frozen file it is callable directly, and reverting
+  it now fails five of its nine tests.
+
+  That review also found two defects in the substitution itself, neither
+  of which had failed anything. It filled placeholders one after another
+  over the growing string, so a criteria string containing
+  `{{RIVAL_SCHOOLS}}` would have had the school list substituted into the
+  middle of the criteria. And `replace(needle, value)` reads `$&`, `$1`
+  and `$$` inside the value, which is content somebody writes. It is one
+  pass over the raw template with a function replacer now.
+- `judge.v3.md` no longer writes either placeholder out in its comment, so
+  there is nothing for the guard to catch.
+- `tests/judge-request.test.ts` checks the invariant at the file level, for
+  every `judge.v*.md`. Confirmed by re-introducing the duplicate and
+  watching four tests fail. Three were the point; the fourth was a test
+  of something else that died on the unexpected exception, which is worth
+  knowing because an exception escaping into an unrelated test is how a
+  guard's blast radius gets misread.
+
+### 2F: four bands, not two, and an unconstrained one
+
+`GoldenCase` gained `expected_rigor_band` and `expected_engagement_band`,
+and `expected_fidelity_band` became optional. An absent band means the axis
+is measured and printed but cannot fail the run; the table prints `any`.
+
+Two cases needed it, and both came out of Arthur's revision of the draft
+criteria:
+
+- `fabricated-source` is now **score 0-50, rigor 0-3, fidelity
+  unconstrained**, and it must also have `weakest_move` name the
+  invention. Arthur widened the score band from 0-40 on 2026-10-24. v3
+  calls a fabricated source a rigor failure, so rigor
+  is where the band belongs. The Stoic reasoning wrapped around the
+  invented quotations really is the school's, so a judge scoring fidelity
+  high there would not be wrong and one scoring it low would not be
+  either. Pinning it would test something the prompt does not claim.
+- The known-weakness cases, `confucian-hierarchy` and the new
+  `ubuntu-conformity`, expect **high fidelity with the loss on
+  engagement**. An argument that authorises hierarchy through roles, or
+  leans on communal expectation, is arguing the school as the school
+  actually runs. What it owes is an answer to the objection its own
+  tradition has had put to it. Saying that without a band to put it in
+  would have left it an untested sentence in a document.
+
+`ubuntu-conformity` exists because the criteria changed. The earliest
+draft scored leaning on communal expectation down on fidelity. The
+approved criteria call it faithful and put the cost of not answering the
+dissent objection on engagement instead, and that change needs a case or it
+is not tested.
+
+An intermediate draft justified the change by saying harmony is Metz's own
+principle. That came from memory, is not in the research file, and Arthur
+withdrew it; the word harmony is gone from the criteria. The change it was
+used to justify survives on its own terms.
+
+### 2F: `--env-file` dropped from `judge:golden`
+
+`npm run judge:golden` passed `--env-file=.env.local`. Node treats a
+missing env file as fatal, so on any box without that file the command died
+before it could report what was actually missing. The key is read from the
+environment now, which is where an eval secret lives. `GOLDEN_LOG=ai_calls`
+is the only mode that still wants `SUPABASE_SERVICE_ROLE_KEY`.
+
+### The sourcing rule, amended
+
+The old rule was: use only passages and citations from
+`content/research/non-western-sources.md`, never fill from memory. Arthur
+amended it on 2026-10-24 after reading the first draft of the fidelity
+criteria:
+
+> quotations must come from the research file (guard stays). Doctrinal
+> description does not need to: the live Stoic criteria describe
+> indifferents without quoting anyone. Describe each school's central
+> commitments, not only the passages we verified. Flag any doctrinal claim
+> you are unsure of for me rather than including it.
+
+The rule for quotations is unchanged, and the guard enforcing it got
+stronger: it now also scans text in quotation marks, after a reviewer
+found five verbatim spans of the research file sitting undeclared because
+their reporting cues were not on its fixed list. The draft criteria file
+now declares eight quotations, two in the criteria and six in the notes.
+What changed in the rule is that doctrinal vocabulary a school cannot be
+described without (ren, li, anatta, dependent origination, dukkha) no
+longer needs a verified passage behind it. Neither `ren` nor
+`li` appears anywhere in the research file, so under the old rule the
+Confucian criteria could not have named the school's two central terms.
+
+The cost is that "flag it" is now doing work a grep used to do. The draft
+criteria file carries a numbered list of the claims it does not assert, and
+that list is part of what Arthur approves, not an appendix to it.
 ### Judging is live, and where that fact is recorded
 
 Arthur turned `KILL_SWITCH_JUDGE` off in production himself, having
@@ -1043,3 +1176,224 @@ instruction, and this entry is it.
 The practical consequence for a reviewer: do not try to verify the live
 state from the repository, and do not report it as unverified either.
 Read it here, and treat the (b) stop condition as live.
+
+### 2F: draft criteria reach the golden run and nothing else
+
+Arthur ruled on 2026-10-24 that the approved criteria for the three draft
+schools do **not** move into `src/lib/judge/rubric.ts`. `/api/judge` keeps
+refusing those schools until he publishes them in Phase 3, which is stop
+condition (c). Instead, in golden-run mode only, the runner reads them
+from `content/prompts/fidelity-criteria.draft.md`.
+
+How that is built, and why each part:
+
+- **`tests/judge/draft-criteria.ts`** reads the draft file and plans each
+  case before any call: a live school against `rubric.ts`, a draft school
+  against its section of the draft file verbatim, a draft school skipped
+  under v1 or v2 because those prompts count the rivals as two, and a
+  fixture naming a school with criteria nowhere thrown out before anything
+  is spent. It is its own module so the planning is testable; the runner
+  cannot be imported by a test, because it calls the model at load.
+- **`callJudgeModel` gained a sixth parameter, `draftCriteria`.** This is a
+  change to a frozen file, made to implement Arthur's instruction, and it
+  is kept as narrow as the prompt-version parameter he approved before it:
+  optional, never passed by `/api/judge` or `judgeDebate`, and placed after
+  the defaulted parameter so `callJudgeModel.length` is still 4. **It can
+  only fill a gap.** Passing it for a school that has live criteria throws,
+  so no caller can use the golden path to change what a live school's
+  request contains. Without it, a draft school throws exactly as before.
+  The six request fixtures are byte-identical either side of it.
+- **`tests/draft-criteria.test.ts`** keeps it confined, like the file-sink
+  test. It walks `src/` and fails on any mention of the draft file or the
+  loader, comments included; the strictness cost `anthropic.ts` two
+  comment rewrites on the first run, which is the point. It drives the real
+  `/api/judge` handler for all three draft schools and shows each answered
+  with `no_criteria` before any topic lookup, insert or model call, with a
+  live school as the control that gets past the refusal. Demonstrated by
+  breaking it twice: a `src/` file reading the draft file failed the walk,
+  and moving the confucian criteria into `rubric.ts` failed the confucian
+  refusal.
+- **The walk is not enough on its own, and two reviewers showed it.** It
+  searches for a name, and a path assembled at runtime,
+  `["content/prompts/fidelity-criteria", "draft", "md"].join(".")`, has no
+  name to find. `tests/draft-criteria-reads.test.ts` records every path the
+  filesystem is asked for while the route loads and handles a live-school
+  request and a refusal for each draft school. Its first version mocked the
+  `node:fs` and `fs` specifiers, and the second reviewer got past it
+  through `node:fs/promises` and through `createRequire`, neither of which
+  a module mock sees. It now patches the real `fs` object, which every one
+  of those paths returns, and uses Node's `syncBuiltinESMExports()` to
+  push the patch through to named imports. All three evasions, each placed
+  at module scope in a file the route imports, pass the walk and fail the
+  recorder. A third reviewer found three more: copying the file and
+  reading the copy, `fs.openAsBlob`, and shelling out to `cat`. The
+  recorder now watches copies and blob opens as well, and `child_process`
+  and `worker_threads` are refused anywhere in `src/` as a tripwire, since
+  no recorder in this process can see a read made by another. The
+  residual: a constructed read in a `src/` file the route never loads, or
+  through a filesystem call not on the watched list.
+
+Two more things came with it. A **dry run**, `GOLDEN_DRY_RUN=1`, validates
+every fixture, plans every case, and prints the call count and cost before
+anything is sent; it needs no key, so readiness can be shown rather than
+asserted. It computes the per-call estimate per prompt version, from the
+token estimates in `anthropic.ts`'s COST comment and the two rate
+constants, plus the difference in the prompt file's size at about four
+bytes a token. It reads each figure from the one declaration that holds it
+and refuses to guess if there are two. It deliberately does not read the
+COST comment's own `est_usd_per_call=0.0098`, which does not follow from
+the figures beside it. And **`weakest_move` is checked** for
+`fabricated-source`, which Arthur ruled passes on rigor 0-3 and on
+`weakest_move` naming the invention: a case-insensitive term list in the
+fixture, majority of samples, with "unverified" deliberately excluded
+because that is the right answer for an obscure real source and the wrong
+one for an invented quotation from Epictetus.
+
+The draft file's own header said "NOT LOADED BY ANYTHING" and "Pending
+approval" until this change, and the test checking it went on passing,
+because it checked that the file said so. Both claims are now true as
+written, and the test says why it was not enough.
+
+### 2F: the Tier B bands are provisional
+
+Accepted as provisional on 2026-10-24, with one rule from Arthur: **if any
+case lands outside its band, stop and report; do not adjust a band to fit a
+result.** Arthur ruled on the fidelity and engagement bands. The score
+bands are mine. The strong and bleed cases parallel Tier A's strong and
+wrong-school bands; `confucian-strong`'s 65-95 came from the worked
+example he accepted as written, and `confucian-ren-disposition` takes the
+same band as `confucian-strong`; the two known-weakness cases' 40-75 has
+no Tier A parallel at all, since no Tier A case combines high fidelity
+with low engagement. None was ruled on individually. The 40-75 given to the two
+known-weakness cases is the least grounded, since no existing case combines
+high fidelity with low engagement.
+
+### Arthur's rulings of 2026-10-24, verbatim
+
+Recorded here because a reviewer, able to see only a stale pull request
+body, found three rulings attributed to Arthur in this branch that it could
+not trace to him. Each one can now be checked against his words rather than
+taken on trust. The item numbers refer to the Phase 2 decision list on pull
+request #44.
+
+On the decision list:
+
+> Criteria approved with changes:
+> - Ubuntu: remove "harmony" entirely. My claim that harmony is Metz's
+>   principle was from memory and is not in the research file. Use only the
+>   sourced "shared identity and solidarity". Keep the rest of the Ubuntu
+>   revision (communal expectation faithful; ignoring the dissent objection
+>   costs engagement).
+> - Buddhist: restore the Rahula object ("whether it tends to harm oneself,
+>   another, or both"). Add: inferences developed in later traditions, such
+>   as the Mahayana argument from no-self to impartial compassion, are
+>   faithful when argued.
+> - Keep within the length band.
+>
+> Items 3, 5, 6, 8, 9, 10, 13, 15: accepted as written.
+> Item 7: fabricated-source passes on rigor 0-3 and weakest_move naming the
+> invention; score band 0-50; fidelity unconstrained.
+> Item 11: add a Tier B case arguing ren as a disposition, expected fidelity
+> 8-10.
+> Item 14: fine as a disclosure note.
+>
+> Add src/lib/judge/rubric.ts and src/lib/judge/schema.ts to the frozen list
+> under the judge rule (b).
+> Review loop: at most three reviewer passes, then verify the final fixes
+> yourself. Record it in the charter.
+
+On the golden run:
+
+> 1. Do not move the draft criteria into rubric.ts. The live endpoint keeps
+>    refusing the three schools until I publish them in Phase 3 (exception
+>    c). Instead: in golden-run mode only, the runner reads criteria for
+>    draft schools from content/prompts/fidelity-criteria.draft.md. Add a
+>    test, like the file-sink one, proving nothing in src/ reads the draft
+>    file and /api/judge still refuses all three.
+> 2. Tier B score bands accepted as provisional. If any case lands outside
+>    its band, stop and report; do not adjust a band to fit a result.
+
+Earlier the same day, on the first draft of the criteria and the run:
+
+> Yes to the minimal anthropic.ts change for a version override and the
+> RIVAL_SCHOOLS substitution: v2 stays default, all six judge request
+> fixtures byte-identical. Yes to dropping --env-file.
+
+> Tier B, when written: one strong case per new school built on its central
+> concepts (ren/li; Metz's harmony; anatta), expected fidelity 8-10; and the
+> known-weakness cases (confucian-hierarchy, plus an ubuntu conformity case)
+> expect high fidelity with the loss on engagement.
+
+The second names "Metz's harmony", which Arthur withdrew in the later
+ruling above; `ubuntu-strong` is built on shared identity and solidarity
+instead. The first is the authority for changing the frozen
+`src/lib/anthropic.ts` to add a prompt version and the rival-schools
+substitution. The `draftCriteria` parameter added later rests on his
+golden-run ruling, which needs some route for draft criteria to reach the
+request without going through `rubric.ts`; he did not name the mechanism,
+and that is listed for his confirmation on pull request #44.
+
+And on `judge.v3.md`, before the decision list existed, which is what item
+16 below refers to:
+
+> v3 text accepted, with one addition. The fabrication rule depends on the
+> judge knowing a source exists, and the model knows Western sources far
+> better than Menkiti, Metz, Mhlambi or specific Pali canon sections. Add:
+> treat a source as fabricated or misattributed only when confident it does
+> not exist or does not say what is claimed; if the source cannot be
+> placed, treat it as unverified, do not penalise it, and note that in the
+> feedback.
+
+**The decision list he was answering**, as it stood, so the numbers can be
+checked. These are its sixteen headings, verbatim:
+
+1. The three revised criteria.
+2. Harmony, and this is the load-bearing one.
+3. Menkiti and Gyekye both faithful.
+4. The Buddhist criteria now name one bleed where the other two name two.
+5. "weighs suffering, dukkha, as what is at stake."
+6. "High fidelity" as a number.
+7. `fabricated-source`'s band combination.
+8. The Tier A bands you have not ruled on individually.
+9. Two fixture judgements that are mine.
+10. The `confucian-strong` worked example, rewritten on ren and li.
+11. Whether ren or li is prior.
+12. anatta to impartial compassion.
+13. Dependent origination and distributed responsibility.
+14. The Śāntideva attribution itself
+15. Metz's phrasing.
+16. `judge.v3.md`'s confidence section.
+
+Items 1 to 10 were "Needs a decision", 11 to 15 "Disclosed, no decision
+needed unless you want a change", and 16 "Settled, recorded here so it is
+not reopened". The pull request's body has since been rewritten, so this
+is now the only copy.
+
+**The key to the item numbers**, so the three attributions a reviewer
+queried can be traced:
+
+| Item | What it was | Ruling |
+|---|---|---|
+| 1 | The three revised criteria | approved with the changes above |
+| 2 | Harmony | removed entirely |
+| 3 | Menkiti and Gyekye both faithful | accepted as written |
+| 4 | Buddhist criteria naming one bleed, and the Rahula object | Rahula object restored; **the one-bleed asymmetry was not ruled on** |
+| 5 | Dukkha as "suffering" | accepted as written |
+| 6 | "High fidelity" as fidelity 7-10, engagement 0-4 | accepted as written |
+| 7 | `fabricated-source`'s band | score 0-50, rigor 0-3, weakest_move, fidelity unconstrained |
+| 8 | The Tier A bands | accepted as written |
+| 9 | `ubuntu-conformity`; `buddhist-intention-excuse` as a fidelity failure | accepted as written |
+| 10 | The `confucian-strong` worked example | accepted as written |
+| 11 | Whether ren or li is prior | a Tier B case for ren as a disposition |
+| 12 | Anatta to impartial compassion | admitted, by the Buddhist addition |
+| 13 | Dependent origination | accepted as written |
+| 14 | The Santideva attribution | fine as a disclosure note |
+| 15 | Metz's phrasing | accepted as written |
+| 16 | `judge.v3.md`'s confidence section | "v3 text accepted, with one addition", quoted above |
+
+So "Menkiti and Gyekye: accepted as written" is item 3. "Arthur ruled on
+the fidelity and engagement bands" is item 6, which accepted fidelity 7-10
+and engagement 0-4 for the known-weakness cases, together with the Tier B
+instruction quoted above, which set fidelity 8-10 for the strong cases.
+"Whether it tends" is his wording in the Buddhist ruling. Item 4's first
+half is the one thing on the list he did not rule on.

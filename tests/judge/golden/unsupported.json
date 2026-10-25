@@ -1,0 +1,18 @@
+{
+  "name": "unsupported",
+  "motion": "Handing your daily choices to an AI assistant costs you something that matters, even when its choices are better than yours.",
+  "school": "stoicism",
+  "argument": "This is plainly true, and any Stoic would say so immediately. The dichotomy of control settles it. Your choices are up to you, and handing them over is therefore a loss, which is obvious once stated. Nobody who has read Epictetus seriously could think otherwise. The externals are indifferent, the faculty of choice is not, and that is the end of the matter. It is the kind of thing that does not need arguing for, because the moment you see the distinction clearly you see the conclusion with it. Anyone unconvinced has simply not understood the distinction yet.",
+  "expected_score_band": [
+    10,
+    40
+  ],
+  "expected_fidelity_band": [
+    3,
+    6
+  ],
+  "expected_objection_school": [
+    "utilitarianism",
+    "virtue-ethics"
+  ]
+}

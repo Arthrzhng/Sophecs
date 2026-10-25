@@ -43,7 +43,7 @@ time. `CONTRIBUTING.md` has the long version of all of this.
 
     git fetch origin main && git checkout -b <short-name> origin/main
 
-As of 2026-10-24 `main` is at 7dd2975. Confirm with `git ls-remote origin main`
+As of 2026-10-25 `main` is at efa2173. Confirm with `git ls-remote origin main`
 rather than trusting that number — it goes stale on the next merge.
 
 ## Before pushing
@@ -68,6 +68,9 @@ without Arthur saying so explicitly:
 - `src/lib/supabase/**`, `supabase/**`
 - `src/lib/anthropic.ts`, `src/lib/elo.ts`, `src/lib/streak.ts`,
   `src/lib/judge-allowlist.ts`
+- `src/lib/judge/rubric.ts` and `src/lib/judge/schema.ts` — the fidelity
+  criteria and `PROMPT_VERSION`. Frozen under (b): a change to either
+  changes what the judge receives without moving a request fixture.
 - The `KILL_SWITCH_JUDGE` and `JUDGE_ALLOWLIST_USER_IDS` env handling
 
 ## Design

@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, it, expect } from "vitest";
 import {
   cueSentences,
+  quotedSpans,
   normalise,
   quoteProblems,
   applyExceptions,
@@ -97,6 +98,23 @@ describe("non-Western content quotations", () => {
     );
     expect(unaccounted).toEqual([]);
   });
+
+  it.each(files)("%s declares every span it puts in quotation marks", (file) => {
+    // The half cueSentences cannot see. Five verbatim spans of the
+    // research file sat undeclared in the draft criteria file because
+    // their reporting cues were not on the fixed cue list.
+    const declared = DECLARED[file];
+    const covered = [
+      ...declared.quotes.map(expected),
+      ...declared.quotes.map((q) => normalise(q.source)),
+      ...(declared.paraphrases ?? []).map((p) => normalise(p.text)),
+    ];
+    const body = searchableContent(read(file), declared);
+    const unaccounted = quotedSpans(body).filter(
+      (span) => !covered.some((c) => c.includes(span) || span.includes(c))
+    );
+    expect(unaccounted).toEqual([]);
+  });
 });
 
 // Changes nothing. Prints what cannot be traced, which for these files is
@@ -116,5 +134,19 @@ describe("original schools, report only", () => {
         untraceable.map((u) => `    ${u}`).join("\n")
     );
     expect(untraceable.length).toBeLessThanOrEqual(REPORT_ONLY.length);
+  });
+});
+
+// The draft criteria file states how many quotations it declares. That
+// number went stale twice in one sitting while the list was being edited,
+// so it is checked against the manifest rather than trusted.
+describe("the draft criteria file's own count of its quotations", () => {
+  it("matches the manifest", () => {
+    const file = "content/prompts/fidelity-criteria.draft.md";
+    const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+      "nine", "ten", "eleven", "twelve"];
+    const stated = /declares every quotation here[^:]*:\s*(\w+),/.exec(read(file))?.[1];
+    expect(stated, "the header should state a count").toBeDefined();
+    expect(words.indexOf(stated as string)).toBe(DECLARED[file].quotes.length);
   });
 });

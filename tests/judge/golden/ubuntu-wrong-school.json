@@ -1,0 +1,19 @@
+{
+  "name": "ubuntu-wrong-school",
+  "motion": "A city should be allowed to use an AI system to decide where to place new bus routes, even where the residents affected have no way to contest the decision.",
+  "school": "ubuntu",
+  "argument": "Count the journeys. The system raises total journeys served per pound spent by a wide margin, and the people who gain most are those currently worst served, so the expected utility is higher and more evenly spread. Community matters a great deal in this tradition, and a community is better off when more of its members can get to work, which is what the figures show. Against that, set the cost of not being able to contest a route decision, which is real but small and falls on few people. Multiply the benefit by the number of residents and the harm by the number who would have objected, and the sum is clearly positive. On that basis the city should proceed. If a later model raised the figure further, the city should switch to it, and if the figure fell the city should stop. The arithmetic is what decides, and the talk of relationships is a way of describing who the arithmetic is about.",
+  "expected_score_band": [
+    5,
+    35
+  ],
+  "expected_fidelity_band": [
+    0,
+    4
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "utilitarianism",
+    "virtue-ethics"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "util-named-text",
+  "motion": "A government should be allowed to use an AI system to allocate social housing, even where applicants cannot be told how their place in the queue was reached.",
+  "school": "utilitarianism",
+  "argument": "Mill's test in Utilitarianism is the greatest happiness of the greatest number, and he is explicit that each person's happiness counts the same as any other's. Apply it. The queue as it stands is administered by people with caseloads too large to be fair and discretion too wide to be checked, and the evidence on that is not seriously disputed. A system that places more households, faster, and with less variance between officers produces more welfare across the affected population, and the population to count is everyone in housing need, not only the articulate ones who would have appealed. The opacity is a real cost, paid in the distress of not knowing, and it has to be weighed rather than waved through. Weighed honestly, against years in temporary accommodation, it does not come close.",
+  "expected_score_band": [
+    70,
+    95
+  ],
+  "expected_fidelity_band": [
+    8,
+    10
+  ],
+  "expected_objection_school": [
+    "stoicism",
+    "virtue-ethics"
+  ]
+}
