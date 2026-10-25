@@ -8,11 +8,14 @@
 //   GOLDEN_DRY_RUN=1 npm run judge:golden         (plan and cost it; no calls)
 //                                                 (1/true/yes; anything unclear refuses)
 //
-// Requires ANTHROPIC_API_KEY in the environment. It is read from the
-// environment and nowhere else: the script no longer loads .env.local via
-// Node's --env-file, because an eval box holds the key as an environment
-// secret and a file that is not there made the command fail before it
-// could say what was missing. SUPABASE_SERVICE_ROLE_KEY is only needed
+// Requires an Anthropic API key in the environment, as SOPHECS_EVAL_KEY.
+// Claude Code's cloud sessions withhold any variable named
+// ANTHROPIC_API_KEY, so the eval key travels under its own name and is
+// handed to the client here; see tests/judge/eval-key.ts. ANTHROPIC_API_KEY
+// still works where it is not withheld. The key is read from the
+// environment and nowhere else: the script does not load .env.local via
+// Node's --env-file, because a file that is not there made the command
+// fail before it could say what was missing. SUPABASE_SERVICE_ROLE_KEY is only needed
 // under GOLDEN_LOG=ai_calls. One of three call sites for the Anthropic API
 // in this repo: the others are /api/judge, through judgeDebate, and
 // src/lib/screen.ts, which screens counterpart replies on
@@ -30,6 +33,7 @@ import {
   type RunnablePromptVersion,
 } from "../../src/lib/anthropic";
 import { planCase, readDraftCriteria, type CasePlan } from "./draft-criteria";
+import { describeEndpoint, describeEvalKey, endpointProblem, resolveEvalKey } from "./eval-key";
 import {
   flush,
   logTarget,
@@ -451,12 +455,32 @@ async function main() {
   // here and says what a real run would do and spend, so the bill is seen
   // before it is incurred. It needs no API key, because the client is only
   // built on the first call.
+  // Which key a run would use, described and never printed. A dry run
+  // reports it so that "is the key visible" can be answered for nothing; a
+  // real run refuses to start without one, here, before anything is spent,
+  // rather than failing on every call.
+  const evalKey = resolveEvalKey(process.env);
+
   if (DRY_RUN) {
     dryRun(cases, plans);
+    console.log(describeEndpoint(process.env));
+    console.log(describeEvalKey(evalKey));
     return;
   }
+  if (!evalKey.ok) {
+    throw new Error(`refusing to start a real run: ${evalKey.reason}`);
+  }
+  const endpoint = endpointProblem(process.env);
+  if (endpoint) {
+    throw new Error(`refusing to start a real run: ${endpoint}`);
+  }
+  // src/lib/anthropic.ts builds its client on the first call, from this
+  // variable, so setting it here, in this process only, is all it takes.
+  process.env.ANTHROPIC_API_KEY = evalKey.key;
+
   // A real run says what it is about to spend before it spends it.
   printPlan(cases, plans);
+  console.log(describeEvalKey(evalKey));
   const run =
     LOG_TO === "file"
       ? startRun({

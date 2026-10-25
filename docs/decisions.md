@@ -1397,3 +1397,63 @@ and engagement 0-4 for the known-weakness cases, together with the Tier B
 instruction quoted above, which set fidelity 8-10 for the strong cases.
 "Whether it tends" is his wording in the Buddhist ruling. Item 4's first
 half is the one thing on the list he did not rule on.
+
+### The eval key travels as `SOPHECS_EVAL_KEY`
+
+Claude Code's cloud sessions withhold any environment variable named
+`ANTHROPIC_API_KEY`. Found on 2026-10-25, after a key set under that name
+never reached a fresh session. The test that settled it: Arthur set
+`ANTHROPIC_API_KEY` and a harmless `SOPHECS_CHECK=1` side by side, and a
+fresh session saw the second and not the first. So variables reach
+sessions, and that one name does not, presumably because Claude Code runs
+on Anthropic's API itself and a key under that name would collide with its
+own sign-in.
+
+The golden runner now reads the key as `SOPHECS_EVAL_KEY`, through
+`tests/judge/eval-key.ts`, and sets `ANTHROPIC_API_KEY` inside its own
+process before the first call. That is enough because `src/lib/anthropic.ts`
+builds its client lazily, on the first call, from that variable; the frozen
+file is untouched, and production on Vercel reads `ANTHROPIC_API_KEY`
+exactly as before. `tests/eval-key.test.ts` refuses any mention of
+`SOPHECS_EVAL_KEY` in `src/`, and checks the runner sets the key in one
+place, after both refusal checks: the one for the key and the one for the
+endpoint. That check is a tripwire on the runner's text, not a proof: an
+aliased write such as `const e = process.env; e.ANTHROPIC_API_KEY = …`
+gets past it.
+
+**A real run also refuses unless the key is going to Anthropic.** The
+library sends the key wherever `ANTHROPIC_BASE_URL` points, read when the
+client is built. In these sessions that is `https://api.anthropic.com`,
+but a session that pointed it at a gateway would have handed the eval key
+to the gateway. So a real run refuses unless the base URL's origin is
+exactly `https://api.anthropic.com`, refuses a username or password in it,
+and refuses if `ANTHROPIC_AUTH_TOKEN` or `ANTHROPIC_CUSTOM_HEADERS` is set,
+since the library would add a second credential or arbitrary headers to
+every request. The dry run prints the endpoint above the key line.
+
+The runner also checks the key's shape before any call: a leading "Bearer",
+quote marks, a space, no `sk-ant-` prefix, or any character after it other
+than letters, digits, hyphens and underscores each refuse the run by name.
+The last catches an invisible character pasted along with the key, so it is
+refused here rather than left to the HTTP layer, whose error might repeat
+the value.
+This session came within one click of saving the key as a Bearer token,
+which Anthropic's API does not take; it wants the key alone, in a header
+called `x-api-key`. Nothing in the module ever prints, returns in a message,
+or throws the key; it is described by its source and length, and a test
+checks the key's text never appears in anything it says.
+
+On the way there, two other routes were tried and set aside, and they are
+worth recording so nobody repeats them:
+
+- **Network secrets.** Claude Code's environment settings can attach a
+  credential to outgoing requests, so the key never enters the session at
+  all. That is the safer design and the platform's documented preference.
+  Its form refused to save an `x-api-key` header for `api.anthropic.com`
+  with a generic error, and the session could not see which input it
+  objected to. Worth another try later, since it keeps the key out of the
+  sandbox entirely; the runner would then need a placeholder key and the
+  network layer to replace it, which is untested.
+- **Timing.** The first fresh session started while the environment still
+  said "Connecting", which looked like the cause. It was not: a later
+  session, started once that cleared, still lacked the key.
