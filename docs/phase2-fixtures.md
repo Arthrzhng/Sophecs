@@ -486,7 +486,7 @@ actually runs.
 | `ubuntu-conformity` | ubuntu | communal expectation against a dissenter, objection unanswered | score 40-75, fidelity 7-10, engagement 0-4 |
 | `buddhist-strong` | buddhist | anatta, intention, the Rahula test | score 70-95, fidelity 8-10 |
 | `buddhist-wrong-school` | buddhist | outcomes only, intention ignored | score 5-35, fidelity 0-4 |
-| `buddhist-intention-excuse` | buddhist | good intention excusing damage | score 5-35, fidelity 0-4 |
+| `buddhist-intention-excuse` | buddhist | good intention excusing damage | score 5-40, fidelity 0-4 |
 
 Three of these exist because of specific decisions Arthur took on the
 criteria, and would be pointless without them:
@@ -513,6 +513,13 @@ known-weakness case, even though the school's page concedes the objection.
 The difference is that the criteria name using a good intention to excuse
 damage as a fidelity failure in terms: the tradition weighs intention, it
 does not treat intention as a discharge.
+
+Its score band was 5-35 until 2026-10-26, when Arthur widened it to 5-40
+after the 2F v3 run scored it 38 [34-38] with fidelity 3, inside its
+fidelity band. v3 lifts every live school's wrong-school case 4 to 10
+points over v2 (the new schools' cases never ran under v2), and
+the fidelity mark is the one that says whether the judge saw the failure;
+it did. No other band moved. `docs/decisions.md` has the ruling.
 
 ## How Tier B runs
 

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import { FIDELITY_CRITERIA, hasFidelityCriteria } from "../../src/lib/judge/rubric";
+import { fidelityCriteriaFor, hasFidelityCriteria } from "../../src/lib/judge/rubric";
+import type { PromptVersion } from "../../src/lib/judge/schema";
 import type { SchoolId } from "../../src/lib/types";
 
 /**
@@ -60,9 +61,12 @@ export type CasePlan =
 /**
  * Decide, before any call is made, whether a case runs and against what.
  *
- * - A live school is always judged against its live criteria. The draft
- *   file is never consulted for it, and `callJudgeModel` refuses a draft
- *   override for a school that has live criteria in any case.
+ * - A live school is always judged against its live criteria for the
+ *   prompt version being run: rubric.ts's text under v1 and v2, and that
+ *   text plus its v3 vocabulary paragraph under v3, exactly as
+ *   `callJudgeModel` builds it. The draft file is never consulted for it,
+ *   and `callJudgeModel` refuses a draft override for a school that has
+ *   live criteria in any case.
  * - A draft school runs only under a prompt that takes its rival schools
  *   from the registry. v1 and v2 name stoicism, utilitarianism and
  *   virtue-ethics in their prose and ask for an objection from "the two
@@ -75,10 +79,16 @@ export type CasePlan =
 export function planCase(
   school: SchoolId,
   promptTemplate: string,
-  draft: Partial<Record<SchoolId, string>>
+  draft: Partial<Record<SchoolId, string>>,
+  version: PromptVersion | "v3"
 ): CasePlan {
   if (hasFidelityCriteria(school)) {
-    return { run: true, source: "live", criteria: FIDELITY_CRITERIA[school], draftCriteria: undefined };
+    return {
+      run: true,
+      source: "live",
+      criteria: fidelityCriteriaFor(school, version),
+      draftCriteria: undefined,
+    };
   }
   const criteria = draft[school];
   if (criteria === undefined) {

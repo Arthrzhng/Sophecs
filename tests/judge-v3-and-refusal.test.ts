@@ -3,7 +3,12 @@ import path from "node:path";
 import { describe, it, expect } from "vitest";
 import { PUBLISHED_SCHOOL_IDS } from "../src/lib/school-registry";
 import { DRAFT_SCHOOL_IDS } from "../src/lib/school-registry.drafts";
-import { FIDELITY_CRITERIA, hasFidelityCriteria, judgeableSchools } from "../src/lib/judge/rubric";
+import {
+  FIDELITY_CRITERIA,
+  fidelityCriteriaFor,
+  hasFidelityCriteria,
+  judgeableSchools,
+} from "../src/lib/judge/rubric";
 import { PROMPT_VERSION } from "../src/lib/judge/schema";
 
 const PROMPTS = path.join(process.cwd(), "content", "prompts");
@@ -229,12 +234,52 @@ describe("the draft fidelity criteria", () => {
     };
   })();
 
+  // The same, for what v3 sends a live school: its criteria plus the
+  // vocabulary paragraph Arthur ruled on 2026-10-26. The draft schools are
+  // only ever judged under v3, so this is the band they are measured
+  // against.
+  const LIVE_V3_BAND = (() => {
+    const texts = PUBLISHED_SCHOOL_IDS.map((id) => fidelityCriteriaFor(id, "v3"));
+    const lengths = texts.map((t) => t.length);
+    const words = texts.map((t) => t.split(/\s+/).length);
+    return {
+      chars: [Math.min(...lengths), Math.max(...lengths)] as const,
+      words: [Math.min(...words), Math.max(...words)] as const,
+    };
+  })();
+
   it("takes its band from the live criteria, which are 730 to 893 characters", () => {
     // Pins the derivation itself: if this changes, the draft file's own
     // stated figures need changing with it, and that is the whole reason
     // the band is derived.
     expect(LIVE_BAND.chars).toEqual([730, 893]);
     expect(LIVE_BAND.words).toEqual([114, 142]);
+  });
+
+  it("takes its v3 band from the live criteria under v3, which are 1046 to 1370 characters", () => {
+    expect(LIVE_V3_BAND.chars).toEqual([1046, 1370]);
+    expect(LIVE_V3_BAND.words).toEqual([164, 225]);
+  });
+
+  it("gives v3 every live school's criteria unchanged, then the vocabulary paragraph", () => {
+    for (const id of PUBLISHED_SCHOOL_IDS) {
+      expect(fidelityCriteriaFor(id, "v2"), id).toBe(FIDELITY_CRITERIA[id]);
+      expect(fidelityCriteriaFor(id, "v1"), id).toBe(FIDELITY_CRITERIA[id]);
+      // The paragraph lives only in the v3 map. A school published from the
+      // draft file with all three paragraphs in CRITERIA_BY_SCHOOL would
+      // send it twice under v3, and fail here instead.
+      expect(FIDELITY_CRITERIA[id], id).not.toContain("Credit the concept");
+      const v3 = fidelityCriteriaFor(id, "v3");
+      expect(v3.startsWith(`${FIDELITY_CRITERIA[id]}\n\n`), id).toBe(true);
+      const rule = v3.slice(FIDELITY_CRITERIA[id].length + 2);
+      expect(rule).toMatch(/^Credit the concept, not the vocabulary\./);
+      expect(rule.replace(/\s+/g, " ")).toContain(
+        "Never mark fidelity down for missing vocabulary alone."
+      );
+    }
+    for (const id of DRAFT_SCHOOL_IDS) {
+      expect(() => fidelityCriteriaFor(id, "v3"), id).toThrowError(/no fidelity criteria/);
+    }
   });
 
   it("says it is approved, and that only the golden runner reads it", () => {
@@ -272,21 +317,28 @@ describe("the draft fidelity criteria", () => {
     expect(sections.length).toBe(DRAFT_SCHOOL_IDS.length);
     for (const [, text] of sections) {
       const body = text.trim();
-      // Two paragraphs: the commitments, then the fidelity failures.
-      expect(body.split("\n\n").length).toBe(2);
+      // Three paragraphs, as the live criteria have under v3: the
+      // commitments, the fidelity failures, then the vocabulary paragraph.
+      const paragraphs = body.split("\n\n");
+      expect(paragraphs.length).toBe(3);
       expect(body).toMatch(/^A faithful /);
-      expect(body).toContain("Score fidelity down when the argument:");
-      // The band the three live ones occupy, measured from them rather
-      // than written down. A reviewer pointed out that these bounds were
-      // literals: nothing in the suite measured the live criteria, so one
-      // of them changing length would leave this green while the comment
-      // above it went false. The numbers are 730 to 893 characters and 114
-      // to 142 words today, and if that moves this test moves with it.
-      expect(body.length).toBeGreaterThanOrEqual(LIVE_BAND.chars[0]);
-      expect(body.length).toBeLessThanOrEqual(LIVE_BAND.chars[1]);
+      expect(paragraphs[1]).toMatch(/^Score fidelity down when the argument:/);
+      expect(paragraphs[2]).toMatch(/^Credit the concept, not the vocabulary\./);
+      expect(paragraphs[2].replace(/\s+/g, " ")).toContain(
+        "Never mark fidelity down for missing vocabulary alone."
+      );
+      // The band the three live ones occupy as v3 sends them, measured
+      // from them rather than written down. A reviewer pointed out that
+      // these bounds were once literals: nothing in the suite measured the
+      // live criteria, so one of them changing length would leave this
+      // green while the comment above it went false. The figures are
+      // pinned by the "takes its v3 band" test above, and if they move
+      // this test moves with them.
+      expect(body.length).toBeGreaterThanOrEqual(LIVE_V3_BAND.chars[0]);
+      expect(body.length).toBeLessThanOrEqual(LIVE_V3_BAND.chars[1]);
       const words = body.split(/\s+/).length;
-      expect(words).toBeGreaterThanOrEqual(LIVE_BAND.words[0]);
-      expect(words).toBeLessThanOrEqual(LIVE_BAND.words[1]);
+      expect(words).toBeGreaterThanOrEqual(LIVE_V3_BAND.words[0]);
+      expect(words).toBeLessThanOrEqual(LIVE_V3_BAND.words[1]);
     }
   });
 });

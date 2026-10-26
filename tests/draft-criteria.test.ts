@@ -76,7 +76,7 @@ const { POST } = await import("../src/app/api/judge/route");
 const { callJudgeModel } = await import("../src/lib/anthropic");
 const { PUBLISHED_SCHOOL_IDS } = await import("../src/lib/school-registry");
 const { DRAFT_SCHOOL_IDS } = await import("../src/lib/school-registry.drafts");
-const { FIDELITY_CRITERIA } = await import("../src/lib/judge/rubric");
+const { FIDELITY_CRITERIA, fidelityCriteriaFor } = await import("../src/lib/judge/rubric");
 const { readDraftCriteria, planCase, DRAFT_CRITERIA_FILE } = await import("./judge/draft-criteria");
 
 function submit() {
@@ -210,22 +210,28 @@ describe("the golden run's draft criteria", () => {
 
   it("judges a live school against rubric.ts, never the draft file", () => {
     for (const id of PUBLISHED_SCHOOL_IDS) {
-      const plan = planCase(id, v3, draft);
+      const plan = planCase(id, v3, draft, "v3");
       expect(plan).toMatchObject({ run: true, source: "live", draftCriteria: undefined });
-      if (plan.run) expect(plan.criteria).toBe(FIDELITY_CRITERIA[id]);
+      // Under v3 that is rubric.ts's text plus its vocabulary paragraph,
+      // exactly what callJudgeModel sends, so the run's fingerprint is of
+      // what was actually judged against.
+      if (plan.run) expect(plan.criteria).toBe(fidelityCriteriaFor(id, "v3"));
+      const underV2 = planCase(id, v2, draft, "v2");
+      expect(underV2).toMatchObject({ run: true, source: "live", draftCriteria: undefined });
+      if (underV2.run) expect(underV2.criteria).toBe(FIDELITY_CRITERIA[id]);
     }
   });
 
   it("judges a draft school against the draft file, under v3", () => {
     for (const id of DRAFT_SCHOOL_IDS) {
-      const plan = planCase(id, v3, draft);
+      const plan = planCase(id, v3, draft, "v3");
       expect(plan).toMatchObject({ run: true, source: "draft", criteria: draft[id] });
     }
   });
 
   it("skips a draft school under v2, whose prompt counts the rivals as two", () => {
     for (const id of DRAFT_SCHOOL_IDS) {
-      const plan = planCase(id, v2, draft);
+      const plan = planCase(id, v2, draft, "v2");
       expect(plan.run).toBe(false);
       if (!plan.run) expect(plan.reason).toContain("counts them as two");
     }
@@ -233,14 +239,14 @@ describe("the golden run's draft criteria", () => {
 
   it("throws, before any call, for an empty section", () => {
     for (const empty of ["", "   ", "\n\n"]) {
-      expect(() => planCase("ubuntu", v3, { ubuntu: empty })).toThrow(
+      expect(() => planCase("ubuntu", v3, { ubuntu: empty }, "v3")).toThrow(
         'the draft criteria for "ubuntu" are empty'
       );
     }
   });
 
   it("throws, before any call, for a school with criteria nowhere", () => {
-    expect(() => planCase("confucian", v3, {})).toThrow(
+    expect(() => planCase("confucian", v3, {}, "v3")).toThrow(
       /has no criteria in src\/lib\/judge\/rubric\.ts or in content\/prompts\/fidelity-criteria\.draft\.md/
     );
   });

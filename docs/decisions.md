@@ -1457,3 +1457,94 @@ worth recording so nobody repeats them:
 - **Timing.** The first fresh session started while the environment still
   said "Connecting", which looked like the cause. It was not: a later
   session, started once that cleared, still lacked the key.
+
+### 2F: Arthur's rulings of 2026-10-26, on the golden runs
+
+The runs are `tests/judge/golden-runs/2026-10-26T00-16-57-040Z-v2.json`
+(v2, 14 cases, 42 calls, $0.3758) and
+`2026-10-26T00-20-49-181Z-v3.json` (v3, 24 cases, 72 calls, $0.9238),
+three samples each. Arthur reviewed both tables and ruled four things.
+His message, verbatim:
+
+> 2F results reviewed. Decisions:
+>
+> 1. Vocabulary over concepts: the v3 judge docks fidelity for missing
+>    terms (confucian-hierarchy: "Ren never appears"; stoic-analogy: "never
+>    names the outcome as an indifferent"). Add to the v3 criteria for ALL
+>    SIX schools: credit the concept whether or not the argument uses the
+>    school's terms; never mark fidelity down for missing vocabulary alone.
+>    For the three live schools, put this in a v3-only criteria set so the
+>    live v2 judge is unchanged until the v3 switch. Show me the wording.
+> 2. verdict_line: 5 of 72 v3 samples exceeded 20 words (v2: 0). Fix it in
+>    judge.v3.md (make the word caps prominent near the response format);
+>    do not truncate or relax the validator. Target 0 failures.
+> 3. buddhist-intention-excuse score band 5-35 -> 5-40 (v3 lifts all
+>    wrong-school cases 4-10 points; fidelity 3 is correct). No other band
+>    changes.
+> 4. Record in docs/decisions.md: under v3 the strong-minus-wrong gap for the
+>    new schools (56-57) matches the original three (55-57); and v3 scores
+>    3-15 points above v2 across the board, which will be a step change at
+>    switch-over.
+>
+> Merge the run files from claude/admiring-mccarthy-gzhkoi with this. Then
+> tell me the cost of a v3-only re-run at three samples, and stop.
+
+The band in item 3 is his ruling on a result, made after he saw it, which
+is what his 2026-10-24 rule ("do not adjust a band to fit a result")
+reserves to him. A v3-only criteria set for the live schools needs
+`rubric.ts` to hold it and one line of `src/lib/anthropic.ts` to choose it
+by version; both are frozen, and both changes are the minimum item 1 asks
+for. What follows is how each was carried out.
+
+1. **Concepts over vocabulary.** The v3 judge docked fidelity for missing
+   terms: "Ren never appears" on `confucian-hierarchy`, "Never names the
+   outcome (...) as an indifferent" on `stoic-analogy`. v2 docks
+   `stoic-analogy` for the same thing ("nor explicitly labels patient
+   outcomes as indifferents"), and the fix is v3-only by design, so v2's
+   fidelity 7 on that case stands until the switch. Every school's criteria
+   now end, under v3 only, with a paragraph that credits the concept
+   whether or not the argument uses the school's terms and says never to
+   mark fidelity down for missing vocabulary alone. For the three live
+   schools it lives in `src/lib/judge/rubric.ts` beside their criteria and
+   is added by `fidelityCriteriaFor` for v3 and later. v2 gets exactly
+   what it did, which the six request fixtures pin, and v1 is held
+   unchanged by a unit test; `tests/judge-request.test.ts` also drives
+   `callJudgeModel` to show v3 carries the paragraph and v2 does not. For the three
+   draft schools it is the third paragraph of each section of
+   `content/prompts/fidelity-criteria.draft.md`, since those schools are
+   only ever judged under v3.
+2. **`verdict_line` over its cap.** 5 of 72 v3 samples returned a
+   `verdict_line` over 20 words; v2 returned none in 42. Fixed in
+   `content/prompts/judge.v3.md` by moving the word caps directly above the
+   response format and naming `verdict_line` there. `improvement_note`,
+   capped at 40 words on revisions and until then mentioned only under
+   Revisions, joins the list. The validator is not
+   relaxed and nothing is truncated. The target is no failures.
+3. **`buddhist-intention-excuse` score band, 5-35 to 5-40.** v3 scored it
+   38 [34-38] with fidelity 3, inside its fidelity band of 0-4, so the
+   judge saw the failure the case is there to test. No other band moved.
+4. **Two things to know at the v3 switch**, recorded as measured. Arthur
+   put them as a gap of 56-57 for the new schools against 55-57 for the
+   original three, and v3 scoring 3-15 points above v2 across the board.
+   The run files say this:
+   - **The gap between strong and wrong-school cases.** Under v3, strong
+     minus wrong-school median score is 56 for Buddhism and 57 for Ubuntu
+     (`ubuntu-strong` from two valid samples, 80 and 82; so too
+     `virtue-strong` below, 83 and 83, the third of each having failed on
+     `verdict_line`).
+     For the original three it is 57 for utilitarianism, 55 for virtue
+     ethics and **48 for stoicism** (80 against 32), so the new schools
+     match utilitarianism and virtue ethics, and stoicism is the outlier.
+     Confucianism has no gap in the table: two of `confucian-strong`'s
+     three samples failed on `verdict_line`, so the runner reported no
+     result. Its one valid sample scored 86 against `confucian-wrong-school`'s
+     22, a gap of 64 from a single sample.
+   - **v3 against v2.** Of the 14 cases both versions ran, 9 scored 3 to 15
+     points higher under v3 (median against median), 2 scored 2 higher
+     (`caricature`, `stoic-analogy`), and 3 did not move (`fabricated-source`,
+     `incoherent`, `unsupported`). The three wrong-school cases rose 4 to
+     10, the strong and exemplar cases 3 to 13, and the two utilitarian
+     source cases 6 (`util-named-text`) and 15 (`util-obscure-source`).
+     Switching production to v3 will be a step change in scores for
+     those. Scores across prompt versions are not compared as equivalent
+     in any case; the stamp on each stored verdict keeps them apart.

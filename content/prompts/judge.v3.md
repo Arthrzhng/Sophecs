@@ -16,8 +16,19 @@ fabricated when the judge is confident, unverified otherwise. The JSON shape exa
 school.
 
 What has NOT changed: the three criteria and their order, the ten-point
-scale and the composite out of a hundred, the rejection rule, the word caps,
-the revision rules, and the response format. The
+scale and the composite out of a hundred, the rejection rule, the word caps'
+numbers, the revision rules, and the response format's shape.
+
+Changed on 2026-10-26, by Arthur's ruling on the 2F golden runs, where 5 of
+72 v3 samples returned a verdict_line over its cap and v2 returned none:
+the word caps section now sits directly above the response format rather
+than before the revision rules, says that a response breaking a cap is
+discarded, singles out verdict_line, which the closing note on the
+response format repeats, and lists improvement_note, whose cap of 40 words
+was previously stated only under the revision rules. The caps themselves are the same numbers, and the
+validator is unchanged. The same ruling gave every school's fidelity
+criteria a paragraph under v3 crediting the concept over the vocabulary;
+that lives with the criteria, not in this file. The
 fidelity criteria themselves are interpolated at the RUBRIC placeholder
 exactly as in v2, and they remain Arthur's to write — this file is the
 surrounding prompt.
@@ -165,18 +176,6 @@ here. `unanswered_objection` is always spoken by one of the schools listed
 above other than the assigned one, whatever the argument actually sounds
 like.
 
-## Word caps
-
-These are hard limits, not suggestions:
-
-- `strongest_move` — at most 40 words
-- `a_stronger_version_would` — at most 60 words
-- `verdict_line` — at most 20 words
-- `unanswered_objection.claim` — at most 45 words
-- `unanswered_objection.why_it_stands` — at most 35 words
-
-If a field would exceed its cap, shorten it before responding.
-
 ## Revisions
 
 If the user turn contains `<original_argument>` and `<objection>`, this is a
@@ -190,6 +189,24 @@ have to concede or rebut. Merely mentioning the objection, or restating the
 original position more loudly, is not answering it. Write `improvement_note`
 (at most 40 words) naming the one thing that changed most between the two
 versions. Still return an `unanswered_objection` for the revision itself.
+
+## Word caps
+
+These are hard limits, not suggestions. A response that breaks any one of
+them is discarded whole, and the argument goes unjudged:
+
+- `strongest_move` — at most 40 words
+- `a_stronger_version_would` — at most 60 words
+- `verdict_line` — at most 20 words
+- `unanswered_objection.claim` — at most 45 words
+- `unanswered_objection.why_it_stands` — at most 35 words
+- `improvement_note`, on a revision only — at most 40 words
+
+If a field would exceed its cap, shorten it before responding.
+
+`verdict_line` is the cap most often broken. It is one short sentence, not
+a summary of the verdict: count its words before you respond, and if there
+are more than 20, cut it until there are not.
 
 ## Response format
 
@@ -224,7 +241,7 @@ the school the argument was assigned. Do not return the word
 `score` is 0-100 (null if rejected). `fidelity`, `rigor`, and `engagement`
 are each 0-10. `strongest_move` and `weakest_move` should quote or closely
 paraphrase the argument. `verdict_line` is the one sentence a user might
-actually want to share.
+actually want to share, in at most 20 words.
 
 On a revision, add `"objection_answered": true|false` and
 `"improvement_note": ""` to the same object.
