@@ -448,7 +448,7 @@ async function main() {
   // school with criteria nowhere throws here, at no cost, rather than
   // three billed cases into the run.
   const draft = readDraftCriteria();
-  const plans = new Map(cases.map((c) => [c.name, planCase(c.school, promptText(), draft)]));
+  const plans = new Map(cases.map((c) => [c.name, planCase(c.school, promptText(), draft, VERSION)]));
 
   // Everything up to here costs nothing: the fixtures are validated, every
   // case is planned, and a broken one has already thrown. A dry run stops

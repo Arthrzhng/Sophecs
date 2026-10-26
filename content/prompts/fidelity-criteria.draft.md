@@ -27,11 +27,18 @@ describe each school's central commitments rather than only the passages
 the research file verified. Every doctrinal claim I was not sure of is
 listed at the bottom instead of being asserted in the criteria.
 
-Structure and length follow the three in rubric.ts: a paragraph on what the
-school's reasoning commits to, then a paragraph naming the ways an argument
-fails fidelity, including the bleeds from rival schools. The existing three
-run 730 to 893 characters and 114 to 142 words, in two paragraphs; these
-run 849 to 888 and 128 to 137.
+Structure and length follow the three in rubric.ts as v3 sends them: a
+paragraph on what the school's reasoning commits to, then a paragraph naming
+the ways an argument fails fidelity, including the bleeds from rival
+schools, then a paragraph crediting the concept over the vocabulary. That
+third paragraph is Arthur's ruling of 2026-10-26, made for all six schools
+after the 2F golden runs; these schools are only ever judged under v3, so
+it is part of their criteria here, while the three live schools carry it
+in rubric.ts and receive it under v3 only. The existing three run 1046 to
+1321 characters and 164 to 216 words under v3, in three paragraphs; these
+run 1200 to 1228 and 186 to 193. Before the third paragraph was added they
+ran 849 to 888 and 128 to 137, against 730 to 893 and 114 to 142 for the
+live three under v2.
 
 Those are `.length` of the stored string, which is what
 tests/judge-v3-and-refusal.test.ts asserts. An earlier revision of this
@@ -47,7 +54,8 @@ each, one composite out of a hundred.
 # Draft fidelity criteria
 
 Approved 2026-10-24. The live judge does not read this file; the golden
-runner does, in eval mode only.
+runner does, in eval mode only. The third paragraph of each section was
+added on 2026-10-26, by Arthur's ruling on the 2F golden runs.
 
 ## `confucian` (Confucianism)
 
@@ -65,6 +73,12 @@ Score fidelity down when the argument: reduces to what the system maximises
 ritual (virtue-ethics bleed); or asserts that relationships matter without
 naming the relation, who owes what to whom, or what the position requires.
 
+Credit the concept, not the vocabulary. An argument that reasons from what a
+role requires, what the parties to a relationship owe one another, and the
+humaneness and propriety through which those duties are carried out is
+reasoning from ren and li whether or not either word appears. Never mark
+fidelity down for missing vocabulary alone.
+
 ## `ubuntu` (Ubuntu)
 
 A faithful Ubuntu argument grounds its claim in relational personhood: a
@@ -80,6 +94,12 @@ Score fidelity down when the argument: maximises expected utility
 that community matters without naming whose relationships are at stake or who
 was left out. Leaning on communal expectation is faithful; ignoring the charge
 that it pressures dissenters costs engagement, not fidelity.
+
+Credit the concept, not the vocabulary. An argument that reasons from what
+people become through one another, and reads a harm as a failure of
+relationship and solidarity, is reasoning from relational personhood whether
+or not it uses the word ubuntu, quotes the maxim, or names Metz, Menkiti or
+Gyekye. Never mark fidelity down for missing vocabulary alone.
 
 ## `buddhist` (Buddhist Ethics)
 
@@ -97,6 +117,12 @@ Score fidelity down when the argument: maximises aggregate welfare, ignoring
 intention and non-harm (consequentialist bleed); uses a good intention to
 excuse damage a careless actor would be blamed for; or asserts non-harm
 without naming who is still hurt.
+
+Credit the concept, not the vocabulary. An argument that weighs suffering,
+intention and non-harm, and treats what happens as arising from many
+conditions rather than one cause, is reasoning from dukkha and dependent
+origination whether or not it uses those terms or the word anatta. Never mark
+fidelity down for missing vocabulary alone.
 
 ## Doctrinal claims, and what Arthur ruled on
 

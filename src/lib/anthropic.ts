@@ -10,7 +10,7 @@ import {
   type ModelVerdict,
   type PromptVersion,
 } from "@/lib/judge/schema";
-import { FIDELITY_CRITERIA, hasFidelityCriteria } from "@/lib/judge/rubric";
+import { fidelityCriteriaFor, hasFidelityCriteria } from "@/lib/judge/rubric";
 import { fillPlaceholders } from "@/lib/judge/fill-placeholder";
 import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
 import type { SchoolId } from "@/lib/types";
@@ -129,9 +129,11 @@ export async function callJudgeModel(
         `live school is always judged against them`
     );
   }
-  // Reading FIDELITY_CRITERIA for a school with none still throws, by
-  // design, so without draftCriteria a draft school fails exactly as before.
-  const criteria = draftCriteria ?? FIDELITY_CRITERIA[school];
+  // Reading criteria for a school with none still throws, by design, so
+  // without draftCriteria a draft school fails exactly as before. v1 and
+  // v2 get rubric.ts's criteria unchanged; v3 adds the vocabulary
+  // paragraph Arthur ruled on 2026-10-26 (see rubric.ts).
+  const criteria = draftCriteria ?? fidelityCriteriaFor(school, promptVersion);
 
   // {{RUBRIC}} is in every version. {{RIVAL_SCHOOLS}} is v3 and later, so
   // it is optional, and its absence leaves v2 byte for byte what it was.
