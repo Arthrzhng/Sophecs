@@ -59,6 +59,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 const { callJudgeModel, judgeDebate, PROMPT_VERSION } = await import("../src/lib/anthropic");
 const { motionForDebate } = await import("../src/lib/motion-text");
 const { PUBLISHED_SCHOOL_IDS } = await import("../src/lib/school-registry");
+const { fidelityCriteriaFor } = await import("../src/lib/judge/rubric");
 
 // The three schools with rows in production. Written out rather than read
 // from the registry on purpose: if the registry ever stopped listing one
@@ -273,6 +274,24 @@ describe("the prompt version override", () => {
 
     // The list the model is offered is the list zod will accept.
     for (const id of PUBLISHED_SCHOOL_IDS) expect(v3System).toContain(`- \`${id}\``);
+  });
+
+  it("sends v3 the vocabulary paragraph the golden runner fingerprints, and v2 none", async () => {
+    // The golden runner fingerprints fidelityCriteriaFor(school, version).
+    // A reviewer reverted callJudgeModel to the bare criteria and every
+    // test stayed green, so the fingerprint could have described criteria
+    // the request did not carry. This drives the request itself.
+    for (const school of PUBLISHED_SCHOOL_IDS) {
+      created.length = 0;
+      await callJudgeModel(MOTION, school, ARGUMENT, undefined, "v3");
+      expect(systemOf(created[0]), school).toContain(fidelityCriteriaFor(school, "v3"));
+
+      created.length = 0;
+      await callJudgeModel(MOTION, school, ARGUMENT);
+      const v2System = systemOf(created[0]);
+      expect(v2System, school).toContain(fidelityCriteriaFor(school, "v2"));
+      expect(v2System, school).not.toContain("Credit the concept, not the vocabulary");
+    }
   });
 
   it("refuses to carry a school's criteria into another school's prompt", async () => {

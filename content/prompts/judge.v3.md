@@ -16,8 +16,8 @@ fabricated when the judge is confident, unverified otherwise. The JSON shape exa
 school.
 
 What has NOT changed: the three criteria and their order, the ten-point
-scale and the composite out of a hundred, the rejection rule, the word caps,
-the revision rules, and the response format.
+scale and the composite out of a hundred, the rejection rule, the word caps'
+numbers, the revision rules, and the response format's shape.
 
 Changed on 2026-10-26, by Arthur's ruling on the 2F golden runs, where 5 of
 72 v3 samples returned a verdict_line over its cap and v2 returned none:
@@ -199,6 +199,7 @@ them is discarded whole, and the argument goes unjudged:
 - `verdict_line` — at most 20 words
 - `unanswered_objection.claim` — at most 45 words
 - `unanswered_objection.why_it_stands` — at most 35 words
+- `improvement_note`, on a revision only — at most 40 words
 
 If a field would exceed its cap, shorten it before responding.
 

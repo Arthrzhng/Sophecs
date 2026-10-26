@@ -516,7 +516,8 @@ does not treat intention as a discharge.
 
 Its score band was 5-35 until 2026-10-26, when Arthur widened it to 5-40
 after the 2F v3 run scored it 38 [34-38] with fidelity 3, inside its
-fidelity band. v3 lifts every wrong-school case 4 to 10 points over v2, and
+fidelity band. v3 lifts every live school's wrong-school case 4 to 10
+points over v2 (the new schools' cases never ran under v2), and
 the fidelity mark is the one that says whether the judge saw the failure;
 it did. No other band moved. `docs/decisions.md` has the ruling.
 

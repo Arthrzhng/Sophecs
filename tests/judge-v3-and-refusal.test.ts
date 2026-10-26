@@ -256,9 +256,9 @@ describe("the draft fidelity criteria", () => {
     expect(LIVE_BAND.words).toEqual([114, 142]);
   });
 
-  it("takes its v3 band from the live criteria under v3, which are 1046 to 1321 characters", () => {
-    expect(LIVE_V3_BAND.chars).toEqual([1046, 1321]);
-    expect(LIVE_V3_BAND.words).toEqual([164, 216]);
+  it("takes its v3 band from the live criteria under v3, which are 1046 to 1370 characters", () => {
+    expect(LIVE_V3_BAND.chars).toEqual([1046, 1370]);
+    expect(LIVE_V3_BAND.words).toEqual([164, 225]);
   });
 
   it("gives v3 every live school's criteria unchanged, then the vocabulary paragraph", () => {
@@ -323,12 +323,13 @@ describe("the draft fidelity criteria", () => {
       expect(paragraphs[2].replace(/\s+/g, " ")).toContain(
         "Never mark fidelity down for missing vocabulary alone."
       );
-      // The band the three live ones occupy, measured from them rather
-      // than written down. A reviewer pointed out that these bounds were
-      // literals: nothing in the suite measured the live criteria, so one
-      // of them changing length would leave this green while the comment
-      // above it went false. The numbers are 730 to 893 characters and 114
-      // to 142 words today, and if that moves this test moves with it.
+      // The band the three live ones occupy as v3 sends them, measured
+      // from them rather than written down. A reviewer pointed out that
+      // these bounds were once literals: nothing in the suite measured the
+      // live criteria, so one of them changing length would leave this
+      // green while the comment above it went false. The figures are
+      // pinned by the "takes its v3 band" test above, and if they move
+      // this test moves with them.
       expect(body.length).toBeGreaterThanOrEqual(LIVE_V3_BAND.chars[0]);
       expect(body.length).toBeLessThanOrEqual(LIVE_V3_BAND.chars[1]);
       const words = body.split(/\s+/).length;

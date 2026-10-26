@@ -35,8 +35,8 @@ third paragraph is Arthur's ruling of 2026-10-26, made for all six schools
 after the 2F golden runs; these schools are only ever judged under v3, so
 it is part of their criteria here, while the three live schools carry it
 in rubric.ts and receive it under v3 only. The existing three run 1046 to
-1321 characters and 164 to 216 words under v3, in three paragraphs; these
-run 1200 to 1228 and 186 to 193. Before the third paragraph was added they
+1370 characters and 164 to 225 words under v3, in three paragraphs; these
+run 1209 to 1281 and 186 to 198. Before the third paragraph was added they
 ran 849 to 888 and 128 to 137, against 730 to 893 and 114 to 142 for the
 live three under v2.
 
@@ -74,9 +74,10 @@ ritual (virtue-ethics bleed); or asserts that relationships matter without
 naming the relation, who owes what to whom, or what the position requires.
 
 Credit the concept, not the vocabulary. An argument that reasons from what a
-role requires, what the parties to a relationship owe one another, and the
-humaneness and propriety through which those duties are carried out is
-reasoning from ren and li whether or not either word appears. Never mark
+role requires, what the parties to a relationship owe one another, the
+humaneness a relationship realises, and the propriety through which conduct
+in it is done is reasoning from ren and li whether or not either word
+appears. Never mark
 fidelity down for missing vocabulary alone.
 
 ## `ubuntu` (Ubuntu)
@@ -119,9 +120,10 @@ excuse damage a careless actor would be blamed for; or asserts non-harm
 without naming who is still hurt.
 
 Credit the concept, not the vocabulary. An argument that weighs suffering,
-intention and non-harm, and treats what happens as arising from many
-conditions rather than one cause, is reasoning from dukkha and dependent
-origination whether or not it uses those terms or the word anatta. Never mark
+intention and non-harm, declines to treat the self as fixed and bounded off
+from others, and treats what happens as arising from many conditions rather
+than one cause is reasoning from dukkha, anatta and dependent origination
+whether or not it uses those terms. Never mark
 fidelity down for missing vocabulary alone.
 
 ## Doctrinal claims, and what Arthur ruled on

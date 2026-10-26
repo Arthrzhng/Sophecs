@@ -217,6 +217,7 @@ describe("the golden run's draft criteria", () => {
       // what was actually judged against.
       if (plan.run) expect(plan.criteria).toBe(fidelityCriteriaFor(id, "v3"));
       const underV2 = planCase(id, v2, draft, "v2");
+      expect(underV2).toMatchObject({ run: true, source: "live", draftCriteria: undefined });
       if (underV2.run) expect(underV2.criteria).toBe(FIDELITY_CRITERIA[id]);
     }
   });

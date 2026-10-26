@@ -1466,27 +1466,36 @@ The runs are `tests/judge/golden-runs/2026-10-26T00-16-57-040Z-v2.json`
 three samples each. Arthur reviewed both tables and ruled four things.
 
 1. **Concepts over vocabulary.** The v3 judge docked fidelity for missing
-   terms: "Ren never appears" on `confucian-hierarchy`, "never names the
-   outcome as an indifferent" on `stoic-analogy`. Every school's criteria
+   terms: "Ren never appears" on `confucian-hierarchy`, "Never names the
+   outcome (...) as an indifferent" on `stoic-analogy`. v2 docks
+   `stoic-analogy` for the same thing ("nor explicitly labels patient
+   outcomes as indifferents"), and the fix is v3-only by design, so v2's
+   fidelity 7 on that case stands until the switch. Every school's criteria
    now end, under v3 only, with a paragraph that credits the concept
    whether or not the argument uses the school's terms and says never to
    mark fidelity down for missing vocabulary alone. For the three live
    schools it lives in `src/lib/judge/rubric.ts` beside their criteria and
-   is added by `fidelityCriteriaFor` for v3 and later; v1 and v2 get
-   exactly what they did, which the six request fixtures pin. For the three
+   is added by `fidelityCriteriaFor` for v3 and later. v2 gets exactly
+   what it did, which the six request fixtures pin, and v1 is held
+   unchanged by a unit test; `tests/judge-request.test.ts` also drives
+   `callJudgeModel` to show v3 carries the paragraph and v2 does not. For the three
    draft schools it is the third paragraph of each section of
    `content/prompts/fidelity-criteria.draft.md`, since those schools are
    only ever judged under v3.
 2. **`verdict_line` over its cap.** 5 of 72 v3 samples returned a
    `verdict_line` over 20 words; v2 returned none in 42. Fixed in
    `content/prompts/judge.v3.md` by moving the word caps directly above the
-   response format and naming `verdict_line` there. The validator is not
+   response format and naming `verdict_line` there. `improvement_note`,
+   capped at 40 words on revisions and until then mentioned only under
+   Revisions, joins the list. The validator is not
    relaxed and nothing is truncated. The target is no failures.
 3. **`buddhist-intention-excuse` score band, 5-35 to 5-40.** v3 scored it
    38 [34-38] with fidelity 3, inside its fidelity band of 0-4, so the
    judge saw the failure the case is there to test. No other band moved.
-4. **Two things to know at the v3 switch**, recorded as measured, which is
-   not quite as they were put:
+4. **Two things to know at the v3 switch**, recorded as measured. Arthur
+   put them as a gap of 56-57 for the new schools against 55-57 for the
+   original three, and v3 scoring 3-15 points above v2 across the board.
+   The run files say this:
    - **The gap between strong and wrong-school cases.** Under v3, strong
      minus wrong-school median score is 56 for Buddhism and 57 for Ubuntu.
      For the original three it is 57 for utilitarianism, 55 for virtue
@@ -1499,9 +1508,9 @@ three samples each. Arthur reviewed both tables and ruled four things.
    - **v3 against v2.** Of the 14 cases both versions ran, 9 scored 3 to 15
      points higher under v3 (median against median), 2 scored 2 higher
      (`caricature`, `stoic-analogy`), and 3 did not move (`fabricated-source`,
-     `incoherent`, `unsupported`). The rise is in the strong and
-     wrong-school cases: wrong-school cases rose 4 to 10, strong and
-     exemplar cases 3 to 15. Switching production to v3 will be a step
-     change in scores for those, and scores across prompt versions are not
-     compared as equivalent in any case; the stamp on each stored verdict
-     is what keeps them apart.
+     `incoherent`, `unsupported`). The three wrong-school cases rose 4 to
+     10, the strong and exemplar cases 3 to 13, and the two utilitarian
+     source cases 6 (`util-named-text`) and 15 (`util-obscure-source`).
+     Switching production to v3 will be a step change in scores for
+     those. Scores across prompt versions are not compared as equivalent
+     in any case; the stamp on each stored verdict keeps them apart.

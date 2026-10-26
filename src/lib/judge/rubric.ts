@@ -91,8 +91,8 @@ export const FIDELITY_CRITERIA: Record<SchoolId, string> = new Proxy(
 );
 
 // v3 only. Arthur's ruling of 2026-10-26, after the 2F golden runs: the v3
-// judge docked fidelity for missing terms ("Ren never appears", "never
-// names the outcome as an indifferent"), so under v3 every school's
+// judge docked fidelity for missing terms ("Ren never appears", "Never
+// names the outcome (...) as an indifferent"), so under v3 every school's
 // criteria end with a paragraph that credits the concept whether or not
 // the argument uses the school's words. The draft schools carry the same
 // paragraph in their own section of the draft criteria file.
@@ -100,13 +100,18 @@ export const FIDELITY_CRITERIA: Record<SchoolId, string> = new Proxy(
 // Kept apart from CRITERIA_BY_SCHOOL so that v1 and v2 receive exactly
 // what they always have: the live judge is v2 until the v3 switch, and the
 // six request fixtures pin that byte for byte.
+//
+// When a draft school is published, its section of the draft criteria
+// file is three paragraphs and the third is this one. Split it: the first
+// two go into CRITERIA_BY_SCHOOL and the third into this map. Moving all
+// three into CRITERIA_BY_SCHOOL and then adding an entry here would send
+// the paragraph twice.
 const VOCABULARY_RULE_V3: Partial<Record<SchoolId, string>> = {
   stoicism: `Credit the concept, not the vocabulary. An argument that separates
-what is up to the agent from what is not, treats an outcome as neither good
-nor bad in itself, or traces distress to a judgment rather than to an event
-is reasoning from the dichotomy of control and the indifferents whether or
-not it uses those terms. Never mark fidelity down for missing vocabulary
-alone.`,
+what is up to the agent from what is not, and treats an outcome as neither
+good nor bad in itself, is reasoning from the dichotomy of control and the
+indifferents whether or not it uses those terms. Never mark fidelity down
+for missing vocabulary alone.`,
 
   utilitarianism: `Credit the concept, not the vocabulary. An argument that
 works out who is affected, by how much and how likely, and counts each
@@ -115,10 +120,10 @@ not it uses the words utility, welfare or impartiality. Never mark fidelity
 down for missing vocabulary alone.`,
 
   "virtue-ethics": `Credit the concept, not the vocabulary. An argument that
-asks what a person of good judgment and character would do, and places the
-right act between too much and too little, is reasoning from practical
-wisdom and the mean whether or not it uses the words phronesis, eudaimonia
-or mean. Naming the virtue at stake in plain words, such as courage or
+asks what a person of good judgment and character would do, places the
+right act between too much and too little, and aims at a life lived well
+over time is reasoning from practical wisdom, the mean and flourishing
+whether or not it uses the words phronesis, eudaimonia or mean. Naming the virtue at stake in plain words, such as courage or
 honesty, is naming it. Never mark fidelity down for missing vocabulary
 alone.`,
 };
