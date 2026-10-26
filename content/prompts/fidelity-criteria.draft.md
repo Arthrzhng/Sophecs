@@ -36,7 +36,7 @@ after the 2F golden runs; these schools are only ever judged under v3, so
 it is part of their criteria here, while the three live schools carry it
 in rubric.ts and receive it under v3 only. The existing three run 1046 to
 1370 characters and 164 to 225 words under v3, in three paragraphs; these
-run 1209 to 1281 and 186 to 198. Before the third paragraph was added they
+run 1209 to 1265 and 186 to 196. Before the third paragraph was added they
 ran 849 to 888 and 128 to 137, against 730 to 893 and 114 to 142 for the
 live three under v2.
 
@@ -77,8 +77,7 @@ Credit the concept, not the vocabulary. An argument that reasons from what a
 role requires, what the parties to a relationship owe one another, the
 humaneness a relationship realises, and the propriety through which conduct
 in it is done is reasoning from ren and li whether or not either word
-appears. Never mark
-fidelity down for missing vocabulary alone.
+appears. Never mark fidelity down for missing vocabulary alone.
 
 ## `ubuntu` (Ubuntu)
 
@@ -120,11 +119,11 @@ excuse damage a careless actor would be blamed for; or asserts non-harm
 without naming who is still hurt.
 
 Credit the concept, not the vocabulary. An argument that weighs suffering,
-intention and non-harm, declines to treat the self as fixed and bounded off
-from others, and treats what happens as arising from many conditions rather
-than one cause is reasoning from dukkha, anatta and dependent origination
-whether or not it uses those terms. Never mark
-fidelity down for missing vocabulary alone.
+intention and non-harm, declines to treat the self as fixed and bounded,
+and treats what happens as arising from many conditions rather than one
+cause is reasoning from dukkha, anatta and dependent origination whether or
+not it uses those terms. Never mark fidelity down for missing vocabulary
+alone.
 
 ## Doctrinal claims, and what Arthur ruled on
 

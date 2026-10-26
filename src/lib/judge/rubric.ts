@@ -123,9 +123,9 @@ down for missing vocabulary alone.`,
 asks what a person of good judgment and character would do, places the
 right act between too much and too little, and aims at a life lived well
 over time is reasoning from practical wisdom, the mean and flourishing
-whether or not it uses the words phronesis, eudaimonia or mean. Naming the virtue at stake in plain words, such as courage or
-honesty, is naming it. Never mark fidelity down for missing vocabulary
-alone.`,
+whether or not it uses the words phronesis, eudaimonia or mean. Naming the
+virtue at stake in plain words, such as courage or honesty, is naming it.
+Never mark fidelity down for missing vocabulary alone.`,
 };
 
 /**

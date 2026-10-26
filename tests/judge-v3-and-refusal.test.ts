@@ -265,6 +265,10 @@ describe("the draft fidelity criteria", () => {
     for (const id of PUBLISHED_SCHOOL_IDS) {
       expect(fidelityCriteriaFor(id, "v2"), id).toBe(FIDELITY_CRITERIA[id]);
       expect(fidelityCriteriaFor(id, "v1"), id).toBe(FIDELITY_CRITERIA[id]);
+      // The paragraph lives only in the v3 map. A school published from the
+      // draft file with all three paragraphs in CRITERIA_BY_SCHOOL would
+      // send it twice under v3, and fail here instead.
+      expect(FIDELITY_CRITERIA[id], id).not.toContain("Credit the concept");
       const v3 = fidelityCriteriaFor(id, "v3");
       expect(v3.startsWith(`${FIDELITY_CRITERIA[id]}\n\n`), id).toBe(true);
       const rule = v3.slice(FIDELITY_CRITERIA[id].length + 2);

@@ -23,8 +23,9 @@ Changed on 2026-10-26, by Arthur's ruling on the 2F golden runs, where 5 of
 72 v3 samples returned a verdict_line over its cap and v2 returned none:
 the word caps section now sits directly above the response format rather
 than before the revision rules, says that a response breaking a cap is
-discarded, and singles out verdict_line, which the closing note on the
-response format repeats. The caps themselves are the same numbers, and the
+discarded, singles out verdict_line, which the closing note on the
+response format repeats, and lists improvement_note, whose cap of 40 words
+was previously stated only under the revision rules. The caps themselves are the same numbers, and the
 validator is unchanged. The same ruling gave every school's fidelity
 criteria a paragraph under v3 crediting the concept over the vocabulary;
 that lives with the criteria, not in this file. The
