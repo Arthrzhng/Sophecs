@@ -4,10 +4,12 @@
 #
 # - 0017: anon and authenticated can no longer read profiles_public;
 #   service_role still can.
-# - 0018: debates_public returns JSON null for every verdict field that can
-#   quote the argument when the argument is private, keeps the scores,
-#   leaves a public argument's verdict and a null verdict untouched, adds no
-#   key a verdict did not have, and keeps 0016's grants.
+# - 0018: for a private argument, or a revision whose original is private,
+#   debates_public rebuilds the verdict from a keep-list (the scores and
+#   flags, each of its own type, and the objection's school alone), so
+#   every field that can quote the argument is left out, as is any field
+#   or value it does not know; a public argument's verdict and a null
+#   verdict are untouched, and 0016's grants stand.
 #
 # Then both roll back, the view returns the whole verdict again, and both
 # re-apply.
@@ -87,7 +89,30 @@ insert into debates (id,user_id,topic_slug,school,argument,argument_public,score
   '{"rejected":false,"score":68,"fidelity":8,"rigor":6,"engagement":6,
     "strongest_move":"old secret","weakest_move":"w","a_stronger_version_would":"a",
     "verdict_line":"v","prompt_version":"v1"}'),
- ('none','44444444-4444-4444-4444-444444444444','vt','stoicism','unjudged secret',false,null,'original',null);
+ ('none','44444444-4444-4444-4444-444444444444','vt','stoicism','unjudged secret',false,null,'original',null),
+ ('xtra','44444444-4444-4444-4444-444444444444','vt','stoicism','extra secret',false,70,'original',
+  '{"rejected":false,"score":70,"fidelity":7,"rigor":7,"engagement":6,"notes":"a secret note",
+    "unanswered_objection":{"school":"utilitarianism","claim":"c secret","why_it_stands":"y","extra":"objection secret"},
+    "prompt_version":"v2"}'),
+ ('ostr','44444444-4444-4444-4444-444444444444','vt','stoicism','string secret',false,70,'original',
+  '{"rejected":false,"score":70,"unanswered_objection":"an objection quoting secret words","prompt_version":"v2"}'),
+ ('arr','44444444-4444-4444-4444-444444444444','vt','stoicism','array secret',false,70,'original',
+  '["a verdict that is not an object, quoting secret words"]'),
+ ('typ','44444444-4444-4444-4444-444444444444','vt','stoicism','typed secret',false,70,'original',
+  '{"rejected":"secret","score":"a secret score","fidelity":7,"rigor":null,"engagement":6,
+    "prompt_version":"secret words","objection_answered":"secret",
+    "unanswered_objection":{"school":"a secret school","claim":"c","why_it_stands":"y"}}');
+insert into debates (id,user_id,topic_slug,school,argument,argument_public,score,kind,parent_debate_id,verdict) values
+ ('pubrev','44444444-4444-4444-4444-444444444444','vt','stoicism','open revision',true,74,'revision','priv',
+  '{"rejected":false,"score":74,"fidelity":7,"rigor":7,"engagement":7,
+    "strongest_move":"quotes the private original, secret words","weakest_move":"w","a_stronger_version_would":"a",
+    "verdict_line":"v","improvement_note":"now drops the secret words",
+    "unanswered_objection":{"school":"utilitarianism","claim":"c","why_it_stands":"y"},"prompt_version":"v2"}'),
+ ('pubrev2','44444444-4444-4444-4444-444444444444','vt','stoicism','open revision two',true,74,'revision','pub',
+  '{"rejected":false,"score":74,"fidelity":7,"rigor":7,"engagement":7,
+    "strongest_move":"quotes the public original, open words","weakest_move":"w","a_stronger_version_would":"a",
+    "verdict_line":"v","improvement_note":"n",
+    "unanswered_objection":{"school":"utilitarianism","claim":"c","why_it_stands":"y"},"prompt_version":"v2"}');
 ROWS
 
 pv() { q "select verdict$1 from debates_public where id = '$2'"; }
@@ -113,10 +138,13 @@ check_after() {
   done
   expect "service_role SELECT profiles_public kept" t "$(q "select has_table_privilege('service_role', 'public.profiles_public', 'SELECT')")"
 
-  # The private row: every quoting field is JSON null, present as a key.
+  # The private row: rebuilt from the keep-list, so every quoting field is
+  # gone, not nulled.
   for k in strongest_move weakest_move a_stronger_version_would verdict_line; do
-    expect "priv $k" "null" "$(pv "->'$k'" priv)"
+    expect "priv $k gone" f "$(q "select verdict ? '$k' from debates_public where id = 'priv'")"
   done
+  expect "priv keys" "engagement,fidelity,prompt_version,rejected,rigor,score,unanswered_objection" \
+    "$(q "select string_agg(k, ',' order by k) from debates_public, jsonb_object_keys(verdict) k where id = 'priv'")"
   expect "priv objection claim" "null" "$(pv "->'unanswered_objection'->'claim'" priv)"
   expect "priv objection why_it_stands" "null" "$(pv "->'unanswered_objection'->'why_it_stands'" priv)"
   expect "priv objection school kept" "utilitarianism" "$(pv "->'unanswered_objection'->>'school'" priv)"
@@ -127,13 +155,22 @@ check_after() {
 
   # Public, rejected, revision, v1 and unjudged rows.
   expect "pub verdict unchanged" t "$(q "select v.verdict = d.verdict from debates_public v join debates d using (id) where id = 'pub'")"
-  expect "rej rejection_reason" "null" "$(pv "->'rejection_reason'" rej)"
+  expect "rej rejection_reason gone" f "$(q "select verdict ? 'rejection_reason' from debates_public where id = 'rej'")"
   expect "rej rejected kept" "true" "$(pv "->>'rejected'" rej)"
-  expect "rej no keys added" "prompt_version,rejected,rejection_reason" "$(q "select string_agg(k, ',' order by k) from debates_public, jsonb_object_keys(verdict) k where id = 'rej'")"
-  expect "rev improvement_note" "null" "$(pv "->'improvement_note'" rev)"
+  expect "rej keys" "prompt_version,rejected" "$(q "select string_agg(k, ',' order by k) from debates_public, jsonb_object_keys(verdict) k where id = 'rej'")"
+  expect "rev improvement_note gone" f "$(q "select verdict ? 'improvement_note' from debates_public where id = 'rev'")"
   expect "rev objection_answered kept" "true" "$(pv "->>'objection_answered'" rev)"
   expect "v1 has no unanswered_objection added" f "$(q "select verdict ? 'unanswered_objection' from debates_public where id = 'v1'")"
-  expect "v1 strongest_move" "null" "$(pv "->'strongest_move'" v1)"
+  expect "v1 strongest_move gone" f "$(q "select verdict ? 'strongest_move' from debates_public where id = 'v1'")"
+  expect "v1 keys" "engagement,fidelity,prompt_version,rejected,rigor,score" "$(q "select string_agg(k, ',' order by k) from debates_public, jsonb_object_keys(verdict) k where id = 'v1'")"
+  expect "xtra: an unknown top-level key is withheld" f "$(q "select verdict ? 'notes' from debates_public where id = 'xtra'")"
+  expect "xtra: the objection keeps its school only" '{"claim": null, "school": "utilitarianism", "why_it_stands": null}' "$(pv "->'unanswered_objection'" xtra)"
+  expect "ostr: an objection that is not an object is withheld" f "$(q "select verdict ? 'unanswered_objection' from debates_public where id = 'ostr'")"
+  expect "arr: a private verdict that is not an object is null" t "$(q "select verdict is null from debates_public where id = 'arr'")"
+  expect "typ: only values of the right type are kept" "engagement,fidelity,rigor" "$(q "select string_agg(k, ',' order by k) from debates_public, jsonb_object_keys(verdict) k where id = 'typ'")"
+  expect "pubrev: a public revision of a private original is withheld" f "$(q "select verdict ? 'strongest_move' or verdict ? 'improvement_note' from debates_public where id = 'pubrev'")"
+  expect "pubrev: its own argument is still shown" "open revision" "$(q "select argument from debates_public where id = 'pubrev'")"
+  expect "pubrev2: a public revision of a public original is shown whole" t "$(q "select v.verdict = d.verdict from debates_public v join debates d using (id) where id = 'pubrev2'")"
   expect "unjudged verdict stays null" t "$(q "select verdict is null from debates_public where id = 'none'")"
   expect "no secret in any public verdict" 0 "$(q "select count(*) from debates_public where verdict::text like '%secret%'")"
   expect "debates itself untouched" "quotes secret words" "$(q "select verdict->>'strongest_move' from debates where id = 'priv'")"

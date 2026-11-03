@@ -25,6 +25,7 @@ import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
 import { PUBLISHED_SCHOOL_IDS } from "@/lib/types";
 import { countsOnTable, yourTableLine } from "@/lib/school-table";
+import { withheldVerdict } from "@/lib/verdict-privacy";
 import {
   FIXTURE_ARGUMENT,
   FIXTURE_MOTION,
@@ -220,21 +221,15 @@ export default function ArenaPreviewPage() {
       </Section>
 
       <Section title="5b. Verdict: a private argument, seen by someone else">
-        {/* What debates_public returns for a private argument since 0018:
-            every field that can quote the argument is null. */}
+        {/* What the page hands Verdict for someone else's view of a
+            private argument: the verdict cut down by withheldVerdict, the
+            same keep-list 0018 applies. */}
         <Verdict
           debateId="preview-private"
           topicSlug="opaque-benefit"
           motion={FIXTURE_MOTION}
           school="stoicism"
-          verdict={{
-            ...FIXTURE_VERDICT,
-            strongest_move: null,
-            weakest_move: null,
-            a_stronger_version_would: null,
-            verdict_line: null,
-            unanswered_objection: { school: "virtue-ethics", claim: null, why_it_stands: null },
-          }}
+          verdict={withheldVerdict(FIXTURE_VERDICT)!}
           eloDelta={4}
           eloAfter={1204}
           weekNumber={41}

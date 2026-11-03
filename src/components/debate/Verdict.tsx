@@ -23,10 +23,10 @@ export interface VerdictData {
   fidelity: number | null;
   rigor: number | null;
   engagement: number | null;
-  // Null, as are the objection's claim and why_it_stands and the
-  // improvement note, when debates_public withholds them: the judge quotes
-  // the argument, so a private argument's verdict shows only its scores to
-  // anyone but its author (migration 0018).
+  // Absent, and the objection's claim and why_it_stands null, when the
+  // verdict is withheld (withheldVerdict in src/lib/verdict-privacy.ts, and
+  // migration 0018): the judge quotes the argument, so a private
+  // argument's verdict shows only its scores to anyone but its author.
   strongest_move?: string | null;
   weakest_move?: string | null;
   a_stronger_version_would?: string | null;
@@ -49,6 +49,8 @@ export interface VerdictData {
 const WITHHELD_HEADING = "The verdict on a private argument";
 const WITHHELD_NOTE =
   "The judge's note can quote the argument, so only the person who wrote it can read it while the argument is private.";
+const WITHHELD_REJECTED =
+  "The judge set this argument aside without a score. Its reason can quote the argument, so only the person who wrote it can read it.";
 function withheldObjection(schoolName: string): string {
   return `The argument left a ${schoolName} objection standing. Its wording can quote the argument, so only the person who wrote it can read it.`;
 }
@@ -164,9 +166,10 @@ export function Verdict({
   // Absent on a revision and on someone else's verdict.
   counterpart?: { seeking: boolean; exchangeId: string | null } | null;
   /**
-   * Someone other than the author, looking at a private argument's verdict:
-   * debates_public has nulled every field that can quote it, and this says
-   * so in their place rather than leaving the spaces empty.
+   * Someone other than the author, looking at a private argument's verdict
+   * (or a revision of a private one): the page has already cut the verdict
+   * down to what cannot quote it, and this says so in place of the judge's
+   * words rather than leaving the spaces empty.
    */
   textWithheld?: boolean;
 }) {
@@ -211,7 +214,11 @@ export function Verdict({
         <div className="mt-8">
           <ErrorState
             title="This was not judged."
-            body={verdict.rejection_reason ?? "The judge returned no verdict for this argument."}
+            body={
+              textWithheld
+                ? WITHHELD_REJECTED
+                : (verdict.rejection_reason ?? "The judge returned no verdict for this argument.")
+            }
             action={
               <div className="flex flex-wrap items-center gap-6 text-sm">
                 <TextLink href={`/debate/${topicSlug}`}>Write it again</TextLink>
@@ -492,7 +499,7 @@ export function Verdict({
               {verdict.objection_answered ? "Objection answered." : "Objection still standing."}
             </p>
           )}
-          {verdict.improvement_note && (
+          {verdict.improvement_note && !textWithheld && (
             <p className="prose-reading mt-3">{verdict.improvement_note}</p>
           )}
 

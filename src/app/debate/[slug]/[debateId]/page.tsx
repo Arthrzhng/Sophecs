@@ -11,7 +11,8 @@ import { Page } from "@/components/layout/Page";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate, shortMotionForShare } from "@/lib/motion-text";
-import { withoutJudgesNote } from "@/lib/verdict-share";
+import { shareTemplateFor } from "@/lib/verdict-share";
+import { verdictForViewer } from "@/lib/verdict-privacy";
 
 export const metadata = { title: "Verdict · Sophecs" };
 
@@ -80,11 +81,6 @@ export default async function VerdictPage({
     }
   }
 
-  // Someone other than the author, on a private argument. The page
-  // withholds the judge's words itself rather than relying on the view
-  // alone, so it says the same thing whichever side of 0018 it runs on.
-  const textWithheld = !isOwner && !argumentPublic;
-
   const isRevision = publicRow.kind === "revision";
 
   // Only an original can have a revision; asking for a revision's revision
@@ -96,12 +92,16 @@ export default async function VerdictPage({
   // here — the parent's argument text is not read at all.
   let comparison: RevisionComparison | null = null;
   let parentObjectionSchool: SchoolId | null = null;
+  // For a revision, whether its original is public: the revision judge is
+  // shown the original, so the revision's verdict can quote it.
+  let parentPublic: boolean | null = null;
   if (isRevision && publicRow.parent_debate_id) {
     const { data: parentRow } = await admin
       .from("debates")
-      .select("id, verdict")
+      .select("id, verdict, argument_public")
       .eq("id", publicRow.parent_debate_id)
       .maybeSingle();
+    parentPublic = Boolean(parentRow?.argument_public);
     const parentVerdict = (parentRow?.verdict ?? null) as VerdictData | null;
     if (parentRow && parentVerdict && !parentVerdict.rejected) {
       comparison = {
@@ -138,7 +138,23 @@ export default async function VerdictPage({
 
   const school = publicRow.school as SchoolId;
   const afterLesson = getMicroLesson(topic.micro_after);
-  const verdict = (isOwner && ownVerdict ? ownVerdict : publicRow.verdict) as VerdictData;
+  // The page's one privacy decision, in src/lib/verdict-privacy.ts: the
+  // author sees their whole verdict; anyone else sees the judge's words
+  // only on a public argument whose original, for a revision, is public
+  // too, and otherwise a verdict cut down on the server. Cut here, not in
+  // the component: Verdict is a client component, and whatever it is
+  // handed lands in the page payload whether it is shown or not.
+  const view = verdictForViewer({
+    isOwner,
+    ownVerdict,
+    publicVerdict: publicRow.verdict,
+    publicArgument: publicRow.argument as string | null,
+    parentPublic,
+  });
+  const textWithheld = view.textWithheld;
+  // Non-null as before: an unjudged row reaching this page behaves exactly
+  // as it does on main.
+  const verdict = view.verdict as VerdictData;
   const eloDelta =
     publicRow.elo_before != null && publicRow.elo_after != null
       ? Math.round(Number(publicRow.elo_after) - Number(publicRow.elo_before))
@@ -168,9 +184,7 @@ export default async function VerdictPage({
   // a reword, and this page is the one that used to say the wrong thing.
   const motion = motionForDebate(publicRow.motion_text as string | null, topic.motion);
   const shortMotion = shortMotionForShare(motion);
-  const shareTemplate = textWithheld
-    ? withoutJudgesNote(schoolContent.verdict_share_line)
-    : schoolContent.verdict_share_line;
+  const shareTemplate = shareTemplateFor(schoolContent.verdict_share_line, textWithheld);
   const baseShareLine = shareTemplate
     .replaceAll("{score}", String(verdict.score ?? ""))
     .replaceAll("{topic}", shortMotion)
