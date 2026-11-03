@@ -11,10 +11,12 @@ Measured against `main` at efa2173.
 ## One thing blocks the run: the key
 
 **Everything else is ready**, and that is checked rather than claimed:
-`GOLDEN_DRY_RUN=1 npm run judge:golden` validates all 24 fixtures, plans
+`GOLDEN_DRY_RUN=1 npm run judge:golden` validates every fixture, plans
 every case, and prints what a real run would do and cost, without a key
-and without sending anything. Under v2 it reports 14 of 24 cases, 42
-calls, about $0.42; under v3, 24 of 24, 72 calls, about $0.93. Any value of
+and without sending anything. With the first 24 cases it reported 14 of 24
+under v2, 42 calls, about $0.42, and under v3 24 of 24, 72 calls, about
+$0.93. Since 2026-11-03 there are 25: v2 still runs 14, and v3 runs 25,
+75 calls, about $1.05. Any value of
 `GOLDEN_DRY_RUN` that is not clearly yes or no refuses to start, because
 `GOLDEN_DRY_RUN=true` used to make a real, billed run.
 
@@ -119,20 +121,21 @@ sending anything. For the first runs it printed about $0.42 for v2 and
 $0.93 for v3, or $0.14 and $0.31 with `GOLDEN_SAMPLES=1`; the table above
 is those figures added up by hand, each row rounded, so the rows sum to
 $1.35 where the unrounded total is $1.34. With the criteria as they stand
-after 2026-11-03 it prints $0.42 and $0.99, or $0.14 and $0.33: v2 is
-unchanged, and v3's criteria are longer.
+after 2026-11-03 it printed $0.42 and $0.99, or $0.14 and $0.33: v2 is
+unchanged, and v3's criteria are longer. With the twenty-fifth case and
+the line added to `judge.v3.md` the same day, v3 prints $1.05, or $0.35.
 
 **The ceiling.** Output is capped at `max_tokens: 850` in
 `src/lib/anthropic.ts`. If every call ran to the cap rather than to the
 650-token estimate, the first runs' 114 calls would have cost about $1.57,
 and $1.74 with the single-sample check: about the most those runs could
 cost, since output is capped, though input is still the four-bytes-a-token
-estimate, so the ceiling is approximate too. For a v3 run at three samples
-with the criteria as they stand after 2026-11-03, the same reckoning gives
-about $1.14 against the dry run's $0.99. The retry below adds a call for
-every reply that fails validation, so the strict ceiling is twice that,
-about $2.27, which would take every reply failing; the 3 Nov run had one
-in 72.
+estimate, so the ceiling is approximate too. For a v3 run of all 25 cases
+at three samples, as things stand after 2026-11-03, the same reckoning
+gives about $1.20 against the dry run's $1.05. The retry below adds a call
+for every reply that fails validation, so the strict ceiling is twice
+that, about $2.41, which would take every reply failing; the 3 Nov run had
+one in 72.
 
 **Since 2026-11-03 a reply that fails validation is sent once more**, in
 golden runs as in production, so a run can make more calls than it plans.
@@ -146,8 +149,8 @@ would have been $0.9791.
 
 Against `AI_MONTHLY_BUDGET_USD`, which is $50 and production-only. A
 single-sample pass with `GOLDEN_SAMPLES=1` is a third of the calls: $0.14
-under v2, and $0.31 for all 24 cases under v3 when first planned, $0.33
-with the criteria as they stand after 2026-11-03. The v2 one is worth doing first,
+under v2, and $0.31 for all 24 cases under v3 when first planned, $0.35
+for all 25 as they stand after 2026-11-03. The v2 one is worth doing first,
 to catch a response that fails validation before paying for three samples.
 
 The runner no longer logs to `ai_calls`: these 114 calls do not land in
@@ -521,6 +524,7 @@ actually runs.
 | `confucian-ren-disposition` | confucian | ren as a cultivated disposition | score 65-95, fidelity 8-10 |
 | `confucian-wrong-school` | confucian | utilitarian in Confucian dress | score 5-35, fidelity 0-4 |
 | `confucian-hierarchy` | confucian | roles authorising hierarchy, objection unanswered | score 40-75, fidelity 7-10, engagement 0-4 |
+| `confucian-hierarchy-school` | confucian | the same, teacher over pupil; held out | score 40-75, fidelity 7-10, engagement 0-4 |
 | `ubuntu-strong` | ubuntu | shared identity and solidarity | score 70-95, fidelity 8-10 |
 | `ubuntu-wrong-school` | ubuntu | expected-utility maximising | score 5-35, fidelity 0-4 |
 | `ubuntu-conformity` | ubuntu | communal expectation against a dissenter, objection unanswered | score 40-75, fidelity 7-10, engagement 0-4 |
@@ -547,6 +551,19 @@ criteria, and would be pointless without them:
   communal expectation down on fidelity. They no longer do, so there has
   to be a case proving the judge moves that loss to engagement rather than
   dropping it. Without it the change to the Ubuntu criteria is untested.
+
+**`confucian-hierarchy-school` is held out.** Arthur added it on
+2026-11-03. The Confucian objection paragraph in the criteria generalises
+the school page's own example, an algorithm honouring every expectation
+between employer and worker, which is also `confucian-hierarchy`'s
+setting, so a result on that case partly measures criteria written with
+it in view. This one has the same shape and the same bands in a setting
+neither the page nor the criteria use: a timetabling system, teacher over
+pupil. It argues the roles faithfully, holds the name of teacher to a
+teacher's work, and never meets the power the teacher holds over the
+pupil. It was written without the page's wording, and it does not tell
+the pupil not to question the teacher, for the reason given for
+`confucian-hierarchy` below.
 
 `buddhist-intention-excuse` stays a fidelity failure rather than a
 known-weakness case, even though the school's page concedes the objection.
@@ -623,7 +640,7 @@ v3 must not move.
 ## A note on these arguments
 
 Each is written as a student would write it, at the length the existing six
-run to: these ten are 151 to 186 words, against 121 to 205 for the
+run to: these eleven are 151 to 186 words, against 121 to 205 for the
 existing six. Each carries its own motion rather than
 pointing at a live one in `debate_topics`, for the reason 2D gave: a motion
 read live is a motion that can be reworded under a thing that depends on

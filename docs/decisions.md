@@ -1671,3 +1671,84 @@ The dry run's estimate also changed. It priced every v3 call at v2's
 criteria length; it now adds each case's own criteria length, at four
 characters a token. Against the 3 Nov run, which billed $0.9934, the old
 estimate was $0.9657 and the new one would have been $0.9791.
+
+### 2F: Arthur's rulings of 2026-11-03 on PR #48
+
+His message, verbatim:
+
+> Decisions on #48:
+> 1. Ubuntu objection: keep as is.
+> 2. Add a held-out Tier B case, confucian-hierarchy-school: same shape as
+>    confucian-hierarchy (roles argued faithfully, power left unmet) but a
+>    different setting, e.g. a school timetabling system, teacher over
+>    pupil. Same bands. Write it without reusing the school page's example.
+> 3. Add to judge.v3.md: when an argument leaves its school's known
+>    objection unmet, that objection should normally be the one reported as
+>    unanswered_objection, voiced by the rival school that would press it
+>    hardest. v3 only; v2 and its request fixtures unchanged.
+> 4. Daily cap: if it can count judged debates per day instead of ai_calls
+>    rows with no schema change, do that; otherwise record it as a pre-pilot
+>    item and leave it.
+> 5. maxDuration = 60: keep.
+>
+> Review loop, merge. Then run the v3-only re-run at three samples on the
+> merged main: approved now, up to $1.20. Run to the end, change nothing,
+> commit the run file, and report: verdict_line failures and retries;
+> stoic-analogy, confucian-hierarchy and confucian-hierarchy-school against
+> their bands, including whether unanswered_objection names the power
+> question; any case outside its band; any case that moved more than 5
+> points since 3 Nov.
+
+How each was carried out:
+
+1. **Ubuntu.** Unchanged.
+2. **`confucian-hierarchy-school`.** A twenty-fifth case, in
+   `tests/judge/golden/`, with `confucian-hierarchy`'s bands: score 40-75,
+   fidelity 7-10, engagement 0-4. A timetabling system, teacher over
+   pupil, 184 words. It argues what each side of the relationship owes,
+   holds the name of teacher to a teacher's work, and never meets the
+   power the teacher holds; it uses none of the school page's wording.
+   `docs/phase2-fixtures.md` describes it with the other Tier B cases.
+3. **`judge.v3.md`.** The section on the objection left standing gains a
+   paragraph: each school's criteria end by naming the objection that
+   school is best known for having to answer, and when the argument leaves
+   it unmet it should normally be the one returned, voiced by whichever
+   listed school would press it hardest. The header records the change in
+   one sentence. `judge.v2.md` and the six request fixtures are unchanged.
+   `tests/judge-v3-and-refusal.test.ts` checks that the instruction is in
+   v3's objection section, before the list of schools, and not in v2;
+   weakening its wording fails that test.
+4. **The daily cap: not changed, recorded below as a pre-pilot item.**
+5. **`maxDuration = 60`.** Kept.
+
+### Open pre-pilot item: the daily cap counts calls, not judged debates
+
+`/api/judge` caps a reader at five judge calls in a rolling 24 hours,
+counted from `ai_calls` rows of kind `judge`, once, before the call. Since
+the retry of 2026-11-03, a submission whose first reply fails validation
+uses two of the five, and a reader at four whose submission is retried
+ends the day at six calls.
+
+Counting judged debates instead needs no schema change: `debates` has
+`user_id`, `created_at` and `verdict`, so "rows with a verdict created in
+the last 24 hours" is one query. It was not done, because on its own it
+stops counting calls that end without a verdict. A submission whose
+replies fail validation twice is billed for both calls and leaves its row
+unjudged, and the route reuses that row on the next try at the same
+topic, so a reader resubmitting such an argument would be billed two
+calls a time while the cap never moved. The only limit left would be
+`AI_MONTHLY_BUDGET_USD`, $50, and reaching it pauses judging for every
+reader, not just the one.
+
+Two ways to do it safely, neither needing a schema change, and both a
+change to how the limit works, so Arthur's to choose (d):
+
+- Count judged debates, plus `ai_calls` rows whose debate is still
+  unjudged. A retried submission that succeeds costs one; failures count
+  until the debate is judged.
+- Count judged debates, and keep a second, higher ceiling on `ai_calls`
+  rows per reader per day, at a number Arthur sets.
+
+**Decide before the Winchester pilot.** Until then the cap stays as it is:
+it can cost a reader an extra slot on the rare retried submission, and it
+cannot be run up.

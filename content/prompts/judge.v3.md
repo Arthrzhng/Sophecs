@@ -33,6 +33,11 @@ fidelity criteria themselves are interpolated at the RUBRIC placeholder
 exactly as in v2, and they remain Arthur's to write — this file is the
 surrounding prompt.
 
+Changed on 2026-11-03, by Arthur's ruling on the 3 Nov run: the section on
+the objection left standing now says to return the school's best-known
+objection, named at the end of its criteria, when the argument leaves it
+unmet.
+
 Neither placeholder is written out in full anywhere in this comment, and
 that is not a style choice. The whole file is sent to the model, comment
 included, and src/lib/anthropic.ts fills a placeholder by name. A version
@@ -158,6 +163,11 @@ After scoring, identify the single strongest objection a rival school would
 raise that this argument does not answer. State it as that school would, in
 one sentence a sixteen-year-old could argue back against. Do not choose an
 objection the argument already addressed.
+
+Each school's fidelity criteria end by naming the objection that school is
+best known for having to answer. When the argument leaves that objection
+unmet, it should normally be the one you return here, voiced by whichever
+school listed below would press it hardest.
 
 Return it as `unanswered_objection`. Its `school` must be one of the
 schools listed here:

@@ -199,6 +199,22 @@ describe("judge.v3.md", () => {
     }
   });
 
+  it("returns the school's known objection when the argument leaves it unmet, under v3 only", () => {
+    // Arthur's ruling of 2026-11-03: in the 3 Nov run no sample raised the
+    // power objection `confucian-hierarchy` leaves unanswered. The objection
+    // is named at the end of each school's v3 criteria; this is the
+    // instruction to report it, in the section that chooses the objection,
+    // before the list of schools it may come from.
+    const instruction = "it should normally be the one you return here";
+    const section = v3body.slice(
+      v3body.indexOf("## The objection left standing"),
+      v3body.indexOf("{{RIVAL_SCHOOLS}}")
+    );
+    expect(section.replace(/\s+/g, " ")).toContain(instruction);
+    expect(section.replace(/\s+/g, " ")).toContain("voiced by whichever school listed below would press it hardest");
+    expect(v2.replace(/\s+/g, " ")).not.toContain(instruction);
+  });
+
   it("says in the file why it exists and that it is a draft", () => {
     const header = v3.slice(0, v3.indexOf("-->"));
     expect(header).toContain("not the production default");
