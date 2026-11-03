@@ -8,7 +8,7 @@ import {
   type JudgeCallResult,
 } from "../../src/lib/anthropic";
 import type { SchoolId } from "../../src/lib/types";
-import type { GoldenCallRecord } from "./golden-log";
+import { recordCall, RUNS_DIR, type GoldenCallRecord, type GoldenRun } from "./golden-log";
 
 export interface Sample {
   score: number;
@@ -45,12 +45,16 @@ export async function takeSample(
   call: () => Promise<JudgeCallResult>,
   record: (attempt: JudgeAttempt) => Promise<void>
 ): Promise<SampleOutcome> {
+  // Set from the first attempt, so a retry that ends in an API error,
+  // which reaches no logger, still counts as a retry, and as a failed one.
   let retried = false;
   let retryFailed = false;
+  let secondReturned = false;
   try {
     const { verdict } = await judgeWithOneRetry(call, async (attempt) => {
-      if (attempt.attempt === 2) {
-        retried = true;
+      if (attempt.attempt === 1) retried = attempt.error !== null;
+      else {
+        secondReturned = true;
         retryFailed = attempt.error !== null;
       }
       await record(attempt);
@@ -74,9 +78,34 @@ export async function takeSample(
       sample: null,
       failure: err instanceof Error ? err.message : String(err),
       retried,
-      retryFailed,
+      retryFailed: retryFailed || (retried && !secondReturned),
     };
   }
+}
+
+/** What a run file records about the case and request, the same for every attempt. */
+export type RecordContext = Pick<
+  GoldenCallRecord,
+  "fixture" | "school" | "prompt_version" | "criteria_source" | "request_fingerprint" | "model"
+>;
+
+/**
+ * Write one attempt to the run file, whatever its outcome. The runner
+ * calls this for every attempt `takeSample` hands it, so a retried sample
+ * leaves two records with the same `sample`, attempts 1 and 2.
+ */
+export function recordAttempt(
+  run: GoldenRun,
+  context: RecordContext,
+  sample: number,
+  attempt: JudgeAttempt,
+  dir: string = RUNS_DIR
+): string {
+  return recordCall(
+    run,
+    { sample, ...context, ...attemptFields(attempt), at: new Date().toISOString() },
+    dir
+  );
 }
 
 /**

@@ -32,13 +32,12 @@ import {
   type JudgeAttempt,
   type RunnablePromptVersion,
 } from "../../src/lib/anthropic";
-import { attemptFields, takeSample, type Sample } from "./golden-sample";
+import { recordAttempt, takeSample, type RecordContext, type Sample } from "./golden-sample";
 import { planCase, readDraftCriteria, type CasePlan } from "./draft-criteria";
 import { describeEndpoint, describeEvalKey, endpointProblem, resolveEvalKey } from "./eval-key";
 import {
   flush,
   logTarget,
-  recordCall,
   requestFingerprint,
   startRun,
   type GoldenRun,
@@ -230,6 +229,14 @@ function spread(values: number[]): string {
 
 type RunnablePlan = Extract<CasePlan, { run: true }>;
 
+// Every attempt takeSample hands over is logged: to ai_calls under
+// GOLDEN_LOG=ai_calls, otherwise to the run file through recordAttempt,
+// which tests/golden-sample.test.ts drives. This body is pinned there word
+// for word, because the runner cannot be imported to test it: importing
+// it starts a run. `if (!run) return;` is unreachable, since `run` is
+// non-null exactly when LOG_TO is "file", but it is what narrows the type
+// for tsc, and a non-null assertion would hide a real null if the two
+// conditions ever drifted apart.
 async function logCall(
   run: GoldenRun | null,
   c: GoldenCase,
@@ -237,21 +244,22 @@ async function logCall(
   sample: number,
   attempt: JudgeAttempt
 ): Promise<void> {
-  const { costUsd, latencyMs } = attempt;
   if (LOG_TO === "ai_calls") {
-    await logAiCall({ userId: null, debateId: null, kind: "golden", costUsd, latencyMs });
+    await logAiCall({
+      userId: null,
+      debateId: null,
+      kind: "golden",
+      costUsd: attempt.costUsd,
+      latencyMs: attempt.latencyMs,
+    });
     return;
   }
-  // Unreachable at runtime: `run` is non-null exactly when LOG_TO ===
-  // "file", and the ai_calls branch above has already returned. It stays
-  // because it is what narrows GoldenRun | null to GoldenRun for tsc, and
-  // the alternative is a non-null assertion that would hide a real null if
-  // the two conditions ever drifted apart. A reviewer called it dead code,
-  // which it is, and removing it fails the typecheck.
   if (!run) return;
-  // Records and writes in one step, so the run survives a crash mid-way.
-  recordCall(run, {
-    sample,
+  recordAttempt(run, caseContext(c, plan), sample, attempt);
+}
+
+function caseContext(c: GoldenCase, plan: RunnablePlan): RecordContext {
+  return {
     fixture: c.name,
     school: c.school,
     prompt_version: VERSION,
@@ -265,9 +273,7 @@ async function logCall(
       argument: c.argument,
     }),
     model: MODEL,
-    ...attemptFields(attempt),
-    at: new Date().toISOString(),
-  });
+  };
 }
 
 // Read once. It used to be re-read on every logged call while

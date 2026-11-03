@@ -1,8 +1,16 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { describe, it, expect } from "vitest";
 import { JudgeValidationError, type JudgeAttempt, type JudgeCallResult } from "../src/lib/anthropic";
-import { attemptFields, takeSample, REJECTED } from "./judge/golden-sample";
+import {
+  attemptFields,
+  recordAttempt,
+  takeSample,
+  REJECTED,
+  type RecordContext,
+} from "./judge/golden-sample";
+import { startRun } from "./judge/golden-log";
 
 // The golden runner's half of Arthur's ruling of 2026-11-03: the retry is
 // logged "in the golden-run log" too. tests/judge-retry.test.ts covers
@@ -96,6 +104,22 @@ describe("takeSample", () => {
     expect(outcome).toMatchObject({ sample: null, failure: REJECTED, retried: false });
   });
 
+  it("counts a retry that ends in an API error as a failed retry", async () => {
+    const { call, state } = queued(OVER_CAP(), new Error("529 overloaded"));
+    const { attempts, record } = recorder();
+    const outcome = await takeSample(call, record);
+
+    expect(state.calls).toBe(2);
+    // Only the billed, validated-or-not reply reaches the log.
+    expect(attempts.map((a) => a.attempt)).toEqual([1]);
+    expect(outcome).toMatchObject({
+      sample: null,
+      failure: "529 overloaded",
+      retried: true,
+      retryFailed: true,
+    });
+  });
+
   it("does not retry or record an error from the API", async () => {
     const { call, state } = queued(new Error("529 overloaded"), VALID);
     const { attempts, record } = recorder();
@@ -151,17 +175,78 @@ describe("attemptFields", () => {
   });
 });
 
+describe("recordAttempt", () => {
+  const CONTEXT: RecordContext = {
+    fixture: "stoic-strong",
+    school: "stoicism",
+    prompt_version: "v3",
+    criteria_source: "live",
+    request_fingerprint: "f",
+    model: "m",
+  };
+
+  it("writes a retried sample as two records, attempts 1 and 2, under one sample number", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "golden-sample-"));
+    try {
+      const run = startRun({ promptVersion: "v3", promptText: "p", model: "m", samplesPerCase: 3 });
+      recordAttempt(run, CONTEXT, 2, { attempt: 1, costUsd: 0.003, latencyMs: 4000, verdict: null, error: "verdict_line: verdict_line exceeds 20 words" }, dir);
+      const file = recordAttempt(run, CONTEXT, 2, { attempt: 2, costUsd: 0.006, latencyMs: 5000, verdict: VALID.verdict, error: null }, dir);
+
+      const written = JSON.parse(fs.readFileSync(file, "utf-8"));
+      expect(written.records).toHaveLength(2);
+      expect(written.records.map((r: { sample: number; attempt: number }) => [r.sample, r.attempt])).toEqual([
+        [2, 1],
+        [2, 2],
+      ]);
+      expect(written.records[0]).toMatchObject({ ...CONTEXT, score: null, error: expect.stringContaining("verdict_line") });
+      expect(written.records[1]).toMatchObject({ ...CONTEXT, score: 72, error: null });
+      // Both billed calls count toward the run's cost.
+      expect(written.total_cost_usd).toBeCloseTo(0.009, 10);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
 describe("the golden runner", () => {
   const runner = fs.readFileSync(path.join(process.cwd(), "tests", "judge", "run-golden.ts"), "utf-8");
+  const flat = (s: string) => s.replace(/\s+/g, " ").trim();
 
-  it("takes each sample through takeSample and logs every attempt it is given", () => {
-    // run-golden.ts starts a billed run when imported, so its wiring is
-    // read rather than run. Each line here is one a reviewer broke while
-    // every other test stayed green.
+  // run-golden.ts starts a billed run when it is imported, so its two
+  // lines of wiring are read rather than run. A reviewer dropped attempt-2
+  // records and hard-coded attempt 1 inside the runner while every other
+  // test stayed green; pinning logCall word for word catches any line
+  // added to it, and everything it delegates to is driven above.
+  it("hands every attempt from takeSample to logCall", () => {
     expect(runner).toContain("await takeSample(");
     expect(runner).toContain("(attempt) => logCall(run, c, plan, i + 1, attempt)");
-    expect(runner).toContain("...attemptFields(attempt),");
-    expect(runner).not.toMatch(/\battempt:\s*1\b/);
     expect(runner).not.toContain("judgeWithOneRetry(");
+  });
+
+  it("logs each attempt it is given, and does nothing else", () => {
+    const start = runner.indexOf("async function logCall(");
+    const body = runner.slice(start, runner.indexOf("\n}\n", start) + 2);
+    expect(flat(body)).toBe(
+      flat(`async function logCall(
+        run: GoldenRun | null,
+        c: GoldenCase,
+        plan: RunnablePlan,
+        sample: number,
+        attempt: JudgeAttempt
+      ): Promise<void> {
+        if (LOG_TO === "ai_calls") {
+          await logAiCall({
+            userId: null,
+            debateId: null,
+            kind: "golden",
+            costUsd: attempt.costUsd,
+            latencyMs: attempt.latencyMs,
+          });
+          return;
+        }
+        if (!run) return;
+        recordAttempt(run, caseContext(c, plan), sample, attempt);
+      }`)
+    );
   });
 });

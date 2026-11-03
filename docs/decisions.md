@@ -1617,16 +1617,18 @@ How each was carried out:
    `OBJECTION_V3`, and `fidelityCriteriaFor` appends it under v3 only; for
    the draft three it is the fourth paragraph of each section of
    `content/prompts/fidelity-criteria.draft.md`. The six request fixtures
-   are unchanged, and a test that sent the paragraph to v2 failed nineteen
-   tests, the six fixture comparisons among them. Under v3 the live three's
-   criteria now run 1464 to 1726 characters and the draft three 1541 to
-   1702, inside that band as Arthur ruled on 2026-10-24.
+   are unchanged, and sending the paragraph to v2 deliberately failed
+   about twenty tests (19 or 20, depending on how it was sent), the six
+   fixture comparisons among them. Under v3 the live three's criteria now
+   run 1464 to 1726 characters and the draft three 1541 to 1723, inside
+   that band as Arthur ruled on 2026-10-24. `judge.v3.md` is not touched:
+   its hash is still the one the 3 Nov run recorded.
 2. **`stoic-analogy`.** Two sentences added after "whether she keeps
-   looking": her consent is the one act that is hers and so must be just;
-   the patients are owed a clinician at the point where the queue is
-   decided, and refusing that post so as never to answer for an ordering
-   she cannot explain would leave them with no one beside the system. Bands
-   unchanged. `docs/phase2-fixtures.md` quotes the amended argument. A
+   looking": her consent comes first of the things up to her and has to
+   be just, because justice is owed to the patients; they are owed a
+   clinician at the point where the queue is decided, and refusing that
+   post so as never to answer for an ordering she cannot explain would
+   leave them with no one beside the system. Bands unchanged. `docs/phase2-fixtures.md` quotes the amended argument. A
    first draft justified the consent by the system ordering the queue at
    least as well as the triage desk; review pointed out that this leaned on
    outcomes the argument's own last sentence sets aside, close to the Stoic
@@ -1638,9 +1640,12 @@ How each was carried out:
    reports every attempt before acting on it. `judgeDebate`, and so
    `/api/judge`, writes each attempt to `ai_calls` as its own row; the
    golden runner writes each to its run file with an `attempt` of 1 or 2,
-   and prints how many replies were retried and how many retries failed.
-   `tests/judge-retry.test.ts` drives both paths against a mocked SDK; with
-   the retry disabled, six of its ten tests fail. The 2026-10-26 change to
+   through `tests/judge/golden-sample.ts`, and prints how many replies were
+   retried and how many retries failed. `tests/judge-retry.test.ts` drives
+   production's path against a mocked SDK; with the retry disabled, six of
+   its ten tests fail. `tests/golden-sample.test.ts` drives the runner's,
+   and pins the runner's own `logCall` word for word, since importing the
+   runner starts a run. The 2026-10-26 change to
    `judge.v3.md` stays. Two consequences of logging every attempt as its
    own row:
    - **The daily cap.** `/api/judge` counts `ai_calls` rows of kind
@@ -1663,6 +1668,6 @@ How each was carried out:
      one line in a frozen file, made as part of the retry Arthur approved.
 
 The dry run's estimate also changed. It priced every v3 call at v2's
-criteria length; it now adds each case's own criteria length, at the same
-four bytes a token. Against the 3 Nov run, which billed $0.9934, the old
+criteria length; it now adds each case's own criteria length, at four
+characters a token. Against the 3 Nov run, which billed $0.9934, the old
 estimate was $0.9657 and the new one would have been $0.9791.

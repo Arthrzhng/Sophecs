@@ -174,8 +174,14 @@ describe("the golden run's file log", () => {
   });
 
   it("goes through recordCall, so the per-call write is not a separate line to forget", () => {
+    // logCall hands each attempt to recordAttempt in golden-sample.ts, which
+    // writes it with recordCall; tests/golden-sample.test.ts pins logCall
+    // whole and drives recordAttempt against a real file.
     const logCall = runner.slice(runner.indexOf("async function logCall"));
-    expect(logCall.slice(0, logCall.indexOf("\n}"))).toContain("recordCall(run,");
+    expect(logCall.slice(0, logCall.indexOf("\n}"))).toContain("recordAttempt(run,");
+    const sample = read("tests/judge/golden-sample.ts");
+    const recordAttempt = sample.slice(sample.indexOf("export function recordAttempt"));
+    expect(recordAttempt.slice(0, recordAttempt.indexOf("\n}"))).toContain("return recordCall(");
   });
 });
 
