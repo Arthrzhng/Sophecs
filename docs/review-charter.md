@@ -367,6 +367,33 @@ breach. An earlier version of this rule gave the command without
 hits: it returns one hit, and a rule whose purpose is stopping a reviewer
 mis-reading a grep is the worst place to put an unrunnable command.
 
+### The security advisor runs before and after
+
+Every step that touches the database runs Supabase's security advisor
+(`get_advisors`, type `security`) before its first change and again after
+its last, and puts both results in the pull request body. **Any ERROR in
+the after run that was not in the before run stops the step**: it is
+reported to Arthur, not fixed in passing. "Touches the database" means a
+migration, a grant, a policy, a function, or a view, applied anywhere
+other than local Postgres.
+
+Arthur set this on 2026-11-03: "Add to the review charter: every step that
+touches the database runs Supabase's security advisor before and after,
+and any new ERROR stops the step." The incident behind it: the advisor had
+been reporting all four public views (`debates_public`,
+`exchanges_public`, `profiles_public`, `public_results`) as ERROR,
+"Security Definer View", and nobody had run it. The same four views were
+also writable by the signed-out API role. Found on 2026-11-03 and closed by
+migrations 0016 and 0017; `docs/decisions.md`, "The public views were
+writable", has the evidence.
+
+The advisor reports the security-definer property, not the grants: it did
+not name the write hole, and it still reports the three views that stay
+public after 0017. So a clean before-and-after is a floor, not a pass.
+The baseline after 0017 is three ERRORs, `security_definer_view` on
+`debates_public`, `exchanges_public` and `public_results`; a step adds to
+that or it does not.
+
 ## 11. Money is not spent without Arthur's yes
 
 Any run that bills an API, and any change to a cost cap, a rate limit, a
