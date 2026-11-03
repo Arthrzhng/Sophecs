@@ -1893,25 +1893,44 @@ judged on the median of three samples, as the runner judges them.
 
 The paragraph #49 added to `judge.v3.md`, and the objection line ending
 every school's criteria, moved neither hierarchy case's engagement or
-objection. A judge blind spot, so the brief's rule applied: fix it in v3,
-the same for all six schools, and rerun.
+objection. A judge blind spot, so the brief's rule applied, in its words:
+"If they show a judge blind spot, fix it in v3 for all six schools
+symmetrically and rerun."
 
-**The fix**, on this branch: the engagement criterion in `judge.v3.md`
+**The fix**, in commit `e0e75ae`: the engagement criterion in `judge.v3.md`
 now says to check first the objection the school's criteria name, and
 that an argument leaving it unmet scores no more than 4 on engagement.
 It is in the engagement criterion, before the rubric, so every school's
 request carries it. v2 is unchanged. `tests/judge-v3-and-refusal.test.ts`
 pins it whole; a cap of 6, or the rule moved to the objection section,
-fails.
+fails. The number 4 is mine: it is the top of the 0-4 engagement band the
+two hierarchy fixtures expect, and Arthur's ruling on PR #48 said only
+that ignoring the objection "costs engagement". It goes on the
+Checkpoint A list as a change to what the v3 judge receives.
 
-**Run 2, `2026-11-03T21-35-58-347Z-v3.json`**, on this branch at
-`e0e75ae`, 78 calls, $1.1559:
+The same commit also added a paragraph to the comment at the head of
+`judge.v3.md` saying why, and that comment is sent to the model with the
+rest of the file. As first written it named the hierarchy cases and their
+engagement scores, which is golden-set information in the judge's prompt;
+run 2 was made with it. Review of #51 found it, and the comment now gives
+only the rule and where the runs are recorded. The next v3 run is the
+first without it. An older paragraph of the same comment, from the ruling
+of 2026-10-26, still tells the model that "5 of 72 v3 samples returned a
+verdict_line over its cap". It predates this pull request and is left for
+Checkpoint A, with the wider question of whether the comment should reach
+the model at all: removing it from what is sent means changing how
+`src/lib/anthropic.ts` reads the file.
+
+**Run 2, `2026-11-03T21-35-58-347Z-v3.json`**, at `e0e75ae`, 78 calls,
+$1.1559:
 
 - verdict_line: 3 first replies over the cap (`buddhist-wrong-school`,
   `stoic-analogy`, `virtue-exemplar`), each retried; the retry on
   `virtue-exemplar` ran over too, so one sample has no result. **Fail**,
-  where run 1 had none: the same prompt text about the cap, so this is the
-  model's variance, and one retry does not absorb it.
+  where run 1 had none. The instruction about the cap was the same in
+  both runs, but the prompt changed elsewhere (the engagement criterion
+  and the head comment), so two runs cannot say whether this is the
+  model's variance or a side effect of that change.
 - `stoic-analogy` 78/78/72, fidelity 8. In band.
 - `confucian-hierarchy` score 61/70/62, fidelity 7, engagement 3/4/3.
   **In band on every axis**, where run 1 was out on engagement.
@@ -1919,16 +1938,21 @@ fails.
   engagement 5/5/4 (median 5, band 0-4). Out on both, by less than run 1.
 - `unanswered_objection` on the hierarchy cases: virtue ethics five
   times, utilitarianism once, on practical judgment or outcomes. **Never
-  the power question.** The judge does now find it, in `weakest_move`:
-  "Never addresses who holds power to adjust or override the system"
-  (`confucian-hierarchy`, sample 3), and "who sets or can override the
+  the power question.** The judge finds it more often in `weakest_move`
+  than in run 1: "Never addresses who holds power to adjust or override
+  the system" (`confucian-hierarchy`, sample 3, with samples 1 and 2
+  asking who adjusts the system), and "who sets or can override the
   system's encoding" on two of the three `confucian-hierarchy-school`
-  samples.
-- The original six in band. The cap moved seven cases by more than five
-  points, all still in band: `buddhist-strong`, `confucian-strong` and
-  `confucian-hierarchy-school` -8, `stoic-strong` and `ubuntu-conformity`
-  -7, `util-strong` -6; `fabricated-source` +10 and `util-wrong-school` +6.
-  Engagement on the strong cases fell from 5-7 to 4-6.
+  samples. Run 1 had it once, on `confucian-hierarchy-school` sample 2:
+  "Never addresses who designs or audits the system's encoding of what
+  roles require".
+- The original six in band. Nine cases moved by more than five points of
+  median score: `buddhist-strong`, `confucian-strong`,
+  `confucian-hierarchy` and `confucian-hierarchy-school` -8,
+  `stoic-strong` and `ubuntu-conformity` -7, `util-strong` -6;
+  `fabricated-source` +10 and `util-wrong-school` +6. All nine are in band
+  in run 2 except `confucian-hierarchy-school`, which was out in both
+  runs. Engagement on the strong cases fell from 5-7 to 4-6.
 
 **Why the objection never names power.** `unanswered_objection.school`
 must be one of the three live schools, and the judge voices whichever
@@ -1958,8 +1982,10 @@ stops here and its questions go to Checkpoint A.
 > 3. Budget: eval cap raised to a cumulative $8.00 (I am raising the key's
 >    Console limit to match). Rerun v3 at three samples after the change.
 
-Ruling 4, on retries, is carried out in its own pull request; see "Two
-retries, and a failed submission does not use an argument".
+Ruling 1 was about dropping `backup_20261022` and does not bear on this
+pull request; it is carried out under Stage 2. Ruling 4, on retries, is
+carried out in its own pull request; see "Two retries, and a failed
+submission does not use an argument".
 
 **The voices.** In `src/lib/judge/objection-voices.ts`, one table for all
 six schools. Under v3 each school's criteria gain a fifth paragraph after
@@ -1975,18 +2001,25 @@ v1, v2 and the six request fixtures are unchanged.
 The five Arthur did not set are drafted from the school pages, and are his
 to confirm at Checkpoint A:
 
-| School | Objection | Voiced by | Why | Once published | Source on the page |
+| School | Objection (in short) | Voiced by | Why, as the judge receives it | Once published | Source on the page |
 | --- | --- | --- | --- | --- | --- |
-| Stoicism | gives up on the world too easily | `utilitarianism` | the harm an unfair system does is a sum someone could reduce, and declining to try is itself a choice about that harm | `ubuntu`: standing apart from an unfair system leaves the people inside it on their own | Stoicism's gets_wrong: "Utilitarians would say this gives up on the world too easily" |
-| Utilitarianism | no total makes the trade fair to the one who pays | `virtue-ethics` | justice gives each person what is owed to them, and a total owes nobody anything | `ubuntu`: each person's capacity for relationship is to be honoured, not netted | Utilitarianism's gets_wrong gives it to Rawls, who is no school here; Ubuntu's page: "Metz argues against building systems to maximise expected utility" |
-| Virtue Ethics | no answer for scale | `utilitarianism` | a policy that touches thousands needs its outcomes compared, and asking what a good person would do does not compare them | none | Virtue Ethics' gets_wrong: "Utilitarians would say this has no answer for scale" |
-| Confucianism | too ready to authorise hierarchy | `utilitarianism` | Arthur's words | `ubuntu`: Arthur's words | Arthur's ruling |
+| Stoicism | gives up on the world too easily | `utilitarianism` | the harm an unfair system does is a sum someone could reduce, and declining to try is itself a choice about that harm | `ubuntu`: a person is a person through other persons, so standing apart from an unfair system leaves the people inside it on their own | Stoicism's gets_wrong: "Utilitarians would say this gives up on the world too easily" |
+| Utilitarianism | no total makes the trade fair to the person who pays | `virtue-ethics` | justice gives each person what is owed to them, and a total owes nobody anything | `ubuntu`: each person's capacity for relationship is to be honoured, not netted against other people's gains | Utilitarianism's gets_wrong gives it to Rawls, who is no school here; Ubuntu's page: "Metz argues against building systems to maximise expected utility" |
+| Virtue Ethics | no answer for scale | `utilitarianism` | a policy that touches thousands of people needs its outcomes compared, and asking what a good person would do does not compare them | none | Virtue Ethics' gets_wrong: "Utilitarians would say this has no answer for scale" |
+| Confucianism | too ready to authorise hierarchy | `utilitarianism` | the subordinate party's interests go uncounted when the stronger party sets the terms | `ubuntu`: solidarity requires the weaker party can be heard | Arthur's ruling, in his words |
 | Ubuntu | a community is not one voice | `stoicism` | a dissenter's own judgment is the one thing the community cannot decide for them | none | Ubuntu's gets_wrong: "Stoics would add that a self defined through others has handed away the one thing that was its own" |
-| Buddhist ethics | much moral teaching, little systematic moral philosophy | `utilitarianism` | deciding who audits a model and how an appeal is weighed takes a way of comparing everyone's claims, which compassion alone does not supply | `confucian`: who answers to whom for a model is a question of roles and what each owes | Buddhist ethics' gets_wrong names the gap; the Confucian page asks "whether the people inside them can still hold each other to what they owe" |
+| Buddhist ethics | much moral teaching, little systematic moral philosophy | `utilitarianism` | deciding who audits a model and how an appeal is weighed takes a way of comparing everyone's claims, which compassion alone does not supply | `confucian`: who answers to whom for a model is a question of roles and what each owes, which non-harm leaves unassigned | **None for this objection.** Buddhist ethics' gets_wrong names the gap; its Utilitarian line is a different objection ("a school weighing intention this heavily lets a well-meaning system off"). The Confucian page asks "whether the people inside them can still hold each other to what they owe" |
 
-The weakest of these is Utilitarianism's. Its own page gives the objection
-to Rawls, and of the live schools Virtue Ethics is the one that argues from
-what each person is owed. It is the most likely to need Arthur's change.
+Two of these are weak, and the most likely to need Arthur's change.
+Utilitarianism's: its own page gives the objection to Rawls, and of the
+live schools Virtue Ethics is the one that argues from what each person is
+owed. Buddhist ethics': no page gives this objection to Utilitarianism, and
+the Buddhist page gives Utilitarianism a different one, about intention
+excusing a well-meaning system, which is what `buddhist-intention-excuse`
+tests. Naming Utilitarianism as the voice for the systematic-theory gap
+could pull that case's objection away from intention. The other four
+match their pages, or Arthur's words. Review of #51 found the Buddhist
+mismatch; the first version of this table hid it.
 
 `tests/objection-voices.test.ts` checks four things:
 - every school has a voice among today's listed rivals;

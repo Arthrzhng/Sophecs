@@ -28,10 +28,8 @@ entry names.
   Production deploy `dpl_6y5YM3N2BaLrTk9hRd9bJz981j7b`, Ready (same
   check).
 - The v3 run on `fe5fd3d`, 75 calls, $1.0806, and the run after the
-  engagement fix, 78 calls, $1.1559, are on branch
-  `claude/beautiful-edison-aofswd` (#51). Eval key total after them:
-  $4.6563 (the sum of the six files' unrounded totals), of which $2.4199
-  is in the run files on `main`.
+  engagement fix, 78 calls, $1.1559, were added by #51. Eval key total
+  after them: $4.6563 (the sum of the six run files' unrounded totals).
 
 ## 2026-11-03: security, the public views
 
@@ -91,8 +89,9 @@ entry names.
 ## 2026-11-03: Stage 1, the v3 runs and the objection voices
 
 - #51: the two v3 runs above (their run files), the Stage 1 result (the
-  pass test is not met: `confucian-hierarchy-school` out of band and the
-  power objection never returned), and Arthur's rulings on it. Under v3
+  pass test is not met: `confucian-hierarchy-school` out of band, the
+  power objection never returned, and in run 2 one sample with no result
+  after its verdict_line retry also ran over), and Arthur's rulings on it. Under v3
   only, each school's criteria now name the rival that normally voices its
   best-known objection (`src/lib/judge/objection-voices.ts`), Confucianism's
   two in Arthur's words and the other five drafted for him to confirm at
