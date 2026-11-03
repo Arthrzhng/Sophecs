@@ -9,8 +9,8 @@ it used, the model, the samples per case, the call count and the total
 cost, then one record per call: the fixture, the sample number, the
 attempt (1, then 2 and 3 for the retries a reply that fails validation
 gets: one retry in runs from 2026-11-03 until Arthur's ruling that evening,
-two after it; files written before the retry existed, the 3 Nov v3 run
-among them, have no attempt and are all first calls), where its fidelity criteria came from
+two after it; files written before the retry existed, the v3 run of 16:47
+on 3 Nov among them, have no attempt and are all first calls), where its fidelity criteria came from
 (`live` for `src/lib/judge/rubric.ts`, `draft` for the draft criteria file
 that only a golden run reads), a request fingerprint, the response, all
 four axes (score, fidelity, rigor, engagement), the objection school, the

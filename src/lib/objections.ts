@@ -81,8 +81,11 @@ export async function getOpenObjections(
   });
 }
 
-// The revision for an original, if one exists. Used by the verdict page to
-// swap "Answer it" for "Answered — read the revision".
+// The judged revision for an original, if one exists. Used by the verdict
+// page to swap "Answer it" for "Answered — read the revision", and by the
+// revise page to close itself. Only a judged one: a revision whose judging
+// failed leaves an unjudged row, the reader is told to try again, and
+// /api/judge reuses that row when they do.
 export async function getRevisionId(
   admin: SupabaseClient,
   parentDebateId: string
@@ -91,6 +94,7 @@ export async function getRevisionId(
     .from("debates")
     .select("id")
     .eq("parent_debate_id", parentDebateId)
+    .not("verdict", "is", null)
     .maybeSingle();
   return (data?.id as string | undefined) ?? null;
 }

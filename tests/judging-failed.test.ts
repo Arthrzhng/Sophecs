@@ -56,6 +56,29 @@ describe("/api/judge", () => {
   });
 });
 
+describe("when the cap cannot be checked", () => {
+  it("refuses the submission before anything is written or billed, rather than skip the cap", () => {
+    const start = route.indexOf('.from("ai_calls")');
+    const block = route.slice(start, route.indexOf('return paused("daily_cap")', start));
+    expect(route.slice(route.lastIndexOf("const {", start), start)).toContain("error: capError");
+    expect(block).toContain("if (capError) {");
+    expect(block).toContain("{ status: 503 }");
+    // Before any row is written or the judge is called.
+    expect(start).toBeLessThan(route.indexOf('admin.from("debates").insert('));
+    expect(start).toBeLessThan(route.indexOf("judged = await judgeDebate("));
+  });
+});
+
+describe("a revision whose judging failed", () => {
+  it("is tried again on its own unjudged row, not refused as already revised", () => {
+    const flat = route.replace(/\s+/g, " ");
+    expect(flat).toContain('.select("id, verdict, argument") .eq("parent_debate_id", parentRow.id)');
+    expect(flat).toContain('if (existingChild?.verdict) return paused("already_revised");');
+    expect(flat).toContain("const reuse = isRevision ? unjudgedRevision : recent;");
+    expect(flat).toContain("const debateId = reuse?.id ?? newId();");
+  });
+});
+
 describe("the argue screen", () => {
   it("shows the failure copy for the route's reason, not the generic error", () => {
     expect(JUDGING_FAILED_REASON).toBe("judging_failed");

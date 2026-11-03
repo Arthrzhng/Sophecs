@@ -187,12 +187,26 @@ describe("judgeDebate retries a reply that fails validation, up to twice", () =>
     ]);
   });
 
-  it("retries a reply that is not JSON at all", async () => {
+  it("retries a reply that is not JSON at all, and logs its length, not its text", async () => {
     replies.push("Here is my verdict: it is good.", WITHIN_CAP);
     const judged = await judgeDebate(PARAMS);
     expect(created).toHaveLength(2);
     expect(inserted).toHaveLength(2);
     expect(judged.verdict).toEqual(JSON.parse(WITHIN_CAP));
+    expect(inserted[0].validation_error).toBe("Model response was not valid JSON (31 characters)");
+  });
+
+  it("never logs what the judge wrote, even when zod would quote it", async () => {
+    const badSchool = verdict(WITHIN_CAP_LINE) as Record<string, unknown>;
+    badSchool.unanswered_objection = {
+      school: "a school named after the argument's own words",
+      claim: "c",
+      why_it_stands: "w",
+    };
+    replies.push(JSON.stringify(badSchool), WITHIN_CAP);
+    await judgeDebate(PARAMS);
+    expect(inserted[0].validation_error).toMatch(/^unanswered_objection\.school: /);
+    expect(String(inserted[0].validation_error)).not.toContain("argument's own words");
   });
 
   it("makes one call and logs one row when the first reply validates", async () => {

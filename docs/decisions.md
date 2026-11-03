@@ -1758,13 +1758,21 @@ change to how the limit works, so Arthur's to choose (d):
   rows per reader per day, at a number Arthur sets.
 
 **Decide before the Winchester pilot.** Until then the cap stays as it is:
-it can cost a reader an extra slot on the rare retried submission, and it
-cannot be run up.
+it can cost a reader an extra slot on the rare retried submission.
+
+*Superseded in part, the same evening.* Arthur's ruling on retries (the
+next entry) allows two retries and takes a submission that ends without a
+verdict out of the cap. So a retried submission that succeeds now uses two
+or three of the five, and a failed one uses none, which means the cap
+**can** now be run up by failed submissions. The second option above,
+a higher per-reader ceiling on calls, is what would close that; it is
+still Arthur's (d).
 
 ### Two retries, and a failed submission does not use an argument
 
-Arthur's ruling of 2026-11-03, after the second v3 run of that day left one
-sample without a verdict when its retry also ran over the verdict_line cap:
+Arthur's ruling of 2026-11-03, after the second v3 run of that day (run file
+`2026-11-03T21-35-58-347Z-v3.json`, commit 588cf1f on branch
+`claude/beautiful-edison-aofswd`, #51) left one sample without a verdict when its retry also ran over the verdict_line cap:
 
 > verdict_line: allow up to two retries. If both fail, the student sees a
 > clear "judging failed, this did not use your turn, try again" message,
@@ -1797,9 +1805,25 @@ How it was carried out:
    later success would bring the earlier failure back into the count.
 4. **Logged.** Each failed reply's ai_calls row carries the validator's
    summary in `validation_error`, also added by 0019. It names the field
-   and cap, never the reply's or the argument's text. The route also writes
-   a failed submission to the production log; until now it logged only
-   outside production.
+   and the rule, never the reply's or the argument's text. Two places used
+   to carry text, and review pass 1 found both: a reply that was not JSON
+   was reported with its first 200 characters, and zod's message for a
+   wrong enum value quotes the value. Now the first gives the reply's
+   length, and the second has its "received '...'" clause cut; a test
+   feeds each and checks the row. The route also writes a failed
+   submission to the production log; until now it logged only outside
+   production.
+5. **A revision can be tried again.** A revision whose judging failed
+   leaves an unjudged child row. Before this, the next try found that row
+   and answered "already revised", and the revise page closed, so the new
+   "Try again" would have been false for a revision. The route now reuses
+   an unjudged child row, as it reuses an original's, and
+   `getRevisionId` counts only a judged revision. Review pass 1 found it;
+   it was already so on `main`, but the message made it a promise.
+6. **The cap fails closed.** If the cap's own query errors (a missing
+   column, before 0019 or after its rollback), the route refuses the
+   submission with a 503 before anything is written or billed, where it
+   used to read the failed count as zero.
 
 **What it does not change.** A submission that ends with a verdict still
 counts once per call. One that needed retries uses two or three of the
@@ -1809,8 +1833,8 @@ billed call still counts toward the monthly budget.
 **The risk it accepts, for Checkpoint A.** Failed submissions no longer
 move the cap. An argument whose replies always fail validation can
 therefore be sent again and again, at up to three calls a time (about
-$0.04, at the $0.0148 a call the 21:35 v3 golden run averaged; production's
-v2 prompt is shorter), with nothing but the
+$0.04, at the $0.0148 a call the 21:35 v3 golden run averaged, in the run
+file named above; production's v2 prompt is shorter), with nothing but the
 monthly budget to stop it. That budget, `AI_MONTHLY_BUDGET_USD`, pauses
 judging for every reader when it is reached. This is the trade the
 pre-pilot item described. A second, higher ceiling on calls per reader

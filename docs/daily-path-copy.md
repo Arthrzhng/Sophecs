@@ -299,6 +299,10 @@ daily cap. Lives in `src/lib/judging-failed.ts`.
 | Body | `This did not use one of today's arguments, and your argument is saved. Try again.` |
 | Button | `Try again` (unchanged) |
 
+If the daily cap itself cannot be checked, nothing is sent to the judge,
+and the generic error ("The judge could not be reached.") carries this
+detail line: `The daily limit could not be checked, so nothing was sent to the judge.`
+
 ## 7. Objection and revise (mockup 05)
 
 | Element | Copy |

@@ -190,8 +190,11 @@ export async function callJudgeModel(
   try {
     parsed = JSON.parse(raw);
   } catch {
+    // The length, not the text. This message is logged to ai_calls and to
+    // the production log, and a reply cut off partway is mostly the judge
+    // paraphrasing the argument.
     throw new JudgeValidationError(
-      `Model response was not valid JSON: ${raw.slice(0, 200)}`,
+      `Model response was not valid JSON (${raw.length} characters)`,
       costUsd,
       latencyMs
     );
@@ -203,8 +206,16 @@ export async function callJudgeModel(
     // array. Word-cap breaches are the common failure here, and the raw
     // message is a multi-line JSON blob that tells neither the golden-set
     // table nor a production log which cap was missed.
+    //
+    // zod's own wording for a wrong enum value quotes the value it got
+    // ("received '...'"), which is the model's text, so that clause is cut:
+    // the summary is logged, and it names a field and a rule, never what the
+    // judge wrote.
     const summary = result.error.issues
-      .map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`)
+      .map(
+        (issue) =>
+          `${issue.path.join(".") || "(root)"}: ${issue.message.replace(/,? received '[^]*$/, "")}`
+      )
       .join("; ");
     throw new JudgeValidationError(summary, costUsd, latencyMs);
   }
@@ -283,11 +294,9 @@ export async function judgeWithRetries(
   logAttempt: (attempt: JudgeAttempt) => Promise<void>
 ): Promise<JudgeCallResult> {
   let failure: JudgeValidationError | null = null;
-  // One entry per call MAX_JUDGE_ATTEMPTS allows; tests/judge-retry.test.ts
-  // holds the two in step.
-  for (const attempt of [1, 2, 3] as const) {
+  for (let attempt = 1; attempt <= MAX_JUDGE_ATTEMPTS; attempt++) {
     const settled = await settle(call);
-    await logAttempt(attemptOf(attempt, settled));
+    await logAttempt(attemptOf(attempt as JudgeAttempt["attempt"], settled));
     if (settled.ok) return settled.result;
     failure = settled.error;
   }

@@ -17,13 +17,17 @@ import type { SchoolId } from "@/lib/types";
 // A submission whose replies fail validation is retried up to twice
 // (judgeWithRetries in src/lib/anthropic.ts), so it can take three model
 // calls. The slowest of 153 golden-run calls on 2026-11-03 took 6.6
-// seconds, so three come to about 20. The project's own limit was not
+// seconds (the run files in commits b32dfb8 and 588cf1f, branch
+// claude/beautiful-edison-aofswd), so three come to about 20. The project's own limit was not
 // readable from here; this sets it rather than assume it. 60 is within
 // every plan's maximum, and Arthur ruled to keep it. A function stopped
 // mid-retry would fail the reader and leave a billed call out of ai_calls.
 export const maxDuration = 60;
 
 const DAILY_CAP = 5;
+// docs/daily-path-copy.md, "Judging failed": the detail line under the
+// argue screen's generic error when the cap cannot be checked.
+const CAP_UNCHECKED = "The daily limit could not be checked, so nothing was sent to the judge.";
 
 const TOPIC_LOCK_DAYS = 7;
 const PAR_ELO_WINDOW = 50;
@@ -113,7 +117,7 @@ export async function POST(request: Request) {
 
   if (!isAllowlisted) {
     const sinceDaily = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { count: dailyCount } = await admin
+    const { count: dailyCount, error: capError } = await admin
       .from("ai_calls")
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
@@ -124,6 +128,14 @@ export async function POST(request: Request) {
       // before it still counts.
       .eq("counts_toward_cap", true)
       .gte("created_at", sinceDaily);
+    // A count that failed is not a count of zero. Unread, an error here
+    // (a missing column, before migration 0019 or after its rollback)
+    // would wave every submission past the cap, so it stops the
+    // submission instead, before anything is written or billed.
+    if (capError) {
+      console.error("[judge] daily cap could not be checked:", capError.message);
+      return NextResponse.json({ ok: false, error: CAP_UNCHECKED }, { status: 503 });
+    }
     if ((dailyCount ?? 0) >= DAILY_CAP) {
       return paused("daily_cap");
     }
@@ -139,6 +151,10 @@ export async function POST(request: Request) {
     created_at: string | null;
     motion_text: string | null;
   } | null = null;
+  // A revision whose judging failed left an unjudged row behind. The
+  // reader was told to try again, so that row is reused, as an original's
+  // unjudged row is, rather than counting as the one revision they get.
+  let unjudgedRevision: { id: string; argument: string | null } | null = null;
   if (isRevision) {
     const { data: parentRow } = await admin
       .from("debates")
@@ -161,10 +177,16 @@ export async function POST(request: Request) {
 
     const { data: existingChild } = await admin
       .from("debates")
-      .select("id")
+      .select("id, verdict, argument")
       .eq("parent_debate_id", parentRow.id)
       .maybeSingle();
-    if (existingChild) return paused("already_revised");
+    if (existingChild?.verdict) return paused("already_revised");
+    if (existingChild) {
+      unjudgedRevision = {
+        id: existingChild.id as string,
+        argument: (existingChild.argument as string | null) ?? null,
+      };
+    }
 
     parent = {
       id: parentRow.id,
@@ -207,7 +229,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const debateId = recent?.id ?? newId();
+  // The unjudged row to reuse, if there is one: an original's from inside
+  // the topic lock, or a revision's from a failed try at it.
+  const reuse = isRevision ? unjudgedRevision : recent;
+  const debateId = reuse?.id ?? newId();
   const school = profile.school as SchoolId;
 
   // The wording this argument is judged against, decided once and used for
@@ -224,11 +249,10 @@ export async function POST(request: Request) {
     topic.motion
   );
 
-  if (!recent) {
-    // `recent` is always null on a revision, so this always inserts a fresh
-    // row there — never the reuse path below, which would otherwise let a
-    // revision overwrite an abandoned unjudged original that happened to
-    // share the topic.
+  if (!reuse) {
+    // `recent` is always null on a revision, and a revision only ever
+    // reuses its own unjudged child, so it never overwrites an abandoned
+    // unjudged original that happened to share the topic.
     const { error: insertError } = await admin.from("debates").insert({
       id: debateId,
       user_id: user.id,
@@ -246,7 +270,7 @@ export async function POST(request: Request) {
     if (insertError) {
       return paused("already_revised");
     }
-  } else if (recent.argument !== body.argument) {
+  } else if (reuse.argument !== body.argument) {
     await admin.from("debates").update({ argument: body.argument }).eq("id", debateId);
   }
 

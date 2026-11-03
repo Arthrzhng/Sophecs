@@ -29,6 +29,10 @@
 -- own: the Supabase runner wraps the file, and by hand it is
 -- `psql --single-transaction`.
 
+-- Waits at most five seconds for the lock rather than queueing behind a
+-- long reader and holding up every ai_calls write behind it.
+set local lock_timeout = '5s';
+
 alter table public.ai_calls
   add column counts_toward_cap boolean not null default true,
   add column validation_error text;
