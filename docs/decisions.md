@@ -1015,6 +1015,30 @@ no new private data, since the motion is public content and the page it
 feeds has always been public, but it is a deliberate widening rather than
 an incidental one.
 
+**Done, Stage 2 of the brief of 2026-11-03**, in that order: migration
+0020 (`supabase/migrations/0020_debates_public_motion_text.sql`) is 0018's
+view, keep-list, parent rule and type checks unchanged, with
+`d.motion_text` appended as the last column, applied before the code that
+reads it. The verdict page and its OG image now select `motion_text` from
+the view, and neither reads `debates` for it; the OG image no longer reads
+`debates` at all. The rollback has to drop and recreate the view, since
+`create or replace` cannot remove a column, so it revokes everything from
+`anon` and `authenticated` before granting SELECT back: a recreated view
+picks up Supabase's default privileges, which would reopen the write hole
+0016 closed. `scripts/test-0020-motion-text-view.sh` (139 checks) runs
+0001 to 0018 under production's grants and checks, after 0020, after its
+rollback and after applying it again, that every column but `motion_text`
+of every row reads exactly as under 0018, that the rollback's
+`pg_get_viewdef` text is 0018's, and that anon and authenticated can only
+SELECT. Breaking the migration on purpose was caught each time: dropping
+the parent rule failed 6 checks, keeping `verdict_line` with its type
+check widened failed 8, and a rollback without the revoke failed 24 (the
+six write privileges for each of anon and authenticated, after the
+rollback and again after 0020 is reapplied, since `create or replace`
+keeps grants). Keeping `verdict_line` without widening the type check
+fails nothing, because the type check drops a string in that slot; the
+unit test that holds the two keep-lists equal is what catches that one.
+
 ### 2F: the version override, and the bug it found in `fillOnce`
 
 Arthur approved a minimal change to the frozen `src/lib/anthropic.ts` on

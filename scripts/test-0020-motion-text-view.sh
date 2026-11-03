@@ -4,11 +4,13 @@
 #
 # - debates_public gains motion_text as its last column, each row's own,
 #   readable by anon, and nothing else about the view changes: 0018's
-#   verdict redaction holds, a private argument stays hidden, and anon and
-#   authenticated can still only SELECT;
-# - the rollback returns the view to 0018's columns with the same
-#   redaction and, under Supabase's default privileges, without reopening
-#   the write hole 0016 closed;
+#   verdict redaction holds (its keep-list, its parent rule), every other
+#   column of every row reads exactly as before, a private argument stays
+#   hidden, and anon and authenticated can still only SELECT;
+# - the rollback returns the view to 0018's definition, read back as the
+#   same text from pg_get_viewdef, with the same rows, and, under
+#   Supabase's default privileges, without reopening the write hole 0016
+#   closed;
 # - 0020 applies again after it.
 #
 # Usage: scripts/test-0020-motion-text-view.sh [port]
@@ -87,6 +89,13 @@ insert into debates (id,user_id,topic_slug,school,argument,argument_public,score
     "strongest_move":"old secret","weakest_move":"w","a_stronger_version_would":"a",
     "verdict_line":"v","prompt_version":"v1"}'),
  ('none','44444444-4444-4444-4444-444444444444','vt','stoicism','unjudged secret',false,null,'original',null);
+-- A published revision of a private original: the revision judge was shown
+-- the original and may quote it, so 0018 withholds this verdict's text too.
+insert into debates (id,user_id,topic_slug,school,argument,argument_public,score,kind,parent_debate_id,verdict) values
+ ('pubrev','44444444-4444-4444-4444-444444444444','vt','stoicism','open revision',true,74,'revision','priv',
+  '{"rejected":false,"score":74,"fidelity":8,"rigor":7,"engagement":7,
+    "verdict_line":"answers secret words","objection_answered":true,
+    "improvement_note":"no longer says secret words","prompt_version":"v2"}');
 ROWS
 
 
@@ -114,10 +123,21 @@ grants_hold() {
   expect "$1: service_role SELECT debates_public" t "$(q "select has_table_privilege('service_role', 'public.debates_public', 'SELECT')")"
 }
 
+# Every column but motion_text, for every row, as one digest: "nothing
+# else about the view changes" checked row by row rather than by sample.
+rows_digest() { q "select md5(string_agg(row(id, topic_slug, school, score, verdict, elo_before, elo_after, created_at, kind, parent_debate_id, argument)::text, '|' order by id)) from debates_public"; }
+viewdef() { q "select pg_get_viewdef('public.debates_public'::regclass, true)"; }
+
 redaction_holds() {
+  # 0018 leaves a withheld field out rather than setting it to null.
   for k in strongest_move weakest_move a_stronger_version_would verdict_line; do
-    expect "$1: priv $k" "null" "$(pv "->'$k'" priv)"
+    expect "$1: priv $k left out" f "$(pv " ? '$k'" priv)"
   done
+  expect "$1: priv objection keeps its school only" '{"claim": null, "school": "utilitarianism", "why_it_stands": null}' "$(pv "->'unanswered_objection'" priv)"
+  expect "$1: published revision of a private original withheld" f "$(pv " ? 'verdict_line'" pubrev)"
+  expect "$1: published revision keeps its score" 74 "$(pv "->>'score'" pubrev)"
+  expect "$1: rejected private row keeps only rejected, prompt_version" '{"rejected": true, "prompt_version": "v2"}' "$(pv "" rej)"
+
   expect "$1: priv scores kept" "72 7 7 6" "$(pv "->>'score' || ' ' || (verdict->>'fidelity') || ' ' || (verdict->>'rigor') || ' ' || (verdict->>'engagement')" priv)"
   expect "$1: no secret in any public verdict" 0 "$(q "select count(*) from debates_public where verdict::text like '%secret%'")"
   expect "$1: priv argument hidden" "" "$(q "select argument from debates_public where id = 'priv'")"
@@ -127,6 +147,9 @@ redaction_holds() {
 
 say "before 0020: 0018's view"
 expect "columns" "$OLD_COLS" "$(cols)"
+DIGEST_0018="$(rows_digest)"
+VIEWDEF_0018="$(viewdef)"
+expect "0018's view has the parent join" t "$(q "select pg_get_viewdef('public.debates_public'::regclass, true) ilike '%left join debates p on%'")"
 grants_hold "before"
 redaction_holds "before"
 
@@ -140,6 +163,7 @@ after() {
   expect "$1: a private row's motion is shown" "The stored wording of priv." "$(q "select motion_text from debates_public where id = 'priv'")"
   expect "$1: a null motion stays null" t "$(q "select motion_text is null from debates_public where id = 'none'")"
   expect "$1: anon reads motion_text" allowed "$(as_role anon "select motion_text from public.debates_public")"
+  expect "$1: every other column of every row as under 0018" "$DIGEST_0018" "$(rows_digest)"
   grants_hold "$1"
   redaction_holds "$1"
 }
@@ -148,6 +172,8 @@ after "after 0020"
 say "rollback 0020"
 apply "$REPO/supabase/rollback/0020_debates_public_motion_text.down.sql"
 expect "columns back to 0018's" "$OLD_COLS" "$(cols)"
+expect "definition back to 0018's, as text" t "$([ "$(viewdef)" = "$VIEWDEF_0018" ] && echo t || echo f)"
+expect "rows as under 0018" "$DIGEST_0018" "$(rows_digest)"
 grants_hold "after rollback"
 redaction_holds "after rollback"
 

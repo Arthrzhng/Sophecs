@@ -8,55 +8,63 @@
 -- view picks up Supabase's default privileges, which give anon and
 -- authenticated every privilege on it: the write hole 0016 closed. So
 -- everything is revoked from them first, and SELECT alone given back.
+-- The definition below is 0018's, character for character, with "create
+-- or replace" as "create"; scripts/test-0020-motion-text-view.sh checks
+-- that pg_get_viewdef reads the same after this as it did under 0018.
 
 drop view public.debates_public;
 
 create view public.debates_public as
   select
-    id,
-    topic_slug,
-    school,
-    score,
+    d.id,
+    d.topic_slug,
+    d.school,
+    d.score,
     case
-      when d.argument_public or d.verdict is null or jsonb_typeof(d.verdict) <> 'object'
-        then d.verdict
+      when d.verdict is null then d.verdict
+      when d.argument_public and coalesce(p.argument_public, true) then d.verdict
+      when jsonb_typeof(d.verdict) <> 'object' then null
       else (
-        select case
-          when jsonb_typeof(r.v -> 'unanswered_objection') = 'object'
-            then jsonb_set(
-              r.v,
-              '{unanswered_objection}',
-              (r.v -> 'unanswered_objection')
-                || '{"claim": null, "why_it_stands": null}'::jsonb
-            )
-          else r.v
+        select coalesce(jsonb_object_agg(e.key, e.value), '{}'::jsonb)
+        from jsonb_each(d.verdict) e
+        where e.key in (
+          'rejected',
+          'score',
+          'fidelity',
+          'rigor',
+          'engagement',
+          'objection_answered',
+          'prompt_version'
+        )
+        and case
+          when e.key = 'rejected' or e.key = 'objection_answered'
+            then jsonb_typeof(e.value) = 'boolean'
+          when e.key = 'prompt_version'
+            then jsonb_typeof(e.value) = 'string' and (e.value #>> '{}') ~ '^v[0-9]+$'
+          else jsonb_typeof(e.value) in ('number', 'null')
         end
-        from (
-          select d.verdict || coalesce(
-            (
-              select jsonb_object_agg(k, 'null'::jsonb)
-              from unnest(array[
-                'strongest_move',
-                'weakest_move',
-                'a_stronger_version_would',
-                'verdict_line',
-                'improvement_note',
-                'rejection_reason'
-              ]) as k
-              where d.verdict ? k
-            ),
-            '{}'::jsonb
-          ) as v
-        ) r
-      )
+      ) || case
+        when jsonb_typeof(d.verdict -> 'unanswered_objection' -> 'school') = 'string'
+          and (d.verdict -> 'unanswered_objection' ->> 'school') ~ '^[a-z-]+$'
+          then jsonb_build_object(
+            'unanswered_objection',
+            jsonb_build_object(
+              'school', d.verdict -> 'unanswered_objection' -> 'school',
+              'claim', null,
+              'why_it_stands', null
+            )
+          )
+        else '{}'::jsonb
+      end
     end as verdict,
-    elo_before,
-    elo_after,
-    created_at,
-    kind,
-    parent_debate_id,
-    case when argument_public then argument else null end as argument
-  from debates d;
+    d.elo_before,
+    d.elo_after,
+    d.created_at,
+    d.kind,
+    d.parent_debate_id,
+    case when d.argument_public then d.argument else null end as argument
+  from debates d
+  left join debates p on p.id = d.parent_debate_id;
 
 revoke all on public.debates_public from public, anon, authenticated;
 grant select on public.debates_public to anon, authenticated;

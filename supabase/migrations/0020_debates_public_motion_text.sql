@@ -7,15 +7,20 @@
 -- code that selects the column deploy. Until then both pages read
 -- debates.motion_text with the admin client.
 --
--- The view is 0018's, verdict expression and all, with motion_text
--- appended as the last column. CREATE OR REPLACE VIEW may only add columns
--- at the end, and keeps the owner and the grants 0016 and 0017 set.
+-- The view is 0018's, character for character (the keep-list for a
+-- private argument's verdict, the parent join, the type checks), with
+-- d.motion_text appended as the last column.
+-- scripts/test-0020-motion-text-view.sh checks that every other column of
+-- every row reads as it did under 0018. CREATE OR REPLACE VIEW may only
+-- add columns at the end, and keeps the owner and the grants 0016 and 0017
+-- set.
 --
 -- A deliberate widening: anon and authenticated hold SELECT on this view,
 -- so the column becomes readable through the Data API. It is the motion as
 -- it was worded when the argument was written, which is public content and
 -- is printed on the public verdict page; nothing about the argument or its
--- author.
+-- author. It is shown for private arguments too, as the page already shows
+-- it.
 --
 -- Locks: ACCESS EXCLUSIVE on the view only, for a catalogue update; no
 -- lock on debates. No transaction of its own: the Supabase runner wraps
@@ -23,48 +28,53 @@
 
 create or replace view public.debates_public as
   select
-    id,
-    topic_slug,
-    school,
-    score,
+    d.id,
+    d.topic_slug,
+    d.school,
+    d.score,
     case
-      when d.argument_public or d.verdict is null or jsonb_typeof(d.verdict) <> 'object'
-        then d.verdict
+      when d.verdict is null then d.verdict
+      when d.argument_public and coalesce(p.argument_public, true) then d.verdict
+      when jsonb_typeof(d.verdict) <> 'object' then null
       else (
-        select case
-          when jsonb_typeof(r.v -> 'unanswered_objection') = 'object'
-            then jsonb_set(
-              r.v,
-              '{unanswered_objection}',
-              (r.v -> 'unanswered_objection')
-                || '{"claim": null, "why_it_stands": null}'::jsonb
-            )
-          else r.v
+        select coalesce(jsonb_object_agg(e.key, e.value), '{}'::jsonb)
+        from jsonb_each(d.verdict) e
+        where e.key in (
+          'rejected',
+          'score',
+          'fidelity',
+          'rigor',
+          'engagement',
+          'objection_answered',
+          'prompt_version'
+        )
+        and case
+          when e.key = 'rejected' or e.key = 'objection_answered'
+            then jsonb_typeof(e.value) = 'boolean'
+          when e.key = 'prompt_version'
+            then jsonb_typeof(e.value) = 'string' and (e.value #>> '{}') ~ '^v[0-9]+$'
+          else jsonb_typeof(e.value) in ('number', 'null')
         end
-        from (
-          select d.verdict || coalesce(
-            (
-              select jsonb_object_agg(k, 'null'::jsonb)
-              from unnest(array[
-                'strongest_move',
-                'weakest_move',
-                'a_stronger_version_would',
-                'verdict_line',
-                'improvement_note',
-                'rejection_reason'
-              ]) as k
-              where d.verdict ? k
-            ),
-            '{}'::jsonb
-          ) as v
-        ) r
-      )
+      ) || case
+        when jsonb_typeof(d.verdict -> 'unanswered_objection' -> 'school') = 'string'
+          and (d.verdict -> 'unanswered_objection' ->> 'school') ~ '^[a-z-]+$'
+          then jsonb_build_object(
+            'unanswered_objection',
+            jsonb_build_object(
+              'school', d.verdict -> 'unanswered_objection' -> 'school',
+              'claim', null,
+              'why_it_stands', null
+            )
+          )
+        else '{}'::jsonb
+      end
     end as verdict,
-    elo_before,
-    elo_after,
-    created_at,
-    kind,
-    parent_debate_id,
-    case when argument_public then argument else null end as argument,
-    motion_text
-  from debates d;
+    d.elo_before,
+    d.elo_after,
+    d.created_at,
+    d.kind,
+    d.parent_debate_id,
+    case when d.argument_public then d.argument else null end as argument,
+    d.motion_text
+  from debates d
+  left join debates p on p.id = d.parent_debate_id;

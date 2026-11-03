@@ -286,13 +286,16 @@ describe("withheldVerdict", () => {
     for (const odd of [null, "secret", ["secret"], 7]) expect(withheldVerdict(odd)).toBeNull();
   });
 
-  it("is the list 0018 keeps, so the page and the view agree", () => {
-    const migration = fs.readFileSync(
-      path.join(process.cwd(), "supabase/migrations/0018_debates_public_private_verdict_text.sql"),
-      "utf-8"
-    );
+  // 0020 redefines the view with 0018's expression and motion_text added,
+  // so the live view's list is 0020's; both are held to the page's.
+  it.each([
+    "supabase/migrations/0018_debates_public_private_verdict_text.sql",
+    "supabase/migrations/0020_debates_public_motion_text.sql",
+    "supabase/rollback/0020_debates_public_motion_text.down.sql",
+  ])("is the list %s keeps, so the page and the view agree", (file) => {
+    const migration = fs.readFileSync(path.join(process.cwd(), file), "utf-8");
     const list = /e\.key in \(([^)]*)\)/.exec(migration)?.[1];
-    expect(list, "0018's list of kept keys").toBeTruthy();
+    expect(list, `${file}'s list of kept keys`).toBeTruthy();
     const keys = [...list!.matchAll(/'([a-z_]+)'/g)].map((m) => m[1]).sort();
     expect(keys).toEqual([...KEPT_FOR_EVERYONE].sort());
   });
