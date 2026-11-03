@@ -23,21 +23,34 @@ export interface VerdictData {
   fidelity: number | null;
   rigor: number | null;
   engagement: number | null;
-  strongest_move?: string;
-  weakest_move?: string;
-  a_stronger_version_would?: string;
-  verdict_line?: string;
+  // Null, as are the objection's claim and why_it_stands and the
+  // improvement note, when debates_public withholds them: the judge quotes
+  // the argument, so a private argument's verdict shows only its scores to
+  // anyone but its author (migration 0018).
+  strongest_move?: string | null;
+  weakest_move?: string | null;
+  a_stronger_version_would?: string | null;
+  verdict_line?: string | null;
   // v2 onwards. Absent on verdicts judged under v1, which exist in
   // production — every read of this is guarded.
   unanswered_objection?: {
     school: SchoolId;
-    claim: string;
-    why_it_stands: string;
+    claim: string | null;
+    why_it_stands: string | null;
   } | null;
   // Only ever set on a revision — the judge is shown the original and the
   // objection, and says whether the objection was actually engaged.
   objection_answered?: boolean;
-  improvement_note?: string;
+  improvement_note?: string | null;
+}
+
+// docs/daily-path-copy.md, "A verdict on a private argument, seen by
+// someone else".
+const WITHHELD_HEADING = "The verdict on a private argument";
+const WITHHELD_NOTE =
+  "The judge's note can quote the argument, so only the person who wrote it can read it while the argument is private.";
+function withheldObjection(schoolName: string): string {
+  return `The argument left a ${schoolName} objection standing. Its wording can quote the argument, so only the person who wrote it can read it.`;
 }
 
 // The parent's four marks, so a revision can be read against its original.
@@ -53,7 +66,7 @@ export interface RevisionComparison {
 
 // One of the judge's three paragraphs, with the label it came with. Sans
 // at the small step, sentence case, no colon — a label, not a field name.
-function Reading({ label, body }: { label: string; body?: string }) {
+function Reading({ label, body }: { label: string; body?: string | null }) {
   if (!body) return null;
   return (
     <div>
@@ -119,6 +132,7 @@ export function Verdict({
   hasRevision,
   comparison,
   counterpart,
+  textWithheld = false,
 }: {
   debateId: string;
   topicSlug: string;
@@ -149,6 +163,12 @@ export function Verdict({
   comparison?: RevisionComparison | null;
   // Absent on a revision and on someone else's verdict.
   counterpart?: { seeking: boolean; exchangeId: string | null } | null;
+  /**
+   * Someone other than the author, looking at a private argument's verdict:
+   * debates_public has nulled every field that can quote it, and this says
+   * so in their place rather than leaving the spaces empty.
+   */
+  textWithheld?: boolean;
 }) {
   const [showAfter, setShowAfter] = useState(showAfterLessonInitially);
   const objection = verdict.rejected ? null : verdict.unanswered_objection ?? null;
@@ -227,7 +247,7 @@ export function Verdict({
             <p className="text-sm text-ink-mid">Week {weekNumber} &middot; verdict is in</p>
           )}
           <h1 className="mt-1 max-w-[34ch] text-xl font-extrabold leading-tight tracking-tight text-ink">
-            {verdict.verdict_line}
+            {textWithheld ? WITHHELD_HEADING : verdict.verdict_line}
           </h1>
           <p className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-mid">
             {eloDelta != null && eloAfter != null && (
@@ -306,11 +326,15 @@ export function Verdict({
         <h2 className="text-lg font-extrabold tracking-tight text-ink">
           The judge&apos;s note
         </h2>
-        <div className="mt-6 space-y-6">
-          <Reading label="Strongest move" body={verdict.strongest_move} />
-          <Reading label="Weakest move" body={verdict.weakest_move} />
-          <Reading label="A stronger version would" body={verdict.a_stronger_version_would} />
-        </div>
+        {textWithheld ? (
+          <p className="prose-reading mt-6">{WITHHELD_NOTE}</p>
+        ) : (
+          <div className="mt-6 space-y-6">
+            <Reading label="Strongest move" body={verdict.strongest_move} />
+            <Reading label="Weakest move" body={verdict.weakest_move} />
+            <Reading label="A stronger version would" body={verdict.a_stronger_version_would} />
+          </div>
+        )}
       </div>
 
       {objection && (
@@ -323,8 +347,16 @@ export function Verdict({
             style={{ borderColor: SCHOOL_COLORS[objection.school].surface }}
           >
             <p className="text-sm text-ink-mid">{SCHOOL_COLORS[objection.school].name}</p>
-            <p className="mt-2 font-serif text-md leading-relaxed text-ink">{objection.claim}</p>
-            <p className="mt-3 text-sm leading-relaxed text-ink-mid">{objection.why_it_stands}</p>
+            {textWithheld ? (
+              <p className="mt-2 text-sm leading-relaxed text-ink-mid">
+                {withheldObjection(SCHOOL_COLORS[objection.school].name)}
+              </p>
+            ) : (
+              <>
+                <p className="mt-2 font-serif text-md leading-relaxed text-ink">{objection.claim}</p>
+                <p className="mt-3 text-sm leading-relaxed text-ink-mid">{objection.why_it_stands}</p>
+              </>
+            )}
           </div>
 
           {/* A revision can't itself be revised — one attempt per objection,

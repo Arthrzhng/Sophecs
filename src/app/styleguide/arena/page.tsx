@@ -219,6 +219,35 @@ export default function ArenaPreviewPage() {
         />
       </Section>
 
+      <Section title="5b. Verdict: a private argument, seen by someone else">
+        {/* What debates_public returns for a private argument since 0018:
+            every field that can quote the argument is null. */}
+        <Verdict
+          debateId="preview-private"
+          topicSlug="opaque-benefit"
+          motion={FIXTURE_MOTION}
+          school="stoicism"
+          verdict={{
+            ...FIXTURE_VERDICT,
+            strongest_move: null,
+            weakest_move: null,
+            a_stronger_version_would: null,
+            verdict_line: null,
+            unanswered_objection: { school: "virtue-ethics", claim: null, why_it_stands: null },
+          }}
+          eloDelta={4}
+          eloAfter={1204}
+          weekNumber={41}
+          argument={null}
+          isOwner={false}
+          argumentPublic={false}
+          afterLesson={null}
+          showAfterLessonInitially={false}
+          shareLine="Scored 71 defending the Stoic line on the opaque benefit. sophecs.com"
+          textWithheld
+        />
+      </Section>
+
       <Section title="6. Verdict: rejected, nothing scored">
         <Verdict
           debateId="preview-rejected"

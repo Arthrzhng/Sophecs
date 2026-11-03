@@ -39,7 +39,8 @@ psql -X -v ON_ERROR_STOP=1 -q -d postgres -c "create database $DB"
 say "shim and migrations 0001 to 0015"
 apply "$REPO/scripts/local-auth-shim.sql"
 for f in "$REPO"/supabase/migrations/*.sql; do
-  case "$(basename "$f")" in 0016_*) continue ;; esac
+  # 0001 to 0015 only: 0016 is under test, and anything after it assumes it.
+  [ "$((10#$(basename "$f" | cut -c1-4)))" -le 15 ] || continue
   apply "$f"
 done
 

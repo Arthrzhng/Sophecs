@@ -282,6 +282,20 @@ they do not change it.
 Argue screen panel heading: `What the judge looks for`. Link under it:
 `Read the full rubric` → `/debate/rubric`.
 
+### A verdict on a private argument, seen by someone else
+
+Added 2026-11-03, with migration 0018. The judge quotes the argument it
+scores, so when the argument is private, everyone but its author sees the
+score and the three rows and not the judge's words. The author's own
+verdict page is unchanged.
+
+| Where | Copy |
+|---|---|
+| Page heading, in place of the verdict line | `The verdict on a private argument` |
+| "The judge's note", in place of its three paragraphs | `The judge's note can quote the argument, so only the person who wrote it can read it while the argument is private.` |
+| The objection left standing, in place of its wording | `The argument left a {School} objection standing. Its wording can quote the argument, so only the person who wrote it can read it.` |
+| Share line | The school's share line without its `The judge's note: {verdict_line}.` sentence |
+
 ## 7. Objection and revise (mockup 05)
 
 | Element | Copy |

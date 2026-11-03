@@ -11,6 +11,7 @@ import { Page } from "@/components/layout/Page";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate, shortMotionForShare } from "@/lib/motion-text";
+import { withoutJudgesNote } from "@/lib/verdict-share";
 
 export const metadata = { title: "Verdict · Sophecs" };
 
@@ -58,21 +59,31 @@ export default async function VerdictPage({
   let isOwner = false;
   let argument: string | null = publicRow.argument;
   let argumentPublic = Boolean(publicRow.argument);
+  // debates_public withholds every verdict field that can quote a private
+  // argument (migration 0018), so the author reads their own verdict from
+  // `debates`, through the same row level security that decides ownership.
+  let ownVerdict: unknown = null;
 
   if (user) {
     // RLS ("debates read own") only returns a row here if this user
     // actually owns it — the sole signal used to decide ownership.
     const { data: ownRow } = await supabase
       .from("debates")
-      .select("argument, argument_public")
+      .select("argument, argument_public, verdict")
       .eq("id", debateId)
       .maybeSingle();
     if (ownRow) {
       isOwner = true;
       argument = ownRow.argument;
       argumentPublic = ownRow.argument_public;
+      ownVerdict = ownRow.verdict;
     }
   }
+
+  // Someone other than the author, on a private argument. The page
+  // withholds the judge's words itself rather than relying on the view
+  // alone, so it says the same thing whichever side of 0018 it runs on.
+  const textWithheld = !isOwner && !argumentPublic;
 
   const isRevision = publicRow.kind === "revision";
 
@@ -127,7 +138,7 @@ export default async function VerdictPage({
 
   const school = publicRow.school as SchoolId;
   const afterLesson = getMicroLesson(topic.micro_after);
-  const verdict = publicRow.verdict as VerdictData;
+  const verdict = (isOwner && ownVerdict ? ownVerdict : publicRow.verdict) as VerdictData;
   const eloDelta =
     publicRow.elo_before != null && publicRow.elo_after != null
       ? Math.round(Number(publicRow.elo_after) - Number(publicRow.elo_before))
@@ -157,7 +168,10 @@ export default async function VerdictPage({
   // a reword, and this page is the one that used to say the wrong thing.
   const motion = motionForDebate(storedMotion?.motion_text as string | null, topic.motion);
   const shortMotion = shortMotionForShare(motion);
-  const baseShareLine = schoolContent.verdict_share_line
+  const shareTemplate = textWithheld
+    ? withoutJudgesNote(schoolContent.verdict_share_line)
+    : schoolContent.verdict_share_line;
+  const baseShareLine = shareTemplate
     .replaceAll("{score}", String(verdict.score ?? ""))
     .replaceAll("{topic}", shortMotion)
     .replaceAll("{verdict_line}", verdict.verdict_line ?? "")
@@ -209,6 +223,7 @@ export default async function VerdictPage({
         hasRevision={revisionId}
         comparison={comparison}
         counterpart={counterpart}
+        textWithheld={textWithheld}
       />
     </Page>
   );

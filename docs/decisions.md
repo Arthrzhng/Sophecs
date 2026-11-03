@@ -1760,3 +1760,187 @@ change to how the limit works, so Arthur's to choose (d):
 **Decide before the Winchester pilot.** Until then the cap stays as it is:
 it can cost a reader an extra slot on the rare retried submission, and it
 cannot be run up.
+
+### The public views were writable (migration 0016)
+
+Found on 2026-11-03 while preparing Stage 2, and reported to Arthur at
+once under the brief's STOP NOW rule. Nothing recent caused it.
+
+**The hole.** The four views that serve public pages, `debates_public`,
+`exchanges_public`, `profiles_public` and `public_results`, are owned by
+`postgres`, which bypasses row level security, and run with their owner's
+rights. Supabase's default privileges had given `anon` and `authenticated`
+every privilege on them, not just SELECT, and each is a simple view that
+Postgres treats as updatable. So anyone holding the anon key, which ships
+in the site's JavaScript as it must, could in principle have updated or
+deleted any user's debate score, verdict and Elo columns, profile row and
+quiz result through the API.
+
+**Evidence, read-only.** The catalogue (`information_schema.role_table_grants`,
+`is_updatable`, the owner's `rolbypassrls`); the security advisor, which
+reported all four as ERROR "Security Definer View"; the app code, which
+only ever reads these views; and the API logs, which keep 24 hours on this
+plan and showed 25 requests in that window, all reads by our own server.
+A zero-row UPDATE on `debates_public` as `anon`, inside a rolled-back
+transaction, ran without a permission error before the fix.
+
+**The fix, Arthur's yes of 2026-11-03.** `0016_public_views_read_only.sql`
+revokes INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES and TRIGGER on the
+four views from `anon` and `authenticated`, and revokes EXECUTE on
+`is_class_member` and `is_class_owner` from `public` and `anon` (no
+signed-out page calls them). Tested first on local Postgres carrying
+production's grants (`scripts/test-0016-view-grants.sh`, 156 checks over
+the hole, the fix, the rollback and a re-apply; a weakened migration fails
+52). The pre-fix grants are in
+`docs/seed-snapshots/2026-11-03-public-view-grants.json`, which the
+rollback restores exactly.
+
+**Read back after applying.** `has_table_privilege` shows SELECT kept and
+every write privilege gone for both roles on all four views, and
+`service_role` unchanged; `has_function_privilege` shows `anon` can no
+longer execute the class helpers and `authenticated` still can. The same
+zero-row UPDATE as `anon`, and a zero-row INSERT on `profiles_public`, now
+fail with "permission denied". A zero-row DELETE probe as `authenticated`
+was attempted through the Supabase tool, which asked for confirmation and
+timed out without running; Arthur ruled that the read-back is enough and
+no further DELETE-shaped probe is sent.
+
+**Advisor before and after.** Before: four `security_definer_view`
+ERRORs, and the class helpers flagged as executable by `anon`. After 0016:
+the same four ERRORs, which are about the views' definer property and not
+their grants, and no `anon` warning on the class helpers. No new ERROR.
+
+### A read-only check for earlier tampering
+
+Arthur asked for it on 2026-11-03, since the 24-hour log window cannot
+show whether the hole was used before. Everything below was read, nothing
+written.
+
+- **Debates.** One row, `jjSZVZFBmu`, a v1 verdict on `opaque-benefit`,
+  argument private. Its stored score, 68, equals the verdict's score, and
+  its `prompt_version` and `rejected` match the verdict. Its Elo move,
+  1200 to 1206, is exactly `soloElo(1200, 1200, 68)` from
+  `src/lib/elo.ts` with the topic's par of 1200, and its author's profile
+  Elo is 1206.
+- **Quiz results.** All 28 recompute exactly from their stored answers,
+  using the option weights in `content/quiz/questions.ts`: vector (largest
+  difference 2e-16), school and secondary all match, and every answer set
+  is ten known options. A first attempt with weights typed from memory
+  showed 28 mismatches; the weights generated from the file showed none.
+  That is why the check reads the file rather than a hand copy.
+- **Row counters** since the statistics reset of 2026-08-25: deletes are
+  2 on `quiz_results`, 2 on `debates` and 1 on `exchanges`. This file
+  records test rows inserted and deleted again during the RLS checks
+  ("Infrastructure" and "RLS, verified three ways"). The counters are
+  consistent with those cleanups; they cannot be tied to them one by one.
+
+**No sign of tampering.** The limit of the method: an edit that changed a
+debate's score, verdict and Elo together, consistently, would pass the
+debate check. The quiz check has no such gap, since answers and vector
+would both have to be rewritten to agree.
+
+### What each public view exposes on SELECT
+
+Report only, at Arthur's request of 2026-11-03, after 0016.
+
+| View | Columns | Who can read | Read by the app |
+| --- | --- | --- | --- |
+| `debates_public` | id, topic, school, score, verdict, Elo before and after, created, kind, parent, argument only when published | anon, authenticated | verdict page, OG image |
+| `profiles_public` | every user's id, handle, display name, school, Elo, streak, join date | anon, authenticated until 0017 | nothing |
+| `exchanges_public` | id, topic, both schools, both debate ids, created; only exchanges complete and published by both sides | anon, authenticated | nothing |
+| `public_results` | quiz result id, school, secondary, vector, challenge source, created | anon, authenticated | `/r/[id]`, its OG image and card, `/c/[id]` |
+
+Two findings came out of it, both ruled on by Arthur the same day and
+recorded below: `profiles_public` listed every user and nothing read it,
+and `debates_public` returned the whole verdict on a private argument.
+
+### `profiles_public` cannot be read from the API (migration 0017)
+
+Arthur's ruling of 2026-11-03: "the app never reads it, and the site
+promises names are never shown. Revoke SELECT from anon and
+authenticated. If anything does read it, stop and tell me instead."
+Before writing the migration, the repository (pages, scripts, tests) and
+the database (`pg_depend` on views and functions) were searched for a
+reader; there is none.
+
+`0017_profiles_public_no_select.sql` revokes SELECT from `anon` and
+`authenticated`. The view stays, so the admin client could still use it.
+Applied and read back: both roles have no privilege left on it,
+`service_role` and `postgres` unchanged. The advisor's ERRORs went from
+four to three, since it no longer counts a view the API cannot reach.
+
+### The judge quotes arguments (migration 0018)
+
+**Rule for any future public surface: a verdict is the argument's text in
+pieces.** The judge quotes the argument it is judging, in every free-text
+field. Any page, image, export, API or view that shows a verdict to anyone
+other than its author has to treat the verdict's text with the argument's
+own privacy.
+
+The measurement, `scripts/measure-verdict-quoting.mjs`, over five golden
+runs on `tests/judge/golden/`, 269 judged samples (the run of 2026-11-03
+18:15 passed by path, since its file is not yet on `main`):
+
+| Field | Has a quoted span | Shares four words in a row with the argument |
+| --- | --- | --- |
+| `verdict_line` | 17 | 10 |
+| `strongest_move` | 78 | 118 |
+| `weakest_move` | 187 | 71 |
+| `a_stronger_version_would` | 48 | 12 |
+| `unanswered_objection.claim` | 38 | 5 |
+| `unanswered_objection.why_it_stands` | 36 | 7 |
+
+Both counts overstate quotation: the first also counts a school's own
+terms in quotation marks, the second stock phrases. The examples settle
+it. `verdict_line` on `util-obscure-source`: "hiding behind 'the service
+should say which it has.'"; `weakest_move` on `stoic-wrong-school`:
+"Explicitly defines wisdom as 'maximize placements across the whole
+population,'". An earlier count of 344 samples, given in conversation,
+counted one run twice; 269 is correct.
+
+Arthur's ruling of 2026-11-03: for rows whose argument is not public,
+return NULL for every verdict field that can quote the argument; keep
+score and criteria scores, and `verdict_line` only if it cannot quote. It
+can, so it goes too. `0018_debates_public_private_verdict_text.sql` sets
+to JSON null, where present, `strongest_move`, `weakest_move`,
+`a_stronger_version_would`, `verdict_line`, `improvement_note`,
+`rejection_reason`, and the objection's `claim` and `why_it_stands`. It
+keeps `rejected`, `score`, `fidelity`, `rigor`, `engagement`,
+`objection_answered`, `prompt_version` and the objection's `school`. A
+published argument's verdict, and a null verdict, are unchanged. Tested on
+local Postgres (`scripts/test-0017-0018-public-views.sh`, 87 checks,
+rollback and re-apply included). The definition it replaces is in
+`docs/seed-snapshots/2026-11-03-debates-public-before-0018.json`.
+
+**The page goes first.** The verdict page now withholds the judge's words
+from anyone but the author when the argument is private, whatever the view
+returns, and reads the author's own full verdict from `debates` through
+row level security. So the page is right before 0018 and after it, and
+0018 is applied only once that code is live. What a reader other than the
+author sees is in `docs/daily-path-copy.md`, "A verdict on a private
+argument, seen by someone else": the score and the three criteria, a note
+saying why the rest is withheld, and the school whose objection was left
+standing. The share line drops its "The judge's note:" sentence for them
+(`src/lib/verdict-share.ts`). The OG image reads only school, score and
+topic, so 0018 does not touch it.
+
+### For Checkpoint A, from the security work
+
+- **Leaked-password protection** is off, and the advisor warns about it.
+  Supabase's password-security guide says: "Leaked password protection is
+  available on the Pro Plan and above." The project is on the free plan.
+  Sophecs signs people in with an email link or Google and asks for no
+  password (`src/components/auth/LoginForm.tsx`), so the protection would
+  only matter if password sign-up is reachable through the Auth API; that
+  setting has not been checked.
+- **The three remaining `security_definer_view` ERRORs.** Closing them
+  means making the views `security_invoker` and moving what they hide into
+  row level security policies on the tables, a redesign rather than a
+  revoke.
+- **`is_class_member` and `is_class_owner`** remain executable by any
+  signed-in user, which the advisor warns about. They cannot simply be
+  revoked: the select policies on `classes` and `class_members`
+  (`0013_classes.sql`) call them as the signed-in user, so a revoke would
+  break class pages. Moving them out of the API's schema is the usual fix.
+- **`exchanges_public`** is readable and unused. Kept, since it is meant
+  to be public and exposes nothing private.
