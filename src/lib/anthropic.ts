@@ -355,14 +355,35 @@ export async function logAiCall(params: {
  * the cap stops counting them. Errors are reported, not thrown: the reader
  * is already being told judging failed, and a failure here costs them a
  * cap slot rather than the message.
+ *
+ * Returns whether the calls are out of the cap, true when there were none
+ * to take out, so the reader is only told the attempt did not use one of
+ * their arguments when that is so.
  */
-export async function excludeFromDailyCap(ids: string[]): Promise<void> {
-  if (ids.length === 0) return;
+export async function excludeFromDailyCap(ids: string[]): Promise<boolean> {
+  if (ids.length === 0) return true;
   const admin = createAdminClient();
   const { error } = await admin.from("ai_calls").update({ counts_toward_cap: false }).in("id", ids);
   if (error) {
     console.error(`[ai_calls] failed to take ${ids.length} call(s) out of the daily cap:`, error.message);
+    return false;
   }
+  return true;
+}
+
+// The errors judgeDebate threw after taking the submission's calls out of
+// the daily cap. A set beside the error rather than a field on it, so the
+// error the caller logs is exactly the one that was thrown.
+const TAKEN_OFF_CAP = new WeakSet<object>();
+
+/**
+ * Whether a submission that judgeDebate failed was taken out of the daily
+ * cap. False for an error judgeDebate did not throw, and for one whose
+ * calls could not be taken out: /api/judge then leaves out the sentence
+ * that says the attempt did not use one of the reader's arguments.
+ */
+export function wasTakenOffDailyCap(err: unknown): boolean {
+  return typeof err === "object" && err !== null && TAKEN_OFF_CAP.has(err);
 }
 
 // Used by /api/judge: calls the model and logs the call in one step, tied
@@ -377,7 +398,8 @@ export async function excludeFromDailyCap(ids: string[]): Promise<void> {
 // submission that ends without one, every reply failing validation or the
 // API failing, has its calls taken out of the cap (Arthur's ruling of
 // 2026-11-03): the reader is told it did not use one of their arguments,
-// and that has to be true. Each failed reply's row carries why it failed.
+// and only when that is true (wasTakenOffDailyCap). Each failed reply's
+// row carries why it failed.
 export async function judgeDebate(params: {
   motion: string;
   school: SchoolId;
@@ -406,7 +428,8 @@ export async function judgeDebate(params: {
       }
     );
   } catch (err) {
-    await excludeFromDailyCap(logged);
+    const offCap = await excludeFromDailyCap(logged);
+    if (offCap && typeof err === "object" && err !== null) TAKEN_OFF_CAP.add(err);
     throw err;
   }
 }

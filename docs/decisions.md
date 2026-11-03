@@ -1792,8 +1792,17 @@ How it was carried out:
    sends it with `reason: "judging_failed"`, and the argue screen shows it
    in place of the generic "The judge could not be reached." "Turn" is
    "argument" because the daily-cap notice on that screen already says
-   "argument". Both sentences are true by construction, and
-   `tests/judging-failed.test.ts` holds them so.
+   "argument". Each sentence is shown only when it is true, and
+   `tests/judging-failed.test.ts` holds them so. "Your argument is saved":
+   the route saves it on the debate row before calling the judge, and when
+   it is updating an earlier unjudged try's row and that update fails, it
+   stops with "Your argument could not be saved, so nothing was sent to
+   the judge. Try again." rather than have the judge score text the row
+   does not hold. "Did not use one of today's arguments": the route sends
+   `offCap`, true only when `judgeDebate` took the submission's calls out
+   of the cap; when that update failed, the screen shows `Your argument is
+   saved. Try again.` instead. Review pass 3 found that both had been
+   claimed "by construction" while neither failure was handled.
 3. **Not counted against the cap.** Migration 0019 adds
    `ai_calls.counts_toward_cap`, true by default, so every existing row
    counts as it did. When a submission ends without a verdict, whether
@@ -1830,15 +1839,34 @@ counts once per call. One that needed retries uses two or three of the
 reader's five, the open pre-pilot item above, which stays Arthur's. Every
 billed call still counts toward the monthly budget.
 
+**One case it does not cover.** If Vercel stops the function partway
+(the route's `maxDuration` is 60 seconds), the calls already logged stay
+in the cap and the reader sees the generic "The judge could not be
+reached.", which makes no claim about the cap. Three calls came to about
+20 seconds at the slowest call measured, so this should be rare.
+
 **The risk it accepts, for Checkpoint A.** Failed submissions no longer
 move the cap. An argument whose replies always fail validation can
 therefore be sent again and again, at up to three calls a time (about
 $0.04, at the $0.0148 a call the 21:35 v3 golden run averaged, in the run
-file named above; production's v2 prompt is shorter), with nothing but the
-monthly budget to stop it. That budget, `AI_MONTHLY_BUDGET_USD`, pauses
-judging for every reader when it is reached. This is the trade the
-pre-pilot item described. A second, higher ceiling on calls per reader
-per day would close it, and that is a rate limit, so Arthur's.
+file named above; production's v2 prompt is shorter). The only other stop
+is meant to be the monthly budget, `AI_MONTHLY_BUDGET_USD`, which pauses
+judging for every reader when it is reached. A second, higher ceiling on
+calls per reader per day would close it, and that is a rate limit, so
+Arthur's.
+
+**And the budget does not hold as written.** Review pass 3 found, and a
+read of `src/lib/budget.ts` confirms, that `getMonthlySpend` sums
+`cost_usd` over a select with no range, so it adds up at most the rows
+the Data API returns in one response (Supabase's default is 1000; the
+project's own setting was not read), and it reads a query error as a
+spend of zero. Past that many calls in a month the budget cannot be
+reached, and an error waves judging through. Production holds one
+`ai_calls` row today, so nothing is at risk yet. Fixing it changes how
+the budget is enforced, which is Arthur's under (d): summing in the
+database, and failing closed on an error as the daily cap now does, is
+the proposed patch, for Checkpoint A. Nothing in this pull request
+depends on it.
 
 ### The public views were writable (migration 0016)
 

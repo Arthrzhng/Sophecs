@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { newId } from "@/lib/ids";
-import { judgeDebate, JudgeValidationError, PROMPT_VERSION } from "@/lib/anthropic";
+import { judgeDebate, JudgeValidationError, PROMPT_VERSION, wasTakenOffDailyCap } from "@/lib/anthropic";
 import { isBudgetExceeded } from "@/lib/budget";
 import { soloElo } from "@/lib/elo";
 import { applyStreakDay, isStreakEligible } from "@/lib/streak";
@@ -11,7 +11,13 @@ import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
 import { MIN_ARGUMENT_WORDS, MAX_ARGUMENT_WORDS, wordCount } from "@/lib/debate-limits";
 import { hasFidelityCriteria } from "@/lib/judge/rubric";
 import { motionForDebate } from "@/lib/motion-text";
-import { JUDGING_FAILED_BODY, JUDGING_FAILED_REASON, JUDGING_FAILED_TITLE } from "@/lib/judging-failed";
+import {
+  ARGUMENT_NOT_SAVED,
+  JUDGING_FAILED_BODY,
+  JUDGING_FAILED_BODY_COUNTED,
+  JUDGING_FAILED_REASON,
+  JUDGING_FAILED_TITLE,
+} from "@/lib/judging-failed";
 import type { SchoolId } from "@/lib/types";
 
 // A submission whose replies fail validation is retried up to twice
@@ -278,7 +284,17 @@ export async function POST(request: Request) {
       return paused("already_revised");
     }
   } else if (reuse.argument !== body.argument) {
-    await admin.from("debates").update({ argument: body.argument }).eq("id", debateId);
+    // Checked, because the judge scores body.argument: a failed save would
+    // store its verdict beside text it never read, and the failure copy
+    // tells the reader their argument is saved.
+    const { error: saveError } = await admin
+      .from("debates")
+      .update({ argument: body.argument })
+      .eq("id", debateId);
+    if (saveError) {
+      console.error(`[judge] argument for ${debateId} could not be saved:`, saveError.message);
+      return NextResponse.json({ ok: false, error: ARGUMENT_NOT_SAVED }, { status: 500 });
+    }
   }
 
   // The model is shown the original and the objection it is meant to answer,
@@ -316,11 +332,15 @@ export async function POST(request: Request) {
     // Each failed reply's ai_calls row also carries its validation error.
     const detail = err instanceof JudgeValidationError ? err.message : String(err);
     console.error(`[judge] submission ${debateId} ended without a verdict:`, detail);
+    // Whether its calls came out of the daily cap. When they did not, the
+    // reader is not told the attempt did not use one of their arguments.
+    const offCap = wasTakenOffDailyCap(err);
     return NextResponse.json(
       {
         ok: false,
         reason: JUDGING_FAILED_REASON,
-        error: `${JUDGING_FAILED_TITLE} ${JUDGING_FAILED_BODY}`,
+        offCap,
+        error: `${JUDGING_FAILED_TITLE} ${offCap ? JUDGING_FAILED_BODY : JUDGING_FAILED_BODY_COUNTED}`,
       },
       { status: 502 }
     );

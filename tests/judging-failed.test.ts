@@ -1,7 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, it, expect } from "vitest";
-import { JUDGING_FAILED_BODY, JUDGING_FAILED_REASON, JUDGING_FAILED_TITLE } from "../src/lib/judging-failed";
+import {
+  ARGUMENT_NOT_SAVED,
+  JUDGING_FAILED_BODY,
+  JUDGING_FAILED_BODY_COUNTED,
+  JUDGING_FAILED_REASON,
+  JUDGING_FAILED_TITLE,
+} from "../src/lib/judging-failed";
 
 // Arthur's ruling of 2026-11-03: when every judge reply fails, the reader
 // sees a clear message that judging failed, that it did not use one of
@@ -25,7 +31,15 @@ describe("the copy", () => {
     );
     expect(doc).toContain(`| Title | \`${JUDGING_FAILED_TITLE}\` |`);
     expect(doc).toContain(`| Body | \`${JUDGING_FAILED_BODY}\` |`);
-    expect(JUDGING_FAILED_TITLE + JUDGING_FAILED_BODY).not.toMatch(/[–—]/);
+    expect(doc).toContain(
+      `| Body, when the calls could not be taken out of the cap | \`${JUDGING_FAILED_BODY_COUNTED}\` |`
+    );
+    expect(doc.replace(/\s+/g, " ")).toContain(`\`${ARGUMENT_NOT_SAVED}\``);
+    // The fallback makes no claim about the cap.
+    expect(JUDGING_FAILED_BODY_COUNTED).not.toMatch(/today|argument[s]? for|cap/i);
+    for (const copy of [JUDGING_FAILED_TITLE, JUDGING_FAILED_BODY, JUDGING_FAILED_BODY_COUNTED, ARGUMENT_NOT_SAVED]) {
+      expect(copy).not.toMatch(/[–—]/);
+    }
   });
 });
 
@@ -41,7 +55,12 @@ describe("/api/judge", () => {
     const start = route.indexOf("judged = await judgeDebate(");
     const handler = route.slice(start, route.indexOf("const { verdict } = judged;", start));
     expect(handler).toContain("reason: JUDGING_FAILED_REASON");
-    expect(handler).toContain("error: `${JUDGING_FAILED_TITLE} ${JUDGING_FAILED_BODY}`");
+    // The cap sentence only when the calls really came out of the cap.
+    expect(handler).toContain("const offCap = wasTakenOffDailyCap(err);");
+    expect(handler).toContain(
+      "error: `${JUDGING_FAILED_TITLE} ${offCap ? JUDGING_FAILED_BODY : JUDGING_FAILED_BODY_COUNTED}`"
+    );
+    expect(handler).toMatch(/\boffCap,\n/);
     expect(handler).toContain("{ status: 502 }");
     // Logged in production as well, not only in development.
     expect(handler).toContain("console.error(");
@@ -53,6 +72,15 @@ describe("/api/judge", () => {
     expect(route.indexOf('admin.from("debates").insert(')).toBeGreaterThan(-1);
     expect(route.indexOf('admin.from("debates").insert(')).toBeLessThan(judged);
     expect(route.indexOf('.update({ argument: body.argument })')).toBeLessThan(judged);
+  });
+
+  it("stops before the judge when an earlier try's row cannot take the new text", () => {
+    const flat = route.replace(/\s+/g, " ");
+    const save = flat.indexOf('.update({ argument: body.argument }) .eq("id", debateId); if (saveError) {');
+    expect(save, "the save is checked").toBeGreaterThan(-1);
+    const refuse = flat.indexOf("error: ARGUMENT_NOT_SAVED", save);
+    expect(refuse).toBeGreaterThan(save);
+    expect(refuse).toBeLessThan(flat.indexOf("judged = await judgeDebate("));
   });
 });
 
@@ -101,6 +129,10 @@ describe("the argue screen", () => {
     expect(check).toBeLessThan(editor.indexOf("if (!response.ok || !response.debateId)"));
     const block = editor.slice(editor.indexOf('status.kind === "judging_failed" && ('));
     expect(block.slice(0, 500)).toContain("title={JUDGING_FAILED_TITLE}");
-    expect(block.slice(0, 500)).toContain("body={JUDGING_FAILED_BODY}");
+    expect(block.slice(0, 500)).toContain(
+      "body={status.offCap ? JUDGING_FAILED_BODY : JUDGING_FAILED_BODY_COUNTED}"
+    );
+    // A response without the flag does not earn the cap sentence.
+    expect(editor).toContain('setStatus({ kind: "judging_failed", offCap: response.offCap === true });');
   });
 });

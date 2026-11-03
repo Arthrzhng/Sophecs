@@ -15,6 +15,8 @@ const created: Record<string, unknown>[] = [];
 const replies: Array<string | Error> = [];
 const inserted: Record<string, unknown>[] = [];
 const updated: Array<{ table: string; values: Record<string, unknown>; column: string; ids: unknown[] }> = [];
+// Set to make the next ai_calls update fail, as a lost connection would.
+let updateFails = false;
 
 vi.mock("@anthropic-ai/sdk", () => {
   class MockAnthropic {
@@ -46,15 +48,21 @@ vi.mock("@/lib/supabase/admin", () => ({
       update: (values: Record<string, unknown>) => ({
         in: async (column: string, ids: unknown[]) => {
           updated.push({ table, values, column, ids: [...ids] });
-          return { error: null };
+          return { error: updateFails ? { message: "connection lost" } : null };
         },
       }),
     }),
   }),
 }));
 
-const { judgeDebate, judgeWithRetries, callJudgeModel, JudgeValidationError, MAX_JUDGE_ATTEMPTS } =
-  await import("../src/lib/anthropic");
+const {
+  judgeDebate,
+  judgeWithRetries,
+  callJudgeModel,
+  JudgeValidationError,
+  MAX_JUDGE_ATTEMPTS,
+  wasTakenOffDailyCap,
+} = await import("../src/lib/anthropic");
 const { VerdictSchema } = await import("../src/lib/judge/schema");
 
 const words = (n: number) => Array.from({ length: n }, (_, i) => `word${i + 1}`).join(" ");
@@ -95,6 +103,7 @@ beforeEach(() => {
   replies.length = 0;
   inserted.length = 0;
   updated.length = 0;
+  updateFails = false;
 });
 
 describe("judgeDebate retries a reply that fails validation, up to twice", () => {
@@ -245,6 +254,37 @@ describe("judgeDebate retries a reply that fails validation, up to twice", () =>
     expect(updated).toEqual([
       { table: "ai_calls", values: { counts_toward_cap: false }, column: "id", ids: [inserted[0].id] },
     ]);
+  });
+});
+
+describe("whether a failed submission came out of the daily cap", () => {
+  it("says so when every reply failed and the rows were taken out", async () => {
+    replies.push(OVER_CAP, OVER_CAP, OVER_CAP);
+    const failure = await judgeDebate(PARAMS).catch((err: unknown) => err);
+    expect(failure).toBeInstanceOf(JudgeValidationError);
+    expect(wasTakenOffDailyCap(failure)).toBe(true);
+  });
+
+  it("says not when the update that takes them out fails, so the reader is not told it", async () => {
+    updateFails = true;
+    replies.push(OVER_CAP, OVER_CAP, OVER_CAP);
+    const failure = await judgeDebate(PARAMS).catch((err: unknown) => err);
+    expect(failure).toBeInstanceOf(JudgeValidationError);
+    expect(updated).toHaveLength(1);
+    expect(wasTakenOffDailyCap(failure)).toBe(false);
+  });
+
+  it("says so for an API error before anything was logged: nothing counts", async () => {
+    replies.push(new Error("529 overloaded"));
+    const failure = await judgeDebate(PARAMS).catch((err: unknown) => err);
+    expect(inserted).toHaveLength(0);
+    expect(wasTakenOffDailyCap(failure)).toBe(true);
+  });
+
+  it("is false for an error judgeDebate did not throw", () => {
+    expect(wasTakenOffDailyCap(new Error("elsewhere"))).toBe(false);
+    expect(wasTakenOffDailyCap("a string")).toBe(false);
+    expect(wasTakenOffDailyCap(null)).toBe(false);
   });
 });
 

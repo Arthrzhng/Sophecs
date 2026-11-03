@@ -67,8 +67,16 @@ entry names.
   debate in the previous 10 minutes, no other active database session,
   and a snapshot of the table in
   `docs/seed-snapshots/2026-11-03-ai-calls-before-0019.json`. Local test
-  `scripts/test-0019-ai-calls-cap.sh`, 17 checks, forward and rollback,
+  `scripts/test-0019-ai-calls-cap.sh`, 16 checks, forward and rollback,
   passed again just before. Read back: both columns present with the
   intended type and default, the one existing row still counts toward
   the cap with its cost unchanged, row level security unchanged.
   Security advisor before and after: the same findings.
+- #52 review: three passes by a fresh reviewer. Pass 3 found that the two
+  claims in the failure copy were not guaranteed (a failed cap update or
+  a failed save of the new text went unchecked); both are now checked and
+  the copy follows them, and each fix was broken on purpose and caught by
+  a test. It also found that the monthly budget cannot be relied on past
+  about 1000 calls a month and fails open on an error; that is Arthur's
+  under (d) and is written up in `docs/decisions.md` for Checkpoint A.
+  Gates on the final head: the five, 514 tests, `check:bundle`.
