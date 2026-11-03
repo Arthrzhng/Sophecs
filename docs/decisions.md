@@ -1760,3 +1760,58 @@ change to how the limit works, so Arthur's to choose (d):
 **Decide before the Winchester pilot.** Until then the cap stays as it is:
 it can cost a reader an extra slot on the rare retried submission, and it
 cannot be run up.
+
+### Two retries, and a failed submission does not use an argument
+
+Arthur's ruling of 2026-11-03, after the second v3 run of that day left one
+sample without a verdict when its retry also ran over the verdict_line cap:
+
+> verdict_line: allow up to two retries. If both fail, the student sees a
+> clear "judging failed, this did not use your turn, try again" message,
+> the attempt does not count against the daily cap, and it is logged.
+
+How it was carried out:
+
+1. **Three calls at most.** `judgeWithOneRetry` becomes `judgeWithRetries`
+   in `src/lib/anthropic.ts`, with `MAX_JUDGE_ATTEMPTS = 3`. The same
+   request is sent each time, so the six request fixtures still describe
+   every call, and a reply is never cut down to fit. The golden runner
+   takes its samples through the same function, so a run measures what
+   readers meet; run files from now on can hold attempts 1 to 3.
+2. **The message.** `Judging failed.` / `This did not use one of today's
+   arguments, and your argument is saved. Try again.`, in
+   `src/lib/judging-failed.ts` and `docs/daily-path-copy.md`. The route
+   sends it with `reason: "judging_failed"`, and the argue screen shows it
+   in place of the generic "The judge could not be reached." "Turn" is
+   "argument" because the daily-cap notice on that screen already says
+   "argument". Both sentences are true by construction, and
+   `tests/judging-failed.test.ts` holds them so.
+3. **Not counted against the cap.** Migration 0019 adds
+   `ai_calls.counts_toward_cap`, true by default, so every existing row
+   counts as it did. When a submission ends without a verdict, whether
+   every reply failed validation or the API failed partway, `judgeDebate`
+   sets it to false on that submission's rows, and the route's cap query
+   counts only rows where it is true. A column, because nothing in a row
+   said how its submission ended. "Rows whose debate has a verdict" would
+   not do: the route reuses an unjudged debate row on the next try, so a
+   later success would bring the earlier failure back into the count.
+4. **Logged.** Each failed reply's ai_calls row carries the validator's
+   summary in `validation_error`, also added by 0019. It names the field
+   and cap, never the reply's or the argument's text. The route also writes
+   a failed submission to the production log; until now it logged only
+   outside production.
+
+**What it does not change.** A submission that ends with a verdict still
+counts once per call. One that needed retries uses two or three of the
+reader's five, the open pre-pilot item above, which stays Arthur's. Every
+billed call still counts toward the monthly budget.
+
+**The risk it accepts, for Checkpoint A.** Failed submissions no longer
+move the cap. An argument whose replies always fail validation can
+therefore be sent again and again, at up to three calls a time (about
+$0.04, at the $0.0148 a call the 21:35 v3 golden run averaged; production's
+v2 prompt is shorter), with nothing but the
+monthly budget to stop it. That budget, `AI_MONTHLY_BUDGET_USD`, pauses
+judging for every reader when it is reached. This is the trade the
+pre-pilot item described. A second, higher ceiling on calls per reader
+per day would close it, and that is a rate limit, so Arthur's.

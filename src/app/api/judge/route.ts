@@ -11,17 +11,20 @@ import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
 import { MIN_ARGUMENT_WORDS, MAX_ARGUMENT_WORDS, wordCount } from "@/lib/debate-limits";
 import { hasFidelityCriteria } from "@/lib/judge/rubric";
 import { motionForDebate } from "@/lib/motion-text";
+import { JUDGING_FAILED_BODY, JUDGING_FAILED_REASON, JUDGING_FAILED_TITLE } from "@/lib/judging-failed";
 import type { SchoolId } from "@/lib/types";
 
-// A submission whose first reply fails validation waits for a second call
-// (judgeWithOneRetry in src/lib/anthropic.ts), so it can take two model
-// calls, about 11 to 13 seconds at golden-run latencies. The project's own
-// limit was not readable from here; this sets it rather than assume it.
-// 60 is within every plan's maximum. A function stopped mid-retry would
-// fail the reader and leave a billed call out of ai_calls.
+// A submission whose replies fail validation is retried up to twice
+// (judgeWithRetries in src/lib/anthropic.ts), so it can take three model
+// calls. The slowest of 153 golden-run calls on 2026-11-03 took 6.6
+// seconds, so three come to about 20. The project's own limit was not
+// readable from here; this sets it rather than assume it. 60 is within
+// every plan's maximum, and Arthur ruled to keep it. A function stopped
+// mid-retry would fail the reader and leave a billed call out of ai_calls.
 export const maxDuration = 60;
 
 const DAILY_CAP = 5;
+
 const TOPIC_LOCK_DAYS = 7;
 const PAR_ELO_WINDOW = 50;
 
@@ -115,6 +118,11 @@ export async function POST(request: Request) {
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
       .eq("kind", "judge")
+      // A submission that ended without a verdict is not one of the
+      // reader's arguments (judgeDebate takes its calls out). Migration
+      // 0019 adds the column with a default of true, so every row written
+      // before it still counts.
+      .eq("counts_toward_cap", true)
       .gte("created_at", sinceDaily);
     if ((dailyCount ?? 0) >= DAILY_CAP) {
       return paused("daily_cap");
@@ -271,12 +279,18 @@ export async function POST(request: Request) {
       revisionOf: revisionContext ?? undefined,
     });
   } catch (err) {
+    // Logged in production too: Arthur asked for a submission that fails
+    // every attempt to be logged. The detail is the validator's summary or
+    // the API's error, which name a field or a status, never the argument.
+    // Each failed reply's ai_calls row also carries its validation error.
     const detail = err instanceof JudgeValidationError ? err.message : String(err);
-    if (process.env.NODE_ENV !== "production") {
-      console.error("[judge] model call failed:", detail);
-    }
+    console.error(`[judge] submission ${debateId} ended without a verdict:`, detail);
     return NextResponse.json(
-      { ok: false, error: "Judging failed. Your argument is saved. Try again." },
+      {
+        ok: false,
+        reason: JUDGING_FAILED_REASON,
+        error: `${JUDGING_FAILED_TITLE} ${JUDGING_FAILED_BODY}`,
+      },
       { status: 502 }
     );
   }

@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// The one retry Arthur ruled on 2026-11-03: a judge reply that fails
-// validation is sent again once, for every prompt version, each attempt
-// logged, and never truncated to fit.
+// The retries Arthur ruled on 2026-11-03: a judge reply that fails
+// validation is sent again, up to twice, for every prompt version, each
+// attempt logged with why it failed, and never truncated to fit. A
+// submission that ends without a verdict has its calls taken out of the
+// daily cap (the later ruling that day, with migration 0019).
 //
 // It drives the real judgeDebate and callJudgeModel against a mocked SDK
 // that hands back a queue of replies, and a mocked admin client that
@@ -12,6 +14,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const created: Record<string, unknown>[] = [];
 const replies: Array<string | Error> = [];
 const inserted: Record<string, unknown>[] = [];
+const updated: Array<{ table: string; values: Record<string, unknown>; column: string; ids: unknown[] }> = [];
 
 vi.mock("@anthropic-ai/sdk", () => {
   class MockAnthropic {
@@ -40,13 +43,18 @@ vi.mock("@/lib/supabase/admin", () => ({
         inserted.push({ table, ...row });
         return { error: null };
       },
+      update: (values: Record<string, unknown>) => ({
+        in: async (column: string, ids: unknown[]) => {
+          updated.push({ table, values, column, ids: [...ids] });
+          return { error: null };
+        },
+      }),
     }),
   }),
 }));
 
-const { judgeDebate, judgeWithOneRetry, callJudgeModel, JudgeValidationError } = await import(
-  "../src/lib/anthropic"
-);
+const { judgeDebate, judgeWithRetries, callJudgeModel, JudgeValidationError, MAX_JUDGE_ATTEMPTS } =
+  await import("../src/lib/anthropic");
 const { VerdictSchema } = await import("../src/lib/judge/schema");
 
 const words = (n: number) => Array.from({ length: n }, (_, i) => `word${i + 1}`).join(" ");
@@ -86,9 +94,14 @@ beforeEach(() => {
   created.length = 0;
   replies.length = 0;
   inserted.length = 0;
+  updated.length = 0;
 });
 
-describe("judgeDebate retries a reply that fails validation, once", () => {
+describe("judgeDebate retries a reply that fails validation, up to twice", () => {
+  it("allows three calls in all", () => {
+    expect(MAX_JUDGE_ATTEMPTS).toBe(3);
+  });
+
   it("still rejects a verdict_line over 20 words: the validator is unchanged", () => {
     const result = VerdictSchema.safeParse(JSON.parse(OVER_CAP));
     expect(result.success).toBe(false);
@@ -129,16 +142,49 @@ describe("judgeDebate retries a reply that fails validation, once", () => {
     expect(inserted[1].cost_usd).toBeCloseTo(0.006, 10);
   });
 
-  it("gives up after the second failure: two calls, two rows, the second failure thrown", async () => {
+  it("writes why a reply failed on its row, and nothing on a reply that validated", async () => {
+    replies.push(OVER_CAP, WITHIN_CAP);
+    await judgeDebate(PARAMS);
+
+    expect(inserted[0].validation_error).toBe("verdict_line: verdict_line exceeds 20 words");
+    expect(inserted[1]).not.toHaveProperty("validation_error");
+    // Neither the reply nor the argument reaches the log.
+    expect(JSON.stringify(inserted)).not.toContain("word21");
+    expect(JSON.stringify(inserted)).not.toContain(PARAMS.argument);
+  });
+
+  it("takes a third reply when the first two fail, and leaves every call in the cap", async () => {
     replies.push(OVER_CAP, OVER_CAP, WITHIN_CAP);
+    const judged = await judgeDebate(PARAMS);
+
+    expect(created).toHaveLength(3);
+    expect(JSON.stringify(created[2])).toBe(JSON.stringify(created[0]));
+    expect(inserted).toHaveLength(3);
+    expect(judged.verdict).toEqual(JSON.parse(WITHIN_CAP));
+    // A submission that ends with a verdict is one of the reader's
+    // arguments, so nothing is taken out of the cap.
+    expect(updated).toHaveLength(0);
+  });
+
+  it("gives up after the third failure, and takes all three calls out of the daily cap", async () => {
+    replies.push(OVER_CAP, OVER_CAP, OVER_CAP, WITHIN_CAP);
     const failure = await judgeDebate(PARAMS).catch((err: unknown) => err);
 
     expect(failure).toBeInstanceOf(JudgeValidationError);
     expect((failure as Error).message).toContain("verdict_line exceeds 20 words");
-    expect(created).toHaveLength(2);
-    expect(inserted).toHaveLength(2);
-    // The third reply was queued and never asked for.
+    expect(created).toHaveLength(3);
+    expect(inserted).toHaveLength(3);
+    // The fourth reply was queued and never asked for.
     expect(replies).toHaveLength(1);
+    // Billed, so still logged; but not one of the reader's arguments.
+    expect(updated).toEqual([
+      {
+        table: "ai_calls",
+        values: { counts_toward_cap: false },
+        column: "id",
+        ids: inserted.map((row) => row.id),
+      },
+    ]);
   });
 
   it("retries a reply that is not JSON at all", async () => {
@@ -154,6 +200,7 @@ describe("judgeDebate retries a reply that fails validation, once", () => {
     await judgeDebate(PARAMS);
     expect(created).toHaveLength(1);
     expect(inserted).toHaveLength(1);
+    expect(updated).toHaveLength(0);
   });
 
   it("does not retry a rejection, which is a valid reply", async () => {
@@ -169,21 +216,29 @@ describe("judgeDebate retries a reply that fails validation, once", () => {
     await expect(judgeDebate(PARAMS)).rejects.toThrow("529 overloaded");
     expect(created).toHaveLength(1);
     expect(inserted).toHaveLength(0);
+    // Nothing was logged, so nothing needs taking out of the cap.
+    expect(updated).toHaveLength(0);
   });
 
-  it("logs the failed first attempt even when the retry hits an API error", async () => {
+  it("logs the failed first attempt when a retry hits an API error, and takes it out of the cap", async () => {
     replies.push(OVER_CAP, new Error("529 overloaded"));
     await expect(judgeDebate(PARAMS)).rejects.toThrow("529 overloaded");
     expect(created).toHaveLength(2);
     expect(inserted).toHaveLength(1);
+    // The submission still ended without a verdict, so the reader is told
+    // it did not use one of their arguments, and the one billed call that
+    // was logged must not count either.
+    expect(updated).toEqual([
+      { table: "ai_calls", values: { counts_toward_cap: false }, column: "id", ids: [inserted[0].id] },
+    ]);
   });
 });
 
-describe("judgeWithOneRetry under v3, as the golden runner calls it", () => {
+describe("judgeWithRetries under v3, as the golden runner calls it", () => {
   it("retries a v3 reply and reports both attempts, the failure first", async () => {
     replies.push(OVER_CAP, WITHIN_CAP);
     const attempts: Array<{ attempt: number; error: string | null; hasVerdict: boolean }> = [];
-    const judged = await judgeWithOneRetry(
+    const judged = await judgeWithRetries(
       () => callJudgeModel(PARAMS.motion, PARAMS.school, PARAMS.argument, undefined, "v3"),
       async (a) => {
         attempts.push({ attempt: a.attempt, error: a.error, hasVerdict: a.verdict !== null });

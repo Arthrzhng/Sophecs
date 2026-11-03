@@ -282,6 +282,23 @@ they do not change it.
 Argue screen panel heading: `What the judge looks for`. Link under it:
 `Read the full rubric` → `/debate/rubric`.
 
+### Judging failed
+
+Shown on the argue screen when a submission ends without a verdict: the
+judge's reply failed validation on the first call and on both retries, or
+the judge's API failed. Arthur's ruling of 2026-11-03 asked for a clear
+"judging failed, this did not use your turn, try again". "Turn" is
+"argument" here because the daily-cap notice on the same screen already
+calls them that: `That is your last argument for today.` Both claims are true by construction: the argument is saved before
+the judge is called, and a failed submission's calls are taken out of the
+daily cap. Lives in `src/lib/judging-failed.ts`.
+
+| Element | Copy |
+|---|---|
+| Title | `Judging failed.` |
+| Body | `This did not use one of today's arguments, and your argument is saved. Try again.` |
+| Button | `Try again` (unchanged) |
+
 ## 7. Objection and revise (mockup 05)
 
 | Element | Copy |

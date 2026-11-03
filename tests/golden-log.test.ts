@@ -27,11 +27,11 @@ describe("production logging", () => {
 
   it("still writes every judged call to ai_calls", () => {
     const judgeDebate = anthropic.slice(anthropic.indexOf("export async function judgeDebate"));
-    // Every attempt, the one that failed validation included, reaches
-    // logAiCall as judgeWithOneRetry's logger. tests/judge-retry.test.ts
-    // proves that by counting the rows a retry writes; this guards the
+    // Every attempt, the ones that failed validation included, reaches
+    // logAiCall as judgeWithRetries's logger. tests/judge-retry.test.ts
+    // proves that by counting the rows the retries write; this guards the
     // wiring from the route's side.
-    expect(judgeDebate).toContain("judgeWithOneRetry(");
+    expect(judgeDebate).toContain("judgeWithRetries(");
     expect((judgeDebate.match(/logAiCall\(/g) ?? []).length).toBe(1);
   });
 
