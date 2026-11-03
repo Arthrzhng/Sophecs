@@ -103,7 +103,7 @@ tokens. A reviewer found it. The estimate is now computed per version:
   3,180 tokens in: **$0.0129** a call. Four bytes a token is a rule of
   thumb; a real count needs an API call. The run reports what was actually
   billed. Since 2026-11-03 the estimate also counts each case's criteria,
-  which under v3 are longer, and prints $0.0138 a call.
+  which under v3 are longer, and prints $0.0141 a call.
 
 | Run | Cases | Samples | Calls | Approximate cost |
 |---|---|---|---|---|
@@ -493,7 +493,7 @@ those.
 
 ---
 
-# Tier B: ten cases, written
+# Tier B: eleven cases, written
 
 Arthur approved the criteria on 2026-10-24 with changes, so these are
 written out and committed to `tests/judge/golden/` rather than described.
@@ -563,7 +563,10 @@ pupil. It argues the roles faithfully, holds the name of teacher to a
 teacher's work, and never meets the power the teacher holds over the
 pupil. It was written without the page's wording, and it does not tell
 the pupil not to question the teacher, for the reason given for
-`confucian-hierarchy` below.
+`confucian-hierarchy` below. Nor does it make the system the source of
+humaneness: the 3 Nov run marked `confucian-hierarchy` down for thinning
+ren to consistency, and a case that did the same could miss for that
+reason rather than the one it exists to test.
 
 `buddhist-intention-excuse` stays a fidelity failure rather than a
 known-weakness case, even though the school's page concedes the objection.

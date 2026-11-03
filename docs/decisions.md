@@ -1705,19 +1705,25 @@ How each was carried out:
 2. **`confucian-hierarchy-school`.** A twenty-fifth case, in
    `tests/judge/golden/`, with `confucian-hierarchy`'s bands: score 40-75,
    fidelity 7-10, engagement 0-4. A timetabling system, teacher over
-   pupil, 184 words. It argues what each side of the relationship owes,
+   pupil, 186 words. It argues what each side of the relationship owes,
    holds the name of teacher to a teacher's work, and never meets the
-   power the teacher holds; it uses none of the school page's wording.
+   power the teacher holds; it uses none of the school page's wording. Its
+   last sentences say the timetable makes nobody humane, so that it does
+   not thin ren to consistency, which is what the 3 Nov run marked
+   `confucian-hierarchy` down for; a miss for that reason would not test
+   the blind spot the case exists for.
    `docs/phase2-fixtures.md` describes it with the other Tier B cases.
 3. **`judge.v3.md`.** The section on the objection left standing gains a
    paragraph: each school's criteria end by naming the objection that
    school is best known for having to answer, and when the argument leaves
    it unmet it should normally be the one returned, voiced by whichever
-   listed school would press it hardest. The header records the change in
-   one sentence. `judge.v2.md` and the six request fixtures are unchanged.
-   `tests/judge-v3-and-refusal.test.ts` checks that the instruction is in
-   v3's objection section, before the list of schools, and not in v2;
-   weakening its wording fails that test.
+   listed rival school would press it hardest. The header records the
+   change in one sentence. `judge.v2.md` and the six request fixtures are
+   unchanged. `tests/judge-v3-and-refusal.test.ts` pins the paragraph
+   whole, in v3's objection section before the list of schools, once, and
+   absent from v2; removing it, weakening it, inverting its condition,
+   deleting its first sentence, moving it after the list or copying it
+   into v2 each fail that test.
 4. **The daily cap: not changed, recorded below as a pre-pilot item.**
 5. **`maxDuration = 60`.** Kept.
 
@@ -1731,7 +1737,9 @@ ends the day at six calls.
 
 Counting judged debates instead needs no schema change: `debates` has
 `user_id`, `created_at` and `verdict`, so "rows with a verdict created in
-the last 24 hours" is one query. It was not done, because on its own it
+the last 24 hours" is one query. It counts by when a row was inserted, not
+when it was judged, since `debates` has no `judged_at`: a row first
+inserted yesterday and judged today falls outside the window. It was not done, because on its own it
 stops counting calls that end without a verdict. A submission whose
 replies fail validation twice is billed for both calls and leaves its row
 unjudged, and the route reuses that row on the next try at the same
