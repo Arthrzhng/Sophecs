@@ -27,6 +27,7 @@ import { z } from "zod";
 import {
   callJudgeModel,
   logAiCall,
+  MAX_JUDGE_ATTEMPTS,
   MODEL,
   PROMPT_VERSION,
   type JudgeAttempt,
@@ -301,8 +302,8 @@ async function sampleCase(
   let retriesFailed = 0;
 
   for (let i = 0; i < SAMPLES; i++) {
-    // The same retry production makes: a reply that fails validation is
-    // sent again once, and every attempt is logged, so a run measures the
+    // The same retries production makes: a reply that fails validation is
+    // sent again, up to twice, and every attempt is logged, so a run measures the
     // judge as readers meet it and its cost includes every billed call.
     const outcome = await takeSample(
       () =>
@@ -429,8 +430,8 @@ function planSummary(cases: GoldenCase[], plans: Map<string, CasePlan>): string 
     `about $${usd.toFixed(2)}, at an estimated ` +
     `$${perCall.toFixed(4)} a call (~${meanIn} tokens in on average, ` +
     `~${est.outputTokens} out, priced at src/lib/anthropic.ts's rates). ` +
-    `A reply that fails validation is sent once more, adding a call each ` +
-    `time; at most double this if every reply failed. ` +
+    `A reply that fails validation is sent again, up to ${MAX_JUDGE_ATTEMPTS - 1} more time(s), ` +
+    `adding a call each time; at most ${MAX_JUDGE_ATTEMPTS} times this if every reply failed. ` +
     `An estimate: the real run reports what was billed.`
   );
 }

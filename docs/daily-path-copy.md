@@ -282,6 +282,36 @@ they do not change it.
 Argue screen panel heading: `What the judge looks for`. Link under it:
 `Read the full rubric` → `/debate/rubric`.
 
+### Judging failed
+
+Shown on the argue screen when a submission ends without a verdict: the
+judge's reply failed validation on the first call and on both retries, or
+the judge's API failed. Arthur's ruling of 2026-11-03 asked for a clear
+"judging failed, this did not use your turn, try again". "Turn" is
+"argument" here because the daily-cap notice on the same screen already
+calls them that: `That is your last argument for today.` Each claim is
+shown only when it is true: the argument is saved on the debate row
+before the judge is called, and the judge is not called if that save
+fails; a failed submission's calls are taken out of the daily cap, and if
+that update fails, the body without the cap sentence is shown instead.
+Lives in `src/lib/judging-failed.ts`.
+
+| Element | Copy |
+|---|---|
+| Title | `Judging failed.` |
+| Body | `This did not use one of today's arguments, and your argument is saved. Try again.` |
+| Body, when the calls could not be taken out of the cap | `Your argument is saved. Try again.` |
+| Button | `Try again` (unchanged) |
+
+If an earlier unjudged try's row cannot be updated with the new text,
+nothing is sent to the judge, and the generic error ("The judge could not
+be reached." / "Your argument is saved in this browser, so nothing is
+lost. Try again in a moment.") carries this detail line: `The new text could not be stored, so nothing was sent to the judge.`
+
+If the daily cap itself cannot be checked, nothing is sent to the judge,
+and the generic error ("The judge could not be reached.") carries this
+detail line: `The daily limit could not be checked, so nothing was sent to the judge.`
+
 ### A verdict on a private argument, seen by someone else
 
 Added 2026-11-03, with migration 0018. The judge quotes the argument it

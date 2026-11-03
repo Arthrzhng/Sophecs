@@ -42,6 +42,51 @@ entry names.
   checks), the security advisor before and after each migration,
   styleguide screenshots at 390 and 1280, contrast of the new text.
   Details in the pull request and in `docs/decisions.md`.
+- #50 merged as `e492812`. Production deploy
+  `dpl_9iY5j8sFupw6kbZL2CShNrVZg9ru`, Ready and aliased to sophecs.com
+  (read from Vercel on 2026-11-03).
+- 0018 applied in production at 23:12 UTC (migration version
+  `20261103231244`), after the deploy. Read back with SQL: the view
+  definition carries the keep-list and the parent join; no private row's
+  public verdict holds `verdict_line`, `improvement`, `reasons` or an
+  objection's wording (0 rows); no public row's verdict differs from the
+  table's (0 rows); grants are SELECT only for anon and authenticated.
+  Security advisor after: the same three `security_definer_view` errors
+  as before, nothing new. The private verdict page
+  (`/debate/opaque-benefit/jjSZVZFBmu`) fetched through Vercel at 23:15
+  UTC: status 200, the private heading, and a page payload whose verdict
+  holds only rejected, score, fidelity, rigor, engagement and
+  prompt_version.
+
+## 2026-11-03: two judge retries, and a failed submission off the cap
+
+- #52: migration 0019 (`counts_toward_cap`, `validation_error` on
+  `ai_calls`) applied in production at 23:17 UTC (migration version
+  `20261103231729`), before the code that filters on it, because the cap
+  query fails closed. Before applying: no `ai_calls` row and no unjudged
+  debate in the previous 10 minutes, no other active database session,
+  and a snapshot of the table in
+  `docs/seed-snapshots/2026-11-03-ai-calls-before-0019.json`. Local test
+  `scripts/test-0019-ai-calls-cap.sh`, 16 checks, forward and rollback,
+  passed again just before. Read back: both columns present with the
+  intended type and default, the one existing row still counts toward
+  the cap with its cost unchanged, row level security unchanged.
+  Security advisor before and after: the same findings.
+- #52 review: three passes by a fresh reviewer. Pass 3 found that the two
+  claims in the failure copy were not guaranteed (a failed cap update or
+  a failed save of the new text went unchecked); both are now checked and
+  the copy follows them, and each fix was broken on purpose and caught by
+  a test. It also found that the monthly budget cannot be relied on past
+  about 1000 calls a month and fails open on an error; that is Arthur's
+  under (d) and is written up in `docs/decisions.md` for Checkpoint A.
+  Gates on the final head: the five, 514 tests, `check:bundle`. The
+  failure states are on `/styleguide/arena`, section 3b, screenshotted at
+  390 and 1280 in `docs/phase3-styleguide/judging-failed/`; every text in
+  them measures at least 6.95:1 against its background (WCAG AA asks
+  4.5:1), read from computed styles with Playwright.
+- #52 merged as `27a7275`. Production deploy
+  `dpl_1kDgNbhGtLkK8NnaEp29j2A7rjBh`, Ready and aliased to sophecs.com
+  (read from Vercel); `/debate` answered 200 through Vercel at 23:42 UTC.
 
 ## 2026-11-03: Stage 1, the v3 runs and the objection voices
 
