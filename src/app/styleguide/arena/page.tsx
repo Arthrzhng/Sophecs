@@ -25,6 +25,7 @@ import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
 import { PUBLISHED_SCHOOL_IDS } from "@/lib/types";
 import { countsOnTable, yourTableLine } from "@/lib/school-table";
+import { withheldVerdict } from "@/lib/verdict-privacy";
 import {
   FIXTURE_ARGUMENT,
   FIXTURE_MOTION,
@@ -216,6 +217,29 @@ export default function ArenaPreviewPage() {
           afterLesson={afterLesson}
           showAfterLessonInitially={false}
           shareLine="Scored 71 on the opaque benefit. sophecs.com"
+        />
+      </Section>
+
+      <Section title="5b. Verdict: a private argument, seen by someone else">
+        {/* What the page hands Verdict for someone else's view of a
+            private argument: the verdict cut down by withheldVerdict, the
+            same keep-list 0018 applies. */}
+        <Verdict
+          debateId="preview-private"
+          topicSlug="opaque-benefit"
+          motion={FIXTURE_MOTION}
+          school="stoicism"
+          verdict={withheldVerdict(FIXTURE_VERDICT)!}
+          eloDelta={4}
+          eloAfter={1204}
+          weekNumber={41}
+          argument={null}
+          isOwner={false}
+          argumentPublic={false}
+          afterLesson={null}
+          showAfterLessonInitially={false}
+          shareLine="Scored 71 defending the Stoic line on the opaque benefit. sophecs.com"
+          textWithheld
         />
       </Section>
 

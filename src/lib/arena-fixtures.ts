@@ -83,7 +83,10 @@ If the evidence is strong, then withholding deployment because the mechanism is 
 
 The objection worth taking seriously is that opacity makes later judgement impossible. If the system fails, nobody can say why, and the responsible party cannot correct their assent. That is a real cost. But it is a cost to future judgement, not a reason to treat present evidence as worthless.`;
 
-export const FIXTURE_VERDICT: VerdictData = {
+// `satisfies`, not a type annotation: the fixture always has its text, and
+// pages that hand its objection to ObjectionBrief need the strings typed as
+// strings rather than as the nullable fields of a withheld verdict.
+export const FIXTURE_VERDICT = {
   rejected: false,
   score: 71,
   fidelity: 8.0,
@@ -103,7 +106,7 @@ export const FIXTURE_VERDICT: VerdictData = {
     why_it_stands:
       "The argument concedes that opacity makes later judgement impossible and then treats that as a cost to be absorbed. It never says what deliberation is supposed to consist of once the reasons are unavailable, which is what the objection is asking.",
   },
-};
+} satisfies VerdictData;
 
 /**
  * A rejected submission.
