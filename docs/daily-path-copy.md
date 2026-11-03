@@ -303,6 +303,22 @@ If the daily cap itself cannot be checked, nothing is sent to the judge,
 and the generic error ("The judge could not be reached.") carries this
 detail line: `The daily limit could not be checked, so nothing was sent to the judge.`
 
+### A verdict on a private argument, seen by someone else
+
+Added 2026-11-03, with migration 0018. The judge quotes the argument it
+scores, so when the argument is private, everyone but its author sees the
+score and the three rows and not the judge's words. The author's own
+verdict page is unchanged.
+
+| Where | Copy |
+|---|---|
+| Page heading, in place of the verdict line | `The verdict on a private argument` |
+| "The judge's note", in place of its three paragraphs | `The judge's note can quote the argument, so only the person who wrote it can read it while the argument is private.` |
+| The objection left standing, in place of its wording | `The argument left a {School} objection standing. Its wording can quote the argument, so only the person who wrote it can read it.` |
+| Share line | The school's share line without its `The judge's note: {verdict_line}.` sentence |
+| A rejected argument, in place of the judge's reason | `The judge set this argument aside without a score. Its reason can quote the argument, so only the person who wrote it can read it.` |
+| A revision's note on what changed | Not shown: the note can quote the argument too |
+
 ## 7. Objection and revise (mockup 05)
 
 | Element | Copy |

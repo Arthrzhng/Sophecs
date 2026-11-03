@@ -1,0 +1,24 @@
+{
+  "what": "The definition, columns and grants of public.debates_public in production, read before migration 0018 was applied (and after 0016 and 0017). Schema only, no rows. 0018's rollback restores this definition; CREATE OR REPLACE VIEW keeps the grants.",
+  "taken_at": "2026-11-03T19:36:17.274088+00:00",
+  "definition": " SELECT id,\n    topic_slug,\n    school,\n    score,\n    verdict,\n    elo_before,\n    elo_after,\n    created_at,\n    kind,\n    parent_debate_id,\n        CASE\n            WHEN argument_public THEN argument\n            ELSE NULL::text\n        END AS argument\n   FROM debates d;",
+  "columns": [
+    "id:text",
+    "topic_slug:text",
+    "school:text",
+    "score:numeric",
+    "verdict:jsonb",
+    "elo_before:numeric",
+    "elo_after:numeric",
+    "created_at:timestamp with time zone",
+    "kind:text",
+    "parent_debate_id:text",
+    "argument:text"
+  ],
+  "grants": {
+    "anon": ["SELECT"],
+    "authenticated": ["SELECT"],
+    "postgres": ["DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"],
+    "service_role": ["DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"]
+  }
+}
