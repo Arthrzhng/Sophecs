@@ -25,6 +25,14 @@ import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
 import { PUBLISHED_SCHOOL_IDS } from "@/lib/types";
 import { countsOnTable, yourTableLine } from "@/lib/school-table";
+import { withheldVerdict } from "@/lib/verdict-privacy";
+import {
+  ARGUMENT_NOT_SAVED,
+  JUDGING_FAILED_BODY,
+  JUDGING_FAILED_BODY_COUNTED,
+  JUDGING_FAILED_TITLE,
+} from "@/lib/judging-failed";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 import {
   FIXTURE_ARGUMENT,
   FIXTURE_MOTION,
@@ -188,6 +196,44 @@ export default function ArenaPreviewPage() {
         />
       </Section>
 
+      {/* What the argue screen shows when a submission ends without a
+          verdict, in the order the route can produce them: the usual
+          case, the case where its calls could not be taken out of the
+          daily cap, and the save of an earlier try's text failing before
+          the judge is called. Same ErrorState and button as the editor. */}
+      <Section title="3b. Judging failed" narrow>
+        <div className="flex flex-col gap-8">
+          <ErrorState
+            title={JUDGING_FAILED_TITLE}
+            body={JUDGING_FAILED_BODY}
+            action={
+              <ChunkyButton tone="paper" className="border-2 border-rule-strong">
+                Try again
+              </ChunkyButton>
+            }
+          />
+          <ErrorState
+            title={JUDGING_FAILED_TITLE}
+            body={JUDGING_FAILED_BODY_COUNTED}
+            action={
+              <ChunkyButton tone="paper" className="border-2 border-rule-strong">
+                Try again
+              </ChunkyButton>
+            }
+          />
+          <ErrorState
+            title="The judge could not be reached."
+            body="Your argument is saved in this browser, so nothing is lost. Try again in a moment."
+            detail={ARGUMENT_NOT_SAVED}
+            action={
+              <ChunkyButton tone="paper" className="border-2 border-rule-strong">
+                Try again
+              </ChunkyButton>
+            }
+          />
+        </div>
+      </Section>
+
       <Section title="4. Challenge invite" narrow>
         <ChallengeInvite
           challengeId="preview"
@@ -216,6 +262,29 @@ export default function ArenaPreviewPage() {
           afterLesson={afterLesson}
           showAfterLessonInitially={false}
           shareLine="Scored 71 on the opaque benefit. sophecs.com"
+        />
+      </Section>
+
+      <Section title="5b. Verdict: a private argument, seen by someone else">
+        {/* What the page hands Verdict for someone else's view of a
+            private argument: the verdict cut down by withheldVerdict, the
+            same keep-list 0018 applies. */}
+        <Verdict
+          debateId="preview-private"
+          topicSlug="opaque-benefit"
+          motion={FIXTURE_MOTION}
+          school="stoicism"
+          verdict={withheldVerdict(FIXTURE_VERDICT)!}
+          eloDelta={4}
+          eloAfter={1204}
+          weekNumber={41}
+          argument={null}
+          isOwner={false}
+          argumentPublic={false}
+          afterLesson={null}
+          showAfterLessonInitially={false}
+          shareLine="Scored 71 defending the Stoic line on the opaque benefit. sophecs.com"
+          textWithheld
         />
       </Section>
 

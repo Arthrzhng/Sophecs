@@ -149,6 +149,8 @@ export default async function MePage({
         .select("id, topic_slug, score, rejected, created_at, kind, parent_debate_id")
         .eq("user_id", user.id)
         .eq("kind", "revision")
+        // Judged revisions only: a failed one is still open to try again.
+        .not("verdict", "is", null)
         .in(
           "parent_debate_id",
           debateHistory.map((d) => d.id)
