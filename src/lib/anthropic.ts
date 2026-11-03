@@ -17,7 +17,8 @@ import type { SchoolId } from "@/lib/types";
 
 // COST: model=claude-sonnet-5 | trigger=debate submission | est_in=1700 est_out=650
 // est_usd_per_call=0.0098 | cap=5/user/day | kill_switch=KILL_SWITCH_JUDGE | logged_to=ai_calls
-// retry=1 on a reply that fails validation, each attempt logged (see judgeWithOneRetry)
+// retry=1 on a reply that fails validation, each attempt logged (see judgeWithOneRetry),
+// so a reader's day can reach 6 calls: the cap is checked before a call, not between attempts
 export const MODEL = "claude-sonnet-5";
 const INPUT_COST_PER_TOKEN = 2 / 1_000_000;
 const OUTPUT_COST_PER_TOKEN = 10 / 1_000_000;
@@ -316,9 +317,11 @@ export async function logAiCall(params: {
 // included, so every billed call counts toward the monthly budget. It
 // counts toward the daily cap too, which counts rows: a submission that
 // needed the retry uses two of the reader's five, as a failure followed
-// by the reader pressing submit again always has. A retry looks like any
-// other row for the same debate; marking it would take a new column or
-// kind, which is a migration.
+// by the reader pressing submit again always has. The route checks the
+// cap once, before the call, so a reader at four whose submission is
+// retried ends the day at six. A retry looks like any other row for the
+// same debate; marking it would take a new column or kind, which is a
+// migration.
 export async function judgeDebate(params: {
   motion: string;
   school: SchoolId;

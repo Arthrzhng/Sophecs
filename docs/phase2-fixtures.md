@@ -114,17 +114,21 @@ the correction this table said $1.12 for everything, and v3's run $0.71.
 
 `GOLDEN_DRY_RUN=1 npm run judge:golden` prints the per-call estimate and
 the run's total for the version it is given, without a key and without
-sending anything: about $0.42 for v2 and $0.93 for v3, or $0.14 and $0.31
-with `GOLDEN_SAMPLES=1`. The Tier A and Tier B split within v3, and the
-totals, are those figures added up by hand. The rows above are each
-rounded, so they sum to $1.35 where the unrounded total is $1.34.
+sending anything. For the first runs it printed about $0.42 for v2 and
+$0.93 for v3, or $0.14 and $0.31 with `GOLDEN_SAMPLES=1`; the table above
+is those figures added up by hand, each row rounded, so the rows sum to
+$1.35 where the unrounded total is $1.34. With the criteria as they stand
+after 2026-11-03 it prints $0.42 and $1.00, or $0.14 and $0.33: v2 is
+unchanged, and v3's criteria are longer.
 
 **The ceiling.** Output is capped at `max_tokens: 850` in
 `src/lib/anthropic.ts`. If every call ran to the cap rather than to the
 650-token estimate, the 114 calls would cost about $1.57, and $1.74 with
-the single-sample check. That is about the most this run can cost at three
-samples a case: output is capped, but input is still the four-bytes-a-token
-estimate, so the ceiling is approximate too.
+the single-sample check. Before the retry below, that was about the most
+those runs could cost at three samples a case: output is capped, but input
+is still the four-bytes-a-token estimate, so the ceiling is approximate too.
+With the retry, every reply that fails validation adds a call, so the
+strict ceiling is twice that; the 3 Nov run had one such reply in 72.
 
 **Since 2026-11-03 a reply that fails validation is sent once more**, in
 golden runs as in production, so a run can make more calls than it plans.
@@ -208,10 +212,11 @@ throughout, score 60-95 for the Stoic case and 70-95 for the other two**.
 > account for the ordering, and whether she keeps looking. Her consent is
 > the one act here that is hers, so it is the one that has to be just, and
 > justice is owed to the patients, not to her wish to explain everything
-> she touches. Where the hospital has good grounds to think the system
-> orders the queue at least as well as the triage desk it relieves,
-> refusing to stand beside it would be choosing clean hands over the people
-> waiting, and that refusal would be the unjust choice. A clinician who
+> she touches. She consents because they are owed a clinician at the point
+> where the queue is decided, one who tells them the truth and keeps watch,
+> and refusing the post so as never to answer for an ordering she cannot
+> explain would leave them with the system and no one beside it. A
+> clinician who
 > uses the system and tells the truth about it has done the part that was
 > hers. A clinician who hides behind it has not, and no accuracy figure
 > repairs that, because the figure was never the thing she was answerable
@@ -222,11 +227,16 @@ carried entirely inside it. v2 gives no instruction to credit this; v3 says
 the form costs nothing.
 
 The two sentences beginning "Her consent is the one act here" were added
-on 2026-11-03, by Arthur's ruling on the 3 Nov run. Every v3 sample there
-gave the same substantive reason for fidelity 7: the argument never says
-why consenting to stand beside the system is itself a just choice. He
-judged the reason fair and had the case answer it, in terms of justice to
-the patients; the band stays 8-10.
+on 2026-11-03, by Arthur's ruling on the 3 Nov run. Its three v3 samples
+gave fidelity 8, 7 and 7. Two named in `weakest_move` that the argument
+never says whether choosing to stand beside the system is itself just; the
+third named the patients' outcomes and raised the same consent in
+`a_stronger_version_would`. Arthur judged the reason fair and had the case
+answer it, in terms of justice to the patients; the band stays 8-10. The
+sentences justify the consent by what she owes the patients at her post,
+not by comparing the system's orderings with anyone else's: a first draft
+did that, and review pointed out that it leaned on outcomes the argument's
+own last sentence sets aside.
 
 ### `virtue-exemplar`
 

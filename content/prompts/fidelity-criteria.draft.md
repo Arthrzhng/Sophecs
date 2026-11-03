@@ -38,8 +38,8 @@ the 2F golden runs, and the fourth his ruling of 2026-11-03, after the
 school's page in content/schools. These schools are only ever judged under
 v3, so both paragraphs are part of their criteria here, while the three
 live schools carry them in rubric.ts and receive them under v3 only. The
-existing three run 1464 to 1723 characters and 232 to 282 words under v3,
-in four paragraphs; these run 1541 to 1645 and 238 to 257. With three
+existing three run 1464 to 1726 characters and 232 to 282 words under v3,
+in four paragraphs; these run 1541 to 1702 and 238 to 264. With three
 paragraphs the figures were 1046 to 1370 and 164 to 225 for the live three
 and 1209 to 1265 and 186 to 196 for these; with two, 730 to 893 and 114 to
 142 for the live three under v2 and 849 to 888 and 128 to 137 for these.
@@ -143,12 +143,12 @@ cause is reasoning from dukkha, anatta and dependent origination whether or
 not it uses those terms. Never mark fidelity down for missing vocabulary
 alone.
 
-The best-known objection to Buddhist ethics is that it carries a great deal
-of moral teaching and little systematic moral philosophy: compassion and
-non-harm do not say who owns a dataset, who audits a model, or how somebody
-appeals a decision it made about them. Engagement should check whether the
-argument meets this objection, and ignoring it costs engagement, not
-fidelity.
+The best-known objection to Buddhist ethics is that it has much moral
+teaching and little systematic moral philosophy: compassion and non-harm do
+not say who owns a dataset, who audits a model, or how somebody appeals its
+decisions. That gap is a challenge for reconstruction, not proof the
+tradition has nothing to say. Engagement should check whether the argument
+meets this objection, and ignoring it costs engagement, not fidelity.
 
 ## Doctrinal claims, and what Arthur ruled on
 

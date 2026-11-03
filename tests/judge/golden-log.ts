@@ -31,8 +31,9 @@ export interface GoldenCallRecord {
   /**
    * 1 for a sample's first call, 2 for the one retry a reply that failed
    * validation gets (Arthur's ruling of 2026-11-03). Two records with the
-   * same sample are one sample. Run files written before the retry have
-   * no such field, and every record in them is a first call.
+   * same sample are one sample. Run files written before the retry, the
+   * 3 Nov v3 run among them, have no such field, and every record in them
+   * is a first call.
    */
   attempt: 1 | 2;
   fixture: string;

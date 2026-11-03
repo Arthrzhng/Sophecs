@@ -265,8 +265,8 @@ describe("the draft fidelity criteria", () => {
     expect(LIVE_BAND.words).toEqual([114, 142]);
   });
 
-  it("takes its v3 band from the live criteria under v3, which are 1464 to 1723 characters", () => {
-    expect(LIVE_V3_BAND.chars).toEqual([1464, 1723]);
+  it("takes its v3 band from the live criteria under v3, which are 1464 to 1726 characters", () => {
+    expect(LIVE_V3_BAND.chars).toEqual([1464, 1726]);
     expect(LIVE_V3_BAND.words).toEqual([232, 282]);
   });
 

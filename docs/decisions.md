@@ -1562,8 +1562,10 @@ above the response format. Compared with the 26 Oct v3 run:
 - `confucian-strong` had all three samples accepted, 86 each with
   fidelity 9, inside its bands; its gap over `confucian-wrong-school` is 62.
 - `stoic-analogy` scored 72 [70-78], inside 60-95, with fidelity 7 [7-8],
-  still below 8-10. No sample docked it for vocabulary any more; all three
-  asked whether consenting to the system is itself a just choice.
+  still below 8-10. No sample docked it for vocabulary any more. Two
+  samples' `weakest_move` asked whether choosing to stand beside the system
+  is itself just; the third named the patients' outcomes, and raised that
+  consent in `a_stronger_version_would`.
 - `confucian-hierarchy` reached fidelity 8 [7-8], inside 7-10, and went
   over its other two bands: score 78 [71-78] against 40-75, engagement 5
   [5-6] against 0-4. It was the only case to move more than 5 points
@@ -1605,24 +1607,30 @@ How each was carried out:
    engagement, not fidelity." Each objection is taken from the gets_wrong
    section of the school's page in `content/schools`, in the page's own
    terms rather than quoted: quietism for Stoicism, the objection Rawls put
-   to utilitarianism, too little guidance for virtue ethics, role ethics
+   to utilitarianism, no answer for scale for virtue ethics, role ethics
    authorising hierarchy for Confucianism, the community that is not one
    voice for Ubuntu, and Keown's point that Buddhist ethics has much moral
-   teaching and little systematic moral philosophy. For the three live
+   teaching and little systematic moral philosophy, given as a challenge
+   for reconstruction rather than proof, as
+   `content/research/non-western-sources.md` asks it to be presented. For the three live
    schools the paragraph is in `src/lib/judge/rubric.ts`, in
    `OBJECTION_V3`, and `fidelityCriteriaFor` appends it under v3 only; for
    the draft three it is the fourth paragraph of each section of
    `content/prompts/fidelity-criteria.draft.md`. The six request fixtures
    are unchanged, and a test that sent the paragraph to v2 failed nineteen
    tests, the six fixture comparisons among them. Under v3 the live three's
-   criteria now run 1464 to 1723 characters and the draft three 1541 to
-   1645.
+   criteria now run 1464 to 1726 characters and the draft three 1541 to
+   1702, inside that band as Arthur ruled on 2026-10-24.
 2. **`stoic-analogy`.** Two sentences added after "whether she keeps
-   looking", saying her consent is the one act that is hers and so must be
-   just, and that where the system orders the queue at least as well as the
-   triage desk it relieves, refusing it would put her clean hands before
-   the patients. Bands unchanged. `docs/phase2-fixtures.md` quotes the
-   amended argument.
+   looking": her consent is the one act that is hers and so must be just;
+   the patients are owed a clinician at the point where the queue is
+   decided, and refusing that post so as never to answer for an ordering
+   she cannot explain would leave them with no one beside the system. Bands
+   unchanged. `docs/phase2-fixtures.md` quotes the amended argument. A
+   first draft justified the consent by the system ordering the queue at
+   least as well as the triage desk; review pointed out that this leaned on
+   outcomes the argument's own last sentence sets aside, close to the Stoic
+   criteria's aggregate-welfare failure, and it was rewritten.
 3. **One retry.** `judgeWithOneRetry` in `src/lib/anthropic.ts` makes a
    judge call and, if the reply fails validation (a cap breached, a field
    missing, or no JSON at all), makes the same call once more. A second
@@ -1636,11 +1644,14 @@ How each was carried out:
    `judge.v3.md` stays. Two consequences of logging every attempt as its
    own row:
    - **The daily cap.** `/api/judge` counts `ai_calls` rows of kind
-     `judge` per reader. A submission that needed the retry uses two of the
-     reader's five, as a failure followed by the reader submitting again
-     already did. Telling a retry apart from a first call in `ai_calls`
+     `judge` per reader, once, before the call. A submission that needed
+     the retry uses two of the reader's five, as a failure followed by the
+     reader submitting again already did, and a reader at four whose
+     submission is retried ends the day at six billed calls, one over the
+     cap. Whether a retry should count against the reader is Arthur's
+     question (d). Telling a retry apart from a first call in `ai_calls`
      would need a new column or kind, which is a migration and so a
-     production database change; not done.
+     production database change (a); not done.
    - **Time.** A retried submission waits for two calls, about 11 to 13
      seconds at the 3 Nov run's latencies (median 5.4s, longest 6.6s). The
      project was created in September 2026, after Vercel made Fluid compute

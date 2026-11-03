@@ -26,13 +26,13 @@ import path from "node:path";
 import { z } from "zod";
 import {
   callJudgeModel,
-  judgeWithOneRetry,
   logAiCall,
   MODEL,
   PROMPT_VERSION,
   type JudgeAttempt,
   type RunnablePromptVersion,
 } from "../../src/lib/anthropic";
+import { attemptFields, takeSample, type Sample } from "./golden-sample";
 import { planCase, readDraftCriteria, type CasePlan } from "./draft-criteria";
 import { describeEndpoint, describeEvalKey, endpointProblem, resolveEvalKey } from "./eval-key";
 import {
@@ -159,15 +159,6 @@ interface GoldenCase {
   expected_objection_school: SchoolId[];
 }
 
-interface Sample {
-  score: number;
-  fidelity: number;
-  rigor: number;
-  engagement: number;
-  weakestMove: string;
-  objectionSchool: SchoolId;
-}
-
 // A band is two numbers, low then high.
 const Band = z.tuple([z.number(), z.number()]).refine(([lo, hi]) => lo <= hi, {
   message: "band's low bound is above its high bound",
@@ -244,7 +235,8 @@ async function logCall(
   c: GoldenCase,
   plan: RunnablePlan,
   sample: number,
-  attempt: JudgeAttempt): Promise<void> {
+  attempt: JudgeAttempt
+): Promise<void> {
   const { costUsd, latencyMs } = attempt;
   if (LOG_TO === "ai_calls") {
     await logAiCall({ userId: null, debateId: null, kind: "golden", costUsd, latencyMs });
@@ -257,15 +249,9 @@ async function logCall(
   // the two conditions ever drifted apart. A reviewer called it dead code,
   // which it is, and removing it fails the typecheck.
   if (!run) return;
-  // A rejection validates, so it is not retried, but it is no score: the
-  // record keeps the reply as `response` and says why it scored nothing.
-  const raw = attempt.verdict;
-  const verdict = raw && !raw.rejected ? raw : null;
-  const error = raw?.rejected ? "model rejected the submission" : attempt.error;
   // Records and writes in one step, so the run survives a crash mid-way.
   recordCall(run, {
     sample,
-    attempt: attempt.attempt,
     fixture: c.name,
     school: c.school,
     prompt_version: VERSION,
@@ -279,15 +265,7 @@ async function logCall(
       argument: c.argument,
     }),
     model: MODEL,
-    response: raw,
-    score: verdict?.score ?? null,
-    fidelity: verdict?.fidelity ?? null,
-    rigor: verdict?.rigor ?? null,
-    engagement: verdict?.engagement ?? null,
-    objection_school: verdict?.unanswered_objection.school ?? null,
-    cost_usd: costUsd,
-    latency_ms: latencyMs,
-    error,
+    ...attemptFields(attempt),
     at: new Date().toISOString(),
   });
 }
@@ -317,50 +295,29 @@ async function sampleCase(
   let retriesFailed = 0;
 
   for (let i = 0; i < SAMPLES; i++) {
-    try {
-      // The same retry production makes: a reply that fails validation is
-      // sent again once, and each attempt is logged, so a run measures the
-      // judge as readers meet it and its cost includes every billed call.
-      const { verdict } = await judgeWithOneRetry(
-        () =>
-          callJudgeModel(
-            c.motion,
-            c.school,
-            c.argument,
-            undefined,
-            VERSION,
-            // undefined for a live school, so it is judged against
-            // rubric.ts exactly as production would; the draft file's text
-            // for a draft school, which callJudgeModel accepts only for a
-            // school with no live criteria.
-            plan.draftCriteria
-          ),
-        async (attempt) => {
-          if (attempt.attempt === 2) {
-            retries++;
-            if (attempt.error !== null) retriesFailed++;
-          }
-          await logCall(run, c, plan, i + 1, attempt);
-        }
-      );
-
-      if (verdict.rejected) {
-        failures.push("model rejected the submission");
-        continue;
-      }
-      samples.push({
-        score: verdict.score,
-        fidelity: verdict.fidelity,
-        rigor: verdict.rigor,
-        engagement: verdict.engagement,
-        weakestMove: verdict.weakest_move,
-        objectionSchool: verdict.unanswered_objection.school,
-      });
-    } catch (err) {
-      // Both attempts of a reply that failed validation twice are logged
-      // already, by the callback above.
-      failures.push(err instanceof Error ? err.message : String(err));
-    }
+    // The same retry production makes: a reply that fails validation is
+    // sent again once, and every attempt is logged, so a run measures the
+    // judge as readers meet it and its cost includes every billed call.
+    const outcome = await takeSample(
+      () =>
+        callJudgeModel(
+          c.motion,
+          c.school,
+          c.argument,
+          undefined,
+          VERSION,
+          // undefined for a live school, so it is judged against rubric.ts
+          // exactly as production would; the draft file's text for a draft
+          // school, which callJudgeModel accepts only for a school with no
+          // live criteria.
+          plan.draftCriteria
+        ),
+      (attempt) => logCall(run, c, plan, i + 1, attempt)
+    );
+    if (outcome.retried) retries++;
+    if (outcome.retryFailed) retriesFailed++;
+    if (outcome.sample) samples.push(outcome.sample);
+    else failures.push(outcome.failure ?? "no sample");
   }
 
   return { samples, failures, retries, retriesFailed };
@@ -430,8 +387,10 @@ function estimatedUsdPerCall(): {
 // est_in was measured under v2, so it includes v2's criteria at their
 // average length. Under v3 every school's criteria carry more paragraphs,
 // which the file-size difference above does not see. Each case adds the
-// difference between its own criteria and that average, at the same four
-// bytes a token. Checked against the 3 Nov v3 run, which billed $0.9934:
+// difference between its own criteria and that average, at four to a
+// token like the file-size term, though this counts characters where that
+// counts bytes; the criteria are almost all ASCII, so the two agree to
+// within a few tokens. Checked against the 3 Nov v3 run, which billed $0.9934:
 // without this the estimate was $0.9657, with it $0.9791, so the rest of
 // the gap is the rule of thumb itself.
 const V2_CRITERIA_MEAN_LENGTH =

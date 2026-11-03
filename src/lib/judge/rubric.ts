@@ -153,8 +153,8 @@ person who pays for it. Engagement should check whether the argument meets
 this objection, and ignoring it costs engagement, not fidelity.`,
 
   "virtue-ethics": `The best-known objection to virtue ethics is that it
-gives too little guidance: knowing what a good person is like does not say
-which policy to adopt, and what a good person would do goes quiet exactly
+has no answer for scale: knowing your own character does not tell you which
+policy saves more lives, and what a good person would do goes quiet exactly
 when interests genuinely conflict. Engagement should check whether the
 argument meets this objection, and ignoring it costs engagement, not
 fidelity.`,
