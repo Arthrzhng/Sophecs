@@ -1839,3 +1839,58 @@ $4.80 on the eval key. After run 2 the key is at $4.6564, leaving $0.1436;
 a full v3 run costs about $1.16, and a run of the hierarchy cases alone
 would not show whether a further v3 change moved the original six. Stage 1
 stops here and its questions go to Checkpoint A.
+
+### Arthur's rulings of 2026-11-03 on the Stage 1 miss
+
+> 2. Power objection: in the v3 criteria/known-objection lines, state which
+>    rival normally voices each school's known objection. Confucianism's
+>    power objection: Utilitarianism (the subordinate party's interests go
+>    uncounted when the stronger party sets the terms) or Ubuntu once
+>    published (solidarity requires the weaker party can be heard). Do the
+>    same exercise for all six known objections, symmetrically.
+> 3. Budget: eval cap raised to a cumulative $8.00 (I am raising the key's
+>    Console limit to match). Rerun v3 at three samples after the change.
+
+Ruling 4, on retries, is carried out in its own pull request; see "Two
+retries, and a failed submission does not use an argument".
+
+**The voices.** In `src/lib/judge/objection-voices.ts`, one table for all
+six schools. Under v3 each school's criteria gain a fifth paragraph after
+the objection paragraph, for the live schools in
+`fidelityCriteriaFor` and for the draft schools in the golden runner's
+`planCase`. It names the rival that normally voices the objection, and
+why. Only rivals the prompt lists are named: a school outside the list
+cannot be returned in `unanswered_objection.school`, so naming it would
+invite a reply that fails validation. Ubuntu's voice for Confucianism
+therefore reaches the judge the day Ubuntu is published, without an edit.
+v1, v2 and the six request fixtures are unchanged.
+
+The five Arthur did not set are drafted from the school pages, and are his
+to confirm at Checkpoint A:
+
+| School | Objection | Voiced by | Why | Once published | Source on the page |
+| --- | --- | --- | --- | --- | --- |
+| Stoicism | gives up on the world too easily | `utilitarianism` | the harm an unfair system does is a sum someone could reduce, and declining to try is itself a choice about that harm | `ubuntu`: standing apart from an unfair system leaves the people inside it on their own | Stoicism's gets_wrong: "Utilitarians would say this gives up on the world too easily" |
+| Utilitarianism | no total makes the trade fair to the one who pays | `virtue-ethics` | justice gives each person what is owed to them, and a total owes nobody anything | `ubuntu`: each person's capacity for relationship is to be honoured, not netted | Utilitarianism's gets_wrong gives it to Rawls, who is no school here; Ubuntu's page: "Metz argues against building systems to maximise expected utility" |
+| Virtue Ethics | no answer for scale | `utilitarianism` | a policy that touches thousands needs its outcomes compared, and asking what a good person would do does not compare them | none | Virtue Ethics' gets_wrong: "Utilitarians would say this has no answer for scale" |
+| Confucianism | too ready to authorise hierarchy | `utilitarianism` | Arthur's words | `ubuntu`: Arthur's words | Arthur's ruling |
+| Ubuntu | a community is not one voice | `stoicism` | a dissenter's own judgment is the one thing the community cannot decide for them | none | Ubuntu's gets_wrong: "Stoics would add that a self defined through others has handed away the one thing that was its own" |
+| Buddhist ethics | much moral teaching, little systematic moral philosophy | `utilitarianism` | deciding who audits a model and how an appeal is weighed takes a way of comparing everyone's claims, which compassion alone does not supply | `confucian`: who answers to whom for a model is a question of roles and what each owes | Buddhist ethics' gets_wrong names the gap; the Confucian page asks "whether the people inside them can still hold each other to what they owe" |
+
+The weakest of these is Utilitarianism's. Its own page gives the objection
+to Rawls, and of the live schools Virtue Ethics is the one that argues from
+what each person is owed. It is the most likely to need Arthur's change.
+
+`tests/objection-voices.test.ts` checks four things:
+- every school has a voice among today's listed rivals;
+- no school voices the objection to itself;
+- no unlisted school is ever named;
+- Arthur's Confucian voices are in his words, with Ubuntu's named only
+  once it is listed.
+
+Breaking the rival filter fails three of those tests. The existing v3
+tests pin the fifth paragraph, and the draft-criteria test pins it on the
+draft plan.
+
+**The budget.** The cap on the eval key is now $8.00 cumulative. It stood
+at $4.6564 before the rerun this ruling asks for.

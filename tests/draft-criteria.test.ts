@@ -76,7 +76,8 @@ const { POST } = await import("../src/app/api/judge/route");
 const { callJudgeModel } = await import("../src/lib/anthropic");
 const { PUBLISHED_SCHOOL_IDS } = await import("../src/lib/school-registry");
 const { DRAFT_SCHOOL_IDS } = await import("../src/lib/school-registry.drafts");
-const { FIDELITY_CRITERIA, fidelityCriteriaFor } = await import("../src/lib/judge/rubric");
+const { FIDELITY_CRITERIA, fidelityCriteriaFor, rivalsOf } = await import("../src/lib/judge/rubric");
+const { objectionVoiceFor } = await import("../src/lib/judge/objection-voices");
 const { readDraftCriteria, planCase, DRAFT_CRITERIA_FILE } = await import("./judge/draft-criteria");
 
 function submit() {
@@ -225,7 +226,10 @@ describe("the golden run's draft criteria", () => {
   it("judges a draft school against the draft file, under v3", () => {
     for (const id of DRAFT_SCHOOL_IDS) {
       const plan = planCase(id, v3, draft, "v3");
-      expect(plan).toMatchObject({ run: true, source: "draft", criteria: draft[id] });
+      // The draft section, then the paragraph naming which listed rival
+      // voices its known objection: what a live school gets under v3 too.
+      const expected = `${draft[id]!.trimEnd()}\n\n${objectionVoiceFor(id, rivalsOf(id))}`;
+      expect(plan).toMatchObject({ run: true, source: "draft", criteria: expected, draftCriteria: expected });
     }
   });
 
