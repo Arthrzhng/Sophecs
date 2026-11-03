@@ -23,10 +23,10 @@ export interface VerdictData {
   fidelity: number | null;
   rigor: number | null;
   engagement: number | null;
-  // Null, as are the objection's claim and why_it_stands and the
-  // improvement note, when debates_public withholds them: the judge quotes
-  // the argument, so a private argument's verdict shows only its scores to
-  // anyone but its author (migration 0018).
+  // Absent, and the objection's claim and why_it_stands null, when the
+  // verdict is withheld (withheldVerdict in src/lib/verdict-privacy.ts, and
+  // migration 0018): the judge quotes the argument, so a private
+  // argument's verdict shows only its scores to anyone but its author.
   strongest_move?: string | null;
   weakest_move?: string | null;
   a_stronger_version_would?: string | null;
@@ -166,9 +166,10 @@ export function Verdict({
   // Absent on a revision and on someone else's verdict.
   counterpart?: { seeking: boolean; exchangeId: string | null } | null;
   /**
-   * Someone other than the author, looking at a private argument's verdict:
-   * debates_public has nulled every field that can quote it, and this says
-   * so in their place rather than leaving the spaces empty.
+   * Someone other than the author, looking at a private argument's verdict
+   * (or a revision of a private one): the page has already cut the verdict
+   * down to what cannot quote it, and this says so in place of the judge's
+   * words rather than leaving the spaces empty.
    */
   textWithheld?: boolean;
 }) {
