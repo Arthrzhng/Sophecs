@@ -127,6 +127,11 @@ grants_hold() {
 # else about the view changes" checked row by row rather than by sample.
 rows_digest() { q "select md5(string_agg(row(id, topic_slug, school, score, verdict, elo_before, elo_after, created_at, kind, parent_debate_id, argument)::text, '|' order by id)) from debates_public"; }
 viewdef() { q "select pg_get_viewdef('public.debates_public'::regclass, true)"; }
+# Owner, options and the whole ACL, column grants included: has_table_privilege
+# above asks about seven privileges; this compares everything. The ACL's
+# entries are sorted, because a recreated view lists the same grants in
+# the order they were made.
+meta() { q "select pg_get_userbyid(c.relowner) || ' | ' || coalesce(c.reloptions::text, '-') || ' | ' || coalesce((select string_agg(x::text, ',' order by x::text) from unnest(c.relacl) x), '-') || ' | ' || (select count(*) from pg_attribute a where a.attrelid = c.oid and a.attacl is not null) || ' column acl(s)' from pg_class c where c.oid = 'public.debates_public'::regclass"; }
 
 redaction_holds() {
   # 0018 leaves a withheld field out rather than setting it to null.
@@ -149,6 +154,8 @@ say "before 0020: 0018's view"
 expect "columns" "$OLD_COLS" "$(cols)"
 DIGEST_0018="$(rows_digest)"
 VIEWDEF_0018="$(viewdef)"
+META_0018="$(meta)"
+echo "  under 0018: $META_0018"
 expect "0018's view has the parent join" t "$(q "select pg_get_viewdef('public.debates_public'::regclass, true) ilike '%left join debates p on%'")"
 grants_hold "before"
 redaction_holds "before"
@@ -164,6 +171,7 @@ after() {
   expect "$1: a null motion stays null" t "$(q "select motion_text is null from debates_public where id = 'none'")"
   expect "$1: anon reads motion_text" allowed "$(as_role anon "select motion_text from public.debates_public")"
   expect "$1: every other column of every row as under 0018" "$DIGEST_0018" "$(rows_digest)"
+  expect "$1: owner, options and grants as under 0018" "$META_0018" "$(meta)"
   grants_hold "$1"
   redaction_holds "$1"
 }
@@ -174,6 +182,7 @@ apply "$REPO/supabase/rollback/0020_debates_public_motion_text.down.sql"
 expect "columns back to 0018's" "$OLD_COLS" "$(cols)"
 expect "definition back to 0018's, as text" t "$([ "$(viewdef)" = "$VIEWDEF_0018" ] && echo t || echo f)"
 expect "rows as under 0018" "$DIGEST_0018" "$(rows_digest)"
+expect "owner, options and grants as under 0018" "$META_0018" "$(meta)"
 grants_hold "after rollback"
 redaction_holds "after rollback"
 

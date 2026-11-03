@@ -142,6 +142,54 @@ describe("motion_text comes from debates_public", () => {
     expect(topic, "the topic read").toBeGreaterThan(-1);
     expect(guard, "the 404 guard must come before the next read").toBeLessThan(topic);
   });
+
+  it("passes the view's motion_text to motionForDebate on both surfaces", () => {
+    const page = fs.readFileSync(path.join(process.cwd(), READERS[0]), "utf-8");
+    const og = fs.readFileSync(path.join(process.cwd(), READERS[1]), "utf-8");
+    expect(page).toContain("motionForDebate(publicRow.motion_text as string | null, topic.motion)");
+    expect(og).toContain("motionForDebate(data.motion_text as string | null, topic.motion)");
+  });
+
+  it("reads the topic on the OG image only for a debate it found", () => {
+    const og = fs.readFileSync(path.join(process.cwd(), READERS[1]), "utf-8");
+    const found = og.indexOf("if (data) {");
+    const topic = og.indexOf('.from("debate_topics")');
+    expect(found).toBeGreaterThan(-1);
+    expect(topic).toBeGreaterThan(found);
+  });
+});
+
+/**
+ * 0020 is 0018's view with one column added, and its rollback is 0018's
+ * view: checked on the SQL text itself, so a change anywhere else in the
+ * verdict expression fails here even if no test row exercises it.
+ */
+describe("0020 and its rollback against 0018", () => {
+  const body = (file: string, from: string) => {
+    const sql = fs.readFileSync(path.join(process.cwd(), file), "utf-8");
+    return sql.slice(sql.indexOf(from)).trim();
+  };
+  const v18 = body("supabase/migrations/0018_debates_public_private_verdict_text.sql", "create or replace view");
+
+  it("0020 adds d.motion_text as the last column and changes nothing else", () => {
+    const v20 = body("supabase/migrations/0020_debates_public_motion_text.sql", "create or replace view");
+    const expected = v18.replace(
+      "case when d.argument_public then d.argument else null end as argument\n  from debates d",
+      "case when d.argument_public then d.argument else null end as argument,\n    d.motion_text\n  from debates d"
+    );
+    expect(expected).not.toBe(v18);
+    expect(v20).toBe(expected);
+  });
+
+  it("the rollback recreates 0018's view exactly, then sets the grants", () => {
+    const rollback = body("supabase/rollback/0020_debates_public_motion_text.down.sql", "create view");
+    const end = "left join debates p on p.id = d.parent_debate_id;";
+    const view = rollback.slice(0, rollback.indexOf(end) + end.length);
+    expect(view).toBe(v18.replace("create or replace view", "create view"));
+    expect(rollback.slice(view.length)).toContain(
+      "revoke all on public.debates_public from public, anon, authenticated;\ngrant select on public.debates_public to anon, authenticated;"
+    );
+  });
 });
 
 /**

@@ -93,7 +93,8 @@ entry names.
   that order: 0020 is applied in production and read back before this
   merges, because the code asks the view for the column. Checks before
   the pull request: the five gates, `check:bundle`,
-  `scripts/test-0020-motion-text-view.sh` (139 checks, run on every
-  migration through 0019), and three deliberate breaks of the migration
-  and its rollback, each caught (`docs/decisions.md`, "Phase 3 item: move
-  `motion_text` into `debates_public`").
+  `scripts/test-0020-motion-text-view.sh` (142 checks, run on every
+  migration through 0019), `scripts/test-migrations.sh`, and deliberate
+  breaks of the migration and its rollback, each caught
+  (`docs/decisions.md`, "Phase 3 item: move `motion_text` into
+  `debates_public`").

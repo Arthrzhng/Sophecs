@@ -1025,12 +1025,26 @@ the view, and neither reads `debates` for it; the OG image no longer reads
 `create or replace` cannot remove a column, so it revokes everything from
 `anon` and `authenticated` before granting SELECT back: a recreated view
 picks up Supabase's default privileges, which would reopen the write hole
-0016 closed. `scripts/test-0020-motion-text-view.sh` (139 checks) runs
-0001 to 0018 under production's grants and checks, after 0020, after its
-rollback and after applying it again, that every column but `motion_text`
-of every row reads exactly as under 0018, that the rollback's
-`pg_get_viewdef` text is 0018's, and that anon and authenticated can only
-SELECT. Breaking the migration on purpose was caught each time: dropping
+0016 closed. `scripts/test-0020-motion-text-view.sh` (142 checks) runs
+every migration before 0020 under production's grants and checks, after
+0020, after its rollback and after applying it again, that every column
+but `motion_text` of every row reads exactly as under 0018, that the
+rollback's `pg_get_viewdef` text is 0018's, that the view's owner,
+options and whole ACL are 0018's, and that anon and authenticated can
+only SELECT. `tests/verdict-privacy.test.ts` also holds the SQL text: 0020
+is 0018 plus the one column, and the rollback is 0018 exactly.
+
+Two things review of #54 found. Rolling back 0015 (which drops
+`debates.motion_text`) now needs 0020 rolled back first, since Postgres
+will not drop a column a view reads; `scripts/test-migrations.sh` failed
+on it and now runs the rollbacks in that order. And production runs
+Postgres 17, where a table's privileges include MAINTAIN: read on
+2026-11-03, anon and authenticated hold MAINTAIN on all four public views,
+because 0016 revoked the six privileges Postgres 16 has. MAINTAIN allows
+VACUUM, ANALYZE and LOCK TABLE, none of which the Data API lets anon run,
+so it is not reachable from the site; it goes with the grants finding
+reported to Arthur the same night. 0020's rollback grants SELECT alone,
+so after it the view has less than it has today, never more. Breaking the migration on purpose was caught each time: dropping
 the parent rule failed 6 checks, keeping `verdict_line` with its type
 check widened failed 8, and a rollback without the revoke failed 24 (the
 six write privileges for each of anon and authenticated, after the

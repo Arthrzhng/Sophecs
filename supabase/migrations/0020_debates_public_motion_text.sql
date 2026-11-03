@@ -11,9 +11,10 @@
 -- private argument's verdict, the parent join, the type checks), with
 -- d.motion_text appended as the last column.
 -- scripts/test-0020-motion-text-view.sh checks that every other column of
--- every row reads as it did under 0018. CREATE OR REPLACE VIEW may only
--- add columns at the end, and keeps the owner and the grants 0016 and 0017
--- set.
+-- every row reads as it did under 0018, and tests/verdict-privacy.test.ts
+-- that the two definitions differ by that column alone. CREATE OR REPLACE
+-- VIEW may only add columns at the end, and keeps the owner and the grants
+-- 0016 set.
 --
 -- A deliberate widening: anon and authenticated hold SELECT on this view,
 -- so the column becomes readable through the Data API. It is the motion as
@@ -22,9 +23,16 @@
 -- author. It is shown for private arguments too, as the page already shows
 -- it.
 --
--- Locks: ACCESS EXCLUSIVE on the view only, for a catalogue update; no
--- lock on debates. No transaction of its own: the Supabase runner wraps
--- the file, and by hand it is `psql --single-transaction`.
+-- Rolling back: 0015's rollback drops debates.motion_text, which Postgres
+-- refuses while this view reads it (safely, inside its transaction). So
+-- 0020's rollback goes first; scripts/test-migrations.sh runs them in
+-- that order.
+--
+-- Locks, until commit: ACCESS EXCLUSIVE on the view, for a catalogue
+-- update, and ACCESS SHARE on debates, which blocks nothing but a
+-- concurrent ALTER or DROP of that table. No transaction of its own: the
+-- Supabase runner wraps the file, and by hand it is
+-- `psql --single-transaction`.
 
 create or replace view public.debates_public as
   select
