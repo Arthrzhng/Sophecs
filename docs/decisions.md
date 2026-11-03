@@ -1758,8 +1758,115 @@ change to how the limit works, so Arthur's to choose (d):
   rows per reader per day, at a number Arthur sets.
 
 **Decide before the Winchester pilot.** Until then the cap stays as it is:
-it can cost a reader an extra slot on the rare retried submission, and it
-cannot be run up.
+it can cost a reader an extra slot on the rare retried submission.
+
+*Superseded in part, the same evening.* Arthur's ruling on retries (the
+next entry) allows two retries and takes a submission that ends without a
+verdict out of the cap. So a retried submission that succeeds now uses two
+or three of the five, and a failed one uses none, which means the cap
+**can** now be run up by failed submissions. The second option above,
+a higher per-reader ceiling on calls, is what would close that; it is
+still Arthur's (d).
+
+### Two retries, and a failed submission does not use an argument
+
+Arthur's ruling of 2026-11-03, after the second v3 run of that day (run file
+`2026-11-03T21-35-58-347Z-v3.json`, commit 588cf1f on branch
+`claude/beautiful-edison-aofswd`, #51) left one sample without a verdict when its retry also ran over the verdict_line cap:
+
+> verdict_line: allow up to two retries. If both fail, the student sees a
+> clear "judging failed, this did not use your turn, try again" message,
+> the attempt does not count against the daily cap, and it is logged.
+
+How it was carried out:
+
+1. **Three calls at most.** `judgeWithOneRetry` becomes `judgeWithRetries`
+   in `src/lib/anthropic.ts`, with `MAX_JUDGE_ATTEMPTS = 3`. The same
+   request is sent each time, so the six request fixtures still describe
+   every call, and a reply is never cut down to fit. The golden runner
+   takes its samples through the same function, so a run measures what
+   readers meet; run files from now on can hold attempts 1 to 3.
+2. **The message.** `Judging failed.` / `This did not use one of today's
+   arguments, and your argument is saved. Try again.`, in
+   `src/lib/judging-failed.ts` and `docs/daily-path-copy.md`. The route
+   sends it with `reason: "judging_failed"`, and the argue screen shows it
+   in place of the generic "The judge could not be reached." "Turn" is
+   "argument" because the daily-cap notice on that screen already says
+   "argument". Each sentence is shown only when it is true, and
+   `tests/judging-failed.test.ts` holds them so. "Your argument is saved":
+   the route saves it on the debate row before calling the judge, and when
+   it is updating an earlier unjudged try's row and that update fails, it
+   stops before the judge, with the generic error and the detail line "The
+   new text could not be stored, so nothing was sent to the judge.",
+   rather than have the judge score text the row does not hold. "Did not use one of today's arguments": the route sends
+   `offCap`, true only when `judgeDebate` took the submission's calls out
+   of the cap; when that update failed, the screen shows `Your argument is
+   saved. Try again.` instead. Review pass 3 found that both had been
+   claimed "by construction" while neither failure was handled.
+3. **Not counted against the cap.** Migration 0019 adds
+   `ai_calls.counts_toward_cap`, true by default, so every existing row
+   counts as it did. When a submission ends without a verdict, whether
+   every reply failed validation or the API failed partway, `judgeDebate`
+   sets it to false on that submission's rows, and the route's cap query
+   counts only rows where it is true. A column, because nothing in a row
+   said how its submission ended. "Rows whose debate has a verdict" would
+   not do: the route reuses an unjudged debate row on the next try, so a
+   later success would bring the earlier failure back into the count.
+4. **Logged.** Each failed reply's ai_calls row carries the validator's
+   summary in `validation_error`, also added by 0019. It names the field
+   and the rule, never the reply's or the argument's text. Two places used
+   to carry text, and review pass 1 found both: a reply that was not JSON
+   was reported with its first 200 characters, and zod's message for a
+   wrong enum value quotes the value. Now the first gives the reply's
+   length, and the second has its "received '...'" clause cut; a test
+   feeds each and checks the row. The route also writes a failed
+   submission to the production log; until now it logged only outside
+   production.
+5. **A revision can be tried again.** A revision whose judging failed
+   leaves an unjudged child row. Before this, the next try found that row
+   and answered "already revised", and the revise page closed, so the new
+   "Try again" would have been false for a revision. The route now reuses
+   an unjudged child row, as it reuses an original's, and
+   `getRevisionId` counts only a judged revision. Review pass 1 found it;
+   it was already so on `main`, but the message made it a promise.
+6. **The cap fails closed.** If the cap's own query errors (a missing
+   column, before 0019 or after its rollback), the route refuses the
+   submission with a 503 before anything is written or billed, where it
+   used to read the failed count as zero.
+
+**What it does not change.** A submission that ends with a verdict still
+counts once per call. One that needed retries uses two or three of the
+reader's five, the open pre-pilot item above, which stays Arthur's. Every
+billed call still counts toward the monthly budget.
+
+**One case it does not cover.** If Vercel stops the function partway
+(the route's `maxDuration` is 60 seconds), the calls already logged stay
+in the cap and the reader sees the generic "The judge could not be
+reached.", which makes no claim about the cap. Three calls came to about
+20 seconds at the slowest call measured, so this should be rare.
+
+**The risk it accepts, for Checkpoint A.** Failed submissions no longer
+move the cap. An argument whose replies always fail validation can
+therefore be sent again and again, at up to three calls a time (about
+$0.04, at the $0.0148 a call the 21:35 v3 golden run averaged, in the run
+file named above; production's v2 prompt is shorter). The only other stop
+is meant to be the monthly budget, `AI_MONTHLY_BUDGET_USD`, which pauses
+judging for every reader when it is reached. A second, higher ceiling on
+calls per reader per day would close it, and that is a rate limit, so
+Arthur's.
+
+**And the budget does not hold as written.** Review pass 3 found, and a
+read of `src/lib/budget.ts` confirms, that `getMonthlySpend` sums
+`cost_usd` over a select with no range, so it adds up at most the rows
+the Data API returns in one response (Supabase's default is 1000; the
+project's own setting was not read), and it reads a query error as a
+spend of zero. Past that many calls in a month the budget cannot be
+reached, and an error waves judging through. Production holds one
+`ai_calls` row today, so nothing is at risk yet. Fixing it changes how
+the budget is enforced, which is Arthur's under (d): summing in the
+database, and failing closed on an error as the daily cap now does, is
+the proposed patch, for Checkpoint A. Nothing in this pull request
+depends on it.
 
 ### The public views were writable (migration 0016)
 

@@ -20,18 +20,27 @@ import { track } from "@/lib/analytics/client";
 import { SCHOOL_ADHERENT, SCHOOL_COLORS } from "@/lib/school-colors";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
 import type { SchoolId } from "@/lib/types";
+import {
+  JUDGING_FAILED_BODY,
+  JUDGING_FAILED_BODY_COUNTED,
+  JUDGING_FAILED_REASON,
+  JUDGING_FAILED_TITLE,
+} from "@/lib/judging-failed";
 
 type Status =
   | { kind: "editing" }
   | { kind: "submitting" }
   | { kind: "paused"; reason: string }
-  | { kind: "error"; message: string };
+  | { kind: "error"; message: string }
+  | { kind: "judging_failed"; offCap: boolean };
 
 interface JudgeResponse {
   ok: boolean;
   debateId?: string;
   paused?: boolean;
   reason?: string;
+  /** On a failed submission: whether its calls came out of the daily cap. */
+  offCap?: boolean;
   error?: string;
   eloDelta?: number;
   eloAfter?: number;
@@ -229,6 +238,12 @@ export function ArgumentEditor({
         track({ name: "judge_paused", props: { reason: response.reason as never } });
       }
       setStatus({ kind: "paused", reason: response.reason ?? "unknown" });
+      return;
+    }
+
+    if (response.reason === JUDGING_FAILED_REASON) {
+      // Only an explicit true earns the sentence about the cap.
+      setStatus({ kind: "judging_failed", offCap: response.offCap === true });
       return;
     }
 
@@ -437,6 +452,20 @@ export function ArgumentEditor({
             title="The judge could not be reached."
             body="Your argument is saved in this browser, so nothing is lost. Try again in a moment."
             detail={status.message}
+            action={
+              <ChunkyButton tone="paper" className="border-2 border-rule-strong" onClick={() => setConfirming(true)}>
+                Try again
+              </ChunkyButton>
+            }
+          />
+        </div>
+      )}
+
+      {status.kind === "judging_failed" && (
+        <div className="mt-6">
+          <ErrorState
+            title={JUDGING_FAILED_TITLE}
+            body={status.offCap ? JUDGING_FAILED_BODY : JUDGING_FAILED_BODY_COUNTED}
             action={
               <ChunkyButton tone="paper" className="border-2 border-rule-strong" onClick={() => setConfirming(true)}>
                 Try again

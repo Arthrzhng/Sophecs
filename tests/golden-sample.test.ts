@@ -12,8 +12,8 @@ import {
 } from "./judge/golden-sample";
 import { startRun } from "./judge/golden-log";
 
-// The golden runner's half of Arthur's ruling of 2026-11-03: the retry is
-// logged "in the golden-run log" too. tests/judge-retry.test.ts covers
+// The golden runner's half of Arthur's rulings of 2026-11-03: the retries
+// are logged "in the golden-run log" too, one retry at first and two since. tests/judge-retry.test.ts covers
 // production's half through judgeDebate; this drives takeSample and
 // attemptFields, which are what run-golden.ts calls, and checks the
 // runner hands them every attempt.
@@ -74,15 +74,31 @@ describe("takeSample", () => {
     expect(outcome.sample?.fidelity).toBe(8);
   });
 
-  it("records two failed attempts and stops", async () => {
-    const { call, state } = queued(OVER_CAP(), OVER_CAP(), VALID);
+  it("takes a third reply when the first two fail, and records all three", async () => {
+    const { call, state } = queued(OVER_CAP(), OVER_CAP(), VALID, VALID);
     const { attempts, record } = recorder();
     const outcome = await takeSample(call, record);
 
-    expect(state.calls).toBe(2);
+    expect(state.calls).toBe(3);
     expect(attempts.map((a) => [a.attempt, a.error !== null])).toEqual([
       [1, true],
       [2, true],
+      [3, false],
+    ]);
+    expect(outcome).toMatchObject({ failure: null, retried: true, retryFailed: false });
+    expect(outcome.sample?.fidelity).toBe(8);
+  });
+
+  it("records three failed attempts and stops", async () => {
+    const { call, state } = queued(OVER_CAP(), OVER_CAP(), OVER_CAP(), VALID);
+    const { attempts, record } = recorder();
+    const outcome = await takeSample(call, record);
+
+    expect(state.calls).toBe(3);
+    expect(attempts.map((a) => [a.attempt, a.error !== null])).toEqual([
+      [1, true],
+      [2, true],
+      [3, true],
     ]);
     expect(outcome.sample).toBeNull();
     expect(outcome.failure).toContain("verdict_line exceeds 20 words");
@@ -220,7 +236,7 @@ describe("the golden runner", () => {
   it("hands every attempt from takeSample to logCall", () => {
     expect(runner).toContain("await takeSample(");
     expect(runner).toContain("(attempt) => logCall(run, c, plan, i + 1, attempt)");
-    expect(runner).not.toContain("judgeWithOneRetry(");
+    expect(runner).not.toContain("judgeWithRetries(");
   });
 
   it("logs each attempt it is given, and does nothing else", () => {

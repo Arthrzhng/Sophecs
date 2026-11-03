@@ -27,6 +27,13 @@ import { PUBLISHED_SCHOOL_IDS } from "@/lib/types";
 import { countsOnTable, yourTableLine } from "@/lib/school-table";
 import { withheldVerdict } from "@/lib/verdict-privacy";
 import {
+  ARGUMENT_NOT_SAVED,
+  JUDGING_FAILED_BODY,
+  JUDGING_FAILED_BODY_COUNTED,
+  JUDGING_FAILED_TITLE,
+} from "@/lib/judging-failed";
+import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
+import {
   FIXTURE_ARGUMENT,
   FIXTURE_MOTION,
   FIXTURE_VERDICT,
@@ -187,6 +194,44 @@ export default function ArenaPreviewPage() {
             "Chrysippus's cylinder — the push is external, the shape is mine.",
           ]}
         />
+      </Section>
+
+      {/* What the argue screen shows when a submission ends without a
+          verdict, in the order the route can produce them: the usual
+          case, the case where its calls could not be taken out of the
+          daily cap, and the save of an earlier try's text failing before
+          the judge is called. Same ErrorState and button as the editor. */}
+      <Section title="3b. Judging failed" narrow>
+        <div className="flex flex-col gap-8">
+          <ErrorState
+            title={JUDGING_FAILED_TITLE}
+            body={JUDGING_FAILED_BODY}
+            action={
+              <ChunkyButton tone="paper" className="border-2 border-rule-strong">
+                Try again
+              </ChunkyButton>
+            }
+          />
+          <ErrorState
+            title={JUDGING_FAILED_TITLE}
+            body={JUDGING_FAILED_BODY_COUNTED}
+            action={
+              <ChunkyButton tone="paper" className="border-2 border-rule-strong">
+                Try again
+              </ChunkyButton>
+            }
+          />
+          <ErrorState
+            title="The judge could not be reached."
+            body="Your argument is saved in this browser, so nothing is lost. Try again in a moment."
+            detail={ARGUMENT_NOT_SAVED}
+            action={
+              <ChunkyButton tone="paper" className="border-2 border-rule-strong">
+                Try again
+              </ChunkyButton>
+            }
+          />
+        </div>
       </Section>
 
       <Section title="4. Challenge invite" narrow>

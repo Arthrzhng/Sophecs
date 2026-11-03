@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { newId } from "@/lib/ids";
-import { judgeDebate, JudgeValidationError, PROMPT_VERSION } from "@/lib/anthropic";
+import { judgeDebate, JudgeValidationError, PROMPT_VERSION, wasTakenOffDailyCap } from "@/lib/anthropic";
 import { isBudgetExceeded } from "@/lib/budget";
 import { soloElo } from "@/lib/elo";
 import { applyStreakDay, isStreakEligible } from "@/lib/streak";
@@ -11,17 +11,30 @@ import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
 import { MIN_ARGUMENT_WORDS, MAX_ARGUMENT_WORDS, wordCount } from "@/lib/debate-limits";
 import { hasFidelityCriteria } from "@/lib/judge/rubric";
 import { motionForDebate } from "@/lib/motion-text";
+import {
+  ARGUMENT_NOT_SAVED,
+  JUDGING_FAILED_BODY,
+  JUDGING_FAILED_BODY_COUNTED,
+  JUDGING_FAILED_REASON,
+  JUDGING_FAILED_TITLE,
+} from "@/lib/judging-failed";
 import type { SchoolId } from "@/lib/types";
 
-// A submission whose first reply fails validation waits for a second call
-// (judgeWithOneRetry in src/lib/anthropic.ts), so it can take two model
-// calls, about 11 to 13 seconds at golden-run latencies. The project's own
-// limit was not readable from here; this sets it rather than assume it.
-// 60 is within every plan's maximum. A function stopped mid-retry would
-// fail the reader and leave a billed call out of ai_calls.
+// A submission whose replies fail validation is retried up to twice
+// (judgeWithRetries in src/lib/anthropic.ts), so it can take three model
+// calls. The slowest of 153 golden-run calls on 2026-11-03 took 6.6
+// seconds (the run files in commits b32dfb8 and 588cf1f, branch
+// claude/beautiful-edison-aofswd), so three come to about 20. The project's own limit was not
+// readable from here; this sets it rather than assume it. 60 is within
+// every plan's maximum, and Arthur ruled to keep it. A function stopped
+// mid-retry would fail the reader and leave a billed call out of ai_calls.
 export const maxDuration = 60;
 
 const DAILY_CAP = 5;
+// docs/daily-path-copy.md, "Judging failed": the detail line under the
+// argue screen's generic error when the cap cannot be checked.
+const CAP_UNCHECKED = "The daily limit could not be checked, so nothing was sent to the judge.";
+
 const TOPIC_LOCK_DAYS = 7;
 const PAR_ELO_WINDOW = 50;
 
@@ -110,12 +123,25 @@ export async function POST(request: Request) {
 
   if (!isAllowlisted) {
     const sinceDaily = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { count: dailyCount } = await admin
+    const { count: dailyCount, error: capError } = await admin
       .from("ai_calls")
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
       .eq("kind", "judge")
+      // A submission that ended without a verdict is not one of the
+      // reader's arguments (judgeDebate takes its calls out). Migration
+      // 0019 adds the column with a default of true, so every row written
+      // before it still counts.
+      .eq("counts_toward_cap", true)
       .gte("created_at", sinceDaily);
+    // A count that failed is not a count of zero. Unread, an error here
+    // (a missing column, before migration 0019 or after its rollback)
+    // would wave every submission past the cap, so it stops the
+    // submission instead, before anything is written or billed.
+    if (capError) {
+      console.error("[judge] daily cap could not be checked:", capError.message);
+      return NextResponse.json({ ok: false, error: CAP_UNCHECKED }, { status: 503 });
+    }
     if ((dailyCount ?? 0) >= DAILY_CAP) {
       return paused("daily_cap");
     }
@@ -131,6 +157,10 @@ export async function POST(request: Request) {
     created_at: string | null;
     motion_text: string | null;
   } | null = null;
+  // A revision whose judging failed left an unjudged row behind. The
+  // reader was told to try again, so that row is reused, as an original's
+  // unjudged row is, rather than counting as the one revision they get.
+  let unjudgedRevision: { id: string; argument: string | null } | null = null;
   if (isRevision) {
     const { data: parentRow } = await admin
       .from("debates")
@@ -151,12 +181,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: "Unknown debate." }, { status: 404 });
     }
 
+    // This reader's own revision only. RLS lets any signed-in user insert
+    // a row of their own, so a row under someone else's id could point at
+    // this original; reusing it would write this reader's revision into
+    // that row. A foreign row falls through to the insert below, where the
+    // unique index answers "already revised", as before.
     const { data: existingChild } = await admin
       .from("debates")
-      .select("id")
+      .select("id, verdict, argument")
       .eq("parent_debate_id", parentRow.id)
+      .eq("user_id", user.id)
+      .eq("kind", "revision")
       .maybeSingle();
-    if (existingChild) return paused("already_revised");
+    if (existingChild?.verdict) return paused("already_revised");
+    if (existingChild) {
+      unjudgedRevision = {
+        id: existingChild.id as string,
+        argument: (existingChild.argument as string | null) ?? null,
+      };
+    }
 
     parent = {
       id: parentRow.id,
@@ -199,7 +242,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const debateId = recent?.id ?? newId();
+  // The unjudged row to reuse, if there is one: an original's from inside
+  // the topic lock, or a revision's from a failed try at it.
+  const reuse = isRevision ? unjudgedRevision : recent;
+  const debateId = reuse?.id ?? newId();
   const school = profile.school as SchoolId;
 
   // The wording this argument is judged against, decided once and used for
@@ -216,11 +262,10 @@ export async function POST(request: Request) {
     topic.motion
   );
 
-  if (!recent) {
-    // `recent` is always null on a revision, so this always inserts a fresh
-    // row there — never the reuse path below, which would otherwise let a
-    // revision overwrite an abandoned unjudged original that happened to
-    // share the topic.
+  if (!reuse) {
+    // `recent` is always null on a revision, and a revision only ever
+    // reuses its own unjudged child, so it never overwrites an abandoned
+    // unjudged original that happened to share the topic.
     const { error: insertError } = await admin.from("debates").insert({
       id: debateId,
       user_id: user.id,
@@ -238,8 +283,18 @@ export async function POST(request: Request) {
     if (insertError) {
       return paused("already_revised");
     }
-  } else if (recent.argument !== body.argument) {
-    await admin.from("debates").update({ argument: body.argument }).eq("id", debateId);
+  } else if (reuse.argument !== body.argument) {
+    // Checked, because the judge scores body.argument: a failed save would
+    // store its verdict beside text it never read, and the failure copy
+    // tells the reader their argument is saved.
+    const { error: saveError } = await admin
+      .from("debates")
+      .update({ argument: body.argument })
+      .eq("id", debateId);
+    if (saveError) {
+      console.error(`[judge] argument for ${debateId} could not be saved:`, saveError.message);
+      return NextResponse.json({ ok: false, error: ARGUMENT_NOT_SAVED }, { status: 500 });
+    }
   }
 
   // The model is shown the original and the objection it is meant to answer,
@@ -271,12 +326,22 @@ export async function POST(request: Request) {
       revisionOf: revisionContext ?? undefined,
     });
   } catch (err) {
+    // Logged in production too: Arthur asked for a submission that fails
+    // every attempt to be logged. The detail is the validator's summary or
+    // the API's error, which name a field or a status, never the argument.
+    // Each failed reply's ai_calls row also carries its validation error.
     const detail = err instanceof JudgeValidationError ? err.message : String(err);
-    if (process.env.NODE_ENV !== "production") {
-      console.error("[judge] model call failed:", detail);
-    }
+    console.error(`[judge] submission ${debateId} ended without a verdict:`, detail);
+    // Whether its calls came out of the daily cap. When they did not, the
+    // reader is not told the attempt did not use one of their arguments.
+    const offCap = wasTakenOffDailyCap(err);
     return NextResponse.json(
-      { ok: false, error: "Judging failed. Your argument is saved. Try again." },
+      {
+        ok: false,
+        reason: JUDGING_FAILED_REASON,
+        offCap,
+        error: `${JUDGING_FAILED_TITLE} ${offCap ? JUDGING_FAILED_BODY : JUDGING_FAILED_BODY_COUNTED}`,
+      },
       { status: 502 }
     );
   }

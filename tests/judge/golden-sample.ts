@@ -1,9 +1,9 @@
-// One golden-run sample: a judge call with production's one retry, and
+// One golden-run sample: a judge call with production's retries, and
 // what the run file records for each attempt. Kept out of run-golden.ts,
 // which runs a whole golden set the moment it is imported, so that
 // tests/golden-sample.test.ts can drive exactly what the runner uses.
 import {
-  judgeWithOneRetry,
+  judgeWithRetries,
   type JudgeAttempt,
   type JudgeCallResult,
 } from "../../src/lib/anthropic";
@@ -26,7 +26,7 @@ export interface SampleOutcome {
   failure: string | null;
   /** Whether the first reply failed validation and was sent again. */
   retried: boolean;
-  /** Whether that second reply failed validation too. */
+  /** Whether the retries ended without a reply that validated. */
   retryFailed: boolean;
 }
 
@@ -34,7 +34,8 @@ export const REJECTED = "model rejected the submission";
 
 /**
  * Take one sample the way production judges a submission: a reply that
- * fails validation is sent again once (Arthur's ruling of 2026-11-03).
+ * fails validation is sent again, up to twice (Arthur's rulings of
+ * 2026-11-03).
  * Every attempt goes to `record` as it happens, the failed one included,
  * so the run file holds every billed call and its cost adds up.
  *
@@ -46,20 +47,16 @@ export async function takeSample(
   record: (attempt: JudgeAttempt) => Promise<void>
 ): Promise<SampleOutcome> {
   // Set from the first attempt, so a retry that ends in an API error,
-  // which reaches no logger, still counts as a retry, and as a failed one.
+  // which reaches no logger, still counts as a retry, and as a failed one:
+  // a sample that ends without a verdict after being retried is exactly
+  // one whose retries failed, however they failed.
   let retried = false;
-  let retryFailed = false;
-  let secondReturned = false;
   try {
-    const { verdict } = await judgeWithOneRetry(call, async (attempt) => {
+    const { verdict } = await judgeWithRetries(call, async (attempt) => {
       if (attempt.attempt === 1) retried = attempt.error !== null;
-      else {
-        secondReturned = true;
-        retryFailed = attempt.error !== null;
-      }
       await record(attempt);
     });
-    if (verdict.rejected) return { sample: null, failure: REJECTED, retried, retryFailed };
+    if (verdict.rejected) return { sample: null, failure: REJECTED, retried, retryFailed: false };
     return {
       sample: {
         score: verdict.score,
@@ -71,14 +68,14 @@ export async function takeSample(
       },
       failure: null,
       retried,
-      retryFailed,
+      retryFailed: false,
     };
   } catch (err) {
     return {
       sample: null,
       failure: err instanceof Error ? err.message : String(err),
       retried,
-      retryFailed: retryFailed || (retried && !secondReturned),
+      retryFailed: retried,
     };
   }
 }
@@ -92,7 +89,7 @@ export type RecordContext = Pick<
 /**
  * Write one attempt to the run file, whatever its outcome. The runner
  * calls this for every attempt `takeSample` hands it, so a retried sample
- * leaves two records with the same `sample`, attempts 1 and 2.
+ * leaves two or three records with the same `sample`, attempts 1 to 3.
  */
 export function recordAttempt(
   run: GoldenRun,
