@@ -391,3 +391,50 @@ rule and new privacy copy, which is a feature decision, not a restyle.
 prompts, the judge prompts, the schema, `streak.ts`, `elo.ts`, the kill
 switch, the share card and the footer privacy copy. Module bodies and
 micro-lesson bodies are unchanged; Stage 5 content only added fields.
+
+## 12. Phase 3.0 previews (Stage 4 of the brief of 2026-11-03, not live)
+
+Shown only on `/styleguide/phase3`, which is a preview route and a 404 in
+production. Written here first, as the brief requires for new UI. None of
+it reaches a reader until Stage 5 builds it behind the `SIX_SCHOOLS` flag,
+and every line is Arthur's to change at Checkpoint A.
+
+### The map
+
+| Element | Copy |
+|---|---|
+| Quiz preview caption | `Where this answer moves you` (the brief's words) |
+| Profile caption | `Where your answers have put you` |
+| Axis, left to right | `Each person on their own` / `People through each other` |
+| Axis, bottom to top | `How it turns out` / `Who you are and what you owe` |
+
+The axis names are `docs/quiz-v2.md`'s, and change if that draft does.
+
+### School table, a school not yet ranked
+
+| Element | Copy |
+|---|---|
+| In place of the rank | `Unranked` |
+| Under the name | `Ranked once it has {N} judged original arguments. {n} so far.` |
+
+{N} is a threshold Arthur has not set; the preview shows a fixture value
+and says so.
+
+### Today, the view from elsewhere
+
+An optional card after the after-reading, not a seventh step.
+
+| Element | Copy |
+|---|---|
+| Eyebrow | `Optional` |
+| Title | `A view from elsewhere` |
+| Body | `Another tradition on this week's motion. There is no check, and it is not a step.` |
+| Button | `Read it` |
+| Label in the lesson player | `A view from elsewhere` |
+
+The passage's own title and source come from its file in `content/micro/`.
+
+### Navigation
+
+The School table link keeps its label, `School table`. Only its icon
+changes, and the preview shows candidates for it.

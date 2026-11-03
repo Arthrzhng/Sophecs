@@ -25,6 +25,11 @@ export interface CardLayoutProps {
   // size, so the web card scales to whatever column it lands in. Satori has no
   // container queries, so the image routes keep raw pixels (the default).
   unit?: "px" | "cqw";
+  // Preview only (/styleguide/phase3): a draft school has no surface or
+  // client-side name yet, so the preview passes a candidate colour and the
+  // name from content. Unset, the card is what it always was.
+  surface?: string;
+  schoolName?: string;
 }
 
 // Pure — no hooks, inline styles only, every size derived from `width` — so
@@ -58,6 +63,8 @@ export function CardLayout({
   height,
   fonts,
   unit = "px",
+  surface,
+  schoolName,
 }: CardLayoutProps) {
   // Sizes are authored against `width` and converted once, here. Scaling the
   // whole tree with a transform is not an option in pure CSS: scale() needs a
@@ -90,7 +97,7 @@ export function CardLayout({
         width: u(width),
         height: u(height),
         padding: u(pad),
-        backgroundColor: CARD_SURFACE[school],
+        backgroundColor: surface ?? CARD_SURFACE[school],
         color: CARD_INK,
         fontFamily: fonts.sans,
       }}
@@ -164,7 +171,7 @@ export function CardLayout({
             wordBreak: "break-word",
           }}
         >
-          {SCHOOL_COLORS[school].name}
+          {schoolName ?? SCHOOL_COLORS[school].name}
         </div>
       </div>
 
