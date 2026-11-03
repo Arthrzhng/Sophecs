@@ -10,7 +10,8 @@ import { JUDGES_NOTE_SENTENCE, withoutJudgesNote } from "../src/lib/verdict-shar
  * What a signed-out visitor can read on a verdict page, and what 2D did
  * not change about it.
  *
- * 2D added a second admin read to this page for `debates.motion_text`.
+ * 2D added a second admin read to this page for `debates.motion_text`,
+ * and Stage 2 of the brief of 2026-11-03 moved it into the view.
  * Privacy here has never depended on which query the motion comes from:
  * it is decided by `debates_public`, which nulls `argument` unless
  * `argument_public`, and by an RLS-gated read that is the only signal of
@@ -93,25 +94,40 @@ describe("a verdict page seen by someone who does not own it", () => {
 });
 
 /**
- * The shape of the read 2D added, checked in the source.
+ * Where the motion's stored wording comes from, checked in the source.
  *
- * Three properties Arthur asked to have pinned: it selects nothing but
- * `motion_text`, it is keyed to the debate the page is already rendering,
- * and it sits after the guard that 404s an unknown or mismatched debate,
- * so a missing row never reaches it.
+ * 2D read `debates.motion_text` with the admin client, beside the view,
+ * on both surfaces. Stage 2 of the brief of 2026-11-03 moved the column
+ * into `debates_public` (migration 0020) and took that read away, so
+ * everything public on the page and the image comes from the view, and
+ * the admin client no longer reads `debates` for it at all.
  */
 const READERS = [
   "src/app/debate/[slug]/[debateId]/page.tsx",
   "src/app/debate/[slug]/[debateId]/opengraph-image.tsx",
 ];
 
-describe("the motion_text read 2D added", () => {
-  it.each(READERS)("%s selects only motion_text, for only that debate", (file) => {
-    const source = fs.readFileSync(path.join(process.cwd(), file), "utf-8");
-    const read = /admin\s*\n?\s*\.from\("debates"\)\s*\n?\s*\.select\("([^"]*)"\)\s*\n?\s*\.eq\("id",\s*debateId\)/;
-    const match = read.exec(source.replace(/\s+/g, " ").replace(/ \./g, "."));
-    expect(match, `${file} should read debates by the rendered debateId`).not.toBeNull();
-    expect(match?.[1], "the select list").toBe("motion_text");
+describe("motion_text comes from debates_public", () => {
+  it.each(READERS)("%s selects motion_text from the view", (file) => {
+    const source = fs.readFileSync(path.join(process.cwd(), file), "utf-8").replace(/\s+/g, " ");
+    const viewRead = /\.from\("debates_public"\) ?\.select\( ?"([^"]*)" ?\)/.exec(source);
+    expect(viewRead, `${file} should read debates_public`).not.toBeNull();
+    expect(viewRead?.[1].split(",").map((c) => c.trim())).toContain("motion_text");
+  });
+
+  it.each(READERS)("%s no longer reads motion_text from debates", (file) => {
+    const source = fs.readFileSync(path.join(process.cwd(), file), "utf-8").replace(/\s+/g, " ");
+    for (const m of source.matchAll(/\.from\("debates"\) ?\.select\( ?"([^"]*)" ?\)/g)) {
+      expect(m[1], `${file} reads debates for ${m[1]}`).not.toContain("motion_text");
+    }
+  });
+
+  it("leaves the OG image with no read of debates at all", () => {
+    const og = fs.readFileSync(
+      path.join(process.cwd(), "src/app/debate/[slug]/[debateId]/opengraph-image.tsx"),
+      "utf-8"
+    );
+    expect(og).not.toContain('from("debates")');
   });
 
   it("404s an unknown or mismatched debate before reading anything else", () => {
@@ -120,24 +136,10 @@ describe("the motion_text read 2D added", () => {
       "utf-8"
     );
     const guard = page.indexOf('if (!publicRow || publicRow.topic_slug !== slug) notFound();');
-    const read = page.indexOf('.select("motion_text")');
+    const topic = page.indexOf('.from("debate_topics")');
     expect(guard, "the notFound guard").toBeGreaterThan(-1);
-    expect(read, "the motion_text read").toBeGreaterThan(-1);
-    expect(
-      guard,
-      "the 404 guard must come first, so a debate that does not exist is never read for"
-    ).toBeLessThan(read);
-  });
-
-  it("only reads for a debate the OG route already found", () => {
-    const og = fs.readFileSync(
-      path.join(process.cwd(), "src/app/debate/[slug]/[debateId]/opengraph-image.tsx"),
-      "utf-8"
-    );
-    const found = og.indexOf("if (data) {");
-    const read = og.indexOf('.select("motion_text")');
-    expect(found).toBeGreaterThan(-1);
-    expect(found).toBeLessThan(read);
+    expect(topic, "the topic read").toBeGreaterThan(-1);
+    expect(guard, "the 404 guard must come before the next read").toBeLessThan(topic);
   });
 });
 
