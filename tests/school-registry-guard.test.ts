@@ -44,6 +44,8 @@ const REGISTRY_FILES: Record<string, string> = {
     "Fixture data for /styleguide/arena, which is preview-only. Demo rows naming schools, not a list the product reads.",
   "src/app/styleguide/arena/page.tsx":
     "Preview-only. Renders one block per school deliberately, to show each colour beside the others.",
+  "src/app/styleguide/phase3/page.tsx":
+    "Preview-only. Places each of the six schools at the map angle docs/quiz-v2.md proposes, and maps the live three to their colour token names; a draft for Arthur, not a list the product reads.",
 };
 
 function sourceFiles(): string[] {

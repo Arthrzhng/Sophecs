@@ -84,3 +84,19 @@ entry names.
   390 and 1280 in `docs/phase3-styleguide/judging-failed/`; every text in
   them measures at least 6.95:1 against its background (WCAG AA asks
   4.5:1), read from computed styles with Playwright.
+
+## 2026-11-03: Stage 4, the Phase 3.0 items on `/styleguide/phase3`
+
+- Preview only: `/styleguide` renders nothing in production, and the
+  card preview route answers only on a preview deployment or with
+  `SOPHECS_PREVIEW` set. Colour candidates for the three draft schools
+  (`scripts/colour-candidates.mjs`, `docs/phase3-styleguide/colour-candidates.json`),
+  the two-axis map in the quiz preview and in Profile history, the school
+  table with six rows, the "view from elsewhere" card on Today and in the
+  lesson player, result cards and their card images for six schools, the
+  lesson filter chips, and a nav icon for the school table. Screenshots of
+  every section at 390 and 1280 in `docs/phase3-styleguide/`, taken from
+  a local production build. Contrast: 203 text elements on the page
+  measured from computed styles with Playwright, none below WCAG AA, the
+  lowest 5.03:1 (text inside SVG and on image backgrounds not measured).
+  The colour choice, and everything shown, is Arthur's at Checkpoint A.
