@@ -49,6 +49,8 @@ export interface VerdictData {
 const WITHHELD_HEADING = "The verdict on a private argument";
 const WITHHELD_NOTE =
   "The judge's note can quote the argument, so only the person who wrote it can read it while the argument is private.";
+const WITHHELD_REJECTED =
+  "The judge set this argument aside without a score. Its reason can quote the argument, so only the person who wrote it can read it.";
 function withheldObjection(schoolName: string): string {
   return `The argument left a ${schoolName} objection standing. Its wording can quote the argument, so only the person who wrote it can read it.`;
 }
@@ -211,7 +213,11 @@ export function Verdict({
         <div className="mt-8">
           <ErrorState
             title="This was not judged."
-            body={verdict.rejection_reason ?? "The judge returned no verdict for this argument."}
+            body={
+              textWithheld
+                ? WITHHELD_REJECTED
+                : (verdict.rejection_reason ?? "The judge returned no verdict for this argument.")
+            }
             action={
               <div className="flex flex-wrap items-center gap-6 text-sm">
                 <TextLink href={`/debate/${topicSlug}`}>Write it again</TextLink>
@@ -492,7 +498,7 @@ export function Verdict({
               {verdict.objection_answered ? "Objection answered." : "Objection still standing."}
             </p>
           )}
-          {verdict.improvement_note && (
+          {verdict.improvement_note && !textWithheld && (
             <p className="prose-reading mt-3">{verdict.improvement_note}</p>
           )}
 

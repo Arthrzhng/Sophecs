@@ -295,6 +295,8 @@ verdict page is unchanged.
 | "The judge's note", in place of its three paragraphs | `The judge's note can quote the argument, so only the person who wrote it can read it while the argument is private.` |
 | The objection left standing, in place of its wording | `The argument left a {School} objection standing. Its wording can quote the argument, so only the person who wrote it can read it.` |
 | Share line | The school's share line without its `The judge's note: {verdict_line}.` sentence |
+| A rejected argument, in place of the judge's reason | `The judge set this argument aside without a score. Its reason can quote the argument, so only the person who wrote it can read it.` |
+| A revision's note on what changed | Not shown: the note can quote the argument too |
 
 ## 7. Objection and revise (mockup 05)
 

@@ -12,3 +12,12 @@ export const JUDGES_NOTE_SENTENCE = /\s*The judge's\s+note:\s*\{verdict_line\}\.
 export function withoutJudgesNote(template: string): string {
   return template.replace(JUDGES_NOTE_SENTENCE, " ").trim();
 }
+
+/**
+ * The share template for a verdict page: the school's own, or, for
+ * someone other than the author of a private argument, the same without
+ * its judge's-note sentence, whose verdict line is withheld.
+ */
+export function shareTemplateFor(template: string, textWithheld: boolean): string {
+  return textWithheld ? withoutJudgesNote(template) : template;
+}

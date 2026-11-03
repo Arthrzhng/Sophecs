@@ -1872,10 +1872,15 @@ four to three, since it no longer counts a view the API cannot reach.
 ### The judge quotes arguments (migration 0018)
 
 **Rule for any future public surface: a verdict is the argument's text in
-pieces.** The judge quotes the argument it is judging, in every free-text
-field. Any page, image, export, API or view that shows a verdict to anyone
-other than its author has to treat the verdict's text with the argument's
-own privacy.
+pieces.** The judge quotes the argument it is judging, in each of the six
+free-text fields measured below, and any field it writes in its own words
+can do the same; `improvement_note` and `rejection_reason` were not
+measured, since the golden runs hold no revisions and no rejections. Any
+page, image, export, API or view that shows a verdict to anyone other than
+its author has to treat the verdict's text with the argument's own
+privacy, and has to do it before the verdict reaches the browser: a prop
+handed to a client component is in the page's source whether or not it is
+rendered.
 
 The measurement, `scripts/measure-verdict-quoting.mjs`, over five golden
 runs on `tests/judge/golden/`, 269 judged samples (the run of 2026-11-03
@@ -1901,22 +1906,41 @@ counted one run twice; 269 is correct.
 Arthur's ruling of 2026-11-03: for rows whose argument is not public,
 return NULL for every verdict field that can quote the argument; keep
 score and criteria scores, and `verdict_line` only if it cannot quote. It
-can, so it goes too. `0018_debates_public_private_verdict_text.sql` sets
-to JSON null, where present, `strongest_move`, `weakest_move`,
-`a_stronger_version_would`, `verdict_line`, `improvement_note`,
-`rejection_reason`, and the objection's `claim` and `why_it_stands`. It
-keeps `rejected`, `score`, `fidelity`, `rigor`, `engagement`,
-`objection_answered`, `prompt_version` and the objection's `school`. A
-published argument's verdict, and a null verdict, are unchanged. Tested on
-local Postgres (`scripts/test-0017-0018-public-views.sh`, 87 checks,
-rollback and re-apply included). The definition it replaces is in
+can, so it goes too. `0018_debates_public_private_verdict_text.sql`
+rebuilds a private argument's verdict from a list of what to keep:
+`rejected`, `score`, `fidelity`, `rigor`, `engagement`,
+`objection_answered`, `prompt_version`, and the objection reduced to its
+`school`, with `claim` and `why_it_stands` as JSON null. Everything else is
+left out, so a field the verdict gains later is withheld until someone
+decides otherwise. The first draft listed what to remove instead. The
+review of #50 showed that an unknown key, an extra key on the objection,
+an objection stored as a string, and a verdict that was not an object
+would all have passed through. Nothing writes those shapes today, but
+Arthur's ruling covers "any other free-text field". A private verdict
+that is not a JSON object becomes null. A published argument's verdict,
+and a null verdict, are unchanged. Tested on local Postgres
+(`scripts/test-0017-0018-public-views.sh`, 99 checks over all four of
+those shapes, rollback and re-apply included). Adding `verdict_line` to
+the keep-list fails 11 of them. The definition it replaces is in
 `docs/seed-snapshots/2026-11-03-debates-public-before-0018.json`.
 
-**The page goes first.** The verdict page now withholds the judge's words
-from anyone but the author when the argument is private, whatever the view
-returns, and reads the author's own full verdict from `debates` through
+**The page goes first.** For anyone but the author of a private argument,
+the verdict page cuts the verdict down on the server, with
+`withheldVerdict` in `src/lib/verdict-privacy.ts`, using the same
+keep-list as 0018. It does this before the verdict reaches the `Verdict`
+component, a client component whose props are written into the page's
+payload. The author reads their own full verdict from `debates` through
 row level security. So the page is right before 0018 and after it, and
-0018 is applied only once that code is live. What a reader other than the
+0018 is applied only once that code is live.
+
+The first version withheld the words only in what `Verdict` rendered. It
+still passed the full verdict as a prop, so before 0018 every field was
+in the page source, and `rejection_reason` and `improvement_note` were
+rendered anyway. The fresh review of #50 found both, and this is the fix.
+`tests/verdict-privacy.test.ts` now checks the props themselves, and that
+the page's keep-list and 0018's are the same list.
+A rejected private argument shows its own withheld note instead of the
+judge's reason, and a revision's note on what changed is not shown. What a reader other than the
 author sees is in `docs/daily-path-copy.md`, "A verdict on a private
 argument, seen by someone else": the score and the three criteria, a note
 saying why the rest is withheld, and the school whose objection was left

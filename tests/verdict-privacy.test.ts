@@ -4,7 +4,8 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, it, expect } from "vitest";
 import { Verdict } from "../src/components/debate/Verdict";
-import { JUDGES_NOTE_SENTENCE, withoutJudgesNote } from "../src/lib/verdict-share";
+import { JUDGES_NOTE_SENTENCE, shareTemplateFor, withoutJudgesNote } from "../src/lib/verdict-share";
+import { KEPT_FOR_EVERYONE, withheldVerdict } from "../src/lib/verdict-privacy";
 
 /**
  * What a signed-out visitor can read on a verdict page, and what 2D did
@@ -48,7 +49,7 @@ function render(opts: {
   isOwner: boolean;
   argumentPublic: boolean;
   textWithheld?: boolean;
-  verdict?: typeof VERDICT | Record<string, unknown>;
+  verdict?: object;
 }) {
   return renderToStaticMarkup(
     createElement(Verdict, {
@@ -188,11 +189,101 @@ describe("a private argument's verdict, seen by someone else", () => {
     for (const mark of ["7.0", "6.0"]) expect(html).toContain(mark);
   });
 
-  it("shows none of the judge's words even if the view still returned them", () => {
-    // The page withholds them itself, so it is safe before 0018 is applied
-    // as well as after: here the full verdict is passed in.
-    const before0018 = render({ argument: null, isOwner: false, argumentPublic: false, textWithheld: true });
-    for (const words of JUDGES_WORDS) expect(before0018).not.toContain(words);
+  it("never hands the judge's words to the client, even when the view returns them", () => {
+    // Before 0018 is applied, or after its rollback, debates_public returns
+    // the whole verdict. The page cuts it down with withheldVerdict on the
+    // server, and Verdict is a client component, so its props are the page
+    // payload: what is checked here is everything the browser receives.
+    const props = withheldVerdict(VERDICT);
+    for (const words of JUDGES_WORDS) expect(JSON.stringify(props)).not.toContain(words);
+    const html = render({ argument: null, isOwner: false, argumentPublic: false, textWithheld: true, verdict: props! });
+    for (const words of JUDGES_WORDS) expect(html).not.toContain(words);
+  });
+
+  it("withholds a rejected argument's reason, and says so", () => {
+    const rejected = { rejected: true, rejection_reason: "It only repeats the words secret plan.", prompt_version: "v2" };
+    for (const verdict of [rejected, withheldVerdict(rejected)!]) {
+      const html = render({ argument: null, isOwner: false, argumentPublic: false, textWithheld: true, verdict });
+      expect(html).not.toContain("secret plan");
+      expect(html).toContain(
+        "The judge set this argument aside without a score. Its reason can quote the argument, so only the person who wrote it can read it."
+      );
+    }
+    // The author still reads it.
+    const own = render({ argument: ARGUMENT_TEXT, isOwner: true, argumentPublic: false, verdict: rejected });
+    expect(own).toContain("secret plan");
+  });
+
+  it("withholds a revision's note on what changed", () => {
+    const revision = { ...VERDICT, objection_answered: true, improvement_note: "Now answers it with the secret plan." };
+    const comparison = { parentDebateId: "parent1", first: { score: 60, fidelity: 6, rigor: 6, engagement: 5 } };
+    const withheld = renderToStaticMarkup(
+      createElement(Verdict, {
+        debateId: "rev1",
+        topicSlug: "opaque-benefit",
+        motion: MOTION,
+        school: "utilitarianism",
+        verdict: revision,
+        eloDelta: null,
+        eloAfter: null,
+        shareLine: "s",
+        afterLesson: null,
+        argument: null,
+        isOwner: false,
+        argumentPublic: false,
+        textWithheld: true,
+        comparison,
+      } as Parameters<typeof Verdict>[0])
+    );
+    expect(withheld).not.toContain("secret plan");
+    expect(withheld).toContain("Objection answered.");
+  });
+});
+
+describe("withheldVerdict", () => {
+  it("keeps only the fields that cannot quote the argument", () => {
+    expect(withheldVerdict(VERDICT)).toEqual({
+      rejected: false,
+      score: 72,
+      fidelity: VERDICT.fidelity,
+      rigor: VERDICT.rigor,
+      engagement: VERDICT.engagement,
+      unanswered_objection: { school: "virtue-ethics", claim: null, why_it_stands: null },
+    });
+  });
+
+  it("drops any field it does not know, so a new one is withheld by default", () => {
+    const withExtra = {
+      ...VERDICT,
+      notes: "secret",
+      improvement_note: "secret",
+      rejection_reason: "secret",
+      unanswered_objection: { ...VERDICT.unanswered_objection, extra: "secret" },
+    };
+    expect(JSON.stringify(withheldVerdict(withExtra))).not.toContain("secret");
+  });
+
+  it("keeps a revision's and a v1 verdict's own scores and flags", () => {
+    const revision = { ...VERDICT, objection_answered: false, prompt_version: "v2" };
+    expect(withheldVerdict(revision)).toMatchObject({ objection_answered: false, prompt_version: "v2", score: 72 });
+    const v1 = { rejected: false, score: 68, fidelity: 8, rigor: 6, engagement: 6, verdict_line: "secret", prompt_version: "v1" };
+    expect(withheldVerdict(v1)).toEqual({ rejected: false, score: 68, fidelity: 8, rigor: 6, engagement: 6, prompt_version: "v1" });
+  });
+
+  it("drops an objection that is not an object, and anything that is not a verdict", () => {
+    expect(withheldVerdict({ ...VERDICT, unanswered_objection: "secret" })).not.toHaveProperty("unanswered_objection");
+    for (const odd of [null, "secret", ["secret"], 7]) expect(withheldVerdict(odd)).toBeNull();
+  });
+
+  it("is the list 0018 keeps, so the page and the view agree", () => {
+    const migration = fs.readFileSync(
+      path.join(process.cwd(), "supabase/migrations/0018_debates_public_private_verdict_text.sql"),
+      "utf-8"
+    );
+    const list = /e\.key in \(([^)]*)\)/.exec(migration)?.[1];
+    expect(list, "0018's list of kept keys").toBeTruthy();
+    const keys = [...list!.matchAll(/'([a-z_]+)'/g)].map((m) => m[1]).sort();
+    expect(keys).toEqual([...KEPT_FOR_EVERYONE].sort());
   });
 });
 
@@ -205,6 +296,12 @@ describe("the author's own verdict", () => {
 });
 
 describe("the share line without the judge's note", () => {
+  it("is used for someone else's view of a private argument, and only then", () => {
+    const template = "Scored {score} on {topic}. The judge's note: {verdict_line}. sophecs.com/debate/{slug}/{id}";
+    expect(shareTemplateFor(template, true)).toBe("Scored {score} on {topic}. sophecs.com/debate/{slug}/{id}");
+    expect(shareTemplateFor(template, false)).toBe(template);
+  });
+
   const SCHOOLS = ["stoicism", "utilitarianism", "virtue-ethics", "confucian", "ubuntu", "buddhist"];
 
   it.each(SCHOOLS)("%s's template carries the sentence it removes, and keeps the rest", (id) => {
@@ -227,12 +324,14 @@ describe("the verdict page's own read", () => {
 
   it("reads the author's verdict from debates, through RLS", () => {
     expect(page).toContain('.select("argument, argument_public, verdict")');
-    expect(page).toContain("isOwner && ownVerdict ? ownVerdict : publicRow.verdict");
+    expect(page.replace(/\s+/g, " ")).toContain(
+      "isOwner && ownVerdict ? ownVerdict : textWithheld ? withheldVerdict(publicRow.verdict) : publicRow.verdict"
+    );
   });
 
   it("withholds the text for anyone but the author on a private argument", () => {
     expect(page).toContain("const textWithheld = !isOwner && !argumentPublic;");
     expect(page).toContain("textWithheld={textWithheld}");
-    expect(page).toContain("withoutJudgesNote(schoolContent.verdict_share_line)");
+    expect(page).toContain("shareTemplateFor(schoolContent.verdict_share_line, textWithheld)");
   });
 });

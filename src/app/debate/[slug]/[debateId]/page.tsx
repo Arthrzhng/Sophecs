@@ -11,7 +11,8 @@ import { Page } from "@/components/layout/Page";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate, shortMotionForShare } from "@/lib/motion-text";
-import { withoutJudgesNote } from "@/lib/verdict-share";
+import { shareTemplateFor } from "@/lib/verdict-share";
+import { withheldVerdict } from "@/lib/verdict-privacy";
 
 export const metadata = { title: "Verdict · Sophecs" };
 
@@ -138,7 +139,15 @@ export default async function VerdictPage({
 
   const school = publicRow.school as SchoolId;
   const afterLesson = getMicroLesson(topic.micro_after);
-  const verdict = (isOwner && ownVerdict ? ownVerdict : publicRow.verdict) as VerdictData;
+  // The author reads their own verdict, from debates through RLS. Anyone
+  // else gets debates_public's, cut down here to the fields that cannot
+  // quote the argument when the argument is private. Cut here, on the
+  // server, not left to the component: Verdict is a client component, and
+  // whatever it is handed lands in the page payload whether it is shown or
+  // not. So the page withholds whatever the view returns.
+  const verdict = (
+    isOwner && ownVerdict ? ownVerdict : textWithheld ? withheldVerdict(publicRow.verdict) : publicRow.verdict
+  ) as VerdictData;
   const eloDelta =
     publicRow.elo_before != null && publicRow.elo_after != null
       ? Math.round(Number(publicRow.elo_after) - Number(publicRow.elo_before))
@@ -168,9 +177,7 @@ export default async function VerdictPage({
   // a reword, and this page is the one that used to say the wrong thing.
   const motion = motionForDebate(storedMotion?.motion_text as string | null, topic.motion);
   const shortMotion = shortMotionForShare(motion);
-  const shareTemplate = textWithheld
-    ? withoutJudgesNote(schoolContent.verdict_share_line)
-    : schoolContent.verdict_share_line;
+  const shareTemplate = shareTemplateFor(schoolContent.verdict_share_line, textWithheld);
   const baseShareLine = shareTemplate
     .replaceAll("{score}", String(verdict.score ?? ""))
     .replaceAll("{topic}", shortMotion)
