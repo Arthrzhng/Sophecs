@@ -84,3 +84,13 @@ entry names.
   390 and 1280 in `docs/phase3-styleguide/judging-failed/`; every text in
   them measures at least 6.95:1 against its background (WCAG AA asks
   4.5:1), read from computed styles with Playwright.
+
+## 2026-11-03: Stage 3, the quiz v2 design
+
+- `docs/quiz-v2.md`, `docs/quiz-v2.json` and
+  `scripts/simulate-quiz-v2.mjs`: a draft of the two-axis, six-school quiz
+  for Arthur to decide at Checkpoint A. Nothing is built and nothing in
+  the product changes. The simulation scores every answer pattern from
+  the JSON and exits non-zero if a school is unreachable, lands outside
+  8% to 30%, or a school's own persona misses it; it exits 0 on the
+  draft.
