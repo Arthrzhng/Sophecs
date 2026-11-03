@@ -1815,7 +1815,8 @@ fails.
   the power question.** The judge does now find it, in `weakest_move`:
   "Never addresses who holds power to adjust or override the system"
   (`confucian-hierarchy`, sample 3), and "who sets or can override the
-  system's encoding" on all three `confucian-hierarchy-school` samples.
+  system's encoding" on two of the three `confucian-hierarchy-school`
+  samples.
 - The original six in band. The cap moved seven cases by more than five
   points, all still in band: `buddhist-strong`, `confucian-strong` and
   `confucian-hierarchy-school` -8, `stoic-strong` and `ubuntu-conformity`
