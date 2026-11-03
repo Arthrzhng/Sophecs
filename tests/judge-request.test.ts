@@ -276,7 +276,7 @@ describe("the prompt version override", () => {
     for (const id of PUBLISHED_SCHOOL_IDS) expect(v3System).toContain(`- \`${id}\``);
   });
 
-  it("sends v3 the vocabulary paragraph the golden runner fingerprints, and v2 none", async () => {
+  it("sends v3 the vocabulary and objection paragraphs the golden runner fingerprints, and v2 neither", async () => {
     // The golden runner fingerprints fidelityCriteriaFor(school, version).
     // A reviewer reverted callJudgeModel to the bare criteria and every
     // test stayed green, so the fingerprint could have described criteria
@@ -291,6 +291,7 @@ describe("the prompt version override", () => {
       const v2System = systemOf(created[0]);
       expect(v2System, school).toContain(fidelityCriteriaFor(school, "v2"));
       expect(v2System, school).not.toContain("Credit the concept, not the vocabulary");
+      expect(v2System, school).not.toContain("The best-known objection to");
     }
   });
 

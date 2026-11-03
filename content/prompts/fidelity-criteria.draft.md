@@ -30,15 +30,19 @@ listed at the bottom instead of being asserted in the criteria.
 Structure and length follow the three in rubric.ts as v3 sends them: a
 paragraph on what the school's reasoning commits to, then a paragraph naming
 the ways an argument fails fidelity, including the bleeds from rival
-schools, then a paragraph crediting the concept over the vocabulary. That
-third paragraph is Arthur's ruling of 2026-10-26, made for all six schools
-after the 2F golden runs; these schools are only ever judged under v3, so
-it is part of their criteria here, while the three live schools carry it
-in rubric.ts and receive it under v3 only. The existing three run 1046 to
-1370 characters and 164 to 225 words under v3, in three paragraphs; these
-run 1209 to 1265 and 186 to 196. Before the third paragraph was added they
-ran 849 to 888 and 128 to 137, against 730 to 893 and 114 to 142 for the
-live three under v2.
+schools, then a paragraph crediting the concept over the vocabulary, then
+the objection the school is best known for having to answer. The third
+paragraph is Arthur's ruling of 2026-10-26, made for all six schools after
+the 2F golden runs, and the fourth his ruling of 2026-11-03, after the
+3 Nov run, taking each objection from the gets_wrong section of the
+school's page in content/schools. These schools are only ever judged under
+v3, so both paragraphs are part of their criteria here, while the three
+live schools carry them in rubric.ts and receive them under v3 only. The
+existing three run 1464 to 1726 characters and 232 to 282 words under v3,
+in four paragraphs; these run 1541 to 1723 and 238 to 268. With three
+paragraphs the figures were 1046 to 1370 and 164 to 225 for the live three
+and 1209 to 1265 and 186 to 196 for these; with two, 730 to 893 and 114 to
+142 for the live three under v2 and 849 to 888 and 128 to 137 for these.
 
 Those are `.length` of the stored string, which is what
 tests/judge-v3-and-refusal.test.ts asserts. An earlier revision of this
@@ -55,7 +59,8 @@ each, one composite out of a hundred.
 
 Approved 2026-10-24. The live judge does not read this file; the golden
 runner does, in eval mode only. The third paragraph of each section was
-added on 2026-10-26, by Arthur's ruling on the 2F golden runs.
+added on 2026-10-26, by Arthur's ruling on the 2F golden runs, and the
+fourth on 2026-11-03, by his ruling on the 3 Nov run.
 
 ## `confucian` (Confucianism)
 
@@ -79,6 +84,13 @@ humaneness a relationship realises, and the propriety through which conduct
 in it is done is reasoning from ren and li whether or not either word
 appears. Never mark fidelity down for missing vocabulary alone.
 
+The best-known objection to Confucianism is that role ethics is too ready
+to authorise hierarchy: mutual duties do not make unequal parties equals,
+and a system can honour every expectation attaching to a role while leaving
+the power between the parties where it found it. Engagement should check
+whether the argument meets this objection, and ignoring it costs
+engagement, not fidelity.
+
 ## `ubuntu` (Ubuntu)
 
 A faithful Ubuntu argument grounds its claim in relational personhood: a
@@ -100,6 +112,12 @@ people become through one another, and reads a harm as a failure of
 relationship and solidarity, is reasoning from relational personhood whether
 or not it uses the word ubuntu, quotes the maxim, or names Metz, Menkiti or
 Gyekye. Never mark fidelity down for missing vocabulary alone.
+
+The best-known objection to Ubuntu is that a community is not one voice:
+somebody decides what communal welfare means and who counts as inside, and
+an appeal to communal expectation can make a dissenter the problem.
+Engagement should check whether the argument meets this objection, and
+ignoring it costs engagement, not fidelity.
 
 ## `buddhist` (Buddhist Ethics)
 
@@ -124,6 +142,14 @@ and treats what happens as arising from many conditions rather than one
 cause is reasoning from dukkha, anatta and dependent origination whether or
 not it uses those terms. Never mark fidelity down for missing vocabulary
 alone.
+
+The best-known objection to Buddhist ethics is that it has much moral
+teaching and little systematic moral philosophy of the kind the West built:
+compassion and non-harm do not say who owns a dataset, who audits a model,
+or how somebody appeals its decisions. That gap is a challenge for
+reconstruction, not proof the tradition is deficient. Engagement should
+check whether the argument meets this objection, and ignoring it costs
+engagement, not fidelity.
 
 ## Doctrinal claims, and what Arthur ruled on
 

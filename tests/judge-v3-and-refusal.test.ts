@@ -218,6 +218,15 @@ describe("judge.v3.md", () => {
 describe("the draft fidelity criteria", () => {
   const DRAFT = path.join(PROMPTS, "fidelity-criteria.draft.md");
 
+  // The objection paragraph Arthur ruled on 2026-11-03, the same two
+  // sentences' frame for all six schools: the objection, then where it
+  // scores. Whitespace is flattened before the closing is compared,
+  // because the paragraphs wrap at different words.
+  const OBJECTION_OPENING = /^The best-known objection to /;
+  const OBJECTION_CLOSING =
+    "Engagement should check whether the argument meets this objection, " +
+    "and ignoring it costs engagement, not fidelity.";
+
   // Derived from the live criteria, so the band cannot drift away from
   // the thing it describes. `.length` of the stored string, which is also
   // what the draft file quotes: measuring a whitespace-flattened copy
@@ -256,26 +265,31 @@ describe("the draft fidelity criteria", () => {
     expect(LIVE_BAND.words).toEqual([114, 142]);
   });
 
-  it("takes its v3 band from the live criteria under v3, which are 1046 to 1370 characters", () => {
-    expect(LIVE_V3_BAND.chars).toEqual([1046, 1370]);
-    expect(LIVE_V3_BAND.words).toEqual([164, 225]);
+  it("takes its v3 band from the live criteria under v3, which are 1464 to 1726 characters", () => {
+    expect(LIVE_V3_BAND.chars).toEqual([1464, 1726]);
+    expect(LIVE_V3_BAND.words).toEqual([232, 282]);
   });
 
-  it("gives v3 every live school's criteria unchanged, then the vocabulary paragraph", () => {
+  it("gives v3 every live school's criteria unchanged, then the vocabulary and objection paragraphs", () => {
     for (const id of PUBLISHED_SCHOOL_IDS) {
       expect(fidelityCriteriaFor(id, "v2"), id).toBe(FIDELITY_CRITERIA[id]);
       expect(fidelityCriteriaFor(id, "v1"), id).toBe(FIDELITY_CRITERIA[id]);
-      // The paragraph lives only in the v3 map. A school published from the
-      // draft file with all three paragraphs in CRITERIA_BY_SCHOOL would
-      // send it twice under v3, and fail here instead.
+      // Both paragraphs live only in the v3 maps. A school published from
+      // the draft file with all four paragraphs in CRITERIA_BY_SCHOOL would
+      // send them twice under v3, and fail here instead.
       expect(FIDELITY_CRITERIA[id], id).not.toContain("Credit the concept");
+      expect(FIDELITY_CRITERIA[id], id).not.toContain("The best-known objection");
       const v3 = fidelityCriteriaFor(id, "v3");
       expect(v3.startsWith(`${FIDELITY_CRITERIA[id]}\n\n`), id).toBe(true);
-      const rule = v3.slice(FIDELITY_CRITERIA[id].length + 2);
+      const added = v3.slice(FIDELITY_CRITERIA[id].length + 2).split("\n\n");
+      expect(added.length, id).toBe(2);
+      const [rule, objection] = added;
       expect(rule).toMatch(/^Credit the concept, not the vocabulary\./);
       expect(rule.replace(/\s+/g, " ")).toContain(
         "Never mark fidelity down for missing vocabulary alone."
       );
+      expect(objection).toMatch(OBJECTION_OPENING);
+      expect(objection.replace(/\s+/g, " ").endsWith(OBJECTION_CLOSING), id).toBe(true);
     }
     for (const id of DRAFT_SCHOOL_IDS) {
       expect(() => fidelityCriteriaFor(id, "v3"), id).toThrowError(/no fidelity criteria/);
@@ -317,16 +331,19 @@ describe("the draft fidelity criteria", () => {
     expect(sections.length).toBe(DRAFT_SCHOOL_IDS.length);
     for (const [, text] of sections) {
       const body = text.trim();
-      // Three paragraphs, as the live criteria have under v3: the
-      // commitments, the fidelity failures, then the vocabulary paragraph.
+      // Four paragraphs, as the live criteria have under v3: the
+      // commitments, the fidelity failures, the vocabulary paragraph, then
+      // the objection the school is best known for having to answer.
       const paragraphs = body.split("\n\n");
-      expect(paragraphs.length).toBe(3);
+      expect(paragraphs.length).toBe(4);
       expect(body).toMatch(/^A faithful /);
       expect(paragraphs[1]).toMatch(/^Score fidelity down when the argument:/);
       expect(paragraphs[2]).toMatch(/^Credit the concept, not the vocabulary\./);
       expect(paragraphs[2].replace(/\s+/g, " ")).toContain(
         "Never mark fidelity down for missing vocabulary alone."
       );
+      expect(paragraphs[3]).toMatch(OBJECTION_OPENING);
+      expect(paragraphs[3].replace(/\s+/g, " ").endsWith(OBJECTION_CLOSING)).toBe(true);
       // The band the three live ones occupy as v3 sends them, measured
       // from them rather than written down. A reviewer pointed out that
       // these bounds were once literals: nothing in the suite measured the

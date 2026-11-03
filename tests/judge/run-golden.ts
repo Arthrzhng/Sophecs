@@ -27,22 +27,24 @@ import { z } from "zod";
 import {
   callJudgeModel,
   logAiCall,
-  JudgeValidationError,
   MODEL,
   PROMPT_VERSION,
+  type JudgeAttempt,
   type RunnablePromptVersion,
 } from "../../src/lib/anthropic";
+import { recordAttempt, takeSample, type RecordContext, type Sample } from "./golden-sample";
 import { planCase, readDraftCriteria, type CasePlan } from "./draft-criteria";
 import { describeEndpoint, describeEvalKey, endpointProblem, resolveEvalKey } from "./eval-key";
 import {
   flush,
   logTarget,
-  recordCall,
   requestFingerprint,
   startRun,
   type GoldenRun,
 } from "./golden-log";
 import type { SchoolId } from "../../src/lib/types";
+import { FIDELITY_CRITERIA } from "../../src/lib/judge/rubric";
+import { PUBLISHED_SCHOOL_IDS } from "../../src/lib/school-registry";
 
 // Where a run logs. `file` writes tests/judge/golden-runs/<run>.json and
 // touches nothing else; `ai_calls` is the old behaviour, kept for anyone
@@ -156,15 +158,6 @@ interface GoldenCase {
   expected_objection_school: SchoolId[];
 }
 
-interface Sample {
-  score: number;
-  fidelity: number;
-  rigor: number;
-  engagement: number;
-  weakestMove: string;
-  objectionSchool: SchoolId;
-}
-
 // A band is two numbers, low then high.
 const Band = z.tuple([z.number(), z.number()]).refine(([lo, hi]) => lo <= hi, {
   message: "band's low bound is above its high bound",
@@ -236,37 +229,37 @@ function spread(values: number[]): string {
 
 type RunnablePlan = Extract<CasePlan, { run: true }>;
 
+// Every attempt takeSample hands over is logged: to ai_calls under
+// GOLDEN_LOG=ai_calls, otherwise to the run file through recordAttempt,
+// which tests/golden-sample.test.ts drives. This body is pinned there word
+// for word, because the runner cannot be imported to test it: importing
+// it starts a run. `if (!run) return;` is unreachable, since `run` is
+// non-null exactly when LOG_TO is "file", but it is what narrows the type
+// for tsc, and a non-null assertion would hide a real null if the two
+// conditions ever drifted apart.
 async function logCall(
   run: GoldenRun | null,
   c: GoldenCase,
   plan: RunnablePlan,
   sample: number,
-  costUsd: number,
-  latencyMs: number,
-  verdict: {
-    score: number;
-    fidelity: number;
-    rigor: number;
-    engagement: number;
-    unanswered_objection: { school: string };
-  } | null,
-  raw: unknown,
-  error: string | null
+  attempt: JudgeAttempt
 ): Promise<void> {
   if (LOG_TO === "ai_calls") {
-    await logAiCall({ userId: null, debateId: null, kind: "golden", costUsd, latencyMs });
+    await logAiCall({
+      userId: null,
+      debateId: null,
+      kind: "golden",
+      costUsd: attempt.costUsd,
+      latencyMs: attempt.latencyMs,
+    });
     return;
   }
-  // Unreachable at runtime: `run` is non-null exactly when LOG_TO ===
-  // "file", and the ai_calls branch above has already returned. It stays
-  // because it is what narrows GoldenRun | null to GoldenRun for tsc, and
-  // the alternative is a non-null assertion that would hide a real null if
-  // the two conditions ever drifted apart. A reviewer called it dead code,
-  // which it is, and removing it fails the typecheck.
   if (!run) return;
-  // Records and writes in one step, so the run survives a crash mid-way.
-  recordCall(run, {
-    sample,
+  recordAttempt(run, caseContext(c, plan), sample, attempt);
+}
+
+function caseContext(c: GoldenCase, plan: RunnablePlan): RecordContext {
+  return {
     fixture: c.name,
     school: c.school,
     prompt_version: VERSION,
@@ -280,17 +273,7 @@ async function logCall(
       argument: c.argument,
     }),
     model: MODEL,
-    response: raw,
-    score: verdict?.score ?? null,
-    fidelity: verdict?.fidelity ?? null,
-    rigor: verdict?.rigor ?? null,
-    engagement: verdict?.engagement ?? null,
-    objection_school: verdict?.unanswered_objection.school ?? null,
-    cost_usd: costUsd,
-    latency_ms: latencyMs,
-    error,
-    at: new Date().toISOString(),
-  });
+  };
 }
 
 // Read once. It used to be re-read on every logged call while
@@ -311,50 +294,39 @@ async function sampleCase(
   c: GoldenCase,
   plan: RunnablePlan,
   run: GoldenRun | null
-): Promise<{ samples: Sample[]; failures: string[] }> {
+): Promise<{ samples: Sample[]; failures: string[]; retries: number; retriesFailed: number }> {
   const samples: Sample[] = [];
   const failures: string[] = [];
+  let retries = 0;
+  let retriesFailed = 0;
 
   for (let i = 0; i < SAMPLES; i++) {
-    try {
-      const { verdict, costUsd, latencyMs } = await callJudgeModel(
-        c.motion,
-        c.school,
-        c.argument,
-        undefined,
-        VERSION,
-        // undefined for a live school, so it is judged against rubric.ts
-        // exactly as production would; the draft file's text for a draft
-        // school, which callJudgeModel accepts only for a school with no
-        // live criteria.
-        plan.draftCriteria
-      );
-
-      if (verdict.rejected) {
-        await logCall(run, c, plan, i + 1, costUsd, latencyMs, null, verdict, "model rejected the submission");
-        failures.push("model rejected the submission");
-        continue;
-      }
-      await logCall(run, c, plan, i + 1, costUsd, latencyMs, verdict, verdict, null);
-      samples.push({
-        score: verdict.score,
-        fidelity: verdict.fidelity,
-        rigor: verdict.rigor,
-        engagement: verdict.engagement,
-        weakestMove: verdict.weakest_move,
-        objectionSchool: verdict.unanswered_objection.school,
-      });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      // A billed call still counts even when the response didn't validate.
-      if (err instanceof JudgeValidationError) {
-        await logCall(run, c, plan, i + 1, err.costUsd, err.latencyMs, null, null, message);
-      }
-      failures.push(message);
-    }
+    // The same retry production makes: a reply that fails validation is
+    // sent again once, and every attempt is logged, so a run measures the
+    // judge as readers meet it and its cost includes every billed call.
+    const outcome = await takeSample(
+      () =>
+        callJudgeModel(
+          c.motion,
+          c.school,
+          c.argument,
+          undefined,
+          VERSION,
+          // undefined for a live school, so it is judged against rubric.ts
+          // exactly as production would; the draft file's text for a draft
+          // school, which callJudgeModel accepts only for a school with no
+          // live criteria.
+          plan.draftCriteria
+        ),
+      (attempt) => logCall(run, c, plan, i + 1, attempt)
+    );
+    if (outcome.retried) retries++;
+    if (outcome.retryFailed) retriesFailed++;
+    if (outcome.sample) samples.push(outcome.sample);
+    else failures.push(outcome.failure ?? "no sample");
   }
 
-  return { samples, failures };
+  return { samples, failures, retries, retriesFailed };
 }
 
 // What one call is expected to cost under the prompt version being run.
@@ -371,7 +343,13 @@ async function sampleCase(
 // - The COST comment's own est_usd_per_call=0.0098 does not follow from
 //   its est_in and est_out at those rates, which give 0.0099. The frozen
 //   file is left alone and the figure is computed here instead.
-function estimatedUsdPerCall(): { usd: number; inputTokens: number; outputTokens: number } {
+function estimatedUsdPerCall(): {
+  usd: number;
+  inputTokens: number;
+  outputTokens: number;
+  inputRate: number;
+  outputRate: number;
+} {
   const source = fs.readFileSync(path.join(process.cwd(), "src", "lib", "anthropic.ts"), "utf-8");
 
   // Each figure must match exactly once, anchored to the declaration that
@@ -407,18 +385,52 @@ function estimatedUsdPerCall(): { usd: number; inputTokens: number; outputTokens
     usd: inputTokens * rate(inRate) + estOut * rate(outRate),
     inputTokens,
     outputTokens: estOut,
+    inputRate: rate(inRate),
+    outputRate: rate(outRate),
   };
 }
 
+// est_in was measured under v2, so it includes v2's criteria at their
+// average length. Under v3 every school's criteria carry more paragraphs,
+// which the file-size difference above does not see. Each case adds the
+// difference between its own criteria and that average, at four to a
+// token like the file-size term, though this counts characters where that
+// counts bytes; the criteria are almost all ASCII, so the two agree to
+// within a few tokens. Checked against the 3 Nov v3 run, which billed $0.9934:
+// without this the estimate was $0.9657, with it $0.9791, so the rest of
+// the gap is the rule of thumb itself.
+const V2_CRITERIA_MEAN_LENGTH =
+  PUBLISHED_SCHOOL_IDS.reduce((sum, id) => sum + FIDELITY_CRITERIA[id].length, 0) /
+  PUBLISHED_SCHOOL_IDS.length;
+
+function retryNote(retries: number, retriesFailed: number): string[] {
+  if (retries === 0) return [];
+  return [`${retries} repl${retries === 1 ? "y" : "ies"} failed validation and retried, ${retriesFailed} failing again`];
+}
+
 function planSummary(cases: GoldenCase[], plans: Map<string, CasePlan>): string {
-  const running = cases.filter((c) => plans.get(c.name)!.run).length;
-  const calls = running * SAMPLES;
   const est = estimatedUsdPerCall();
+  let running = 0;
+  let usd = 0;
+  let inputTokens = 0;
+  for (const c of cases) {
+    const plan = plans.get(c.name)!;
+    if (!plan.run) continue;
+    running++;
+    const tokensIn = est.inputTokens + (plan.criteria.length - V2_CRITERIA_MEAN_LENGTH) / 4;
+    inputTokens += tokensIn;
+    usd += SAMPLES * (tokensIn * est.inputRate + est.outputTokens * est.outputRate);
+  }
+  const calls = running * SAMPLES;
+  const perCall = calls ? usd / calls : 0;
+  const meanIn = running ? Math.round(inputTokens / running) : 0;
   return (
     `${running} of ${cases.length} case(s) would run: ${calls} call(s), ` +
-    `about $${(calls * est.usd).toFixed(2)}, at an estimated ` +
-    `$${est.usd.toFixed(4)} a call (~${est.inputTokens} tokens in, ` +
+    `about $${usd.toFixed(2)}, at an estimated ` +
+    `$${perCall.toFixed(4)} a call (~${meanIn} tokens in on average, ` +
     `~${est.outputTokens} out, priced at src/lib/anthropic.ts's rates). ` +
+    `A reply that fails validation is sent once more, adding a call each ` +
+    `time; at most double this if every reply failed. ` +
     `An estimate: the real run reports what was billed.`
   );
 }
@@ -509,6 +521,8 @@ async function main() {
 
   let anyFail = false;
   const skipped: string[] = [];
+  let totalRetries = 0;
+  let totalRetriesFailed = 0;
 
   for (const c of cases) {
     // A draft school runs against the draft file's criteria, under a prompt
@@ -521,7 +535,9 @@ async function main() {
       continue;
     }
 
-    const { samples, failures } = await sampleCase(c, plan, run);
+    const { samples, failures, retries, retriesFailed } = await sampleCase(c, plan, run);
+    totalRetries += retries;
+    totalRetriesFailed += retriesFailed;
 
     // Fewer than half the samples usable means the case has no measurable
     // result, not a low one — reporting a median of one sample would hide
@@ -544,7 +560,11 @@ async function main() {
         weakestMovePass: true,
         objection: "-",
         objectionPass: false,
-        notes: [`${failures.length}/${SAMPLES} samples failed`, ...new Set(failures)],
+        notes: [
+          `${failures.length}/${SAMPLES} samples failed`,
+          ...new Set(failures),
+          ...retryNote(retries, retriesFailed),
+        ],
       });
       anyFail = true;
       continue;
@@ -600,6 +620,7 @@ async function main() {
 
     const notes: string[] = [];
     if (failures.length) notes.push(`${failures.length}/${SAMPLES} samples failed`, ...new Set(failures));
+    notes.push(...retryNote(retries, retriesFailed));
     if (!objectionPass) notes.push(`objection from argued school in ${samples.length - rivals.length} sample(s)`);
     if (terms && !weakestMovePass) {
       notes.push(
@@ -656,6 +677,15 @@ async function main() {
     console.log(`  ${r.name}:`);
     for (const note of r.notes) console.log(`    - ${note}`);
   }
+
+  // The figure Arthur's target of no failures is read against: how many
+  // first replies failed validation and were sent again, and how many of
+  // those second replies failed too.
+  console.log(
+    `\n${totalRetries} repl${totalRetries === 1 ? "y" : "ies"} failed validation and ` +
+      `${totalRetries === 1 ? "was" : "were"} retried; ${totalRetriesFailed} of the ` +
+      `retries also failed.`
+  );
 
   if (run) {
     const file = flush(run, true);

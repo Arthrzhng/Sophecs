@@ -63,8 +63,8 @@ export type CasePlan =
  *
  * - A live school is always judged against its live criteria for the
  *   prompt version being run: rubric.ts's text under v1 and v2, and that
- *   text plus its v3 vocabulary paragraph under v3, exactly as
- *   `callJudgeModel` builds it. The draft file is never consulted for it,
+ *   text plus its v3 vocabulary and objection paragraphs under v3, exactly
+ *   as `callJudgeModel` builds it. The draft file is never consulted for it,
  *   and `callJudgeModel` refuses a draft override for a school that has
  *   live criteria in any case.
  * - A draft school runs only under a prompt that takes its rival schools

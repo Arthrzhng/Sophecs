@@ -100,7 +100,8 @@ tokens. A reviewer found it. The estimate is now computed per version:
 - v3 adds the difference in file size at roughly four bytes a token, about
   3,180 tokens in: **$0.0129** a call. Four bytes a token is a rule of
   thumb; a real count needs an API call. The run reports what was actually
-  billed.
+  billed. Since 2026-11-03 the estimate also counts each case's criteria,
+  which under v3 are longer, and prints $0.0138 a call.
 
 | Run | Cases | Samples | Calls | Approximate cost |
 |---|---|---|---|---|
@@ -114,21 +115,39 @@ the correction this table said $1.12 for everything, and v3's run $0.71.
 
 `GOLDEN_DRY_RUN=1 npm run judge:golden` prints the per-call estimate and
 the run's total for the version it is given, without a key and without
-sending anything: about $0.42 for v2 and $0.93 for v3, or $0.14 and $0.31
-with `GOLDEN_SAMPLES=1`. The Tier A and Tier B split within v3, and the
-totals, are those figures added up by hand. The rows above are each
-rounded, so they sum to $1.35 where the unrounded total is $1.34.
+sending anything. For the first runs it printed about $0.42 for v2 and
+$0.93 for v3, or $0.14 and $0.31 with `GOLDEN_SAMPLES=1`; the table above
+is those figures added up by hand, each row rounded, so the rows sum to
+$1.35 where the unrounded total is $1.34. With the criteria as they stand
+after 2026-11-03 it prints $0.42 and $0.99, or $0.14 and $0.33: v2 is
+unchanged, and v3's criteria are longer.
 
 **The ceiling.** Output is capped at `max_tokens: 850` in
 `src/lib/anthropic.ts`. If every call ran to the cap rather than to the
-650-token estimate, the 114 calls would cost about $1.57, and $1.74 with
-the single-sample check. That is about the most this run can cost at three
-samples a case: output is capped, but input is still the four-bytes-a-token
-estimate, so the ceiling is approximate too.
+650-token estimate, the first runs' 114 calls would have cost about $1.57,
+and $1.74 with the single-sample check: about the most those runs could
+cost, since output is capped, though input is still the four-bytes-a-token
+estimate, so the ceiling is approximate too. For a v3 run at three samples
+with the criteria as they stand after 2026-11-03, the same reckoning gives
+about $1.14 against the dry run's $0.99. The retry below adds a call for
+every reply that fails validation, so the strict ceiling is twice that,
+about $2.27, which would take every reply failing; the 3 Nov run had one
+in 72.
+
+**Since 2026-11-03 a reply that fails validation is sent once more**, in
+golden runs as in production, so a run can make more calls than it plans.
+Each retry is one more call at about the per-call figure; the 3 Nov v3 run,
+made before the retry existed, had one reply in 72 fail. The dry run says
+so beside its estimate. It also now counts each school's criteria: est_in
+was measured under v2, and v3's criteria carry two paragraphs v2's do not,
+which the file-size difference above never saw. Checked against the 3 Nov
+run, which billed $0.9934, the old estimate was $0.9657 and the new one
+would have been $0.9791.
 
 Against `AI_MONTHLY_BUDGET_USD`, which is $50 and production-only. A
 single-sample pass with `GOLDEN_SAMPLES=1` is a third of the calls: $0.14
-under v2, $0.31 for all 24 cases under v3. The v2 one is worth doing first,
+under v2, and $0.31 for all 24 cases under v3 when first planned, $0.33
+with the criteria as they stand after 2026-11-03. The v2 one is worth doing first,
 to catch a response that fails validation before paying for three samples.
 
 The runner no longer logs to `ai_calls`: these 114 calls do not land in
@@ -195,7 +214,14 @@ throughout, score 60-95 for the Stoic case and 70-95 for the other two**.
 > triage system is the weather. Whether it orders the queue well is not up
 > to the clinician standing beside it; what is up to her is whether she
 > consented to stand there, whether she said plainly that she cannot
-> account for the ordering, and whether she keeps looking. A clinician who
+> account for the ordering, and whether she keeps looking. Her consent
+> comes first of those, and it has to be just: justice is owed to the
+> patients, not to her wish to explain everything she touches. She
+> consents because they are owed a clinician at the point
+> where the queue is decided, one who tells them the truth and keeps watch,
+> and refusing the post so as never to answer for an ordering she cannot
+> explain would leave them with the system and no one beside it. A
+> clinician who
 > uses the system and tells the truth about it has done the part that was
 > hers. A clinician who hides behind it has not, and no accuracy figure
 > repairs that, because the figure was never the thing she was answerable
@@ -204,6 +230,18 @@ throughout, score 60-95 for the Stoic case and 70-95 for the other two**.
 Tests: the analogy is the whole argument, and the dichotomy of control is
 carried entirely inside it. v2 gives no instruction to credit this; v3 says
 the form costs nothing.
+
+The two sentences beginning "Her consent comes first of those" were added
+on 2026-11-03, by Arthur's ruling on the 3 Nov run. Its three v3 samples
+gave fidelity 8, 7 and 7. Two named in `weakest_move` that the argument
+never says whether choosing to stand beside the system is itself just; the
+third named the patients' outcomes and raised the same consent in
+`a_stronger_version_would`. Arthur judged the reason fair and had the case
+answer it, in terms of justice to the patients; the band stays 8-10. The
+sentences justify the consent by what she owes the patients at her post,
+not by comparing the system's orderings with anyone else's: a first draft
+did that, and review pointed out that it leaned on outcomes the argument's
+own last sentence sets aside.
 
 ### `virtue-exemplar`
 
@@ -426,10 +464,12 @@ judgement.
 
 `npm run judge:golden` writes every call to
 `tests/judge/golden-runs/<run-id>.json` and does not touch `ai_calls`.
-Each record carries the prompt version, the fixture, where its criteria
-came from (`live` or `draft`), a request fingerprint, the response, all
-four axes (score, fidelity, rigor, engagement), the objection school, the
-cost and the latency. The file is rewritten after every call, so a run
+Each record carries the prompt version, the fixture, the sample and the
+attempt (2 for the one retry a reply that failed validation gets, so two
+records can share a sample), where its criteria came from (`live` or
+`draft`), a request fingerprint, the response, all four axes (score,
+fidelity, rigor, engagement), the objection school, the cost and the
+latency. The file is rewritten after every call, so a run
 that dies part way through still leaves what it spent.
 
 The fingerprint is of the inputs, not of the literal request bytes, and the

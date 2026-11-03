@@ -27,10 +27,12 @@ describe("production logging", () => {
 
   it("still writes every judged call to ai_calls", () => {
     const judgeDebate = anthropic.slice(anthropic.indexOf("export async function judgeDebate"));
-    // Once on the success path, once when the response fails validation
-    // but the call was still billed.
-    expect((judgeDebate.match(/await logAiCall\(/g) ?? []).length).toBe(2);
-    expect(judgeDebate).toContain("JudgeValidationError");
+    // Every attempt, the one that failed validation included, reaches
+    // logAiCall as judgeWithOneRetry's logger. tests/judge-retry.test.ts
+    // proves that by counting the rows a retry writes; this guards the
+    // wiring from the route's side.
+    expect(judgeDebate).toContain("judgeWithOneRetry(");
+    expect((judgeDebate.match(/logAiCall\(/g) ?? []).length).toBe(1);
   });
 
   it("still goes through judgeDebate from the route", () => {
@@ -104,6 +106,7 @@ describe("the golden run's file log", () => {
 
   const sample = (n: number): GoldenCallRecord => ({
     sample: n,
+    attempt: 1,
     fixture: "stoic-strong",
     school: "stoicism",
     prompt_version: "v2",
@@ -152,6 +155,7 @@ describe("the golden run's file log", () => {
       const run = startRun({ promptVersion: "v2", promptText: "p", model: "m", samplesPerCase: 1 });
       const written = JSON.parse(fs.readFileSync(recordCall(run, sample(1), dir), "utf-8"));
       for (const field of [
+        "attempt",
         "prompt_version",
         "criteria_source",
         "fixture",
@@ -170,8 +174,14 @@ describe("the golden run's file log", () => {
   });
 
   it("goes through recordCall, so the per-call write is not a separate line to forget", () => {
+    // logCall hands each attempt to recordAttempt in golden-sample.ts, which
+    // writes it with recordCall; tests/golden-sample.test.ts pins logCall
+    // whole and drives recordAttempt against a real file.
     const logCall = runner.slice(runner.indexOf("async function logCall"));
-    expect(logCall.slice(0, logCall.indexOf("\n}"))).toContain("recordCall(run,");
+    expect(logCall.slice(0, logCall.indexOf("\n}"))).toContain("recordAttempt(run,");
+    const sample = read("tests/judge/golden-sample.ts");
+    const recordAttempt = sample.slice(sample.indexOf("export function recordAttempt"));
+    expect(recordAttempt.slice(0, recordAttempt.indexOf("\n}"))).toContain("return recordCall(");
   });
 });
 

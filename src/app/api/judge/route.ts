@@ -13,6 +13,14 @@ import { hasFidelityCriteria } from "@/lib/judge/rubric";
 import { motionForDebate } from "@/lib/motion-text";
 import type { SchoolId } from "@/lib/types";
 
+// A submission whose first reply fails validation waits for a second call
+// (judgeWithOneRetry in src/lib/anthropic.ts), so it can take two model
+// calls, about 11 to 13 seconds at golden-run latencies. The project's own
+// limit was not readable from here; this sets it rather than assume it.
+// 60 is within every plan's maximum. A function stopped mid-retry would
+// fail the reader and leave a billed call out of ai_calls.
+export const maxDuration = 60;
+
 const DAILY_CAP = 5;
 const TOPIC_LOCK_DAYS = 7;
 const PAR_ELO_WINDOW = 50;
