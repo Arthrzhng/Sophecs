@@ -1760,3 +1760,81 @@ change to how the limit works, so Arthur's to choose (d):
 **Decide before the Winchester pilot.** Until then the cap stays as it is:
 it can cost a reader an extra slot on the rare retried submission, and it
 cannot be run up.
+
+### 2F, Stage 1 of the brief of 2026-11-03: two v3 runs, and a miss
+
+The brief's pass test for 2F: no verdict_line failure after the retry;
+`stoic-analogy`, `confucian-hierarchy` and `confucian-hierarchy-school` in
+band, with `unanswered_objection` naming the power question on both
+hierarchy cases; the original six (`stoic-strong`, `stoic-wrong-school`,
+`util-strong`, `util-wrong-school`, `virtue-strong`,
+`virtue-wrong-school`) in band. **Neither run passes it.** Bands are
+judged on the median of three samples, as the runner judges them.
+
+**Run 1, `2026-11-03T18-15-56-294Z-v3.json`**, on `main` at `fe5fd3d`,
+75 calls, $1.0806:
+
+- verdict_line: no reply over the cap, no retry. Pass.
+- `stoic-analogy` 78/78/78, fidelity 8. In band.
+- `confucian-hierarchy` score 72/70/70 and fidelity 7 in band;
+  engagement 5/5/5 against 0-4. Objections: virtue ethics, three times,
+  on practical judgment.
+- `confucian-hierarchy-school` score 86/86/86 against 40-75, engagement
+  7/7/7 against 0-4. Objections: utilitarianism once, virtue ethics
+  twice; none on power.
+- The original six in band.
+
+The paragraph #49 added to `judge.v3.md`, and the objection line ending
+every school's criteria, moved neither hierarchy case's engagement or
+objection. A judge blind spot, so the brief's rule applied: fix it in v3,
+the same for all six schools, and rerun.
+
+**The fix**, on this branch: the engagement criterion in `judge.v3.md`
+now says to check first the objection the school's criteria name, and
+that an argument leaving it unmet scores no more than 4 on engagement.
+It is in the engagement criterion, before the rubric, so every school's
+request carries it. v2 is unchanged. `tests/judge-v3-and-refusal.test.ts`
+pins it whole; a cap of 6, or the rule moved to the objection section,
+fails.
+
+**Run 2, `2026-11-03T21-35-58-347Z-v3.json`**, on this branch at
+`e0e75ae`, 78 calls, $1.1559:
+
+- verdict_line: 3 first replies over the cap (`buddhist-wrong-school`,
+  `stoic-analogy`, `virtue-exemplar`), each retried; the retry on
+  `virtue-exemplar` ran over too, so one sample has no result. **Fail**,
+  where run 1 had none: the same prompt text about the cap, so this is the
+  model's variance, and one retry does not absorb it.
+- `stoic-analogy` 78/78/72, fidelity 8. In band.
+- `confucian-hierarchy` score 61/70/62, fidelity 7, engagement 3/4/3.
+  **In band on every axis**, where run 1 was out on engagement.
+- `confucian-hierarchy-school` score 80/78/72 (median 78, band 40-75),
+  engagement 5/5/4 (median 5, band 0-4). Out on both, by less than run 1.
+- `unanswered_objection` on the hierarchy cases: virtue ethics five
+  times, utilitarianism once, on practical judgment or outcomes. **Never
+  the power question.** The judge does now find it, in `weakest_move`:
+  "Never addresses who holds power to adjust or override the system"
+  (`confucian-hierarchy`, sample 3), and "who sets or can override the
+  system's encoding" on all three `confucian-hierarchy-school` samples.
+- The original six in band. The cap moved seven cases by more than five
+  points, all still in band: `buddhist-strong`, `confucian-strong` and
+  `confucian-hierarchy-school` -8, `stoic-strong` and `ubuntu-conformity`
+  -7, `util-strong` -6; `fabricated-source` +10 and `util-wrong-school` +6.
+  Engagement on the strong cases fell from 5-7 to 4-6.
+
+**Why the objection never names power.** `unanswered_objection.school`
+must be one of the three live schools, and the judge voices whichever
+objection that school is known for: practical wisdom for virtue ethics,
+outcomes for utilitarianism. Sophecs's own Confucian page does not give
+the power objection to any of them. It cites "Confucian Role-Ethics with
+Non-Domination" and Rosenlee for it, and gives utilitarianism a different
+objection, about strangers. So the instruction asks the judge to put an
+objection in the mouth of a school that, on Sophecs's own pages, does not
+make it. That is a content question, not a prompt one, and goes to
+Checkpoint A.
+
+**Why there is no third run.** The brief allows two further runs within
+$4.80 on the eval key. After run 2 the key is at $4.6564, leaving $0.1436;
+a full v3 run costs about $1.16, and a run of the hierarchy cases alone
+would not show whether a further v3 change moved the original six. Stage 1
+stops here and its questions go to Checkpoint A.
