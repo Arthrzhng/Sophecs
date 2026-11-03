@@ -84,3 +84,16 @@ entry names.
   390 and 1280 in `docs/phase3-styleguide/judging-failed/`; every text in
   them measures at least 6.95:1 against its background (WCAG AA asks
   4.5:1), read from computed styles with Playwright.
+
+## 2026-11-03: Stage 2, `motion_text` into `debates_public`
+
+- Migration 0020 adds `motion_text` to `debates_public` as its last
+  column, on 0018's definition unchanged; the verdict page and its OG
+  image then read it from the view and stop reading `debates` for it. In
+  that order: 0020 is applied in production and read back before this
+  merges, because the code asks the view for the column. Checks before
+  the pull request: the five gates, `check:bundle`,
+  `scripts/test-0020-motion-text-view.sh` (139 checks, run on every
+  migration through 0019), and three deliberate breaks of the migration
+  and its rollback, each caught (`docs/decisions.md`, "Phase 3 item: move
+  `motion_text` into `debates_public`").
