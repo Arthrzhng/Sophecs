@@ -90,8 +90,9 @@ entry names.
 
 - #51: the two v3 runs above (their run files), the Stage 1 result (the
   pass test is not met: `confucian-hierarchy-school` out of band, the
-  power objection never returned, and in run 2 one sample with no result
-  after its verdict_line retry also ran over), and Arthur's rulings on it. Under v3
+  power objection never returned, and in run 2 a verdict_line failure,
+  one sample's retry also running over the cap and leaving it no
+  result), and Arthur's rulings on it. Under v3
   only, each school's criteria now name the rival that normally voices its
   best-known objection (`src/lib/judge/objection-voices.ts`), Confucianism's
   two in Arthur's words and the other five drafted for him to confirm at

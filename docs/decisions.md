@@ -1865,7 +1865,7 @@ reached, and an error waves judging through. Production holds one
 `ai_calls` row today, so nothing is at risk yet. Fixing it changes how
 the budget is enforced, which is Arthur's under (d): summing in the
 database, and failing closed on an error as the daily cap now does, is
-the proposed patch, for Checkpoint A. Nothing in this pull request
+the proposed patch, for Checkpoint A. Nothing in #52
 depends on it.
 
 ### 2F, Stage 1 of the brief of 2026-11-03: two v3 runs, and a miss
@@ -1903,9 +1903,13 @@ that an argument leaving it unmet scores no more than 4 on engagement.
 It is in the engagement criterion, before the rubric, so every school's
 request carries it. v2 is unchanged. `tests/judge-v3-and-refusal.test.ts`
 pins it whole; a cap of 6, or the rule moved to the objection section,
-fails. The number 4 is mine: it is the top of the 0-4 engagement band the
-two hierarchy fixtures expect, and Arthur's ruling on PR #48 said only
-that ignoring the objection "costs engagement". It goes on the
+fails. "Check first" rests on Arthur's ruling on the 3 Nov run (item 1,
+carried out by #48), which asked to "instruct that engagement should check
+whether the argument meets it, and that ignoring it costs engagement, not
+fidelity". It set no number. The number 4 is mine: it is the top of the
+0-4 engagement band that three fixtures expect (`confucian-hierarchy`,
+`confucian-hierarchy-school` and `ubuntu-conformity`), so the cap sits
+exactly at the edge of every such band in the golden set. It goes on the
 Checkpoint A list as a change to what the v3 judge receives.
 
 The same commit also added a paragraph to the comment at the head of
@@ -1916,7 +1920,7 @@ run 2 was made with it. Review of #51 found it, and the comment now gives
 only the rule and where the runs are recorded. The next v3 run is the
 first without it. An older paragraph of the same comment, from the ruling
 of 2026-10-26, still tells the model that "5 of 72 v3 samples returned a
-verdict_line over its cap". It predates this pull request and is left for
+verdict_line over its cap". It predates #51 and is left for
 Checkpoint A, with the wider question of whether the comment should reach
 the model at all: removing it from what is sent means changing how
 `src/lib/anthropic.ts` reads the file.
@@ -1982,8 +1986,9 @@ stops here and its questions go to Checkpoint A.
 > 3. Budget: eval cap raised to a cumulative $8.00 (I am raising the key's
 >    Console limit to match). Rerun v3 at three samples after the change.
 
-Ruling 1 was about dropping `backup_20261022` and does not bear on this
-pull request; it is carried out under Stage 2. Ruling 4, on retries, is
+Ruling 1, "backup drop: done via retry (I approved the prompt).", does not
+bear on #51; it is for Stage 2, under "Open item: drop `backup_20261022`
+after 2026-10-29". Ruling 4, on retries, is
 carried out in its own pull request; see "Two retries, and a failed
 submission does not use an argument".
 
@@ -2008,7 +2013,7 @@ to confirm at Checkpoint A:
 | Virtue Ethics | no answer for scale | `utilitarianism` | a policy that touches thousands of people needs its outcomes compared, and asking what a good person would do does not compare them | none | Virtue Ethics' gets_wrong: "Utilitarians would say this has no answer for scale" |
 | Confucianism | too ready to authorise hierarchy | `utilitarianism` | the subordinate party's interests go uncounted when the stronger party sets the terms | `ubuntu`: solidarity requires the weaker party can be heard | Arthur's ruling, in his words |
 | Ubuntu | a community is not one voice | `stoicism` | a dissenter's own judgment is the one thing the community cannot decide for them | none | Ubuntu's gets_wrong: "Stoics would add that a self defined through others has handed away the one thing that was its own" |
-| Buddhist ethics | much moral teaching, little systematic moral philosophy | `utilitarianism` | deciding who audits a model and how an appeal is weighed takes a way of comparing everyone's claims, which compassion alone does not supply | `confucian`: who answers to whom for a model is a question of roles and what each owes, which non-harm leaves unassigned | **None for this objection.** Buddhist ethics' gets_wrong names the gap; its Utilitarian line is a different objection ("a school weighing intention this heavily lets a well-meaning system off"). The Confucian page asks "whether the people inside them can still hold each other to what they owe" |
+| Buddhist ethics | much moral teaching, little systematic moral philosophy | `utilitarianism` | deciding who audits a model and how an appeal is weighed takes a way of comparing everyone's claims, which compassion alone does not supply | `confucian`: who answers to whom for a model is a question of roles and what each owes, which non-harm leaves unassigned | **None for this objection.** Buddhist ethics' gets_wrong names the gap; its Utilitarian line is a different objection ("a school weighing intention this heavily lets a well-meaning system off for damage a careless one would be condemned for"). The Confucian page asks "whether the people inside them can still hold each other to what they owe" |
 
 Two of these are weak, and the most likely to need Arthur's change.
 Utilitarianism's: its own page gives the objection to Rawls, and of the
