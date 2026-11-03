@@ -28,6 +28,13 @@ import type { SchoolId } from "../../src/lib/types";
 export interface GoldenCallRecord {
   /** 1-based, within the samples taken for this fixture. */
   sample: number;
+  /**
+   * 1 for a sample's first call, 2 for the one retry a reply that failed
+   * validation gets (Arthur's ruling of 2026-11-03). Two records with the
+   * same sample are one sample. Run files written before the retry have
+   * no such field, and every record in them is a first call.
+   */
+  attempt: 1 | 2;
   fixture: string;
   school: SchoolId;
   prompt_version: string;

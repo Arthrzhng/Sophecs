@@ -212,9 +212,9 @@ describe("the golden run's draft criteria", () => {
     for (const id of PUBLISHED_SCHOOL_IDS) {
       const plan = planCase(id, v3, draft, "v3");
       expect(plan).toMatchObject({ run: true, source: "live", draftCriteria: undefined });
-      // Under v3 that is rubric.ts's text plus its vocabulary paragraph,
-      // exactly what callJudgeModel sends, so the run's fingerprint is of
-      // what was actually judged against.
+      // Under v3 that is rubric.ts's text plus its vocabulary and objection
+      // paragraphs, exactly what callJudgeModel sends, so the run's
+      // fingerprint is of what was actually judged against.
       if (plan.run) expect(plan.criteria).toBe(fidelityCriteriaFor(id, "v3"));
       const underV2 = planCase(id, v2, draft, "v2");
       expect(underV2).toMatchObject({ run: true, source: "live", draftCriteria: undefined });

@@ -27,8 +27,10 @@ discarded, singles out verdict_line, which the closing note on the
 response format repeats, and lists improvement_note, whose cap of 40 words
 was previously stated only under the revision rules. The caps themselves are the same numbers, and the
 validator is unchanged. The same ruling gave every school's fidelity
-criteria a paragraph under v3 crediting the concept over the vocabulary;
-that lives with the criteria, not in this file. The
+criteria a paragraph under v3 crediting the concept over the vocabulary,
+and his ruling of 2026-11-03 a further paragraph naming the objection the
+school is best known for having to answer and scoring it under
+engagement; both live with the criteria, not in this file. The
 fidelity criteria themselves are interpolated at the RUBRIC placeholder
 exactly as in v2, and they remain Arthur's to write — this file is the
 surrounding prompt.

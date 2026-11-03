@@ -17,6 +17,7 @@ import type { SchoolId } from "@/lib/types";
 
 // COST: model=claude-sonnet-5 | trigger=debate submission | est_in=1700 est_out=650
 // est_usd_per_call=0.0098 | cap=5/user/day | kill_switch=KILL_SWITCH_JUDGE | logged_to=ai_calls
+// retry=1 on a reply that fails validation, each attempt logged (see judgeWithOneRetry)
 export const MODEL = "claude-sonnet-5";
 const INPUT_COST_PER_TOKEN = 2 / 1_000_000;
 const OUTPUT_COST_PER_TOKEN = 10 / 1_000_000;
@@ -208,6 +209,77 @@ export async function callJudgeModel(
   return { verdict: result.data, latencyMs, costUsd };
 }
 
+/** One billed call to the judge, as whoever made it logs it. */
+export interface JudgeAttempt {
+  /** 1 for the first call, 2 for the retry. There is never a third. */
+  attempt: 1 | 2;
+  costUsd: number;
+  latencyMs: number;
+  /** The reply, when it validated; null when it did not. */
+  verdict: ModelVerdict | null;
+  /** Why the reply did not validate; null when it did. */
+  error: string | null;
+}
+
+type Settled = { ok: true; result: JudgeCallResult } | { ok: false; error: JudgeValidationError };
+
+async function settle(call: () => Promise<JudgeCallResult>): Promise<Settled> {
+  try {
+    return { ok: true, result: await call() };
+  } catch (err) {
+    // Only a reply that came back and failed validation is retried. An
+    // error from the API or the network propagates exactly as before.
+    if (err instanceof JudgeValidationError) return { ok: false, error: err };
+    throw err;
+  }
+}
+
+function attemptOf(attempt: 1 | 2, settled: Settled): JudgeAttempt {
+  return settled.ok
+    ? {
+        attempt,
+        costUsd: settled.result.costUsd,
+        latencyMs: settled.result.latencyMs,
+        verdict: settled.result.verdict,
+        error: null,
+      }
+    : {
+        attempt,
+        costUsd: settled.error.costUsd,
+        latencyMs: settled.error.latencyMs,
+        verdict: null,
+        error: settled.error.message,
+      };
+}
+
+/**
+ * Make a judge call, and make it once more if the reply fails validation.
+ *
+ * Arthur's ruling of 2026-11-03, for every prompt version: a reply that
+ * breaks the schema, most often a `verdict_line` over its 20-word cap, is
+ * sent again once rather than failing the submission. Never more than
+ * once, and the reply is never cut down to fit: a second reply that also
+ * fails throws that failure, and a reply that validates is returned as it
+ * came.
+ *
+ * Every billed call goes to `logAttempt` before anything else happens, the
+ * failed one included, because Anthropic bills it either way: `judgeDebate`
+ * writes each one to ai_calls, and the golden runner to its run file.
+ */
+export async function judgeWithOneRetry(
+  call: () => Promise<JudgeCallResult>,
+  logAttempt: (attempt: JudgeAttempt) => Promise<void>
+): Promise<JudgeCallResult> {
+  const first = await settle(call);
+  await logAttempt(attemptOf(1, first));
+  if (first.ok) return first.result;
+
+  const second = await settle(call);
+  await logAttempt(attemptOf(2, second));
+  if (second.ok) return second.result;
+  throw second.error;
+}
+
 export async function logAiCall(params: {
   userId: string | null;
   debateId: string | null;
@@ -239,6 +311,14 @@ export async function logAiCall(params: {
 // Used by /api/judge: calls the model and logs the call in one step, tied
 // to the debate/user it's for. kind defaults to "judge"; the allowlist path
 // passes "judge_allowlist" so those calls are distinguishable in ai_calls.
+//
+// Each attempt is its own ai_calls row, the one that failed validation
+// included, so every billed call counts toward the monthly budget. It
+// counts toward the daily cap too, which counts rows: a submission that
+// needed the retry uses two of the reader's five, as a failure followed
+// by the reader pressing submit again always has. A retry looks like any
+// other row for the same debate; marking it would take a new column or
+// kind, which is a migration.
 export async function judgeDebate(params: {
   motion: string;
   school: SchoolId;
@@ -249,36 +329,17 @@ export async function judgeDebate(params: {
   revisionOf?: RevisionContext;
 }): Promise<JudgeCallResult> {
   const kind = params.kind ?? "judge";
-  try {
-    const result = await callJudgeModel(
-      params.motion,
-      params.school,
-      params.argument,
-      params.revisionOf
-    );
-    await logAiCall({
-      userId: params.userId,
-      debateId: params.debateId,
-      kind,
-      costUsd: result.costUsd,
-      latencyMs: result.latencyMs,
-    });
-    return result;
-  } catch (err) {
-    if (err instanceof JudgeValidationError) {
-      // The model was actually called and billed — log it even though the
-      // response didn't validate, so it still counts toward the daily cap
-      // and the monthly budget.
-      await logAiCall({
+  return judgeWithOneRetry(
+    () => callJudgeModel(params.motion, params.school, params.argument, params.revisionOf),
+    (attempt) =>
+      logAiCall({
         userId: params.userId,
         debateId: params.debateId,
         kind,
-        costUsd: err.costUsd,
-        latencyMs: err.latencyMs,
-      });
-    }
-    throw err;
-  }
+        costUsd: attempt.costUsd,
+        latencyMs: attempt.latencyMs,
+      })
+  );
 }
 
 export { PROMPT_VERSION };

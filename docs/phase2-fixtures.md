@@ -126,6 +126,16 @@ the single-sample check. That is about the most this run can cost at three
 samples a case: output is capped, but input is still the four-bytes-a-token
 estimate, so the ceiling is approximate too.
 
+**Since 2026-11-03 a reply that fails validation is sent once more**, in
+golden runs as in production, so a run can make more calls than it plans.
+Each retry is one more call at about the per-call figure; the 3 Nov v3 run,
+made before the retry existed, had one reply in 72 fail. The dry run says
+so beside its estimate. It also now counts each school's criteria: est_in
+was measured under v2, and v3's criteria carry two paragraphs v2's do not,
+which the file-size difference above never saw. Checked against the 3 Nov
+run, which billed $0.9934, the old estimate was $0.9657 and the new one
+would have been $0.9791.
+
 Against `AI_MONTHLY_BUDGET_USD`, which is $50 and production-only. A
 single-sample pass with `GOLDEN_SAMPLES=1` is a third of the calls: $0.14
 under v2, $0.31 for all 24 cases under v3. The v2 one is worth doing first,
@@ -195,7 +205,13 @@ throughout, score 60-95 for the Stoic case and 70-95 for the other two**.
 > triage system is the weather. Whether it orders the queue well is not up
 > to the clinician standing beside it; what is up to her is whether she
 > consented to stand there, whether she said plainly that she cannot
-> account for the ordering, and whether she keeps looking. A clinician who
+> account for the ordering, and whether she keeps looking. Her consent is
+> the one act here that is hers, so it is the one that has to be just, and
+> justice is owed to the patients, not to her wish to explain everything
+> she touches. Where the hospital has good grounds to think the system
+> orders the queue at least as well as the triage desk it relieves,
+> refusing to stand beside it would be choosing clean hands over the people
+> waiting, and that refusal would be the unjust choice. A clinician who
 > uses the system and tells the truth about it has done the part that was
 > hers. A clinician who hides behind it has not, and no accuracy figure
 > repairs that, because the figure was never the thing she was answerable
@@ -204,6 +220,13 @@ throughout, score 60-95 for the Stoic case and 70-95 for the other two**.
 Tests: the analogy is the whole argument, and the dichotomy of control is
 carried entirely inside it. v2 gives no instruction to credit this; v3 says
 the form costs nothing.
+
+The two sentences beginning "Her consent is the one act here" were added
+on 2026-11-03, by Arthur's ruling on the 3 Nov run. Every v3 sample there
+gave the same substantive reason for fidelity 7: the argument never says
+why consenting to stand beside the system is itself a just choice. He
+judged the reason fair and had the case answer it, in terms of justice to
+the patients; the band stays 8-10.
 
 ### `virtue-exemplar`
 
@@ -426,10 +449,12 @@ judgement.
 
 `npm run judge:golden` writes every call to
 `tests/judge/golden-runs/<run-id>.json` and does not touch `ai_calls`.
-Each record carries the prompt version, the fixture, where its criteria
-came from (`live` or `draft`), a request fingerprint, the response, all
-four axes (score, fidelity, rigor, engagement), the objection school, the
-cost and the latency. The file is rewritten after every call, so a run
+Each record carries the prompt version, the fixture, the sample and the
+attempt (2 for the one retry a reply that failed validation gets, so two
+records can share a sample), where its criteria came from (`live` or
+`draft`), a request fingerprint, the response, all four axes (score,
+fidelity, rigor, engagement), the objection school, the cost and the
+latency. The file is rewritten after every call, so a run
 that dies part way through still leaves what it spent.
 
 The fingerprint is of the inputs, not of the literal request bytes, and the

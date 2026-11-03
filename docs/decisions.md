@@ -1548,3 +1548,110 @@ for. What follows is how each was carried out.
      Switching production to v3 will be a step change in scores for
      those. Scores across prompt versions are not compared as equivalent
      in any case; the stamp on each stored verdict keeps them apart.
+
+### 2F: the 3 Nov v3 re-run, and Arthur's rulings of 2026-11-03
+
+**The run.** `tests/judge/golden-runs/2026-11-03T16-47-04-974Z-v3.json`:
+v3 only, 24 cases, three samples, 72 calls, $0.9934 billed against an
+estimate of $0.97. It ran against main at d788dfe, so it measured the two
+rulings of 2026-10-26: the vocabulary paragraph and the word caps moved
+above the response format. Compared with the 26 Oct v3 run:
+
+- `verdict_line` failures fell from 5 in 72 to 1 (`stoic-strong`,
+  sample 1). The longest accepted `verdict_line` was 18 words.
+- `confucian-strong` had all three samples accepted, 86 each with
+  fidelity 9, inside its bands; its gap over `confucian-wrong-school` is 62.
+- `stoic-analogy` scored 72 [70-78], inside 60-95, with fidelity 7 [7-8],
+  still below 8-10. No sample docked it for vocabulary any more; all three
+  asked whether consenting to the system is itself a just choice.
+- `confucian-hierarchy` reached fidelity 8 [7-8], inside 7-10, and went
+  over its other two bands: score 78 [71-78] against 40-75, engagement 5
+  [5-6] against 0-4. It was the only case to move more than 5 points
+  (median 68.5 to 78; the earlier median was from two valid samples).
+- No other case was outside a band, and none other moved more than 4.
+
+**Arthur's rulings**, verbatim:
+
+> Decisions on the 3 Nov run:
+>
+> 1. confucian-hierarchy: the judge never raised the power/hierarchy
+>    objection in any sample (weakest_move and unanswered_objection were all
+>    about virtue-ethics judgment). That is a judge blind spot, not a band
+>    problem; bands stay. Fix in the v3 criteria for ALL SIX schools: add
+>    each school's best-known objection, drawn from content/schools/*.md
+>    gets_wrong (for the live three, write an equivalent line), and instruct
+>    that engagement should check whether the argument meets it, and that
+>    ignoring it costs engagement, not fidelity. v3-only for the live three;
+>    the six v2 request fixtures stay byte-identical. Show me the six
+>    objection lines.
+> 2. stoic-analogy: the judge's reasons are substantive and fair: it never
+>    justifies the choice to consent. Amend the fixture with one or two
+>    sentences justifying that consent as her choice (e.g. in terms of
+>    justice to the patients). Band stays 8-10.
+> 3. verdict_line: add a single automatic retry when the judge reply fails
+>    schema validation, for both v2 and v3, logged in ai_calls (and in the
+>    golden-run log), max one retry, never truncating. I approve this change
+>    to the frozen judge path. Add a test. Keep the prompt change from #47.
+>
+> Run the review loop and merge. Then dry-run a v3-only re-run and tell me
+> the cost; do not start it until I approve.
+
+How each was carried out:
+
+1. **The objection each school is best known for having to answer.** Every
+   school's v3 criteria now end with a fourth paragraph: "The best-known
+   objection to ..." and the objection, then "Engagement should check
+   whether the argument meets this objection, and ignoring it costs
+   engagement, not fidelity." Each objection is taken from the gets_wrong
+   section of the school's page in `content/schools`, in the page's own
+   terms rather than quoted: quietism for Stoicism, the objection Rawls put
+   to utilitarianism, too little guidance for virtue ethics, role ethics
+   authorising hierarchy for Confucianism, the community that is not one
+   voice for Ubuntu, and Keown's point that Buddhist ethics has much moral
+   teaching and little systematic moral philosophy. For the three live
+   schools the paragraph is in `src/lib/judge/rubric.ts`, in
+   `OBJECTION_V3`, and `fidelityCriteriaFor` appends it under v3 only; for
+   the draft three it is the fourth paragraph of each section of
+   `content/prompts/fidelity-criteria.draft.md`. The six request fixtures
+   are unchanged, and a test that sent the paragraph to v2 failed nineteen
+   tests, the six fixture comparisons among them. Under v3 the live three's
+   criteria now run 1464 to 1723 characters and the draft three 1541 to
+   1645.
+2. **`stoic-analogy`.** Two sentences added after "whether she keeps
+   looking", saying her consent is the one act that is hers and so must be
+   just, and that where the system orders the queue at least as well as the
+   triage desk it relieves, refusing it would put her clean hands before
+   the patients. Bands unchanged. `docs/phase2-fixtures.md` quotes the
+   amended argument.
+3. **One retry.** `judgeWithOneRetry` in `src/lib/anthropic.ts` makes a
+   judge call and, if the reply fails validation (a cap breached, a field
+   missing, or no JSON at all), makes the same call once more. A second
+   failure is thrown; nothing is truncated; an API error is not retried. It
+   reports every attempt before acting on it. `judgeDebate`, and so
+   `/api/judge`, writes each attempt to `ai_calls` as its own row; the
+   golden runner writes each to its run file with an `attempt` of 1 or 2,
+   and prints how many replies were retried and how many retries failed.
+   `tests/judge-retry.test.ts` drives both paths against a mocked SDK; with
+   the retry disabled, six of its ten tests fail. The 2026-10-26 change to
+   `judge.v3.md` stays. Two consequences of logging every attempt as its
+   own row:
+   - **The daily cap.** `/api/judge` counts `ai_calls` rows of kind
+     `judge` per reader. A submission that needed the retry uses two of the
+     reader's five, as a failure followed by the reader submitting again
+     already did. Telling a retry apart from a first call in `ai_calls`
+     would need a new column or kind, which is a migration and so a
+     production database change; not done.
+   - **Time.** A retried submission waits for two calls, about 11 to 13
+     seconds at the 3 Nov run's latencies (median 5.4s, longest 6.6s). The
+     project was created in September 2026, after Vercel made Fluid compute
+     the default for new projects, but its time limit could not be read
+     through the tools available, and production has logged one judge call
+     (5.5s), which says nothing about it. A function stopped mid-retry would
+     fail the reader and leave a billed call out of `ai_calls`. So
+     `/api/judge` now sets `maxDuration = 60`, within every plan's maximum:
+     one line in a frozen file, made as part of the retry Arthur approved.
+
+The dry run's estimate also changed. It priced every v3 call at v2's
+criteria length; it now adds each case's own criteria length, at the same
+four bytes a token. Against the 3 Nov run, which billed $0.9934, the old
+estimate was $0.9657 and the new one would have been $0.9791.

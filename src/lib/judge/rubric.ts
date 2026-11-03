@@ -102,10 +102,11 @@ export const FIDELITY_CRITERIA: Record<SchoolId, string> = new Proxy(
 // six request fixtures pin that byte for byte.
 //
 // When a draft school is published, its section of the draft criteria
-// file is three paragraphs and the third is this one. Split it: the first
-// two go into CRITERIA_BY_SCHOOL and the third into this map. Moving all
-// three into CRITERIA_BY_SCHOOL and then adding an entry here would send
-// the paragraph twice.
+// file is four paragraphs: the third is this one and the fourth is its
+// entry in OBJECTION_V3 below. Split it: the first two go into
+// CRITERIA_BY_SCHOOL, the third into this map and the fourth into that
+// one. Moving all four into CRITERIA_BY_SCHOOL and then adding entries
+// here would send both paragraphs twice.
 const VOCABULARY_RULE_V3: Partial<Record<SchoolId, string>> = {
   stoicism: `Credit the concept, not the vocabulary. An argument that separates
 what is up to the agent from what is not, and treats an outcome as neither
@@ -128,13 +129,44 @@ virtue at stake in plain words, such as courage or honesty, is naming it.
 Never mark fidelity down for missing vocabulary alone.`,
 };
 
+// v3 only. Arthur's ruling of 2026-11-03, after the 3 Nov golden run: in
+// no sample did the judge raise the power objection that
+// `confucian-hierarchy` leaves unanswered, which is a blind spot in the
+// judge rather than a wrong band. So under v3 every school's criteria end
+// with the objection that school is best known for having to answer,
+// taken from the gets_wrong section of its page in content/schools, and
+// an instruction to check engagement against it. Like the vocabulary
+// paragraph it is kept out of CRITERIA_BY_SCHOOL, so v1 and v2, and the
+// six request fixtures, are unchanged.
+const OBJECTION_V3: Partial<Record<SchoolId, string>> = {
+  stoicism: `The best-known objection to Stoicism is that it gives up on the
+world too easily: if only your own judgment is up to you, there is no
+argument for making an unfair system fairer, only for tolerating it with
+good posture. Engagement should check whether the argument meets this
+objection, and ignoring it costs engagement, not fidelity.`,
+
+  utilitarianism: `The best-known objection to utilitarianism is that it
+treats a whole society's welfare the way one person treats trade-offs across
+their own life, netting one person's loss against other people's gains as
+if a single subject bore both, when no total makes the trade fair to the
+person who pays for it. Engagement should check whether the argument meets
+this objection, and ignoring it costs engagement, not fidelity.`,
+
+  "virtue-ethics": `The best-known objection to virtue ethics is that it
+gives too little guidance: knowing what a good person is like does not say
+which policy to adopt, and what a good person would do goes quiet exactly
+when interests genuinely conflict. Engagement should check whether the
+argument meets this objection, and ignoring it costs engagement, not
+fidelity.`,
+};
+
 /**
  * The criteria a given prompt version interpolates for a school.
  *
  * v1 and v2 get `FIDELITY_CRITERIA[school]` unchanged. Later versions get
- * the same text with the school's vocabulary paragraph after it. Like
- * `FIDELITY_CRITERIA`, it throws for a school with no criteria, rather
- * than handing the judge nothing.
+ * the same text with the school's vocabulary paragraph after it, then its
+ * objection paragraph. Like `FIDELITY_CRITERIA`, it throws for a school
+ * with no criteria, rather than handing the judge nothing.
  */
 export function fidelityCriteriaFor(school: SchoolId, version: PromptVersion | "v3"): string {
   const base = FIDELITY_CRITERIA[school];
@@ -143,7 +175,11 @@ export function fidelityCriteriaFor(school: SchoolId, version: PromptVersion | "
   if (rule === undefined) {
     throw new Error(`judge/rubric: no v3 vocabulary paragraph for school "${school}".`);
   }
-  return `${base}\n\n${rule}`;
+  const objection = OBJECTION_V3[school];
+  if (objection === undefined) {
+    throw new Error(`judge/rubric: no v3 objection paragraph for school "${school}".`);
+  }
+  return `${base}\n\n${rule}\n\n${objection}`;
 }
 
 /**
