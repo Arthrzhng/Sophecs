@@ -1796,9 +1796,9 @@ How it was carried out:
    `tests/judging-failed.test.ts` holds them so. "Your argument is saved":
    the route saves it on the debate row before calling the judge, and when
    it is updating an earlier unjudged try's row and that update fails, it
-   stops with "Your argument could not be saved, so nothing was sent to
-   the judge. Try again." rather than have the judge score text the row
-   does not hold. "Did not use one of today's arguments": the route sends
+   stops before the judge, with the generic error and the detail line "The
+   new text could not be stored, so nothing was sent to the judge.",
+   rather than have the judge score text the row does not hold. "Did not use one of today's arguments": the route sends
    `offCap`, true only when `judgeDebate` took the submission's calls out
    of the cap; when that update failed, the screen shows `Your argument is
    saved. Try again.` instead. Review pass 3 found that both had been

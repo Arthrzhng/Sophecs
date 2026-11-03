@@ -17,7 +17,8 @@ export const JUDGING_FAILED_BODY =
   "This did not use one of today's arguments, and your argument is saved. Try again.";
 // When the failed submission's calls could not be taken out of the cap.
 export const JUDGING_FAILED_BODY_COUNTED = "Your argument is saved. Try again.";
-// When the argument could not be saved before the judge was called, so
-// nothing was sent: docs/daily-path-copy.md, "Judging failed".
-export const ARGUMENT_NOT_SAVED =
-  "Your argument could not be saved, so nothing was sent to the judge. Try again.";
+// The detail line under the generic error when an earlier unjudged try's
+// row could not take the new text, so nothing was sent: docs/daily-path-
+// copy.md, "Judging failed". The generic body above it says the argument
+// is saved in this browser, which stays true.
+export const ARGUMENT_NOT_SAVED = "The new text could not be stored, so nothing was sent to the judge.";

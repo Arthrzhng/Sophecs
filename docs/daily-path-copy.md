@@ -304,8 +304,9 @@ Lives in `src/lib/judging-failed.ts`.
 | Button | `Try again` (unchanged) |
 
 If an earlier unjudged try's row cannot be updated with the new text,
-nothing is sent to the judge, and the generic error carries this line
-instead: `Your argument could not be saved, so nothing was sent to the judge. Try again.`
+nothing is sent to the judge, and the generic error ("The judge could not
+be reached." / "Your argument is saved in this browser, so nothing is
+lost. Try again in a moment.") carries this detail line: `The new text could not be stored, so nothing was sent to the judge.`
 
 If the daily cap itself cannot be checked, nothing is sent to the judge,
 and the generic error ("The judge could not be reached.") carries this

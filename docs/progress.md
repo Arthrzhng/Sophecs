@@ -79,4 +79,8 @@ entry names.
   a test. It also found that the monthly budget cannot be relied on past
   about 1000 calls a month and fails open on an error; that is Arthur's
   under (d) and is written up in `docs/decisions.md` for Checkpoint A.
-  Gates on the final head: the five, 514 tests, `check:bundle`.
+  Gates on the final head: the five, 514 tests, `check:bundle`. The
+  failure states are on `/styleguide/arena`, section 3b, screenshotted at
+  390 and 1280 in `docs/phase3-styleguide/judging-failed/`; every text in
+  them measures at least 6.95:1 against its background (WCAG AA asks
+  4.5:1), read from computed styles with Playwright.
