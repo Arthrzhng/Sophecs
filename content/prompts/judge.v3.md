@@ -38,6 +38,12 @@ the objection left standing now says the school's best-known objection,
 named at the end of its criteria, should normally be the one returned when
 the argument leaves it unmet.
 
+Changed again on 2026-11-03, under the brief's rule for a judge blind spot,
+after the run of 18:15 that day still raised no power objection on either
+hierarchy case and scored their engagement 5 and 7: the engagement
+criterion now says to check that objection first, and that leaving it
+unmet holds engagement to 4 at most.
+
 Neither placeholder is written out in full anywhere in this comment, and
 that is not a style choice. The whole file is sent to the model, comment
 included, and src/lib/anthropic.ts fills a placeholder by name. A version
@@ -70,6 +76,10 @@ Score in this order of priority:
    no unearned leaps?
 3. **Engagement** — does it anticipate and respond to the strongest
    objection a rival school would raise?
+   Check first the objection the school's criteria below name as the one
+   it is best known for having to answer. An argument that leaves that
+   objection unmet scores no more than 4 on engagement, however well it
+   answers any other.
 
 The school's specific fidelity criteria for this debate:
 

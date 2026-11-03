@@ -223,6 +223,29 @@ describe("judge.v3.md", () => {
     expect(flat(v2)).not.toContain("should normally be the one you return here");
   });
 
+  it("holds engagement to 4 when the school's known objection is left unmet, under v3 only", () => {
+    // The 18:15 run of 2026-11-03: with the paragraph above in place, neither
+    // hierarchy case raised the power objection, and their engagement came
+    // back 5 and 7 against a band of 0-4. A judge blind spot, so under the
+    // brief the fix is in v3 and the same for all six schools: it sits in the
+    // engagement criterion, which every school's request carries.
+    // Pinned whole and inside the engagement criterion, before the rubric:
+    // a phrase check would pass with the cap removed or the condition
+    // inverted, and the same words anywhere else would not be read as part
+    // of how engagement is scored.
+    const rule =
+      "Check first the objection the school's criteria below name as the one " +
+      "it is best known for having to answer. An argument that leaves that " +
+      "objection unmet scores no more than 4 on engagement, however well it " +
+      "answers any other.";
+    const flat = (s: string) => s.replace(/\s+/g, " ");
+    const criterion = flat(v3body.slice(v3body.indexOf("3. **Engagement**"), v3body.indexOf("{{RUBRIC}}")));
+    expect(criterion).toContain(rule);
+    expect(flat(v3body).split(rule)).toHaveLength(2);
+    expect(flat(v2)).not.toContain("scores no more than 4 on engagement");
+    expect(flat(v2)).not.toContain("best known for having to answer");
+  });
+
   it("says in the file why it exists and that it is a draft", () => {
     const header = v3.slice(0, v3.indexOf("-->"));
     expect(header).toContain("not the production default");
