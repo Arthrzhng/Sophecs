@@ -175,10 +175,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: "Unknown debate." }, { status: 404 });
     }
 
+    // This reader's own revision only. RLS lets any signed-in user insert
+    // a row of their own, so a row under someone else's id could point at
+    // this original; reusing it would write this reader's revision into
+    // that row. A foreign row falls through to the insert below, where the
+    // unique index answers "already revised", as before.
     const { data: existingChild } = await admin
       .from("debates")
       .select("id, verdict, argument")
       .eq("parent_debate_id", parentRow.id)
+      .eq("user_id", user.id)
+      .eq("kind", "revision")
       .maybeSingle();
     if (existingChild?.verdict) return paused("already_revised");
     if (existingChild) {

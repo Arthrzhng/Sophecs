@@ -39,12 +39,15 @@ export async function getOpenObjections(
   const rows = originals ?? [];
   if (rows.length === 0) return [];
 
-  // One round trip for every child rather than one per parent.
+  // One round trip for every child rather than one per parent. Judged
+  // children only: a revision whose judging failed leaves the objection
+  // open, and the reader is told to try again.
   const { data: children } = await admin
     .from("debates")
     .select("parent_debate_id")
     .eq("user_id", userId)
     .eq("kind", "revision")
+    .not("verdict", "is", null)
     .in(
       "parent_debate_id",
       rows.map((r) => r.id)

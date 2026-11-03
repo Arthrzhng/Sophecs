@@ -72,10 +72,23 @@ describe("when the cap cannot be checked", () => {
 describe("a revision whose judging failed", () => {
   it("is tried again on its own unjudged row, not refused as already revised", () => {
     const flat = route.replace(/\s+/g, " ");
-    expect(flat).toContain('.select("id, verdict, argument") .eq("parent_debate_id", parentRow.id)');
+    // This reader's own revision row only, never someone else's that
+    // points at the same original.
+    expect(flat).toContain(
+      '.select("id, verdict, argument") .eq("parent_debate_id", parentRow.id) .eq("user_id", user.id) .eq("kind", "revision")'
+    );
     expect(flat).toContain('if (existingChild?.verdict) return paused("already_revised");');
     expect(flat).toContain("const reuse = isRevision ? unjudgedRevision : recent;");
     expect(flat).toContain("const debateId = reuse?.id ?? newId();");
+  });
+});
+
+describe("the other places that ask whether an argument was revised", () => {
+  it("count only a judged revision, so a failed one leaves the objection open", () => {
+    const objections = read("src/lib/objections.ts").replace(/\s+/g, " ");
+    const me = read("src/app/me/page.tsx").replace(/\s+/g, " ");
+    expect(objections).toContain('.eq("kind", "revision") .not("verdict", "is", null)');
+    expect(me).toContain('.eq("kind", "revision") // Judged revisions only: a failed one is still open to try again. .not("verdict", "is", null)');
   });
 });
 
