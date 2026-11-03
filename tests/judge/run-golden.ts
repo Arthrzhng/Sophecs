@@ -301,8 +301,8 @@ async function sampleCase(
   let retriesFailed = 0;
 
   for (let i = 0; i < SAMPLES; i++) {
-    // The same retry production makes: a reply that fails validation is
-    // sent again once, and every attempt is logged, so a run measures the
+    // The same retries production makes: a reply that fails validation is
+    // sent again, up to twice, and every attempt is logged, so a run measures the
     // judge as readers meet it and its cost includes every billed call.
     const outcome = await takeSample(
       () =>
