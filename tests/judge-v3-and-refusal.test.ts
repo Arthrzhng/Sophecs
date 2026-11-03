@@ -199,6 +199,30 @@ describe("judge.v3.md", () => {
     }
   });
 
+  it("returns the school's known objection when the argument leaves it unmet, under v3 only", () => {
+    // Arthur's ruling of 2026-11-03: in the 3 Nov run no sample raised the
+    // power objection `confucian-hierarchy` leaves unanswered. The objection
+    // is named at the end of each school's v3 criteria; this is the
+    // instruction to report it, in the section that chooses the objection,
+    // before the list of schools it may come from.
+    // The whole paragraph, not a phrase from it: a reviewer inverted the
+    // condition and deleted the first sentence, and a phrase check passed
+    // both.
+    const paragraph =
+      "Each school's fidelity criteria end by naming the objection that school is " +
+      "best known for having to answer. When the argument leaves that objection " +
+      "unmet, it should normally be the one you return here, voiced by whichever " +
+      "rival school listed below would press it hardest.";
+    const flat = (s: string) => s.replace(/\s+/g, " ");
+    const section = flat(
+      v3body.slice(v3body.indexOf("## The objection left standing"), v3body.indexOf("{{RIVAL_SCHOOLS}}"))
+    );
+    expect(section).toContain(paragraph);
+    expect(flat(v3body).split(paragraph)).toHaveLength(2);
+    expect(flat(v2)).not.toContain("best known for having to answer");
+    expect(flat(v2)).not.toContain("should normally be the one you return here");
+  });
+
   it("says in the file why it exists and that it is a draft", () => {
     const header = v3.slice(0, v3.indexOf("-->"));
     expect(header).toContain("not the production default");
