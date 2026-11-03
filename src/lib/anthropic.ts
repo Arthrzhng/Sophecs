@@ -17,8 +17,10 @@ import type { SchoolId } from "@/lib/types";
 
 // COST: model=claude-sonnet-5 | trigger=debate submission | est_in=1700 est_out=650
 // est_usd_per_call=0.0098 | cap=5/user/day | kill_switch=KILL_SWITCH_JUDGE | logged_to=ai_calls
-// retry=1 on a reply that fails validation, each attempt logged (see judgeWithOneRetry),
-// so a reader's day can reach 6 calls: the cap is checked before a call, not between attempts
+// retries=2 on a reply that fails validation, each attempt logged (see judgeWithRetries):
+// a submission makes at most 3 calls. The cap is checked before a submission, not between
+// attempts, so a reader's day can pass 5 calls; a submission that ends without a verdict
+// does not count toward the cap at all (counts_toward_cap, migration 0019)
 export const MODEL = "claude-sonnet-5";
 const INPUT_COST_PER_TOKEN = 2 / 1_000_000;
 const OUTPUT_COST_PER_TOKEN = 10 / 1_000_000;
@@ -188,8 +190,11 @@ export async function callJudgeModel(
   try {
     parsed = JSON.parse(raw);
   } catch {
+    // The length, not the text. This message is logged to ai_calls and to
+    // the production log, and a reply cut off partway is mostly the judge
+    // paraphrasing the argument.
     throw new JudgeValidationError(
-      `Model response was not valid JSON: ${raw.slice(0, 200)}`,
+      `Model response was not valid JSON (${raw.length} characters)`,
       costUsd,
       latencyMs
     );
@@ -201,8 +206,16 @@ export async function callJudgeModel(
     // array. Word-cap breaches are the common failure here, and the raw
     // message is a multi-line JSON blob that tells neither the golden-set
     // table nor a production log which cap was missed.
+    //
+    // zod's own wording for a wrong enum value quotes the value it got
+    // ("received '...'"), which is the model's text, so that clause is cut:
+    // the summary is logged, and it names a field and a rule, never what the
+    // judge wrote.
     const summary = result.error.issues
-      .map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`)
+      .map(
+        (issue) =>
+          `${issue.path.join(".") || "(root)"}: ${issue.message.replace(/,? received '[^]*$/, "")}`
+      )
       .join("; ");
     throw new JudgeValidationError(summary, costUsd, latencyMs);
   }
@@ -210,10 +223,16 @@ export async function callJudgeModel(
   return { verdict: result.data, latencyMs, costUsd };
 }
 
+/**
+ * How many times one submission may call the judge: the first call and up
+ * to two retries. Arthur's ruling of 2026-11-03, raising it from one retry.
+ */
+export const MAX_JUDGE_ATTEMPTS = 3;
+
 /** One billed call to the judge, as whoever made it logs it. */
 export interface JudgeAttempt {
-  /** 1 for the first call, 2 for the retry. There is never a third. */
-  attempt: 1 | 2;
+  /** 1 for the first call, 2 and 3 for the retries. There is never a fourth. */
+  attempt: 1 | 2 | 3;
   costUsd: number;
   latencyMs: number;
   /** The reply, when it validated; null when it did not. */
@@ -235,7 +254,7 @@ async function settle(call: () => Promise<JudgeCallResult>): Promise<Settled> {
   }
 }
 
-function attemptOf(attempt: 1 | 2, settled: Settled): JudgeAttempt {
+function attemptOf(attempt: 1 | 2 | 3, settled: Settled): JudgeAttempt {
   return settled.ok
     ? {
         attempt,
@@ -254,43 +273,58 @@ function attemptOf(attempt: 1 | 2, settled: Settled): JudgeAttempt {
 }
 
 /**
- * Make a judge call, and make it once more if the reply fails validation.
+ * Make a judge call, and make it again, up to twice more, while the reply
+ * fails validation.
  *
- * Arthur's ruling of 2026-11-03, for every prompt version: a reply that
+ * Arthur's rulings of 2026-11-03, for every prompt version: a reply that
  * breaks the schema, most often a `verdict_line` over its 20-word cap, is
- * sent again once rather than failing the submission. Never more than
- * once, and the reply is never cut down to fit: a second reply that also
- * fails throws that failure, and a reply that validates is returned as it
- * came.
+ * sent again rather than failing the submission. First one retry; later
+ * that day, after a golden run where one sample failed twice, two. Never
+ * more than `MAX_JUDGE_ATTEMPTS` calls, and the reply is never cut down to
+ * fit: when the last reply also fails, that failure is thrown, and a reply
+ * that validates is returned as it came.
  *
  * Every billed call goes to `logAttempt` before anything else happens, the
- * failed one included, because Anthropic bills it either way: `judgeDebate`
- * writes each one to ai_calls, and the golden runner to its run file.
+ * failed ones included, because Anthropic bills them either way:
+ * `judgeDebate` writes each one to ai_calls, and the golden runner to its
+ * run file.
  */
-export async function judgeWithOneRetry(
+export async function judgeWithRetries(
   call: () => Promise<JudgeCallResult>,
   logAttempt: (attempt: JudgeAttempt) => Promise<void>
 ): Promise<JudgeCallResult> {
-  const first = await settle(call);
-  await logAttempt(attemptOf(1, first));
-  if (first.ok) return first.result;
-
-  const second = await settle(call);
-  await logAttempt(attemptOf(2, second));
-  if (second.ok) return second.result;
-  throw second.error;
+  let failure: JudgeValidationError | null = null;
+  for (let attempt = 1; attempt <= MAX_JUDGE_ATTEMPTS; attempt++) {
+    const settled = await settle(call);
+    await logAttempt(attemptOf(attempt as JudgeAttempt["attempt"], settled));
+    if (settled.ok) return settled.result;
+    failure = settled.error;
+  }
+  throw failure as JudgeValidationError;
 }
 
+/**
+ * Writes one ai_calls row and returns its id, so a caller that later learns
+ * the call should not count toward the daily cap can say so.
+ *
+ * `validationError` is why a judge reply failed validation, and is written
+ * only when it did. It names the field and the cap that was missed (see
+ * `callJudgeModel`), never any of the reply's or the argument's text, so
+ * it is safe to keep: that is the logging Arthur asked for on a submission
+ * whose every reply fails.
+ */
 export async function logAiCall(params: {
   userId: string | null;
   debateId: string | null;
   kind: "judge" | "golden" | "judge_allowlist";
   costUsd: number;
   latencyMs: number;
-}): Promise<void> {
+  validationError?: string | null;
+}): Promise<string> {
   const admin = createAdminClient();
-  const { error } = await admin.from("ai_calls").insert({
-    id: newId(),
+  const id = newId();
+  const row: Record<string, unknown> = {
+    id,
     user_id: params.userId,
     kind: params.kind,
     model: MODEL,
@@ -298,7 +332,9 @@ export async function logAiCall(params: {
     latency_ms: params.latencyMs,
     debate_id: params.debateId,
     prompt_version: PROMPT_VERSION,
-  });
+  };
+  if (params.validationError) row.validation_error = params.validationError;
+  const { error } = await admin.from("ai_calls").insert(row);
   // "Every call is logged, no exceptions" only holds if a failed log write
   // is at least visible. Found by the golden set silently showing 0 rows
   // in this sandbox (a network-egress restriction, not a real bug) — with
@@ -307,21 +343,63 @@ export async function logAiCall(params: {
   if (error) {
     console.error(`[ai_calls] failed to log ${params.kind} call:`, error.message);
   }
+  return id;
+}
+
+/**
+ * Takes a failed submission's calls out of the daily cap.
+ *
+ * Arthur's ruling of 2026-11-03: a submission that ends without a verdict
+ * does not use one of the reader's arguments for the day. Its calls stay
+ * in ai_calls, and in the monthly budget, because they were billed; only
+ * the cap stops counting them. Errors are reported, not thrown: the reader
+ * is already being told judging failed, and a failure here costs them a
+ * cap slot rather than the message.
+ *
+ * Returns whether the calls are out of the cap, true when there were none
+ * to take out, so the reader is only told the attempt did not use one of
+ * their arguments when that is so.
+ */
+export async function excludeFromDailyCap(ids: string[]): Promise<boolean> {
+  if (ids.length === 0) return true;
+  const admin = createAdminClient();
+  const { error } = await admin.from("ai_calls").update({ counts_toward_cap: false }).in("id", ids);
+  if (error) {
+    console.error(`[ai_calls] failed to take ${ids.length} call(s) out of the daily cap:`, error.message);
+    return false;
+  }
+  return true;
+}
+
+// The errors judgeDebate threw after taking the submission's calls out of
+// the daily cap. A set beside the error rather than a field on it, so the
+// error the caller logs is exactly the one that was thrown.
+const TAKEN_OFF_CAP = new WeakSet<object>();
+
+/**
+ * Whether a submission that judgeDebate failed was taken out of the daily
+ * cap. False for an error judgeDebate did not throw, and for one whose
+ * calls could not be taken out: /api/judge then leaves out the sentence
+ * that says the attempt did not use one of the reader's arguments.
+ */
+export function wasTakenOffDailyCap(err: unknown): boolean {
+  return typeof err === "object" && err !== null && TAKEN_OFF_CAP.has(err);
 }
 
 // Used by /api/judge: calls the model and logs the call in one step, tied
 // to the debate/user it's for. kind defaults to "judge"; the allowlist path
 // passes "judge_allowlist" so those calls are distinguishable in ai_calls.
 //
-// Each attempt is its own ai_calls row, the one that failed validation
-// included, so every billed call counts toward the monthly budget. It
-// counts toward the daily cap too, which counts rows: a submission that
-// needed the retry uses two of the reader's five, as a failure followed
-// by the reader pressing submit again always has. The route checks the
-// cap once, before the call, so a reader at four whose submission is
-// retried ends the day at six. A retry looks like any other row for the
-// same debate; marking it would take a new column or kind, which is a
-// migration.
+// Each attempt is its own ai_calls row, the ones that failed validation
+// included, so every billed call counts toward the monthly budget. A
+// submission that ends with a verdict counts toward the daily cap once per
+// call, as before: one that needed a retry uses two or three of the
+// reader's five. The route checks the cap once, before the call. A
+// submission that ends without one, every reply failing validation or the
+// API failing, has its calls taken out of the cap (Arthur's ruling of
+// 2026-11-03): the reader is told it did not use one of their arguments,
+// and only when that is true (wasTakenOffDailyCap). Each failed reply's
+// row carries why it failed.
 export async function judgeDebate(params: {
   motion: string;
   school: SchoolId;
@@ -332,17 +410,28 @@ export async function judgeDebate(params: {
   revisionOf?: RevisionContext;
 }): Promise<JudgeCallResult> {
   const kind = params.kind ?? "judge";
-  return judgeWithOneRetry(
-    () => callJudgeModel(params.motion, params.school, params.argument, params.revisionOf),
-    (attempt) =>
-      logAiCall({
-        userId: params.userId,
-        debateId: params.debateId,
-        kind,
-        costUsd: attempt.costUsd,
-        latencyMs: attempt.latencyMs,
-      })
-  );
+  const logged: string[] = [];
+  try {
+    return await judgeWithRetries(
+      () => callJudgeModel(params.motion, params.school, params.argument, params.revisionOf),
+      async (attempt) => {
+        logged.push(
+          await logAiCall({
+            userId: params.userId,
+            debateId: params.debateId,
+            kind,
+            costUsd: attempt.costUsd,
+            latencyMs: attempt.latencyMs,
+            validationError: attempt.error,
+          })
+        );
+      }
+    );
+  } catch (err) {
+    const offCap = await excludeFromDailyCap(logged);
+    if (offCap && typeof err === "object" && err !== null) TAKEN_OFF_CAP.add(err);
+    throw err;
+  }
 }
 
 export { PROMPT_VERSION };
