@@ -16,7 +16,7 @@ import { log, main, parseFlags, str, writeReport } from "./seed/cli";
 main(async () => {
   const f = parseFlags(process.argv.slice(2), {
     values: ["expected-project-ref", "confirm-production", "run-id", "plan", "confirm-teardown"],
-    booleans: ["execute"],
+    booleans: ["execute", "break-stale-lock"],
   });
   const ref = str(f, "expected-project-ref");
   const runId = str(f, "run-id");
@@ -42,7 +42,7 @@ main(async () => {
     log("preview only; nothing deleted.");
     return;
   }
-  const r = await teardown(adapter, runId, { log });
+  const r = await teardown(adapter, runId, { log, breakStaleLock: Boolean(f["break-stale-lock"]) });
   const checks = compareBaselines(r.before, r.after);
   for (const c of checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}: ${c.detail}`);
   log(`report: ${writeReport(`unseed-${runId}`, { ...r, checks })}`);

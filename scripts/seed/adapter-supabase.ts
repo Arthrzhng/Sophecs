@@ -147,6 +147,17 @@ export class SupabaseAdapter implements Adapter {
     const { error } = await this.db.from("seed_runs").update({ lock_token: null, locked_at: null }).eq("id", id).eq("lock_token", token);
     fail("unlock", error);
   }
+  async breakStaleLock(id: string, minutes: number) {
+    const { data, error } = await this.db
+      .from("seed_runs")
+      .update({ lock_token: null, locked_at: null })
+      .eq("id", id)
+      .not("lock_token", "is", null)
+      .lt("locked_at", new Date(Date.now() - minutes * 60_000).toISOString())
+      .select("id");
+    fail("break stale lock", error);
+    return (data ?? []).length === 1;
+  }
   async recordIntents(items: Omit<RegistryItem, "state">[]) {
     for (const c of chunks(items, 500)) {
       const { error } = await this.db.from("seed_run_items").upsert(c, { onConflict: "run_id,kind,logical_id", ignoreDuplicates: true });

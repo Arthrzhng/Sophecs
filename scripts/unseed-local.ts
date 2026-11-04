@@ -9,7 +9,7 @@ import { compareBaselines } from "./seed/baseline";
 import { log, main, parseFlags, str } from "./seed/cli";
 
 main(async () => {
-  const f = parseFlags(process.argv.slice(2), { values: ["run-id", "plan", "confirm-teardown"], booleans: ["execute"] });
+  const f = parseFlags(process.argv.slice(2), { values: ["run-id", "plan", "confirm-teardown"], booleans: ["execute", "break-stale-lock"] });
   const target = localTarget();
   const runId = str(f, "run-id");
   const planPath = str(f, "plan");
@@ -28,6 +28,6 @@ main(async () => {
     log("preview only; nothing deleted.");
     return;
   }
-  const r = await teardown(adapter, runId, { log });
+  const r = await teardown(adapter, runId, { log, breakStaleLock: Boolean(f["break-stale-lock"]) });
   for (const c of compareBaselines(r.before, r.after)) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}: ${c.detail}`);
 });

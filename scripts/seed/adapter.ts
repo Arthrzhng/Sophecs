@@ -109,6 +109,11 @@ export interface Adapter {
   /** Takes the run's lock if nobody holds it. True when taken. */
   acquireLock(id: string, token: string): Promise<boolean>;
   releaseLock(id: string, token: string): Promise<void>;
+  /**
+   * Clears a lock left by a process that died, only if it was taken more
+   * than `minutes` ago. True when a lock was cleared.
+   */
+  breakStaleLock(id: string, minutes: number): Promise<boolean>;
   /** Inserts intents; an existing (run, kind, logical id) is left alone, and a row another run owns is refused. */
   recordIntents(items: Omit<RegistryItem, "state">[]): Promise<void>;
   setState(runId: string, kind: Kind, logicalIds: string[], state: ItemState): Promise<void>;

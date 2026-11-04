@@ -28,7 +28,7 @@ const MARKER = "sophecs seed-local: disposable database made by scripts/seed-loc
 main(async () => {
   const f = parseFlags(process.argv.slice(2), {
     values: ["run-id", "plan", "seed", "from", "to", "users", "anon-results", "challenges", "exchanges", "classes", "canary", "out", "real-judge", "batch-size"],
-    booleans: ["execute", "validate", "create-db", "drop-db", "make-plan", "six-schools"],
+    booleans: ["execute", "validate", "create-db", "drop-db", "make-plan", "six-schools", "break-stale-lock"],
   });
   refuseUnsupported(f);
   // The host check happens here, before psql is ever started.
@@ -110,7 +110,7 @@ main(async () => {
     log(`dry run, reads only: ${JSON.stringify((await snapshot(db)).genuine)} genuine rows; nothing written.`);
     return;
   }
-  const result = await execute({ dataset, plan, adapter: db, cohortLimit, batchSize: int(f, "batch-size", 500, 1, 2000), log, signal: cancelSignal(log) });
+  const result = await execute({ dataset, plan, adapter: db, cohortLimit, batchSize: int(f, "batch-size", 500, 1, 2000), log, signal: cancelSignal(log), breakStaleLock: Boolean(f["break-stale-lock"]) });
   log(`wrote ${JSON.stringify(result.written)} in ${result.seconds.toFixed(1)} s (${result.rowsPerSecond.toFixed(0)} rows/s)`);
   const report = await validate(db, dataset, result.before, { cohortLimit });
   for (const c of report.checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}: ${c.detail}`);

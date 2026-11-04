@@ -17,7 +17,7 @@
 
 import { randomUUID } from "node:crypto";
 import type { Adapter, Entanglement, Kind, RegistryItem, Table } from "./adapter";
-import { StopError } from "./engine";
+import { StopError, STALE_LOCK_MINUTES } from "./engine";
 import { snapshot, type Baseline } from "./baseline";
 
 export interface TeardownPreview {
@@ -132,7 +132,7 @@ export interface TeardownReport {
 export async function teardown(
   adapter: Adapter,
   runId: string,
-  opts: { log?: (s: string) => void; batchSize?: number } = {}
+  opts: { log?: (s: string) => void; batchSize?: number; breakStaleLock?: boolean } = {}
 ): Promise<TeardownReport> {
   const log = opts.log ?? (() => {});
   const size = opts.batchSize ?? 250;
@@ -143,7 +143,9 @@ export async function teardown(
     );
   const before = await snapshot(adapter);
   const token = randomUUID();
-  if (!(await adapter.acquireLock(runId, token))) throw new StopError(`run ${runId} is locked by another process`);
+  if (opts.breakStaleLock && (await adapter.breakStaleLock(runId, STALE_LOCK_MINUTES))) log(`cleared a stale lock on ${runId}`);
+  if (!(await adapter.acquireLock(runId, token)))
+    throw new StopError(`run ${runId} is locked by another process (if that process died, add --break-stale-lock after ${STALE_LOCK_MINUTES} minutes)`);
   const deleted: Record<string, number> = {};
   try {
     await adapter.updateRun(runId, { status: "tearing_down" });
@@ -185,7 +187,11 @@ export async function teardown(
     }
     const remaining = Object.values(leftOver).reduce((a, b) => a + b, 0);
     if (remaining) throw new StopError(`${remaining} of the run's rows are still present after teardown`);
-    await adapter.updateRun(runId, { status: "torn_down", last_error: null, counts: { ...((await adapter.getRun(runId))?.counts ?? {}), deleted } });
+    // The audit count is what the registry now says is deleted, so a
+    // teardown resumed after a crash records the whole run, not its last pass.
+    const totals: Record<string, number> = {};
+    for (const { kind } of ORDER) totals[kind] = (await adapter.items(runId, kind)).filter((i) => i.state === "deleted").length;
+    await adapter.updateRun(runId, { status: "torn_down", last_error: null, counts: { ...((await adapter.getRun(runId))?.counts ?? {}), deleted: totals } });
     const after = await snapshot(adapter);
     return { deleted, cleared: p.entanglements.length, before, after, leftOver };
   } catch (err) {

@@ -113,6 +113,13 @@ export class MemoryAdapter implements Adapter {
     }
   }
 
+  async breakStaleLock(id: string, minutes: number) {
+    const r = this.runs.get(id);
+    if (!r || !r.lock_token || !r.locked_at || Date.parse(r.locked_at) > Date.now() - minutes * 60_000) return false;
+    r.lock_token = null;
+    r.locked_at = null;
+    return true;
+  }
   async recordIntents(items: Omit<RegistryItem, "state">[]) {
     await this.fault("recordIntents", () => {
       for (const it of items) {

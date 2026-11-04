@@ -1,0 +1,215 @@
+// The engine and teardown against an in-memory database with the real
+// schema's ownership rules: retries, lost responses, crashes, resumes,
+// locks, refusal to adopt rows it did not write, and teardown that leaves
+// genuine rows and other runs alone.
+import { describe, expect, it } from "vitest";
+import { MemoryAdapter } from "../../scripts/seed/adapter-memory";
+import { execute, StopError } from "../../scripts/seed/engine";
+import { validate } from "../../scripts/seed/validate";
+import { preview, teardown } from "../../scripts/seed/teardown";
+import { smallPlan } from "./fixture";
+import type { Dataset } from "../../scripts/seed/generate";
+import type { Plan } from "../../scripts/seed/plan";
+
+const { plan, dataset } = smallPlan();
+const quiet = { retryBaseMs: 1, batchSize: 100 };
+
+function freshDb(faults = {}) {
+  const db = new MemoryAdapter(faults);
+  for (const t of plan.topics)
+    db.table("debate_topics").set(t.slug, { id: t.slug, slug: t.slug, motion: t.motion, active: true, par_elo: 1200, par_n: 0 });
+  // A genuine reader, with a debate and a result, that nothing may touch.
+  db.table("profiles").set("g1", { id: "g1", elo: 1216, streak: 1, school: "stoicism", is_sample: false });
+  db.table("quiz_results").set("GEN0000001", { id: "GEN0000001", user_id: "g1", challenge_from: null, is_sample: false });
+  db.table("debates").set("GEN000DEB1", { id: "GEN000DEB1", user_id: "g1", challenge_id: null, parent_debate_id: null, is_sample: false, seeking_counterpart_at: null });
+  return db;
+}
+
+const genuine = (db: MemoryAdapter) =>
+  JSON.stringify(["profiles", "quiz_results", "debates"].map((t) => [...db.table(t).values()].filter((r) => !r.is_sample)));
+
+const sampleRows = (db: MemoryAdapter) =>
+  ["profiles", "quiz_results", "challenges", "debates", "exchanges"].reduce((n, t) => n + [...db.table(t).values()].filter((r) => r.is_sample).length, 0) +
+  ["turns", "reading_responses", "classes", "class_members"].reduce((n, t) => n + db.table(t).size, 0);
+
+const total = (ds: Dataset) =>
+  ds.profiles.length + ds.quizResults.length + ds.challenges.length + ds.debates.length + ds.exchanges.length + ds.turns.length + ds.readingResponses.length + ds.classes.length + ds.classMembers.length;
+
+describe("execute", () => {
+  it("writes every row once, validates, and changes no genuine row", async () => {
+    const db = freshDb();
+    const before = genuine(db);
+    const r = await execute({ dataset, plan, adapter: db, ...quiet });
+    expect(sampleRows(db)).toBe(total(dataset));
+    expect(db.authUsers.size).toBe(dataset.authUsers.length);
+    expect(genuine(db)).toBe(before);
+    const v = await validate(db, dataset, r.before);
+    expect(v.checks.filter((c) => !c.ok)).toEqual([]);
+    expect((await db.getRun(plan.runId))!.status).toBe("complete");
+  });
+
+  it("is a no-op the second time", async () => {
+    const db = freshDb();
+    await execute({ dataset, plan, adapter: db, ...quiet });
+    const again = await execute({ dataset, plan, adapter: db, ...quiet });
+    expect(Object.values(again.written).reduce((a, b) => a + b, 0)).toBe(0);
+    expect(sampleRows(db)).toBe(total(dataset));
+  });
+
+  it("survives writes that succeed and then report failure, without duplicates", async () => {
+    const db = freshDb({ failAfter: { "insert:debates": 2, createAuthUser: 3, recordIntents: 1 } });
+    await execute({ dataset, plan, adapter: db, ...quiet });
+    expect(db.authUsers.size).toBe(dataset.authUsers.length);
+    expect(sampleRows(db)).toBe(total(dataset));
+  });
+
+  it("resumes a crashed run where it stopped, writing nothing twice", async () => {
+    const db = freshDb({ failBefore: { "insert:debates": 3 } });
+    await expect(execute({ dataset, plan, adapter: db, ...quiet, retries: 3 })).rejects.toThrow(/injected/);
+    const run = (await db.getRun(plan.runId))!;
+    expect(run.status).toBe("failed");
+    expect(run.lock_token).toBeNull();
+    const profilesBefore = db.calls["insert:profiles"];
+    await execute({ dataset, plan, adapter: db, ...quiet });
+    expect(db.calls["insert:profiles"]).toBe(profilesBefore); // profiles were already created
+    expect(sampleRows(db)).toBe(total(dataset));
+    expect((await db.getRun(plan.runId))!.status).toBe("complete");
+  });
+
+  it("refuses to adopt a genuine row that happens to have a planned id", async () => {
+    const db = freshDb();
+    const victim = dataset.debates[5].rowId;
+    db.table("debates").set(victim, { id: victim, user_id: "g1", is_sample: false, argument: "genuine" });
+    await expect(execute({ dataset, plan, adapter: db, ...quiet })).rejects.toThrow(StopError);
+    expect(db.table("debates").get(victim)).toMatchObject({ is_sample: false, argument: "genuine" });
+  });
+
+  it("refuses to adopt an auth user that is not the run's", async () => {
+    const db = freshDb();
+    const u = dataset.authUsers[3];
+    db.authUsers.set(u.rowId, { id: u.rowId, email: "someone@example.com", runId: null, loginBlocked: false });
+    // An earlier attempt's intent makes the engine look before creating.
+    await db.insertRun({ id: plan.runId, status: "failed", plan_hash: plan.manifestHash, generator_version: plan.generatorVersion, seed: plan.seed, window_from: plan.window.from, window_to: plan.window.to, counts: {}, lock_token: null, locked_at: null, last_error: null });
+    await db.recordIntents([{ run_id: plan.runId, kind: "auth_user", logical_id: u.logicalId, row_id: u.rowId }]);
+    await expect(execute({ dataset, plan, adapter: db, ...quiet })).rejects.toThrow(/not this run's/);
+  });
+
+  it("runs one run at a time, and resumes only from its own plan", async () => {
+    const db = freshDb();
+    await db.insertRun({ id: "sample-1-other", status: "running", plan_hash: "x", generator_version: "x", seed: 1, window_from: plan.window.from, window_to: plan.window.to, counts: {}, lock_token: "held", locked_at: new Date().toISOString(), last_error: null });
+    await expect(execute({ dataset, plan, adapter: db, ...quiet })).rejects.toThrow(/holds a lock/);
+    const db2 = freshDb();
+    await db2.insertRun({ id: plan.runId, status: "failed", plan_hash: "another", generator_version: plan.generatorVersion, seed: plan.seed, window_from: plan.window.from, window_to: plan.window.to, counts: {}, lock_token: null, locked_at: null, last_error: null });
+    await expect(execute({ dataset, plan, adapter: db2, ...quiet })).rejects.toThrow(/different plan/);
+  });
+
+  it("clears a dead process's lock only when asked and only once it is stale", async () => {
+    const db = freshDb();
+    const run = { id: plan.runId, status: "running" as const, plan_hash: plan.manifestHash, generator_version: plan.generatorVersion, seed: plan.seed, window_from: plan.window.from, window_to: plan.window.to, counts: {}, lock_token: "dead", locked_at: new Date().toISOString(), last_error: null };
+    await db.insertRun(run);
+    await expect(execute({ dataset, plan, adapter: db, ...quiet })).rejects.toThrow(/locked by another process/);
+    await expect(execute({ dataset, plan, adapter: db, ...quiet, breakStaleLock: true })).rejects.toThrow(/less than 15 minutes/);
+    await db.updateRun(plan.runId, { locked_at: new Date(Date.now() - 20 * 60_000).toISOString() });
+    await execute({ dataset, plan, adapter: db, ...quiet, breakStaleLock: true });
+    expect(sampleRows(db)).toBe(total(dataset));
+  });
+
+  it("writes only the canary's cohort, then the rest", async () => {
+    const db = freshDb();
+    await execute({ dataset, plan, adapter: db, ...quiet, cohortLimit: 25 });
+    expect(db.authUsers.size).toBe(25);
+    const inCanary = dataset.debates.filter((d) => d.cohort < 25).length;
+    expect([...db.table("debates").values()].filter((d) => d.is_sample).length).toBe(inCanary);
+    expect((await db.getRun(plan.runId))!.status).toBe("running");
+    const v = await validate(db, dataset, null, { cohortLimit: 25 });
+    expect(v.checks.filter((c) => !c.ok)).toEqual([]);
+    await execute({ dataset, plan, adapter: db, ...quiet });
+    expect(sampleRows(db)).toBe(total(dataset));
+  });
+
+  it("stops cleanly when cancelled and resumes", async () => {
+    const db = freshDb();
+    const ac = new AbortController();
+    ac.abort();
+    const r = await execute({ dataset, plan, adapter: db, ...quiet, signal: ac.signal });
+    expect(r.cancelled).toBe(true);
+    expect((await db.getRun(plan.runId))!.lock_token).toBeNull();
+    await execute({ dataset, plan, adapter: db, ...quiet });
+    expect(sampleRows(db)).toBe(total(dataset));
+  });
+
+  it("refuses when the target's motions differ from the plan's", async () => {
+    const db = freshDb();
+    db.table("debate_topics").get("no-decision")!.motion = "Reworded.";
+    await expect(execute({ dataset, plan, adapter: db, ...quiet })).rejects.toThrow(/differs from the plan/);
+    expect(db.authUsers.size).toBe(0);
+  });
+});
+
+describe("teardown", () => {
+  async function seeded(other?: { plan: Plan; dataset: Dataset }) {
+    const db = freshDb();
+    await execute({ dataset, plan, adapter: db, ...quiet });
+    if (other) await execute({ dataset: other.dataset, plan: other.plan, adapter: db, ...quiet });
+    return db;
+  }
+
+  it("removes exactly the run's rows, clears genuine references first, and keeps the audit", async () => {
+    const db = await seeded();
+    const sampleResult = dataset.quizResults[0].rowId;
+    const sampleChallenge = dataset.challenges[0].rowId;
+    db.table("quiz_results").set("GEN0000002", { id: "GEN0000002", user_id: "g1", challenge_from: sampleResult, is_sample: false });
+    db.table("debates").set("GEN000DEB2", { id: "GEN000DEB2", user_id: "g1", challenge_id: sampleChallenge, parent_debate_id: null, is_sample: false });
+    const p = await preview(db, plan.runId);
+    expect(p.entanglements.map((e) => `${e.table}.${e.column}`).sort()).toEqual(["debates.challenge_id", "quiz_results.challenge_from"]);
+    expect(p.blocking).toEqual([]);
+    await teardown(db, plan.runId);
+    expect(sampleRows(db)).toBe(0);
+    expect(db.authUsers.size).toBe(0);
+    expect(db.table("quiz_results").get("GEN0000002")).toMatchObject({ challenge_from: null, is_sample: false });
+    expect(db.table("debates").get("GEN000DEB2")).toMatchObject({ challenge_id: null, is_sample: false });
+    expect(db.table("profiles").get("g1")).toMatchObject({ elo: 1216, is_sample: false });
+    expect((await db.getRun(plan.runId))!.status).toBe("torn_down");
+    expect([...db.registry.values()].every((i) => i.state === "deleted")).toBe(true);
+  });
+
+  it("stops, deleting nothing, when a genuine row could only be kept by deleting it", async () => {
+    const db = await seeded();
+    const cls = dataset.classes[0].rowId;
+    db.table("class_members").set(`${cls}:g1`, { class_id: cls, user_id: "g1" });
+    const rowsBefore = sampleRows(db);
+    await expect(teardown(db, plan.runId)).rejects.toThrow(/genuine row/);
+    expect(sampleRows(db)).toBe(rowsBefore);
+    expect(db.table("class_members").has(`${cls}:g1`)).toBe(true);
+  });
+
+  it("leaves another run's rows alone", async () => {
+    const other = smallPlan({ seed: 99 });
+    const db = await seeded(other);
+    await teardown(db, plan.runId);
+    expect(sampleRows(db)).toBe(total(other.dataset));
+    const v = await validate(db, other.dataset, null);
+    expect(v.checks.filter((c) => !c.ok)).toEqual([]);
+  });
+
+  it("deletes by marker or owner as well as id: a genuine id passed by mistake survives", async () => {
+    const db = await seeded();
+    await db.deleteOwned("debates", ["GEN000DEB1"], []);
+    await db.deleteOwned("reading_responses", [dataset.readingResponses[0].rowId], ["someone-else"]);
+    expect(db.table("debates").has("GEN000DEB1")).toBe(true);
+    expect(db.table("reading_responses").has(dataset.readingResponses[0].rowId)).toBe(true);
+  });
+
+  it("resumes after a teardown that died part way", async () => {
+    const db = await seeded();
+    // As if the process died after deleting half the auth users.
+    const half = dataset.authUsers.slice(0, Math.floor(dataset.authUsers.length / 2));
+    await teardown(db, plan.runId).catch(() => {});
+    for (const u of half) db.authUsers.set(u.rowId, { id: u.rowId, email: u.row.email, runId: plan.runId, loginBlocked: true });
+    await db.updateRun(plan.runId, { status: "tearing_down" });
+    for (const i of db.registry.values()) if (i.kind === "auth_user" && half.some((u) => u.rowId === i.row_id)) i.state = "created";
+    await teardown(db, plan.runId);
+    expect(db.authUsers.size).toBe(0);
+    expect((await db.getRun(plan.runId))!.counts).toMatchObject({ deleted: { auth_user: dataset.authUsers.length } });
+  });
+});

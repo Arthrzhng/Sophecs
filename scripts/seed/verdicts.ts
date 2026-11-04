@@ -15,8 +15,9 @@
 // (strong 70-90, mid 50-70, weak 25-50).
 
 import type { Rng } from "./rng";
+import { schoolAdherent, schoolName } from "../../src/lib/school-registry";
 import {
-  RIVAL_INTRO,
+  rivalIntro,
   quoteFrom,
   type BankArgument,
   type Objection,
@@ -40,17 +41,12 @@ const AXIS_BANDS: Record<Tier, { f: [number, number]; r: [number, number]; e: [n
   weak: { f: [2, 5], r: [2.5, 5], e: [1, 3.5] },
 };
 
-const NAME: Record<SchoolId, string> = {
-  stoicism: "Stoicism",
-  utilitarianism: "Utilitarianism",
-  "virtue-ethics": "Virtue Ethics",
-};
-const ADHERENT: Record<SchoolId, string> = {
-  stoicism: "Stoic",
-  utilitarianism: "utilitarian",
-  "virtue-ethics": "virtue ethicist",
-};
+const NAME = (s: SchoolId) => schoolName(s);
+const ADHERENT = (s: SchoolId) => schoolAdherent(s);
 
+// What each school's own ground is, in the words a verdict uses to praise
+// an argument for standing on it. Sample text keyed by school, as the
+// fidelity criteria are; not a list the product reads.
 const FEATURE: Record<SchoolId, string[]> = {
   stoicism: [
     "keeps to the line between what is up to us and what is not",
@@ -140,7 +136,7 @@ export function templateVerdict(
   const score = scoreFor(arg.tier, f, r, e, rng);
   const openIdx = unansweredRival(fr, arg.school, parts, rng);
   const open = s.objections[openIdx];
-  const rivalName = NAME[open.rival];
+  const rivalName = NAME(open.rival);
   const feature = rng.pick(FEATURE[arg.school]);
 
   let strongest: string;
@@ -150,17 +146,17 @@ export function templateVerdict(
   if (arg.tier === "weak") {
     const q = quoteFrom(s.positions[parts.position], rng);
     const wq = quoteFrom(parts.weak.length ? fr.weak[parts.weak[0]] : s.examples[parts.example ?? 0], rng);
-    strongest = `The opening, "${q}", states the ${NAME[arg.school]} position clearly, though little after it reasons from that position.`;
-    weakest = `"${wq}" is an opinion about the topic rather than a reason a ${ADHERENT[arg.school]} would give, and most of the argument is like it.`;
+    strongest = `The opening, "${q}", states the ${NAME(arg.school)} position clearly, though little after it reasons from that position.`;
+    weakest = `"${wq}" is an opinion about the topic rather than a reason a ${ADHERENT(arg.school)} would give, and most of the argument is like it.`;
     const reasonSentence = shortestSentence(s.reasons);
-    stronger = `argue from what a ${ADHERENT[arg.school]} actually holds, for instance: ${reasonSentence}`;
+    stronger = `argue from what a ${ADHERENT(arg.school)} actually holds, for instance: ${reasonSentence}`;
     line = rng.pick([
-      `States a ${NAME[arg.school]} position but argues mostly from general opinion.`,
-      `The position is ${NAME[arg.school]}'s; the reasons offered for it are not.`,
+      `States a ${NAME(arg.school)} position but argues mostly from general opinion.`,
+      `The position is ${NAME(arg.school)}'s; the reasons offered for it are not.`,
     ]);
   } else {
     const q = quoteFrom(s.reasons[parts.reasons[0]], rng);
-    strongest = `The line "${q}" ${feature}, which is the school's own ground rather than a conclusion borrowed from elsewhere.`;
+    strongest = `"${q}" ${feature}, on the school's own ground.`;
     const weakSource =
       parts.example !== null ? s.examples[parts.example] : s.reasons[parts.reasons[parts.reasons.length - 1]];
     const wq = quoteFrom(weakSource, rng);
@@ -168,15 +164,15 @@ export function templateVerdict(
       weakest = `"${wq}" is asserted more than shown, and it carries weight the argument never quite earns.`;
       stronger = `also answer the ${rivalName} objection, that ${open.claim} As it stands the argument leaves that reply to the reader.`;
       line = rng.pick([
-        `A faithful ${NAME[arg.school]} case that meets one objection head on.`,
-        `Reasons as a ${ADHERENT[arg.school]} reasons, and answers a hard reply.`,
+        `A faithful ${NAME(arg.school)} case that meets one objection head on.`,
+        `Reasons as a ${ADHERENT(arg.school)} reasons, and answers a hard reply.`,
       ]);
     } else {
       weakest = `The argument never meets an objection. "${wq}" is left to stand alone where a rival school would push hardest.`;
-      stronger = `take on the ${rivalName} objection directly. ${RIVAL_INTRO[open.rival]} would say that ${open.claim} The argument needs an answer to that.`;
+      stronger = `take on the ${rivalName} objection directly. ${rivalIntro(open.rival)} would say that ${open.claim} The argument needs an answer to that.`;
       line = rng.pick([
-        `A sound ${NAME[arg.school]} case that leaves its strongest objection unanswered.`,
-        `Faithful to ${NAME[arg.school]}, but it never faces the obvious reply.`,
+        `A sound ${NAME(arg.school)} case that leaves its strongest objection unanswered.`,
+        `Faithful to ${NAME(arg.school)}, but it never faces the obvious reply.`,
       ]);
     }
   }
@@ -219,7 +215,14 @@ export function templateRevisionVerdict(
   const added = s.objections[answeredIdx];
   const q = quoteFrom(added.answer, rng);
   const remaining = s.objections.map((_, i) => i).filter((i) => !revisedParts.objections.includes(i));
-  const next = remaining.length ? s.objections[rng.pick(remaining)] : null;
+  // The judge's schema always names an objection. When the revision now
+  // meets both rivals, the one it met first is named as met only thinly.
+  const next = remaining.length
+    ? objectionBlock(s.objections[rng.pick(remaining)])
+    : {
+        ...objectionBlock(s.objections[revisedParts.objections[0]]),
+        why_it_stands: `The reply to it is stated rather than argued, so a determined ${ADHERENT(s.objections[revisedParts.objections[0]].rival)} could press it again.`,
+      };
   const base = templateVerdict(fr, { school, tier }, revisedParts, 0.5, rng);
   return {
     ...base,
@@ -228,13 +231,13 @@ export function templateRevisionVerdict(
     rigor: r,
     engagement: e,
     verdict_line: answered
-      ? `Now answers the ${NAME[added.rival]} objection on ${NAME[school]}'s own terms.`
-      : `Tries to answer the ${NAME[added.rival]} objection but restates the position instead.`,
-    unanswered_objection: next ? objectionBlock(next) : null,
+      ? `Now answers the ${NAME(added.rival)} objection on ${NAME(school)}'s own terms.`
+      : `Tries to answer the ${NAME(added.rival)} objection but restates the position instead.`,
+    unanswered_objection: next,
     objection_answered: answered,
     improvement_note: answered
-      ? `"${q}" meets the ${NAME[added.rival]} objection directly, which the first attempt did not.`
-      : `The new paragraph names the ${NAME[added.rival]} objection, but "${q}" restates the position more than it answers it.`,
+      ? `"${q}" meets the ${NAME(added.rival)} objection directly, which the first attempt did not.`
+      : `The new paragraph names the ${NAME(added.rival)} objection, but "${q}" restates the position more than it answers it.`,
     prompt_version: TEMPLATE_PROMPT_VERSION,
   };
 }

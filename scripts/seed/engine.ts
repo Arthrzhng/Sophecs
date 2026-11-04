@@ -62,7 +62,11 @@ export interface ExecuteOptions {
   signal?: AbortSignal;
   retries?: number;
   retryBaseMs?: number;
+  /** Clear this run's lock if a dead process left it more than STALE_LOCK_MINUTES ago. */
+  breakStaleLock?: boolean;
 }
+
+export const STALE_LOCK_MINUTES = 15;
 
 export interface ExecuteReport {
   runId: string;
@@ -157,7 +161,13 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     throw new StopError(`run ${run.id} was started from a different plan`);
   if (run.status === "tearing_down" || run.status === "torn_down")
     throw new StopError(`run ${run.id} is ${run.status}; it cannot be resumed`);
-  if (!(await adapter.acquireLock(run.id, token))) throw new StopError(`run ${run.id} is locked by another process`);
+  if (run.lock_token && opts.breakStaleLock) {
+    if (!(await adapter.breakStaleLock(run.id, STALE_LOCK_MINUTES)))
+      throw new StopError(`run ${run.id}'s lock is less than ${STALE_LOCK_MINUTES} minutes old; another process may still be running`);
+    log(`cleared a stale lock on ${run.id}`);
+  }
+  if (!(await adapter.acquireLock(run.id, token)))
+    throw new StopError(`run ${run.id} is locked by another process (if that process died, add --break-stale-lock after ${STALE_LOCK_MINUTES} minutes)`);
   const racing = (await adapter.listRuns()).filter((r) => r.id !== run!.id && r.lock_token);
   if (racing.length) {
     await adapter.releaseLock(run.id, token);

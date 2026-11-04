@@ -958,7 +958,8 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
   const responseBank = readingResponseBank as Record<string, string[][]>;
   const addReading = (u: User, topic: TopicSlug, before: number, r: Rng) => {
     const start = Math.max(u.signup + MINUTE, before - r.int(4, 40) * MINUTE);
-    if (start >= before || start > to - 2 * MINUTE) return;
+    // Both answers, a few minutes apart, strictly before the argument.
+    if (start + 5 * MINUTE >= before || start > to - 6 * MINUTE) return;
     for (const chunk of [0, 1]) {
       const rid = id(r);
       readingResponses.push({

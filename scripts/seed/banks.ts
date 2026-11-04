@@ -13,12 +13,15 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Rng } from "./rng";
+import { QUIZ_SCHOOLS, schoolAdherent, type QuizSchoolId } from "../../src/lib/school-registry";
 
 export const SEED_DIR = join(process.cwd(), "scripts", "seed");
 export const ARGUMENT_DIR = join(SEED_DIR, "arguments");
 
-export const SCHOOLS = ["stoicism", "utilitarianism", "virtue-ethics"] as const;
-export type SchoolId = (typeof SCHOOLS)[number];
+// The schools the quiz sorts into, from the registry: a sample account
+// can only hold a school a reader could be placed in.
+export const SCHOOLS = QUIZ_SCHOOLS;
+export type SchoolId = QuizSchoolId;
 export const TOPICS = [
   "opaque-benefit",
   "crash-arithmetic",
@@ -92,11 +95,10 @@ export interface BankArgument {
   words: number;
 }
 
-export const RIVAL_INTRO: Record<SchoolId, string> = {
-  stoicism: "A Stoic",
-  utilitarianism: "A utilitarian",
-  "virtue-ethics": "A virtue ethicist",
-};
+/** "A Stoic", as the class page names a member with no display name. */
+export function rivalIntro(school: SchoolId): string {
+  return `A ${schoolAdherent(school)}`;
+}
 
 export function wordCount(text: string): number {
   return text.trim().split(/\s+/).filter(Boolean).length;
@@ -111,7 +113,7 @@ export function loadClosings(): Closings {
 }
 
 export function objectionSentence(o: Objection): string {
-  return `${RIVAL_INTRO[o.rival]} will object that ${o.claim} ${o.answer}`;
+  return `${rivalIntro(o.rival)} will object that ${o.claim} ${o.answer}`;
 }
 
 /** The text of an argument made of `parts`, in paragraphs. */

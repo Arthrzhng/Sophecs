@@ -33,7 +33,7 @@ const argv = isPlan ? rest : process.argv.slice(2);
 main(async () => {
   const f = parseFlags(argv, {
     values: ["expected-project-ref", "confirm-production", "run-id", "plan", "seed", "from", "to", "users", "anon-results", "challenges", "exchanges", "classes", "canary", "out", "real-judge", "concurrency", "batch-size", "rows-per-second", "auth-per-second"],
-    booleans: ["execute", "validate", "six-schools"],
+    booleans: ["execute", "validate", "six-schools", "break-stale-lock"],
   });
   refuseUnsupported(f);
   const ref = str(f, "expected-project-ref");
@@ -121,6 +121,7 @@ main(async () => {
     authConcurrency: int(f, "concurrency", 4, 1, 8),
     log,
     signal: cancelSignal(log),
+    breakStaleLock: Boolean(f["break-stale-lock"]),
   });
   log(`wrote ${JSON.stringify(result.written)} in ${result.seconds.toFixed(1)} s (${result.rowsPerSecond.toFixed(0)} rows/s${result.authUsersPerSecond ? `, ${result.authUsersPerSecond.toFixed(1)} auth users/s` : ""})`);
   if (result.cancelled) {

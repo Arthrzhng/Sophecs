@@ -113,6 +113,13 @@ export class LocalAdapter implements Adapter {
   async releaseLock(id: string, token: string) {
     this.sql(`update public.seed_runs set lock_token = null, locked_at = null where id = ${json(id)}::json #>> '{}' and lock_token = ${json(token)}::json #>> '{}';`);
   }
+  async breakStaleLock(id: string, minutes: number) {
+    const out = this.sql(
+      `update public.seed_runs set lock_token = null, locked_at = null
+       where id = ${json(id)}::json #>> '{}' and lock_token is not null and locked_at < now() - make_interval(mins => ${Math.floor(minutes)}) returning id;`
+    ).trim();
+    return out.length > 0;
+  }
   async recordIntents(items: Omit<RegistryItem, "state">[]) {
     if (!items.length) return;
     this.sql(
