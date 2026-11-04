@@ -113,12 +113,13 @@ export interface CreateChallengeOutput {
   error?: string;
 }
 
-// Called from ChallengeButton on /r/[id]. The row is created with only
+// Called from ChallengeButton, on /r/[id] and on the quiz result page
+// straight after the quiz. The row is created with only
 // challenger_result_id in Phase 1 — see docs/decisions.md. Only the
 // result's owner may challenge from it: the browser the quiz was taken in
 // (its anon_id cookie) or the account the result is saved to. Anyone else
 // gets the answer an unknown result gets; without the check, anyone could
-// open a challenge in another reader's name.
+// open a challenge in another reader's name through this action.
 export async function createChallenge(resultId: string): Promise<CreateChallengeOutput> {
   if (!isAdminConfigured()) {
     return { ok: false, error: "Supabase is not configured in this environment." };

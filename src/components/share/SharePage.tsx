@@ -59,7 +59,7 @@ export function SharePage({
   // and one action. Everything else on this page is for someone who already
   // has a result of their own; showing a stranger four competing next steps
   // is how a shared link stops converting.
-  const coldRecipient = !isOwner && !showDebateThem && !otherVector;
+  const coldRecipient = !isOwner && !isSavedToProfile && !showDebateThem && !otherVector;
 
   return (
     <main className="flex-1">

@@ -2400,10 +2400,23 @@ that came from a challenge, which did exactly that.
 The action now checks ownership the way `/r/[id]` already tells an owner
 apart: the `anon_id` cookie the quiz was taken under, or the signed-in
 account the result is saved to. Anyone else gets "Unknown result.", the
-answer an unknown id gets. The page offers the button only to the owner;
-any other visitor who is not a party to a challenge on it is offered the
-quiz, as a first-time visitor already is. `tests/create-challenge.test.ts`;
-two of its four cases fail on the old code.
+answer an unknown id gets. `/r/[id]` offers "Challenge a friend" only to
+the owner (by cookie or by saved account, the latter newly treated as an
+owner rather than as a first-time visitor); a visitor who is not the
+owner gets "Debate them" where the page shows it, and "Take the quiz"
+otherwise. `tests/create-challenge.test.ts`; two of its four cases fail
+on the old code.
+
+**What this does not close.** The action was one path. The database
+itself still lets `anon` and `authenticated` insert any challenge
+(0001's policy "anon insert own", `with check (true)`, and the table's
+grants), so anyone holding the public key can still open a challenge
+naming another reader's result through the Data API, skipping the
+action. Shown on a local copy with Supabase's default grants; production
+not checked from here. It is part of the wider write-permission fix
+reported on 2026-11-03, which waits on Arthur's "yes, the grants fix":
+every writer to `challenges` uses the server role, so dropping the insert
+policy would break nothing on the site.
 
 ### For Checkpoint A, from the security work
 
