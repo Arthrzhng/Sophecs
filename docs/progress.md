@@ -208,7 +208,10 @@ entry names.
   lost the result. It now stores the challenger's result id, and accepts
   an open challenge once. `docs/decisions.md`, "A challenge link stores
   the challenger's result (2026-11-04)". `tests/challenge-accept.test.ts`.
-
+  `src/app/actions.ts` is frozen; Arthur's ruling of 2026-11-04 asked for
+  this fix.
+- #59 merged as `759b0bd`, after one review pass. Production deploy
+  `dpl_4q3FDcdbaPcTvCpirGPPEek6igvr`, Ready (read from Vercel).
 
 ## 2026-11-04: only a result's owner can challenge from it
 
