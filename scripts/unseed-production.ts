@@ -1,9 +1,11 @@
-// Teardown of one production seed run. Preview by default; nothing is
-// deleted without every one of:
+// Teardown of one production seed run, from a machine with the service
+// key. Preview by default; nothing is deleted without every one of:
 //   --expected-project-ref <ref> --confirm-production <ref> --run-id <id>
-//   --plan <file> --execute --confirm-teardown <id>
-// matching each other, the plan and the target. Teardown is not part of
-// any approval unless named in it explicitly (docs/sample-activity.md).
+//   --execute --confirm-teardown <id>
+// matching each other and the target. It works from the registry, so no
+// plan is needed; a --plan given is checked against the run. The same
+// teardown runs from the workflow (mode teardown). Teardown is run only on
+// Arthur's instruction (docs/sample-activity.md, "Teardown").
 
 import { existsSync } from "node:fs";
 import { productionTarget, describeTarget, GuardError } from "./seed/env";
@@ -23,10 +25,12 @@ main(async () => {
   if (!ref) throw new GuardError("--expected-project-ref is required");
   if (str(f, "confirm-production") !== ref) throw new GuardError("--confirm-production must repeat --expected-project-ref exactly");
   if (!runId) throw new GuardError("--run-id is required");
-  if (!planPath || !existsSync(planPath)) throw new GuardError("--plan must name an existing plan file");
-  const plan = readPlan(planPath);
-  if (plan.target.kind !== "production" || plan.target.projectRef !== ref) throw new GuardError("the plan is not for this project");
-  if (plan.runId !== runId) throw new GuardError(`--run-id ${runId} is not the plan's run ${plan.runId}`);
+  if (planPath) {
+    if (!existsSync(planPath)) throw new GuardError("--plan names no file");
+    const plan = readPlan(planPath);
+    if (plan.target.kind !== "production" || plan.target.projectRef !== ref) throw new GuardError("the plan is not for this project");
+    if (plan.runId !== runId) throw new GuardError(`--run-id ${runId} is not the plan's run ${plan.runId}`);
+  }
   if (f.execute && str(f, "confirm-teardown") !== runId) throw new GuardError("--confirm-teardown must repeat the run id exactly");
 
   const target = productionTarget(ref, str(f, "confirm-production"));

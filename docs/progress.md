@@ -229,27 +229,34 @@ entry names.
   `src/app/actions.ts` is frozen; Arthur's ruling of 2026-11-04 asked for
   this fix.
 
-## 2026-11-04: sample activity, built and tested locally, not run
+## 2026-11-04: sample activity, revised to Arthur's ruling, not yet run
 
-- Branch `sample-activity`: migration 0022 (the `is_sample` marker, the
-  `seed_runs` and `seed_run_items` registry, triggers that let only the
-  server role set the marker and refuse a reader's row pointing at a sample
-  row, the marker on `debates_public` and
-  `public_results`, `elo_percentile` over genuine profiles, an index on
-  `debates(created_at)`), the Sample label and sample-assessment wording,
-  the par-window filter in `/api/judge` and the challenge guard, the
-  school table and Today read in full past 1,000 rows, and the seed
-  tooling in `scripts/seed/`. `docs/sample-activity.md` has the design.
-- Not applied and not run anywhere but a local Postgres 16. Migration
-  0022: `scripts/test-0022-sample-activity.sh`, all checks passed, and
-  `scripts/test-migrations.sh` with 0022 in the rollback round trip, exit
-  0. The seed: a local run of 4,000 accounts end to end (create, plan,
-  canary of 40, full, validate, teardown preview, teardown), with genuine
-  rows in the database that it left as they were.
-- A production plan made offline (manifest `ed400abc366f...`), kept out
-  of the repository with its seed, since the generator is public and the
-  seed fixes every row id. Waiting on Arthur's approval with everything
-  else that run needs; the plan is remade in the minute before the run.
-- Reviewed four times by fresh reviewers, one past the charter's cap of
-  three; the last round's fixes were verified by the agent, not a fresh
-  reviewer (#57 lists the findings and fixes).
+- Arthur approved the run on 2026-11-04 in a revised form: 3,278 accounts;
+  permanent, with new activity on a schedule; a GitHub Actions workflow
+  holding the service key and the seed as repository secrets; "Sample" on
+  every surface, share and link-preview images included; no synthetic
+  referrers and nothing in PostHog; real numbers kept real; a reader's
+  own rating, percentile and streak against real readers only; class
+  pages that never show a sample; exact duplicate arguments under 5%; no
+  genuine-row export. `docs/sample-activity.md` has the design.
+- Branch `sample-activity`:
+  - migration 0022 (0021 went to the challenges fix): the marker, the
+    registry (no seed stored; `base_to`, `last_report`), eleven triggers,
+    the marker on the two views, `elo_percentile` over genuine profiles,
+    an index on `debates(created_at)`;
+  - a generator whose base window is fixed and whose arguments run on
+    without changing anything already made, texts given out without
+    repeats (0% exact duplicates at full size), and an engine that
+    extends a run and brings profiles up to date;
+  - `.github/workflows/sample-activity.yml` and `scripts/seed-ci.ts`:
+    canary, full, extend every six hours, and teardown by hand with the
+    run's id typed in; a public log with counts and check names only;
+  - the Sample mark on the verdict, result and card images and in the
+    three pages' titles; a sample-page marker that stops every analytics
+    event; samples left out of class pages; a sample challenge never
+    accepted; a query in the doc for real and sample counts.
+- Tested on local Postgres 16: the 0022 test and the migration round trip
+  pass; 600 accounts end to end, canary, full, an extension three days on
+  that wrote only the 59 new arguments and the 24 profiles they moved, the
+  earlier plan then refused, validation passing, and teardown leaving the
+  genuine reader as it was.

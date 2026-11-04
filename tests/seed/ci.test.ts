@@ -92,4 +92,28 @@ describe("the scheduled workflow's path", () => {
     // The checks are named, without their figures.
     expect(lines).toMatch(/^ok {2}\s*elo_percentile\(1200\) counts genuine profiles only$/m);
   });
+
+  it("tears down only with the run's id typed in, and logs counts only", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    // A genuine result pointing at a sample result: cleared, and its id kept out of the log.
+    const sampleResult = [...db.table("quiz_results").values()].find((r) => r.is_sample)!;
+    db.table("quiz_results").set("GENUINE01", { id: "GENUINE01", user_id: "g1", challenge_from: sampleResult.id, is_sample: false });
+    const lines: string[] = [];
+    const run1 = (confirm?: string) =>
+      runCi({ mode: "teardown", adapter: db, seed: "", projectRef: "tekifezydjlgxgndkxul", now: () => at(2), log: (l) => lines.push(l), config: SMALL, confirmTeardown: confirm });
+    await expect(run1(undefined)).rejects.toThrow(/repeat the run id/);
+    await expect(run1("sample-wrong")).rejects.toThrow(/repeat the run id/);
+    expect(samples(db, "debates")).toBeGreaterThan(0);
+    const out = await run1(run.id);
+    expect(out).toMatchObject({ ok: true, outcome: "torn-down" });
+    expect(samples(db, "profiles") + samples(db, "debates") + samples(db, "quiz_results")).toBe(0);
+    expect(db.table("quiz_results").get("GENUINE01")).toMatchObject({ challenge_from: null, is_sample: false });
+    expect(lines.join("\n")).not.toContain("GENUINE01");
+    expect(lines.join("\n")).not.toContain("g1");
+    expect((await db.getRun(run.id))!.status).toBe("torn_down");
+  });
 });
+

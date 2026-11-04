@@ -12,6 +12,9 @@
 //   full    the rest of that run, and its activity up to now.
 //   extend  the scheduled step: the run's activity up to now. Does
 //           nothing until a full stage has passed, or after teardown.
+//   teardown  on Arthur's instruction only, by hand, with
+//           --confirm-teardown repeating the run's id: removes the run's
+//           rows (scripts/seed/teardown.ts).
 //
 // Each mode makes its plan in memory from the run's fixed inputs and the
 // secret seed, runs the dry-run checks (reads only), executes, and
@@ -19,8 +22,7 @@
 // prints counts, timings and the names of the checks with ok or FAIL, and
 // nothing about readers' data, no hash and no seed. The full report,
 // genuine figures included, goes to seed_runs.last_report, which only the
-// server role can read. Teardown is not here: it stays one command, run
-// only on Arthur's instruction (docs/sample-activity.md, "Teardown").
+// server role can read.
 
 import { productionTarget, productionSeed, GuardError } from "./seed/env";
 import { SupabaseAdapter } from "./seed/adapter-supabase";
@@ -28,12 +30,20 @@ import { runCi, MODES, type Mode } from "./seed/ci";
 import { log, main, nowFloored, parseFlags, str } from "./seed/cli";
 
 main(async () => {
-  const f = parseFlags(process.argv.slice(2), { values: ["mode", "expected-project-ref", "confirm-production"], booleans: [] });
+  const f = parseFlags(process.argv.slice(2), { values: ["mode", "expected-project-ref", "confirm-production", "confirm-teardown"], booleans: [] });
   const mode = str(f, "mode") as Mode | undefined;
   if (!mode || !MODES.includes(mode)) throw new GuardError(`--mode must be one of ${MODES.join(", ")}`);
   const ref = str(f, "expected-project-ref");
   if (!ref) throw new GuardError("--expected-project-ref is required");
   const target = productionTarget(ref, str(f, "confirm-production"));
-  const outcome = await runCi({ mode, adapter: new SupabaseAdapter(target), seed: productionSeed(), projectRef: ref, now: nowFloored, log });
+  const outcome = await runCi({
+    mode,
+    adapter: new SupabaseAdapter(target),
+    seed: mode === "teardown" ? "" : productionSeed(),
+    projectRef: ref,
+    now: nowFloored,
+    log,
+    confirmTeardown: str(f, "confirm-teardown"),
+  });
   if (!outcome.ok) process.exitCode = 1;
 });

@@ -14,7 +14,8 @@
 #
 # Modes, by hand: canary (starts the run, first 40 accounts), full (the
 # rest), extend (what the schedule runs; it does nothing until a full
-# stage has passed, or after teardown). Teardown is not here.
+# stage has passed, or after teardown), and teardown, run only on Arthur's
+# instruction and only with the run's id typed into confirm_teardown.
 name: Sample activity
 
 on:
@@ -23,11 +24,16 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "canary, full or extend"
+        description: "canary, full, extend, or teardown (Arthur's instruction only)"
         required: true
         default: extend
         type: choice
-        options: [canary, full, extend]
+        options: [canary, full, extend, teardown]
+      confirm_teardown:
+        description: "Teardown only: the run's id, typed exactly"
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: read
@@ -68,7 +74,8 @@ jobs:
       - name: Sample activity
         env:
           MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'extend' }}
-        run: npm run -s seed:ci -- --mode "$MODE" --expected-project-ref tekifezydjlgxgndkxul --confirm-production tekifezydjlgxgndkxul
+          CONFIRM_TEARDOWN: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm_teardown || '' }}
+        run: npm run -s seed:ci -- --mode "$MODE" --expected-project-ref tekifezydjlgxgndkxul --confirm-production tekifezydjlgxgndkxul --confirm-teardown "$CONFIRM_TEARDOWN"
       - name: Remove the credentials file
         if: always()
         run: rm -f .env.seed.production

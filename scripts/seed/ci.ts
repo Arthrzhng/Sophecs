@@ -10,9 +10,10 @@ import { execute } from "./engine";
 import { validate } from "./validate";
 import { dryRun } from "./dryrun";
 import { GuardError } from "./env";
+import { preview, teardown } from "./teardown";
 
 export const CANARY_ACCOUNTS = 40;
-export const MODES = ["canary", "full", "extend"] as const;
+export const MODES = ["canary", "full", "extend", "teardown"] as const;
 export type Mode = (typeof MODES)[number];
 
 export interface CiOptions {
@@ -26,12 +27,14 @@ export interface CiOptions {
   /** Volumes; the defaults are production's. Tests pass smaller ones. */
   config?: Partial<Pick<GenConfig, "users" | "anonResults" | "challenges" | "exchanges" | "classes">>;
   batchSize?: number;
+  /** Teardown only: must repeat the active run's id exactly. */
+  confirmTeardown?: string;
 }
 
 export interface CiOutcome {
   ok: boolean;
   /** What happened, in a word: nothing to do, refused by the dry run, written. */
-  outcome: "idle" | "dry-run-failed" | "written";
+  outcome: "idle" | "dry-run-failed" | "written" | "torn-down" | "teardown-stopped";
   runId?: string;
 }
 
@@ -41,6 +44,7 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
   await adapter.checkSchema();
 
   const active = (await adapter.listRuns()).filter((r) => r.status !== "torn_down");
+  if (o.mode === "teardown") return tearDown(o, active);
   let baseTo: string;
   let cohortLimit: number | undefined;
   if (o.mode === "canary") {
@@ -103,4 +107,33 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
   await record({ written: result.written, seconds: result.seconds, ok: v.ok, checks: v.checks });
   if (!v.ok) log("validation failed: stop here (docs/sample-activity.md, \"Stop conditions\"); details in seed_runs.last_report");
   return { ok: v.ok, outcome: "written", runId: plan.runId };
+}
+
+// Teardown, on Arthur's instruction only: by hand, with the run's id typed
+// in to confirm. The log gets counts; row ids, genuine ones included, go to
+// seed_runs.last_report.
+async function tearDown(o: CiOptions, active: Awaited<ReturnType<CiOptions["adapter"]["listRuns"]>>): Promise<CiOutcome> {
+  const { adapter, log } = o;
+  if (active.length === 0) {
+    log("no sample run is active; nothing to tear down");
+    return { ok: true, outcome: "idle" };
+  }
+  if (active.length > 1) throw new GuardError(`${active.length} sample runs are active; expected one`);
+  const run = active[0];
+  if (o.confirmTeardown !== run.id) throw new GuardError(`teardown needs confirm_teardown to repeat the run id exactly (${run.id})`);
+  const p = await preview(adapter, run.id);
+  for (const [kind, v] of Object.entries(p.items)) log(`  ${kind}: ${v.created} created, ${v.intended} intended, ${v.deleted} already deleted`);
+  log(`genuine references to sample rows: ${p.entanglements.length} (${p.blocking.length} that teardown cannot keep)`);
+  const report: Record<string, unknown> = { mode: "teardown", at: new Date().toISOString(), preview: p };
+  try {
+    const r = await teardown(adapter, run.id, { log: (line) => log(line) });
+    for (const c of r.checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}`);
+    const ok = r.checks.every((c) => c.ok);
+    await adapter.updateRun(run.id, { last_report: { ...report, deleted: r.deleted, checks: r.checks, ok } });
+    return { ok, outcome: "torn-down", runId: run.id };
+  } catch (err) {
+    await adapter.updateRun(run.id, { last_report: { ...report, error: String((err as Error).message), ok: false } });
+    log("teardown stopped; nothing more was deleted (the reason is in seed_runs.last_report)");
+    return { ok: false, outcome: "teardown-stopped", runId: run.id };
+  }
 }
