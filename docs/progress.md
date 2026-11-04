@@ -190,3 +190,12 @@ entry names.
   (read from Vercel). Fetched through Vercel at 00:43 UTC on 2026-11-04:
   `/styleguide/phase3/card/confucian` answered 404, as it should in
   production, and `/robots.txt` 200.
+
+## 2026-11-04: only a result's owner can challenge from it
+
+- `createChallenge` checks the caller owns the result (cookie or saved
+  account), and `/r/[id]` offers "Challenge a friend" to the owner only,
+  "Take the quiz" to anyone else. `docs/decisions.md`, "Only a result's
+  owner can challenge from it (2026-11-04)". `tests/create-challenge.test.ts`.
+  `src/app/actions.ts` is frozen; Arthur's ruling of 2026-11-04 asked for
+  this fix.

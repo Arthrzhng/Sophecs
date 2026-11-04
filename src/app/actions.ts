@@ -114,12 +114,31 @@ export interface CreateChallengeOutput {
 }
 
 // Called from ChallengeButton on /r/[id]. The row is created with only
-// challenger_result_id in Phase 1 — see docs/decisions.md.
+// challenger_result_id in Phase 1 — see docs/decisions.md. Only the
+// result's owner may challenge from it: the browser the quiz was taken in
+// (its anon_id cookie) or the account the result is saved to. Anyone else
+// gets the answer an unknown result gets; without the check, anyone could
+// open a challenge in another reader's name.
 export async function createChallenge(resultId: string): Promise<CreateChallengeOutput> {
   if (!isAdminConfigured()) {
     return { ok: false, error: "Supabase is not configured in this environment." };
   }
   const admin = createAdminClient();
+  const { data: result } = await admin
+    .from("quiz_results")
+    .select("anon_id, user_id")
+    .eq("id", resultId)
+    .maybeSingle();
+  const anonId = (await cookies()).get("anon_id")?.value;
+  let isOwner = Boolean(result && anonId && result.anon_id === anonId);
+  if (result && !isOwner && result.user_id) {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    isOwner = Boolean(user && user.id === result.user_id);
+  }
+  if (!isOwner) return { ok: false, error: "Unknown result." };
   const id = newId();
   const { error } = await admin
     .from("challenges")

@@ -2387,6 +2387,24 @@ standing. The share line drops its "The judge's note:" sentence for them
 (`src/lib/verdict-share.ts`). The OG image reads only school, score and
 topic, so 0018 does not touch it.
 
+### Only a result's owner can challenge from it (2026-11-04)
+
+Found while building sample activity (#57), and fixed on Arthur's ruling
+of 2026-11-04. `createChallenge` inserted a challenge for whatever result
+id it was given, with the server role, so anyone could open a challenge
+in another reader's name: the result's owner then showed as the
+challenger to whoever opened the link. `/r/[id]` also offered the
+"Challenge a friend" button to a visitor looking at someone else's result
+that came from a challenge, which did exactly that.
+
+The action now checks ownership the way `/r/[id]` already tells an owner
+apart: the `anon_id` cookie the quiz was taken under, or the signed-in
+account the result is saved to. Anyone else gets "Unknown result.", the
+answer an unknown id gets. The page offers the button only to the owner;
+any other visitor who is not a party to a challenge on it is offered the
+quiz, as a first-time visitor already is. `tests/create-challenge.test.ts`;
+two of its four cases fail on the old code.
+
 ### For Checkpoint A, from the security work
 
 - **Leaked-password protection** is off, and the advisor warns about it.

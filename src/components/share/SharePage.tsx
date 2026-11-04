@@ -108,16 +108,27 @@ export function SharePage({
                   school={school}
                 />
               )}
-              <ChallengeButton
-                resultId={resultId}
-                school={school}
-                variant={showDebateThem ? "secondary" : "primary"}
-              />
+              {/* Only the result's owner can challenge from it
+                  (createChallenge checks); anyone else is offered the
+                  quiz, as a first-time visitor is. */}
+              {isOwner || isSavedToProfile ? (
+                <ChallengeButton
+                  resultId={resultId}
+                  school={school}
+                  variant={showDebateThem ? "secondary" : "primary"}
+                />
+              ) : (
+                !showDebateThem && (
+                  <ChunkyLink href="/" school={school}>
+                    Take the quiz
+                  </ChunkyLink>
+                )
+              )}
             </div>
 
             <div className="mt-6">
               {/* Never the page's primary: the action row above it is
-                  always either "Debate them" or "Challenge a friend". */}
+                  always one of "Debate them", "Challenge a friend" or "Take the quiz". */}
               <ShareSheet
                 resultId={resultId}
                 school={school}
