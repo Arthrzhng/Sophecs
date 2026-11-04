@@ -249,5 +249,11 @@ entry names.
   `docs/decisions.md`, "Clients keep only the writes the site makes
   (migration 0022)".
 - Tested on local Postgres: `scripts/test-0022-client-write-grants.sh`,
-  all checks passed, and five deliberate breaks each caught;
-  `scripts/test-migrations.sh`; `tests/client-writes.test.ts`.
+  all checks passed, and seven deliberate breaks each caught (named in
+  `docs/decisions.md`); `scripts/test-migrations.sh`;
+  `tests/client-writes.test.ts`.
+- One fresh review: no blocking finding. Fixed: the test's Postgres 17
+  check counted every table; a REVOKE that takes nothing passed silently
+  (the migration now checks what is left and fails); the client-writes
+  scan missed five ways of reaching a session client; what goes beyond
+  the approved wording is now listed; four doc errors.

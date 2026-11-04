@@ -10,10 +10,15 @@
 #   with a client key still works, as do the server role's writes;
 # - each object's privileges after 0022 are exactly the ones meant;
 # - the rollback restores each object's privileges as they were, and 0022
-#   applies again.
+#   applies again;
+# - a privilege the REVOKE cannot take (granted by another role) makes
+#   0022 fail as a whole, changing nothing.
 #
-# Postgres 16 has no MAINTAIN, so on it the MAINTAIN half of 0022 is a
-# no-op and its checks print as skipped. Production runs Postgres 17.
+# Postgres 16 has no MAINTAIN, so on it the MAINTAIN half of 0022 and of
+# its rollback is a no-op and its checks print as skipped. Production runs
+# Postgres 17: there, 0022's own closing check fails the migration if
+# MAINTAIN is left, and the read-back confirms it. The rollback's MAINTAIN
+# half is not tested anywhere.
 #
 # Usage: scripts/test-0022-client-write-grants.sh [port]
 set -euo pipefail
@@ -34,8 +39,9 @@ expect() {
 # Runs one statement as a role, as a signed-in user and with the x-anon-id
 # header the site sends, inside a transaction that is rolled back. Prints
 # how many rows it reached (the command tag's count, or a count(*)'s
-# value), or "denied" for a privilege error. Any other error prints as
-# itself, so a check cannot pass on a typo. No RETURNING: it would make the
+# value), or "denied" for a missing table privilege. Any other error, a
+# missing schema or function privilege included, prints as itself, so a
+# check cannot pass on a typo. No RETURNING: it would make the
 # select policy narrow what an update reaches.
 R=11111111-1111-4111-8111-111111111111   # a signed-in reader with a profile
 T=22222222-2222-4222-8222-222222222222   # a signed-in reader with no profile yet
@@ -44,7 +50,7 @@ ANON=aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa
 reach() {
   local out
   out=$(psql -X -At -v ON_ERROR_STOP=1 -d "$DB" -c "begin; set local role $1; select set_config('request.jwt.claim.sub', '${3:-}', true); select set_config('request.headers', '{\"x-anon-id\": \"$ANON\"}', true); $2; rollback;" 2>&1) || {
-    if printf '%s' "$out" | grep -q 'permission denied'; then echo denied
+    if printf '%s' "$out" | grep -qE 'permission denied for (table|view) '; then echo denied
     else echo "error: $(printf '%s' "$out" | grep ERROR)"; fi
     return
   }
@@ -60,7 +66,11 @@ acls() {
   q "select coalesce(string_agg(attname || ':' || attacl::text, ' ' order by attname), 'none') from pg_attribute
       where attrelid = 'public.profiles'::regclass and attacl is not null"
 }
-cleanup() { psql -X -q -d postgres -c "drop database if exists $DB" >/dev/null 2>&1 || true; }
+cleanup() {
+  psql -X -q -d postgres -c "drop database if exists $DB" >/dev/null 2>&1 || true
+  # A role is cluster-wide: drop it once no database refers to it.
+  psql -X -q -d postgres -c "drop role if exists grantor_0022_test" >/dev/null 2>&1 || true
+}
 trap cleanup EXIT
 psql -X -v ON_ERROR_STOP=1 -q -d postgres -c "create database $DB"
 PG17=$(q "select current_setting('server_version_num')::int >= 170000")
@@ -154,7 +164,7 @@ expect "table and view ACLs" \
   "$(acls | head -1)"
 expect "column grants on profiles" "argument_default_public:{authenticated=w/postgres} display_name:{authenticated=w/postgres}" "$(acls | tail -1)"
 if [ "$PG17" = t ]; then
-  expect "no MAINTAIN left with anon or authenticated" 0 "$(q "select count(*) from pg_class c, unnest(c.relacl) a where c.relnamespace = 'public'::regnamespace and (a::text like 'anon=%m%' or a::text like 'authenticated=%m%')")"
+  expect "no MAINTAIN left with anon or authenticated on the nine" 0 "$(q "select count(*) from pg_class c, aclexplode(c.relacl) a where c.relnamespace = 'public'::regnamespace and c.relname in ($(printf "'%s'," $TABLES $VIEWS | sed 's/,$//')) and a.grantee in ('anon'::regrole, 'authenticated'::regrole) and a.privilege_type = 'MAINTAIN'")"
 else
   printf '  skip  MAINTAIN: Postgres %s has none\n' "$(q "show server_version")"
 fi
@@ -169,6 +179,21 @@ say "0022 again"
 apply "$REPO/supabase/migrations/0022_client_write_grants.sql"
 closed "re-applied" denied
 kept "re-applied"
+
+say "a privilege REVOKE cannot take makes 0022 fail, changing nothing"
+# As if a role other than the owner had granted it (production's default
+# privileges name supabase_admin as a grantor for objects it owns): the
+# owner's REVOKE does not take another grantor's grant.
+apply "$REPO/supabase/rollback/0022_client_write_grants.down.sql"
+q "do \$\$ begin if not exists (select 1 from pg_roles where rolname = 'grantor_0022_test') then create role grantor_0022_test nologin; end if; end \$\$" >/dev/null
+q "grant insert on public.debates to grantor_0022_test with grant option" >/dev/null
+q "set role grantor_0022_test; grant insert on public.debates to anon" >/dev/null
+ACL_STUCK=$(acls)
+OUT=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/migrations/0022_client_write_grants.sql" 2>&1 || true)
+expect "0022 stops on it, naming it" 1 "$(printf '%s' "$OUT" | grep -c 'still held after the revokes: anon INSERT on debates')"
+expect "and changes nothing" "$ACL_STUCK" "$(acls)"
+q "revoke all on public.debates from grantor_0022_test cascade" >/dev/null
+expect "with that grant gone, 0022 applies" "" "$(apply "$REPO/supabase/migrations/0022_client_write_grants.sql" 2>&1)"
 
 if [ "$FAILED" -ne 0 ]; then echo; echo "== FAILED =="; exit 1; fi
 echo; echo "== all checks passed =="

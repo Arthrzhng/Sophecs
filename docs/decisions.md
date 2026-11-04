@@ -2520,8 +2520,8 @@ before/after)". 0021 took the challenges update policy on its own first.
 **The holes.** Supabase's default privileges give `anon` and
 `authenticated` every privilege on every table made in `public`, so row
 level security is all that stands between the public key and a write.
-Four early policies allowed writes the site never makes with a client
-key:
+Six early policies, on five tables, allowed writes the site never makes
+with a client key:
 
 - `debates`, "debates insert own": a signed-in user could insert rows
   under their own id with any verdict, score and rating, which
@@ -2536,8 +2536,9 @@ key:
   id could join it without the code and past the joining limit.
 
 Every one of these writes goes through the server role in the site:
-`src/app/actions.ts`, `src/app/debate/actions.ts`, `src/app/me/actions.ts`,
-`src/lib/claim.ts` and `src/lib/challenge.ts`.
+`src/app/actions.ts`, `src/app/api/judge/route.ts`,
+`src/app/debate/actions.ts`, `src/app/me/actions.ts`, `src/lib/claim.ts`
+and `src/lib/challenge.ts`.
 
 **The fix.** `0022_client_write_grants.sql` revokes INSERT, UPDATE,
 DELETE, TRUNCATE, REFERENCES and TRIGGER on the five tables from `anon`
@@ -2550,7 +2551,21 @@ revokes MAINTAIN from these tables and from the four public views, which
 0016 missed ("Phase 3 item: move `motion_text` into `debates_public`").
 `reading_responses`, which the site writes signed in, is not touched.
 The policies stay, unreachable without the grant; dropping them is a
-second change to review, and the grant alone is what decides.
+second change to review, and the grant alone is what decides. A REVOKE
+that finds nothing it may take (a privilege another role granted) still
+succeeds, so the migration ends by reading what anon and authenticated
+hold and fails as a whole if anything meant to go is left.
+
+**Beyond the wording Arthur approved.** The proposal he said yes to named
+INSERT, UPDATE and DELETE on `debates`, `challenges` and `quiz_results`,
+UPDATE on `profiles` limited to two columns, INSERT on `class_members`,
+and MAINTAIN on the views. The migration also revokes TRUNCATE,
+REFERENCES, TRIGGER and MAINTAIN on the five tables (none reachable
+through the Data API, none used); INSERT and DELETE on `profiles` (without
+the INSERT revoke, a signed-in user could create their own profile, with
+any rating, before the server makes it at first sign-in); UPDATE on
+`class_members`; and DELETE on `class_members` for anon. These are put to
+him before it is applied.
 
 Three other tables have client write policies the site also does not use:
 `blocks` ("blocks own"), `reports` ("reports insert own") and `classes`
@@ -2562,15 +2577,30 @@ left as they are.
 **Tests.** `scripts/test-0022-client-write-grants.sh` sets Supabase's
 default privileges on local Postgres 16, applies every migration before
 0022, and checks that each of the six writes goes through before it and
-is refused after; that the four client writes the site makes and its
-reads still work, as anon, signed in and as the server role; each object's
-exact ACL after it; and that the rollback restores every ACL as it was,
-and 0022 applies again. Five deliberate breaks of the migration and the
-rollback were each caught. Postgres 16 has no MAINTAIN, so that half is
-checked against production's read-back instead.
-`tests/client-writes.test.ts` lists every write in `src/` not made with
-the admin client and holds it to the four keeps, so a new signed-in write
-fails a unit test rather than production.
+is refused after; that the client writes the site makes and its reads
+still work, as anon, signed in and as the server role; each object's
+exact ACL after it; that the rollback restores every ACL as it was, and
+0022 applies again; and that a privilege granted by another role makes
+0022 fail without changing anything. Breaking it on purpose, each caught:
+no column grant (5 checks fail), DELETE on `class_members` revoked too
+(3), the rollback keeping the column grant (1), the rollback leaving out
+`class_members` (2), the closing check removed (2); and `profiles` left
+out of the revoke, or the column grant given to anon too, each make 0022
+refuse to apply. Postgres 16 has no MAINTAIN: in production 0022's closing
+check fails the migration if MAINTAIN is left and the read-back confirms
+it, but the rollback's MAINTAIN half is not tested anywhere.
+`tests/client-writes.test.ts` finds every `.from(...)` chain ending in a
+write, and every `.rpc(...)`, in `src/`, works out whether the receiver
+is the admin client, and holds the rest to the site's four client writes,
+so a new signed-in write fails a unit test rather than production. It
+cannot follow a client through an untraced variable (it accepts a
+parameter only when named `admin` and typed `SupabaseClient`), and says
+so in its header.
+
+For a later list: the column grant lets the Data API set `display_name`
+without `setDisplayName`'s trim and 60-character limit, as "own update"
+already did before 0022, and class owners see that name. A check
+constraint on the column would hold it.
 
 **Snapshot, read-back and advisor:** recorded in `docs/progress.md` when
 0022 is applied.
