@@ -22,10 +22,16 @@ export async function GET(_req: Request, { params }: { params: Promise<{ school:
 
   const content = getAllSchools({ includeDrafts: true })[school];
   const draft = (DRAFT_SCHOOL_IDS as readonly SchoolId[]).includes(school);
+  // The recommended candidate's card surface: darker than the marker, as
+  // the live schools' --color-*-surface is, so the card's ink reads at AA
+  // even at its lowest opacity (scripts/colour-candidates.mjs).
   const surface = draft
-    ? (JSON.parse(
-        fs.readFileSync(path.join(process.cwd(), "docs/phase3-styleguide/colour-candidates.json"), "utf8")
-      ).recommended[school] as string)
+    ? (() => {
+        const colours = JSON.parse(
+          fs.readFileSync(path.join(process.cwd(), "docs/phase3-styleguide/colour-candidates.json"), "utf8")
+        ) as { recommended: Record<string, string>; candidates: Record<string, { hex: string; cardSurface: string }[]> };
+        return colours.candidates[school].find((c) => c.hex === colours.recommended[school])!.cardSurface;
+      })()
     : undefined;
   // The fonts and registrations src/app/r/[id]/opengraph-image.tsx uses.
   const [spectral, spectralItalic, plexSans] = await loadCardFonts();

@@ -1,7 +1,10 @@
 /**
  * Candidates for the School table's navigation icon: Phase 3.0 preview
- * only (Stage 4 of the brief of 2026-11-03). The triangle meant the three
- * schools' corners; with six schools it means nothing. Each candidate is
+ * only. The brief of 2026-11-03 asks for "a neutral nav icon for School
+ * table (the triangle no longer means anything)". The site header's links
+ * carry no icons today (src/components/nav/SiteHeader.tsx), so this would
+ * add one rather than replace one; the only triangle in src/ is the quiz's
+ * SchoolTriangle, which drew three schools. Each candidate is
  * neutral: it says "a table of standings" and favours no school's shape.
  * 24 by 24, `currentColor`, decoration beside the label `School table`.
  */

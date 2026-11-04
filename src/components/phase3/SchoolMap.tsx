@@ -60,11 +60,33 @@ export function SchoolMap({
   caption?: string;
 }) {
   const titleId = `map-${title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
+  const descId = `${titleId}-desc`;
+  // What role="img" hides from a screen reader: where the schools sit and
+  // what the marks show.
+  const description = [
+    `The schools sit on a ring, in this order going round: ${schools
+      .slice()
+      .sort((a, b) => a.angle - b.angle)
+      .map((s) => s.name)
+      .join(", ")}.`,
+    reader ? "A filled dot marks where you stand." : "",
+    preview ? "A dashed ring marks where this answer would move you." : "",
+    history && history.length > 1 ? "A line joins your earlier positions in order." : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   return (
     <figure className="m-0 max-w-[460px]">
       <p className="text-center text-xs font-bold text-ink-mid">{axes.y[1]}</p>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby={titleId} className="mt-1 w-full">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        role="img"
+        aria-labelledby={titleId}
+        aria-describedby={descId}
+        className="mt-1 w-full"
+      >
         <title id={titleId}>{title}</title>
+        <desc id={descId}>{description}</desc>
 
         {/* The ring the schools sit on, and the two axes. */}
         <circle cx={CX} cy={CY} r={R} fill="none" stroke="var(--color-rule)" strokeWidth={2} />

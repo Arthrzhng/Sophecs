@@ -40,12 +40,22 @@ interface Candidate {
   minDeltaEProtanopia: number;
   deuteranopia: string;
   protanopia: string;
+  cardSurface: string;
+  cardInkFull: number;
+  cardInkAtLowestOpacity: number;
 }
 interface Candidates {
   existing: Record<string, { hex: string; deuteranopia: string; protanopia: string; textOnHero: number }>;
   candidates: Record<string, Candidate[]>;
   recommended: Record<string, string> & { minPairwiseDeltaE: number };
 }
+
+// The colour script keys the live schools by their token names.
+const TOKEN_KEY: Partial<Record<SchoolId, string>> = {
+  stoicism: "stoic",
+  utilitarianism: "utilitarian",
+  "virtue-ethics": "virtue",
+};
 
 // docs/quiz-v2.md, section 2: each school's angle on the map.
 const ANGLES: Record<SchoolId, number> = {
@@ -95,7 +105,9 @@ export default function Phase3Page() {
           Three per school, from <Mono>scripts/colour-candidates.mjs</Mono>. Each carries white
           hero text at AA, shows as a dot on paper, keeps its distance from the three live schools
           in normal vision and under simulated deuteranopia and protanopia, and avoids its
-          school&apos;s stereotyped hues. Only indigo to plum survived those constraints. The
+          school&apos;s stereotyped hues. All but four of the colours that pass those constraints are
+          indigo to plum (hue 250 to 335); the four others, three dark teals and a brown, are not
+          among those offered. The
           recommended set is the three that stay furthest apart from each other: a smallest
           difference of {colours.recommended.minPairwiseDeltaE} (CIEDE2000) under any of the three
           views.
@@ -112,7 +124,7 @@ export default function Phase3Page() {
             swatches={ALL.map((id) => ({
               name: nameOf(id),
               colour: (PUBLISHED_SCHOOL_IDS as readonly SchoolId[]).includes(id)
-                ? colours.existing[{ stoicism: "stoic", utilitarianism: "utilitarian", "virtue-ethics": "virtue" }[id as "stoicism"]][view]
+                ? colours.existing[TOKEN_KEY[id]!][view]
                 : colours.candidates[id].find((c) => c.hex === colours.recommended[id])![view],
             }))}
           />
@@ -194,8 +206,10 @@ export default function Phase3Page() {
 
       <Section title="Result cards, six schools">
         <p className="mb-4 max-w-[62ch] text-sm text-ink-mid">
-          Each school&apos;s own one_line at the card&apos;s 1200 by 630. The new schools use the
-          recommended candidate as their surface.
+          Each school&apos;s own one_line at the card&apos;s 1200 by 630. The new schools use a card
+          surface derived from the recommended candidate: the same hue, darkened until the card&apos;s
+          text reads at AA at its lowest opacity, as the live schools&apos; surfaces are darker than
+          their markers.
         </p>
         <div className="grid gap-6">
           {ALL.map((id) => {
@@ -214,7 +228,7 @@ export default function Phase3Page() {
                     sans: "var(--font-plex-sans), system-ui, sans-serif",
                   }}
                   unit="cqw"
-                  surface={colours.recommended[id]}
+                  surface={colours.candidates[id].find((c) => c.hex === colours.recommended[id])!.cardSurface}
                   schoolName={nameOf(id)}
                 />
               </div>
@@ -248,14 +262,16 @@ export default function Phase3Page() {
       <Section title="Lesson filter chips, six schools">
         <div role="group" aria-label="Filter by school" className="flex flex-wrap gap-2">
           {["All", ...ALL.map(nameOf)].map((label, i) => (
-            <span
+            <button
+              type="button"
               key={label}
+              aria-pressed={i === 0}
               className={`inline-flex min-h-11 items-center rounded-full border-2 px-4 text-sm font-bold ${
                 i === 0 ? "border-ink bg-ink text-paper" : "border-rule-strong bg-surface text-ink"
               }`}
             >
               {label}
-            </span>
+            </button>
           ))}
         </div>
       </Section>

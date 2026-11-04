@@ -87,7 +87,7 @@ entry names.
 
 ## 2026-11-03: Stage 4, the Phase 3.0 items on `/styleguide/phase3`
 
-- Preview only: `/styleguide` renders nothing in production, and the
+- Preview only: `/styleguide/phase3` renders nothing in production, and the
   card preview route answers only on a preview deployment or with
   `SOPHECS_PREVIEW` set. Colour candidates for the three draft schools
   (`scripts/colour-candidates.mjs`, `docs/phase3-styleguide/colour-candidates.json`),

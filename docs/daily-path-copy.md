@@ -482,5 +482,7 @@ The passage's own title and source come from its file in `content/micro/`.
 
 ### Navigation
 
-The School table link keeps its label, `School table`. Only its icon
-changes, and the preview shows candidates for it.
+The School table link keeps its label, `School table`. The brief asks for
+"a neutral nav icon for School table (the triangle no longer means
+anything)"; the header's links carry no icons today, so this would add
+one beside the label, and the preview shows candidates for it.

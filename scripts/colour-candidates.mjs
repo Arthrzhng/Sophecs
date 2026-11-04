@@ -147,6 +147,11 @@ const PAPER = hexToRgb("#f7f3ea");
 const SCHOOLS = { stoic: "#3e5c4b", utilitarian: "#8a6320", virtue: "#7a3540" };
 const OTHERS = { "correct (judge blue)": "#1e5fa0", "step-done orange": "#d9822b" };
 
+// src/lib/card-tokens.ts CARD_INK: the near-white the result card sets its
+// text in, at as little as 0.8 opacity (src/components/card/CardLayout.tsx).
+const CARD_INK = hexToRgb("#faf8f2");
+const CARD_INK_LOWEST_OPACITY = 0.8;
+
 const MIN_WHITE_TEXT = 4.5;
 const MIN_DOT_ON_PAPER = 3;
 const MIN_DE = 20; // to the three schools, normal vision
@@ -175,7 +180,10 @@ const excludedBy = (school, H) =>
 
 // ---- search ----------------------------------------------------------------
 const pool = [];
-for (let L = 0.34; L <= 0.56; L += 0.02) {
+// Integer steps, so float error cannot drop the last one (0.34 + 11 * 0.02
+// summed in floats overshoots 0.56).
+for (let Li = 0; Li <= 11; Li++) {
+  const L = 0.34 + Li * 0.02;
   for (let C = 0.05; C <= 0.17; C += 0.01) {
     for (let H = 0; H < 360; H += 5) {
       const rgb = oklchToRgb(L, C, H);
@@ -229,8 +237,9 @@ for (let round = 0; round < 3; round++) {
 }
 
 // The recommended set: one per school, chosen so the three new colours
-// are as far from each other as possible under all three views, and never
-// closer than MIN_DE_CVD.
+// are as far from each other as possible under all three views. Nothing
+// holds that distance to MIN_DE_CVD: no set of the 27 reaches 12, and the
+// best one's smallest difference (11.4) is reported as it is.
 let best = null;
 for (const a of byschool.confucian)
   for (const b of byschool.ubuntu)
@@ -250,6 +259,21 @@ for (const a of byschool.confucian)
     }
 
 const round = (n, d = 1) => Math.round(n * 10 ** d) / 10 ** d;
+
+// The result card's own surface, as the live schools have one darker than
+// their marker (--color-*-surface): the candidate's hue and chroma at the
+// highest lightness, in 0.005 steps down, where the card's ink at its
+// lowest opacity still reads at AA.
+const inkOn = (surface, opacity) => contrast(over(CARD_INK, surface, opacity), surface);
+function cardSurfaceFor(c) {
+  for (let L = c.L; L > 0.1; L -= 0.005) {
+    const rgb = oklchToRgb(L, c.C, c.H);
+    if (!rgb) continue;
+    const q = hexToRgb(rgbToHex(rgb));
+    if (inkOn(q, CARD_INK_LOWEST_OPACITY) >= MIN_WHITE_TEXT) return q;
+  }
+  throw new Error(`no card surface for ${c.hex}`);
+}
 const describe = (c) => ({
   hex: c.hex,
   oklch: { L: round(c.L, 2), C: round(c.C, 2), H: c.H },
@@ -261,6 +285,14 @@ const describe = (c) => ({
   minDeltaEProtanopia: round(c.dEProt),
   deuteranopia: rgbToHex(simulate(c.rgb, "deuteranopia")),
   protanopia: rgbToHex(simulate(c.rgb, "protanopia")),
+  ...(() => {
+    const surface = cardSurfaceFor(c);
+    return {
+      cardSurface: rgbToHex(surface),
+      cardInkFull: round(inkOn(surface, 1), 2),
+      cardInkAtLowestOpacity: round(inkOn(surface, CARD_INK_LOWEST_OPACITY), 2),
+    };
+  })(),
 });
 const existing = Object.fromEntries(
   Object.entries({ ...SCHOOLS, ...OTHERS }).map(([k, h]) => [

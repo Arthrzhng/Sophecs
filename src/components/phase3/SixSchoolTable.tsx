@@ -29,13 +29,13 @@ export function SixSchoolTable({ rows, threshold }: { rows: SixSchoolRow[]; thre
   return (
     <ol className="space-y-3">
       {ranked.map((row, i) => (
-        <Row key={row.id} row={row} rank={String(i + 1)} />
+        <Row key={row.id} row={row} rank={i + 1} />
       ))}
       {unranked.map((row) => (
         <Row
           key={row.id}
           row={row}
-          rank="Unranked"
+          rank={null}
           note={`Ranked once it has ${threshold} judged original arguments. ${row.arguments} so far.`}
         />
       ))}
@@ -43,13 +43,17 @@ export function SixSchoolTable({ rows, threshold }: { rows: SixSchoolRow[]; thre
   );
 }
 
-function Row({ row, rank, note }: { row: SixSchoolRow; rank: string; note?: string }) {
+// The live table's pattern (src/components/table/SchoolTable.tsx): the rank
+// is read out as "Rank N" or "Not ranked yet", and the digit, or the null
+// glyph, is decoration.
+function Row({ row, rank, note }: { row: SixSchoolRow; rank: number | null; note?: string }) {
   return (
     <li className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-card border-2 border-rule bg-surface px-4 py-3">
-      <span
-        className={`min-w-10 font-mono tabular font-bold text-ink ${note ? "text-xs uppercase tracking-widest text-ink-mid" : "text-md"}`}
-      >
-        {rank}
+      <span className="min-w-10 text-center">
+        <span className="sr-only">{rank == null ? "Not ranked yet" : `Rank ${rank}`}</span>
+        <span aria-hidden="true" className="font-mono tabular text-lg font-extrabold text-ink">
+          {rank ?? "\u2014"}
+        </span>
       </span>
       <span aria-hidden="true" className="size-3 shrink-0 rounded-full" style={{ background: row.colour }} />
       <span className="min-w-0 flex-1">
