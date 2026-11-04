@@ -214,19 +214,22 @@ export async function seekCounterpart(
   if (!match) return { ok: true, exchangeId: null };
 
   const exchangeId = newId();
-  // The waiting seeker opens. They have been holding a turn-shaped gap for
-  // longer, and the newer arrival has just re-read their own argument, so
-  // giving the opener's slot to whoever waited keeps the first reply the
-  // freshest one. `next_turn` is the newer seeker, per the brief.
+  // The newer seeker opens, per the brief: they are here now, and have
+  // just re-read their own argument. The turn route
+  // (src/app/api/counterpart/turn/route.ts) takes odd turns from user_a and
+  // refuses unless next_turn agrees, so the opener is user_a and next_turn
+  // names them. Until 2026-11-04 the waiting seeker was user_a while
+  // next_turn named the newer one, and no exchange could take its first
+  // turn (docs/decisions.md, "The newer seeker is user_a").
   const { error: insertError } = await admin.from("exchanges").insert({
     id: exchangeId,
     topic_slug: mine.topic_slug,
-    debate_a: match.id,
-    debate_b: mine.id,
-    user_a: match.user_id,
-    user_b: user.id,
-    school_a: match.school,
-    school_b: mine.school,
+    debate_a: mine.id,
+    debate_b: match.id,
+    user_a: user.id,
+    user_b: match.user_id,
+    school_a: mine.school,
+    school_b: match.school,
     next_turn: user.id,
   });
   if (insertError) return { ok: false, error: insertError.message };
