@@ -101,6 +101,17 @@ entry names.
   five gates, the judge request fixtures, `check:bundle`, a dry run of the
   golden set under v3 (no calls, no spend). Eval key total unchanged at
   $4.6563.
+- #51 merged as `8490b96`. Production deploy
+  `dpl_FpKc3kRUFBCk2Mu3fVfKF7AkcQ1i`, Ready and aliased to sophecs.com
+  (read from Vercel); `/robots.txt` answered 200 at 00:03 UTC on
+  2026-11-04.
+- The rerun Arthur asked for, on `8490b96`: run file
+  `2026-11-04T00-02-04-581Z-v3.json`, 76 calls, $1.1371, under a watchdog
+  set to stop the runner at $2.00. Eval key total $5.7934 of $8.00. Every
+  part of the pass test now holds except `confucian-hierarchy-school`,
+  out of band on score and engagement as in both earlier runs; the power
+  objection is now returned, in Utilitarianism's voice. Details in
+  `docs/decisions.md`, "2F, the rerun after the objection voices".
 
 ## 2026-11-03: Stage 2, `motion_text` into `debates_public`
 
@@ -115,6 +126,18 @@ entry names.
   breaks of the migration and its rollback, each caught
   (`docs/decisions.md`, "Phase 3 item: move `motion_text` into
   `debates_public`").
+- 0020 applied in production at 00:13:54 UTC on 2026-11-04 (migration
+  version `20261104001354`), after a check that nothing was being judged,
+  the security advisor, and a snapshot of the view's definition, rows and
+  ACL. Read back: `motion_text` last, every other column of every row
+  unchanged by digest, `motion_text` equal to `debates.motion_text` for
+  every row, owner, options and ACL unchanged; advisor unchanged.
+- #54 merged as `bbb9390`. Production deploy
+  `dpl_7sFvLWk1ojKEc29bwkjEeqLsCyLE`, Ready and aliased to sophecs.com
+  (read from Vercel). The private verdict page
+  (`/debate/opaque-benefit/jjSZVZFBmu`) fetched through Vercel at 00:17
+  UTC: 200, the private heading, and the debate's stored wording, which
+  differs from the topic's current wording, so it is read from the view.
 
 ## 2026-11-03: Stage 3, the quiz v2 design
 
@@ -125,3 +148,6 @@ entry names.
   the JSON and exits non-zero if a school is unreachable, lands outside
   8% to 30%, or a school's own persona misses it; it exits 0 on the
   draft.
+- #53 merged as `d283316`, after two review passes. Production deploy
+  `dpl_466taYAkDfiFcHAqxVaMoJbz6DxB`, Ready (read from Vercel); docs and
+  a script only, nothing served changes.
