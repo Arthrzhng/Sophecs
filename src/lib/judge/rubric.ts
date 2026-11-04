@@ -1,5 +1,6 @@
 import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "@/lib/school-registry";
 import type { PromptVersion } from "@/lib/judge/schema";
+import { objectionVoiceFor } from "@/lib/judge/objection-voices";
 
 // Fidelity criteria per school — what makes an argument a genuine instance
 // of that school's reasoning, not just reasoning that happens to reach a
@@ -165,8 +166,10 @@ fidelity.`,
  *
  * v1 and v2 get `FIDELITY_CRITERIA[school]` unchanged. Later versions get
  * the same text with the school's vocabulary paragraph after it, then its
- * objection paragraph. Like `FIDELITY_CRITERIA`, it throws for a school
- * with no criteria, rather than handing the judge nothing.
+ * objection paragraph, then which rival normally voices that objection
+ * (src/lib/judge/objection-voices.ts, Arthur's ruling of 2026-11-03),
+ * naming only rivals the prompt lists. Like `FIDELITY_CRITERIA`, it throws
+ * for a school with no criteria, rather than handing the judge nothing.
  */
 export function fidelityCriteriaFor(school: SchoolId, version: PromptVersion | "v3"): string {
   const base = FIDELITY_CRITERIA[school];
@@ -179,7 +182,8 @@ export function fidelityCriteriaFor(school: SchoolId, version: PromptVersion | "
   if (objection === undefined) {
     throw new Error(`judge/rubric: no v3 objection paragraph for school "${school}".`);
   }
-  return `${base}\n\n${rule}\n\n${objection}`;
+  const voice = objectionVoiceFor(school, rivalsOf(school));
+  return `${base}\n\n${rule}\n\n${objection}\n\n${voice}`;
 }
 
 /**
@@ -192,6 +196,16 @@ export function fidelityCriteriaFor(school: SchoolId, version: PromptVersion | "
  */
 export function hasFidelityCriteria(id: SchoolId): boolean {
   return CRITERIA_BY_SCHOOL[id] !== undefined;
+}
+
+/**
+ * The schools a v3 prompt lists as rivals to `school`: every published
+ * school but its own. The prompt's list is built from the same registry
+ * (RIVAL_SCHOOLS_BLOCK in src/lib/anthropic.ts) and says the objection may
+ * not come from the assigned school.
+ */
+export function rivalsOf(school: SchoolId): SchoolId[] {
+  return PUBLISHED_SCHOOL_IDS.filter((id) => id !== school);
 }
 
 /** The schools that can be judged: published, and with criteria written. */

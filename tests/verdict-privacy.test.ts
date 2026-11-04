@@ -11,7 +11,8 @@ import { KEPT_FOR_EVERYONE, verdictForViewer, withheldVerdict } from "../src/lib
  * What a signed-out visitor can read on a verdict page, and what 2D did
  * not change about it.
  *
- * 2D added a second admin read to this page for `debates.motion_text`.
+ * 2D added a second admin read to this page for `debates.motion_text`,
+ * and Stage 2 of the brief of 2026-11-03 moved it into the view.
  * Privacy here has never depended on which query the motion comes from:
  * it is decided by `debates_public`, which nulls `argument` unless
  * `argument_public`, and by an RLS-gated read that is the only signal of
@@ -94,25 +95,60 @@ describe("a verdict page seen by someone who does not own it", () => {
 });
 
 /**
- * The shape of the read 2D added, checked in the source.
+ * Where the motion's stored wording comes from, checked in the source.
  *
- * Three properties Arthur asked to have pinned: it selects nothing but
- * `motion_text`, it is keyed to the debate the page is already rendering,
- * and it sits after the guard that 404s an unknown or mismatched debate,
- * so a missing row never reaches it.
+ * 2D read `debates.motion_text` with the admin client, beside the view,
+ * on both surfaces. Stage 2 of the brief of 2026-11-03 moved the column
+ * into `debates_public` (migration 0020) and took that read away, so
+ * everything public on the page and the image comes from the view, and
+ * the admin client no longer reads `debates` for it at all.
  */
+/** Source with comments removed (not inside strings: the files have none there). */
+function codeOnly(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/(^|[^:])\/\/[^\n]*/g, "$1");
+}
+
+/** The body of the block that opens at `opener`, up to its matching brace. */
+function blockAfter(source: string, opener: string): string {
+  const start = source.indexOf(opener);
+  if (start === -1) return "";
+  let depth = 0;
+  for (let i = start + opener.length - 1; i < source.length; i += 1) {
+    if (source[i] === "{") depth += 1;
+    else if (source[i] === "}") {
+      depth -= 1;
+      if (depth === 0) return source.slice(start, i + 1);
+    }
+  }
+  return "";
+}
+
 const READERS = [
   "src/app/debate/[slug]/[debateId]/page.tsx",
   "src/app/debate/[slug]/[debateId]/opengraph-image.tsx",
 ];
 
-describe("the motion_text read 2D added", () => {
-  it.each(READERS)("%s selects only motion_text, for only that debate", (file) => {
-    const source = fs.readFileSync(path.join(process.cwd(), file), "utf-8");
-    const read = /admin\s*\n?\s*\.from\("debates"\)\s*\n?\s*\.select\("([^"]*)"\)\s*\n?\s*\.eq\("id",\s*debateId\)/;
-    const match = read.exec(source.replace(/\s+/g, " ").replace(/ \./g, "."));
-    expect(match, `${file} should read debates by the rendered debateId`).not.toBeNull();
-    expect(match?.[1], "the select list").toBe("motion_text");
+describe("motion_text comes from debates_public", () => {
+  it.each(READERS)("%s selects motion_text from the view", (file) => {
+    const source = fs.readFileSync(path.join(process.cwd(), file), "utf-8").replace(/\s+/g, " ");
+    const viewRead = /\.from\("debates_public"\) ?\.select\( ?"([^"]*)" ?\)/.exec(source);
+    expect(viewRead, `${file} should read debates_public`).not.toBeNull();
+    expect(viewRead?.[1].split(",").map((c) => c.trim())).toContain("motion_text");
+  });
+
+  it.each(READERS)("%s no longer reads motion_text from debates", (file) => {
+    const source = fs.readFileSync(path.join(process.cwd(), file), "utf-8").replace(/\s+/g, " ");
+    for (const m of source.matchAll(/\.from\("debates"\) ?\.select\( ?"([^"]*)" ?\)/g)) {
+      expect(m[1], `${file} reads debates for ${m[1]}`).not.toContain("motion_text");
+    }
+  });
+
+  it("leaves the OG image with no read of debates at all", () => {
+    const og = fs.readFileSync(
+      path.join(process.cwd(), "src/app/debate/[slug]/[debateId]/opengraph-image.tsx"),
+      "utf-8"
+    );
+    expect(og).not.toContain('from("debates")');
   });
 
   it("404s an unknown or mismatched debate before reading anything else", () => {
@@ -121,24 +157,61 @@ describe("the motion_text read 2D added", () => {
       "utf-8"
     );
     const guard = page.indexOf('if (!publicRow || publicRow.topic_slug !== slug) notFound();');
-    const read = page.indexOf('.select("motion_text")');
+    const topic = page.indexOf('.from("debate_topics")');
     expect(guard, "the notFound guard").toBeGreaterThan(-1);
-    expect(read, "the motion_text read").toBeGreaterThan(-1);
-    expect(
-      guard,
-      "the 404 guard must come first, so a debate that does not exist is never read for"
-    ).toBeLessThan(read);
+    expect(topic, "the topic read").toBeGreaterThan(-1);
+    expect(guard, "the 404 guard must come before the next read").toBeLessThan(topic);
   });
 
-  it("only reads for a debate the OG route already found", () => {
-    const og = fs.readFileSync(
-      path.join(process.cwd(), "src/app/debate/[slug]/[debateId]/opengraph-image.tsx"),
-      "utf-8"
+  it("passes the view's motion_text to motionForDebate on both surfaces", () => {
+    // Comments stripped, so a comment quoting the call cannot stand in for it.
+    const page = codeOnly(fs.readFileSync(path.join(process.cwd(), READERS[0]), "utf-8"));
+    const og = codeOnly(fs.readFileSync(path.join(process.cwd(), READERS[1]), "utf-8"));
+    expect(page).toContain(
+      "const motion = motionForDebate(publicRow.motion_text as string | null, topic.motion)"
     );
-    const found = og.indexOf("if (data) {");
-    const read = og.indexOf('.select("motion_text")');
-    expect(found).toBeGreaterThan(-1);
-    expect(found).toBeLessThan(read);
+    expect(og).toContain("motion = motionForDebate(data.motion_text as string | null, topic.motion)");
+  });
+
+  it("reads the topic on the OG image only inside the block for a debate it found", () => {
+    const og = codeOnly(fs.readFileSync(path.join(process.cwd(), READERS[1]), "utf-8"));
+    const block = blockAfter(og, "if (data) {");
+    expect(block, "the if (data) block").not.toBe("");
+    expect(block).toContain('.from("debate_topics")');
+    expect(og.split('.from("debate_topics")').length - 1, "one topic read").toBe(1);
+  });
+});
+
+/**
+ * 0020 is 0018's view with one column added, and its rollback is 0018's
+ * view: checked on the SQL text itself, so a change anywhere else in the
+ * verdict expression fails here even if no test row exercises it.
+ */
+describe("0020 and its rollback against 0018", () => {
+  const body = (file: string, from: string) => {
+    const sql = fs.readFileSync(path.join(process.cwd(), file), "utf-8");
+    return sql.slice(sql.indexOf(from)).trim();
+  };
+  const v18 = body("supabase/migrations/0018_debates_public_private_verdict_text.sql", "create or replace view");
+
+  it("0020 adds d.motion_text as the last column and changes nothing else", () => {
+    const v20 = body("supabase/migrations/0020_debates_public_motion_text.sql", "create or replace view");
+    const expected = v18.replace(
+      "case when d.argument_public then d.argument else null end as argument\n  from debates d",
+      "case when d.argument_public then d.argument else null end as argument,\n    d.motion_text\n  from debates d"
+    );
+    expect(expected).not.toBe(v18);
+    expect(v20).toBe(expected);
+  });
+
+  it("the rollback recreates 0018's view exactly, then sets the grants", () => {
+    const rollback = body("supabase/rollback/0020_debates_public_motion_text.down.sql", "create view");
+    const end = "left join debates p on p.id = d.parent_debate_id;";
+    const view = rollback.slice(0, rollback.indexOf(end) + end.length);
+    expect(view).toBe(v18.replace("create or replace view", "create view"));
+    expect(rollback.slice(view.length)).toContain(
+      "revoke all on public.debates_public from public, anon, authenticated;\ngrant select on public.debates_public to anon, authenticated;"
+    );
   });
 });
 
@@ -284,13 +357,16 @@ describe("withheldVerdict", () => {
     for (const odd of [null, "secret", ["secret"], 7]) expect(withheldVerdict(odd)).toBeNull();
   });
 
-  it("is the list 0018 keeps, so the page and the view agree", () => {
-    const migration = fs.readFileSync(
-      path.join(process.cwd(), "supabase/migrations/0018_debates_public_private_verdict_text.sql"),
-      "utf-8"
-    );
+  // 0020 redefines the view with 0018's expression and motion_text added,
+  // so the live view's list is 0020's; both are held to the page's.
+  it.each([
+    "supabase/migrations/0018_debates_public_private_verdict_text.sql",
+    "supabase/migrations/0020_debates_public_motion_text.sql",
+    "supabase/rollback/0020_debates_public_motion_text.down.sql",
+  ])("is the list %s keeps, so the page and the view agree", (file) => {
+    const migration = fs.readFileSync(path.join(process.cwd(), file), "utf-8");
     const list = /e\.key in \(([^)]*)\)/.exec(migration)?.[1];
-    expect(list, "0018's list of kept keys").toBeTruthy();
+    expect(list, `${file}'s list of kept keys`).toBeTruthy();
     const keys = [...list!.matchAll(/'([a-z_]+)'/g)].map((m) => m[1]).sort();
     expect(keys).toEqual([...KEPT_FOR_EVERYONE].sort());
   });
