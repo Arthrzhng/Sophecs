@@ -10,7 +10,8 @@ item (e)). Checkpoint A asks for those decisions in one list.
   answer pattern and reports where they land. Run it with
   `node scripts/simulate-quiz-v2.mjs`. It exits non-zero if a school is
   unreachable, lands outside 8% to 30%, or a school's persona misses its
-  school.
+  school, and also if a school has no weight or an option's vector does
+  not match its school's angle and weight.
 
 Quotations from the school pages are from `content/schools/*.md`, and
 those from the research file are from `content/research/non-western-sources.md`.
@@ -108,7 +109,7 @@ x runs from each person on their own (-1) to people through each other
 | Stoicism | 165° | -0.97 | 0.26 | What is in our power holds almost nothing "except one act: giving or withholding assent", and your standing lives "not in outcomes you never controlled, but in the one act nothing external can reach." | Possibly, on x. The page reads the school through Epictetus on what is in our power. Stoic cosmopolitanism, concern widening to all people, would pull it towards the middle. It is not in Sophecs's research file, so it is named here and not cited. |
 | Utilitarianism | 245° | -0.42 | -0.91 | "the right act is whichever produces the largest net sum of good over harm, added across everyone it touches. A unit is a unit, whoever feels it." It is the furthest towards outcomes. | On x, as the argument against in section 1 says: it is impartial rather than self-regarding. |
 | Buddhist Ethics | 310° | 0.64 | -0.77 | The method on its page is to reflect "on whether it tends toward your own harm, another's, or both", and the line it leads with is "Treating others like oneself". | **The most contested of the six**, on both axes (research file, four positions). It is on the outcomes side because the page's method weighs what an act does, to oneself and to others. It is short of Utilitarianism on y because "an act is weighed by the volition behind it as much as by what follows". |
-| Ubuntu | 0° | 1.00 | 0.00 | "A person is a person through other persons". It sits in the middle of y because its page's test is whether people "flourish through one another", while "Metz argues against building systems to maximise expected utility." | Yes, on y. The research file summarises Menkiti's view as "normative personhood is achieved through morally fulfilling communal obligations", which would move it towards role. The Ubuntu page places Gyekye's "moderate version" between Metz and Menkiti, so it would move the same way, less far. Sophecs "takes Thaddeus Metz's relational reading" (the Ubuntu page). |
+| Ubuntu | 0° | 1.00 | 0.00 | "A person is a person through other persons". It sits in the middle of y because its page's test is whether people "flourish through one another", while "Metz argues against building systems to maximise expected utility." | Yes, on y. The research file summarises Menkiti's view as "normative personhood is achieved through morally fulfilling communal obligations", which would move it towards role. The Ubuntu page places Gyekye's "moderate version" between Metz and Menkiti, which would move it the same way, less far; but its gloss, "insisting individuals keep their own worth and rights", points towards the individual end of x. Both readings are Arthur's to weigh. Sophecs "takes Thaddeus Metz's relational reading" (the Ubuntu page). |
 
 Order along x, from each person on their own: Stoicism, Utilitarianism,
 Virtue Ethics, then Confucianism and Buddhist Ethics (level), then Ubuntu.
@@ -138,8 +139,8 @@ eye:
 - 3d, "decided together";
 - 5b, "Do what an honest person would do here, even if it costs me friends";
 - 6d, "Be patient with him";
-- 7c, "Keeping quiet would be cowardly", which also calls every other
-  option cowardly;
+- 7c, "Keeping quiet would be cowardly", which also casts 7a, the one
+  option that stays quiet, as cowardly;
 - 9a, "Being someone people can trust".
 
 Each is a real position, but it may read as the answer a teacher wants.
@@ -156,11 +157,14 @@ Arthur, from review:
 
 Two were redrafted after review. 3b had read as a head count ("fewer
 people upset"), indistinguishable from Utilitarianism, with nothing of the
-intention the Buddhist page weighs; it now asks why you want each choice.
-8c had been the only option that uses the AI unseen, which encoded the
-textbook objection to Utilitarianism rather than its reasoning; it now
-weighs who gains and loses. Neither change moves an option's school, so
-the simulation is unchanged.
+intention the Buddhist page weighs; it now asks both why you want each
+choice and who it would hurt, which is the page's "as much as". 8c had
+led with using the AI unseen, which encoded the textbook objection to
+Utilitarianism rather than its reasoning; it now weighs good and harm to
+everyone, the reader's own learning included. It is still the only
+option under which using the tool could come out right, because only a
+sum can favour it; Arthur may want that kept or changed. Neither change
+moves an option's school, so the simulation is unchanged.
 
 **1. Your group project is due tomorrow and one person has done almost nothing. What do you do?**
 
@@ -185,7 +189,7 @@ the simulation is unchanged.
 | | Option | Leans | x, y |
 | --- | --- | --- | --- |
 | a | Go to the lunch. Being a grandchild comes with days you turn up for, whether or not you feel like it. | Confucianism | 0.51, 0.61 |
-| b | Check why I want each one first. Going to either for a bad reason, like guilt or just wanting to win, would make it the wrong choice. | Buddhist Ethics | 0.61, -0.73 |
+| b | Ask why I want each one and who it would hurt, me included. Going for a bad reason, like just wanting to win, would make it the wrong choice. | Buddhist Ethics | 0.61, -0.73 |
 | c | Ask myself what someone I really look up to would do, and do that. | Virtue Ethics | -0.27, 0.75 |
 | d | Ask the family. It is their day as much as mine, so it should be decided together. | Ubuntu | 0.90, 0.00 |
 
@@ -231,7 +235,7 @@ the simulation is unchanged.
 | --- | --- | --- | --- |
 | a | Write it myself. A student owes the teacher their own work, the way the teacher owes them honest marking. | Confucianism | 0.51, 0.61 |
 | b | Ask what using it would do to my own learning and to everyone else's marks, and if it harms either, do not use it. | Buddhist Ethics | 0.61, -0.73 |
-| c | Add up who gains and who loses if I use it, my mark against everyone else's, and go with whichever comes out ahead. | Utilitarianism | -0.42, -0.91 |
+| c | Weigh the good and harm to everyone it touches, my own learning included, and do whatever comes out best overall. | Utilitarianism | -0.42, -0.91 |
 | d | Whether anyone finds out is not the point. What I do with my own mind is the one thing that is mine. | Stoicism | -0.97, 0.26 |
 
 **9. A friend tells you a secret. Passing it on would stop another friend making a big mistake.**
@@ -272,9 +276,7 @@ the simulation is unchanged.
 In the simulation no answer pattern out of 1,048,576 produced a tie, so
 the rule is there for completeness rather than because it does work. v1
 is different: `src/lib/scoring.ts` treats scores within 0.005 as a tie,
-so its question-10 rule does fire. If v2's tolerance were ever widened to
-match, note that question 10 has no Buddhist Ethics or Ubuntu option, so
-its tie-break would never favour either.
+so its question-10 rule does fire.
 
 ## 5. The simulated distribution
 
@@ -355,9 +357,14 @@ same. A reader who never retakes keeps their v1 school.
 
 **What the build will need** (Stage 5, not now):
 - **A version on each result.** v1 stores three school weights in
-  `quiz_results.vector`; v2 would store a point. The result page reads
-  that column to draw its triangle (`src/lib/quiz-position.ts`), so a v2
-  row must not reach code written for v1 rows. The recommendation is an
+  `quiz_results.vector`; v2 would store a point. On a result page the
+  stored vector is read only by the share page's comparison columns
+  (`src/components/share/SharePage.tsx`, `VectorColumn`), which print
+  each school's weight as a percentage, and only when there is a second
+  result to compare; a v2 point there would print "NaN%". The triangle
+  (`src/lib/quiz-position.ts`) is drawn only by the quiz itself, from the
+  answers in progress. Either way a v2 row must not reach code written
+  for v1 rows. The recommendation is an
   additive `quiz_version` column, defaulting to 1 so every existing row is
   v1 without being rewritten. That is a migration, and it is Arthur's yes
   before it is applied.
@@ -380,7 +387,7 @@ Each of these is Arthur's to decide:
 2. The six positions, and especially Buddhist Ethics' and Ubuntu's
    (section 2).
 3. The ten questions and forty options: the five flagged as possibly too
-   nice, the four groups flagged as possibly underselling their school,
+   nice, the three groups flagged as possibly underselling their school,
    and the two redrafted after review, 3b and 8c (section 3).
 4. Weighted options (16.2% to 17.7%) or equal ones (10.9% to 23.0%)
    (section 5).
@@ -388,8 +395,13 @@ Each of these is Arthur's to decide:
    One of v2's questions is about AI (8), two more are about apps (4 and
    10), and seven are about neither, so the lines would need rewording if
    v2 ships as drafted.
-   They live in `content/schools/*.md`, under `share_lines`.
+   They live in `content/schools/*.md`, under `share_lines`. The same
+   "how AI should decide things" framing is also in `src/app/layout.tsx`
+   (the site description), `src/components/share/SharePage.tsx` and
+   `src/components/share/ChallengeInvite.tsx`.
 6. Whether none of the six is a rule-based ethics (section 1, "Rules to
    results"), which is my reading and not certain.
-7. Ubuntu's alternatives: the Ubuntu page places Gyekye between Metz and
-   Menkiti, so both would move it towards role (section 2).
+7. Ubuntu's alternatives: Menkiti's reading would move it towards role.
+   The Ubuntu page places Gyekye between Metz and Menkiti, which points
+   the same way, but its gloss on him, individuals keeping "their own
+   worth and rights", points towards the individual end (section 2).

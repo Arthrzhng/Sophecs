@@ -14,7 +14,8 @@
 //   question, then to the order the schools are listed in.
 // Exits non-zero if any school is unreachable, lands outside 8% to 30%,
 // or a school's persona (always the option leaning towards it) misses it,
-// and if an option's vector disagrees with its school's angle and weight.
+// or if a school has no weight or an option's vector disagrees with its
+// school's angle and weight.
 import fs from "node:fs";
 
 const file = process.argv[2] ?? "docs/quiz-v2.json";

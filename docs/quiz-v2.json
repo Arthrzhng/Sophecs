@@ -138,7 +138,7 @@
         },
         {
           "id": "3b",
-          "label": "Check why I want each one first. Going to either for a bad reason, like guilt or just wanting to win, would make it the wrong choice.",
+          "label": "Ask why I want each one and who it would hurt, me included. Going for a bad reason, like just wanting to win, would make it the wrong choice.",
           "leans": "buddhist",
           "vector": {
             "x": 0.61,
@@ -357,7 +357,7 @@
         },
         {
           "id": "8c",
-          "label": "Add up who gains and who loses if I use it, my mark against everyone else's, and go with whichever comes out ahead.",
+          "label": "Weigh the good and harm to everyone it touches, my own learning included, and do whatever comes out best overall.",
           "leans": "utilitarianism",
           "vector": {
             "x": -0.42,
