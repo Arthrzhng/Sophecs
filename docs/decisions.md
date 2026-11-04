@@ -2387,6 +2387,41 @@ standing. The share line drops its "The judge's note:" sentence for them
 (`src/lib/verdict-share.ts`). The OG image reads only school, score and
 topic, so 0018 does not touch it.
 
+### No client may update a challenge (migration 0021)
+
+Part of the write permissions reported to Arthur under STOP NOW on
+2026-11-03, and named again while building sample activity (#57), since
+it is live in production and the site never needs it. Arthur's ruling of
+2026-11-04 takes this one piece of the wider grants fix on its own: drop
+the policy, and make `assignChallengeTopic` check that its caller is a
+party. The rest of the grants fix still waits on his "yes, the grants
+fix".
+
+**The hole.** 0001 gave `anon` and `authenticated` an update policy on
+`challenges`, "accept sets challengee", with `using (true)` and
+`with check (true)`, and the table grants UPDATE to both. A select policy
+narrows an update only when the statement reads a column, so an update
+with no filter reached every row: anyone holding the public key could
+rewrite any challenge's status, results and debate ids, and
+`recordChallengeDebate` trusts those debate ids when it moves two
+readers' ratings. Every challenge write the site makes is through the
+server role: `submitQuizResult`, `assignChallengeTopic` and
+`recordChallengeDebate`.
+
+**The fix.** `0021_challenges_no_client_update.sql` drops the policy, so
+row level security refuses every client update; grants and the other two
+policies are unchanged. `scripts/test-0021-challenges-update.sh` shows on
+local Postgres with production's grants that before it anon reaches all
+three challenges with an unfiltered update and a party its own, that
+after it neither reaches any while the server role still writes and a
+party still reads, and that the rollback restores the policy exactly and
+0021 applies again. `assignChallengeTopic` now answers a signed-in
+stranger as it answers a missing challenge, using the same party test
+`/api/judge` applies (`resolveChallengeSide`); `tests/challenge-topic.test.ts`.
+
+**Snapshot, read-back and advisor:** in the pull request and in
+`docs/progress.md`.
+
 ### For Checkpoint A, from the security work
 
 - **Leaked-password protection** is off, and the advisor warns about it.

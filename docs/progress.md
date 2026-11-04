@@ -190,3 +190,12 @@ entry names.
   (read from Vercel). Fetched through Vercel at 00:43 UTC on 2026-11-04:
   `/styleguide/phase3/card/confucian` answered 404, as it should in
   production, and `/robots.txt` 200.
+
+## 2026-11-04: no client may update a challenge (migration 0021)
+
+- Arthur's ruling of 2026-11-04, ahead of sample activity: drop the
+  `challenges` update policy, and a party check in `assignChallengeTopic`.
+  `docs/decisions.md`, "No client may update a challenge (migration 0021)".
+- Tested on local Postgres: `scripts/test-0021-challenges-update.sh`, all
+  checks passed; `tests/challenge-topic.test.ts`, which fails two of its
+  five cases with the check removed.
