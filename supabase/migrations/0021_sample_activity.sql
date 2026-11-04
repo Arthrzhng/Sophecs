@@ -68,7 +68,9 @@ create table public.seed_run_items (
   )),
   logical_id text not null,
   row_id text,
-  state text not null default 'intended' check (state in ('intended', 'created', 'deleted')),
+  -- abandoned: the id turned out to be a row the run did not write. Never
+  -- acted on, kept for the audit.
+  state text not null default 'intended' check (state in ('intended', 'created', 'deleted', 'abandoned')),
   updated_at timestamptz not null default now(),
   primary key (run_id, kind, logical_id)
 );
@@ -112,6 +114,37 @@ create trigger challenges_guard_sample before insert or update on public.challen
   for each row execute function public.guard_sample_marker();
 create trigger exchanges_guard_sample before insert or update on public.exchanges
   for each row execute function public.guard_sample_marker();
+
+-- 3b. A sample account's class takes no genuine member, by any path: the
+-- join action refuses it, and so does this, for a signed-in reader
+-- inserting through the Data API under the "member join self" policy.
+-- Sample class ids can be worked out from the public seed tooling, and a
+-- genuine member would be a genuine row that teardown could not keep.
+-- SECURITY DEFINER to read the owner's profile past row level security;
+-- the caller's role is the `role` setting, which SET ROLE (how the Data API
+-- switches to anon or authenticated) sets and a definer function does not.
+create or replace function public.guard_sample_class_join() returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  if coalesce(current_setting('role', true), 'none') not in ('anon', 'authenticated') then
+    return new;
+  end if;
+  if exists (
+    select 1 from public.classes c join public.profiles p on p.id = c.owner_id
+    where c.id = new.class_id and p.is_sample
+  ) then
+    raise exception 'this class does not take members';
+  end if;
+  return new;
+end;
+$$;
+revoke all on function public.guard_sample_class_join() from public, anon, authenticated;
+
+create trigger class_members_guard_sample before insert or update on public.class_members
+  for each row execute function public.guard_sample_class_join();
 
 -- 4. The public views carry the marker, so the pages that read them can
 -- label sample rows. debates_public is 0020's definition, unchanged, with

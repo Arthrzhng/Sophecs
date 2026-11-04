@@ -98,6 +98,12 @@ export class MemoryAdapter implements Adapter {
     const r = this.runs.get(id);
     if (r) this.runs.set(id, { ...r, ...patch });
   }
+  async updateRunLocked(id: string, token: string, patch: Partial<SeedRun>) {
+    const r = this.runs.get(id);
+    if (!r || r.lock_token !== token) return false;
+    this.runs.set(id, { ...r, ...patch });
+    return true;
+  }
   async acquireLock(id: string, token: string) {
     const r = this.runs.get(id);
     if (!r || r.lock_token) return false;

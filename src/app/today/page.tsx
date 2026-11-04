@@ -107,6 +107,7 @@ export default async function TodayPage() {
     ),
   ]);
   const topics = topicRows.data;
+  if (judgedRows.error) console.error("[today] week of debates:", judgedRows.error);
 
   const judged: JudgedArgument[] = (judgedRows.rows ?? []).map((row) => ({
     school: row.school,

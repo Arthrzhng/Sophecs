@@ -55,6 +55,18 @@ describe("readAll", () => {
     expect(result.error).toMatch(/max-rows/);
   });
 
+  it("does not mistake rows deleted between page reads for a cap", async () => {
+    let rows = Array.from({ length: 2500 }, (_, i) => ({ id: i }));
+    let call = 0;
+    const page = async (from: number, to: number) => {
+      // After the first page is read, a row is deleted.
+      if (call++ === 1) rows = rows.slice(1);
+      return { data: rows.slice(from, to + 1), error: null, count: rows.length };
+    };
+    const result = await readAll(page);
+    expect(result.error).toBeNull();
+  });
+
   it("refuses to guess past a full first page with no count", async () => {
     const { page } = fakeTable(1500, 1000, { count: false });
     const result = await readAll(page);

@@ -104,6 +104,9 @@ export default async function SchoolTablePage() {
         : Promise.resolve({ data: null }),
     ]);
 
+    // A failed read shows the week as empty, as before, and says why in the log.
+    if (week_.error) console.error("[table] week of debates:", week_.error);
+    if (histories.error) console.error("[table] school changes:", histories.error);
     const rows = week_.rows ?? [];
 
     judged = rows.map((row) => ({

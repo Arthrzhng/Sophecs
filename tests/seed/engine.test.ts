@@ -252,27 +252,96 @@ describe("the lock while a run is alive", () => {
 });
 
 describe("genuine-state checks on a live site", () => {
-  it("pass when a reader's own new argument changed their profile, and fail when nothing explains a change", async () => {
+  it("pass through ordinary reader activity, and fail when the par is not the genuine par", async () => {
     const { snapshot, compareBaselines } = await import("../../scripts/seed/baseline");
     const db = freshDb();
     const before = await snapshot(db);
-    // A reader argues during the run: their rating changes, and so does
-    // the genuine par for the topic, through /api/judge as normal.
     await new Promise((r) => setTimeout(r, 5));
+    // During the run: a reader argues (rating and par move through
+    // /api/judge as normal), another signs up, and one deletes their account.
     db.table("debates").set("GEN000DEB9", { id: "GEN000DEB9", user_id: "g1", topic_slug: "no-decision", kind: "original", elo_before: 1216, created_at: new Date().toISOString(), is_sample: false });
     db.table("profiles").get("g1")!.elo = 1230;
     db.table("debate_topics").get("no-decision")!.par_elo = 1216;
     db.table("debate_topics").get("no-decision")!.par_n = 1;
+    db.table("profiles").set("g3", { id: "g3", elo: 1200, streak: 0, school: "stoicism", is_sample: false });
     const after = await snapshot(db);
     expect(compareBaselines(before, after).filter((c) => !c.ok)).toEqual([]);
-    // Now a change nobody's activity explains.
-    db.table("profiles").set("g2", { id: "g2", elo: 1100, streak: 0, school: "stoicism", is_sample: false });
-    db.table("profiles").get("g2")!.elo = 1100;
-    const before2 = await snapshot(db);
-    db.table("profiles").get("g2")!.elo = 1500;
+    db.table("profiles").delete("g3");
+    expect(compareBaselines(before, await snapshot(db)).filter((c) => !c.ok)).toEqual([]);
+    // A par that is not what genuine originals give fails, as does a par
+    // moved on a topic with no genuine originals.
+    db.table("debate_topics").get("no-decision")!.par_elo = 1250;
     db.table("debate_topics").get("crash-arithmetic")!.par_elo = 1300;
-    const failed = compareBaselines(before2, await snapshot(db)).filter((c) => !c.ok).map((c) => c.name);
-    expect(failed).toContain("every changed genuine profile is explained by that reader's own activity");
-    expect(failed).toContain("debate_topics crash-arithmetic par is the genuine par");
+    const failed = compareBaselines(before, await snapshot(db)).filter((c) => !c.ok).map((c) => c.name);
+    expect(failed).toEqual(["debate_topics crash-arithmetic par is the genuine par", "debate_topics no-decision par is the genuine par"]);
+  });
+});
+
+describe("review pass 2 scenarios", () => {
+  const openStates = (db: MemoryAdapter) => [...db.registry.values()].filter((i) => i.state === "intended" || i.state === "created").length;
+
+  it("after a failed run, teardown leaves no open intent, so the rollback can run", async () => {
+    const db = freshDb({ failBefore: { "insert:debates": 3 } });
+    await expect(execute({ dataset, plan, adapter: db, ...quiet, retries: 3 })).rejects.toThrow(/injected/);
+    expect([...db.registry.values()].some((i) => i.kind === "debate" && i.state === "intended")).toBe(true);
+    await teardown(db, plan.runId);
+    expect(openStates(db)).toBe(0);
+    expect((await db.getRun(plan.runId))!.status).toBe("torn_down");
+  });
+
+  it("an intent on a row the run did not write is abandoned and the row left alone", async () => {
+    const db = freshDb();
+    const victim = dataset.debates[5].rowId;
+    db.table("debates").set(victim, { id: victim, user_id: "g1", is_sample: false, argument: "genuine" });
+    db.table("quiz_results").set("GEN0000003", { id: "GEN0000003", user_id: "g1", challenge_from: null, is_sample: false });
+    await expect(execute({ dataset, plan, adapter: db, ...quiet })).rejects.toThrow(StopError);
+    const p = await preview(db, plan.runId);
+    expect(p.foreign).toEqual([{ kind: "debate", rowId: victim }]);
+    await teardown(db, plan.runId);
+    expect(db.table("debates").get(victim)).toMatchObject({ is_sample: false, argument: "genuine" });
+    expect([...db.registry.values()].find((i) => i.row_id === victim)!.state).toBe("abandoned");
+    expect(openStates(db)).toBe(0);
+  });
+
+  it("auth workers start no new user after the first failure", async () => {
+    const db = freshDb();
+    const bad = dataset.authUsers[6].rowId;
+    const real = db.createAuthUser.bind(db);
+    let after = 0;
+    let failed = false;
+    db.createAuthUser = async (u) => {
+      if (failed) after++;
+      if (u.id === bad) {
+        failed = true;
+        throw new Error("refused");
+      }
+      return real(u);
+    };
+    await expect(execute({ dataset, plan, adapter: db, ...quiet, retries: 1, authConcurrency: 4 })).rejects.toThrow(/refused/);
+    const created = db.authUsers.size;
+    await new Promise((r) => setTimeout(r, 20));
+    expect(db.authUsers.size).toBe(created);
+    expect(after).toBeLessThanOrEqual(3); // at most the calls already in flight
+  });
+
+  it("a lock lost between writing a batch and marking it stops before the mark", async () => {
+    const db = freshDb();
+    let refreshes = 0;
+    const realRefresh = db.refreshLock.bind(db);
+    db.refreshLock = async (id: string, token: string) => {
+      refreshes++;
+      // The second refresh of a batch is the one before setState.
+      if (refreshes === 6) {
+        db.runs.get(id)!.lock_token = "someone-else";
+        return false;
+      }
+      return realRefresh(id, token);
+    };
+    const marksBefore = () => [...db.registry.values()].filter((i) => i.state === "created").length;
+    await expect(execute({ dataset, plan, adapter: db, ...quiet })).rejects.toThrow(/taken by another process/);
+    const marked = marksBefore();
+    // Batches are 100 here: two whole batches marked, the third written and not marked.
+    expect(marked).toBe(200);
+    expect(db.runs.get(plan.runId)!.status).toBe("running");
   });
 });

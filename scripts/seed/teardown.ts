@@ -24,6 +24,10 @@ export interface TeardownPreview {
   runId: string;
   status: string;
   items: Record<string, { created: number; intended: number; deleted: number }>;
+  /** Intents whose row was never written: marked deleted by teardown. */
+  absent: number;
+  /** Intents whose id is a row the run did not write: never touched, marked abandoned. */
+  foreign: { kind: Kind; rowId: string }[];
   entanglements: Entanglement[];
   blocking: Entanglement[];
 }
@@ -47,41 +51,59 @@ const OWNER_OF: Partial<Record<Kind, string>> = { turn: "exchange_id", reading_r
 /**
  * The run's registry items, keeping an item only when its row is proven to
  * be the run's: created items were proven when they were written; an
- * intended item is kept only if its row reads back marked, or owned by one
- * of the run's users or exchanges. An intent whose id turned out to be a
- * genuine row (the collision the engine stops on) is dropped here, so
- * nothing that points at that genuine row is treated as a sample reference.
+ * intended item (a crash between recording the intent and marking it) is
+ * kept only if its row reads back marked, or owned by one of the run's
+ * proven users or exchanges. Auth users are proven first, since the other
+ * kinds' ownership rests on them. The rest are sorted out:
+ * - absent: the row was never written, so there is nothing to delete; the
+ *   intent is marked deleted;
+ * - foreign: a row with that id exists and is not the run's (the collision
+ *   the engine stops on); it is never touched, the intent is marked
+ *   abandoned, and nothing pointing at it counts as a sample reference.
  */
 async function loadItems(adapter: Adapter, runId: string) {
-  const out = {} as Record<Kind, RegistryItem[]>;
-  for (const { kind } of ORDER) out[kind] = await adapter.items(runId, kind);
+  const items = {} as Record<Kind, RegistryItem[]>;
+  for (const { kind } of ORDER) items[kind] = await adapter.items(runId, kind);
+  const absent: RegistryItem[] = [];
+  const foreign: RegistryItem[] = [];
+  const settle = (kind: Kind, proven: Set<string>, present: Set<string>) => {
+    for (const i of items[kind].filter((x) => x.state === "intended")) {
+      if (proven.has(i.row_id)) continue;
+      (present.has(i.row_id) ? foreign : absent).push(i);
+    }
+    items[kind] = items[kind].filter((i) => i.state !== "intended" || proven.has(i.row_id));
+  };
+  {
+    const proven = new Set<string>();
+    const present = new Set<string>();
+    for (const i of items.auth_user.filter((x) => x.state === "intended")) {
+      const u = await adapter.getAuthUser(i.row_id);
+      if (!u) continue;
+      present.add(i.row_id);
+      if (u.runId === runId) proven.add(i.row_id);
+    }
+    settle("auth_user", proven, present);
+  }
   const owners = new Set([
-    ...out.auth_user.map((i) => i.row_id),
-    ...out.exchange.filter((i) => i.state === "created").map((i) => i.row_id),
+    ...items.auth_user.filter((i) => i.state !== "abandoned").map((i) => i.row_id),
+    ...items.exchange.filter((i) => i.state === "created").map((i) => i.row_id),
   ]);
   for (const { kind, table } of ORDER) {
-    const unproven = out[kind].filter((i) => i.state === "intended");
+    if (!table) continue;
+    const unproven = items[kind].filter((i) => i.state === "intended");
     if (!unproven.length) continue;
-    let proven = new Set<string>();
-    if (table) {
-      const rows = await adapter.selectByIds(table, unproven.map((i) => i.row_id));
-      proven = new Set(
-        rows
-          .filter((r) => (MARKED_KIND[kind] ? r.is_sample === true : owners.has(String(r[OWNER_OF[kind]!]))))
-          .map((r) => (table === "class_members" ? `${r.class_id}:${r.user_id}` : String(r.id)))
-      );
-    } else {
-      for (const i of unproven) {
-        const u = await adapter.getAuthUser(i.row_id);
-        if (u && u.runId === runId) proven.add(i.row_id);
-      }
-    }
-    out[kind] = out[kind].filter((i) => i.state !== "intended" || proven.has(i.row_id));
+    const rows = await adapter.selectByIds(table, unproven.map((i) => i.row_id));
+    const key = (r: Record<string, unknown>) => (table === "class_members" ? `${r.class_id}:${r.user_id}` : String(r.id));
+    const present = new Set(rows.map(key));
+    const proven = new Set(
+      rows.filter((r) => (MARKED_KIND[kind] ? r.is_sample === true : owners.has(String(r[OWNER_OF[kind]!])))).map(key)
+    );
+    settle(kind, proven, present);
   }
-  return out;
+  return { items, absent, foreign };
 }
 
-const live = (items: RegistryItem[]) => items.filter((i) => i.state !== "deleted");
+const live = (items: RegistryItem[]) => items.filter((i) => i.state === "created" || i.state === "intended");
 
 /** Genuine rows that point at this run's rows. Reads only. */
 export async function findEntanglements(adapter: Adapter, items: Record<Kind, RegistryItem[]>): Promise<Entanglement[]> {
@@ -141,7 +163,7 @@ export async function preview(adapter: Adapter, runId: string): Promise<Teardown
   await adapter.checkSchema();
   const run = await adapter.getRun(runId);
   if (!run) throw new StopError(`no seed run ${runId}`);
-  const items = await loadItems(adapter, runId);
+  const { items, absent, foreign } = await loadItems(adapter, runId);
   const summary: TeardownPreview["items"] = {};
   for (const { kind } of ORDER) {
     const list = items[kind];
@@ -152,7 +174,15 @@ export async function preview(adapter: Adapter, runId: string): Promise<Teardown
     };
   }
   const entanglements = await findEntanglements(adapter, items);
-  return { runId, status: run.status, items: summary, entanglements, blocking: entanglements.filter((e) => !e.nullable) };
+  return {
+    runId,
+    status: run.status,
+    items: summary,
+    absent: absent.length,
+    foreign: foreign.map((i) => ({ kind: i.kind, rowId: i.row_id })),
+    entanglements,
+    blocking: entanglements.filter((e) => !e.nullable),
+  };
 }
 
 export interface TeardownReport {
@@ -182,10 +212,18 @@ export async function teardown(
     throw new StopError(`run ${runId} is locked by another process (if that process died, add --break-stale-lock after ${STALE_LOCK_MINUTES} minutes)`);
   const deleted: Record<string, number> = {};
   try {
-    await adapter.updateRun(runId, { status: "tearing_down" });
+    if (!(await adapter.updateRunLocked(runId, token, { status: "tearing_down" })))
+      throw new LockLostError(`run ${runId}'s lock was taken before teardown began`);
     for (const e of p.entanglements) await adapter.clearReference(e);
     log(`cleared ${p.entanglements.length} genuine reference(s) to sample rows`);
-    const items = await loadItems(adapter, runId);
+    const { items, absent, foreign } = await loadItems(adapter, runId);
+    // Settle the intents that never became the run's rows, so the registry
+    // ends with nothing left in an open state.
+    for (const kind of new Set(absent.map((i) => i.kind)))
+      await adapter.setState(runId, kind, absent.filter((i) => i.kind === kind).map((i) => i.logical_id), "deleted");
+    for (const kind of new Set(foreign.map((i) => i.kind)))
+      await adapter.setState(runId, kind, foreign.filter((i) => i.kind === kind).map((i) => i.logical_id), "abandoned");
+    if (absent.length || foreign.length) log(`settled ${absent.length} intent(s) never written, ${foreign.length} abandoned on a row the run did not write`);
     const owners = [...live(items.auth_user).map((i) => i.row_id), ...live(items.exchange).map((i) => i.row_id)];
     for (const { kind, table } of ORDER) {
       let list = live(items[kind]);
@@ -206,6 +244,7 @@ export async function teardown(
             if (u.runId !== runId) throw new StopError(`auth user ${b.row_id} does not carry run ${runId}; not deleting it`);
             await adapter.deleteAuthUser(b.row_id);
           }
+        await heartbeat(adapter, runId, token);
         await adapter.setState(runId, kind, batch.map((b) => b.logical_id), "deleted");
       }
       deleted[kind] = list.length;
@@ -221,7 +260,10 @@ export async function teardown(
       leftOver[kind] = n;
     }
     let authLeft = 0;
-    for (const i of items.auth_user) if (await adapter.getAuthUser(i.row_id)) authLeft++;
+    for (const [n, i] of items.auth_user.entries()) {
+      if (n % 50 === 0) await heartbeat(adapter, runId, token);
+      if (await adapter.getAuthUser(i.row_id)) authLeft++;
+    }
     leftOver.auth_user = authLeft;
     const remaining = Object.values(leftOver).reduce((a, b) => a + b, 0);
     if (remaining) throw new StopError(`${remaining} of the run's rows are still present after teardown`);
@@ -229,12 +271,17 @@ export async function teardown(
     // teardown resumed after a crash records the whole run, not its last pass.
     const totals: Record<string, number> = {};
     for (const { kind } of ORDER) totals[kind] = (await adapter.items(runId, kind)).filter((i) => i.state === "deleted").length;
-    await adapter.updateRun(runId, { status: "torn_down", last_error: null, counts: { ...((await adapter.getRun(runId))?.counts ?? {}), deleted: totals } });
+    const ended = await adapter.updateRunLocked(runId, token, {
+      status: "torn_down",
+      last_error: null,
+      counts: { ...((await adapter.getRun(runId))?.counts ?? {}), deleted: totals },
+    });
+    if (!ended) throw new LockLostError(`run ${runId}'s lock was taken before teardown could record its end`);
     const after = await snapshot(adapter);
     return { deleted, cleared: p.entanglements.length, before, after, leftOver };
   } catch (err) {
     if (!(err instanceof LockLostError))
-      await adapter.updateRun(runId, { last_error: `teardown: ${String((err as Error).message).slice(0, 480)}` });
+      await adapter.updateRunLocked(runId, token, { last_error: `teardown: ${String((err as Error).message).slice(0, 480)}` }).catch(() => false);
     throw err;
   } finally {
     await adapter.releaseLock(runId, token);

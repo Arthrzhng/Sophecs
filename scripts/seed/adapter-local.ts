@@ -104,6 +104,14 @@ export class LocalAdapter implements Adapter {
     const sets = Object.keys(patch).map((k) => `${ident(k)} = (json_populate_record(null::public.seed_runs, ${json(patch)})).${ident(k)}`);
     this.sql(`update public.seed_runs set ${[...sets, "updated_at = now()"].join(", ")} where id = ${json(id)}::json #>> '{}';`);
   }
+  async updateRunLocked(id: string, token: string, patch: Partial<SeedRun>) {
+    const sets = Object.keys(patch).map((k) => `${ident(k)} = (json_populate_record(null::public.seed_runs, ${json(patch)})).${ident(k)}`);
+    const out = this.sql(
+      `update public.seed_runs set ${[...sets, "updated_at = now()"].join(", ")}
+       where id = ${json(id)}::json #>> '{}' and lock_token = ${json(token)}::json #>> '{}' returning id;`
+    ).trim();
+    return out.length > 0;
+  }
   async acquireLock(id: string, token: string) {
     const out = this.sql(
       `update public.seed_runs set lock_token = ${json(token)}::json #>> '{}', locked_at = now() where id = ${json(id)}::json #>> '{}' and lock_token is null returning id;`

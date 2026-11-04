@@ -47,16 +47,18 @@ export async function readAll<T>(
 
   // Every page but the last must be full. A shorter one means the server
   // caps responses below pageSize (its max-rows), which is the truncation
-  // this function exists to prevent, so it is an error, not a result.
-  const short = (got: number, from: number) => from + got < total && got < pageSize;
-  if (short(rows.length, 0)) return { rows: null, error: `a page returned ${rows.length} of ${pageSize} rows; max-rows is below the page size` };
+  // this function exists to prevent, so it is an error, not a result. Each
+  // page is judged against its own count, so rows deleted between two page
+  // reads shorten the last page without being mistaken for a cap.
+  const short = (got: number, from: number, count: number) => from + got < count && got < pageSize;
+  if (short(rows.length, 0, total)) return { rows: null, error: `a page returned ${rows.length} of ${pageSize} rows; max-rows is below the page size` };
   const starts: number[] = [];
   for (let from = pageSize; from < total; from += pageSize) starts.push(from);
   const rest = await Promise.all(starts.map((from) => page(from, from + pageSize - 1)));
   for (const [i, r] of rest.entries()) {
     if (r.error) return { rows: null, error: r.error.message };
     const got = r.data ?? [];
-    if (short(got.length, starts[i])) return { rows: null, error: `a page returned ${got.length} of ${pageSize} rows; max-rows is below the page size` };
+    if (short(got.length, starts[i], r.count ?? total)) return { rows: null, error: `a page returned ${got.length} of ${pageSize} rows; max-rows is below the page size` };
     rows.push(...got);
   }
   return { rows, error: null };

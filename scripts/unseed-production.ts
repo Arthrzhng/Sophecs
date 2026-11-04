@@ -36,6 +36,8 @@ main(async () => {
   const p = await preview(adapter, runId);
   log(`run ${runId}: ${p.status}`);
   for (const [k, v] of Object.entries(p.items)) log(`  ${k}: ${v.created} created, ${v.intended} intended, ${v.deleted} already deleted`);
+  log(`intents never written: ${p.absent}; abandoned on a row the run did not write: ${p.foreign.length}`);
+  for (const f of p.foreign) log(`  abandoned ${f.kind} ${f.rowId} (not touched)`);
   log(`genuine references to sample rows: ${p.entanglements.length} (${p.blocking.length} that teardown cannot keep)`);
   for (const e of p.entanglements) log(`  ${e.nullable ? "clear" : "STOP "} ${e.table}.${e.column} ${e.rowId} -> ${e.pointsAt}`);
   if (!f.execute) {

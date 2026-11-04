@@ -3,7 +3,7 @@
 -- and dropping the registry removes the only record of which unmarked rows
 -- (turns, reading responses, classes, members, auth users) were samples.
 -- The rollback refuses while any row is still marked, while any run is not
--- torn down, and while any registry item is not deleted.
+-- torn down, and while any registry item is still intended or created.
 --
 -- Deploy the code that does not read these columns first.
 
@@ -16,7 +16,7 @@ do $$ begin
     raise exception 'sample rows remain; tear the runs down first';
   end if;
   if exists (select 1 from public.seed_runs where status <> 'torn_down')
-     or exists (select 1 from public.seed_run_items where state <> 'deleted') then
+     or exists (select 1 from public.seed_run_items where state not in ('deleted', 'abandoned')) then
     raise exception 'a seed run is not torn down; tear it down first';
   end if;
 end $$;
@@ -108,6 +108,8 @@ drop trigger debates_guard_sample on public.debates;
 drop trigger challenges_guard_sample on public.challenges;
 drop trigger exchanges_guard_sample on public.exchanges;
 drop function public.guard_sample_marker();
+drop trigger class_members_guard_sample on public.class_members;
+drop function public.guard_sample_class_join();
 
 drop table public.seed_run_items;
 drop table public.seed_runs;

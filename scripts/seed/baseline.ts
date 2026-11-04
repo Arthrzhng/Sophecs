@@ -1,16 +1,19 @@
 // What genuine data looked like before a run, read without writing, and a
-// comparison afterwards that still means something on a live site where
-// readers keep arguing while the run writes. It never restores anything.
+// comparison afterwards. It never restores anything.
 //
-// - Each genuine profile is compared row by row. A changed profile passes
-//   only if that reader has genuine activity (an argument or a quiz result)
-//   dated after the baseline: their own activity explains the change, a
-//   seed run cannot.
-// - Each topic's par is recomputed from genuine originals the way
-//   /api/judge computes it (the last 50 ratings before), and must equal the
-//   stored par; a topic with no genuine originals must be unchanged.
-// - elo_percentile(1200) is recomputed from genuine profiles and must
-//   equal what the function returns.
+// On a live site readers sign up, argue, delete accounts and finish
+// challenges while a run writes, so most differences between two
+// snapshots are theirs. Only checks that hold whatever readers do can
+// fail; the rest are reported as information:
+// - each topic's stored par must equal the par /api/judge computes from
+//   genuine originals alone (the last 50 ratings before), and a topic with
+//   no genuine originals must keep the par it had before the run;
+// - elo_percentile(1200) must equal the share computed from genuine
+//   profiles alone.
+// Row counts and changed genuine profiles are information. That the run
+// writes no genuine row is proven where it writes: every row is read back
+// and must be marked or owned by the run (engine.ts), and every update is
+// scoped to the marker (the adapters).
 
 import type { Adapter } from "./adapter";
 
@@ -35,6 +38,8 @@ const MARKED_TABLES = ["profiles", "quiz_results", "challenges", "debates", "exc
 const OTHER_TABLES = ["turns", "reading_responses", "classes", "class_members", "blocks", "reports", "ai_calls"] as const;
 
 export async function snapshot(adapter: Adapter): Promise<Baseline> {
+  // Stamped before the first read, so activity during the reads counts as after.
+  const at = new Date().toISOString();
   const genuine: Record<string, number> = {};
   for (const t of MARKED_TABLES) genuine[t] = await adapter.count(t, { sample: false });
   const totals: Record<string, number> = {};
@@ -54,7 +59,7 @@ export async function snapshot(adapter: Adapter): Promise<Baseline> {
   for (const t of topics) {
     const window = debates
       .filter((d) => d.topic_slug === t.slug && d.kind === "original" && d.elo_before !== null)
-      .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))
+      .sort((a, b) => Date.parse(String(b.created_at)) - Date.parse(String(a.created_at)))
       .slice(0, PAR_ELO_WINDOW)
       .map((d) => Number(d.elo_before));
     expectedPar[t.slug] = window.length ? { par: window.reduce((s, v) => s + v, 0) / window.length, n: window.length } : null;
@@ -65,7 +70,7 @@ export async function snapshot(adapter: Adapter): Promise<Baseline> {
     .map((r) => ({ userId: String(r.user_id), at: String(r.created_at) }));
   const elos = profiles.map((p) => Number(p.elo));
   return {
-    at: new Date().toISOString(),
+    at,
     genuine,
     totals,
     genuineProfiles,
@@ -83,43 +88,51 @@ export interface BaselineCheck {
   detail: string;
 }
 
-export function compareBaselines(before: Baseline, after: Baseline): BaselineCheck[] {
+/** The checks that need no baseline: par and percentile from genuine rows alone. */
+export function isolationChecks(now: Baseline, before: Baseline | null = null): BaselineCheck[] {
   const checks: BaselineCheck[] = [];
-  for (const t of Object.keys(before.genuine)) {
-    checks.push({
-      name: `genuine ${t} not removed`,
-      ok: after.genuine[t] >= before.genuine[t],
-      detail: `${before.genuine[t]} before, ${after.genuine[t]} after`,
-    });
-  }
-  const since = Date.parse(before.at);
-  const activeSince = new Set(after.activity.filter((a) => Date.parse(a.at) >= since).map((a) => a.userId));
-  const ids = new Set([...Object.keys(before.genuineProfiles), ...Object.keys(after.genuineProfiles)]);
-  const changed = [...ids].filter((id) => before.genuineProfiles[id] !== after.genuineProfiles[id]);
-  const unexplained = changed.filter((id) => !activeSince.has(id) || !(id in after.genuineProfiles));
-  checks.push({
-    name: "every changed genuine profile is explained by that reader's own activity",
-    ok: unexplained.length === 0,
-    detail: `${Object.keys(after.genuineProfiles).length} genuine profiles; ${changed.length} changed, ${unexplained.length} unexplained${unexplained.length ? ` (e.g. ${unexplained[0]})` : ""}`,
-  });
-  for (const t of after.topics) {
-    const expected = after.expectedPar[t.slug];
-    const prior = before.topics.find((x) => x.slug === t.slug);
+  for (const t of now.topics) {
+    const expected = now.expectedPar[t.slug];
+    const prior = before?.topics.find((x) => x.slug === t.slug);
+    if (!expected && !prior) {
+      checks.push({ name: `debate_topics ${t.slug} par`, ok: true, detail: `no genuine originals; ${t.par_elo}/${t.par_n} (information)` });
+      continue;
+    }
     const ok = expected
       ? Math.abs(t.par_elo - expected.par) < 1e-6 && t.par_n === expected.n
-      : Boolean(prior && prior.par_elo === t.par_elo && prior.par_n === t.par_n);
+      : prior!.par_elo === t.par_elo && prior!.par_n === t.par_n;
     checks.push({
       name: `debate_topics ${t.slug} par is the genuine par`,
       ok,
       detail: expected
-        ? `stored ${t.par_elo}/${t.par_n}, from genuine originals ${expected.par}/${expected.n}`
-        : `no genuine originals; ${prior ? `${prior.par_elo}/${prior.par_n}` : "missing"} before, ${t.par_elo}/${t.par_n} after`,
+        ? `stored ${t.par_elo}/${t.par_n}, from genuine originals ${expected.par}/${expected.n}${ok ? "" : "; if two judgings finished together this can be transient: validate again before stopping"}`
+        : `no genuine originals; ${prior!.par_elo}/${prior!.par_n} before, ${t.par_elo}/${t.par_n} after`,
     });
   }
   checks.push({
     name: "elo_percentile(1200) counts genuine profiles only",
-    ok: after.percentile1200 !== null && Math.abs(after.percentile1200 - after.expectedPercentile1200) < 1e-9,
-    detail: `function ${after.percentile1200}, from genuine profiles ${after.expectedPercentile1200}`,
+    ok: now.percentile1200 !== null && Math.abs(now.percentile1200 - now.expectedPercentile1200) < 1e-9,
+    detail: `function ${now.percentile1200}, from genuine profiles ${now.expectedPercentile1200}`,
   });
+  return checks;
+}
+
+export function compareBaselines(before: Baseline, after: Baseline): BaselineCheck[] {
+  const checks: BaselineCheck[] = [];
+  const counts = Object.keys(before.genuine).map((t) => `${t} ${before.genuine[t]} -> ${after.genuine[t]}`);
+  checks.push({ name: "genuine rows", ok: true, detail: `${counts.join(", ")} (information: readers may add or delete)` });
+  const since = Date.parse(before.at);
+  const activeSince = new Set(after.activity.filter((a) => Date.parse(a.at) >= since).map((a) => a.userId));
+  const existing = Object.keys(before.genuineProfiles);
+  const changed = existing.filter((id) => id in after.genuineProfiles && before.genuineProfiles[id] !== after.genuineProfiles[id]);
+  const added = Object.keys(after.genuineProfiles).filter((id) => !(id in before.genuineProfiles)).length;
+  const removed = existing.filter((id) => !(id in after.genuineProfiles)).length;
+  const quiet = changed.filter((id) => !activeSince.has(id)).length;
+  checks.push({
+    name: "genuine profiles",
+    ok: true,
+    detail: `${changed.length} changed (${quiet} with no new argument or result of their own, e.g. a challenge's other side or a late verdict), ${added} new, ${removed} removed (information)`,
+  });
+  checks.push(...isolationChecks(after, before));
   return checks;
 }

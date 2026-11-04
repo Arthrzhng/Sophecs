@@ -41,7 +41,9 @@ import { DAY, HOUR, MINUTE, TIMEZONES, activeTimeOn, dayWeight, iso, startOfUtcD
 import { GIVEN_NAMES, INITIALS, CLASS_NAMES } from "./names";
 import readingResponseBank from "./reading-responses.json";
 
-export const GENERATOR_VERSION = "sample-activity-1";
+// Bumped whenever the same plan inputs would give different rows, so an
+// older plan is refused by name rather than by a hash mismatch.
+export const GENERATOR_VERSION = "sample-activity-2";
 
 export interface GenConfig {
   seed: number;

@@ -65,7 +65,7 @@ done
 # tables made before this point get the same grants by hand, as they have
 # in production, so that row level security and the guard are what decide.
 q "alter default privileges in schema public grant all on tables to anon, authenticated, service_role" >/dev/null
-for t in debates profiles quiz_results challenges exchanges; do
+for t in debates profiles quiz_results challenges exchanges classes class_members; do
   q "grant all on public.$t to anon, authenticated, service_role" >/dev/null
 done
 # Supabase's service_role bypasses row level security. The shim creates it
@@ -173,16 +173,30 @@ expect "two low sample ratings do not move a genuine percentile" "$PCT_BEFORE" "
 expect "debates_public carries the marker" "t t" "$(q "select is_sample || ' ' || verdict_is_template from debates_public where id = 'sdeb'" | sed 's/true/t/g')"
 expect "genuine rows read false" "f f" "$(q "select is_sample || ' ' || verdict_is_template from debates_public where id = 'gpub'" | sed 's/false/f/g')"
 
+say "a sample account's class takes no genuine member"
+psql -X -q -v ON_ERROR_STOP=1 -d "$DB" >/dev/null <<CLS
+insert into classes (id, code, owner_id, name) values ('sclass', 'samplecd', '66666666-6666-6666-6666-666666666666', 'Sample class');
+insert into classes (id, code, owner_id, name) values ('gclass', 'genuinec', '$U', 'Genuine class');
+CLS
+join_as() { as_role authenticated "insert into class_members (class_id, user_id) values ('$1', '77777777-7777-7777-7777-777777777777')" 77777777-7777-7777-7777-777777777777; }
+r=$(join_as sclass); expect "a reader joins a sample class through the Data API" refused "$(printf '%s' "$r" | grep -q 'does not take members' && echo refused || echo "$r")"
+expect "a reader joins a genuine class" allowed "$(join_as gclass)"
+expect "the server role adds a sample member" allowed "$(as_role service_role "insert into class_members (class_id, user_id) values ('sclass', '77777777-7777-7777-7777-777777777777')")"
+expect "anon and authenticated cannot call the guard" "f f" "$(q "select has_function_privilege('anon', 'public.guard_sample_class_join()', 'EXECUTE') || ' ' || has_function_privilege('authenticated', 'public.guard_sample_class_join()', 'EXECUTE')" | sed 's/false/f/g')"
+q "delete from classes where id in ('sclass','gclass')" >/dev/null
+
 say "rollback refuses while a run is not torn down"
+# The run alone: its one item is already deleted, so only the run's status
+# can make the rollback refuse here.
 q "insert into seed_runs (id, status, plan_hash, generator_version, seed, window_from, window_to) values ('run-cccccc','complete','h','g',1,now(),now())" >/dev/null
-q "insert into seed_run_items (run_id, kind, logical_id, row_id, state) values ('run-cccccc','turn','t1','turn1','created')" >/dev/null
+q "insert into seed_run_items (run_id, kind, logical_id, row_id, state) values ('run-cccccc','turn','t1','turn1','deleted')" >/dev/null
 q "delete from debates where is_sample; delete from profiles where is_sample" >/dev/null
 held=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/rollback/0021_sample_activity.down.sql" 2>&1 || true)
 expect "refused for an open run" refused "$(printf '%s' "$held" | grep -q 'not torn down' && echo refused || echo "$held")"
-q "update seed_runs set status = 'torn_down'" >/dev/null
+q "update seed_runs set status = 'torn_down'; update seed_run_items set state = 'created'" >/dev/null
 held=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/rollback/0021_sample_activity.down.sql" 2>&1 || true)
 expect "refused for an item not deleted" refused "$(printf '%s' "$held" | grep -q 'not torn down' && echo refused || echo "$held")"
-q "update seed_run_items set state = 'deleted'" >/dev/null
+q "update seed_run_items set state = 'abandoned'" >/dev/null
 psql -X -q -v ON_ERROR_STOP=1 -d "$DB" >/dev/null <<SAMPLES2
 insert into profiles (id, handle, display_name, school, elo, streak, is_sample) values
   ('66666666-6666-6666-6666-666666666666', 'sample-a', 'Sample A', 'stoicism', 900, 0, true);

@@ -34,6 +34,7 @@ import {
 } from "./adapter";
 
 export const BAN_DURATION = "876000h"; // one hundred years
+const REQUEST_TIMEOUT_MS = 30_000;
 const CHUNK = 100; // ids per filter, to keep request URLs short
 
 function chunks<T>(xs: T[], n = CHUNK): T[][] {
@@ -73,6 +74,9 @@ export class SupabaseAdapter implements Adapter {
       client ??
       createClient(t.url, t.serviceKey, {
         auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+        // No request may hang: a stalled call would hold the run's lock
+        // without refreshing it. The engine retries a timed-out call.
+        global: { fetch: (input, init) => fetch(input, { ...init, signal: init?.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS) }) },
       });
   }
 
@@ -134,6 +138,16 @@ export class SupabaseAdapter implements Adapter {
   async updateRun(id: string, patch: Partial<SeedRun>) {
     const { error } = await this.db.from("seed_runs").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", id);
     fail("seed_runs update", error);
+  }
+  async updateRunLocked(id: string, token: string, patch: Partial<SeedRun>) {
+    const { data, error } = await this.db
+      .from("seed_runs")
+      .update({ ...patch, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .eq("lock_token", token)
+      .select("id");
+    fail("seed_runs update", error);
+    return (data ?? []).length === 1;
   }
   async acquireLock(id: string, token: string) {
     const { data, error } = await this.db

@@ -16,5 +16,9 @@ export const SAMPLE_ASSESSMENT = "Sample assessment";
 export const SAMPLE_ASSESSMENT_NOTE =
   "Written from a template for a sample account. The judge did not read this argument.";
 
-// Under the school table, in a week whose rows count a sample argument.
-export const TABLE_SAMPLE_NOTE = "This week's rankings include sample accounts.";
+// Under the school table, in a week whose arguments or school changes count
+// a sample account.
+export const TABLE_SAMPLE_NOTE = "This week's table includes sample accounts.";
+
+// Under Today's school rank, in a week whose ranked arguments include one.
+export const RANK_SAMPLE_NOTE = "This week's ranks include sample accounts.";

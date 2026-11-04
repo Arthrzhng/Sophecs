@@ -183,7 +183,8 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     await adapter.releaseLock(run.id, token);
     throw new StopError(`run ${racing[0].id} took a lock at the same time; stopping`);
   }
-  await adapter.updateRun(run.id, { status: "running", last_error: null });
+  if (!(await adapter.updateRunLocked(run.id, token, { status: "running", last_error: null })))
+    throw new LockLostError(`run ${run.id}'s lock was taken before the run began`);
 
   const owners = ownerIds(ds);
   const written: Record<string, number> = {};
@@ -225,6 +226,9 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
             assertOwned(phase.table!, r, b.row, owners);
           }
         }
+        // Still ours before anything is marked: a process that lost the lock
+        // mid-batch stops here rather than record work as its own.
+        await heartbeat(adapter, run.id, token);
         await retry(() => adapter.setState(run!.id, phase.kind, batch.map((b) => b.logicalId), "created"), attempts, baseMs, log, `${phase.kind} mark`);
         written[phase.kind] += batch.length;
         rows += batch.length;
@@ -239,21 +243,25 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
       // own debate ids go on once the debates exist.
       if (phase.kind === "debate") {
         const links = ds.challengeLinks.filter((l) => l.cohort < limit);
-        await heartbeat(adapter, run.id, token);
-        for (const l of links)
+        for (const [n, l] of links.entries()) {
+          if (n % 25 === 0) await heartbeat(adapter, run.id, token);
           await retry(() => adapter.linkChallenge(l.rowId, l.row.challenger_debate_id, l.row.challengee_debate_id), attempts, baseMs, log, "challenge link");
+        }
         log(`challenge links: ${links.length} set`);
       }
     }
     const complete = !cancelled && limit === Infinity;
-    await adapter.updateRun(run.id, {
+    const recorded = await adapter.updateRunLocked(run.id, token, {
       status: complete ? "complete" : "running",
       last_error: cancelled ? "cancelled; run the same command again to resume" : null,
       counts: { ...plan.counts, cohortLimit: Number.isFinite(limit) ? limit : null },
     });
+    if (!recorded) throw new LockLostError(`run ${run.id}'s lock was taken before the run could record its end`);
   } catch (err) {
+    // Only while still holding the lock: a process that lost it must not
+    // write over the state of the one that took it.
     if (!(err instanceof LockLostError))
-      await adapter.updateRun(run.id, { status: "failed", last_error: String((err as Error).message).slice(0, 500) });
+      await adapter.updateRunLocked(run.id, token, { status: "failed", last_error: String((err as Error).message).slice(0, 500) }).catch(() => false);
     throw err;
   } finally {
     await adapter.releaseLock(run.id, token);
@@ -283,6 +291,9 @@ async function writeAuthUsers(
   log: (s: string) => void
 ) {
   let next = 0;
+  // The first failure stops every worker from starting another user; the
+  // ones in flight finish, and only then does the error propagate.
+  let stopped = false;
   const one = async (b: Item<Record<string, unknown>>) => {
     const email = String(b.row.email);
     const n = Number(b.logicalId.split(":")[1]);
@@ -311,12 +322,19 @@ async function writeAuthUsers(
     );
   };
   const workers = Array.from({ length: Math.max(1, concurrency) }, async () => {
-    while (next < batch.length) {
+    while (!stopped && next < batch.length) {
       const b = batch[next++];
-      await one(b);
+      try {
+        await one(b);
+      } catch (err) {
+        stopped = true;
+        throw err;
+      }
     }
   });
-  await Promise.all(workers);
+  const settled = await Promise.allSettled(workers);
+  const failure = settled.find((s) => s.status === "rejected");
+  if (failure) throw (failure as PromiseRejectedResult).reason;
 }
 
 export { compareBaselines };

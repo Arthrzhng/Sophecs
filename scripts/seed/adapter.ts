@@ -19,7 +19,10 @@ export type Kind =
   | "class"
   | "class_member";
 
-export type ItemState = "intended" | "created" | "deleted";
+// abandoned: an intent whose id turned out to belong to a row the run did
+// not write (the collision the engine stops on). Never acted on; kept, and
+// reported, so the audit says what happened.
+export type ItemState = "intended" | "created" | "deleted" | "abandoned";
 
 export interface RegistryItem {
   run_id: string;
@@ -106,6 +109,8 @@ export interface Adapter {
   listRuns(): Promise<SeedRun[]>;
   insertRun(run: SeedRun): Promise<void>;
   updateRun(id: string, patch: Partial<SeedRun>): Promise<void>;
+  /** As updateRun, only while `token` holds the run's lock. False when it does not. */
+  updateRunLocked(id: string, token: string, patch: Partial<SeedRun>): Promise<boolean>;
   /** Takes the run's lock if nobody holds it. True when taken. */
   acquireLock(id: string, token: string): Promise<boolean>;
   releaseLock(id: string, token: string): Promise<void>;

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TABLE_SAMPLE_NOTE } from "@/lib/sample";
+import { RANK_SAMPLE_NOTE } from "@/lib/sample";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import { schoolColourVar } from "@/lib/school-registry";
 import { streakLine, STREAK_PAUSED_LINE } from "@/lib/streak-copy";
@@ -164,7 +164,14 @@ export function SchoolCard({
       <p className="mt-1 text-sm text-ink-mid">
         {place ? `${place} on the table this week` : "Not ranked yet this week"}
       </p>
-      {includesSamples && <p className="mt-1 text-sm text-ink-mid">{TABLE_SAMPLE_NOTE}</p>}
+      {includesSamples && (
+        <p className="mt-1 text-sm text-ink-mid">
+          {RANK_SAMPLE_NOTE}{" "}
+          <Link href="/method#samples" className="text-ink underline underline-offset-4">
+            What a sample account is
+          </Link>
+        </p>
+      )}
       <p className="mt-3">
         <Link
           href="/table"

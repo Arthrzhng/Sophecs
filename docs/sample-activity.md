@@ -19,8 +19,8 @@ messaging, so a sample account is seen in fewer places than the word
 
 | Surface | Who can see it | What a sample shows |
 | --- | --- | --- |
-| `/table` (school table) | anyone | Counted like anyone else in the week it falls in. In any week with a sample argument the table says "This week's rankings include sample accounts." and links here. |
-| `/today` school rank | signed-in readers | The same rows as the table. |
+| `/table` (school table) | anyone | Counted like anyone else in the week it falls in. In any week with a sample argument or school change the table says "This week's table includes sample accounts." and links here. |
+| `/today` school rank | signed-in readers | The same rows as the table, and "This week's ranks include sample accounts." with the same link in a week whose ranked arguments include one. |
 | `/debate/<slug>/<id>` (verdict) | anyone with the link | The Sample label; "Sample assessment" in place of "How the judge scored you", "Notes on the argument" in place of "The judge's note", and a line saying the judge did not read it. No share row. |
 | `/r/<id>` (result) | anyone with the link | The Sample label, "A sample account's result", and the stranger's view only (no "Debate them"). |
 | `/c/<id>` (challenge) | anyone with the link | The Sample label, "A sample account's challenge"; "Take the quiz" goes to `/quiz` without accepting the challenge. |
@@ -59,9 +59,10 @@ challenges." `/method#samples` explains the rest.
   `quiz_results.referrer`, as the brief allows; they are marked
   `is_sample`, and any query of referrers or sign-ups from the database
   must filter on it. `scripts/review-verdicts.ts` already does.
-- **Classes.** `joinClass` answers a sample class's code as a wrong code,
-  so no reader can join one, even with a code worked out from the public
-  generator.
+- **Classes.** No reader can join a sample class, even with an id or code
+  worked out from the public generator: `joinClass` answers its code as a
+  wrong code, and a trigger in 0021 refuses the same insert made directly
+  through the Data API (`scripts/test-0021-sample-activity.sh`).
 - **Email and sign-in.** Sample users are created through the Auth admin
   API with `email_confirm: true` (no confirmation mail), no password, a
   ban of 876,000 hours, and addresses on `sophecs.test`, a domain reserved
@@ -78,7 +79,8 @@ challenges." `/method#samples` explains the rest.
   `debates.verdict_is_template`. Existing rows read false without being
   rewritten.
 - A trigger lets only the server role set or clear the marker, so a reader
-  editing their own profile cannot mark or unmark anything.
+  editing their own profile cannot mark or unmark anything. Another refuses
+  a reader joining a class a sample account owns.
 - `seed_runs` (one row per run: plan hash, generator version, seed,
   window, status, lock) and `seed_run_items` (one row per row a run
   intends to write, recorded before the write). A unique index on
@@ -87,7 +89,8 @@ challenges." `/method#samples` explains the rest.
 - `debates_public` and `public_results` gain the marker, appended, with
   their owner and grants unchanged.
 - An index on `debates(created_at)` for the week reads.
-- The rollback refuses while any sample row remains.
+- The rollback refuses while any sample row remains, any run is not torn
+  down, or any registry item is still intended or created.
 
 `scripts/test-0021-sample-activity.sh` proves all of it on a throwaway
 local database, including the rollback and re-apply.
@@ -203,13 +206,21 @@ not the run's stops the run rather than be adopted); mark the intents
 created. An auth user with an intent from an earlier attempt is looked up
 before it is created. A lost response, a crash or Ctrl-C leaves a state
 the same command resumes without writing anything twice. One run at a
-time: a run takes a lock, and a lock left by a dead process can be
-cleared with `--break-stale-lock` after 15 minutes.
+time: a run takes a lock, refreshes it before every batch and before
+marking anything, writes the run's own row only while holding it, and
+stops without writing more the moment it finds the lock taken. A lock
+left by a dead process can be cleared with `--break-stale-lock` once it has
+gone 15 minutes without a refresh; every request has a 30-second timeout,
+so a live run never goes that long. The 15 minutes are measured on the
+clocks of the machines involved, so run every command from one machine.
 
 ## Teardown
 
 Preview by default. It deletes the run's registry items, scoped again by
-the marker or the run's own users, in dependency order. First it looks for
+the marker or the run's own users, in dependency order. An intent whose row
+was never written (a crash between recording it and writing) is marked
+deleted; an intent whose id turned out to be a row the run did not write is
+never touched and is marked abandoned, and the preview lists it. First it looks for
 genuine rows that point at the run's rows: a nullable reference (a
 reader's `challenge_from`, a debate's `challenge_id`) is cleared so the
 genuine row stays; anything that would be deleted with the sample row (a
@@ -230,13 +241,17 @@ registry and removable by id, and the genuine data the run could affect is
 small enough to keep a copy of. The dry run writes every genuine row of
 the affected tables to `scripts/seed/reports/genuine-export-<run>.json` on
 the operator's machine (git-ignored, never printed), and records a
-baseline. Validation then checks, in a way that still holds while readers
-keep using the site: no genuine row removed; every genuine profile that
-changed has that reader's own new argument or quiz result to explain it;
-each topic's stored par equals the par computed from genuine originals
-alone; `elo_percentile(1200)` equals the share computed from genuine
-profiles alone. The dry run runs the same checks first, so a failure
-afterwards is the run's.
+baseline. Validation fails only on checks that hold whatever readers do
+during the run: each topic's stored par must equal the par computed from
+genuine originals alone (or be unchanged where there are none), and
+`elo_percentile(1200)` must equal the share computed from genuine profiles
+alone. The dry run runs the same checks first, so a failure afterwards is
+the run's (or, for the par, two judgings finishing together; validate
+again before stopping). Genuine row counts and changed genuine profiles
+are reported as information, since sign-ups, deletions, challenges and late
+verdicts move them. That the run writes no genuine row is proven where it
+writes: every row is read back and must be marked or owned by the run, and
+every update is scoped to the marker.
 
 ## Rollout
 
@@ -307,9 +322,10 @@ asks, with where each lives:
    reasons.
 3. **The reading answers.** `scripts/seed/reading-responses.json`.
 4. **The visible wording.** "Sample", the explanation (the brief's own
-   words), "Sample assessment", "This week's rankings include sample
-   accounts.", the `/method#samples` section (`src/app/method/page.tsx`),
-   "A sample account's result" and "A sample account's challenge".
+   words), "Sample assessment", "This week's table includes sample
+   accounts." on `/table`, "This week's ranks include sample accounts." on
+   Today, the `/method#samples` section (`src/app/method/page.tsx`), "A
+   sample account's result" and "A sample account's challenge".
 5. **Counting samples on the table and in Today's rank at all.** In the
    week of the run a few hundred sample arguments decide the order; after
    that week, only genuine arguments count.
@@ -318,6 +334,14 @@ asks, with where each lives:
    honest.
 7. **The class names** (`scripts/seed/names.ts`): generic, naming no real
    school or teacher.
+8. **Synthetic referrers in production.** Sample quiz results carry
+   TikTok, Instagram, X, direct and challenge-link referrers, marked
+   `is_sample`; the alternative is to leave `referrer` empty on samples.
+9. **The genuine-row export.** The dry run copies every genuine row of the
+   affected tables (private arguments, quiz answers, `anon_id`, reports,
+   blocks) to the operator's machine as the backup the free plan lacks.
+   That is readers' data leaving the database, kept git-ignored and never
+   printed; the alternative is a backup with fewer columns.
 
 ## Findings from building this
 

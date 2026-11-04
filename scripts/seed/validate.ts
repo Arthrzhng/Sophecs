@@ -4,7 +4,7 @@
 import type { Adapter, Kind, Table } from "./adapter";
 import type { Dataset } from "./generate";
 import { phases } from "./engine";
-import { snapshot, compareBaselines, type Baseline, type BaselineCheck } from "./baseline";
+import { snapshot, compareBaselines, isolationChecks, type Baseline, type BaselineCheck } from "./baseline";
 import { Rng } from "./rng";
 
 export interface ValidationReport {
@@ -105,7 +105,9 @@ export async function validate(
 
   // 6. Genuine data.
   const after = await snapshot(adapter);
-  if (before) checks.push(...compareBaselines(before, after));
+  // With a baseline, the comparison; without one (a standalone --validate),
+  // the par and percentile checks still run, since they need none.
+  checks.push(...(before ? compareBaselines(before, after) : isolationChecks(after)));
 
   return { ok: checks.every((c) => c.ok), checks, after };
 }

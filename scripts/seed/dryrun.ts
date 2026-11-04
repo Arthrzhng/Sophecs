@@ -5,7 +5,7 @@
 
 import type { Adapter } from "./adapter";
 import type { Plan } from "./plan";
-import { snapshot, compareBaselines, type Baseline } from "./baseline";
+import { snapshot, isolationChecks, type Baseline } from "./baseline";
 
 export interface DryRunReport {
   ok: boolean;
@@ -23,7 +23,7 @@ export async function dryRun(adapter: Adapter, plan: Plan): Promise<DryRunReport
   lines.push(`genuine profiles: ${Object.keys(baseline.genuineProfiles).length}; elo_percentile(1200) = ${baseline.percentile1200}`);
   // The checks a run is validated against must already hold before it, or
   // a failure afterwards could not be told from one the run caused.
-  for (const c of compareBaselines(baseline, baseline)) {
+  for (const c of isolationChecks(baseline)) {
     if (!c.ok) ok = false;
     lines.push(`  ${c.ok ? "ok  " : "FAIL"} ${c.name}: ${c.detail}`);
   }
