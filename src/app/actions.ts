@@ -56,6 +56,20 @@ export async function submitQuizResult(
     data: { user },
   } = await supabase.auth.getUser();
 
+  // A challenge link (/quiz?c=<id>) names a challenge, but challenge_from
+  // references quiz_results(id), and /r/[id] reads it as the challenger's
+  // result. So the challenger's result id is what is stored. Until
+  // 2026-11-04 the challenge's own id was written here, which failed the
+  // foreign key and lost the reader's whole result. An unknown challenge
+  // id is treated as no challenge.
+  const { data: challenge } = input.challengeId
+    ? await admin
+        .from("challenges")
+        .select("challenger_result_id")
+        .eq("id", input.challengeId)
+        .maybeSingle()
+    : { data: null };
+
   const { error } = await admin.from("quiz_results").insert({
     id,
     anon_id: anonId,
@@ -64,7 +78,7 @@ export async function submitQuizResult(
     secondary: input.secondary,
     vector: input.vector,
     answers: input.answers,
-    challenge_from: input.challengeId ?? null,
+    challenge_from: (challenge?.challenger_result_id as string | undefined) ?? null,
     referrer: input.referrer ?? null,
   });
 
@@ -82,26 +96,25 @@ export async function submitQuizResult(
 
   let challengerSchool: SchoolId | undefined;
 
-  if (input.challengeId) {
-    const { data: challenge } = await admin
-      .from("challenges")
-      .select("challenger_result_id")
-      .eq("id", input.challengeId)
+  if (input.challengeId && challenge) {
+    const { data: challengerResult } = await admin
+      .from("quiz_results")
+      .select("school")
+      .eq("id", challenge.challenger_result_id)
       .single();
+    challengerSchool = challengerResult?.school as SchoolId | undefined;
 
-    if (challenge) {
-      const { data: challengerResult } = await admin
-        .from("quiz_results")
-        .select("school")
-        .eq("id", challenge.challenger_result_id)
-        .single();
-      challengerSchool = challengerResult?.school as SchoolId | undefined;
-
-      await admin
-        .from("challenges")
-        .update({ challengee_result_id: id, status: "accepted" })
-        .eq("id", input.challengeId);
-    }
+    // Accepted once, by the first reader to finish: the challenge has one
+    // challengee. Without the conditions, a link shared widely would let
+    // each later reader replace the first, and reopen a finished
+    // challenge. Nobody could accept one before the fix above, so this
+    // changes no behaviour production has seen.
+    await admin
+      .from("challenges")
+      .update({ challengee_result_id: id, status: "accepted" })
+      .eq("id", input.challengeId)
+      .eq("status", "open")
+      .is("challengee_result_id", null);
   }
 
   return { ok: true, id, challengerSchool, schoolChanged };

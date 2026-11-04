@@ -190,3 +190,13 @@ entry names.
   (read from Vercel). Fetched through Vercel at 00:43 UTC on 2026-11-04:
   `/styleguide/phase3/card/confucian` answered 404, as it should in
   production, and `/robots.txt` 200.
+
+## 2026-11-04: a challenge can be accepted
+
+- `submitQuizResult` wrote a challenge's id into `challenge_from`, which
+  references `quiz_results(id)`, so taking the quiz from a challenge link
+  lost the result. It now stores the challenger's result id, and accepts
+  an open challenge once. `docs/decisions.md`, "A challenge link stores
+  the challenger's result (2026-11-04)". `tests/challenge-accept.test.ts`.
+  `src/app/actions.ts` is frozen; Arthur's ruling of 2026-11-04 asked for
+  this fix.
