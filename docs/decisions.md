@@ -2510,6 +2510,71 @@ account is refused, as `/api/judge` would not record their debate either.
 **Snapshot, read-back and advisor:** recorded in `docs/progress.md` when
 0021 is applied.
 
+### Clients keep only the writes the site makes (migration 0022)
+
+Reported to Arthur under STOP NOW on 2026-11-03 and kept out of the repo
+until closed; his "yes, the grants fix" came on 2026-11-04, "under the
+same process (local test, snapshot, apply, read-back, advisor
+before/after)". 0021 took the challenges update policy on its own first.
+
+**The holes.** Supabase's default privileges give `anon` and
+`authenticated` every privilege on every table made in `public`, so row
+level security is all that stands between the public key and a write.
+Four early policies allowed writes the site never makes with a client
+key:
+
+- `debates`, "debates insert own": a signed-in user could insert rows
+  under their own id with any verdict, score and rating, which
+  `debates_public` then shows on a public verdict page.
+- `profiles`, "own update" and "own insert": no column limit, so a user
+  could set their own rating, streak and school, or create a profile with
+  them before the site made one.
+- `challenges` and `quiz_results`, "anon insert own", `with check (true)`:
+  anyone holding the public key could insert any row, a challenge naming
+  someone else's result included.
+- `class_members`, "member join self": a signed-in user who knew a class's
+  id could join it without the code and past the joining limit.
+
+Every one of these writes goes through the server role in the site:
+`src/app/actions.ts`, `src/app/debate/actions.ts`, `src/app/me/actions.ts`,
+`src/lib/claim.ts` and `src/lib/challenge.ts`.
+
+**The fix.** `0022_client_write_grants.sql` revokes INSERT, UPDATE,
+DELETE, TRUNCATE, REFERENCES and TRIGGER on the five tables from `anon`
+and `authenticated`, and gives back only what the site uses with a client
+key: UPDATE of `profiles.display_name` and
+`profiles.argument_default_public` (`setDisplayName`,
+`setArgumentDefaultPublic`) and DELETE on `class_members` (`leaveClass`),
+both to `authenticated` only. SELECT is unchanged. On Postgres 17 it also
+revokes MAINTAIN from these tables and from the four public views, which
+0016 missed ("Phase 3 item: move `motion_text` into `debates_public`").
+`reading_responses`, which the site writes signed in, is not touched.
+The policies stay, unreachable without the grant; dropping them is a
+second change to review, and the grant alone is what decides.
+
+Three other tables have client write policies the site also does not use:
+`blocks` ("blocks own"), `reports` ("reports insert own") and `classes`
+("class insert own"). Each lets a signed-in user do to their own rows
+what the site already lets them do, without its validation (a class past
+the limit, a block, a report). They were not in the approved fix and are
+left as they are.
+
+**Tests.** `scripts/test-0022-client-write-grants.sh` sets Supabase's
+default privileges on local Postgres 16, applies every migration before
+0022, and checks that each of the six writes goes through before it and
+is refused after; that the four client writes the site makes and its
+reads still work, as anon, signed in and as the server role; each object's
+exact ACL after it; and that the rollback restores every ACL as it was,
+and 0022 applies again. Five deliberate breaks of the migration and the
+rollback were each caught. Postgres 16 has no MAINTAIN, so that half is
+checked against production's read-back instead.
+`tests/client-writes.test.ts` lists every write in `src/` not made with
+the admin client and holds it to the four keeps, so a new signed-in write
+fails a unit test rather than production.
+
+**Snapshot, read-back and advisor:** recorded in `docs/progress.md` when
+0022 is applied.
+
 ### For Checkpoint A, from the security work
 
 - **Leaked-password protection** is off, and the advisor warns about it.

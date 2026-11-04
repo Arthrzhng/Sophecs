@@ -243,3 +243,11 @@ entry names.
   `argument: null` and `textWithheld: true`: no field that can quote the
   argument reaches a stranger, as 0018 and 0020's keep-list intend.
 
+## 2026-11-04: clients keep only the writes the site makes (migration 0022)
+
+- Arthur's "yes, the grants fix" of 2026-11-04, under the views process.
+  `docs/decisions.md`, "Clients keep only the writes the site makes
+  (migration 0022)".
+- Tested on local Postgres: `scripts/test-0022-client-write-grants.sh`,
+  all checks passed, and five deliberate breaks each caught;
+  `scripts/test-migrations.sh`; `tests/client-writes.test.ts`.
