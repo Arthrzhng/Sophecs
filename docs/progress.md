@@ -210,3 +210,14 @@ entry names.
   the challenger's result (2026-11-04)". `tests/challenge-accept.test.ts`.
   `src/app/actions.ts` is frozen; Arthur's ruling of 2026-11-04 asked for
   this fix.
+- #59 merged as `759b0bd`, after one review pass. Production deploy
+  `dpl_4q3FDcdbaPcTvCpirGPPEek6igvr`, Ready (read from Vercel).
+
+## 2026-11-04: only a result's owner can challenge from it
+
+- `createChallenge` checks the caller owns the result (cookie or saved
+  account), and `/r/[id]` offers "Challenge a friend" to the owner only,
+  "Take the quiz" to anyone else. `docs/decisions.md`, "Only a result's
+  owner can challenge from it (2026-11-04)". `tests/create-challenge.test.ts`.
+  `src/app/actions.ts` is frozen; Arthur's ruling of 2026-11-04 asked for
+  this fix.

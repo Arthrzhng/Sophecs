@@ -2438,6 +2438,32 @@ this fix, so these conditions change nothing production has seen.
 `tests/challenge-accept.test.ts`, whose fake enforces the foreign key;
 four of its six cases fail on the old code.
 
+### Only a result's owner can challenge from it (2026-11-04)
+
+Found while building sample activity (#57), and fixed on Arthur's ruling
+of 2026-11-04. `createChallenge` inserted a challenge for whatever result
+id it was given, with the server role, so anyone could open a challenge
+in another reader's name: the result's owner then showed as the
+challenger to whoever opened the link. `/r/[id]` also offered the
+"Challenge a friend" button to a visitor looking at someone else's result
+that came from a challenge, which did exactly that.
+
+The action now checks ownership the way `/r/[id]` already tells an owner
+apart: the `anon_id` cookie the quiz was taken under, or the signed-in
+account the result is saved to. Anyone else gets "Unknown result.", the
+answer an unknown id gets. `/r/[id]` offers "Challenge a friend" only to
+the owner (by cookie or by saved account, the latter newly treated as an
+owner rather than as a first-time visitor); a visitor who is not the
+owner gets "Debate them" where the page shows it, and "Take the quiz"
+otherwise. `tests/create-challenge.test.ts`; two of its four cases fail
+on the old code.
+
+**What this does not close.** The action was one path to this. Another
+goes through the database's own permissions and is part of the wider
+write-permission fix reported to Arthur on 2026-11-03, which waits on his
+"yes, the grants fix"; its details stay out of this public file until it
+is closed.
+
 ### For Checkpoint A, from the security work
 
 - **Leaked-password protection** is off, and the advisor warns about it.
