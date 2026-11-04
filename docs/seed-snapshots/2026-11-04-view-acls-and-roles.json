@@ -1,0 +1,25 @@
+{
+  "taken_at": "2026-11-04, after 00:09 and before 00:12 UTC (the view ACLs were also read, with the same result, earlier, before midnight UTC on 2026-11-03)",
+  "why": "Read-only, for PR #54 (migration 0020) after review: the ACL of each public view from pg_class.relacl, which shows Postgres 17's MAINTAIN privilege where information_schema does not; whether anon and authenticated can log in; the default privileges a newly created table or view in public receives; and whether any public function runs dynamic SQL.",
+  "postgres": "PostgreSQL 17.6",
+  "query": "select json_agg(...) from pg_roles where rolname in ('anon','authenticated','service_role','authenticator'); pg_default_acl joined to pg_namespace for public, objtype 'r'; pg_class.relacl for every view in public; count of public functions whose source contains 'execute '",
+  "roles": [
+    { "role": "anon", "can_login": false, "inherit": true, "bypassrls": false },
+    { "role": "authenticated", "can_login": false, "inherit": true, "bypassrls": false },
+    { "role": "authenticator", "can_login": true, "inherit": false, "bypassrls": false },
+    { "role": "service_role", "can_login": false, "inherit": true, "bypassrls": true }
+  ],
+  "default_acl_tables_public": [
+    { "owner": "postgres", "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}" },
+    { "owner": "supabase_admin", "acl": "{postgres=arwdDxtm/supabase_admin,anon=arwdDxtm/supabase_admin,authenticated=arwdDxtm/supabase_admin,service_role=arwdDxtm/supabase_admin}" }
+  ],
+  "public_views": [
+    { "view": "debates_public", "owner": "postgres", "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}" },
+    { "view": "exchanges_public", "owner": "postgres", "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}" },
+    { "view": "profiles_public", "owner": "postgres", "acl": "{postgres=arwdDxtm/postgres,anon=m/postgres,authenticated=m/postgres,service_role=arwdDxtm/postgres}" },
+    { "view": "public_results", "owner": "postgres", "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}" }
+  ],
+  "debates_public_reloptions": null,
+  "debates_public_column_acls": 0,
+  "public_functions_with_execute": 0
+}

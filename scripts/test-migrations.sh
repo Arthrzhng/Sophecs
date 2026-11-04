@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Applies every migration to a throwaway local database, rolls the last two
-# back, applies them again, and times each statement while holding its
-# lock.
+# Applies every migration to a throwaway local database, rolls back 0020,
+# 0015 and 0014 (0020 first, because its view reads the column 0015 adds),
+# applies them again, and times each statement while holding its lock.
 #
 # There is no Docker and no Supabase CLI in this environment, so this drives
 # the PostgreSQL 16 server binaries directly. docs/phase2-recon.md section 5
@@ -58,8 +58,11 @@ psql -At -d "$DB" -c "
   from information_schema.columns
   where table_schema='public' and table_name='debates' and column_name='motion_text'"
 
-say "rollback: 0015 then 0014"
-for f in "$REPO/supabase/rollback/0015_debates_motion_text.down.sql" \
+# 0020 puts debates.motion_text into debates_public, and Postgres will not
+# drop a column a view reads, so 0015's rollback needs 0020's first.
+say "rollback: 0020, then 0015, then 0014"
+for f in "$REPO/supabase/rollback/0020_debates_public_motion_text.down.sql" \
+         "$REPO/supabase/rollback/0015_debates_motion_text.down.sql" \
          "$REPO/supabase/rollback/0014_more_schools.down.sql"; do
   start=$(date +%s%N)
   psql_q -f "$f"
@@ -82,7 +85,8 @@ psql -At -d "$DB" -c "
 
 say "forward again, to prove the rollback left a re-appliable database"
 for f in "$REPO/supabase/migrations/0014_more_schools.sql" \
-         "$REPO/supabase/migrations/0015_debates_motion_text.sql"; do
+         "$REPO/supabase/migrations/0015_debates_motion_text.sql" \
+         "$REPO/supabase/migrations/0020_debates_public_motion_text.sql"; do
   start=$(date +%s%N)
   psql_q -f "$f"
   printf '  %-40s %6.1f ms\n' "$(basename "$f")" "$(( $(date +%s%N) - start ))e-6"

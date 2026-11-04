@@ -11,8 +11,8 @@ merge commit and deploy state of the one before.
 
 Eval key spend is kept as a running total against Arthur's cumulative
 cap: $4.80 in the brief of 2026-11-03, raised to $8.00 by his ruling of
-the same evening (recorded in `docs/decisions.md` on branch
-`claude/beautiful-edison-aofswd`, #51, until that merges). The total is the sum of `total_cost_usd` over every
+the same evening (recorded in `docs/decisions.md`, "Arthur's rulings of
+2026-11-03 on the Stage 1 miss"). The total is the sum of `total_cost_usd` over every
 golden run file, including any on a branch not yet merged, which each
 entry names.
 
@@ -28,10 +28,8 @@ entry names.
   Production deploy `dpl_6y5YM3N2BaLrTk9hRd9bJz981j7b`, Ready (same
   check).
 - The v3 run on `fe5fd3d`, 75 calls, $1.0806, and the run after the
-  engagement fix, 78 calls, $1.1559, are on branch
-  `claude/beautiful-edison-aofswd` (#51). Eval key total after them:
-  $4.6563 (the sum of the six files' unrounded totals), of which $2.4199
-  is in the run files on `main`.
+  engagement fix, 78 calls, $1.1559, were added by #51. Eval key total
+  after them: $4.6563 (the sum of the six run files' unrounded totals).
 
 ## 2026-11-03: security, the public views
 
@@ -84,6 +82,49 @@ entry names.
   390 and 1280 in `docs/phase3-styleguide/judging-failed/`; every text in
   them measures at least 6.95:1 against its background (WCAG AA asks
   4.5:1), read from computed styles with Playwright.
+- #52 merged as `27a7275`. Production deploy
+  `dpl_1kDgNbhGtLkK8NnaEp29j2A7rjBh`, Ready and aliased to sophecs.com
+  (read from Vercel); `/debate` answered 200 through Vercel at 23:42 UTC.
+
+## 2026-11-03: Stage 1, the v3 runs and the objection voices
+
+- #51: the two v3 runs above (their run files), the Stage 1 result (the
+  pass test is not met: `confucian-hierarchy-school` out of band, the
+  power objection never returned, and in run 2 a verdict_line failure,
+  one sample's retry also running over the cap and leaving it no
+  result), and Arthur's rulings on it. Under v3
+  only, each school's criteria now name the rival that normally voices its
+  best-known objection (`src/lib/judge/objection-voices.ts`), Confucianism's
+  two in Arthur's words and the other five drafted for him to confirm at
+  Checkpoint A. Production's judge is v2 and does not change: the v2
+  request fixtures are unchanged, which the test suite checks. Checks: the
+  five gates, the judge request fixtures, `check:bundle`, a dry run of the
+  golden set under v3 (no calls, no spend). Eval key total unchanged at
+  $4.6563.
+
+## 2026-11-03: Stage 2, `motion_text` into `debates_public`
+
+- Migration 0020 adds `motion_text` to `debates_public` as its last
+  column, on 0018's definition unchanged; the verdict page and its OG
+  image then read it from the view and stop reading `debates` for it. In
+  that order: 0020 is applied in production and read back before this
+  merges, because the code asks the view for the column. Checks before
+  the pull request: the five gates, `check:bundle`,
+  `scripts/test-0020-motion-text-view.sh` (142 checks, run on every
+  migration through 0019), `scripts/test-migrations.sh`, and deliberate
+  breaks of the migration and its rollback, each caught
+  (`docs/decisions.md`, "Phase 3 item: move `motion_text` into
+  `debates_public`").
+
+## 2026-11-03: Stage 3, the quiz v2 design
+
+- `docs/quiz-v2.md`, `docs/quiz-v2.json` and
+  `scripts/simulate-quiz-v2.mjs`: a draft of the two-axis, six-school quiz
+  for Arthur to decide at Checkpoint A. Nothing is built and nothing in
+  the product changes. The simulation scores every answer pattern from
+  the JSON and exits non-zero if a school is unreachable, lands outside
+  8% to 30%, or a school's own persona misses it; it exits 0 on the
+  draft.
 
 ## 2026-11-03: Stage 4, the Phase 3.0 items on `/styleguide/phase3`
 

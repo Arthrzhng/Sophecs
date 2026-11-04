@@ -40,6 +40,8 @@ const REGISTRY_FILES: Record<string, string> = {
     "Holds the Tailwind class names, which have to appear as literals or v4's scanner never generates the utilities.",
   "src/lib/judge/rubric.ts":
     "The fidelity criteria, which are judge content and Arthur's to write. Partial, and reading a school that has none throws.",
+  "src/lib/judge/objection-voices.ts":
+    "Which rival voices each school's best-known objection: judge content, Arthur's to confirm (ruling of 2026-11-03). Total over SchoolId, so a new school does not typecheck until it has a voice, and only rivals the prompt lists are ever named.",
   "src/lib/arena-fixtures.ts":
     "Fixture data for /styleguide/arena, which is preview-only. Demo rows naming schools, not a list the product reads.",
   "src/app/styleguide/arena/page.tsx":

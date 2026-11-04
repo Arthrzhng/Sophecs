@@ -34,22 +34,22 @@ export default async function VerdictPage({
   const { data: publicRow } = await admin
     .from("debates_public")
     .select(
-      "id, topic_slug, school, score, verdict, elo_before, elo_after, argument, kind, parent_debate_id, created_at"
+      "id, topic_slug, school, score, verdict, elo_before, elo_after, argument, kind, parent_debate_id, created_at, motion_text"
     )
     .eq("id", debateId)
     .maybeSingle();
   if (!publicRow || publicRow.topic_slug !== slug) notFound();
 
-  // `motion_text` comes from `debates` rather than from `debates_public`,
-  // which exposes a fixed column list and does not carry it. Adding it to
-  // the view would have meant a migration before this code could deploy,
-  // and the column is public content the admin client already reads from
-  // this table further down the page. Parallel with the topic read, so it
-  // costs no extra round trip.
-  const [{ data: topic }, { data: storedMotion }] = await Promise.all([
-    admin.from("debate_topics").select("motion, micro_after").eq("slug", slug).maybeSingle(),
-    admin.from("debates").select("motion_text").eq("id", debateId).maybeSingle(),
-  ]);
+  // `motion_text`, the motion as it was worded when the argument was
+  // written, comes from `debates_public` with everything else public on
+  // this page (migration 0020). It used to need a second admin read of
+  // `debates`; see docs/decisions.md, "Phase 3 item: move `motion_text`
+  // into `debates_public`".
+  const { data: topic } = await admin
+    .from("debate_topics")
+    .select("motion, micro_after")
+    .eq("slug", slug)
+    .maybeSingle();
   if (!topic) notFound();
 
   const supabase = await createSupabaseServerClient();
@@ -182,7 +182,7 @@ export default async function VerdictPage({
   // The wording this argument was actually argued against, not the wording
   // the motion carries now. The two differ for any debate submitted before
   // a reword, and this page is the one that used to say the wrong thing.
-  const motion = motionForDebate(storedMotion?.motion_text as string | null, topic.motion);
+  const motion = motionForDebate(publicRow.motion_text as string | null, topic.motion);
   const shortMotion = shortMotionForShare(motion);
   const shareTemplate = shareTemplateFor(schoolContent.verdict_share_line, textWithheld);
   const baseShareLine = shareTemplate

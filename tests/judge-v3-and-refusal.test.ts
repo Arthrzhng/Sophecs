@@ -8,7 +8,9 @@ import {
   fidelityCriteriaFor,
   hasFidelityCriteria,
   judgeableSchools,
+  rivalsOf,
 } from "../src/lib/judge/rubric";
+import { objectionVoiceFor } from "../src/lib/judge/objection-voices";
 import { PROMPT_VERSION } from "../src/lib/judge/schema";
 
 const PROMPTS = path.join(process.cwd(), "content", "prompts");
@@ -223,6 +225,29 @@ describe("judge.v3.md", () => {
     expect(flat(v2)).not.toContain("should normally be the one you return here");
   });
 
+  it("holds engagement to 4 when the school's known objection is left unmet, under v3 only", () => {
+    // The 18:15 run of 2026-11-03: with the paragraph above in place, neither
+    // hierarchy case raised the power objection, and their engagement came
+    // back 5 and 7 against a band of 0-4. A judge blind spot, so under the
+    // brief the fix is in v3 and the same for all six schools: it sits in the
+    // engagement criterion, which every school's request carries.
+    // Pinned whole and inside the engagement criterion, before the rubric:
+    // a phrase check would pass with the cap removed or the condition
+    // inverted, and the same words anywhere else would not be read as part
+    // of how engagement is scored.
+    const rule =
+      "Check first the objection the school's criteria below name as the one " +
+      "it is best known for having to answer. An argument that leaves that " +
+      "objection unmet scores no more than 4 on engagement, however well it " +
+      "answers any other.";
+    const flat = (s: string) => s.replace(/\s+/g, " ");
+    const criterion = flat(v3body.slice(v3body.indexOf("3. **Engagement**"), v3body.indexOf("{{RUBRIC}}")));
+    expect(criterion).toContain(rule);
+    expect(flat(v3body).split(rule)).toHaveLength(2);
+    expect(flat(v2)).not.toContain("scores no more than 4 on engagement");
+    expect(flat(v2)).not.toContain("best known for having to answer");
+  });
+
   it("says in the file why it exists and that it is a draft", () => {
     const header = v3.slice(0, v3.indexOf("-->"));
     expect(header).toContain("not the production default");
@@ -268,11 +293,17 @@ describe("the draft fidelity criteria", () => {
   })();
 
   // The same, for what v3 sends a live school: its criteria plus the
-  // vocabulary paragraph Arthur ruled on 2026-10-26. The draft schools are
-  // only ever judged under v3, so this is the band they are measured
-  // against.
+  // vocabulary paragraph Arthur ruled on 2026-10-26 and the objection
+  // paragraph of 2026-11-03. The draft schools are only ever judged under
+  // v3, so this is the band they are measured against. It stops before the
+  // voice paragraph (src/lib/judge/objection-voices.ts), because the draft
+  // file does not carry one: the golden runner adds it to both kinds of
+  // school alike, and the next test but one holds that.
   const LIVE_V3_BAND = (() => {
-    const texts = PUBLISHED_SCHOOL_IDS.map((id) => fidelityCriteriaFor(id, "v3"));
+    const texts = PUBLISHED_SCHOOL_IDS.map((id) => {
+      const v3 = fidelityCriteriaFor(id, "v3");
+      return v3.slice(0, v3.lastIndexOf("\n\n"));
+    });
     const lengths = texts.map((t) => t.length);
     const words = texts.map((t) => t.split(/\s+/).length);
     return {
@@ -294,7 +325,7 @@ describe("the draft fidelity criteria", () => {
     expect(LIVE_V3_BAND.words).toEqual([232, 282]);
   });
 
-  it("gives v3 every live school's criteria unchanged, then the vocabulary and objection paragraphs", () => {
+  it("gives v3 every live school's criteria unchanged, then the vocabulary, objection and voice paragraphs", () => {
     for (const id of PUBLISHED_SCHOOL_IDS) {
       expect(fidelityCriteriaFor(id, "v2"), id).toBe(FIDELITY_CRITERIA[id]);
       expect(fidelityCriteriaFor(id, "v1"), id).toBe(FIDELITY_CRITERIA[id]);
@@ -306,8 +337,11 @@ describe("the draft fidelity criteria", () => {
       const v3 = fidelityCriteriaFor(id, "v3");
       expect(v3.startsWith(`${FIDELITY_CRITERIA[id]}\n\n`), id).toBe(true);
       const added = v3.slice(FIDELITY_CRITERIA[id].length + 2).split("\n\n");
-      expect(added.length, id).toBe(2);
-      const [rule, objection] = added;
+      expect(added.length, id).toBe(3);
+      const [rule, objection, voice] = added;
+      // Which rival voices the objection, naming only rivals the prompt
+      // lists (Arthur's ruling of 2026-11-03).
+      expect(voice, id).toBe(objectionVoiceFor(id, rivalsOf(id)));
       expect(rule).toMatch(/^Credit the concept, not the vocabulary\./);
       expect(rule.replace(/\s+/g, " ")).toContain(
         "Never mark fidelity down for missing vocabulary alone."
