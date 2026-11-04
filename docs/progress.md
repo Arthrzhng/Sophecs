@@ -138,6 +138,10 @@ entry names.
   lesson filter chips, and a nav icon for the school table. Screenshots of
   every section at 390 and 1280 in `docs/phase3-styleguide/`, taken from
   a local production build. Contrast: 203 text elements on the page
-  measured from computed styles with Playwright, none below WCAG AA, the
-  lowest 5.03:1 (text inside SVG and on image backgrounds not measured).
+  measured from computed styles with Playwright, each text colour blended
+  by its own alpha and every ancestor's opacity, none below WCAG AA, the
+  lowest 4.54:1; 16 inside SVG or on an image background not measured.
+  (A first measurement ignored opacity and reported 5.03:1; review found
+  the draft cards' attribution at 3.86:1, which led to the derived card
+  surfaces.)
   The colour choice, and everything shown, is Arthur's at Checkpoint A.
