@@ -56,6 +56,34 @@ export async function submitQuizResult(
     data: { user },
   } = await supabase.auth.getUser();
 
+  // A challenge link (/quiz?c=<id>) names a challenge, but challenge_from
+  // references quiz_results(id), and /r/[id] reads it as the challenger's
+  // result. So the challenger's result id is what is stored. Until
+  // 2026-11-04 the challenge's own id was written here, which failed the
+  // foreign key and lost the reader's whole result. An unknown challenge
+  // id is treated as no challenge, and so is a challenger opening their own
+  // link (same browser or same account): they are not their own
+  // challengee, and taking the slot would lock out the friend they sent it
+  // to.
+  let challenge: { challengerResultId: string; challengerSchool: SchoolId } | null = null;
+  if (input.challengeId) {
+    const { data: c } = await admin
+      .from("challenges")
+      .select("challenger_result_id")
+      .eq("id", input.challengeId)
+      .maybeSingle();
+    if (c) {
+      const { data: challenger } = await admin
+        .from("quiz_results")
+        .select("school, anon_id, user_id")
+        .eq("id", c.challenger_result_id)
+        .maybeSingle();
+      const own = Boolean(challenger && (challenger.anon_id === anonId || (user && challenger.user_id === user.id)));
+      if (challenger && !own)
+        challenge = { challengerResultId: c.challenger_result_id as string, challengerSchool: challenger.school as SchoolId };
+    }
+  }
+
   const { error } = await admin.from("quiz_results").insert({
     id,
     anon_id: anonId,
@@ -64,7 +92,7 @@ export async function submitQuizResult(
     secondary: input.secondary,
     vector: input.vector,
     answers: input.answers,
-    challenge_from: input.challengeId ?? null,
+    challenge_from: challenge?.challengerResultId ?? null,
     referrer: input.referrer ?? null,
   });
 
@@ -82,26 +110,21 @@ export async function submitQuizResult(
 
   let challengerSchool: SchoolId | undefined;
 
-  if (input.challengeId) {
-    const { data: challenge } = await admin
+  if (input.challengeId && challenge) {
+    // Accepted once, by the first reader to finish: the challenge has one
+    // challengee. Without the conditions, a link shared widely would let
+    // each later reader replace the first, and reopen a finished
+    // challenge. Nobody could accept one before the fix above, so this
+    // changes no behaviour production has seen. Only the reader whose
+    // update took the slot reports an acceptance (challenge_accepted).
+    const { data: accepted } = await admin
       .from("challenges")
-      .select("challenger_result_id")
+      .update({ challengee_result_id: id, status: "accepted" })
       .eq("id", input.challengeId)
-      .single();
-
-    if (challenge) {
-      const { data: challengerResult } = await admin
-        .from("quiz_results")
-        .select("school")
-        .eq("id", challenge.challenger_result_id)
-        .single();
-      challengerSchool = challengerResult?.school as SchoolId | undefined;
-
-      await admin
-        .from("challenges")
-        .update({ challengee_result_id: id, status: "accepted" })
-        .eq("id", input.challengeId);
-    }
+      .eq("status", "open")
+      .is("challengee_result_id", null)
+      .select("id");
+    if (accepted?.length) challengerSchool = challenge.challengerSchool;
   }
 
   return { ok: true, id, challengerSchool, schoolChanged };
