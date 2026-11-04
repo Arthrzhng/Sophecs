@@ -10,7 +10,6 @@ import { productionTarget, describeTarget, GuardError } from "./seed/env";
 import { SupabaseAdapter } from "./seed/adapter-supabase";
 import { readPlan } from "./seed/plan";
 import { preview, teardown } from "./seed/teardown";
-import { compareBaselines } from "./seed/baseline";
 import { log, main, parseFlags, str, writeReport } from "./seed/cli";
 
 main(async () => {
@@ -45,7 +44,7 @@ main(async () => {
     return;
   }
   const r = await teardown(adapter, runId, { log, breakStaleLock: Boolean(f["break-stale-lock"]) });
-  const checks = compareBaselines(r.before, r.after);
+  const checks = r.checks;
   for (const c of checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}: ${c.detail}`);
   log(`report: ${writeReport(`unseed-${runId}`, { ...r, checks })}`);
   if (!checks.every((c) => c.ok)) process.exitCode = 1;

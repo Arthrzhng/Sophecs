@@ -108,8 +108,13 @@ drop trigger debates_guard_sample on public.debates;
 drop trigger challenges_guard_sample on public.challenges;
 drop trigger exchanges_guard_sample on public.exchanges;
 drop function public.guard_sample_marker();
-drop trigger class_members_guard_sample on public.class_members;
-drop function public.guard_sample_class_join();
+drop trigger class_members_guard_reference on public.class_members;
+drop trigger challenges_guard_reference on public.challenges;
+drop trigger quiz_results_guard_reference on public.quiz_results;
+drop trigger debates_guard_reference on public.debates;
+drop trigger blocks_guard_reference on public.blocks;
+drop trigger reports_guard_reference on public.reports;
+drop function public.guard_sample_reference();
 
 drop table public.seed_run_items;
 drop table public.seed_runs;

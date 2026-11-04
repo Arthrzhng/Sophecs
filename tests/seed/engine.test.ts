@@ -345,3 +345,50 @@ describe("review pass 2 scenarios", () => {
     expect(db.runs.get(plan.runId)!.status).toBe("running");
   });
 });
+
+describe("review pass 3 scenarios", () => {
+  const openStates = (db: MemoryAdapter) => [...db.registry.values()].filter((i) => i.state === "intended" || i.state === "created").length;
+
+  it("a teardown resumed after it abandoned an intent finishes, and the preview still lists the abandoned row", async () => {
+    const db = freshDb();
+    const victim = dataset.debates[5].rowId;
+    db.table("debates").set(victim, { id: victim, user_id: "g1", is_sample: false, argument: "genuine" });
+    await expect(execute({ dataset, plan, adapter: db, ...quiet })).rejects.toThrow(StopError);
+    // The first teardown settles the intents, then dies at the first auth delete.
+    const realDelete = db.deleteAuthUser.bind(db);
+    let calls = 0;
+    db.deleteAuthUser = async (id: string) => {
+      if (++calls === 1) throw new Error("connection reset");
+      return realDelete(id);
+    };
+    await expect(teardown(db, plan.runId, { rereadMs: 1 })).rejects.toThrow(/connection reset/);
+    expect([...db.registry.values()].find((i) => i.row_id === victim)!.state).toBe("abandoned");
+    const p = await preview(db, plan.runId);
+    expect(p.foreign).toEqual([{ kind: "debate", rowId: victim }]);
+    const r = await teardown(db, plan.runId, { rereadMs: 1 });
+    expect(r.leftOver).toMatchObject({ debate: 0, auth_user: 0 });
+    expect(r.checks.filter((c) => !c.ok)).toEqual([]);
+    expect(db.table("debates").get(victim)).toMatchObject({ is_sample: false, argument: "genuine" });
+    expect(openStates(db)).toBe(0);
+    expect((await db.getRun(plan.runId))!.status).toBe("torn_down");
+  });
+
+  it("a par or percentile read inside a reader's write is read again before it fails", async () => {
+    const db = freshDb();
+    const r = await execute({ dataset, plan, adapter: db, ...quiet });
+    // The first read lands between a reader's rating and the topic's par.
+    const realPercentile = db.percentile.bind(db);
+    let reads = 0;
+    db.percentile = async (elo: number) => (++reads === 1 ? 0.5 : realPercentile(elo));
+    const v = await validate(db, dataset, r.before, { rereadMs: 1 });
+    expect(v.checks.filter((c) => !c.ok)).toEqual([]);
+    expect(v.checks.find((c) => c.name.startsWith("elo_percentile"))!.detail).toMatch(/differed on the first read/);
+    expect(reads).toBe(2);
+    // A difference that holds on the second read fails.
+    db.percentile = async () => 0.5;
+    const again = await validate(db, dataset, r.before, { rereadMs: 1 });
+    const failed = again.checks.filter((c) => !c.ok);
+    expect(failed.map((c) => c.name)).toEqual(["elo_percentile(1200) counts genuine profiles only"]);
+    expect(failed[0].detail).toMatch(/read twice/);
+  });
+});

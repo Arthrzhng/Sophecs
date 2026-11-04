@@ -78,6 +78,28 @@ export async function heartbeat(adapter: Adapter, runId: string, token: string) 
     throw new LockLostError(`run ${runId}'s lock was taken by another process; stopping without writing more`);
 }
 
+/**
+ * A heartbeat at most once a minute, for loops of one request at a time
+ * (auth users), where a batch can take longer than the stale-lock window.
+ */
+export function pulse(adapter: Adapter, runId: string, token: string, everyMs = 60_000) {
+  let last = Date.now();
+  return async () => {
+    if (Date.now() - last < everyMs) return;
+    last = Date.now();
+    await heartbeat(adapter, runId, token);
+  };
+}
+
+/** Releases the lock without letting a failure to release hide the error that ended the run. */
+export async function releaseQuietly(adapter: Adapter, runId: string, token: string, log: (s: string) => void) {
+  try {
+    await adapter.releaseLock(runId, token);
+  } catch (err) {
+    log(`could not release the lock on ${runId} (${(err as Error).message}); it goes stale in ${STALE_LOCK_MINUTES} minutes`);
+  }
+}
+
 export interface ExecuteReport {
   runId: string;
   written: Record<string, number>;
@@ -215,7 +237,7 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
           attempts, baseMs, log, `${phase.kind} intents`
         );
         if (phase.kind === "auth_user") {
-          await writeAuthUsers(adapter, run.id, batch, known, opts.authConcurrency ?? 4, attempts, baseMs, log);
+          await writeAuthUsers(adapter, run.id, batch, known, opts.authConcurrency ?? 4, attempts, baseMs, log, pulse(adapter, run.id, token));
         } else {
           await retry(() => adapter.insertIgnore(phase.table!, batch.map((b) => b.row), phase.conflict), attempts, baseMs, log, `${phase.table} insert`);
           const back = await retry(() => adapter.selectByIds(phase.table!, batch.map((b) => b.rowId)), attempts, baseMs, log, `${phase.table} read back`);
@@ -264,7 +286,7 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
       await adapter.updateRunLocked(run.id, token, { status: "failed", last_error: String((err as Error).message).slice(0, 500) }).catch(() => false);
     throw err;
   } finally {
-    await adapter.releaseLock(run.id, token);
+    await releaseQuietly(adapter, run.id, token, log);
   }
 
   const seconds = (Date.now() - started) / 1000;
@@ -288,7 +310,8 @@ async function writeAuthUsers(
   concurrency: number,
   attempts: number,
   baseMs: number,
-  log: (s: string) => void
+  log: (s: string) => void,
+  beat: () => Promise<void> = async () => {}
 ) {
   let next = 0;
   // The first failure stops every worker from starting another user; the
@@ -325,6 +348,7 @@ async function writeAuthUsers(
     while (!stopped && next < batch.length) {
       const b = batch[next++];
       try {
+        await beat();
         await one(b);
       } catch (err) {
         stopped = true;

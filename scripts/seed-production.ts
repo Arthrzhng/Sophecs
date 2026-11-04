@@ -1,9 +1,11 @@
 // Sample activity for production. docs/sample-activity.md has the design
 // and the rollout; the short version:
 //
-//   plan     npm run seed:plan -- --expected-project-ref <ref> [--seed N] [--from ISO] [--to ISO]
+//   plan     npm run seed:plan -- --expected-project-ref <ref> --seed N [--from ISO] [--to ISO]
 //            or npm run seed:production -- --dry-run --expected-project-ref <ref> --seed N
-//            Writes docs/seed-plans/<run-id>.json. No network, no writes.
+//            Writes scripts/seed/reports/plans/<run-id>.json, which is git-ignored:
+//            a production plan names every row id the run will write, so it is
+//            kept off the public repository. No network, no writes.
 //   dry run  npm run seed:production -- --expected-project-ref <ref> --confirm-production <ref>
 //              --run-id <id> --plan <file>
 //            Regenerates the plan's rows and checks them against its hash. With
@@ -43,9 +45,12 @@ main(async () => {
 
   if (isPlan) {
     if (!ref || !/^[a-z]{20}$/.test(ref)) throw new GuardError("--expected-project-ref must be a 20-letter project ref");
+    // No default seed for production: with a public generator, a public
+    // seed would publish every id the run will write.
+    if (!str(f, "seed")) throw new GuardError("--seed is required for a production plan; choose a number that is not written down anywhere public");
     const to = isoFlag(f, "to", nowFloored());
     const gen = {
-      seed: int(f, "seed", 20261104, 0, 2 ** 31 - 1),
+      seed: int(f, "seed", -1, 0, 2 ** 31 - 1),
       from: isoFlag(f, "from", DEFAULTS.from),
       to,
       users: int(f, "users", DEFAULTS.users, 1, 20000),
@@ -59,7 +64,7 @@ main(async () => {
       ? { rowsPerSecond: Number(str(f, "rows-per-second")), authUsersPerSecond: Number(str(f, "auth-per-second") ?? 4), source: "given on the command line" }
       : undefined;
     const runIdGuess = `sample-${gen.seed}-${to.replace(/[-:T]/g, "").slice(0, 12)}`;
-    const out = str(f, "out") ?? join("docs", "seed-plans", `${runIdGuess}.json`);
+    const out = str(f, "out") ?? join("scripts", "seed", "reports", "plans", `${runIdGuess}.json`);
     const { plan } = buildPlan({ target: { kind: "production", projectRef: ref }, gen, planPath: out, measured });
     writePlan(out, plan);
     log(`plan ${plan.runId} written to ${out}`);

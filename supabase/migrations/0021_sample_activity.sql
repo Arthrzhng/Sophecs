@@ -115,36 +115,68 @@ create trigger challenges_guard_sample before insert or update on public.challen
 create trigger exchanges_guard_sample before insert or update on public.exchanges
   for each row execute function public.guard_sample_marker();
 
--- 3b. A sample account's class takes no genuine member, by any path: the
--- join action refuses it, and so does this, for a signed-in reader
--- inserting through the Data API under the "member join self" policy.
--- Sample class ids can be worked out from the public seed tooling, and a
--- genuine member would be a genuine row that teardown could not keep.
--- SECURITY DEFINER to read the owner's profile past row level security;
--- the caller's role is the `role` setting, which SET ROLE (how the Data API
--- switches to anon or authenticated) sets and a definer function does not.
-create or replace function public.guard_sample_class_join() returns trigger
+-- 3b. No genuine row may come to point at a sample row through the Data
+-- API. Teardown keeps genuine rows: it clears a genuine reference to a
+-- sample row where the column allows null, and stops otherwise, so a
+-- reference a visitor could add with the anon key (a challenge naming a
+-- sample result, a result claiming a sample user, a block or report naming
+-- a sample account, a member joining a sample class) would let anyone stop
+-- a teardown. Sample ids are listable through the public views and
+-- derivable from the public seed tooling, so this refuses those writes for
+-- anon and authenticated callers. The site makes all of these writes with
+-- the server role, which this lets through, as it does migrations.
+--
+-- SECURITY DEFINER to read sample rows past row level security. The
+-- caller's role is the `role` setting, which the Data API sets with SET
+-- ROLE and a definer function does not change.
+create or replace function public.guard_sample_reference() returns trigger
 language plpgsql
 security definer
 set search_path = public, pg_temp
 as $$
+declare
+  hit boolean := false;
 begin
   if coalesce(current_setting('role', true), 'none') not in ('anon', 'authenticated') then
     return new;
   end if;
-  if exists (
-    select 1 from public.classes c join public.profiles p on p.id = c.owner_id
-    where c.id = new.class_id and p.is_sample
-  ) then
-    raise exception 'this class does not take members';
+  if tg_table_name = 'class_members' then
+    hit := exists (select 1 from classes c join profiles p on p.id = c.owner_id where c.id = new.class_id and p.is_sample)
+        or exists (select 1 from profiles p where p.id = new.user_id and p.is_sample);
+  elsif tg_table_name = 'challenges' then
+    hit := exists (select 1 from quiz_results r where r.is_sample and r.id in (new.challenger_result_id, new.challengee_result_id))
+        or exists (select 1 from debates d where d.is_sample and d.id in (new.challenger_debate_id, new.challengee_debate_id));
+  elsif tg_table_name = 'quiz_results' then
+    hit := exists (select 1 from quiz_results r where r.is_sample and r.id = new.challenge_from)
+        or exists (select 1 from profiles p where p.is_sample and p.id = new.user_id);
+  elsif tg_table_name = 'debates' then
+    hit := exists (select 1 from debates d where d.is_sample and d.id = new.parent_debate_id)
+        or exists (select 1 from challenges c where c.is_sample and c.id = new.challenge_id);
+  elsif tg_table_name = 'blocks' then
+    hit := exists (select 1 from profiles p where p.is_sample and p.id in (new.blocker_id, new.blocked_id));
+  elsif tg_table_name = 'reports' then
+    hit := exists (select 1 from turns t join exchanges e on e.id = t.exchange_id where t.id = new.turn_id and e.is_sample);
+  end if;
+  if hit then
+    raise exception 'sample rows cannot be referenced from here';
   end if;
   return new;
 end;
 $$;
-revoke all on function public.guard_sample_class_join() from public, anon, authenticated;
+revoke all on function public.guard_sample_reference() from public, anon, authenticated;
 
-create trigger class_members_guard_sample before insert or update on public.class_members
-  for each row execute function public.guard_sample_class_join();
+create trigger class_members_guard_reference before insert or update on public.class_members
+  for each row execute function public.guard_sample_reference();
+create trigger challenges_guard_reference before insert or update on public.challenges
+  for each row execute function public.guard_sample_reference();
+create trigger quiz_results_guard_reference before insert or update on public.quiz_results
+  for each row execute function public.guard_sample_reference();
+create trigger debates_guard_reference before insert or update on public.debates
+  for each row execute function public.guard_sample_reference();
+create trigger blocks_guard_reference before insert or update on public.blocks
+  for each row execute function public.guard_sample_reference();
+create trigger reports_guard_reference before insert or update on public.reports
+  for each row execute function public.guard_sample_reference();
 
 -- 4. The public views carry the marker, so the pages that read them can
 -- label sample rows. debates_public is 0020's definition, unchanged, with

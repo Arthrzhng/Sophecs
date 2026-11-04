@@ -17,8 +17,8 @@
 
 import { randomUUID } from "node:crypto";
 import type { Adapter, Entanglement, Kind, RegistryItem, Table } from "./adapter";
-import { StopError, LockLostError, STALE_LOCK_MINUTES, heartbeat } from "./engine";
-import { snapshot, type Baseline } from "./baseline";
+import { StopError, LockLostError, STALE_LOCK_MINUTES, heartbeat, pulse, releaseQuietly } from "./engine";
+import { snapshot, settledChecks, compareBaselines, type Baseline, type BaselineCheck } from "./baseline";
 
 export interface TeardownPreview {
   runId: string;
@@ -26,7 +26,7 @@ export interface TeardownPreview {
   items: Record<string, { created: number; intended: number; deleted: number }>;
   /** Intents whose row was never written: marked deleted by teardown. */
   absent: number;
-  /** Intents whose id is a row the run did not write: never touched, marked abandoned. */
+  /** Intents whose id is a row the run did not write: never touched, marked abandoned now or by an earlier pass. */
   foreign: { kind: Kind; rowId: string }[];
   entanglements: Entanglement[];
   blocking: Entanglement[];
@@ -179,7 +179,10 @@ export async function preview(adapter: Adapter, runId: string): Promise<Teardown
     status: run.status,
     items: summary,
     absent: absent.length,
-    foreign: foreign.map((i) => ({ kind: i.kind, rowId: i.row_id })),
+    foreign: [...foreign, ...ORDER.flatMap(({ kind }) => items[kind].filter((i) => i.state === "abandoned"))].map((i) => ({
+      kind: i.kind,
+      rowId: i.row_id,
+    })),
     entanglements,
     blocking: entanglements.filter((e) => !e.nullable),
   };
@@ -190,13 +193,15 @@ export interface TeardownReport {
   cleared: number;
   before: Baseline;
   after: Baseline;
+  /** compareBaselines(before, after), read again before a failure is reported. */
+  checks: BaselineCheck[];
   leftOver: Record<string, number>;
 }
 
 export async function teardown(
   adapter: Adapter,
   runId: string,
-  opts: { log?: (s: string) => void; batchSize?: number; breakStaleLock?: boolean } = {}
+  opts: { log?: (s: string) => void; batchSize?: number; breakStaleLock?: boolean; rereadMs?: number } = {}
 ): Promise<TeardownReport> {
   const log = opts.log ?? (() => {});
   const size = opts.batchSize ?? 250;
@@ -217,6 +222,7 @@ export async function teardown(
     for (const e of p.entanglements) await adapter.clearReference(e);
     log(`cleared ${p.entanglements.length} genuine reference(s) to sample rows`);
     const { items, absent, foreign } = await loadItems(adapter, runId);
+    const beat = pulse(adapter, runId, token);
     // Settle the intents that never became the run's rows, so the registry
     // ends with nothing left in an open state.
     for (const kind of new Set(absent.map((i) => i.kind)))
@@ -239,6 +245,7 @@ export async function teardown(
         if (table) await adapter.deleteOwned(table, batch.map((b) => b.row_id), owners);
         else
           for (const b of batch) {
+            await beat();
             const u = await adapter.getAuthUser(b.row_id);
             if (!u) continue;
             if (u.runId !== runId) throw new StopError(`auth user ${b.row_id} does not carry run ${runId}; not deleting it`);
@@ -251,18 +258,26 @@ export async function teardown(
       log(`${kind}: ${list.length} deleted`);
     }
     // Proven by id, not by counts: none of the run's rows is still there.
+    // Abandoned intents are left out (their rows are not the run's), and a
+    // row found at a settled id counts only if it is the run's: marked, or
+    // owned by the run's users or exchanges.
     const leftOver: Record<string, number> = {};
+    const ownerSet = new Set(owners);
     for (const { kind, table } of ORDER) {
       if (!table) continue;
-      const ids = items[kind].map((i) => i.row_id);
+      const ids = items[kind].filter((i) => i.state !== "abandoned").map((i) => i.row_id);
       let n = 0;
-      for (let i = 0; i < ids.length; i += size) n += (await adapter.selectByIds(table, ids.slice(i, i + size))).length;
+      for (let i = 0; i < ids.length; i += size) {
+        const rows = await adapter.selectByIds(table, ids.slice(i, i + size));
+        n += rows.filter((r) => (MARKED_KIND[kind] ? r.is_sample === true : ownerSet.has(String(r[OWNER_OF[kind]!])))).length;
+      }
       leftOver[kind] = n;
     }
     let authLeft = 0;
-    for (const [n, i] of items.auth_user.entries()) {
-      if (n % 50 === 0) await heartbeat(adapter, runId, token);
-      if (await adapter.getAuthUser(i.row_id)) authLeft++;
+    for (const i of items.auth_user.filter((x) => x.state !== "abandoned")) {
+      await beat();
+      const u = await adapter.getAuthUser(i.row_id);
+      if (u && u.runId === runId) authLeft++;
     }
     leftOver.auth_user = authLeft;
     const remaining = Object.values(leftOver).reduce((a, b) => a + b, 0);
@@ -277,13 +292,13 @@ export async function teardown(
       counts: { ...((await adapter.getRun(runId))?.counts ?? {}), deleted: totals },
     });
     if (!ended) throw new LockLostError(`run ${runId}'s lock was taken before teardown could record its end`);
-    const after = await snapshot(adapter);
-    return { deleted, cleared: p.entanglements.length, before, after, leftOver };
+    const { now: after, checks } = await settledChecks(adapter, (now) => compareBaselines(before, now), { waitMs: opts.rereadMs });
+    return { deleted, cleared: p.entanglements.length, before, after, checks, leftOver };
   } catch (err) {
     if (!(err instanceof LockLostError))
       await adapter.updateRunLocked(runId, token, { last_error: `teardown: ${String((err as Error).message).slice(0, 480)}` }).catch(() => false);
     throw err;
   } finally {
-    await adapter.releaseLock(runId, token);
+    await releaseQuietly(adapter, runId, token, log);
   }
 }

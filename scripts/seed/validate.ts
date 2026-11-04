@@ -4,7 +4,7 @@
 import type { Adapter, Kind, Table } from "./adapter";
 import type { Dataset } from "./generate";
 import { phases } from "./engine";
-import { snapshot, compareBaselines, isolationChecks, type Baseline, type BaselineCheck } from "./baseline";
+import { settledChecks, compareBaselines, isolationChecks, type Baseline, type BaselineCheck } from "./baseline";
 import { Rng } from "./rng";
 
 export interface ValidationReport {
@@ -31,7 +31,7 @@ export async function validate(
   adapter: Adapter,
   ds: Dataset,
   before: Baseline | null,
-  opts: { cohortLimit?: number; spot?: number; authSpot?: number } = {}
+  opts: { cohortLimit?: number; spot?: number; authSpot?: number; rereadMs?: number } = {}
 ): Promise<ValidationReport> {
   const limit = opts.cohortLimit ?? Infinity;
   const checks: BaselineCheck[] = [];
@@ -103,11 +103,12 @@ export async function validate(
     checks.push({ name: "auth users blocked from signing in and owned by the run", ok: bad === 0, detail: `${picked.length - bad} of ${picked.length}` });
   }
 
-  // 6. Genuine data.
-  const after = await snapshot(adapter);
-  // With a baseline, the comparison; without one (a standalone --validate),
-  // the par and percentile checks still run, since they need none.
-  checks.push(...(before ? compareBaselines(before, after) : isolationChecks(after)));
+  // 6. Genuine data. With a baseline, the comparison; without one (a
+  // standalone --validate), the par and percentile checks still run, since
+  // they need none. Either is read again before a failure is reported.
+  const settled = await settledChecks(adapter, (now) => (before ? compareBaselines(before, now) : isolationChecks(now)), { waitMs: opts.rereadMs });
+  const after = settled.now;
+  checks.push(...settled.checks);
 
   return { ok: checks.every((c) => c.ok), checks, after };
 }

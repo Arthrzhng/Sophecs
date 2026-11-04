@@ -5,7 +5,7 @@
 
 import type { Adapter } from "./adapter";
 import type { Plan } from "./plan";
-import { snapshot, isolationChecks, type Baseline } from "./baseline";
+import { settledChecks, isolationChecks, type Baseline } from "./baseline";
 
 export interface DryRunReport {
   ok: boolean;
@@ -13,17 +13,18 @@ export interface DryRunReport {
   baseline: Baseline;
 }
 
-export async function dryRun(adapter: Adapter, plan: Plan): Promise<DryRunReport> {
+export async function dryRun(adapter: Adapter, plan: Plan, opts: { rereadMs?: number } = {}): Promise<DryRunReport> {
   const lines: string[] = [];
   let ok = true;
   await adapter.checkSchema();
   lines.push("schema: migration 0021 is in place");
-  const baseline = await snapshot(adapter);
+  // The checks a run is validated against must already hold before it, or
+  // a failure afterwards could not be told from one the run caused. A
+  // failure is read again before it is reported (baseline.ts).
+  const { now: baseline, checks } = await settledChecks(adapter, (now) => isolationChecks(now), { waitMs: opts.rereadMs });
   lines.push(`genuine rows: ${JSON.stringify(baseline.genuine)}; other tables: ${JSON.stringify(baseline.totals)}`);
   lines.push(`genuine profiles: ${Object.keys(baseline.genuineProfiles).length}; elo_percentile(1200) = ${baseline.percentile1200}`);
-  // The checks a run is validated against must already hold before it, or
-  // a failure afterwards could not be told from one the run caused.
-  for (const c of isolationChecks(baseline)) {
+  for (const c of checks) {
     if (!c.ok) ok = false;
     lines.push(`  ${c.ok ? "ok  " : "FAIL"} ${c.name}: ${c.detail}`);
   }

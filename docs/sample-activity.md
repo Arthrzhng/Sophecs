@@ -59,10 +59,17 @@ challenges." `/method#samples` explains the rest.
   `quiz_results.referrer`, as the brief allows; they are marked
   `is_sample`, and any query of referrers or sign-ups from the database
   must filter on it. `scripts/review-verdicts.ts` already does.
-- **Classes.** No reader can join a sample class, even with an id or code
-  worked out from the public generator: `joinClass` answers its code as a
-  wrong code, and a trigger in 0021 refuses the same insert made directly
-  through the Data API (`scripts/test-0021-sample-activity.sh`).
+- **Classes, challenges and other references.** No reader can attach a
+  row of their own to a sample row, even with an id worked out from the
+  public generator: `joinClass` answers a sample class's code as a wrong
+  code, and a trigger in 0021 refuses the same thing on every path a
+  signed-in or anonymous request has through the Data API: joining a
+  sample class or adding a sample member, a challenge or quiz result
+  pointing at a sample's result or debate, a debate whose parent or
+  challenge is a sample's, a block naming a sample account, a report on a
+  sample exchange's turn (`scripts/test-0021-sample-activity.sh` tries
+  each). So no genuine row can come to depend on a sample row, and
+  teardown is never left choosing between the two.
 - **Email and sign-in.** Sample users are created through the Auth admin
   API with `email_confirm: true` (no confirmation mail), no password, a
   ban of 876,000 hours, and addresses on `sophecs.test`, a domain reserved
@@ -78,9 +85,14 @@ challenges." `/method#samples` explains the rest.
   `quiz_results`, `debates`, `challenges` and `exchanges`, and
   `debates.verdict_is_template`. Existing rows read false without being
   rewritten.
-- A trigger lets only the server role set or clear the marker, so a reader
-  editing their own profile cannot mark or unmark anything. Another refuses
-  a reader joining a class a sample account owns.
+- Eleven triggers. Five (`*_guard_sample`) let only the server role set or
+  clear the marker, so a reader editing their own profile cannot mark or
+  unmark anything. Six (`*_guard_reference`, on `class_members`,
+  `challenges`, `quiz_results`, `debates`, `blocks` and `reports`) refuse
+  an anonymous or signed-in write that would point at a sample row; the
+  server role, which the app's own server code and the seed use, is not
+  affected. The function behind them runs as its owner so it can see
+  sample rows the caller cannot, and no client role may call it directly.
 - `seed_runs` (one row per run: plan hash, generator version, seed,
   window, status, lock) and `seed_run_items` (one row per row a run
   intends to write, recorded before the write). A unique index on
@@ -109,27 +121,28 @@ in time order, `checkQuote` and `checkBody` for every turn,
 `getWeeklyMotion`, `authorForSeq`, and the seven-day topic lock and
 five-a-day limit `/api/judge` enforces.
 
-Measured on the production plan `docs/seed-plans/sample-20261104-202611040204.json`
-(seed 20261104, window to 2026-11-04 02:04 UTC), from its `distributions`
-block. Another seed or window gives other figures; the plan file is the
-record for its run.
+Measured on a production plan made with the defaults on 2026-11-04
+(window to 03:19 UTC, manifest `ed400abc366f...`), from its
+`distributions` block. Another seed or window gives slightly different
+figures; each plan file records its own. Production plans are kept out of
+the repository (see Commands), so the plan itself is not linked here.
 
 | | Target | Measured |
 | --- | --- | --- |
-| Schools, all quiz results (Stoicism / Utilitarianism / Virtue Ethics) | 40 / 35 / 25 | 41.6 / 34.3 / 24.1 |
-| Accounts by arguments: none, 1-3, 4-29, 30+ | 60 / 25 / 12 / 3 | 60 / 25.4 / 11.6 / 3 |
-| Debaters who revise | about 15% | 13.6% |
-| Arguments, revisions included | 9,000 to 12,000 | 9,370 (445 revisions) |
-| Rejected | about 3% | 2.6% |
-| Score bands 70-90 / 50-69 / 25-49 | 25 / 50 / 25 | 26.4 / 50.5 / 23.1 |
-| Exchanges complete / lapsed / open | 70 / 20 / 10 | 413 / 129 / 58 of 600 |
+| Schools, all quiz results (Stoicism / Utilitarianism / Virtue Ethics) | 40 / 35 / 25 | 41.1 / 33.5 / 25.4 |
+| Accounts by arguments: none, 1-3, 4-29, 30+ | 60 / 25 / 12 / 3 | 60 / 25.3 / 11.7 / 3 |
+| Debaters who revise | about 15% | 13.4% |
+| Arguments, revisions included | 9,000 to 12,000 | 9,452 (440 revisions) |
+| Rejected | about 3% | 2.9% |
+| Score bands 70-90 / 50-69 / 25-49 | 25 / 50 / 25 | 26.2 / 50.3 / 23.5 |
+| Exchanges complete / lapsed / open | 70 / 20 / 10 | 411 / 129 / 60 of 600 |
 | Challenges complete / accepted / open | | 120 / 80 / 200 |
-| Reading answers | about 3,000 | 2,764 |
-| Accounts that switched school once / twice | about 8% / a few | 322 / 35 |
-| Debaters still active 14 days after joining | most stop | 13% |
-| Timezones: London / New York / Los Angeles / Chicago | UK, then US, then a spread | 52.1 / 13 / 6.1 / 5 (rest spread over nine) |
-| Arguments sharing their exact text with another | measured | 30.3% (7,666 distinct texts) |
-| Near duplicates (not exact) | measured | 43.6% |
+| Reading answers | about 3,000 | 3,050 |
+| Accounts that switched school once / twice | about 8% / a few | 306 / 41 |
+| Debaters still active 14 days after joining | most stop | 12.4% |
+| Timezones: London / New York / Los Angeles / Chicago | UK, then US, then a spread | 52 / 12.9 / 6.1 / 5.3 (rest spread over nine) |
+| Arguments sharing their exact text with another | measured | 29.4% (7,795 distinct texts) |
+| Near duplicates (not exact) | measured | 44% |
 | Reading answers sharing text | measured | 100% |
 
 **Arguments.** `scripts/seed/arguments/<topic>.<school>.json`, forty each
@@ -166,7 +179,8 @@ All of them refuse on any mismatch between flags, plan, credentials and
 target, before the first write. None runs from a build, install hook,
 migration, CI job or route, and there is no HTTP endpoint.
 
-    npm run seed:plan -- --expected-project-ref tekifezydjlgxgndkxul [--seed N] [--from ISO] [--to ISO]
+    npm run seed:plan -- --expected-project-ref tekifezydjlgxgndkxul --seed N [--from ISO] [--to ISO]
+        # writes scripts/seed/reports/plans/<run-id>.json; no network
     npm run seed:production -- --expected-project-ref tekifezydjlgxgndkxul --confirm-production tekifezydjlgxgndkxul --run-id <id> --plan <file>
         # dry run: regenerates the rows, checks the plan's hash, reads the target; writes nothing
     ... --execute --canary 40     # the first 40 accounts and what depends only on them
@@ -178,6 +192,17 @@ migration, CI job or route, and there is no HTTP endpoint.
     npm run seed:local -- --create-db | --make-plan | --run-id <id> --plan <file> [--execute|--validate] | --drop-db
     npm run unseed:local -- --run-id <id> --plan <file> [--execute --confirm-teardown <id>]
     npm run test:seed-db          # migration 0021 on a throwaway local database
+
+A production plan needs `--seed`, and is written under
+`scripts/seed/reports/`, which is git-ignored. The generator is public, so
+a plan, a seed or a run id (which contains the seed and the window's end)
+in the public repository would publish every id the run will write; a row
+put at one of those ids first would stop the run (it never adopts a row it
+did not write). The approval names the run id and the manifest hash, and
+the operator makes the same plan from the same flags: the dry run refuses
+unless the rows regenerate to that hash. Make the plan in the minute
+before the dry run: the window ends when the plan is made, and the table
+and Today show only the current week.
 
 `--six-schools` is refused: the published quiz scores three schools.
 `--real-judge` is refused: the real pipeline is `/api/judge`, which needs a
@@ -206,9 +231,11 @@ not the run's stops the run rather than be adopted); mark the intents
 created. An auth user with an intent from an earlier attempt is looked up
 before it is created. A lost response, a crash or Ctrl-C leaves a state
 the same command resumes without writing anything twice. One run at a
-time: a run takes a lock, refreshes it before every batch and before
-marking anything, writes the run's own row only while holding it, and
-stops without writing more the moment it finds the lock taken. A lock
+time: a run takes a lock, refreshes it before every batch, before marking
+anything and at least once a minute while it creates auth users one at a
+time, writes the run's own row only while holding it, and stops without
+writing more the moment it finds the lock taken. Teardown holds the same
+lock the same way. A lock
 left by a dead process can be cleared with `--break-stale-lock` once it has
 gone 15 minutes without a refresh; every request has a 30-second timeout,
 so a live run never goes that long. The 15 minutes are measured on the
@@ -220,7 +247,8 @@ Preview by default. It deletes the run's registry items, scoped again by
 the marker or the run's own users, in dependency order. An intent whose row
 was never written (a crash between recording it and writing) is marked
 deleted; an intent whose id turned out to be a row the run did not write is
-never touched and is marked abandoned, and the preview lists it. First it looks for
+never touched and is marked abandoned, and the preview lists it (also on a
+teardown resumed after an earlier pass settled it). First it looks for
 genuine rows that point at the run's rows: a nullable reference (a
 reader's `challenge_from`, a debate's `challenge_id`) is cleared so the
 genuine row stays; anything that would be deleted with the sample row (a
@@ -245,9 +273,10 @@ baseline. Validation fails only on checks that hold whatever readers do
 during the run: each topic's stored par must equal the par computed from
 genuine originals alone (or be unchanged where there are none), and
 `elo_percentile(1200)` must equal the share computed from genuine profiles
-alone. The dry run runs the same checks first, so a failure afterwards is
-the run's (or, for the par, two judgings finishing together; validate
-again before stopping). Genuine row counts and changed genuine profiles
+alone. A failing check is read again five seconds later before it is
+reported, since one read can land inside a reader's judging (the rating
+is written before the par moves). The dry run runs the same checks first,
+so a failure afterwards is the run's. Genuine row counts and changed genuine profiles
 are reported as information, since sign-ups, deletions, challenges and late
 verdicts move them. That the run writes no genuine row is proven where it
 writes: every row is read back and must be marked or owned by the run, and
@@ -263,15 +292,17 @@ empty week, and the par query in `/api/judge` would fail and stop updating.
 1. Security advisor, read and recorded (`docs/review-charter.md` rule 10).
 2. Apply `0021_sample_activity` to production. Read it back: the six
    columns, the two registry tables with RLS on and no anon or
-   authenticated grants, the five triggers, the two views' columns and
+   authenticated grants, the eleven triggers (five `*_guard_sample`, six
+   `*_guard_reference`), the two views' columns and
    grants, `elo_percentile(1200)` unchanged. Security advisor again; any
    new finding stops here.
 3. Merge this pull request. The merge deploys `main` to production on
    Vercel; it applies no migration and runs no seed. Confirm the merge
    commit and the deploy Ready, then fetch `/table`, a genuine verdict
    page and `/method`.
-4. Dry run against production: the plan's rows regenerated and matched to
-   its hash, the schema, the motions, no other run, the genuine export and
+4. Plan, on the operator's machine, in the minute before the dry run
+   (`npm run seed:plan`, with the seed given in the approval). Dry run
+   against production: the plan's rows regenerated and matched to its hash, the schema, the motions, no other run, the genuine export and
    baseline, every baseline check passing.
 5. Canary: `--execute --canary 40`. The first 40 accounts and everything
    that depends only on them. Automated validation, then a sample verdict,

@@ -5,7 +5,6 @@ import { localTarget, describeTarget, GuardError } from "./seed/env";
 import { LocalAdapter } from "./seed/adapter-local";
 import { readPlan } from "./seed/plan";
 import { preview, teardown } from "./seed/teardown";
-import { compareBaselines } from "./seed/baseline";
 import { log, main, parseFlags, str } from "./seed/cli";
 
 main(async () => {
@@ -31,5 +30,5 @@ main(async () => {
     return;
   }
   const r = await teardown(adapter, runId, { log, breakStaleLock: Boolean(f["break-stale-lock"]) });
-  for (const c of compareBaselines(r.before, r.after)) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}: ${c.detail}`);
+  for (const c of r.checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}: ${c.detail}`);
 });

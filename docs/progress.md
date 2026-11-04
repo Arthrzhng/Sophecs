@@ -201,8 +201,9 @@ entry names.
 ## 2026-11-04: sample activity, built and tested locally, not run
 
 - Branch `sample-activity`: migration 0021 (the `is_sample` marker, the
-  `seed_runs` and `seed_run_items` registry, a trigger that lets only the
-  server role set the marker, the marker on `debates_public` and
+  `seed_runs` and `seed_run_items` registry, triggers that let only the
+  server role set the marker and refuse a reader's row pointing at a sample
+  row, the marker on `debates_public` and
   `public_results`, `elo_percentile` over genuine profiles, an index on
   `debates(created_at)`), the Sample label and sample-assessment wording,
   the par-window filter in `/api/judge` and the challenge guard, the
@@ -214,5 +215,9 @@ entry names.
   0. The seed: a local run of 4,000 accounts end to end (create, plan,
   canary of 40, full, validate, teardown preview, teardown), with genuine
   rows in the database that it left as they were.
-- Production plan `docs/seed-plans/sample-20261104-202611040204.json`,
-  waiting on Arthur's approval with everything else that run needs.
+- A production plan made offline (manifest `ed400abc366f...`), kept out
+  of the repository with its seed, since the generator is public and the
+  seed fixes every row id. Waiting on Arthur's approval with everything
+  else that run needs; the plan is remade in the minute before the run.
+- Reviewed three times by fresh reviewers (#57 lists the findings and
+  fixes).

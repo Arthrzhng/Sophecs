@@ -65,7 +65,7 @@ done
 # tables made before this point get the same grants by hand, as they have
 # in production, so that row level security and the guard are what decide.
 q "alter default privileges in schema public grant all on tables to anon, authenticated, service_role" >/dev/null
-for t in debates profiles quiz_results challenges exchanges classes class_members; do
+for t in debates profiles quiz_results challenges exchanges classes class_members blocks reports turns; do
   q "grant all on public.$t to anon, authenticated, service_role" >/dev/null
 done
 # Supabase's service_role bypasses row level security. The shim creates it
@@ -173,17 +173,38 @@ expect "two low sample ratings do not move a genuine percentile" "$PCT_BEFORE" "
 expect "debates_public carries the marker" "t t" "$(q "select is_sample || ' ' || verdict_is_template from debates_public where id = 'sdeb'" | sed 's/true/t/g')"
 expect "genuine rows read false" "f f" "$(q "select is_sample || ' ' || verdict_is_template from debates_public where id = 'gpub'" | sed 's/false/f/g')"
 
-say "a sample account's class takes no genuine member"
-psql -X -q -v ON_ERROR_STOP=1 -d "$DB" >/dev/null <<CLS
+say "no genuine row can be made to point at a sample row through the Data API"
+psql -X -q -v ON_ERROR_STOP=1 -d "$DB" >/dev/null <<REF
+insert into auth.users (id) values ('88888888-8888-8888-8888-888888888888');
+insert into profiles (id, display_name, school, elo, streak) values ('88888888-8888-8888-8888-888888888888', 'Reader Two', 'stoicism', 1200, 0);
+insert into quiz_results (id, school, vector, answers, anon_id) values ('GENRES001', 'stoicism', '{}', '[]', gen_random_uuid());
 insert into classes (id, code, owner_id, name) values ('sclass', 'samplecd', '66666666-6666-6666-6666-666666666666', 'Sample class');
 insert into classes (id, code, owner_id, name) values ('gclass', 'genuinec', '$U', 'Genuine class');
-CLS
-join_as() { as_role authenticated "insert into class_members (class_id, user_id) values ('$1', '77777777-7777-7777-7777-777777777777')" 77777777-7777-7777-7777-777777777777; }
-r=$(join_as sclass); expect "a reader joins a sample class through the Data API" refused "$(printf '%s' "$r" | grep -q 'does not take members' && echo refused || echo "$r")"
-expect "a reader joins a genuine class" allowed "$(join_as gclass)"
-expect "the server role adds a sample member" allowed "$(as_role service_role "insert into class_members (class_id, user_id) values ('sclass', '77777777-7777-7777-7777-777777777777')")"
-expect "anon and authenticated cannot call the guard" "f f" "$(q "select has_function_privilege('anon', 'public.guard_sample_class_join()', 'EXECUTE') || ' ' || has_function_privilege('authenticated', 'public.guard_sample_class_join()', 'EXECUTE')" | sed 's/false/f/g')"
-q "delete from classes where id in ('sclass','gclass')" >/dev/null
+insert into quiz_results (id, school, vector, answers, anon_id, is_sample) values ('sres', 'stoicism', '{}', '[]', gen_random_uuid(), true);
+insert into challenges (id, challenger_result_id, is_sample) values ('schal', 'sres', true);
+insert into exchanges (id, topic_slug, debate_a, debate_b, user_a, user_b, school_a, school_b, is_sample)
+  values ('sex', 'st', 'sdeb', 'sdeb', '66666666-6666-6666-6666-666666666666', '77777777-7777-7777-7777-777777777777', 'stoicism', 'utilitarianism', true);
+insert into turns (id, exchange_id, author_id, seq, quoted_claim, body, screen_result)
+  values ('sturn', 'sex', '66666666-6666-6666-6666-666666666666', 1, 'sample words', repeat('a sample turn body. ', 10), 'ok');
+REF
+R=88888888-8888-8888-8888-888888888888
+refused() { printf '%s' "$1" | grep -q 'cannot be referenced' && echo refused || echo "$1"; }
+expect "authenticated joins a sample class" refused "$(refused "$(as_role authenticated "insert into class_members (class_id, user_id) values ('sclass', '$R')" $R)")"
+expect "authenticated joins a genuine class" allowed "$(as_role authenticated "insert into class_members (class_id, user_id) values ('gclass', '$R')" $R)"
+expect "anon challenges from a sample result" refused "$(refused "$(as_role anon "insert into challenges (id, challenger_result_id) values ('c1', 'sres')")")"
+# Updates run through the same trigger function as these inserts; row
+# level security already hides every challenge from a caller who is not a
+# party to it, so an update by anon or authenticated matches no row here.
+expect "anon result naming a sample challenger" refused "$(refused "$(as_role anon "insert into quiz_results (id, school, vector, answers, anon_id, challenge_from) values ('q1', 'stoicism', '{}', '[]', gen_random_uuid(), 'sres')")")"
+expect "anon result claiming a sample user" refused "$(refused "$(as_role anon "insert into quiz_results (id, school, vector, answers, anon_id, user_id) values ('q2', 'stoicism', '{}', '[]', gen_random_uuid(), '66666666-6666-6666-6666-666666666666')")")"
+expect "anon genuine result" allowed "$(as_role anon "insert into quiz_results (id, school, vector, answers, anon_id) values ('q3', 'stoicism', '{}', '[]', gen_random_uuid())")"
+expect "authenticated revision of a sample debate" refused "$(refused "$(as_role authenticated "insert into debates (id, user_id, topic_slug, school, argument, kind, parent_debate_id) values ('d1', '$R', 'st', 'stoicism', 'x', 'revision', 'sdeb')" $R)")"
+expect "authenticated blocks a sample account" refused "$(refused "$(as_role authenticated "insert into blocks (blocker_id, blocked_id) values ('$R', '66666666-6666-6666-6666-666666666666')" $R)")"
+expect "authenticated reports a sample turn" refused "$(refused "$(as_role authenticated "insert into reports (id, turn_id, reporter_id, reason) values ('r1', 'sturn', '$R', 'spam')" $R)")"
+expect "the server role may (the site's own writes)" allowed "$(as_role service_role "insert into class_members (class_id, user_id) values ('sclass', '77777777-7777-7777-7777-777777777777')")"
+expect "a migration or the SQL editor may (no role set)" allowed "$(psql -X -At -d "$DB" -c "begin; insert into blocks (blocker_id, blocked_id) values ('$R', '66666666-6666-6666-6666-666666666666'); rollback;" >/dev/null 2>&1 && echo allowed || echo refused)"
+expect "anon and authenticated cannot call the guard" "f f" "$(q "select has_function_privilege('anon', 'public.guard_sample_reference()', 'EXECUTE') || ' ' || has_function_privilege('authenticated', 'public.guard_sample_reference()', 'EXECUTE')" | sed 's/false/f/g')"
+q "delete from turns where id = 'sturn'; delete from exchanges where id = 'sex'; delete from challenges where id = 'schal'; delete from quiz_results where id = 'sres'; delete from classes where id in ('sclass','gclass'); delete from quiz_results where id = 'GENRES001'; delete from profiles where id = '$R'; delete from auth.users where id = '$R'" >/dev/null
 
 say "rollback refuses while a run is not torn down"
 # The run alone: its one item is already deleted, so only the run's status
@@ -221,7 +242,8 @@ expect "public_results rows as before" "$PR_DIGEST" "$(pr_digest)"
 expect "elo_percentile as before" "$PCT_BEFORE" "$(q "select elo_percentile(1150)")"
 expect "no is_sample column left" 0 "$(q "select count(*) from information_schema.columns where table_schema='public' and column_name in ('is_sample','verdict_is_template')")"
 expect "no registry left" 0 "$(q "select count(*) from pg_class where relname in ('seed_runs','seed_run_items')")"
-expect "no guard left" 0 "$(q "select count(*) from pg_proc where proname = 'guard_sample_marker'")"
+expect "no guard left" 0 "$(q "select count(*) from pg_proc where proname in ('guard_sample_marker', 'guard_sample_reference')")"
+expect "no guard trigger left" 0 "$(q "select count(*) from pg_trigger where tgname like '%guard_sample' or tgname like '%guard_reference'")"
 expect "no created_at index left" 0 "$(q "select count(*) from pg_indexes where indexname='debates_created_at_idx'")"
 
 say "re-apply 0021"

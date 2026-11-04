@@ -44,7 +44,13 @@ export async function snapshot(adapter: Adapter): Promise<Baseline> {
   for (const t of MARKED_TABLES) genuine[t] = await adapter.count(t, { sample: false });
   const totals: Record<string, number> = {};
   for (const t of OTHER_TABLES) totals[t] = await adapter.count(t);
+  // Read in the order that keeps each pair consistent under live writes:
+  // the percentile straight after the profiles it is compared with, and the
+  // debates before the topics, since /api/judge writes a debate's rating
+  // before it moves the topic's par.
   const profiles = await adapter.scan("profiles", ["id", "elo", "streak", "school"], { sample: false });
+  const percentile1200 = await adapter.percentile(1200);
+  const debates = await adapter.scan("debates", ["user_id", "topic_slug", "kind", "elo_before", "created_at"], { sample: false });
   const genuineProfiles = Object.fromEntries(profiles.map((p) => [String(p.id), `${Number(p.elo)}|${p.streak}|${p.school}`]));
   const topics = (await adapter.scan("debate_topics", ["slug", "motion", "active", "par_elo", "par_n"])).map((t) => ({
     slug: String(t.slug),
@@ -54,7 +60,6 @@ export async function snapshot(adapter: Adapter): Promise<Baseline> {
     par_n: Number(t.par_n),
   }));
   topics.sort((a, b) => a.slug.localeCompare(b.slug));
-  const debates = await adapter.scan("debates", ["user_id", "topic_slug", "kind", "elo_before", "created_at"], { sample: false });
   const expectedPar: Baseline["expectedPar"] = {};
   for (const t of topics) {
     const window = debates
@@ -76,7 +81,7 @@ export async function snapshot(adapter: Adapter): Promise<Baseline> {
     genuineProfiles,
     topics,
     expectedPar,
-    percentile1200: await adapter.percentile(1200),
+    percentile1200,
     expectedPercentile1200: elos.length ? elos.filter((e) => e < 1200).length / elos.length : 0,
     activity,
   };
@@ -105,7 +110,7 @@ export function isolationChecks(now: Baseline, before: Baseline | null = null): 
       name: `debate_topics ${t.slug} par is the genuine par`,
       ok,
       detail: expected
-        ? `stored ${t.par_elo}/${t.par_n}, from genuine originals ${expected.par}/${expected.n}${ok ? "" : "; if two judgings finished together this can be transient: validate again before stopping"}`
+        ? `stored ${t.par_elo}/${t.par_n}, from genuine originals ${expected.par}/${expected.n}`
         : `no genuine originals; ${prior!.par_elo}/${prior!.par_n} before, ${t.par_elo}/${t.par_n} after`,
     });
   }
@@ -115,6 +120,37 @@ export function isolationChecks(now: Baseline, before: Baseline | null = null): 
     detail: `function ${now.percentile1200}, from genuine profiles ${now.expectedPercentile1200}`,
   });
   return checks;
+}
+
+export const REREAD_MS = 5_000;
+
+/**
+ * A snapshot and its checks, read once more before a failure is reported.
+ * /api/judge writes a debate's rating before it moves the topic's par, and
+ * a reader can sign up between the profiles read and the percentile, so
+ * one read can land inside a reader's write. A check that still fails on a
+ * second read, taken `waitMs` later, is reported as a failure.
+ */
+export async function settledChecks(
+  adapter: Adapter,
+  check: (now: Baseline) => BaselineCheck[],
+  opts: { waitMs?: number } = {}
+): Promise<{ now: Baseline; checks: BaselineCheck[] }> {
+  const first = await snapshot(adapter);
+  const checks = check(first);
+  if (checks.every((c) => c.ok)) return { now: first, checks };
+  const waitMs = opts.waitMs ?? REREAD_MS;
+  await new Promise((r) => setTimeout(r, waitMs));
+  const now = await snapshot(adapter);
+  const failedFirst = new Set(checks.filter((c) => !c.ok).map((c) => c.name));
+  return {
+    now,
+    checks: check(now).map((c) =>
+      c.ok
+        ? failedFirst.has(c.name) ? { ...c, detail: `${c.detail} (differed on the first read, ${waitMs / 1000} s earlier)` } : c
+        : { ...c, detail: `${c.detail}; read twice, ${waitMs / 1000} s apart` }
+    ),
+  };
 }
 
 export function compareBaselines(before: Baseline, after: Baseline): BaselineCheck[] {
