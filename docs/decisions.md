@@ -1865,8 +1865,181 @@ reached, and an error waves judging through. Production holds one
 `ai_calls` row today, so nothing is at risk yet. Fixing it changes how
 the budget is enforced, which is Arthur's under (d): summing in the
 database, and failing closed on an error as the daily cap now does, is
-the proposed patch, for Checkpoint A. Nothing in this pull request
+the proposed patch, for Checkpoint A. Nothing in #52
 depends on it.
+
+### 2F, Stage 1 of the brief of 2026-11-03: two v3 runs, and a miss
+
+The brief's pass test for 2F: no verdict_line failure after the retry;
+`stoic-analogy`, `confucian-hierarchy` and `confucian-hierarchy-school` in
+band, with `unanswered_objection` naming the power question on both
+hierarchy cases; the original six (`stoic-strong`, `stoic-wrong-school`,
+`util-strong`, `util-wrong-school`, `virtue-strong`,
+`virtue-wrong-school`) in band. **Neither run passes it.** Bands are
+judged on the median of three samples, as the runner judges them.
+
+**Run 1, `2026-11-03T18-15-56-294Z-v3.json`**, on `main` at `fe5fd3d`,
+75 calls, $1.0806:
+
+- verdict_line: no reply over the cap, no retry. Pass.
+- `stoic-analogy` 78/78/78, fidelity 8. In band.
+- `confucian-hierarchy` score 72/70/70 and fidelity 7 in band;
+  engagement 5/5/5 against 0-4. Objections: virtue ethics, three times,
+  on practical judgment.
+- `confucian-hierarchy-school` score 86/86/86 against 40-75, engagement
+  7/7/7 against 0-4. Objections: utilitarianism once, virtue ethics
+  twice; none on power.
+- The original six in band.
+
+The paragraph #49 added to `judge.v3.md`, and the objection line ending
+every school's criteria, moved neither hierarchy case's engagement or
+objection. A judge blind spot, so the brief's rule applied, in its words:
+"If they show a judge blind spot, fix it in v3 for all six schools
+symmetrically and rerun."
+
+**The fix**, in commit `e0e75ae`: the engagement criterion in `judge.v3.md`
+now says to check first the objection the school's criteria name, and
+that an argument leaving it unmet scores no more than 4 on engagement.
+It is in the engagement criterion, before the rubric, so every school's
+request carries it. v2 is unchanged. `tests/judge-v3-and-refusal.test.ts`
+pins it whole; a cap of 6, or the rule moved to the objection section,
+fails. "Check first" rests on Arthur's ruling on the 3 Nov run (item 1,
+carried out by #48), which asked to "instruct that engagement should check
+whether the argument meets it, and that ignoring it costs engagement, not
+fidelity". It set no number. The number 4 is mine: it is the top of the
+0-4 engagement band that three fixtures expect (`confucian-hierarchy`,
+`confucian-hierarchy-school` and `ubuntu-conformity`), so the cap sits
+exactly at the edge of every such band in the golden set. It goes on the
+Checkpoint A list as a change to what the v3 judge receives.
+
+The same commit also added a paragraph to the comment at the head of
+`judge.v3.md` saying why, and that comment is sent to the model with the
+rest of the file. As first written it named the hierarchy cases and their
+engagement scores, which is golden-set information in the judge's prompt;
+run 2 was made with it. Review of #51 found it, and the comment now gives
+only the rule and where the runs are recorded. The next v3 run is the
+first without it. An older paragraph of the same comment, from the ruling
+of 2026-10-26, still tells the model that "5 of 72 v3 samples returned a
+verdict_line over its cap". It predates #51 and is left for
+Checkpoint A, with the wider question of whether the comment should reach
+the model at all: removing it from what is sent means changing how
+`src/lib/anthropic.ts` reads the file.
+
+**Run 2, `2026-11-03T21-35-58-347Z-v3.json`**, at `e0e75ae`, 78 calls,
+$1.1559:
+
+- verdict_line: 3 first replies over the cap (`buddhist-wrong-school`,
+  `stoic-analogy`, `virtue-exemplar`), each retried; the retry on
+  `virtue-exemplar` ran over too, so one sample has no result. **Fail**,
+  where run 1 had none. The instruction about the cap was the same in
+  both runs, but the prompt changed elsewhere (the engagement criterion
+  and the head comment), so two runs cannot say whether this is the
+  model's variance or a side effect of that change.
+- `stoic-analogy` 78/78/72, fidelity 8. In band.
+- `confucian-hierarchy` score 61/70/62, fidelity 7, engagement 3/4/3.
+  **In band on every axis**, where run 1 was out on engagement.
+- `confucian-hierarchy-school` score 80/78/72 (median 78, band 40-75),
+  engagement 5/5/4 (median 5, band 0-4). Out on both, by less than run 1.
+- `unanswered_objection` on the hierarchy cases: virtue ethics five
+  times, utilitarianism once, on practical judgment or outcomes. **Never
+  the power question.** The judge finds it more often in `weakest_move`
+  than in run 1: "Never addresses who holds power to adjust or override
+  the system" (`confucian-hierarchy`, sample 3, with samples 1 and 2
+  asking who adjusts the system), and "who sets or can override the
+  system's encoding" on two of the three `confucian-hierarchy-school`
+  samples. Run 1 had it once, on `confucian-hierarchy-school` sample 2:
+  "Never addresses who designs or audits the system's encoding of what
+  roles require".
+- The original six in band. Nine cases moved by more than five points of
+  median score: `buddhist-strong`, `confucian-strong`,
+  `confucian-hierarchy` and `confucian-hierarchy-school` -8,
+  `stoic-strong` and `ubuntu-conformity` -7, `util-strong` -6;
+  `fabricated-source` +10 and `util-wrong-school` +6. All nine are in band
+  in run 2 except `confucian-hierarchy-school`, which was out in both
+  runs. Engagement on the strong cases fell from 5-7 to 4-6.
+
+**Why the objection never names power.** `unanswered_objection.school`
+must be one of the three live schools, and the judge voices whichever
+objection that school is known for: practical wisdom for virtue ethics,
+outcomes for utilitarianism. Sophecs's own Confucian page does not give
+the power objection to any of them. It cites "Confucian Role-Ethics with
+Non-Domination" and Rosenlee for it, and gives utilitarianism a different
+objection, about strangers. So the instruction asks the judge to put an
+objection in the mouth of a school that, on Sophecs's own pages, does not
+make it. That is a content question, not a prompt one, and goes to
+Checkpoint A.
+
+**Why there is no third run.** The brief allows two further runs within
+$4.80 on the eval key. After run 2 the key is at $4.6563, leaving $0.1437;
+a full v3 run costs about $1.16, and a run of the hierarchy cases alone
+would not show whether a further v3 change moved the original six. Stage 1
+stops here and its questions go to Checkpoint A.
+
+### Arthur's rulings of 2026-11-03 on the Stage 1 miss
+
+> 2. Power objection: in the v3 criteria/known-objection lines, state which
+>    rival normally voices each school's known objection. Confucianism's
+>    power objection: Utilitarianism (the subordinate party's interests go
+>    uncounted when the stronger party sets the terms) or Ubuntu once
+>    published (solidarity requires the weaker party can be heard). Do the
+>    same exercise for all six known objections, symmetrically.
+> 3. Budget: eval cap raised to a cumulative $8.00 (I am raising the key's
+>    Console limit to match). Rerun v3 at three samples after the change.
+
+Ruling 1, "backup drop: done via retry (I approved the prompt).", does not
+bear on #51; it is for Stage 2, under "Open item: drop `backup_20261022`
+after 2026-10-29". Ruling 4, on retries, is
+carried out in its own pull request; see "Two retries, and a failed
+submission does not use an argument".
+
+**The voices.** In `src/lib/judge/objection-voices.ts`, one table for all
+six schools. Under v3 each school's criteria gain a fifth paragraph after
+the objection paragraph, for the live schools in
+`fidelityCriteriaFor` and for the draft schools in the golden runner's
+`planCase`. It names the rival that normally voices the objection, and
+why. Only rivals the prompt lists are named: a school outside the list
+cannot be returned in `unanswered_objection.school`, so naming it would
+invite a reply that fails validation. Ubuntu's voice for Confucianism
+therefore reaches the judge the day Ubuntu is published, without an edit.
+v1, v2 and the six request fixtures are unchanged.
+
+The five Arthur did not set are drafted from the school pages, and are his
+to confirm at Checkpoint A:
+
+| School | Objection (in short) | Voiced by | Why, as the judge receives it | Once published | Source on the page |
+| --- | --- | --- | --- | --- | --- |
+| Stoicism | gives up on the world too easily | `utilitarianism` | the harm an unfair system does is a sum someone could reduce, and declining to try is itself a choice about that harm | `ubuntu`: a person is a person through other persons, so standing apart from an unfair system leaves the people inside it on their own | Stoicism's gets_wrong: "Utilitarians would say this gives up on the world too easily" |
+| Utilitarianism | no total makes the trade fair to the person who pays | `virtue-ethics` | justice gives each person what is owed to them, and a total owes nobody anything | `ubuntu`: each person's capacity for relationship is to be honoured, not netted against other people's gains | Utilitarianism's gets_wrong gives it to Rawls, who is no school here; Ubuntu's page: "Metz argues against building systems to maximise expected utility" |
+| Virtue Ethics | no answer for scale | `utilitarianism` | a policy that touches thousands of people needs its outcomes compared, and asking what a good person would do does not compare them | none | Virtue Ethics' gets_wrong: "Utilitarians would say this has no answer for scale" |
+| Confucianism | too ready to authorise hierarchy | `utilitarianism` | the subordinate party's interests go uncounted when the stronger party sets the terms | `ubuntu`: solidarity requires the weaker party can be heard | Arthur's ruling, in his words |
+| Ubuntu | a community is not one voice | `stoicism` | a dissenter's own judgment is the one thing the community cannot decide for them | none | Ubuntu's gets_wrong: "Stoics would add that a self defined through others has handed away the one thing that was its own" |
+| Buddhist ethics | much moral teaching, little systematic moral philosophy | `utilitarianism` | deciding who audits a model and how an appeal is weighed takes a way of comparing everyone's claims, which compassion alone does not supply | `confucian`: who answers to whom for a model is a question of roles and what each owes, which non-harm leaves unassigned | **None for this objection.** Buddhist ethics' gets_wrong names the gap; its Utilitarian line is a different objection ("a school weighing intention this heavily lets a well-meaning system off for damage a careless one would be condemned for"). The Confucian page asks "whether the people inside them can still hold each other to what they owe" |
+
+Two of these are weak, and the most likely to need Arthur's change.
+Utilitarianism's: its own page gives the objection to Rawls, and of the
+live schools Virtue Ethics is the one that argues from what each person is
+owed. Buddhist ethics': no page gives this objection to Utilitarianism, and
+the Buddhist page gives Utilitarianism a different one, about intention
+excusing a well-meaning system, which is what `buddhist-intention-excuse`
+tests. Naming Utilitarianism as the voice for the systematic-theory gap
+could pull that case's objection away from intention. The other four
+match their pages, or Arthur's words. Review of #51 found the Buddhist
+mismatch; the first version of this table hid it.
+
+`tests/objection-voices.test.ts` checks four things:
+- every school has a voice among today's listed rivals;
+- no school voices the objection to itself;
+- no unlisted school is ever named;
+- Arthur's Confucian voices are in his words, with Ubuntu's named only
+  once it is listed.
+
+Breaking the rival filter fails three of those tests. The existing v3
+tests pin the fifth paragraph, and the draft-criteria test pins it on the
+draft plan.
+
+**The budget.** The cap on the eval key is now $8.00 cumulative. It stood
+at $4.6563 (the six run files' unrounded totals summed) before the rerun
+this ruling asks for.
 
 ### The public views were writable (migration 0016)
 
