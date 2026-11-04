@@ -146,6 +146,33 @@ export function compose(
   return paragraphs.join("\n\n");
 }
 
+const wordsOf = new Map<string, number>();
+function words(text: string): number {
+  let n = wordsOf.get(text);
+  if (n === undefined) {
+    n = wordCount(text);
+    wordsOf.set(text, n);
+  }
+  return n;
+}
+
+/**
+ * wordCount(compose(...)), without composing: every passage is joined to
+ * the next with a space or a blank line, so the words add up
+ * (tests/seed/banks.test.ts checks the two agree).
+ */
+export function partsWords(fr: TopicFragments, closings: Closings, school: SchoolId, parts: Parts): number {
+  const s = fr.schools[school];
+  let n = words(s.positions[parts.position]);
+  if (parts.frame !== undefined) n += words(FRAMES[parts.frame]);
+  for (const r of parts.reasons) n += words(s.reasons[r]);
+  for (const w of parts.weak) n += words(fr.weak[w]);
+  if (parts.example !== null) n += words(s.examples[parts.example]);
+  for (const o of parts.objections) n += words(objectionSentence(s.objections[o]));
+  if (parts.closing !== null) n += words(closings[school][parts.closing]);
+  return n;
+}
+
 /**
  * Drops passages, least load-bearing first, until the text fits: the
  * example, then the closing, then a second reason. Used for revisions,
@@ -153,7 +180,7 @@ export function compose(
  */
 export function fit(fr: TopicFragments, closings: Closings, school: SchoolId, parts: Parts): Parts {
   const p: Parts = { ...parts, reasons: [...parts.reasons], objections: [...parts.objections], weak: [...parts.weak] };
-  const over = () => wordCount(compose(fr, closings, school, p)) > MAX_WORDS;
+  const over = () => partsWords(fr, closings, school, p) > MAX_WORDS;
   if (over() && p.example !== null) p.example = null;
   if (over() && p.closing !== null) p.closing = null;
   if (over() && p.weak.length > 1) p.weak = p.weak.slice(0, 1);

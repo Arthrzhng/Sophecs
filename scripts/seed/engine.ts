@@ -132,6 +132,17 @@ async function retry<T>(fn: () => Promise<T>, attempts: number, baseMs: number, 
 /** Profile fields a later plan can change: what the replay ends on. */
 export const PROFILE_MUTABLE = ["elo", "streak", "streak_updated_on", "school", "school_history"] as const;
 
+/** JSON with object keys sorted: jsonb does not keep the order they were written in. */
+function canonical(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map(canonical).join(",")}]`;
+  if (v && typeof v === "object")
+    return `{${Object.keys(v as object)
+      .sort()
+      .map((k) => `${JSON.stringify(k)}:${canonical((v as Record<string, unknown>)[k])}`)
+      .join(",")}}`;
+  return JSON.stringify(v ?? null);
+}
+
 /** The mutable fields where the database row differs from the plan's. */
 export function changedFields(current: Record<string, unknown> | undefined, planned: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = {};
@@ -139,7 +150,7 @@ export function changedFields(current: Record<string, unknown> | undefined, plan
   for (const k of PROFILE_MUTABLE) {
     const a = current[k] ?? null;
     const b = planned[k] ?? null;
-    const same = typeof a === "number" || typeof b === "number" ? Number(a) === Number(b) : JSON.stringify(a) === JSON.stringify(b);
+    const same = typeof a === "number" || typeof b === "number" ? Number(a) === Number(b) : canonical(a) === canonical(b);
     if (!same) out[k] = b;
   }
   return out;

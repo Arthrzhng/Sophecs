@@ -24,17 +24,8 @@
 
 import { productionTarget, productionSeed, GuardError } from "./seed/env";
 import { SupabaseAdapter } from "./seed/adapter-supabase";
-import { buildPlan } from "./seed/plan";
-import { DEFAULTS, type GenConfig } from "./seed/generate";
-import { contentTopics } from "./seed/topics";
-import { execute } from "./seed/engine";
-import { validate } from "./seed/validate";
-import { dryRun } from "./seed/dryrun";
+import { runCi, MODES, type Mode } from "./seed/ci";
 import { log, main, nowFloored, parseFlags, str } from "./seed/cli";
-
-export const CANARY_ACCOUNTS = 40;
-const MODES = ["canary", "full", "extend"] as const;
-type Mode = (typeof MODES)[number];
 
 main(async () => {
   const f = parseFlags(process.argv.slice(2), { values: ["mode", "expected-project-ref", "confirm-production"], booleans: [] });
@@ -43,73 +34,6 @@ main(async () => {
   const ref = str(f, "expected-project-ref");
   if (!ref) throw new GuardError("--expected-project-ref is required");
   const target = productionTarget(ref, str(f, "confirm-production"));
-  const seed = productionSeed();
-  const adapter = new SupabaseAdapter(target);
-  await adapter.checkSchema();
-
-  const active = (await adapter.listRuns()).filter((r) => r.status !== "torn_down");
-  let baseTo: string;
-  let cohortLimit: number | undefined;
-  if (mode === "canary") {
-    if (active.length) throw new GuardError(`run ${active[0].id} exists; a canary starts a new run`);
-    baseTo = nowFloored();
-    cohortLimit = CANARY_ACCOUNTS;
-  } else {
-    if (active.length === 0) {
-      log("no sample run is active; nothing to do");
-      return;
-    }
-    if (active.length > 1) throw new GuardError(`${active.length} sample runs are active; expected one`);
-    const run = active[0];
-    if (mode === "extend" && run.counts?.stage !== "full") {
-      log(`run ${run.id} has not had its full stage; nothing to do until it has`);
-      return;
-    }
-    baseTo = new Date(run.base_to).toISOString();
-  }
-
-  const gen: GenConfig = {
-    seed,
-    from: DEFAULTS.from,
-    baseTo,
-    to: nowFloored(),
-    users: DEFAULTS.users,
-    anonResults: DEFAULTS.anonResults,
-    challenges: DEFAULTS.challenges,
-    exchanges: DEFAULTS.exchanges,
-    classes: DEFAULTS.classes,
-    topics: contentTopics(),
-  };
-  const started = Date.now();
-  const { plan, dataset } = buildPlan({ target: { kind: "production", projectRef: ref }, gen, planPath: "(in memory)" });
-  log(`${mode}: run ${plan.runId}, activity to ${plan.window.to}; plan made in ${((Date.now() - started) / 1000).toFixed(1)} s`);
-
-  const report: Record<string, unknown> = { mode, at: new Date().toISOString(), window: plan.window, counts: plan.counts };
-  const record = async (patch: Record<string, unknown>) => {
-    Object.assign(report, patch);
-    if (await adapter.getRun(plan.runId)) await adapter.updateRun(plan.runId, { last_report: report });
-  };
-
-  const dry = await dryRun(adapter, plan);
-  if (!dry.ok) {
-    await record({ dryRun: dry.lines, ok: false });
-    log("dry-run checks failed; nothing written (details in seed_runs.last_report)");
-    process.exitCode = 1;
-    return;
-  }
-  log("dry-run checks passed");
-
-  const result = await execute({ dataset, plan, adapter, cohortLimit, log, batchSize: 250, authConcurrency: 4 });
-  log(
-    `wrote ${JSON.stringify(result.written)} in ${result.seconds.toFixed(1)} s (${result.rowsPerSecond.toFixed(0)} rows/s${
-      result.authUsersPerSecond ? `, ${result.authUsersPerSecond.toFixed(1)} auth users/s` : ""
-    })`
-  );
-  const v = await validate(adapter, dataset, result.before, { cohortLimit });
-  for (const c of v.checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}`);
-  await record({ written: result.written, seconds: result.seconds, ok: v.ok, checks: v.checks });
-  if (!v.ok) {
-    log("validation failed: stop here (docs/sample-activity.md, \"Stop conditions\"); details in seed_runs.last_report");
-    process.exitCode = 1;
-  }
+  const outcome = await runCi({ mode, adapter: new SupabaseAdapter(target), seed: productionSeed(), projectRef: ref, now: nowFloored, log });
+  if (!outcome.ok) process.exitCode = 1;
 });

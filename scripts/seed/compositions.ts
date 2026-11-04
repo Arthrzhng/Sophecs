@@ -3,7 +3,7 @@
 // generator draws on every composition the hand-written passages allow:
 // for each motion, school and tier, every position, reason, example,
 // objection, closing and opening sentence that the tier takes, kept when
-// it lands between 80 and 250 words and reads differently from the rest.
+// it lands between 80 and 250 words and is made of different passages.
 //
 // Each list is shuffled once per run (plain compositions before the ones
 // with an opening sentence) and given out in order, so no composition is
@@ -13,10 +13,24 @@
 // already given (generate.ts). Exact duplicates come only from a list
 // running out, which the plan measures (exactDuplicateArgumentsPct).
 
-import { candidates, compose, fit, FRAMES, wordCount, MIN_WORDS, MAX_WORDS, type Banks, type Parts, type SchoolId, type Tier, type TopicSlug } from "./banks";
+import { candidates, fit, partsWords, FRAMES, MIN_WORDS, MAX_WORDS, type Banks, type Parts, type SchoolId, type Tier, type TopicSlug } from "./banks";
 import type { Rng } from "./rng";
 
+// Built once per process for each set of passages: the key is the passages
+// themselves, so an edited passage is never served from a stale list.
+const cache = new Map<string, Parts[]>();
+
 export function allCompositions(banks: Banks, topic: TopicSlug, school: SchoolId, tier: Tier): Parts[] {
+  const fr = banks.fragments[topic];
+  const key = JSON.stringify([tier, school, fr.weak, fr.weak_direction, fr.schools[school], banks.closings[school]]);
+  const hit = cache.get(key);
+  if (hit) return hit;
+  const built = build(banks, topic, school, tier);
+  cache.set(key, built);
+  return built;
+}
+
+function build(banks: Banks, topic: TopicSlug, school: SchoolId, tier: Tier): Parts[] {
   const fr = banks.fragments[topic];
   const seen = new Set<string>();
   const out: Parts[] = [];
@@ -24,10 +38,11 @@ export function allCompositions(banks: Banks, topic: TopicSlug, school: SchoolId
     for (const frame of [undefined, ...FRAMES.map((_, i) => i)]) {
       let parts: Parts = frame === undefined ? { ...base } : { ...base, frame };
       if (tier === "strong") parts = fit(fr, banks.closings, school, parts);
-      const text = compose(fr, banks.closings, school, parts);
-      const words = wordCount(text);
-      if (words < MIN_WORDS || words > MAX_WORDS || seen.has(text)) continue;
-      seen.add(text);
+      const words = partsWords(fr, banks.closings, school, parts);
+      // The same passages make the same text, so the parts are the key.
+      const key = JSON.stringify(parts);
+      if (words < MIN_WORDS || words > MAX_WORDS || seen.has(key)) continue;
+      seen.add(key);
       out.push(parts);
     }
   }

@@ -106,4 +106,14 @@ describe("submitQuizResult from a challenge link", () => {
     expect(tables.quiz_results.at(-1)).toMatchObject({ challenge_from: null });
     expect(tables.challenges[0]).toMatchObject({ challengee_result_id: null, status: "open" });
   });
+
+  it("never accepts a sample account's challenge", async () => {
+    tables.challenges[0].is_sample = true;
+    const res = await submitQuizResult({ ...answers, challengeId: "c1" });
+    expect(res).toMatchObject({ ok: true });
+    expect((res as { challengerSchool?: string }).challengerSchool).toBeUndefined();
+    expect(tables.quiz_results.at(-1)).toMatchObject({ challenge_from: null });
+    expect(tables.challenges[0]).toMatchObject({ challengee_result_id: null, status: "open" });
+  });
 });
+

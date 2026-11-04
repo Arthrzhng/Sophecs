@@ -29,7 +29,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       .single();
     if (data) {
       school = data.school as SchoolId;
-      sample = data.is_sample === true;
+      sample = Boolean(data.is_sample);
     }
   }
 

@@ -34,7 +34,7 @@ export default async function VerdictOGImage({
     if (data) {
       school = data.school as SchoolId;
       score = Number(data.score ?? 0);
-      sample = data.is_sample === true;
+      sample = Boolean(data.is_sample);
       // The stored wording comes from the view with the rest (migration
       // 0020), as on the verdict page; the topic's current motion is the
       // fallback for a debate stored before motion_text existed.

@@ -35,4 +35,26 @@ describe("argument banks", () => {
         expect(rivals).toEqual(SCHOOLS.filter((s) => s !== school).sort());
       }
   });
+
+  it("count words from the passages exactly as composing and counting would", async () => {
+    const { allCompositions } = await import("../../scripts/seed/compositions");
+    const { loadBanks, compose, partsWords, wordCount, TOPICS, SCHOOLS } = await import("../../scripts/seed/banks");
+    const banks = loadBanks();
+    let checked = 0;
+    for (const topic of TOPICS)
+      for (const school of SCHOOLS)
+        for (const tier of ["strong", "mid", "weak"] as const) {
+          const all = allCompositions(banks, topic, school, tier);
+          for (let i = 0; i < all.length; i += 97) {
+            const p = all[i];
+            expect(partsWords(banks.fragments[topic], banks.closings, school, p)).toBe(wordCount(compose(banks.fragments[topic], banks.closings, school, p)));
+            checked++;
+          }
+          // And no two compositions in a list make the same text.
+          const texts = all.map((p) => compose(banks.fragments[topic], banks.closings, school, p));
+          expect(new Set(texts).size).toBe(texts.length);
+        }
+    expect(checked).toBeGreaterThan(1000);
+  });
 });
+

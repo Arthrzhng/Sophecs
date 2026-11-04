@@ -69,10 +69,13 @@ export async function submitQuizResult(
   if (input.challengeId) {
     const { data: c } = await admin
       .from("challenges")
-      .select("challenger_result_id")
+      .select("challenger_result_id, is_sample")
       .eq("id", input.challengeId)
       .maybeSingle();
-    if (c) {
+    // A sample account's challenge is never accepted (docs/sample-activity.md):
+    // its page sends readers to the quiz without it, and a link made by hand
+    // is treated as no challenge.
+    if (c && !c.is_sample) {
       const { data: challenger } = await admin
         .from("quiz_results")
         .select("school, anon_id, user_id")

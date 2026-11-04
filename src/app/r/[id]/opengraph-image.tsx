@@ -28,7 +28,7 @@ export default async function OGImage({ params }: { params: Promise<{ id: string
       .single();
     if (data) {
       school = data.school as SchoolId;
-      sample = data.is_sample === true;
+      sample = Boolean(data.is_sample);
     }
   }
 

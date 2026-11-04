@@ -81,9 +81,25 @@ describe("metrics", () => {
     expect(tracked.map((e) => e.name).sort()).toEqual(["objection_viewed", "verdict_viewed"]);
   });
 
-  it("the result and challenge pages render no view tracker for a sample", async () => {
+  it("the result, challenge and verdict pages mark a sample page instead of tracking it", async () => {
     const { readFileSync } = await import("node:fs");
-    expect(readFileSync("src/app/r/[id]/page.tsx", "utf8")).toMatch(/\{!result\.is_sample && \(\s*<CardViewTracker/);
-    expect(readFileSync("src/app/c/[id]/page.tsx", "utf8")).toMatch(/\{!challenge\.isSample && <ChallengeViewTracker/);
+    expect(readFileSync("src/app/r/[id]/page.tsx", "utf8")).toMatch(/\{result\.is_sample \? \(\s*<SamplePageMarker \/>\s*\) : \(\s*<CardViewTracker/);
+    expect(readFileSync("src/app/c/[id]/page.tsx", "utf8")).toMatch(/\{challenge\.isSample \? <SamplePageMarker \/> : <ChallengeViewTracker/);
+    expect(readFileSync("src/app/debate/[slug]/[debateId]/page.tsx", "utf8")).toMatch(/\{publicRow\.is_sample && <SamplePageMarker \/>\}/);
+  });
+
+  it("nothing reaches PostHog from a page that carries the sample marker", async () => {
+    // The real module: this file mocks it for the trackers above.
+    const { onSamplePage, SAMPLE_PAGE_ATTRIBUTE } = await vi.importActual<typeof import("../../src/lib/analytics/client")>("../../src/lib/analytics/client");
+    const { readFileSync } = await import("node:fs");
+    // The marker component writes the attribute the client looks for.
+    expect(readFileSync("src/components/sample/SamplePageMarker.tsx", "utf8")).toContain(`${SAMPLE_PAGE_ATTRIBUTE}=""`);
+    // track() returns before loading PostHog when the marker is present.
+    const src = readFileSync("src/lib/analytics/client.ts", "utf8");
+    const body = src.slice(src.indexOf("export function track("));
+    expect(body.indexOf("if (onSamplePage()) return;")).toBeGreaterThan(-1);
+    expect(body.indexOf("if (onSamplePage()) return;")).toBeLessThan(body.indexOf("ensureClient()"));
+    // Without a DOM (server rendering, tests), nothing is a sample page.
+    expect(onSamplePage()).toBe(false);
   });
 });

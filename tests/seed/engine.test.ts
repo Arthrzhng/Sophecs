@@ -89,23 +89,23 @@ describe("execute", () => {
     const u = dataset.authUsers[3];
     db.authUsers.set(u.rowId, { id: u.rowId, email: "someone@example.com", runId: null, loginBlocked: false });
     // An earlier attempt's intent makes the engine look before creating.
-    await db.insertRun({ id: plan.runId, status: "failed", plan_hash: plan.manifestHash, generator_version: plan.generatorVersion, seed: plan.seed, window_from: plan.window.from, window_to: plan.window.to, counts: {}, lock_token: null, locked_at: null, last_error: null });
+    await db.insertRun({ id: plan.runId, status: "failed", plan_hash: plan.baseHash, generator_version: plan.generatorVersion, window_from: plan.window.from, base_to: plan.window.baseTo, window_to: plan.window.to, counts: {}, last_report: null, lock_token: null, locked_at: null, last_error: null });
     await db.recordIntents([{ run_id: plan.runId, kind: "auth_user", logical_id: u.logicalId, row_id: u.rowId }]);
     await expect(execute({ dataset, plan, adapter: db, ...quiet })).rejects.toThrow(/not this run's/);
   });
 
   it("runs one run at a time, and resumes only from its own plan", async () => {
     const db = freshDb();
-    await db.insertRun({ id: "sample-1-other", status: "running", plan_hash: "x", generator_version: "x", seed: 1, window_from: plan.window.from, window_to: plan.window.to, counts: {}, lock_token: "held", locked_at: new Date().toISOString(), last_error: null });
+    await db.insertRun({ id: "sample-1-other", status: "running", plan_hash: "x", generator_version: "x", window_from: plan.window.from, base_to: plan.window.baseTo, window_to: plan.window.to, counts: {}, last_report: null, lock_token: "held", locked_at: new Date().toISOString(), last_error: null });
     await expect(execute({ dataset, plan, adapter: db, ...quiet })).rejects.toThrow(/holds a lock/);
     const db2 = freshDb();
-    await db2.insertRun({ id: plan.runId, status: "failed", plan_hash: "another", generator_version: plan.generatorVersion, seed: plan.seed, window_from: plan.window.from, window_to: plan.window.to, counts: {}, lock_token: null, locked_at: null, last_error: null });
+    await db2.insertRun({ id: plan.runId, status: "failed", plan_hash: "another", generator_version: plan.generatorVersion, window_from: plan.window.from, base_to: plan.window.baseTo, window_to: plan.window.to, counts: {}, last_report: null, lock_token: null, locked_at: null, last_error: null });
     await expect(execute({ dataset, plan, adapter: db2, ...quiet })).rejects.toThrow(/different plan/);
   });
 
   it("clears a dead process's lock only when asked and only once it is stale", async () => {
     const db = freshDb();
-    const run = { id: plan.runId, status: "running" as const, plan_hash: plan.manifestHash, generator_version: plan.generatorVersion, seed: plan.seed, window_from: plan.window.from, window_to: plan.window.to, counts: {}, lock_token: "dead", locked_at: new Date().toISOString(), last_error: null };
+    const run = { id: plan.runId, status: "running" as const, plan_hash: plan.baseHash, generator_version: plan.generatorVersion, window_from: plan.window.from, base_to: plan.window.baseTo, window_to: plan.window.to, counts: {}, last_report: null, lock_token: "dead", locked_at: new Date().toISOString(), last_error: null };
     await db.insertRun(run);
     await expect(execute({ dataset, plan, adapter: db, ...quiet })).rejects.toThrow(/locked by another process/);
     await expect(execute({ dataset, plan, adapter: db, ...quiet, breakStaleLock: true })).rejects.toThrow(/less than 15 minutes/);
@@ -184,7 +184,7 @@ describe("teardown", () => {
   });
 
   it("leaves another run's rows alone", async () => {
-    const other = smallPlan({ seed: 99 });
+    const other = smallPlan({ seed: "99", baseTo: "2026-11-04T11:00:00.000Z", to: "2026-11-04T11:00:00.000Z" });
     const db = await seeded(other);
     await teardown(db, plan.runId);
     expect(sampleRows(db)).toBe(total(other.dataset));

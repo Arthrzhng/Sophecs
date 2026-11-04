@@ -43,6 +43,27 @@ describe("the seed never runs by itself", () => {
     expect(readFileSync("vercel.json", "utf8")).not.toMatch(/seed/);
     expect(readFileSync("next.config.ts", "utf8")).not.toMatch(/seed/);
   });
+  it("runs from one workflow only, on its schedule or by hand, never on a push or a pull request", () => {
+    // Arthur's ruling of 2026-11-04 puts the seed in a scheduled workflow;
+    // no other workflow may touch it, and this one may not run on events
+    // a fork or a branch can cause, which is how secrets reach strangers.
+    const dir = ".github/workflows";
+    const workflows = readdirSync(dir).filter((f) => /\.ya?ml$/.test(f));
+    for (const f of workflows.filter((x) => x !== "sample-activity.yml")) expect(readFileSync(join(dir, f), "utf8"), f).not.toMatch(/seed/i);
+    const wf = readFileSync(join(dir, "sample-activity.yml"), "utf8");
+    const on = wf.slice(wf.indexOf("\non:"), wf.indexOf("\npermissions:"));
+    expect(on).toMatch(/schedule:/);
+    expect(on).toMatch(/workflow_dispatch:/);
+    expect(on).not.toMatch(/\b(push|pull_request|pull_request_target|workflow_run|issue_comment|release)\b/);
+    expect(wf).toMatch(/github\.ref == 'refs\/heads\/main'/);
+    expect(wf).toMatch(/npm run -s seed:ci -- --mode "\$MODE"/);
+    // Secrets go into the credentials file only, never onto a command line
+    // or into an echo, and the file is removed whatever happened.
+    expect(wf).not.toMatch(/echo[^\n]*secrets\./);
+    expect(wf.match(/\$\{\{ secrets\./g)).toHaveLength(2);
+    expect(wf).toMatch(/if: always\(\)\n\s*run: rm -f \.env\.seed\.production/);
+    expect(wf).toMatch(/persist-credentials: false/);
+  });
   it("has no HTTP endpoint", () => {
     for (const f of files("src/app").filter((x) => /route\.tsx?$/.test(x))) expect(readFileSync(f, "utf8"), f).not.toMatch(/seed_run|is_sample.*true/);
   });

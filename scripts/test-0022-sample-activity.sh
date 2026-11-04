@@ -157,6 +157,9 @@ dup=$(psql -X -d "$DB" -c "insert into seed_run_items (run_id, kind, logical_id,
 expect "a second run claiming the same row" refused "$(printf '%s' "$dup" | grep -q 'seed_run_items_row' && echo refused || echo "$dup")"
 bad=$(psql -X -d "$DB" -c "insert into seed_runs (id, status, plan_hash, generator_version, window_from, base_to, window_to) values ('Bad Id','running','h','g',now() - interval '1 day',now(),now())" 2>&1 || true)
 expect "a malformed run id" refused "$(printf '%s' "$bad" | grep -q 'check constraint' && echo refused || echo "$bad")"
+backwards=$(psql -X -d "$DB" -c "insert into seed_runs (id, status, plan_hash, generator_version, window_from, base_to, window_to) values ('run-dddddd','running','h','g',now() - interval '1 day',now(),now() - interval '1 hour')" 2>&1 || true)
+expect "a run whose activity ends before its base window" refused "$(printf '%s' "$backwards" | grep -q 'check constraint' && echo refused || echo "$backwards")"
+expect "the registry keeps no seed" 0 "$(q "select count(*) from information_schema.columns where table_schema = 'public' and table_name = 'seed_runs' and column_name like '%seed%'")"
 q "delete from seed_run_items; delete from seed_runs" >/dev/null
 
 say "elo_percentile counts genuine profiles only"
