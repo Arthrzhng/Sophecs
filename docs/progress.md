@@ -190,3 +190,29 @@ entry names.
   (read from Vercel). Fetched through Vercel at 00:43 UTC on 2026-11-04:
   `/styleguide/phase3/card/confucian` answered 404, as it should in
   production, and `/robots.txt` 200.
+
+## 2026-11-04: Checkpoint A
+
+- #56 merged as `7f0406e`: the Stage 1 rerun, the merge log for #51, #53,
+  #54 and #55, and `docs/checkpoint-a.md`. Production deploy
+  `dpl_12RLEjQrBzewYW9gw79ZRUsAmFZY`, Ready (read from Vercel on
+  2026-11-04).
+
+## 2026-11-04: sample activity, built and tested locally, not run
+
+- Branch `sample-activity`: migration 0021 (the `is_sample` marker, the
+  `seed_runs` and `seed_run_items` registry, a trigger that lets only the
+  server role set the marker, the marker on `debates_public` and
+  `public_results`, `elo_percentile` over genuine profiles, an index on
+  `debates(created_at)`), the Sample label and sample-assessment wording,
+  the par-window filter in `/api/judge` and the challenge guard, the
+  school table and Today read in full past 1,000 rows, and the seed
+  tooling in `scripts/seed/`. `docs/sample-activity.md` has the design.
+- Not applied and not run anywhere but a local Postgres 16. Migration
+  0021: `scripts/test-0021-sample-activity.sh`, all checks passed, and
+  `scripts/test-migrations.sh` with 0021 in the rollback round trip, exit
+  0. The seed: a local run of 4,000 accounts end to end (create, plan,
+  canary of 40, full, validate, teardown preview, teardown), with genuine
+  rows in the database that it left as they were.
+- Production plan `docs/seed-plans/sample-20261104-202611040204.json`,
+  waiting on Arthur's approval with everything else that run needs.

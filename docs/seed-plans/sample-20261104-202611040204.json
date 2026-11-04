@@ -1,0 +1,251 @@
+{
+  "planVersion": 1,
+  "runId": "sample-20261104-202611040204",
+  "target": {
+    "kind": "production",
+    "projectRef": "tekifezydjlgxgndkxul"
+  },
+  "createdAt": "2026-11-04T02:04:24.848Z",
+  "codeVersion": "8700fc4529e1a76dd5e09cb60cad0368de62a41c",
+  "generatorVersion": "sample-activity-1",
+  "seed": 20261104,
+  "window": {
+    "from": "2026-09-18T00:00:00.000Z",
+    "to": "2026-11-04T02:04:00.000Z"
+  },
+  "config": {
+    "users": 4000,
+    "anonResults": 6000,
+    "challenges": 400,
+    "exchanges": 600,
+    "classes": 12
+  },
+  "topics": [
+    {
+      "slug": "opaque-benefit",
+      "motion": "An AI system that reliably reduces suffering should be deployed even where the people it decides about cannot be told why."
+    },
+    {
+      "slug": "crash-arithmetic",
+      "motion": "A self-driving car should be programmed to minimise total deaths in an unavoidable crash, even when that means sacrificing its own passenger."
+    },
+    {
+      "slug": "no-decision",
+      "motion": "It is a mistake to say that a language model decides anything."
+    },
+    {
+      "slug": "moral-training",
+      "motion": "Training a model on human feedback can make it good in the same sense that moral upbringing makes a person good."
+    },
+    {
+      "slug": "careful-builder",
+      "motion": "When an AI system causes harm, the people who built it are to blame in proportion to the harm, however careful they were."
+    },
+    {
+      "slug": "borrowed-judgement",
+      "motion": "Handing daily choices to an AI assistant costs something that matters, even when its choices are better than the ones it replaces."
+    }
+  ],
+  "manifestHash": "98296d1d13becd55a7acc18f5c67d126fc3c7f58ff90a0abeeaa4b97b53cd713",
+  "counts": {
+    "auth_user": 4000,
+    "profile": 4000,
+    "quiz_result": 10392,
+    "challenge": 400,
+    "debate": 9370,
+    "exchange": 600,
+    "turn": 2050,
+    "reading_response": 2764,
+    "class": 12,
+    "class_member": 272,
+    "challenge_link": 120
+  },
+  "distributions": {
+    "quizSchoolsAllResultsPct": {
+      "utilitarianism": 34.3,
+      "stoicism": 41.6,
+      "virtue-ethics": 24.1
+    },
+    "profileSchoolsPct": {
+      "utilitarianism": 34.6,
+      "stoicism": 41.6,
+      "virtue-ethics": 23.9
+    },
+    "accountsByDebatesPct": {
+      "quizOnly": 60,
+      "1-3": 25.4,
+      "4-29": 11.6,
+      "30+": 3
+    },
+    "debatersWhoRevisePct": 13.6,
+    "debates": {
+      "originals": 8925,
+      "revisions": 445
+    },
+    "rejectedPct": 2.6,
+    "scoreBandsPct": {
+      "70-90": 26.4,
+      "50-69": 50.5,
+      "25-49": 23.1
+    },
+    "words": {
+      "min": 80,
+      "max": 250,
+      "mean": 140
+    },
+    "exactDuplicateArgumentsPct": 30.3,
+    "distinctArgumentTexts": 7666,
+    "nearDuplicateArgumentsPct": 43.6,
+    "readingResponsesSharingTextPct": 100,
+    "referrersPct": {
+      "direct": 41.6,
+      "instagram": 18.2,
+      "x": 9.5,
+      "tiktok": 28.8,
+      "challenge": 1.9
+    },
+    "timezonesPct": {
+      "America/New_York": 13,
+      "America/Chicago": 5,
+      "America/Los_Angeles": 6.1,
+      "Asia/Singapore": 3.5,
+      "Europe/London": 52.1,
+      "Asia/Hong_Kong": 2,
+      "Europe/Paris": 1.9,
+      "Europe/Dublin": 2.9,
+      "America/Toronto": 3.3,
+      "Asia/Kolkata": 3.1,
+      "Africa/Lagos": 1.7,
+      "Europe/Berlin": 2.9,
+      "Australia/Sydney": 2.8
+    },
+    "debatersActiveAfter14DaysPct": 13,
+    "exchangeOutcomes": {
+      "complete": 413,
+      "lapsed": 129,
+      "open": 58
+    },
+    "challengeStatuses": {
+      "complete": 120,
+      "accepted": 80,
+      "open": 200
+    },
+    "classSizes": [
+      25,
+      29,
+      28,
+      19,
+      15,
+      18,
+      23,
+      18,
+      23,
+      28,
+      17,
+      29
+    ],
+    "schoolSwitches": {
+      "once": 322,
+      "twice": 35
+    },
+    "sampleParElo": {
+      "opaque-benefit": {
+        "par": 1224.2,
+        "n": 50
+      },
+      "crash-arithmetic": {
+        "par": 1222.2,
+        "n": 50
+      },
+      "no-decision": {
+        "par": 1217.18,
+        "n": 50
+      },
+      "moral-training": {
+        "par": 1207.28,
+        "n": 50
+      },
+      "careful-builder": {
+        "par": 1217.96,
+        "n": 50
+      },
+      "borrowed-judgement": {
+        "par": 1220.92,
+        "n": 50
+      }
+    },
+    "eloRange": [
+      1157,
+      1329
+    ]
+  },
+  "prerequisites": [
+    "Migration 0021_sample_activity applied to the target (checked before any write).",
+    "The code that reads is_sample deployed (labels, table note, par-window filter in /api/judge, challenge guard).",
+    "debate_topics on the target matches the plan's six motions (checked before any write).",
+    ".env.seed.production holds SEED_SUPABASE_URL and SEED_SUPABASE_SERVICE_ROLE_KEY for this project, on the machine that runs the command, with network access to the project.",
+    "Auth settings checked: no auth hook or custom SMTP that would act on admin-created users.",
+    "No other seed run holds a lock (checked before any write)."
+  ],
+  "effects": {
+    "authUsers": 4000,
+    "rowsByTable": {
+      "profiles": 4000,
+      "quiz_results": 10392,
+      "challenges": 400,
+      "debates": 9370,
+      "exchanges": 600,
+      "turns": 2050,
+      "reading_responses": 2764,
+      "classes": 12,
+      "class_members": 272
+    },
+    "challengeLinksUpdated": 120,
+    "approxRowBytes": 33352708,
+    "approxRowBytesByKind": {
+      "auth_user": 426890,
+      "profile": 1217952,
+      "quiz_result": 5696324,
+      "challenge": 73526,
+      "debate": 23477492,
+      "exchange": 250843,
+      "turn": 1521416,
+      "reading_response": 655616,
+      "class": 1913,
+      "class_member": 30736
+    },
+    "writesOutside": "None. debate_topics, ai_calls, reports, blocks, payments and analytics are not written. No email is sent; no event is emitted."
+  },
+  "runtime": {
+    "estimateSeconds": 1200,
+    "basis": "assumed: 150 rows/s and 4 auth users/s until a canary measures them"
+  },
+  "costs": {
+    "paidApiCalls": 0,
+    "note": "No model call is made: verdicts are templates. On Supabase's free plan the run adds database rows and auth users within the plan's limits; nothing is billed."
+  },
+  "validation": [
+    "Every registry item for the run is created, and every row reads back marked and owned.",
+    "Sample rows per table equal the registry's created items across runs.",
+    "Spot checks: 50 rows per kind read back equal to the plan's rows.",
+    "No sample debate is waiting for a counterpart (seeking_counterpart_at is null).",
+    "Genuine rows not removed; genuine profiles' ratings, streaks and schools unchanged; debate_topics par unchanged; elo_percentile(1200) unchanged.",
+    "Auth spot check: 20 sample users are banned, carry this run's id, and have the planned email."
+  ],
+  "recovery": [
+    "Cancel with Ctrl-C: the current batch finishes, the lock is released, and the same command resumes.",
+    "A failed run is resumed by the same command; nothing is written twice.",
+    "Teardown removes exactly this run's rows: npm run unseed:production -- --expected-project-ref tekifezydjlgxgndkxul --confirm-production tekifezydjlgxgndkxul --run-id sample-20261104-202611040204 --plan docs/seed-plans/sample-20261104-202611040204.json (preview), then add --execute --confirm-teardown sample-20261104-202611040204.",
+    "Teardown clears any genuine reference to a sample row first, and stops if a genuine row could only be kept by deleting it.",
+    "Rolling back migration 0021 is possible only after teardown (supabase/rollback/0021_sample_activity.down.sql refuses while sample rows remain)."
+  ],
+  "commands": {
+    "dryRun": "npm run seed:production -- --expected-project-ref tekifezydjlgxgndkxul --confirm-production tekifezydjlgxgndkxul --run-id sample-20261104-202611040204 --plan docs/seed-plans/sample-20261104-202611040204.json",
+    "canary": "npm run seed:production -- --expected-project-ref tekifezydjlgxgndkxul --confirm-production tekifezydjlgxgndkxul --run-id sample-20261104-202611040204 --plan docs/seed-plans/sample-20261104-202611040204.json --execute --canary 40",
+    "full": "npm run seed:production -- --expected-project-ref tekifezydjlgxgndkxul --confirm-production tekifezydjlgxgndkxul --run-id sample-20261104-202611040204 --plan docs/seed-plans/sample-20261104-202611040204.json --execute",
+    "resume": "npm run seed:production -- --expected-project-ref tekifezydjlgxgndkxul --confirm-production tekifezydjlgxgndkxul --run-id sample-20261104-202611040204 --plan docs/seed-plans/sample-20261104-202611040204.json --execute",
+    "validate": "npm run seed:production -- --expected-project-ref tekifezydjlgxgndkxul --confirm-production tekifezydjlgxgndkxul --run-id sample-20261104-202611040204 --plan docs/seed-plans/sample-20261104-202611040204.json --validate",
+    "teardownPreview": "npm run unseed:production -- --expected-project-ref tekifezydjlgxgndkxul --confirm-production tekifezydjlgxgndkxul --run-id sample-20261104-202611040204 --plan docs/seed-plans/sample-20261104-202611040204.json",
+    "teardown": "npm run unseed:production -- --expected-project-ref tekifezydjlgxgndkxul --confirm-production tekifezydjlgxgndkxul --run-id sample-20261104-202611040204 --plan docs/seed-plans/sample-20261104-202611040204.json --execute --confirm-teardown sample-20261104-202611040204"
+  }
+}
