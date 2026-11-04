@@ -87,10 +87,10 @@ export class SupabaseAdapter implements Adapter {
   async checkSchema() {
     for (const table of ["profiles", "quiz_results", "challenges", "debates", "exchanges"]) {
       const { error } = await this.db.from(table).select("is_sample").limit(1);
-      fail(`migration 0021 is not applied (${table}.is_sample)`, error);
+      fail(`migration 0022 is not applied (${table}.is_sample)`, error);
     }
     const { error } = await this.db.from("seed_runs").select("id").limit(1);
-    fail("migration 0021 is not applied (seed_runs)", error);
+    fail("migration 0022 is not applied (seed_runs)", error);
   }
 
   async scan(table: ScanTable, columns: string[], where?: { sample?: boolean }) {
@@ -275,6 +275,19 @@ export class SupabaseAdapter implements Adapter {
       out.push(...(data ?? []));
     }
     return out;
+  }
+  async updateSampleRows(table: "profiles", rows: { id: string; patch: Record<string, unknown> }[]) {
+    // One request per row: each is scoped to is_sample, so a genuine id
+    // passed by mistake matches nothing. Four at a time.
+    let next = 0;
+    const worker = async () => {
+      while (next < rows.length) {
+        const { id, patch } = rows[next++];
+        const { error } = await this.db.from(table).update(patch).eq("id", id).eq("is_sample", true);
+        fail(`${table} update`, error);
+      }
+    };
+    await Promise.all(Array.from({ length: 4 }, worker));
   }
   async linkChallenge(id: string, a: string, b: string) {
     const { error } = await this.db

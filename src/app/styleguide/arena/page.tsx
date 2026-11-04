@@ -890,16 +890,6 @@ export default function ArenaPreviewPage() {
         />
       </Section>
 
-      <Section title="41. Sample: a class with a sample member">
-        <div className="rounded-panel border-2 border-rule">
-          <ClassView
-            name="Year 12 Philosophy"
-            code="KQ47PD"
-            members={FIXTURE_STUDENTS.slice(0, 2).map((m, i) => (i === 1 ? { ...m, isSample: true } : m))}
-            topics={classTopics}
-          />
-        </div>
-      </Section>
     </Page>
   );
 }

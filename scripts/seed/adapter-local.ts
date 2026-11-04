@@ -72,7 +72,7 @@ export class LocalAdapter implements Adapter {
                 and table_name in ('profiles','quiz_results','debates','challenges','exchanges'))::int as marked,
               (select count(*) from information_schema.tables where table_schema = 'public' and table_name in ('seed_runs','seed_run_items'))::int as registry`
     );
-    if (r.marked !== 5 || r.registry !== 2) throw new Error("migration 0021_sample_activity is not applied to this database");
+    if (r.marked !== 5 || r.registry !== 2) throw new Error("migration 0022_sample_activity is not applied to this database");
   }
 
   async scan(table: ScanTable, columns: string[], where?: { sample?: boolean }) {
@@ -182,6 +182,15 @@ export class LocalAdapter implements Adapter {
     if (!ids.length) return [];
     const key = table === "class_members" ? `(class_id || ':' || user_id::text)` : "id::text";
     return this.query(`select * from public.${ident(table)} where ${key} = any(${textArray(ids)})`);
+  }
+  async updateSampleRows(table: "profiles", rows: { id: string; patch: Record<string, unknown> }[]) {
+    // One statement per row, each scoped to is_sample; the values go
+    // through json_populate_record, so types are the table's own.
+    const statements = rows.map(({ id, patch }) => {
+      const sets = Object.keys(patch).map((k) => `${ident(k)} = (json_populate_record(null::public.${ident(table)}, ${json(patch)})).${ident(k)}`);
+      return `update public.${ident(table)} set ${sets.join(", ")} where id::text = ${json(id)}::json #>> '{}' and is_sample;`;
+    });
+    if (statements.length) this.sql(statements.join("\n"));
   }
   async linkChallenge(id: string, a: string, b: string) {
     this.sql(

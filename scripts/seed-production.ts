@@ -17,14 +17,14 @@
 // Every mismatch between the flags, the plan, the credentials and the
 // target refuses before the first write.
 
-import { productionTarget, describeTarget, GuardError } from "./seed/env";
+import { productionTarget, productionSeed, describeTarget, GuardError } from "./seed/env";
 import { SupabaseAdapter } from "./seed/adapter-supabase";
 import { buildPlan, readPlan, writePlan, datasetForPlan } from "./seed/plan";
 import { DEFAULTS } from "./seed/generate";
 import { contentTopics } from "./seed/topics";
 import { execute } from "./seed/engine";
 import { validate } from "./seed/validate";
-import { dryRun, exportGenuine } from "./seed/dryrun";
+import { dryRun } from "./seed/dryrun";
 import { cancelSignal, int, isoFlag, log, main, nowFloored, parseFlags, refuseUnsupported, str, writeReport } from "./seed/cli";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -34,7 +34,7 @@ const argv = command === "plan" ? rest : process.argv.slice(2);
 
 main(async () => {
   const f = parseFlags(argv, {
-    values: ["expected-project-ref", "confirm-production", "run-id", "plan", "seed", "from", "to", "users", "anon-results", "challenges", "exchanges", "classes", "canary", "out", "real-judge", "concurrency", "batch-size", "rows-per-second", "auth-per-second"],
+    values: ["expected-project-ref", "confirm-production", "run-id", "plan", "seed", "from", "base-to", "to", "users", "anon-results", "challenges", "exchanges", "classes", "canary", "out", "real-judge", "concurrency", "batch-size", "rows-per-second", "auth-per-second"],
     booleans: ["execute", "validate", "six-schools", "break-stale-lock", "dry-run"],
   });
   refuseUnsupported(f);
@@ -45,15 +45,16 @@ main(async () => {
 
   if (isPlan) {
     if (!ref || !/^[a-z]{20}$/.test(ref)) throw new GuardError("--expected-project-ref must be a 20-letter project ref");
-    // No default seed for production: with a public generator, a public
-    // seed would publish every id the run will write.
-    if (!str(f, "seed")) throw new GuardError("--seed is required for a production plan; choose a number that is not written down anywhere public");
-    // The local default, and in the repository's history.
-    if (int(f, "seed", -1, 0, 2 ** 31 - 1) === 20261104) throw new GuardError("--seed 20261104 is public (the local default); choose another");
-    const to = isoFlag(f, "to", nowFloored());
+    // The seed comes from the credentials file, never a flag: with a
+    // public generator it fixes every id the run will write, and a flag
+    // would leave it in shell history.
+    if (str(f, "seed")) throw new GuardError("--seed is not taken for production; put SEED_PLAN_SEED in .env.seed.production");
+    const baseTo = isoFlag(f, "base-to", nowFloored());
+    const to = isoFlag(f, "to", baseTo);
     const gen = {
-      seed: int(f, "seed", -1, 0, 2 ** 31 - 1),
+      seed: productionSeed(),
       from: isoFlag(f, "from", DEFAULTS.from),
+      baseTo,
       to,
       users: int(f, "users", DEFAULTS.users, 1, 20000),
       anonResults: int(f, "anon-results", DEFAULTS.anonResults, 0, 50000),
@@ -65,12 +66,11 @@ main(async () => {
     const measured = str(f, "rows-per-second")
       ? { rowsPerSecond: Number(str(f, "rows-per-second")), authUsersPerSecond: Number(str(f, "auth-per-second") ?? 4), source: "given on the command line" }
       : undefined;
-    const runIdGuess = `sample-${gen.seed}-${to.replace(/[-:T]/g, "").slice(0, 12)}`;
+    const runIdGuess = `sample-${baseTo.replace(/[-:T]/g, "").slice(0, 12)}`;
     const out = str(f, "out") ?? join("scripts", "seed", "reports", "plans", `${runIdGuess}.json`);
     const { plan } = buildPlan({ target: { kind: "production", projectRef: ref }, gen, planPath: out, measured });
     writePlan(out, plan);
     log(`plan ${plan.runId} written to ${out}`);
-    log(`manifest ${plan.manifestHash}`);
     log(JSON.stringify(plan.counts));
     return;
   }
@@ -101,8 +101,6 @@ main(async () => {
     const report = await dryRun(adapter, plan);
     for (const line of report.lines) log(line);
     log(`baseline: ${writeReport(`dryrun-${plan.runId}`, report)}`);
-    // Kept on this machine only (scripts/seed/reports/ is git-ignored).
-    log(`genuine rows exported to ${writeReport(`genuine-export-${plan.runId}`, await exportGenuine(adapter))}`);
     if (!report.ok) process.exitCode = 1;
     else log("Add --execute to run it.");
     return;

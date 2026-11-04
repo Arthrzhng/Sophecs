@@ -138,7 +138,7 @@ export function SchoolCard({
   elo: number;
   /** The school's place on this week's table, or null with nothing judged. */
   rank: number | null;
-  /** This week's ranks count a sample account's argument (migration 0021). */
+  /** This week's ranks count a sample account's argument (migration 0022). */
   includesSamples?: boolean;
 }) {
   const place = rank != null ? PLACES[rank - 1] : null;

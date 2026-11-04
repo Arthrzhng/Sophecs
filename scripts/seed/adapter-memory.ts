@@ -183,6 +183,12 @@ export class MemoryAdapter implements Adapter {
   async selectByIds(table: Table, ids: string[]) {
     return ids.map((id) => this.table(table).get(id)).filter((r): r is Row => Boolean(r)).map((r) => ({ ...r }));
   }
+  async updateSampleRows(table: "profiles", rows: { id: string; patch: Record<string, unknown> }[]) {
+    for (const { id, patch } of rows) {
+      const r = this.table(table).get(id);
+      if (r && r.is_sample === true) Object.assign(r, patch);
+    }
+  }
   async linkChallenge(id: string, a: string, b: string) {
     const r = this.table("challenges").get(id);
     if (r && r.is_sample) Object.assign(r, { challenger_debate_id: a, challengee_debate_id: b });

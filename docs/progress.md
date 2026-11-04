@@ -200,7 +200,7 @@ entry names.
 
 ## 2026-11-04: sample activity, built and tested locally, not run
 
-- Branch `sample-activity`: migration 0021 (the `is_sample` marker, the
+- Branch `sample-activity`: migration 0022 (the `is_sample` marker, the
   `seed_runs` and `seed_run_items` registry, triggers that let only the
   server role set the marker and refuse a reader's row pointing at a sample
   row, the marker on `debates_public` and
@@ -210,8 +210,8 @@ entry names.
   school table and Today read in full past 1,000 rows, and the seed
   tooling in `scripts/seed/`. `docs/sample-activity.md` has the design.
 - Not applied and not run anywhere but a local Postgres 16. Migration
-  0021: `scripts/test-0021-sample-activity.sh`, all checks passed, and
-  `scripts/test-migrations.sh` with 0021 in the rollback round trip, exit
+  0022: `scripts/test-0022-sample-activity.sh`, all checks passed, and
+  `scripts/test-migrations.sh` with 0022 in the rollback round trip, exit
   0. The seed: a local run of 4,000 accounts end to end (create, plan,
   canary of 40, full, validate, teardown preview, teardown), with genuine
   rows in the database that it left as they were.

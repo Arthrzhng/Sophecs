@@ -17,7 +17,7 @@ export async function dryRun(adapter: Adapter, plan: Plan, opts: { rereadMs?: nu
   const lines: string[] = [];
   let ok = true;
   await adapter.checkSchema();
-  lines.push("schema: migration 0021 is in place");
+  lines.push("schema: migration 0022 is in place");
   // The checks a run is validated against must already hold before it, or
   // a failure afterwards could not be told from one the run caused. A
   // failure is read again before it is reported (baseline.ts).
@@ -31,10 +31,13 @@ export async function dryRun(adapter: Adapter, plan: Plan, opts: { rereadMs?: nu
   const runs = await adapter.listRuns();
   lines.push(`runs on target: ${runs.map((r) => `${r.id} ${r.status}${r.lock_token ? " (locked)" : ""}`).join(", ") || "none"}`);
   const run = runs.find((r) => r.id === plan.runId);
-  if (run && run.plan_hash !== plan.manifestHash) {
+  if (run && run.plan_hash !== plan.baseHash) {
     ok = false;
-    lines.push(`this run exists with a different plan hash: refuse`);
-  } else lines.push(run ? `this run exists: ${run.status}` : "this run has not started");
+    lines.push(`this run exists with a different seed, base window or config: refuse`);
+  } else if (run && Date.parse(plan.window.to) < Date.parse(run.window_to)) {
+    ok = false;
+    lines.push(`this run already reaches ${run.window_to}, later than this plan: refuse`);
+  } else lines.push(run ? `this run exists: ${run.status}, stage ${String(run.counts?.stage ?? "none")}` : "this run has not started");
   const locked = runs.filter((r) => r.id !== plan.runId && r.lock_token);
   if (locked.length) {
     ok = false;
@@ -48,20 +51,4 @@ export async function dryRun(adapter: Adapter, plan: Plan, opts: { rereadMs?: nu
   }
   lines.push(ok ? "dry run passed; nothing written" : "dry run found a problem; nothing written");
   return { ok, lines, baseline };
-}
-
-/**
- * Every genuine row of the tables a run touches or reads around, for the
- * operator to keep before the first write. Production is on the free plan,
- * with no restorable backup; this file, the registry and teardown are the
- * recovery path (docs/sample-activity.md, "Backup and recovery"). It holds
- * readers' data, so it is written only to scripts/seed/reports/ on the
- * operator's own machine, which is git-ignored, and never printed.
- */
-export async function exportGenuine(adapter: Adapter): Promise<Record<string, Record<string, unknown>[]>> {
-  const out: Record<string, Record<string, unknown>[]> = {};
-  const all = ["*"];
-  for (const t of ["profiles", "quiz_results", "challenges", "debates", "exchanges"] as const) out[t] = await adapter.scan(t, all, { sample: false });
-  for (const t of ["turns", "reading_responses", "classes", "class_members", "blocks", "reports", "debate_topics"] as const) out[t] = await adapter.scan(t, all);
-  return out;
 }

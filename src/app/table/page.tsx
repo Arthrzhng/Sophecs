@@ -117,7 +117,7 @@ export default async function SchoolTablePage() {
     const entries = (histories.rows ?? []).flatMap((p) =>
       Array.isArray(p.school_history) ? (p.school_history as SchoolChange[]) : []
     );
-    // Sample accounts (migration 0021) are counted like anyone else, in
+    // Sample accounts (migration 0022) are counted like anyone else, in
     // both the arguments and the joined and left columns, and the table
     // says so in any week either includes one.
     const inWeek = (at: string) => Date.parse(at) >= start.getTime() && Date.parse(at) < end.getTime();

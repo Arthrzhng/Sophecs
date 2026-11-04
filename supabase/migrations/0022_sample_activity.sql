@@ -48,12 +48,20 @@ alter table public.debates add column verdict_is_template boolean not null defau
 create table public.seed_runs (
   id text primary key check (id ~ '^[a-z0-9-]{6,64}$'),
   status text not null check (status in ('running', 'complete', 'failed', 'tearing_down', 'torn_down')),
+  -- A hash of the run's fixed inputs (generator, seed, base window,
+  -- config, motions). The seed itself is never stored.
   plan_hash text not null,
   generator_version text not null,
-  seed integer not null,
   window_from timestamptz not null,
+  -- The base window's end, fixed for the life of the run; window_to moves
+  -- forward each time the run is extended (docs/sample-activity.md).
+  base_to timestamptz not null,
   window_to timestamptz not null,
+  check (window_from < base_to and base_to <= window_to),
   counts jsonb not null default '{}'::jsonb,
+  -- The last execution's or validation's full report: kept here, readable
+  -- by the server role only, rather than in a public workflow log.
+  last_report jsonb,
   lock_token text,
   locked_at timestamptz,
   last_error text,

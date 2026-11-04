@@ -11,7 +11,7 @@ import { GENERATOR_VERSION, generate, type Dataset, type GenConfig } from "./gen
 import { phases } from "./engine";
 import { loadBanks, wordCount, type Banks } from "./banks";
 
-export const PLAN_VERSION = 1;
+export const PLAN_VERSION = 2;
 
 export interface Plan {
   planVersion: number;
@@ -20,10 +20,13 @@ export interface Plan {
   createdAt: string;
   codeVersion: string;
   generatorVersion: string;
-  seed: number;
-  window: { from: string; to: string };
-  config: Omit<GenConfig, "topics" | "seed" | "from" | "to">;
+  /** Secret in production. Never printed; kept only in the plan file on the operator's machine. */
+  seed: string;
+  window: { from: string; baseTo: string; to: string };
+  config: Omit<GenConfig, "topics" | "seed" | "from" | "baseTo" | "to">;
   topics: { slug: string; motion: string }[];
+  /** The run's identity: generator, seed, base window, config and motions. Unchanged as `to` moves. */
+  baseHash: string;
   manifestHash: string;
   counts: Record<string, number>;
   distributions: Record<string, unknown>;
@@ -42,6 +45,24 @@ export function manifestHash(ds: Dataset): string {
   for (const p of phases(ds)) for (const it of p.items) h.update(JSON.stringify([p.kind, it.logicalId, it.rowId, it.cohort, it.row]) + "\n");
   for (const l of ds.challengeLinks) h.update(JSON.stringify(["link", l.logicalId, l.rowId, l.cohort, l.row]) + "\n");
   return h.digest("hex");
+}
+
+/**
+ * The fixed part of a plan, hashed: what makes two plans the same run.
+ * Stored in seed_runs.plan_hash, which only the server role can read. It
+ * is never printed, since with the public generator it would let a seed
+ * be checked by guessing.
+ */
+export function baseHash(gen: GenConfig): string {
+  const fixed = {
+    generator: GENERATOR_VERSION,
+    seed: gen.seed,
+    from: gen.from,
+    baseTo: gen.baseTo,
+    config: { users: gen.users, anonResults: gen.anonResults, challenges: gen.challenges, exchanges: gen.exchanges, classes: gen.classes },
+    topics: gen.topics.map((t) => [t.slug, t.motion]),
+  };
+  return createHash("sha256").update(JSON.stringify(fixed)).digest("hex");
 }
 
 export function counts(ds: Dataset): Record<string, number> {
@@ -140,15 +161,7 @@ export function describe(ds: Dataset): Record<string, unknown> {
     distinctArgumentTexts: textCount.size,
     nearDuplicateArgumentsPct: share(nearDup, deb.length),
     readingResponsesSharingTextPct: share(rr.filter((r) => rrCount.get(r)! > 1).length, rr.length),
-    referrersPct: Object.fromEntries(
-      Object.entries(
-        tally(
-          ds.quizResults.map((q) =>
-            q.row.referrer === "" ? "direct" : q.row.referrer.includes("tiktok") ? "tiktok" : q.row.referrer.includes("instagram") ? "instagram" : q.row.referrer.includes("t.co") ? "x" : "challenge"
-          )
-        )
-      ).map(([k, v]) => [k, share(v, ds.quizResults.length)])
-    ),
+    quizResultsWithAReferrer: ds.quizResults.filter((q) => q.row.referrer !== null).length,
     timezonesPct: Object.fromEntries(Object.entries(tally(ds.profiles.map((p) => p.row.tz))).map(([k, v]) => [k, share(v, users)])),
     debatersActiveAfter14DaysPct: share(retained, last.size),
     exchangeOutcomes: tally(ds.exchanges.map((e) => e.row.status)),
@@ -208,7 +221,7 @@ export function buildPlan(input: PlanInput, banks: Banks = loadBanks()): { plan:
     codeVersion: codeVersion(),
     generatorVersion: GENERATOR_VERSION,
     seed: input.gen.seed,
-    window: { from: input.gen.from, to: input.gen.to },
+    window: { from: input.gen.from, baseTo: input.gen.baseTo, to: input.gen.to },
     config: {
       users: input.gen.users,
       anonResults: input.gen.anonResults,
@@ -217,11 +230,12 @@ export function buildPlan(input: PlanInput, banks: Banks = loadBanks()): { plan:
       classes: input.gen.classes,
     },
     topics: input.gen.topics.map((t) => ({ slug: t.slug, motion: t.motion })),
+    baseHash: baseHash(input.gen),
     manifestHash: manifestHash(ds),
     counts: n,
     distributions: describe(ds),
     prerequisites: [
-      "Migration 0021_sample_activity applied to the target (checked before any write).",
+      "Migration 0022_sample_activity applied to the target (checked before any write).",
       "The code that reads is_sample deployed (labels, table note, par-window filter in /api/judge, challenge guard).",
       "debate_topics on the target matches the plan's six motions (checked before any write).",
       prod
@@ -261,7 +275,7 @@ export function buildPlan(input: PlanInput, banks: Banks = loadBanks()): { plan:
       "A failed run is resumed by the same command; nothing is written twice.",
       `Teardown removes exactly this run's rows: npm run unseed:${script} -- ${flags} (preview), then add --execute --confirm-teardown ${ds.runId}.`,
       "Teardown clears any genuine reference to a sample row first, and stops if a genuine row could only be kept by deleting it.",
-      "Rolling back migration 0021 is possible only after teardown (supabase/rollback/0021_sample_activity.down.sql refuses while sample rows remain).",
+      "Rolling back migration 0022 is possible only after teardown (supabase/rollback/0022_sample_activity.down.sql refuses while sample rows remain).",
     ],
     commands: {
       dryRun: `npm run seed:${script} -- ${flags}`,
@@ -295,7 +309,9 @@ export function datasetForPlan(plan: Plan, topics: GenConfig["topics"], banks: B
     const mine = topics.find((x) => x.slug === t.slug);
     if (!mine || mine.motion !== t.motion) throw new Error(`content/topics ${t.slug} differs from the plan`);
   }
-  const ds = generate({ seed: plan.seed, from: plan.window.from, to: plan.window.to, ...plan.config, topics }, banks);
+  const gen: GenConfig = { seed: plan.seed, from: plan.window.from, baseTo: plan.window.baseTo, to: plan.window.to, ...plan.config, topics };
+  if (baseHash(gen) !== plan.baseHash) throw new Error("the plan's fixed part does not hash to its base hash");
+  const ds = generate(gen, banks);
   if (ds.runId !== plan.runId) throw new Error("the regenerated run id differs from the plan's");
   const hash = manifestHash(ds);
   if (hash !== plan.manifestHash) throw new Error(`the regenerated dataset hashes to ${hash}, not the plan's ${plan.manifestHash}`);

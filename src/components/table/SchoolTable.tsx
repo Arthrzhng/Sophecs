@@ -20,7 +20,7 @@ export interface SchoolTableProps {
   paused: boolean;
   /**
    * Said when the week's rows count a sample account's argument
-   * (migration 0021). Null in a week with none.
+   * (migration 0022). Null in a week with none.
    */
   sampleNote?: string | null;
 }

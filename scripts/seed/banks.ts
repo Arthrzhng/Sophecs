@@ -169,7 +169,7 @@ function eligibleWeak(fr: TopicFragments, school: SchoolId): number[] {
     .map(([, i]) => i);
 }
 
-function candidates(fr: TopicFragments, school: SchoolId, tier: Tier, closingCount: number): Parts[] {
+export function candidates(fr: TopicFragments, school: SchoolId, tier: Tier, closingCount: number): Parts[] {
   const s = fr.schools[school];
   const out: Parts[] = [];
   const P = s.positions.length,

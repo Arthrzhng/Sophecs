@@ -24,8 +24,8 @@ describe("sample activity stays out of genuine calibration", () => {
     expect(src).toMatch(/if \(challengerDebate\.is_sample \|\| challengeeDebate\.is_sample\) return \{ completed: false \};/);
     expect(src.indexOf("is_sample) return")).toBeLessThan(src.indexOf("pairwiseElo(\n"));
   });
-  it("elo_percentile counts genuine profiles only (migration 0021)", () => {
-    const sql = readFileSync("supabase/migrations/0021_sample_activity.sql", "utf8");
+  it("elo_percentile counts genuine profiles only (migration 0022)", () => {
+    const sql = readFileSync("supabase/migrations/0022_sample_activity.sql", "utf8");
     expect(sql).toMatch(/from profiles where not is_sample and elo < user_elo/);
   });
 });

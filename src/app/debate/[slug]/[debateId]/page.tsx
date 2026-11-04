@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { SamplePageMarker } from "@/components/sample/SamplePageMarker";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { Verdict, type VerdictData, type RevisionComparison } from "@/components/debate/Verdict";
@@ -14,7 +15,14 @@ import { motionForDebate, shortMotionForShare } from "@/lib/motion-text";
 import { shareTemplateFor } from "@/lib/verdict-share";
 import { verdictForViewer } from "@/lib/verdict-privacy";
 
-export const metadata = { title: "Verdict · Sophecs" };
+// A sample account's verdict says so in the title too, which is what a
+// link preview shows first.
+export async function generateMetadata({ params }: { params: Promise<{ debateId: string }> }) {
+  const { debateId } = await params;
+  if (!isAdminConfigured()) return { title: "Verdict · Sophecs" };
+  const { data } = await createAdminClient().from("debates_public").select("is_sample").eq("id", debateId).maybeSingle();
+  return { title: data?.is_sample ? "Sample verdict · Sophecs" : "Verdict · Sophecs" };
+}
 
 // Public — anyone with the link can view a verdict. Argument text is
 // gated separately (owner or argument_public), not the page itself.
@@ -207,6 +215,7 @@ export default async function VerdictPage({
 
   return (
     <Page width="ui">
+      {publicRow.is_sample && <SamplePageMarker />}
       <Verdict
         debateId={debateId}
         topicSlug={slug}
@@ -238,7 +247,7 @@ export default async function VerdictPage({
         comparison={comparison}
         counterpart={counterpart}
         textWithheld={textWithheld}
-        // A sample account's argument (migration 0021): labelled, and a
+        // A sample account's argument (migration 0022): labelled, and a
         // template verdict says it is one.
         sample={
           publicRow.is_sample

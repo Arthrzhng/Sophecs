@@ -17,16 +17,18 @@ export default async function OGImage({ params }: { params: Promise<{ id: string
   const [spectral, spectralItalic, plexSans] = await loadCardFonts();
 
   let school: SchoolId = "stoicism";
+  let sample = false;
 
   if (isAdminConfigured()) {
     const admin = createAdminClient();
     const { data } = await admin
       .from("public_results")
-      .select("school")
+      .select("school, is_sample")
       .eq("id", id)
       .single();
     if (data) {
       school = data.school as SchoolId;
+      sample = data.is_sample === true;
     }
   }
 
@@ -38,6 +40,7 @@ export default async function OGImage({ params }: { params: Promise<{ id: string
         school={school}
         oneLine={content.one_line}
         oneLineAttribution={content.one_line_attribution}
+        sample={sample}
         width={1200}
         height={630}
         fonts={{ serif: "Spectral", sans: "IBM Plex Sans" }}

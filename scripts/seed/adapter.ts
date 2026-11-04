@@ -37,12 +37,17 @@ export type RunStatus = "running" | "complete" | "failed" | "tearing_down" | "to
 export interface SeedRun {
   id: string;
   status: RunStatus;
+  /** The base hash (plan.ts): generator, seed, base window, config, motions. The seed itself is never stored. */
   plan_hash: string;
   generator_version: string;
-  seed: number;
   window_from: string;
+  /** The base window's end, fixed for the life of the run. */
+  base_to: string;
+  /** How far the run's activity reaches; moves forward with each extension. */
   window_to: string;
   counts: Record<string, unknown>;
+  /** The last execution's or validation's full report, kept here rather than in public logs. */
+  last_report: Record<string, unknown> | null;
   lock_token: string | null;
   locked_at: string | null;
   last_error: string | null;
@@ -96,7 +101,7 @@ export interface Adapter {
   describe(): string;
 
   // Read-only.
-  /** Throws unless migration 0021 is in place. */
+  /** Throws unless migration 0022 is in place. */
   checkSchema(): Promise<void>;
   /** Every row of a table, paginated by the adapter, optionally only genuine or only sample rows. */
   scan(table: ScanTable, columns: string[], where?: { sample?: boolean }): Promise<Record<string, unknown>[]>;
@@ -136,6 +141,8 @@ export interface Adapter {
   insertIgnore(table: Table, rows: Record<string, unknown>[], conflict: string[]): Promise<void>;
   /** Rows with these ids (or, for class_members, these "class:user" keys). */
   selectByIds(table: Table, ids: string[]): Promise<Record<string, unknown>[]>;
+  /** Updates sample rows by id, only where is_sample is true. */
+  updateSampleRows(table: "profiles", rows: { id: string; patch: Record<string, unknown> }[]): Promise<void>;
   /** Sets a sample challenge's two debate ids. */
   linkChallenge(id: string, challengerDebateId: string, challengeeDebateId: string): Promise<void>;
   /** Clears the debate ids on sample challenges, so their debates can go. */

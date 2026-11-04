@@ -1,7 +1,9 @@
-// Shared command-line handling for the four seed entry points. Nothing in
-// this directory runs on its own: no build step, install hook, migration,
-// CI job or route imports it, and there is no HTTP endpoint for it
-// (tests/seed/isolation.test.ts checks that).
+// Shared command-line handling for the seed entry points. Nothing in this
+// directory runs on its own: no build step, install hook, migration or
+// route imports it, there is no HTTP endpoint for it, and the one workflow
+// that runs it, .github/workflows/sample-activity.yml, runs only on its
+// schedule or by hand, never on a push or a pull request
+// (tests/seed/isolation.test.ts checks all of that).
 
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -64,10 +66,15 @@ export function refuseUnsupported(f: Flags) {
     );
 }
 
+// Readers' data stays in Supabase (Arthur, 2026-11-04): a report on disk
+// keeps counts and check results, and leaves out the baselines, which hold
+// genuine profiles' ids, ratings and activity times.
+const GENUINE_KEYS = new Set(["baseline", "before", "after", "genuineProfiles", "activity"]);
+
 export function writeReport(name: string, body: unknown): string {
   mkdirSync(REPORT_DIR, { recursive: true });
   const path = join(REPORT_DIR, `${name}-${new Date().toISOString().replace(/[:.]/g, "-")}.json`);
-  writeFileSync(path, JSON.stringify(body, null, 2) + "\n");
+  writeFileSync(path, JSON.stringify(body, (k, v) => (GENUINE_KEYS.has(k) ? undefined : v), 2) + "\n");
   return path;
 }
 

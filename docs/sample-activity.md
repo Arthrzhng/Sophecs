@@ -9,7 +9,7 @@ can show one say what it is.
 This file is the design and the runbook. The code is `scripts/seed/`,
 `scripts/seed-production.ts`, `scripts/unseed-production.ts`,
 `scripts/seed-local.ts` and `scripts/unseed-local.ts`; the schema is
-`supabase/migrations/0021_sample_activity.sql`.
+`supabase/migrations/0022_sample_activity.sql`.
 
 ## Where a sample account can be seen
 
@@ -61,7 +61,7 @@ challenges." `/method#samples` explains the rest.
   must filter on it. `scripts/review-verdicts.ts` already does.
 - **Classes, challenges and other references.** No reader can attach a
   row of their own to a sample row, even with an id worked out from the
-  public generator. A trigger in 0021 refuses it on every path a signed-in
+  public generator. A trigger in 0022 refuses it on every path a signed-in
   or anonymous request has through the Data API, inserts and updates
   alike: joining a sample class or adding a sample member, a challenge or
   quiz result pointing at a sample's result or debate, a debate whose
@@ -71,7 +71,7 @@ challenges." `/method#samples` explains the rest.
   exchange; `joinClass` answers a sample class's code as a wrong code),
   except `createChallenge`, which takes any result id; so a genuine
   challenge is checked by the trigger whoever writes it.
-  `scripts/test-0021-sample-activity.sh` tries each path. So no genuine
+  `scripts/test-0022-sample-activity.sh` tries each path. So no genuine
   row can come to depend on a sample row, and teardown is never left
   choosing between the two.
 - **Email and sign-in.** Sample users are created through the Auth admin
@@ -83,7 +83,7 @@ challenges." `/method#samples` explains the rest.
   `prompt_version` `sample-template-1`, `verdict_is_template` true. No
   `ai_calls`, `reports`, `blocks`, payment or analytics row is written.
 
-## The marker and the registry (migration 0021)
+## The marker and the registry (migration 0022)
 
 - `is_sample boolean not null default false` on `profiles`,
   `quiz_results`, `debates`, `challenges` and `exchanges`, and
@@ -109,7 +109,7 @@ challenges." `/method#samples` explains the rest.
 - The rollback refuses while any sample row remains, any run is not torn
   down, or any registry item is still intended or created.
 
-`scripts/test-0021-sample-activity.sh` proves all of it on a throwaway
+`scripts/test-0022-sample-activity.sh` proves all of it on a throwaway
 local database, including the rollback and re-apply.
 
 ## The dataset
@@ -196,7 +196,7 @@ migration, CI job or route, and there is no HTTP endpoint.
 
     npm run seed:local -- --create-db | --make-plan | --run-id <id> --plan <file> [--execute|--validate] | --drop-db
     npm run unseed:local -- --run-id <id> --plan <file> [--execute --confirm-teardown <id>]
-    npm run test:seed-db          # migration 0021 on a throwaway local database
+    npm run test:seed-db          # migration 0022 on a throwaway local database
 
 A production plan needs `--seed`, and is written under
 `scripts/seed/reports/`, which is git-ignored. The generator is public, so
@@ -300,7 +300,7 @@ verdict, result and challenge pages would 404, the table would show an
 empty week, and the par query in `/api/judge` would fail and stop updating.
 
 1. Security advisor, read and recorded (`docs/review-charter.md` rule 10).
-2. Apply `0021_sample_activity` to production. Read it back: the six
+2. Apply `0022_sample_activity` to production. Read it back: the six
    columns, the two registry tables with RLS on and no anon or
    authenticated grants, the eleven triggers (five `*_guard_sample`, six
    `*_guard_reference`), the two views' columns and

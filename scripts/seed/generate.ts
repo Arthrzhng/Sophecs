@@ -2,6 +2,16 @@
 // and a window, before anything is written anywhere. Pure: the same config
 // gives the same rows, in the same order, with the same ids.
 //
+// Two layers. The base window, from `from` to `baseTo`, holds the accounts,
+// their quiz results, challenges, counterpart exchanges, reading answers and
+// classes, and is fixed for the life of a run. Arguments run on past it, to
+// `to`, which moves forward each time the run is extended: every debater's
+// arguments come from their own random stream and stop at their own
+// lifetime, never at `to`, so moving `to` later only appends. Rows up to
+// the old `to` come out the same (tests/seed/extension.test.ts); what a
+// later `to` changes in them is the profiles' rating, streak and school,
+// which the engine updates.
+//
 // What it reuses from the app rather than reimplementing:
 // - the quiz bank and scoreQuiz, so a sample's school comes out of answers
 //   it gave, as a reader's does (answers are biased, outcomes are not set);
@@ -24,18 +34,17 @@ import {
   TOPICS,
   compose,
   fit,
-  FRAMES,
   wordCount,
   quoteFrom,
   objectionSentence,
   type Banks,
-  type BankArgument,
   type Parts,
   type SchoolId,
   type Tier,
   type TopicSlug,
 } from "./banks";
 import { templateVerdict, templateRevisionVerdict, templateRejection, type Verdict, type Rejection } from "./verdicts";
+import { Compositions } from "./compositions";
 import { replay } from "./replay";
 import { DAY, HOUR, MINUTE, TIMEZONES, activeTimeOn, dayWeight, iso, startOfUtcDay } from "./time";
 import { GIVEN_NAMES, INITIALS, CLASS_NAMES } from "./names";
@@ -43,12 +52,16 @@ import readingResponseBank from "./reading-responses.json";
 
 // Bumped whenever the same plan inputs would give different rows, so an
 // older plan is refused by name rather than by a hash mismatch.
-export const GENERATOR_VERSION = "sample-activity-2";
+export const GENERATOR_VERSION = "sample-activity-3";
 
 export interface GenConfig {
-  seed: number;
+  /** Secret in production: with the public generator it fixes every row id. */
+  seed: string;
   from: string; // ISO, inclusive
-  to: string; // ISO, frozen in the plan
+  /** The base window's end, fixed for the life of a run. */
+  baseTo: string;
+  /** Activity is generated up to here; at least baseTo. */
+  to: string;
   users: number;
   anonResults: number;
   challenges: number;
@@ -57,12 +70,14 @@ export interface GenConfig {
   topics: { slug: string; title: string; motion: string; sort: number; microBefore: string }[];
 }
 
+// 3,278 accounts, Arthur's ruling of 2026-11-04, and the other volumes
+// scaled from the brief's 4,000 by the same factor.
 export const DEFAULTS = {
-  users: 4000,
-  anonResults: 6000,
-  challenges: 400,
-  exchanges: 600,
-  classes: 12,
+  users: 3278,
+  anonResults: 4917,
+  challenges: 328,
+  exchanges: 492,
+  classes: 10,
   from: "2026-09-18T00:00:00.000Z",
 };
 
@@ -95,7 +110,8 @@ export interface QuizResultRow {
   vector: Record<SchoolId, number>;
   answers: { q: number; opt: string }[];
   challenge_from: string | null;
-  referrer: string;
+  /** Always null: sample results carry no referrer (Arthur, 2026-11-04). */
+  referrer: null;
   created_at: string;
   is_sample: true;
 }
@@ -211,9 +227,10 @@ export interface Dataset {
   sampleParElo: Record<string, { par: number; n: number }>;
 }
 
-export function runIdFor(seed: number, to: string): string {
-  const stamp = to.replace(/[-:T]/g, "").slice(0, 12); // yyyymmddhhmm
-  return `sample-${seed}-${stamp}`;
+/** From the base window's end alone: the id is public and names no seed. */
+export function runIdFor(baseTo: string): string {
+  const stamp = baseTo.replace(/[-:T]/g, "").slice(0, 12); // yyyymmddhhmm
+  return `sample-${stamp}`;
 }
 
 export function emailFor(runId: string, n: number): string {
@@ -246,27 +263,37 @@ interface WorkingDebate {
   t: number;
   user: User;
   tier: Tier;
-  base: BankArgument;
   parts: Parts;
   verdict: Verdict | null;
 }
 
-const REFERRERS: [string, number][] = [
-  ["https://www.tiktok.com/", 0.3],
-  ["https://l.instagram.com/", 0.2],
-  ["https://t.co/", 0.1],
-  ["", 0.4],
-];
+/** One original argument's place in a debater's stream, before its text. */
+interface Slot {
+  u: User;
+  k: number;
+  t: number;
+  topic: TopicSlug;
+  school: SchoolId;
+  tier: Tier;
+  rejected: boolean;
+  argumentPublic: boolean;
+  revise: { delay: number; answered: boolean } | null;
+}
 
 export function generate(cfg: GenConfig, banks: Banks): Dataset {
   const from = Date.parse(cfg.from);
-  const to = Date.parse(cfg.to);
+  // Everything but the arguments ends at the base window's end, which is
+  // called `to` below; the arguments run on to `horizon`.
+  const to = Date.parse(cfg.baseTo);
+  const horizon = Date.parse(cfg.to);
   if (!(to > from)) throw new Error("the window ends before it starts");
-  const runId = runIdFor(cfg.seed, cfg.to);
-  // The window is part of the root: the same seed with another end gives
-  // other ids, so a new plan never collides with a torn-down run's ids,
-  // which the registry keeps for its audit.
-  const root = new Rng(`sophecs-sample/${GENERATOR_VERSION}/${cfg.seed}/${cfg.from}/${cfg.to}`);
+  if (horizon < to) throw new Error("the run cannot be extended to before its base window ends");
+  const runId = runIdFor(cfg.baseTo);
+  // The base window is part of the root: the same seed with another base
+  // gives other ids, so a new run never collides with a torn-down run's
+  // ids, which the registry keeps for its audit. `to` is not, so extending
+  // a run keeps its ids.
+  const root = new Rng(`sophecs-sample/${GENERATOR_VERSION}/${cfg.seed}/${cfg.from}/${cfg.baseTo}`);
   const days = Math.ceil((to - from) / DAY);
   const id = (r: Rng) => r.token(ID_ALPHABET, ID_LENGTH);
   const topicBySlug = new Map(cfg.topics.map((t) => [t.slug, t]));
@@ -418,7 +445,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         user_id: u.id,
         ...quiz,
         challenge_from: null,
-        referrer: r.weighted(REFERRERS),
+        referrer: null,
         created_at: iso(t),
         is_sample: true,
       },
@@ -450,7 +477,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
           user_id: u.id,
           ...retake,
           challenge_from: null,
-          referrer: "",
+          referrer: null,
           created_at: iso(at),
           is_sample: true,
         },
@@ -478,7 +505,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         user_id: null,
         ...quiz,
         challenge_from: null,
-        referrer: r.weighted(REFERRERS),
+        referrer: null,
         created_at: iso(t),
         is_sample: true,
       },
@@ -493,8 +520,15 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
   };
 
   // ---- 5. arguments ----
+  // Three passes. (a) Each debater's originals, from their own stream:
+  // when, on which motion, from which school, of what quality, rejected or
+  // not, and whether they will revise. The stream stops at the debater's
+  // own lifetime or budget, and at `horizon` before anything about the next
+  // argument is drawn, so a later horizon only appends. (b) Texts, given out
+  // in time order across everyone, each composition of the passages once
+  // before any repeats (compositions.ts). (c) Revisions, each from its
+  // parent's own stream.
   const debateRng = root.fork("debates");
-  const debates: WorkingDebate[] = [];
   const weeklyTopics = cfg.topics.map((t) => ({ slug: t.slug, title: t.title, sort: t.sort }));
   const pickTier = (r: Rng, skill: number): Tier => {
     const shift = 0.3 * (skill - 0.5);
@@ -504,63 +538,36 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
       ["weak", 0.25 - shift],
     ] as const);
   };
-  const vary = (r: Rng, base: BankArgument): Parts => {
-    const s = banks.fragments[base.topic].schools[base.school];
-    const p: Parts = { ...base.parts, reasons: [...base.parts.reasons], objections: [...base.parts.objections], weak: [...base.parts.weak] };
-    if (r.chance(0.5)) p.position = r.int(0, s.positions.length - 1);
-    if (r.chance(0.5)) p.frame = r.int(0, FRAMES.length - 1);
-    if (p.example !== null && r.chance(0.6)) p.example = r.int(0, s.examples.length - 1);
-    if (p.closing !== null && r.chance(0.6)) p.closing = r.int(0, banks.closings[base.school].length - 1);
-    if (p.weak.length === 2 && r.chance(0.5)) p.weak.reverse();
-    if (p.reasons.length === 2 && r.chance(0.3)) p.reasons.reverse();
-    const textOf = (x: Parts) => compose(banks.fragments[base.topic], banks.closings, base.school, x);
-    if (p.example !== null && p.reasons.length > 0 && r.chance(0.15)) {
-      const dropped = { ...p, example: null };
-      if (wordCount(textOf(dropped)) >= 80) return dropped;
-    }
-    if (wordCount(textOf(p)) > 250 && p.frame !== undefined) delete p.frame;
-    if (wordCount(textOf(p)) > 250 || wordCount(textOf(p)) < 80) return base.parts;
-    return p;
-  };
 
+  const slots: Slot[] = [];
   for (const u of users) {
     if (u.cls === "quiz") continue;
     const r = debateRng.fork(`u${u.n}`);
     // About 15% of debaters revise: half the heavy users, and one in
-    // eight of the rest.
+    // eight of the rest. A reviser revises some of their arguments.
     const reviser = r.chance(u.cls === "heavy" ? 0.5 : 0.125);
-    let total =
+    const budget =
       u.cls === "light"
         ? r.weighted([[1, 0.5], [2, 0.3], [3, 0.2]] as const)
         : u.cls === "regular"
           ? Math.min(29, 4 + Math.round(r.exponential(7)))
-          : r.int(30, 36);
-    // A light reader who revises wrote an original to revise.
-    if (reviser && u.cls === "light" && total === 1) total = 2;
-    const revisions = reviser
-      ? u.cls === "light"
-        ? 1
-        : u.cls === "regular"
-          ? r.int(1, Math.min(3, total - 1))
-          : r.int(2, 6)
-      : 0;
-    const originalsWanted = total - revisions;
-    // Most people drop off within a fortnight; regulars last longer and
-    // heavy users stay to the end of the window.
-    const span =
+          : Infinity;
+    const reviseChance = !reviser ? 0 : u.cls === "light" ? 0.6 : u.cls === "regular" ? 0.3 : 0.15;
+    // Most people drop off within a fortnight; regulars last longer; heavy
+    // users stay for months.
+    const lifetime =
       u.cls === "light"
         ? Math.min(20 * DAY, Math.max(0.05 * DAY, r.exponential(4 * DAY)))
         : u.cls === "regular"
           ? 6 * DAY + r.exponential(14 * DAY)
-          : to - u.signup;
-    const end = Math.min(to - 5 * MINUTE, u.signup + span);
-    const mine: WorkingDebate[] = [];
+          : 120 * DAY + r.exponential(365 * DAY);
+    const end = u.signup + lifetime;
     const lockedUntil = new Map<string, number>();
     const recent: number[] = [];
     let t = u.signup + r.int(3, 45) * MINUTE;
-    let attempts = 0;
-    while (mine.length < originalsWanted && t < end && attempts < 2000) {
-      attempts++;
+    let k = 0;
+    let guard = 0;
+    while (k < budget && t < end && t <= horizon && guard++ < 1_000_000) {
       // Five a day, as /api/judge counts them: within any 24 hours.
       while (recent.length && recent[0] <= t - DAY) recent.shift();
       if (recent.length >= 5) {
@@ -568,7 +575,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         continue;
       }
       const weekly = getWeeklyMotion(weeklyTopics, new Date(t))!.slug as TopicSlug;
-      const open = TOPICS.filter((s) => (lockedUntil.get(s) ?? 0) <= t);
+      const open = TOPICS.filter((x) => (lockedUntil.get(x) ?? 0) <= t);
       if (open.length === 0) {
         t = Math.min(...[...lockedUntil.values()]) + r.int(30, 600) * MINUTE;
         continue;
@@ -577,42 +584,14 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
       const school = schoolOf(u, t);
       const progress = Math.min(1, (t - u.signup) / (30 * DAY));
       const tier = pickTier(r, Math.min(1, u.skill + (u.cls === "heavy" ? 0.15 * progress : 0)));
-      const pool = banks.arguments[`${topic}.${school}`].filter((a) => a.tier === tier);
-      const base = r.pick(pool);
-      const parts = vary(r, base);
-      const rejectChance = tier === "weak" ? 0.06 : tier === "mid" ? 0.024 : 0.01;
-      const rejected = r.chance(rejectChance);
-      const fr = banks.fragments[topic];
-      const verdict = rejected ? null : templateVerdict(fr, { school, tier }, parts, u.skill, r);
-      const rejection = rejected ? templateRejection(r) : null;
-      const rid = id(r);
-      const topicRow = topicBySlug.get(topic)!;
-      const row: DebateRow = {
-        id: rid,
-        user_id: u.id,
-        topic_slug: topic,
-        challenge_id: null,
-        school,
-        argument: withTypos(compose(fr, banks.closings, school, parts), verdict, r),
-        rejected,
-        rejection_reason: null,
-        verdict: verdict ?? rejection!,
-        score: verdict ? verdict.score : null,
-        prompt_version: (verdict ?? rejection!).prompt_version,
-        argument_public: r.chance(0.1) ? !u.defaultPublic : u.defaultPublic,
-        elo_before: null,
-        elo_after: null,
-        elo_recomputed_at: null,
-        created_at: iso(t),
-        kind: "original",
-        parent_debate_id: null,
-        seeking_counterpart_at: null,
-        motion_text: topicRow.motion,
-        is_sample: true,
-        verdict_is_template: true,
-      };
-      if (rejection) row.rejection_reason = rejection.rejection_reason;
-      mine.push({ row, t, user: u, tier, base, parts, verdict });
+      const rejected = r.chance(tier === "weak" ? 0.06 : tier === "mid" ? 0.024 : 0.01);
+      const argumentPublic = r.chance(0.1) ? !u.defaultPublic : u.defaultPublic;
+      const revise =
+        !rejected && r.chance(reviseChance)
+          ? { delay: Math.max(10 * MINUTE, Math.min(6 * DAY, r.exponential(DAY))), answered: r.chance(0.85) }
+          : null;
+      slots.push({ u, k, t, topic, school, tier, rejected, argumentPublic, revise });
+      k++;
       lockedUntil.set(topic, t + 7 * DAY + MINUTE);
       recent.push(t);
       // The next argument: often the same sitting, otherwise a later day,
@@ -622,65 +601,96 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         const gapDays = u.cls === "heavy" ? r.exponential(0.6) : u.cls === "regular" ? r.exponential(1.8) : r.exponential(2.5);
         let next: number | null = null;
         const firstDay = startOfUtcDay(t + Math.max(u.cls === "heavy" ? 0 : 1, Math.round(gapDays)) * DAY);
-        for (let k = 0; k < 4 && next === null; k++) next = activeTimeOn(r, u.tz, firstDay + k * DAY, t + 10 * MINUTE, end);
+        for (let d = 0; d < 4 && next === null; d++) next = activeTimeOn(r, u.tz, firstDay + d * DAY, t + 10 * MINUTE, end);
         t = next ?? end + 1;
       }
     }
-    // Revisions: answer the objection the verdict named, some time later.
-    const eligible = r.shuffle(mine.filter((d) => d.verdict && d.verdict.unanswered_objection));
-    const revs: WorkingDebate[] = [];
-    for (const parent of eligible.slice(0, revisions)) {
-      const rt = parent.t + Math.max(10 * MINUTE, Math.min(6 * DAY, r.exponential(DAY)));
-      if (rt > to - MINUTE) continue;
-      const fr = banks.fragments[parent.row.topic_slug as TopicSlug];
-      const s = fr.schools[parent.row.school];
-      const answeredIdx = s.objections.findIndex((o) => o.rival === parent.verdict!.unanswered_objection!.school);
-      const answered = r.chance(0.85);
-      const revisedParts = fit(fr, banks.closings, parent.row.school, {
-        ...parent.parts,
-        objections: [...parent.parts.objections, answeredIdx],
-      });
-      const verdict = templateRevisionVerdict(
-        fr,
-        parent.row.school,
-        parent.tier,
-        parent.verdict!,
-        revisedParts,
-        answeredIdx,
-        answered,
-        r
-      );
-      const rid = id(r);
-      revs.push({
-        row: {
-          ...parent.row,
-          id: rid,
-          challenge_id: null,
-          argument: compose(fr, banks.closings, parent.row.school, revisedParts),
-          rejected: false,
-          rejection_reason: null,
-          verdict,
-          score: verdict.score,
-          argument_public: r.chance(0.8) ? parent.row.argument_public : !parent.row.argument_public,
-          created_at: iso(rt),
-          kind: "revision",
-          parent_debate_id: parent.row.id,
-        },
-        t: rt,
-        user: u,
-        tier: parent.tier,
-        base: parent.base,
-        parts: revisedParts,
+  }
+  slots.sort((a, b) => a.t - b.t || a.u.n - b.u.n || a.k - b.k);
+
+  const compositions = new Compositions(banks, root.fork("compositions"));
+  const debates: WorkingDebate[] = [];
+  const revisionsOf: { parent: WorkingDebate; slot: Slot }[] = [];
+  for (const slot of slots) {
+    const { u, topic, school, tier } = slot;
+    const r = root.fork(`debate/${u.n}/${slot.k}`);
+    const fr = banks.fragments[topic];
+    const parts = compositions.next(topic, school, tier);
+    const verdict = slot.rejected ? null : templateVerdict(fr, { school, tier }, parts, u.skill, r);
+    const rejection = slot.rejected ? templateRejection(r) : null;
+    const rid = id(r);
+    const row: DebateRow = {
+      id: rid,
+      user_id: u.id,
+      topic_slug: topic,
+      challenge_id: null,
+      school,
+      argument: withTypos(compose(fr, banks.closings, school, parts), verdict, r),
+      rejected: slot.rejected,
+      rejection_reason: rejection ? rejection.rejection_reason : null,
+      verdict: verdict ?? rejection!,
+      score: verdict ? verdict.score : null,
+      prompt_version: (verdict ?? rejection!).prompt_version,
+      argument_public: slot.argumentPublic,
+      elo_before: null,
+      elo_after: null,
+      elo_recomputed_at: null,
+      created_at: iso(slot.t),
+      kind: "original",
+      parent_debate_id: null,
+      seeking_counterpart_at: null,
+      motion_text: topicBySlug.get(topic)!.motion,
+      is_sample: true,
+      verdict_is_template: true,
+    };
+    const d: WorkingDebate = { row, t: slot.t, user: u, tier, parts, verdict };
+    debates.push(d);
+    if (slot.revise) revisionsOf.push({ parent: d, slot });
+  }
+
+  // Revisions answer the objection the verdict named, some time later.
+  for (const { parent, slot } of revisionsOf) {
+    if (!parent.verdict || !parent.verdict.unanswered_objection) continue;
+    const rt = parent.t + slot.revise!.delay;
+    if (rt > horizon) continue;
+    const r = root.fork(`revision/${slot.u.n}/${slot.k}`);
+    const fr = banks.fragments[parent.row.topic_slug as TopicSlug];
+    const s = fr.schools[parent.row.school];
+    const answeredIdx = s.objections.findIndex((o) => o.rival === parent.verdict!.unanswered_objection!.school);
+    const revisedParts = fit(fr, banks.closings, parent.row.school, {
+      ...parent.parts,
+      objections: [...parent.parts.objections, answeredIdx],
+    });
+    const verdict = templateRevisionVerdict(fr, parent.row.school, parent.tier, parent.verdict, revisedParts, answeredIdx, slot.revise!.answered, r);
+    const rid = id(r);
+    debates.push({
+      row: {
+        ...parent.row,
+        id: rid,
+        challenge_id: null,
+        argument: compose(fr, banks.closings, parent.row.school, revisedParts),
+        rejected: false,
+        rejection_reason: null,
         verdict,
-      });
-    }
-    debates.push(...mine, ...revs);
+        score: verdict.score,
+        argument_public: r.chance(0.8) ? parent.row.argument_public : !parent.row.argument_public,
+        created_at: iso(rt),
+        kind: "revision",
+        parent_debate_id: parent.row.id,
+      },
+      t: rt,
+      user: slot.u,
+      tier: parent.tier,
+      parts: revisedParts,
+      verdict,
+    });
   }
   debates.sort((a, b) => a.t - b.t || a.row.id.localeCompare(b.row.id));
   const debateById = new Map(debates.map((d) => [d.row.id, d]));
+  // Challenges, exchanges and reading answers belong to the base window.
   const originalsOf = new Map<string, WorkingDebate[]>();
   for (const d of debates) {
-    if (d.row.kind !== "original") continue;
+    if (d.row.kind !== "original" || d.t > to) continue;
     const list = originalsOf.get(d.user.id) ?? [];
     list.push(d);
     originalsOf.set(d.user.id, list);
@@ -694,7 +704,6 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
   const nComplete = Math.round(cfg.challenges * 0.3);
   const nAccepted = Math.round(cfg.challenges * 0.2);
   const nOpen = cfg.challenges - nComplete - nAccepted;
-  const challengeUrl = (cid: string) => `https://sophecs.com/c/${cid}`;
   const userById = new Map(users.map((u) => [u.id, u]));
   // Complete: two people who argued the same motion around the same time,
   // the second having arrived through the first one's challenge link.
@@ -742,7 +751,6 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
           },
         });
         bFirst.row.challenge_from = aFirst.rowId;
-        bFirst.row.referrer = challengeUrl(cid);
         bFirst.cohort = Math.max(bFirst.cohort, a.n);
         takenChallengees.add(bFirst.rowId);
         ad.row.challenge_id = cid;
@@ -796,7 +804,6 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
       },
     });
     challengee.row.challenge_from = challenger.rowId;
-    challengee.row.referrer = challengeUrl(cid);
     challengee.cohort = Math.max(challengee.cohort, challenger.cohort);
     takenChallengees.add(challengee.rowId);
   }
@@ -839,7 +846,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
   const turns: Item<TurnRow>[] = [];
   const waiting = new Map<string, { d: WorkingDebate; at: number }[]>();
   const openPairs = new Set<string>();
-  const optIn = debates.filter((d) => d.row.kind === "original" && !d.row.rejected);
+  const optIn = debates.filter((d) => d.row.kind === "original" && !d.row.rejected && d.t <= to);
   const pOpt = Math.min(0.9, (cfg.exchanges * 2.4) / Math.max(1, optIn.length));
   const pairsMade: { a: WorkingDebate; b: WorkingDebate; at: number }[] = [];
   for (const d of optIn) {

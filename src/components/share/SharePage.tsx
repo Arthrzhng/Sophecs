@@ -25,7 +25,7 @@ export interface SharePageProps {
   shareLine: string;
   shareLineIndex: number;
   /**
-   * A sample account's result (migration 0021). Labelled, and shown as to
+   * A sample account's result (migration 0022). Labelled, and shown as to
    * a stranger: a sample account takes up no challenge and debates no one.
    */
   isSample?: boolean;

@@ -181,7 +181,7 @@ export function Verdict({
    */
   textWithheld?: boolean;
   /**
-   * Set on an argument a sample account made (migration 0021). It gets the
+   * Set on an argument a sample account made (migration 0022). It gets the
    * Sample label, no share row, and no view events. `template` is a
    * verdict written from a template rather than by the judge: it says so,
    * and nothing on the page claims the judge read it.

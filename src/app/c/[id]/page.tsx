@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { SamplePageMarker } from "@/components/sample/SamplePageMarker";
 import { Page } from "@/components/layout/Page";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { ChallengeInvite } from "@/components/share/ChallengeInvite";
@@ -6,7 +7,13 @@ import { ChallengeViewTracker } from "@/components/share/ChallengeViewTracker";
 import { getSchool } from "@/lib/schools";
 import type { SchoolId } from "@/lib/types";
 
-export const metadata = { title: "You've been challenged · Sophecs" };
+// A sample account's challenge says so in the title too, which is what a
+// link preview shows first.
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const challenge = await getChallenge(id);
+  return { title: challenge?.isSample ? "A sample account's challenge · Sophecs" : "You've been challenged · Sophecs" };
+}
 
 async function getChallenge(id: string) {
   if (!isAdminConfigured()) return null;
@@ -40,7 +47,7 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
     <Page width="read" rhythm="path">
         {/* A sample account's challenge is labelled and not counted as a
             challenge being opened (docs/sample-activity.md, "Metrics"). */}
-        {!challenge.isSample && <ChallengeViewTracker challengeId={id} />}
+        {challenge.isSample ? <SamplePageMarker /> : <ChallengeViewTracker challengeId={id} />}
         <ChallengeInvite
           challengeId={id}
           school={challenge.school}

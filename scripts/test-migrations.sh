@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Applies every migration to a throwaway local database, rolls back 0021,
-# 0020, 0015 and 0014 (newest first: 0021 and 0020 redefine the view that
+# Applies every migration to a throwaway local database, rolls back 0022,
+# 0020, 0015 and 0014 (newest first: 0022 and 0020 redefine the view that
 # reads the column 0015 adds), applies them again, and times each statement
 # while holding its lock.
 #
@@ -61,8 +61,8 @@ psql -At -d "$DB" -c "
 
 # 0020 puts debates.motion_text into debates_public, and Postgres will not
 # drop a column a view reads, so 0015's rollback needs 0020's first.
-say "rollback: 0021, 0020, then 0015, then 0014"
-for f in "$REPO/supabase/rollback/0021_sample_activity.down.sql" \
+say "rollback: 0022, 0020, then 0015, then 0014"
+for f in "$REPO/supabase/rollback/0022_sample_activity.down.sql" \
          "$REPO/supabase/rollback/0020_debates_public_motion_text.down.sql" \
          "$REPO/supabase/rollback/0015_debates_motion_text.down.sql" \
          "$REPO/supabase/rollback/0014_more_schools.down.sql"; do
@@ -89,7 +89,7 @@ say "forward again, to prove the rollback left a re-appliable database"
 for f in "$REPO/supabase/migrations/0014_more_schools.sql" \
          "$REPO/supabase/migrations/0015_debates_motion_text.sql" \
          "$REPO/supabase/migrations/0020_debates_public_motion_text.sql" \
-         "$REPO/supabase/migrations/0021_sample_activity.sql"; do
+         "$REPO/supabase/migrations/0022_sample_activity.sql"; do
   start=$(date +%s%N)
   psql_q -f "$f"
   printf '  %-40s %6.1f ms\n' "$(basename "$f")" "$(( $(date +%s%N) - start ))e-6"

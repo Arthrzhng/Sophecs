@@ -43,7 +43,21 @@ export function aliasToUser(userId: string) {
   ensureClient().then((posthog) => posthog?.alias(userId));
 }
 
+/**
+ * A page showing a sample account's verdict, result or challenge carries
+ * this marker (SamplePageMarker), and nothing is sent to PostHog from it:
+ * samples never reach analytics (docs/sample-activity.md, "Metrics").
+ * Checked when the event is fired, so a page the reader has already left
+ * cannot decide it.
+ */
+export const SAMPLE_PAGE_ATTRIBUTE = "data-sophecs-sample-page";
+
+export function onSamplePage(): boolean {
+  return typeof document !== "undefined" && document.querySelector(`[${SAMPLE_PAGE_ATTRIBUTE}]`) !== null;
+}
+
 export function track(event: AnalyticsEvent) {
+  if (onSamplePage()) return;
   ensureClient().then((posthog) => {
     if (!posthog) {
       if (process.env.NODE_ENV !== "production") {

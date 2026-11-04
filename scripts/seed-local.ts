@@ -19,7 +19,7 @@ import { DEFAULTS } from "./seed/generate";
 import { contentTopics } from "./seed/topics";
 import { execute } from "./seed/engine";
 import { validate } from "./seed/validate";
-import { dryRun, exportGenuine } from "./seed/dryrun";
+import { dryRun } from "./seed/dryrun";
 import { getAllTopicFiles } from "../src/lib/topics";
 import { REPORT_DIR, cancelSignal, int, isoFlag, log, main, nowFloored, parseFlags, refuseUnsupported, str, writeReport } from "./seed/cli";
 
@@ -27,7 +27,7 @@ const MARKER = "sophecs seed-local: disposable database made by scripts/seed-loc
 
 main(async () => {
   const f = parseFlags(process.argv.slice(2), {
-    values: ["run-id", "plan", "seed", "from", "to", "users", "anon-results", "challenges", "exchanges", "classes", "canary", "out", "real-judge", "batch-size"],
+    values: ["run-id", "plan", "seed", "from", "base-to", "to", "users", "anon-results", "challenges", "exchanges", "classes", "canary", "out", "real-judge", "batch-size"],
     booleans: ["execute", "validate", "create-db", "drop-db", "make-plan", "six-schools", "break-stale-lock"],
   });
   refuseUnsupported(f);
@@ -64,15 +64,17 @@ main(async () => {
     return;
   }
   if (f["make-plan"]) {
-    const to = isoFlag(f, "to", nowFloored());
-    const seed = int(f, "seed", 20261104, 0, 2 ** 31 - 1);
-    const out = str(f, "out") ?? join(REPORT_DIR, `sample-${seed}-${to.replace(/[-:T]/g, "").slice(0, 12)}.local-plan.json`);
+    const baseTo = isoFlag(f, "base-to", nowFloored());
+    const to = isoFlag(f, "to", baseTo);
+    const seed = str(f, "seed") ?? "20261104";
+    const out = str(f, "out") ?? join(REPORT_DIR, `sample-${baseTo.replace(/[-:T]/g, "").slice(0, 12)}.local-plan.json`);
     const { plan } = buildPlan({
       target: { kind: "local", database: target.database },
       planPath: out,
       gen: {
         seed,
         from: isoFlag(f, "from", DEFAULTS.from),
+        baseTo,
         to,
         users: int(f, "users", DEFAULTS.users, 1, 20000),
         anonResults: int(f, "anon-results", DEFAULTS.anonResults, 0, 50000),
@@ -108,7 +110,6 @@ main(async () => {
   if (!f.execute) {
     const report = await dryRun(db, plan);
     for (const line of report.lines) log(line);
-    log(`genuine rows exported to ${writeReport(`genuine-export-${plan.runId}`, await exportGenuine(db))}`);
     if (!report.ok) process.exitCode = 1;
     return;
   }

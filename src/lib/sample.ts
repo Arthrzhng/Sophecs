@@ -1,7 +1,7 @@
 // Sample accounts: the words the site uses for them, in one place.
 //
 // A sample account is one scripts/seed-production.ts created, marked
-// `is_sample` in the database (migration 0021). Its activity renders
+// `is_sample` in the database (migration 0022). Its activity renders
 // through the ordinary pages, and wherever one is identified it carries
 // the label below. docs/sample-activity.md has the design.
 

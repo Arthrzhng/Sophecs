@@ -129,6 +129,22 @@ async function retry<T>(fn: () => Promise<T>, attempts: number, baseMs: number, 
   throw last;
 }
 
+/** Profile fields a later plan can change: what the replay ends on. */
+export const PROFILE_MUTABLE = ["elo", "streak", "streak_updated_on", "school", "school_history"] as const;
+
+/** The mutable fields where the database row differs from the plan's. */
+export function changedFields(current: Record<string, unknown> | undefined, planned: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  if (!current) return out;
+  for (const k of PROFILE_MUTABLE) {
+    const a = current[k] ?? null;
+    const b = planned[k] ?? null;
+    const same = typeof a === "number" || typeof b === "number" ? Number(a) === Number(b) : JSON.stringify(a) === JSON.stringify(b);
+    if (!same) out[k] = b;
+  }
+  return out;
+}
+
 export function ownerIds(ds: Dataset): Set<string> {
   return new Set([...ds.authUsers.map((u) => u.rowId), ...ds.exchanges.map((e) => e.rowId)]);
 }
@@ -176,12 +192,13 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     const fresh: SeedRun = {
       id: plan.runId,
       status: "running",
-      plan_hash: plan.manifestHash,
+      plan_hash: plan.baseHash,
       generator_version: plan.generatorVersion,
-      seed: plan.seed,
       window_from: plan.window.from,
+      base_to: plan.window.baseTo,
       window_to: plan.window.to,
       counts: plan.counts,
+      last_report: null,
       lock_token: null,
       locked_at: null,
       last_error: null,
@@ -189,8 +206,17 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     await adapter.insertRun(fresh);
     run = fresh;
   }
-  if (run.plan_hash !== plan.manifestHash || run.generator_version !== plan.generatorVersion || run.seed !== plan.seed)
+  // The same run: the same generator, seed, base window, config and
+  // motions (the base hash). Only `to` may differ, and only later.
+  if (
+    run.plan_hash !== plan.baseHash ||
+    run.generator_version !== plan.generatorVersion ||
+    Date.parse(run.base_to) !== Date.parse(plan.window.baseTo) ||
+    Date.parse(run.window_from) !== Date.parse(plan.window.from)
+  )
     throw new StopError(`run ${run.id} was started from a different plan`);
+  if (Date.parse(plan.window.to) < Date.parse(run.window_to))
+    throw new StopError(`run ${run.id} already reaches ${run.window_to}; this plan ends earlier, at ${plan.window.to}`);
   if (run.status === "tearing_down" || run.status === "torn_down")
     throw new StopError(`run ${run.id} is ${run.status}; it cannot be resumed`);
   if (run.lock_token && opts.breakStaleLock) {
@@ -272,11 +298,47 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
         log(`challenge links: ${links.length} set`);
       }
     }
+    // Profiles written earlier (by the canary, or before an extension)
+    // carry the rating, streak and school of their time; bring them to the
+    // plan's. Read back and compared first, so only a changed profile is
+    // written, and every update is scoped to sample rows by the adapter.
+    if (!cancelled) {
+      const profilesNow = ds.profiles.filter((p) => p.cohort < limit);
+      let updated = 0;
+      for (let i = 0; i < profilesNow.length; i += batchSize) {
+        if (opts.signal?.aborted) {
+          cancelled = true;
+          break;
+        }
+        const batch = profilesNow.slice(i, i + batchSize);
+        await heartbeat(adapter, run.id, token);
+        const back = await retry(() => adapter.selectByIds("profiles", batch.map((b) => b.rowId)), attempts, baseMs, log, "profiles read back");
+        const byId = new Map(back.map((r) => [String(r.id), r]));
+        const changes = batch
+          .map((b) => ({ id: b.rowId, patch: changedFields(byId.get(b.rowId), b.row as unknown as Record<string, unknown>) }))
+          .filter((c) => Object.keys(c.patch).length > 0);
+        for (const c of changes) {
+          if (!byId.get(c.id) || byId.get(c.id)!.is_sample !== true) throw new StopError(`profiles ${c.id} is not a sample row; refusing to update it`);
+        }
+        if (changes.length) await retry(() => adapter.updateSampleRows("profiles", changes), attempts, baseMs, log, "profiles update");
+        updated += changes.length;
+      }
+      written.profile_update = updated;
+      log(`profiles brought up to date: ${updated}`);
+    }
     const complete = !cancelled && limit === Infinity;
     const recorded = await adapter.updateRunLocked(run.id, token, {
       status: complete ? "complete" : "running",
       last_error: cancelled ? "cancelled; run the same command again to resume" : null,
-      counts: { ...plan.counts, cohortLimit: Number.isFinite(limit) ? limit : null },
+      // window_to moves only when the whole plan is in: a canary or a
+      // cancelled run leaves it where it was.
+      ...(complete ? { window_to: plan.window.to } : {}),
+      counts: {
+        ...plan.counts,
+        manifest_hash: plan.manifestHash,
+        stage: complete ? "full" : String(run.counts?.stage ?? "") === "full" ? "full" : "canary",
+        cohortLimit: Number.isFinite(limit) ? limit : null,
+      },
     });
     if (!recorded) throw new LockLostError(`run ${run.id}'s lock was taken before the run could record its end`);
   } catch (err) {

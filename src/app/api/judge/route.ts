@@ -448,7 +448,7 @@ export async function POST(request: Request) {
   // one indexed query, exact, no drift. Revisions are excluded from both the
   // write trigger and the window: a revision's elo_before is a copy of its
   // parent's elo_after, so counting it would weight one participant twice.
-  // Sample accounts' debates (migration 0021) are excluded too: they are
+  // Sample accounts' debates (migration 0022) are excluded too: they are
   // generated, and a genuine reader's rating is never measured against
   // them. docs/sample-activity.md, "Ratings".
   if (!isRevision) {

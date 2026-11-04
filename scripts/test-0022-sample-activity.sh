@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Proves migration 0021 on a throwaway local database, under the grants
+# Proves migration 0022 on a throwaway local database, under the grants
 # 0016 left in production (as far as Postgres 16 has them; production runs
 # 17, see test-0020-motion-text-view.sh):
 #
@@ -12,13 +12,13 @@
 # - elo_percentile counts genuine profiles only;
 # - the rollback refuses while a sample row remains, then returns both
 #   views to their earlier definitions, as text, with the same grants;
-# - 0021 applies again after it.
+# - 0022 applies again after it.
 #
-# Usage: scripts/test-0021-sample-activity.sh [port]
+# Usage: scripts/test-0022-sample-activity.sh [port]
 set -euo pipefail
 
 PORT="${1:-55432}"
-DB="sophecs_0021_test_$$"
+DB="sophecs_0022_test_$$"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 export PGHOST=127.0.0.1 PGPORT="$PORT" PGUSER=postgres
 
@@ -46,10 +46,10 @@ cleanup() { psql -X -q -d postgres -c "drop database if exists $DB" >/dev/null 2
 trap cleanup EXIT
 psql -X -v ON_ERROR_STOP=1 -q -d postgres -c "create database $DB"
 
-say "shim, every migration before 0021, production's grants"
+say "shim, every migration before 0022, production's grants"
 apply "$REPO/scripts/local-auth-shim.sql"
 for f in "$REPO"/supabase/migrations/*.sql; do
-  [ "$((10#$(basename "$f" | cut -c1-4)))" -lt 21 ] || continue
+  [ "$((10#$(basename "$f" | cut -c1-4)))" -lt 22 ] || continue
   case "$(basename "$f")" in 0016_*)
     for v in debates_public exchanges_public profiles_public public_results; do
       q "grant all on public.$v to anon, authenticated, service_role" >/dev/null
@@ -61,7 +61,7 @@ for f in "$REPO"/supabase/migrations/*.sql; do
   apply "$f"
 done
 # Supabase's default privileges: anything new in public is granted to all
-# three roles. 0021's registry tables must not keep what this grants. The
+# three roles. 0022's registry tables must not keep what this grants. The
 # tables made before this point get the same grants by hand, as they have
 # in production, so that row level security and the guard are what decide.
 q "alter default privileges in schema public grant all on tables to anon, authenticated, service_role" >/dev/null
@@ -97,7 +97,7 @@ cols() { q "select string_agg(column_name, ',' order by ordinal_position) from i
 dp_digest() { q "select md5(string_agg(row(id, topic_slug, school, score, verdict, elo_before, elo_after, created_at, kind, parent_debate_id, argument, motion_text)::text, '|' order by id)) from debates_public"; }
 pr_digest() { q "select md5(string_agg(row(id, school, secondary, vector, challenge_from, created_at)::text, '|' order by id)) from public_results"; }
 
-say "before 0021"
+say "before 0022"
 DP_COLS="$(cols debates_public)"; PR_COLS="$(cols public_results)"
 DP_DEF="$(viewdef debates_public)"; PR_DEF="$(viewdef public_results)"
 DP_META="$(meta debates_public)"; PR_META="$(meta public_results)"
@@ -107,8 +107,8 @@ echo "  debates_public: $DP_META"
 echo "  public_results: $PR_META"
 echo "  elo_percentile(1150) = $PCT_BEFORE"
 
-say "apply 0021"
-apply "$REPO/supabase/migrations/0021_sample_activity.sql"
+say "apply 0022"
+apply "$REPO/supabase/migrations/0022_sample_activity.sql"
 
 after() {
   expect "$1: debates_public columns" "$DP_COLS,is_sample,verdict_is_template" "$(cols debates_public)"
@@ -137,7 +137,7 @@ after() {
   expect "$1: seed_run_items has row level security" t "$(q "select relrowsecurity from pg_class where oid = 'public.seed_run_items'::regclass")"
   expect "$1: debates has a created_at index" 1 "$(q "select count(*) from pg_indexes where schemaname='public' and indexname='debates_created_at_idx'")"
 }
-after "after 0021"
+after "after 0022"
 
 say "the marker: only the server role sets or clears it"
 # A signed-in reader's own profile update, which the "own update" policy
@@ -151,11 +151,11 @@ expect "service_role inserts a sample quiz result" allowed "$(as_role service_ro
 expect "service_role clears a marker" allowed "$(as_role service_role "update quiz_results set is_sample = false where id = 'gquiz'")"
 
 say "the registry: one owner per row"
-q "insert into seed_runs (id, status, plan_hash, generator_version, seed, window_from, window_to) values ('run-aaaaaa','running','h','g',1,now(),now()), ('run-bbbbbb','running','h','g',1,now(),now())" >/dev/null
+q "insert into seed_runs (id, status, plan_hash, generator_version, window_from, base_to, window_to) values ('run-aaaaaa','running','h','g',now() - interval '1 day',now(),now()), ('run-bbbbbb','running','h','g',now() - interval '1 day',now(),now())" >/dev/null
 q "insert into seed_run_items (run_id, kind, logical_id, row_id, state) values ('run-aaaaaa','debate','d1','row1','created')" >/dev/null
 dup=$(psql -X -d "$DB" -c "insert into seed_run_items (run_id, kind, logical_id, row_id, state) values ('run-bbbbbb','debate','d9','row1','created')" 2>&1 || true)
 expect "a second run claiming the same row" refused "$(printf '%s' "$dup" | grep -q 'seed_run_items_row' && echo refused || echo "$dup")"
-bad=$(psql -X -d "$DB" -c "insert into seed_runs (id, status, plan_hash, generator_version, seed, window_from, window_to) values ('Bad Id','running','h','g',1,now(),now())" 2>&1 || true)
+bad=$(psql -X -d "$DB" -c "insert into seed_runs (id, status, plan_hash, generator_version, window_from, base_to, window_to) values ('Bad Id','running','h','g',now() - interval '1 day',now(),now())" 2>&1 || true)
 expect "a malformed run id" refused "$(printf '%s' "$bad" | grep -q 'check constraint' && echo refused || echo "$bad")"
 q "delete from seed_run_items; delete from seed_runs" >/dev/null
 
@@ -227,13 +227,13 @@ q "delete from turns where id = 'sturn'; delete from exchanges where id = 'sex';
 say "rollback refuses while a run is not torn down"
 # The run alone: its one item is already deleted, so only the run's status
 # can make the rollback refuse here.
-q "insert into seed_runs (id, status, plan_hash, generator_version, seed, window_from, window_to) values ('run-cccccc','complete','h','g',1,now(),now())" >/dev/null
+q "insert into seed_runs (id, status, plan_hash, generator_version, window_from, base_to, window_to) values ('run-cccccc','complete','h','g',now() - interval '1 day',now(),now())" >/dev/null
 q "insert into seed_run_items (run_id, kind, logical_id, row_id, state) values ('run-cccccc','turn','t1','turn1','deleted')" >/dev/null
 q "delete from debates where is_sample; delete from profiles where is_sample" >/dev/null
-held=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/rollback/0021_sample_activity.down.sql" 2>&1 || true)
+held=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/rollback/0022_sample_activity.down.sql" 2>&1 || true)
 expect "refused for an open run" refused "$(printf '%s' "$held" | grep -q 'not torn down' && echo refused || echo "$held")"
 q "update seed_runs set status = 'torn_down'; update seed_run_items set state = 'created'" >/dev/null
-held=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/rollback/0021_sample_activity.down.sql" 2>&1 || true)
+held=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/rollback/0022_sample_activity.down.sql" 2>&1 || true)
 expect "refused for an item not deleted" refused "$(printf '%s' "$held" | grep -q 'not torn down' && echo refused || echo "$held")"
 q "update seed_run_items set state = 'abandoned'" >/dev/null
 psql -X -q -v ON_ERROR_STOP=1 -d "$DB" >/dev/null <<SAMPLES2
@@ -242,13 +242,13 @@ insert into profiles (id, handle, display_name, school, elo, streak, is_sample) 
 SAMPLES2
 
 say "rollback refuses while sample rows remain"
-held=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/rollback/0021_sample_activity.down.sql" 2>&1 || true)
+held=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/rollback/0022_sample_activity.down.sql" 2>&1 || true)
 expect "refused" refused "$(printf '%s' "$held" | grep -q 'sample rows remain' && echo refused || echo "$held")"
 expect "nothing dropped" t "$(q "select exists (select 1 from information_schema.columns where table_name='profiles' and column_name='is_sample')")"
 q "delete from debates where is_sample; delete from profiles where is_sample; delete from quiz_results where is_sample" >/dev/null
 
 say "rollback"
-apply "$REPO/supabase/rollback/0021_sample_activity.down.sql"
+apply "$REPO/supabase/rollback/0022_sample_activity.down.sql"
 expect "debates_public columns as before" "$DP_COLS" "$(cols debates_public)"
 expect "public_results columns as before" "$PR_COLS" "$(cols public_results)"
 expect "debates_public definition as before, as text" t "$([ "$(viewdef debates_public)" = "$DP_DEF" ] && echo t || echo f)"
@@ -264,8 +264,8 @@ expect "no guard left" 0 "$(q "select count(*) from pg_proc where proname in ('g
 expect "no guard trigger left" 0 "$(q "select count(*) from pg_trigger where tgname like '%guard_sample' or tgname like '%guard_reference'")"
 expect "no created_at index left" 0 "$(q "select count(*) from pg_indexes where indexname='debates_created_at_idx'")"
 
-say "re-apply 0021"
-apply "$REPO/supabase/migrations/0021_sample_activity.sql"
+say "re-apply 0022"
+apply "$REPO/supabase/migrations/0022_sample_activity.sql"
 after "re-applied"
 
 if [ "$FAILED" -ne 0 ]; then say "FAILED"; exit 1; fi

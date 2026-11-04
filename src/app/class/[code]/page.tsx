@@ -50,17 +50,14 @@ export default async function ClassPage({ params }: { params: Promise<{ code: st
       .order("sort", { ascending: true }),
   ]);
 
-  const members = memberRows ?? [];
+  let members = memberRows ?? [];
   const topics = (topicRows ?? []).map((t) => ({
     slug: t.slug as string,
     title: t.title as string,
     microBefore: (t.micro_before as string | null) ?? null,
   }));
 
-  const profileById = new Map<
-    string,
-    { displayName: string | null; school: SchoolId | null; isSample: boolean }
-  >();
+  const profileById = new Map<string, { displayName: string | null; school: SchoolId | null }>();
   const statesByUser = new Map<string, Record<string, CaseState>>();
 
   if (members.length > 0) {
@@ -69,13 +66,22 @@ export default async function ClassPage({ params }: { params: Promise<{ code: st
       .from("profiles")
       .select("id, display_name, school, is_sample")
       .in("id", userIds);
+    // A class page never shows a sample account (Arthur, 2026-11-04). A
+    // reader's class cannot hold one (migration 0022 refuses the join),
+    // and a sample class is owned by a sample account, which cannot sign
+    // in; this keeps it so whatever the data says.
+    const sampleIds = new Set<string>();
     for (const p of profiles ?? []) {
+      if (p.is_sample) {
+        sampleIds.add(p.id as string);
+        continue;
+      }
       profileById.set(p.id as string, {
         displayName: (p.display_name as string | null) ?? null,
         school: (p.school as SchoolId | null) ?? null,
-        isSample: Boolean(p.is_sample),
       });
     }
+    members = members.filter((m) => !sampleIds.has(m.user_id as string));
 
     // getCaseStates is two queries per user, so a 30-student class is 60
     // round trips run concurrently rather than 6 x N sequentially. The
@@ -83,10 +89,11 @@ export default async function ClassPage({ params }: { params: Promise<{ code: st
     // batching across users would mean rewriting getCaseStates to take a
     // user list, and its `read` rule needs per-user response counts
     // anyway. Revisit if a class ever gets large enough to matter.
+    const genuineIds = userIds.filter((id) => !sampleIds.has(id));
     const results = await Promise.all(
-      userIds.map((id) => getCaseStates(admin, id, topics))
+      genuineIds.map((id) => getCaseStates(admin, id, topics))
     );
-    userIds.forEach((id, i) => statesByUser.set(id, results[i]));
+    genuineIds.forEach((id, i) => statesByUser.set(id, results[i]));
   }
 
   // The container is written out rather than taken from <Page>, because
@@ -108,7 +115,6 @@ export default async function ClassPage({ params }: { params: Promise<{ code: st
               profile?.displayName ??
               (school ? `A ${SCHOOL_ADHERENT[school]}` : "A student"),
             school,
-            isSample: profile?.isSample ?? false,
             states: statesByUser.get(id) ?? {},
           };
         })}

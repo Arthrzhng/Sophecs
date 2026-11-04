@@ -152,3 +152,18 @@ export function productionTarget(
 export function describeTarget(t: LocalTarget | ProductionTarget): string {
   return t.kind === "local" ? `local ${t.host}:${t.port}/${t.database}` : `production ${t.ref}`;
 }
+
+/**
+ * The production seed, SEED_PLAN_SEED in .env.seed.production. With the
+ * generator public, the seed fixes every row id a run will write, so it is
+ * a secret (a GitHub repository secret for the workflow) and long enough
+ * that guessing it from rows already public is out of reach. Never
+ * printed: GitHub masks it in workflow logs, and nothing here logs it.
+ */
+export function productionSeed(root = process.cwd()): string {
+  const seed = readFile(root, PRODUCTION_FILE).SEED_PLAN_SEED;
+  if (!seed) throw new GuardError(`${PRODUCTION_FILE} has no SEED_PLAN_SEED`);
+  if (!/^[A-Za-z0-9_-]{24,128}$/.test(seed))
+    throw new GuardError("SEED_PLAN_SEED must be 24 to 128 letters, digits, - or _ (for example the output of `openssl rand -hex 16`)");
+  return seed;
+}

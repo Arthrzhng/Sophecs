@@ -18,16 +18,18 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const [spectral, spectralItalic, plexSans] = await loadCardFonts();
 
   let school: SchoolId = "stoicism";
+  let sample = false;
 
   if (isAdminConfigured()) {
     const admin = createAdminClient();
     const { data } = await admin
       .from("public_results")
-      .select("school")
+      .select("school, is_sample")
       .eq("id", id)
       .single();
     if (data) {
       school = data.school as SchoolId;
+      sample = data.is_sample === true;
     }
   }
 
@@ -39,6 +41,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         school={school}
         oneLine={content.one_line}
         oneLineAttribution={content.one_line_attribution}
+        sample={sample}
         width={SIZE.width}
         height={SIZE.height}
         fonts={{ serif: "Spectral", sans: "IBM Plex Sans" }}
