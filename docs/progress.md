@@ -161,5 +161,32 @@ entry names.
   relations: `debates`, `exchanges`, `profiles`, `quiz_results`. Arthur's
   ruling said the drop had been done on retry; it had not. `drop schema
   backup_20261022 cascade;` was retried through the same tool, which asked
-  Arthur to confirm; no answer came within its 230-second limit, so
-  nothing was dropped. It waits on his approval.
+  Arthur to confirm; no answer came within its 230-second limit, and the
+  tool reported the question unanswered, so the drop should not have run.
+  That has not been read back yet. It waits on his approval and a
+  read-back.
+
+## 2026-11-03: Stage 4, the Phase 3.0 items on `/styleguide/phase3`
+
+- Preview only: `/styleguide/phase3` renders nothing in production, and the
+  card preview route answers only on a preview deployment or with
+  `SOPHECS_PREVIEW` set. Colour candidates for the three draft schools
+  (`scripts/colour-candidates.mjs`, `docs/phase3-styleguide/colour-candidates.json`),
+  the two-axis map in the quiz preview and in Profile history, the school
+  table with six rows, the "view from elsewhere" card on Today and in the
+  lesson player, result cards and their card images for six schools, the
+  lesson filter chips, and a nav icon for the school table. Screenshots of
+  every section at 390 and 1280 in `docs/phase3-styleguide/`, taken from
+  a local production build. Contrast: 203 text elements on the page
+  measured from computed styles with Playwright, each text colour blended
+  by its own alpha and every ancestor's opacity, none below WCAG AA, the
+  lowest 4.54:1; 16 inside SVG or on an image background not measured.
+  (A first measurement ignored opacity and reported 5.03:1; review found
+  the draft cards' attribution at 3.86:1, which led to the derived card
+  surfaces.)
+  The colour choice, and everything shown, is Arthur's at Checkpoint A.
+- #55 merged as `0729d1f`, after two review passes. Production deploy
+  `dpl_EwjphTGXXpsSApZqtUcB36ojUVs8`, Ready and aliased to sophecs.com
+  (read from Vercel). Fetched through Vercel at 00:43 UTC on 2026-11-04:
+  `/styleguide/phase3/card/confucian` answered 404, as it should in
+  production, and `/robots.txt` 200.

@@ -13,7 +13,11 @@ export function MicroLesson({
   return (
     <div>
       <p className="mb-2 text-sm text-ink-soft">
-        {lesson.position === "before" ? "Before you argue" : "After you argue"}
+        {lesson.position === "before"
+          ? "Before you argue"
+          : lesson.position === "after"
+            ? "After you argue"
+            : "A view from elsewhere"}
       </p>
       <h2 className="font-serif text-lg font-medium text-ink">{lesson.title}</h2>
       <div className="prose-reading mt-5">

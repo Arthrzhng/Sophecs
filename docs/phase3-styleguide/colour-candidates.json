@@ -1,0 +1,267 @@
+{
+  "what": "Colour candidates for the three new schools, from scripts/colour-candidates.mjs. Arthur's to choose; nothing here is in use.",
+  "thresholds": {
+    "MIN_WHITE_TEXT": 4.5,
+    "MIN_DOT_ON_PAPER": 3,
+    "MIN_DE": 20,
+    "MIN_DE_OTHERS": 15,
+    "MIN_DE_CVD": 12,
+    "MIN_DE_BETWEEN": 10
+  },
+  "excluded": {
+    "confucian": [
+      [
+        340,
+        360,
+        "red"
+      ],
+      [
+        0,
+        45,
+        "red"
+      ],
+      [
+        65,
+        115,
+        "gold"
+      ]
+    ],
+    "buddhist": [
+      [
+        40,
+        95,
+        "saffron, orange to yellow"
+      ]
+    ],
+    "ubuntu": [
+      [
+        25,
+        110,
+        "earth palette: terracotta, browns, ochres, and kente's gold"
+      ],
+      [
+        130,
+        160,
+        "kente's green"
+      ]
+    ]
+  },
+  "existing": {
+    "stoic": {
+      "hex": "#3e5c4b",
+      "deuteranopia": "#56544c",
+      "protanopia": "#5b584a",
+      "textOnHero": 6.38
+    },
+    "utilitarian": {
+      "hex": "#8a6320",
+      "deuteranopia": "#7b6e22",
+      "protanopia": "#726416",
+      "textOnHero": 4.73
+    },
+    "virtue": {
+      "hex": "#7a3540",
+      "deuteranopia": "#55503e",
+      "protanopia": "#434340",
+      "textOnHero": 7.4
+    },
+    "correct (judge blue)": {
+      "hex": "#1e5fa0",
+      "deuteranopia": "#2a589f",
+      "protanopia": "#3f64a3",
+      "textOnHero": 5.66
+    },
+    "step-done orange": {
+      "hex": "#d9822b",
+      "deuteranopia": "#b19f2c",
+      "protanopia": "#9d8b1d",
+      "textOnHero": 2.65
+    }
+  },
+  "candidates": {
+    "confucian": [
+      {
+        "hex": "#705bbe",
+        "oklch": {
+          "L": 0.54,
+          "C": 0.15,
+          "H": 290
+        },
+        "textOnHero": 4.68,
+        "dotOnPaper": 4.83,
+        "minDeltaE": 29.5,
+        "minDeltaEBlueOrange": 16.3,
+        "minDeltaEDeuteranopia": 30.8,
+        "minDeltaEProtanopia": 30,
+        "deuteranopia": "#3269bc",
+        "protanopia": "#306dc1",
+        "cardSurface": "#634db0",
+        "cardInkFull": 6.14,
+        "cardInkAtLowestOpacity": 4.59
+      },
+      {
+        "hex": "#16307a",
+        "oklch": {
+          "L": 0.34,
+          "C": 0.13,
+          "H": 265
+        },
+        "textOnHero": 10.07,
+        "dotOnPaper": 10.91,
+        "minDeltaE": 29.7,
+        "minDeltaEBlueOrange": 16.3,
+        "minDeltaEDeuteranopia": 31.2,
+        "minDeltaEProtanopia": 24.3,
+        "deuteranopia": "#003279",
+        "protanopia": "#003b7c",
+        "cardSurface": "#16307a",
+        "cardInkFull": 11.38,
+        "cardInkAtLowestOpacity": 7.83
+      },
+      {
+        "hex": "#70318a",
+        "oklch": {
+          "L": 0.44,
+          "C": 0.15,
+          "H": 315
+        },
+        "textOnHero": 7.15,
+        "dotOnPaper": 7.6,
+        "minDeltaE": 22,
+        "minDeltaEBlueOrange": 26,
+        "minDeltaEDeuteranopia": 26.2,
+        "minDeltaEProtanopia": 24.2,
+        "deuteranopia": "#2f4f88",
+        "protanopia": "#0f4a8d",
+        "cardSurface": "#70318a",
+        "cardInkFull": 7.92,
+        "cardInkAtLowestOpacity": 5.69
+      }
+    ],
+    "ubuntu": [
+      {
+        "hex": "#4e40a0",
+        "oklch": {
+          "L": 0.44,
+          "C": 0.15,
+          "H": 285
+        },
+        "textOnHero": 6.99,
+        "dotOnPaper": 7.39,
+        "minDeltaE": 27.6,
+        "minDeltaEBlueOrange": 15.7,
+        "minDeltaEDeuteranopia": 30.3,
+        "minDeltaEProtanopia": 26.6,
+        "deuteranopia": "#004c9e",
+        "protanopia": "#0052a3",
+        "cardSurface": "#4e40a0",
+        "cardInkFull": 7.71,
+        "cardInkAtLowestOpacity": 5.59
+      },
+      {
+        "hex": "#944da4",
+        "oklch": {
+          "L": 0.54,
+          "C": 0.15,
+          "H": 320
+        },
+        "textOnHero": 4.75,
+        "dotOnPaper": 4.92,
+        "minDeltaE": 23.5,
+        "minDeltaEBlueOrange": 27.4,
+        "minDeltaEDeuteranopia": 26.4,
+        "minDeltaEProtanopia": 26.3,
+        "deuteranopia": "#546ca2",
+        "protanopia": "#3d65a7",
+        "cardSurface": "#874197",
+        "cardInkFull": 6.12,
+        "cardInkAtLowestOpacity": 4.55
+      },
+      {
+        "hex": "#5f4d7e",
+        "oklch": {
+          "L": 0.46,
+          "C": 0.08,
+          "H": 300
+        },
+        "textOnHero": 6.35,
+        "dotOnPaper": 6.66,
+        "minDeltaE": 21.2,
+        "minDeltaEBlueOrange": 19,
+        "minDeltaEDeuteranopia": 21.8,
+        "minDeltaEProtanopia": 19.9,
+        "deuteranopia": "#44557d",
+        "protanopia": "#415680",
+        "cardSurface": "#5f4d7e",
+        "cardInkFull": 6.94,
+        "cardInkAtLowestOpacity": 5.13
+      }
+    ],
+    "buddhist": [
+      {
+        "hex": "#411b7b",
+        "oklch": {
+          "L": 0.34,
+          "C": 0.15,
+          "H": 295
+        },
+        "textOnHero": 10.44,
+        "dotOnPaper": 11.37,
+        "minDeltaE": 26.6,
+        "minDeltaEBlueOrange": 24.7,
+        "minDeltaEDeuteranopia": 31.2,
+        "minDeltaEProtanopia": 25.9,
+        "deuteranopia": "#003279",
+        "protanopia": "#00347e",
+        "cardSurface": "#411b7b",
+        "cardInkFull": 11.86,
+        "cardInkAtLowestOpacity": 8.07
+      },
+      {
+        "hex": "#6a6996",
+        "oklch": {
+          "L": 0.54,
+          "C": 0.07,
+          "H": 285
+        },
+        "textOnHero": 4.54,
+        "dotOnPaper": 4.65,
+        "minDeltaE": 26.7,
+        "minDeltaEBlueOrange": 15.3,
+        "minDeltaEDeuteranopia": 23.6,
+        "minDeltaEProtanopia": 24,
+        "deuteranopia": "#5b6c95",
+        "protanopia": "#5c6f98",
+        "cardSurface": "#5c5b87",
+        "cardInkFull": 5.99,
+        "cardInkAtLowestOpacity": 4.52
+      },
+      {
+        "hex": "#422c59",
+        "oklch": {
+          "L": 0.34,
+          "C": 0.08,
+          "H": 305
+        },
+        "textOnHero": 10.12,
+        "dotOnPaper": 10.92,
+        "minDeltaE": 20.8,
+        "minDeltaEBlueOrange": 24.6,
+        "minDeltaEDeuteranopia": 23.2,
+        "minDeltaEProtanopia": 18.8,
+        "deuteranopia": "#253658",
+        "protanopia": "#20355b",
+        "cardSurface": "#422c59",
+        "cardInkFull": 11.39,
+        "cardInkAtLowestOpacity": 7.9
+      }
+    ]
+  },
+  "recommended": {
+    "confucian": "#705bbe",
+    "ubuntu": "#5f4d7e",
+    "buddhist": "#411b7b",
+    "minPairwiseDeltaE": 11.4
+  },
+  "poolSize": 1056
+}

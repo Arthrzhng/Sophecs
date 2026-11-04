@@ -146,7 +146,7 @@ Nothing is built. The draft asks for:
    The Ubuntu page places Gyekye between Metz and Menkiti, which points the
    same way, but its gloss on him points towards the individual end.
 
-### Colours for the three draft schools (#55, branch `phase3-styleguide`, `/styleguide/phase3`)
+### Colours for the three draft schools (#55, `/styleguide/phase3` on a preview deployment)
 
 `scripts/colour-candidates.mjs` searched for colours that:
 - carry white hero text at AA;
