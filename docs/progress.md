@@ -125,3 +125,23 @@ entry names.
   the JSON and exits non-zero if a school is unreachable, lands outside
   8% to 30%, or a school's own persona misses it; it exits 0 on the
   draft.
+
+## 2026-11-03: Stage 4, the Phase 3.0 items on `/styleguide/phase3`
+
+- Preview only: `/styleguide/phase3` renders nothing in production, and the
+  card preview route answers only on a preview deployment or with
+  `SOPHECS_PREVIEW` set. Colour candidates for the three draft schools
+  (`scripts/colour-candidates.mjs`, `docs/phase3-styleguide/colour-candidates.json`),
+  the two-axis map in the quiz preview and in Profile history, the school
+  table with six rows, the "view from elsewhere" card on Today and in the
+  lesson player, result cards and their card images for six schools, the
+  lesson filter chips, and a nav icon for the school table. Screenshots of
+  every section at 390 and 1280 in `docs/phase3-styleguide/`, taken from
+  a local production build. Contrast: 203 text elements on the page
+  measured from computed styles with Playwright, each text colour blended
+  by its own alpha and every ancestor's opacity, none below WCAG AA, the
+  lowest 4.54:1; 16 inside SVG or on an image background not measured.
+  (A first measurement ignored opacity and reported 5.03:1; review found
+  the draft cards' attribution at 3.86:1, which led to the derived card
+  surfaces.)
+  The colour choice, and everything shown, is Arthur's at Checkpoint A.
