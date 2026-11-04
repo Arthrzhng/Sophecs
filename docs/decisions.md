@@ -2458,16 +2458,11 @@ owner gets "Debate them" where the page shows it, and "Take the quiz"
 otherwise. `tests/create-challenge.test.ts`; two of its four cases fail
 on the old code.
 
-**What this does not close.** The action was one path. The database
-itself still lets `anon` and `authenticated` insert any challenge
-(0001's policy "anon insert own", `with check (true)`, and the table's
-grants), so anyone holding the public key can still open a challenge
-naming another reader's result through the Data API, skipping the
-action. Shown on a local copy with Supabase's default grants; production
-not checked from here. It is part of the wider write-permission fix
-reported on 2026-11-03, which waits on Arthur's "yes, the grants fix":
-every writer to `challenges` uses the server role, so dropping the insert
-policy would break nothing on the site.
+**What this does not close.** The action was one path to this. Another
+goes through the database's own permissions and is part of the wider
+write-permission fix reported to Arthur on 2026-11-03, which waits on his
+"yes, the grants fix"; its details stay out of this public file until it
+is closed.
 
 ### For Checkpoint A, from the security work
 
