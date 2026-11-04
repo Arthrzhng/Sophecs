@@ -101,3 +101,17 @@ entry names.
   five gates, the judge request fixtures, `check:bundle`, a dry run of the
   golden set under v3 (no calls, no spend). Eval key total unchanged at
   $4.6563.
+
+## 2026-11-03: Stage 2, `motion_text` into `debates_public`
+
+- Migration 0020 adds `motion_text` to `debates_public` as its last
+  column, on 0018's definition unchanged; the verdict page and its OG
+  image then read it from the view and stop reading `debates` for it. In
+  that order: 0020 is applied in production and read back before this
+  merges, because the code asks the view for the column. Checks before
+  the pull request: the five gates, `check:bundle`,
+  `scripts/test-0020-motion-text-view.sh` (142 checks, run on every
+  migration through 0019), `scripts/test-migrations.sh`, and deliberate
+  breaks of the migration and its rollback, each caught
+  (`docs/decisions.md`, "Phase 3 item: move `motion_text` into
+  `debates_public`").

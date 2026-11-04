@@ -27,21 +27,22 @@ export default async function VerdictOGImage({
     const admin = createAdminClient();
     const { data } = await admin
       .from("debates_public")
-      .select("school, score, topic_slug")
+      .select("school, score, topic_slug, motion_text")
       .eq("id", debateId)
       .maybeSingle();
     if (data) {
       school = data.school as SchoolId;
       score = Number(data.score ?? 0);
-      // Same two reads as the verdict page, and for the same reason:
-      // `debates_public` does not carry `motion_text`, so the stored
-      // wording comes from `debates` instead of from a migration.
-      const [{ data: topic }, { data: storedMotion }] = await Promise.all([
-        admin.from("debate_topics").select("motion").eq("slug", data.topic_slug).maybeSingle(),
-        admin.from("debates").select("motion_text").eq("id", debateId).maybeSingle(),
-      ]);
+      // The stored wording comes from the view with the rest (migration
+      // 0020), as on the verdict page; the topic's current motion is the
+      // fallback for a debate stored before motion_text existed.
+      const { data: topic } = await admin
+        .from("debate_topics")
+        .select("motion")
+        .eq("slug", data.topic_slug)
+        .maybeSingle();
       if (topic) {
-        motion = motionForDebate(storedMotion?.motion_text as string | null, topic.motion);
+        motion = motionForDebate(data.motion_text as string | null, topic.motion);
       }
     }
   }

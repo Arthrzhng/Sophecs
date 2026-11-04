@@ -1015,6 +1015,63 @@ no new private data, since the motion is public content and the page it
 feeds has always been public, but it is a deliberate widening rather than
 an incidental one.
 
+**Done, Stage 2 of the brief of 2026-11-03**, in that order: migration
+0020 (`supabase/migrations/0020_debates_public_motion_text.sql`) is 0018's
+view, keep-list, parent rule and type checks unchanged, with
+`d.motion_text` appended as the last column, applied before the code that
+reads it. The verdict page and its OG image now select `motion_text` from
+the view, and neither reads `debates` for it; the OG image no longer reads
+`debates` at all. The rollback has to drop and recreate the view, since
+`create or replace` cannot remove a column, so it revokes everything from
+`anon` and `authenticated` before granting SELECT back: a recreated view
+picks up Supabase's default privileges, which would reopen the write hole
+0016 closed. `scripts/test-0020-motion-text-view.sh` (142 checks) runs
+every migration before 0020 under production's grants and checks, after
+0020, after its rollback and after applying it again, that every column
+but `motion_text` of every row reads exactly as under 0018, that the
+rollback's `pg_get_viewdef` text is 0018's, that the view's owner,
+options and whole ACL are 0018's, and that anon and authenticated can
+only SELECT. `tests/verdict-privacy.test.ts` also holds the SQL text: 0020
+is 0018 plus the one column, and the rollback is 0018 exactly. Breaking
+the migration on purpose was caught each time: dropping the parent rule
+failed 6 checks, keeping `verdict_line` with its type check widened
+failed 8, and a rollback without the revoke failed 26 (the six write
+privileges for each of anon and authenticated, after the rollback and
+again after 0020 is reapplied, since `create or replace` keeps grants,
+plus the owner, options and ACL comparison at both points). Keeping
+`verdict_line` without widening the type check fails no SQL check,
+because the type check drops a string in that slot; the unit test that
+holds the keep-lists equal is what catches that one. The test runs on
+Postgres 16, so "production's grants" there means the seven privileges
+16 has; see below for 17's eighth.
+
+Two things review of #54 found. First, rolling back 0015 (which drops
+`debates.motion_text`) now needs 0020 rolled back first, since Postgres
+will not drop a column a view reads; `scripts/test-migrations.sh` failed
+on it and now runs the rollbacks in that order.
+
+Second, production runs Postgres 17.6, where a table has an eighth
+privilege, MAINTAIN, and 0016 revoked the six Postgres 16 privileges
+other than SELECT. A read of `pg_class.relacl` on 2026-11-03, repeated on
+2026-11-04 and kept in
+`docs/seed-snapshots/2026-11-04-view-acls-and-roles.json`, shows anon and
+authenticated holding MAINTAIN on all four public views (`anon=rm`, and
+`anon=m` on `profiles_public`). The earlier grants snapshot missed it
+because it was read from `information_schema`, which does not list
+MAINTAIN; the next grants read uses `relacl`. On Postgres 17 MAINTAIN
+allows VACUUM, ANALYZE, CLUSTER, REFRESH MATERIALIZED VIEW, REINDEX and
+LOCK TABLE. On a view only LOCK does anything, and locking a view locks
+the tables it reads, in the same mode, with the view owner's rights: a
+role holding it could stop every read and write of `debates`. It is not
+reachable today, by the same read: anon and authenticated cannot log in
+(`rolcanlogin` false), the Data API never issues LOCK, and no function in
+`public` runs dynamic SQL. It goes with the grants finding reported to
+Arthur on 2026-11-03. 0020's rollback grants SELECT alone, so after it
+the view has less than it has today. That assumes the rollback runs as
+`postgres`, whose default privileges in `public` the same read shows
+granting anon, authenticated and service_role everything, which the
+revoke then removes.
+
 ### 2F: the version override, and the bug it found in `fillOnce`
 
 Arthur approved a minimal change to the frozen `src/lib/anthropic.ts` on
