@@ -2583,15 +2583,17 @@ still work, as anon, signed in and as the server role; each object's
 exact ACL after it; that the rollback restores every ACL as it was, and
 0022 applies again; and that privileges granted by another role, one of
 each shape (both roles, a table privilege, TRUNCATE, an INSERT on columns
-only, an UPDATE of a profiles column other than the two kept), make 0022
-fail naming each, without changing anything. Breaking it on purpose,
-each caught: no column grant (5 checks fail), DELETE on `class_members`
-revoked too (3), the rollback keeping the column grant (1), the rollback
-leaving out `class_members` (2), the closing check removed (2), and the
-closing check narrowed to one role (3), one table (2), one privilege (1),
-no profiles columns (1) or table-level privileges only (1); and `profiles`
-left out of the revoke, or the column grant given to anon too, each make
-0022 refuse to apply. Postgres 16 has no MAINTAIN: in production 0022's closing
+only, an UPDATE of a profiles column other than the two kept, and a
+table-level UPDATE on `profiles`, the one table-level case the check reads
+column by column), make 0022 fail naming each, without changing anything.
+Breaking it on purpose, each caught (rerun on the final version): no
+column grant (5 checks fail), DELETE on `class_members` revoked too (3),
+the rollback keeping the column grant (1), the rollback leaving out
+`class_members` (2), the closing check removed (7), and the closing check
+narrowed to one role (4), one table (2), one privilege (1), no profiles
+columns (2) or table-level privileges only (1); and `profiles` left out
+of the revoke, or the column grant given to anon too, each make 0022
+refuse to apply. Postgres 16 has no MAINTAIN: in production 0022's closing
 check fails the migration if MAINTAIN is left and the read-back confirms
 it, but the rollback's MAINTAIN half is not tested anywhere.
 `tests/client-writes.test.ts` finds every `.from(...)` and `.rpc(...)` in
@@ -2601,8 +2603,9 @@ builder kept in a variable included), with the columns an update sets
 (a spread or a non-literal shows as `?`), and checks that every helper
 taking `admin: SupabaseClient` is given the admin client. The report is
 held to the site's four client writes, so a new signed-in write fails a
-unit test rather than production. Its header lists what it cannot see,
-none of which `src/` does today.
+unit test rather than production. It reads strings and comments as
+blanks, leaves storage buckets out, and its header lists what it cannot
+see, none of which `src/` does today.
 
 For a later list: the column grant lets the Data API set `display_name`
 without `setDisplayName`'s trim and 60-character limit, as "own update"

@@ -204,12 +204,23 @@ for want in "anon INSERT on debates" "anon TRUNCATE on quiz_results" "authentica
   expect "0022 stops, naming $want" 1 "$(printf '%s' "$OUT" | grep 'still held after the revokes' | grep -c "$want")"
 done
 expect "and changes nothing" "$ACL_STUCK" "$(acls)"
+# The one table-level privilege the check skips (UPDATE on profiles for
+# authenticated, read column by column instead) is still caught.
+psql -X -q -v ON_ERROR_STOP=1 -d "$DB" >/dev/null <<'STUCK'
+set role grantor_0022_test;
+revoke update (elo) on public.profiles from authenticated;
+grant update on public.profiles to authenticated;
+STUCK
+ACL_STUCK=$(acls)
+OUT=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/migrations/0022_client_write_grants.sql" 2>&1 || true)
+expect "0022 stops on a table-level UPDATE of profiles, naming a column" 1 "$(printf '%s' "$OUT" | grep 'still held after the revokes' | grep -c 'authenticated UPDATE of profiles.elo')"
+expect "and changes nothing" "$ACL_STUCK" "$(acls)"
 # Column grants are not taken by a table-level REVOKE ... CASCADE; the
 # grantor takes them back itself.
 psql -X -q -v ON_ERROR_STOP=1 -d "$DB" >/dev/null <<'UNSTUCK'
 set role grantor_0022_test;
 revoke insert (id, user_id, topic_slug, school, argument, verdict, score, elo_after) on public.debates from authenticated;
-revoke update (elo) on public.profiles from authenticated;
+revoke update on public.profiles from authenticated;
 UNSTUCK
 for t in debates quiz_results class_members profiles; do q "revoke all on public.$t from grantor_0022_test cascade" >/dev/null; done
 expect "with those grants gone, 0022 applies" "" "$(apply "$REPO/supabase/migrations/0022_client_write_grants.sql" 2>&1)"

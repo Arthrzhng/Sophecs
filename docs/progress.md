@@ -249,10 +249,10 @@ entry names.
   `docs/decisions.md`, "Clients keep only the writes the site makes
   (migration 0022)".
 - Tested on local Postgres: `scripts/test-0022-client-write-grants.sh`,
-  all checks passed, and seven deliberate breaks each caught (named in
+  all checks passed, and thirteen deliberate breaks each caught (named in
   `docs/decisions.md`); `scripts/test-migrations.sh`;
   `tests/client-writes.test.ts`.
-- Two fresh review passes, no blocking finding. Fixed after the first:
+- Three fresh review passes, no blocking finding. Fixed after the first:
   the test's Postgres 17 check counted every table; a REVOKE that takes
   nothing passed silently (the migration now checks what is left and
   fails); the client-writes scan missed five ways of reaching a session
@@ -260,3 +260,5 @@ entry names.
   errors. After the second: the closing check missed column-only grants
   and was tested on one case only; the scan passed a comment inside a
   chain, a builder kept in a variable, and update keys it could not read.
+  After the third: the scan read strings and comments as code, reported
+  storage buckets, and trusted any `admin` parameter; two stale counts.
