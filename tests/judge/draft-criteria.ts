@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import { fidelityCriteriaFor, hasFidelityCriteria } from "../../src/lib/judge/rubric";
+import { fidelityCriteriaFor, hasFidelityCriteria, rivalsOf } from "../../src/lib/judge/rubric";
+import { objectionVoiceFor } from "../../src/lib/judge/objection-voices";
 import type { PromptVersion } from "../../src/lib/judge/schema";
 import type { SchoolId } from "../../src/lib/types";
 
@@ -112,5 +113,9 @@ export function planCase(
         "schools from the registry; this one counts them as two",
     };
   }
-  return { run: true, source: "draft", criteria, draftCriteria: criteria };
+  // The same voice paragraph fidelityCriteriaFor adds for a live school
+  // under v3, so the two kinds of school are told the same thing. Draft
+  // schools only ever run under a prompt that lists rivals, which is v3.
+  const withVoice = `${criteria.trimEnd()}\n\n${objectionVoiceFor(school, rivalsOf(school))}`;
+  return { run: true, source: "draft", criteria: withVoice, draftCriteria: withVoice };
 }

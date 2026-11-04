@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# Proves migration 0020 on a throwaway local database, under production's
-# grants as 0016 and 0017 left them:
+# Proves migration 0020 on a throwaway local database, under the grants
+# 0016 left in production, as far as Postgres 16 has them: production runs
+# 17, whose eighth privilege, MAINTAIN, this server does not have (see
+# docs/decisions.md, "Phase 3 item: move `motion_text` into
+# `debates_public`"):
 #
 # - debates_public gains motion_text as its last column, each row's own,
 #   readable by anon, and nothing else about the view changes: 0018's

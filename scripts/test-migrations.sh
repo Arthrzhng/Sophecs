@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Applies every migration to a throwaway local database, rolls the last two
-# back, applies them again, and times each statement while holding its
-# lock.
+# Applies every migration to a throwaway local database, rolls back 0020,
+# 0015 and 0014 (0020 first, because its view reads the column 0015 adds),
+# applies them again, and times each statement while holding its lock.
 #
 # There is no Docker and no Supabase CLI in this environment, so this drives
 # the PostgreSQL 16 server binaries directly. docs/phase2-recon.md section 5

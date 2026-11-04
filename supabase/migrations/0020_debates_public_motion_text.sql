@@ -28,9 +28,9 @@
 -- 0020's rollback goes first; scripts/test-migrations.sh runs them in
 -- that order.
 --
--- Locks, until commit: ACCESS EXCLUSIVE on the view, for a catalogue
--- update, and ACCESS SHARE on debates, which blocks nothing but a
--- concurrent ALTER or DROP of that table. No transaction of its own: the
+-- Locks, until commit: ACCESS EXCLUSIVE on the view, which holds every
+-- read of debates_public for the moment the catalogue update takes, and
+-- ACCESS SHARE on debates, which conflicts only with ACCESS EXCLUSIVE. No transaction of its own: the
 -- Supabase runner wraps the file, and by hand it is
 -- `psql --single-transaction`.
 

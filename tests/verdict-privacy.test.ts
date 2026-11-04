@@ -103,6 +103,26 @@ describe("a verdict page seen by someone who does not own it", () => {
  * everything public on the page and the image comes from the view, and
  * the admin client no longer reads `debates` for it at all.
  */
+/** Source with comments removed (not inside strings: the files have none there). */
+function codeOnly(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/(^|[^:])\/\/[^\n]*/g, "$1");
+}
+
+/** The body of the block that opens at `opener`, up to its matching brace. */
+function blockAfter(source: string, opener: string): string {
+  const start = source.indexOf(opener);
+  if (start === -1) return "";
+  let depth = 0;
+  for (let i = start + opener.length - 1; i < source.length; i += 1) {
+    if (source[i] === "{") depth += 1;
+    else if (source[i] === "}") {
+      depth -= 1;
+      if (depth === 0) return source.slice(start, i + 1);
+    }
+  }
+  return "";
+}
+
 const READERS = [
   "src/app/debate/[slug]/[debateId]/page.tsx",
   "src/app/debate/[slug]/[debateId]/opengraph-image.tsx",
@@ -144,18 +164,21 @@ describe("motion_text comes from debates_public", () => {
   });
 
   it("passes the view's motion_text to motionForDebate on both surfaces", () => {
-    const page = fs.readFileSync(path.join(process.cwd(), READERS[0]), "utf-8");
-    const og = fs.readFileSync(path.join(process.cwd(), READERS[1]), "utf-8");
-    expect(page).toContain("motionForDebate(publicRow.motion_text as string | null, topic.motion)");
-    expect(og).toContain("motionForDebate(data.motion_text as string | null, topic.motion)");
+    // Comments stripped, so a comment quoting the call cannot stand in for it.
+    const page = codeOnly(fs.readFileSync(path.join(process.cwd(), READERS[0]), "utf-8"));
+    const og = codeOnly(fs.readFileSync(path.join(process.cwd(), READERS[1]), "utf-8"));
+    expect(page).toContain(
+      "const motion = motionForDebate(publicRow.motion_text as string | null, topic.motion)"
+    );
+    expect(og).toContain("motion = motionForDebate(data.motion_text as string | null, topic.motion)");
   });
 
-  it("reads the topic on the OG image only for a debate it found", () => {
-    const og = fs.readFileSync(path.join(process.cwd(), READERS[1]), "utf-8");
-    const found = og.indexOf("if (data) {");
-    const topic = og.indexOf('.from("debate_topics")');
-    expect(found).toBeGreaterThan(-1);
-    expect(topic).toBeGreaterThan(found);
+  it("reads the topic on the OG image only inside the block for a debate it found", () => {
+    const og = codeOnly(fs.readFileSync(path.join(process.cwd(), READERS[1]), "utf-8"));
+    const block = blockAfter(og, "if (data) {");
+    expect(block, "the if (data) block").not.toBe("");
+    expect(block).toContain('.from("debate_topics")');
+    expect(og.split('.from("debate_topics")').length - 1, "one topic read").toBe(1);
   });
 });
 

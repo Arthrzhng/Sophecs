@@ -15,8 +15,15 @@
 -- Production runs Postgres 17, where "every privilege" includes MAINTAIN,
 -- which 0016 did not revoke, so anon and authenticated hold it on the view
 -- today (read on 2026-11-03). This leaves them without it: less than they
--- have now, never more. On Postgres 16, where the local test runs, the
--- grants after this are exactly 0018's, owner and options included.
+-- have now. That assumes it runs as postgres, whose default privileges in
+-- public grant anon, authenticated and service_role everything (read on
+-- 2026-11-04, docs/seed-snapshots/2026-11-04-view-acls-and-roles.json),
+-- which the revoke then removes. On Postgres 16, where the local test
+-- runs, the grants after this are exactly 0018's, owner and options
+-- included.
+--
+-- Locks, until commit: ACCESS EXCLUSIVE on the view (dropped and
+-- recreated) and ACCESS SHARE on debates, as for 0020.
 -- The definition below is 0018's, character for character, with "create
 -- or replace" as "create"; scripts/test-0020-motion-text-view.sh checks
 -- that pg_get_viewdef reads the same after this as it did under 0018.
