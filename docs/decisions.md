@@ -2126,25 +2126,30 @@ sample's last attempt:
   construes them, never weighed independently" (sample 1); "still lets
   the employer author both sides of the ledger" (sample 2); "A system
   fixed by the employer encodes only the obligations the employer
-  recognizes" (sample 3). On `confucian-hierarchy-school` two of three do:
-  "whose judgment decided that" (sample 1) and "If the system sets the
-  terms by encoding what the relationship already asks, nobody is checking
-  whether those terms still serve the pupil's actual interests" (sample 2).
-  Sample 3 is about the pupil's interests going unweighed, not about who
-  holds power. Whether these meet "naming the power question" is Arthur's
-  call; the quotations are verbatim from the run file.
+  recognizes" (sample 3). On `confucian-hierarchy-school` sample 1 does
+  clearly: "whose judgment decided that". Sample 2 is borderline: its
+  claim opens "If the system sets the terms by encoding what the
+  relationship already asks, nobody is checking whether those terms still
+  serve the pupil's actual interests", but its reason is about the pupil's
+  welfare: "The argument never asks whether the encoded duties track what
+  currently benefits the pupil, only whether they match the role." Sample
+  3 is about the pupil's interests going unweighed, not about who holds
+  power. That reading is mine; whether these meet "naming the power
+  question" is Arthur's call. The quotations are verbatim from the run
+  file.
 - **The original six: pass.** `stoic-strong` 70, `stoic-wrong-school` 24,
   `util-strong` 82, `util-wrong-school` 22, `virtue-strong` 78,
   `virtue-wrong-school` 28, all in band.
 
-**So Stage 1 still does not pass, on one case.** Everything else in the
-test now holds. `confucian-hierarchy-school` has been out of band in all
+**So Stage 1 still does not pass, on one case.** On my reading, which is
+Arthur's to confirm on the power question, everything else in the test
+now holds. `confucian-hierarchy-school` has been out of band in all
 three runs (86, 78, 80). The brief says never widen a band, and that band
 questions go to Checkpoint A, so it goes there.
 
-**One thing the judge does not do.** On `confucian-hierarchy-school` every
-sample returns the school's known objection as unanswered and still
-scores engagement 5. The v3 criterion says an argument that leaves that
+**One thing the judge does not do.** On `confucian-hierarchy-school`,
+sample 1 returns the school's known objection as unanswered, and sample 2
+arguably does, and both score engagement 5. The v3 criterion says an argument that leaves that
 objection unmet "scores no more than 4 on engagement". On
 `confucian-hierarchy` it holds (4/3/3). So the cap is not applied
 reliably, and that case's engagement band is missed because of it.
@@ -2154,12 +2159,15 @@ points of median score from run 2: `confucian-hierarchy` +8 (62 to 70),
 `ubuntu-strong` -7 (78 to 71) and `util-wrong-school` -6 (28 to 22), all
 in band. Review of #51 asked whether naming Utilitarianism as the voice
 of Buddhist Ethics' objection would pull `buddhist-intention-excuse`
-away from intention: two of its three objections still target intention
-("not inferred from the builders' good hearts", "not just certify its
-intentions"), and one is the systematic-theory gap.
+away from intention. It did once: two of its three objections still
+target intention ("not inferred from the builders' good hearts", "not
+just certify its intentions"), as all six did in runs 1 and 2, but
+sample 1 is the systematic-theory gap, close to the voice's own words:
+"compassion alone gives no way to make that comparison".
 
-**No further run.** Arthur's ruling asked for one rerun, and the brief's
-"at most two further reruns" are used: run 2 after the engagement fix,
+**No further run.** Arthur's ruling asked for one rerun, and the brief of
+2026-11-03 (Arthur's instructions to the session, not in the repo) allows
+"At most two further reruns within the budget." Both are used: run 2 after the engagement fix,
 and this one. What remains is a band question and a judge-compliance
 question, both for Arthur.
 

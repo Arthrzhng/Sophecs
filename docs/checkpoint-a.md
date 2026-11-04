@@ -10,17 +10,12 @@ What shipped to get here is in `docs/progress.md`; why, in
 
 ## 0. Waiting on Arthur already (sent under STOP NOW, 2026-11-03)
 
-**Write permissions the site never uses.** Five tables accept writes from
-signed-in users, or from anyone, that the site itself only makes through
-its server key:
-
-- `debates` takes a signed-in user's own rows with any verdict, score and
-  rating;
-- `profiles` lets its owner change their rating, streak and school;
-- `challenges` lets anyone create or edit any challenge;
-- `quiz_results` takes any insert;
-- `class_members` lets a signed-in user join a class by its id without the
-  code.
+**Write permissions the site never uses.** Some tables accept writes,
+from signed-in users or from anyone, that the site itself only ever makes
+through its server key. The tables, what each allows, and the evidence
+were sent to Arthur on 2026-11-03 under STOP NOW. They are left out of
+this file, because the repository is public and the holes are not yet
+closed.
 
 Found since, and part of the same fix: production runs Postgres 17, and
 anon and authenticated hold its eighth privilege, `MAINTAIN`, on all four
@@ -48,7 +43,7 @@ has every figure and quotation.
 | `stoic-analogy` in band | yes | yes | yes |
 | `confucian-hierarchy` in band | no (engagement 5) | yes | yes |
 | `confucian-hierarchy-school` in band | no (86, eng 7) | no (78, eng 5) | no (80, eng 5) |
-| power question in `unanswered_objection` | never | never | 3 of 3 on `confucian-hierarchy`, 2 of 3 on `-school` |
+| power question in `unanswered_objection`, on my reading | never | never | 3 of 3 on `confucian-hierarchy`; on `-school`, 1 clear, 1 borderline, 1 not |
 | original six in band | yes | yes | yes |
 
 Eval key spend: $5.7934 of the $8.00 cap. No further run is planned.
@@ -58,11 +53,14 @@ Eval key spend: $5.7934 of the $8.00 cap. No further run is planned.
    in all three runs. The brief says never widen a band to fit a result,
    so this is yours: keep the band and treat it as a judge problem, or
    decide the fixture argument earns more than the band allows.
-2. **The judge does not apply the engagement cap reliably.** On that case
-   every sample returns the school's known objection as unanswered and
-   still scores engagement 5, where the v3 criterion says no more than 4.
-   On `confucian-hierarchy` it holds. A stronger instruction is a change
-   to what the judge receives, (b).
+2. **The judge does not apply the engagement cap reliably.** On that case,
+   sample 1 returns the power objection as unanswered, and sample 2
+   arguably does; both score engagement 5, where the v3 criterion says no
+   more than 4. On `confucian-hierarchy` it holds. A stronger instruction
+   is a change to what the judge receives, (b).
+3. **Whether the power question is met.** Which of these objections count
+   as naming it is a judgement, mine above and Arthur's to confirm; the
+   decisions entry quotes each one.
 
 ## Spending, rate limits and budget: (d)
 
@@ -90,8 +88,9 @@ Eval key spend: $5.7934 of the $8.00 cap. No further run is planned.
 
 ## What the judge receives: (b)
 
-1. **The v3 engagement cap of 4.** "Check first" is Arthur's ruling; the
-   number is mine, the top of the 0-4 engagement band in all three
+1. **The v3 engagement cap of 4.** "Check first" rests on Arthur's ruling
+   on the 3 Nov run, which asked that engagement check whether the
+   argument meets the objection; the number is mine, the top of the 0-4 engagement band in all three
    fixtures that have one. `content/prompts/judge.v3.md`, and
    `docs/decisions.md`, "2F, Stage 1 of the brief of 2026-11-03".
 2. **The head comment of `judge.v3.md` reaches the model.** It still holds
@@ -120,8 +119,10 @@ Two are weak:
 
 The other three match their pages: Stoicism and Virtue Ethics are voiced
 by Utilitarianism, and Ubuntu by Stoicism. In the rerun the Buddhist risk
-did not show: two of `buddhist-intention-excuse`'s three objections still
-target intention.
+showed once: two of `buddhist-intention-excuse`'s three objections still
+target intention, as all six did in runs 1 and 2, but sample 1 is the
+systematic-theory gap, close to the voice's own wording ("compassion
+alone gives no way to make that comparison").
 
 ### Quiz v2 (#53, `docs/quiz-v2.md`, section 7)
 
@@ -130,7 +131,7 @@ Nothing is built. The draft asks for:
 1. The two axes and their plain names.
 2. The six positions, especially Buddhist Ethics' and Ubuntu's.
 3. The ten questions and forty options: the five flagged as possibly too
-   nice, the options flagged as possibly underselling their school, and
+   nice, the three groups flagged as possibly underselling their school, and
    the two redrafted after review (3b, 8c).
 4. Weighted options (16.2% to 17.7% per school) or equal ones (10.9% to
    23.0%).
@@ -139,12 +140,13 @@ Nothing is built. The draft asks for:
    ships as drafted: `content/schools/*.md` (`share_lines`), and the same
    framing in `src/app/layout.tsx`, `src/components/share/SharePage.tsx`
    and `src/components/share/ChallengeInvite.tsx`.
-6. Whether none of the six is a rule-based ethics, which the axes rest on.
+6. Whether none of the six is a rule-based ethics, which the axes rest on:
+   the draft calls this "my reading and not certain".
 7. Ubuntu's alternatives: Menkiti's reading would move it towards role.
    The Ubuntu page places Gyekye between Metz and Menkiti, which points the
    same way, but its gloss on him points towards the individual end.
 
-### Colours for the three draft schools (#55, `/styleguide/phase3`)
+### Colours for the three draft schools (#55, branch `phase3-styleguide`, `/styleguide/phase3`)
 
 `scripts/colour-candidates.mjs` searched for colours that:
 - carry white hero text at AA;
@@ -154,16 +156,17 @@ Nothing is built. The draft asks for:
 - avoid each school's stereotyped hues.
 
 **Nearly everything that survived is indigo to plum.** Of the 1,056
-colours that pass those tests, all but four have a hue between 250 and
-335; the four others, three dark teals and a brown, are not among those
-offered. So the three new schools would all be violets, told apart by
-lightness and chroma more than hue. The recommended set is confucian
-`#705bbe`, ubuntu `#5f4d7e` and buddhist `#411b7b`; its smallest pairwise
-difference is 11.4 (CIEDE2000), closer to each other than the 12 each
-keeps from the live three under simulated colour blindness. Each also
-gets a darker card surface, as the live schools have, on which the card's
-text reads at AA. Candidates, figures and screenshots are in
-`docs/phase3-styleguide/`.
+colours that pass every test but the per-school hue exclusions, all but
+four have a hue between 250 and 335; the four others, three dark teals
+and a brown, are not among those offered. So the three new schools would
+all be violets, told apart by lightness and chroma more than hue. The
+recommended set is confucian `#705bbe`, ubuntu `#5f4d7e` and buddhist
+`#411b7b`. At their closest the three are 11.4 apart (CIEDE2000, across
+normal vision and both simulations), below the 12 the script requires
+between any candidate and the live three under simulated colour
+blindness. Each candidate has a card surface on which the card's text
+reads at AA; only Confucianism's had to be darkened to get there.
+Candidates, figures and screenshots are in `docs/phase3-styleguide/`.
 
 The choice is Arthur's: one of these, or loosen a constraint.
 
@@ -177,7 +180,11 @@ The choice is Arthur's: one of these, or loosen a constraint.
    user. The class policies call them, so a revoke would break class pages;
    moving them out of the API schema is the usual fix. Same entry.
 3. **`elo_percentile`** has a mutable `search_path` (advisor warning).
-4. **The 0018 shape.** For a private argument, withheld verdict fields are
+   `supabase/migrations/0006_elo_percentile.sql`.
+4. **`exchanges_public`** is readable and unused. It was kept because it
+   is meant to be public and exposes nothing private; whether to keep it
+   is Arthur's. "For Checkpoint A, from the security work".
+5. **The 0018 shape.** For a private argument, withheld verdict fields are
    left out of the public verdict rather than set to null.
    `supabase/migrations/0018_debates_public_private_verdict_text.sql`.
 
@@ -185,9 +192,9 @@ The choice is Arthur's: one of these, or loosen a constraint.
 
 - **`backup_20261022` still exists** (4 relations when last read, on
   2026-11-04). Arthur's ruling said the drop was done on retry, but it had
-  not gone through. It was retried on 2026-11-04 shortly after 00:20 UTC;
-  the database tool asked Arthur to confirm, and no answer came in time.
-  It needs his approval of that prompt, then a read-back. `docs/decisions.md`, "Open item: drop `backup_20261022`
+  not gone through. It was retried on 2026-11-04; the database tool asked
+  Arthur to confirm, and no answer came in time. It needs his approval of
+  that prompt, then a read-back. `docs/progress.md` logs both. `docs/decisions.md`, "Open item: drop `backup_20261022`
   after 2026-10-29".
 - **The brief and the repo disagree on one small thing.** The brief asks
   for "a neutral nav icon for School table (the triangle no longer means

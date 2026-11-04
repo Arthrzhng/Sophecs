@@ -107,9 +107,10 @@ entry names.
   2026-11-04.
 - The rerun Arthur asked for, on `8490b96`: run file
   `2026-11-04T00-02-04-581Z-v3.json`, 76 calls, $1.1371, under a watchdog
-  set to stop the runner at $2.00. Eval key total $5.7934 of $8.00. Every
-  part of the pass test now holds except `confucian-hierarchy-school`,
-  out of band on score and engagement as in both earlier runs; the power
+  set to stop the runner at $2.00. Eval key total $5.7934 of $8.00. On my
+  reading, which is Arthur's to confirm on the power question, every part
+  of the pass test now holds except `confucian-hierarchy-school`, out of
+  band on score and engagement as in both earlier runs; the power
   objection is now returned, in Utilitarianism's voice. Details in
   `docs/decisions.md`, "2F, the rerun after the objection voices".
 
@@ -136,8 +137,10 @@ entry names.
   `dpl_7sFvLWk1ojKEc29bwkjEeqLsCyLE`, Ready and aliased to sophecs.com
   (read from Vercel). The private verdict page
   (`/debate/opaque-benefit/jjSZVZFBmu`) fetched through Vercel at 00:17
-  UTC: 200, the private heading, and the debate's stored wording, which
-  differs from the topic's current wording, so it is read from the view.
+  UTC, just after Vercel reported sophecs.com aliased to
+  `dpl_7sFvLWk1ojKEc29bwkjEeqLsCyLE`: 200, the private heading, and the
+  debate's stored wording, which differs from the topic's current wording.
+  That deployment's code reads the stored wording only from the view.
 
 ## 2026-11-03: Stage 3, the quiz v2 design
 
@@ -150,4 +153,13 @@ entry names.
   draft.
 - #53 merged as `d283316`, after two review passes. Production deploy
   `dpl_466taYAkDfiFcHAqxVaMoJbz6DxB`, Ready (read from Vercel); docs and
-  a script only, nothing served changes.
+  a script only, nothing served changes. Vercel reported sophecs.com
+  aliased to it.
+- `backup_20261022` (the open item in `docs/decisions.md`): on 2026-11-04,
+  after 00:17 UTC, a read through the Supabase tool (`execute_sql`,
+  counting `pg_class` rows in that namespace) found the schema with its 4
+  relations: `debates`, `exchanges`, `profiles`, `quiz_results`. Arthur's
+  ruling said the drop had been done on retry; it had not. `drop schema
+  backup_20261022 cascade;` was retried through the same tool, which asked
+  Arthur to confirm; no answer came within its 230-second limit, so
+  nothing was dropped. It waits on his approval.
