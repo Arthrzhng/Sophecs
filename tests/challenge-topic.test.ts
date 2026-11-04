@@ -51,6 +51,7 @@ vi.mock("@/lib/supabase/server", () => ({
 vi.mock("next/cache", () => ({ revalidatePath: () => {} }));
 
 const { assignChallengeTopic } = await import("../src/app/debate/actions");
+const { viewerIsChallengeParty } = await import("../src/lib/challenge");
 
 beforeEach(() => {
   updates.length = 0;
@@ -91,8 +92,34 @@ describe("assignChallengeTopic", () => {
     expect(await assignChallengeTopic("c1")).toEqual({ ok: false, error: "Challenge not found." });
   });
 
+  it("refuses a party whose result is not saved to their account, as /api/judge would not record their debate", async () => {
+    // Quiz taken on one device, signed in on another: the result keeps a
+    // null user_id until a claim from its own anon_id.
+    tables.quiz_results[1].user_id = null;
+    signedIn = "challengee";
+    expect(await assignChallengeTopic("c1")).toEqual({ ok: false, error: "Challenge not found." });
+  });
+
   it("still needs a signed-in reader", async () => {
     signedIn = null;
     expect(await assignChallengeTopic("c1")).toEqual({ ok: false, error: "Not signed in." });
+  });
+});
+
+describe("viewerIsChallengeParty (who /r/[id] shows Debate them to)", () => {
+  const challenger = { anon_id: "anon-a", user_id: "user-a" };
+  const challengee = { anon_id: "anon-b", user_id: null };
+  it("is true for either side, by cookie or by account", () => {
+    expect(viewerIsChallengeParty({ anonId: "anon-a" }, [challengee, challenger])).toBe(true);
+    expect(viewerIsChallengeParty({ userId: "user-a" }, [challengee, challenger])).toBe(true);
+    expect(viewerIsChallengeParty({ anonId: "anon-b" }, [challengee, challenger])).toBe(true);
+  });
+  it("is false for anyone else, and for a missing owner row", () => {
+    expect(viewerIsChallengeParty({ anonId: "anon-z", userId: "user-z" }, [challengee, challenger])).toBe(false);
+    expect(viewerIsChallengeParty({}, [challengee, challenger])).toBe(false);
+    expect(viewerIsChallengeParty({ userId: "user-a" }, [null])).toBe(false);
+  });
+  it("never matches on an absent id", () => {
+    expect(viewerIsChallengeParty({ anonId: null, userId: null }, [{ anon_id: null, user_id: null }])).toBe(false);
   });
 });

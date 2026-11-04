@@ -2392,20 +2392,26 @@ topic, so 0018 does not touch it.
 Part of the write permissions reported to Arthur under STOP NOW on
 2026-11-03, and named again while building sample activity (#57), since
 it is live in production and the site never needs it. Arthur's ruling of
-2026-11-04 takes this one piece of the wider grants fix on its own: drop
-the policy, and make `assignChallengeTopic` check that its caller is a
-party. The rest of the grants fix still waits on his "yes, the grants
-fix".
+2026-11-04 takes this one piece of the wider grants fix on its own:
+"drop the 'accept sets challengee' policy and add a caller-is-a-party
+check to assignChallengeTopic, under the views process (local test,
+snapshot, apply, read-back, advisor before/after)". The rest of the
+grants fix still waits on his "yes, the grants fix".
 
 **The hole.** 0001 gave `anon` and `authenticated` an update policy on
 `challenges`, "accept sets challengee", with `using (true)` and
 `with check (true)`, and the table grants UPDATE to both. A select policy
-narrows an update only when the statement reads a column, so an update
-with no filter reached every row: anyone holding the public key could
-rewrite any challenge's status, results and debate ids, and
-`recordChallengeDebate` trusts those debate ids when it moves two
-readers' ratings. Every challenge write the site makes is through the
-server role: `submitQuizResult`, `assignChallengeTopic` and
+narrows an update only when the statement reads a column. Through the
+Data API every update carries a filter (Supabase runs it with
+`safeupdate`), so the reach there is the rows the caller can read: a
+signed-in party could rewrite any column of its own challenges, the other
+side's result and the debate ids included, and `recordChallengeDebate`
+trusts those debate ids when it moves both readers' ratings. In SQL as
+the anon role an update with no filter reached every row; the message of
+2026-11-03 said "anyone ... can edit any existing challenge", which holds
+for that SQL session and overstates what the Data API allows. Every
+challenge write the site makes is through the server role:
+`createChallenge`, `submitQuizResult`, `assignChallengeTopic` and
 `recordChallengeDebate`.
 
 **The fix.** `0021_challenges_no_client_update.sql` drops the policy, so
@@ -2418,9 +2424,14 @@ party still reads, and that the rollback restores the policy exactly and
 0021 applies again. `assignChallengeTopic` now answers a signed-in
 stranger as it answers a missing challenge, using the same party test
 `/api/judge` applies (`resolveChallengeSide`); `tests/challenge-topic.test.ts`.
+`/r/[id]` shows "Debate them" only to the two parties
+(`viewerIsChallengeParty`), since anyone else would now get an error from
+it; they get the ordinary challenge button as the main action, as on a
+result with no challenge. A party whose result is not saved to their
+account is refused, as `/api/judge` would not record their debate either.
 
-**Snapshot, read-back and advisor:** in the pull request and in
-`docs/progress.md`.
+**Snapshot, read-back and advisor:** recorded in `docs/progress.md` when
+0021 is applied.
 
 ### For Checkpoint A, from the security work
 

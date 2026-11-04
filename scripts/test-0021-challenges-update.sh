@@ -28,9 +28,9 @@ expect() {
 # Runs one statement as a role, as a signed-in user and with the x-anon-id
 # header the site sends, inside a transaction that is rolled back. Prints
 # how many rows it reached: the command tag's count for an update or an
-# insert (with no RETURNING, which would hide rows the caller cannot read
-# while still writing them), or a count(*)'s value. An error prints as
-# such.
+# insert, or a count(*)'s value. An error prints as such. No RETURNING:
+# it makes the select policy apply to the rows an update reaches, so it
+# would measure a narrower reach than a statement without it has.
 R=88888888-8888-8888-8888-888888888888
 ANON=aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa
 reach() {
@@ -62,8 +62,14 @@ insert into challenges (id, challenger_result_id) values ('c1', 'rmine'), ('c2',
 ROWS
 
 say "before 0021: the hole"
+# In SQL as the anon role. The Data API refuses an update with no filter
+# (Supabase runs it with safeupdate), and a filter reads a column, which
+# makes the select policy apply: through the API the reach is the rows the
+# caller can read, so the live hole is a party rewriting its own.
 expect "anon, no filter, reaches every challenge" 3 "$(reach anon "update challenges set status = 'complete'")"
-expect "a party reaches its own" 1 "$(reach authenticated "update challenges set status = 'complete' where id = 'c1'" $R)"
+expect "anon with a filter (the Data API's only form) reaches none it cannot read" 0 "$(reach anon "update challenges set status = 'complete' where id = 'c2'")"
+expect "a party, with a filter, reaches its own" 1 "$(reach authenticated "update challenges set status = 'complete' where id = 'c1'" $R)"
+expect "and can rewrite any column of it" 1 "$(reach authenticated "update challenges set challengee_result_id = 'rother', status = 'complete' where id = 'c1'" $R)"
 
 say "apply 0021"
 apply "$REPO/supabase/migrations/0021_challenges_no_client_update.sql"
