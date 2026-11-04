@@ -57,19 +57,23 @@ export default async function ClassPage({ params }: { params: Promise<{ code: st
     microBefore: (t.micro_before as string | null) ?? null,
   }));
 
-  const profileById = new Map<string, { displayName: string | null; school: SchoolId | null }>();
+  const profileById = new Map<
+    string,
+    { displayName: string | null; school: SchoolId | null; isSample: boolean }
+  >();
   const statesByUser = new Map<string, Record<string, CaseState>>();
 
   if (members.length > 0) {
     const userIds = members.map((m) => m.user_id as string);
     const { data: profiles } = await admin
       .from("profiles")
-      .select("id, display_name, school")
+      .select("id, display_name, school, is_sample")
       .in("id", userIds);
     for (const p of profiles ?? []) {
       profileById.set(p.id as string, {
         displayName: (p.display_name as string | null) ?? null,
         school: (p.school as SchoolId | null) ?? null,
+        isSample: Boolean(p.is_sample),
       });
     }
 
@@ -104,6 +108,7 @@ export default async function ClassPage({ params }: { params: Promise<{ code: st
               profile?.displayName ??
               (school ? `A ${SCHOOL_ADHERENT[school]}` : "A student"),
             school,
+            isSample: profile?.isSample ?? false,
             states: statesByUser.get(id) ?? {},
           };
         })}

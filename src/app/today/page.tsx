@@ -15,6 +15,7 @@ import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
 import { isoWeekRange, rankSchools, type JudgedArgument } from "@/lib/school-table";
 import { todayUTC } from "@/lib/streak";
+import { readAll } from "@/lib/read-all";
 import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "@/lib/types";
 
 export const metadata = {
@@ -89,23 +90,27 @@ export default async function TodayPage() {
       .eq("active", true),
     // The same rows the school table counts: originals, not rejected,
     // judged, inside this ISO week. Kept in step by reading the same
-    // columns through the same rankSchools, not by a second tally.
-    admin
-      .from("debates")
-      .select("school, verdict")
-      .eq("kind", "original")
-      .eq("rejected", false)
-      .not("verdict", "is", null)
-      .gte("created_at", start.toISOString())
-      .lt("created_at", end.toISOString()),
+    // columns through the same rankSchools, not by a second tally, and
+    // through readAll, as the table does, so a week of more than 1,000
+    // arguments is counted whole (src/lib/read-all.ts).
+    readAll<{ school: SchoolId; fidelity: unknown }>((from, to) =>
+      admin
+        .from("debates")
+        .select("school, fidelity:verdict->fidelity", { count: "exact" })
+        .eq("kind", "original")
+        .eq("rejected", false)
+        .not("verdict", "is", null)
+        .gte("created_at", start.toISOString())
+        .lt("created_at", end.toISOString())
+        .order("id")
+        .range(from, to)
+    ),
   ]);
   const topics = topicRows.data;
 
-  const judged: JudgedArgument[] = (
-    (judgedRows.data ?? []) as { school: SchoolId; verdict: { fidelity?: number | null } | null }[]
-  ).map((row) => ({
+  const judged: JudgedArgument[] = (judgedRows.rows ?? []).map((row) => ({
     school: row.school,
-    fidelity: typeof row.verdict?.fidelity === "number" ? row.verdict.fidelity : null,
+    fidelity: typeof row.fidelity === "number" ? row.fidelity : null,
   }));
 
   // Joined and left are the table's own columns and play no part in the

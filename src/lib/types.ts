@@ -40,4 +40,6 @@ export interface QuizResultRow {
   vector: SchoolVector;
   challenge_from: string | null;
   created_at: string;
+  /** A sample account's result (migration 0021). Absent where not read. */
+  is_sample?: boolean;
 }

@@ -168,7 +168,13 @@ create or replace view public.debates_public as
 create or replace view public.public_results as
   select id, school, secondary, vector, challenge_from, created_at, is_sample from quiz_results;
 
--- 5. A genuine reader's percentile is among genuine readers. Sample
+-- 5. The school table and Today read one ISO week of debates by
+-- created_at, which had no index; with sample activity there are enough
+-- rows for it to matter. A plain build, not concurrent: production holds
+-- one debate today, and the runner's transaction rules out CONCURRENTLY.
+create index debates_created_at_idx on public.debates (created_at);
+
+-- 6. A genuine reader's percentile is among genuine readers. Sample
 -- ratings are shown, labelled, but never move where a real reader stands.
 create or replace function public.elo_percentile(user_elo numeric)
 returns numeric

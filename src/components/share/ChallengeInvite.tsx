@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { SCHOOL_CHUNKY } from "@/components/daily-path/chunky";
 import { SCHOOL_ADHERENT } from "@/lib/school-colors";
+import { SampleLabel } from "@/components/sample/SampleLabel";
 import type { SchoolContent } from "@/lib/schools";
 import type { SchoolId } from "@/lib/types";
 
@@ -25,17 +26,21 @@ export function ChallengeInvite({
   challengeId,
   school,
   content,
+  isSample = false,
 }: {
   challengeId: string;
   school: SchoolId;
   content: SchoolContent;
+  /** Sent by a sample account (migration 0021), which will not answer. */
+  isSample?: boolean;
 }) {
   const adherent = SCHOOL_ADHERENT[school].toLowerCase();
 
   return (
     <>
+      {isSample && <SampleLabel />}
       <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
-        Someone challenged you
+        {isSample ? "A sample account's challenge" : "Someone challenged you"}
       </p>
       <h1 className="mt-2 max-w-[24ch] text-xl font-extrabold leading-tight tracking-tight text-ink">
         They came out a {adherent}. Find out what you are.
@@ -49,7 +54,11 @@ export function ChallengeInvite({
       </p>
 
       <div className="mt-8">
-        <ChunkyLink href={`/quiz?c=${challengeId}`} tone="ink">
+        {/* A sample account's challenge sends the reader to the quiz
+            without accepting it: no genuine result is tied to a sample
+            row, and nothing is left waiting on an account that will not
+            answer. */}
+        <ChunkyLink href={isSample ? "/quiz" : `/quiz?c=${challengeId}`} tone="ink">
           Take the quiz
         </ChunkyLink>
       </div>

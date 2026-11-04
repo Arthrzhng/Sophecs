@@ -34,7 +34,7 @@ export default async function VerdictPage({
   const { data: publicRow } = await admin
     .from("debates_public")
     .select(
-      "id, topic_slug, school, score, verdict, elo_before, elo_after, argument, kind, parent_debate_id, created_at, motion_text"
+      "id, topic_slug, school, score, verdict, elo_before, elo_after, argument, kind, parent_debate_id, created_at, motion_text, is_sample, verdict_is_template"
     )
     .eq("id", debateId)
     .maybeSingle();
@@ -238,6 +238,13 @@ export default async function VerdictPage({
         comparison={comparison}
         counterpart={counterpart}
         textWithheld={textWithheld}
+        // A sample account's argument (migration 0021): labelled, and a
+        // template verdict says it is one.
+        sample={
+          publicRow.is_sample
+            ? { template: Boolean(publicRow.verdict_is_template) }
+            : null
+        }
       />
     </Page>
   );

@@ -3,12 +3,15 @@ import { CaseTicks } from "@/components/debate/CaseTicks";
 import { SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { CaseState } from "@/lib/case-steps";
 import type { SchoolId } from "@/lib/types";
+import { SampleLabel } from "@/components/sample/SampleLabel";
 
 export interface ClassMember {
   id: string;
   /** A display name, or "A Stoic", or "A student". Never an email. */
   name: string;
   school: SchoolId | null;
+  /** A sample account (migration 0021), labelled where it is named. */
+  isSample?: boolean;
   states: Record<string, CaseState>;
 }
 
@@ -63,6 +66,7 @@ export function ClassView({
                 </p>
               )}
               <h2 className="mt-1 font-serif text-md font-medium text-ink">{member.name}</h2>
+              {member.isSample && <SampleLabel />}
               <ul className="mt-4 flex flex-col gap-4">
                 {topics.map((topic) => (
                   <li key={topic.slug}>

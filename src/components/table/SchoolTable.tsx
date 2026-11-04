@@ -2,6 +2,7 @@ import { SCHOOL_COLORS } from "@/lib/school-colors";
 import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
 import { joinedLeftLabel, type SchoolTableRow } from "@/lib/school-table";
 import type { SchoolId } from "@/lib/types";
+import { TextLink } from "@/components/ui/TextLink";
 
 /** A value the week has not produced. Same marker the verdict uses. */
 const NOTHING = "—";
@@ -17,6 +18,11 @@ export interface SchoolTableProps {
   emptyWeek: boolean;
   /** True when the kill switch is on for this reader. */
   paused: boolean;
+  /**
+   * Said when the week's rows count a sample account's argument
+   * (migration 0021). Null in a week with none.
+   */
+  sampleNote?: string | null;
 }
 
 function Cell({ label, children }: { label: string; children: React.ReactNode }) {
@@ -51,6 +57,7 @@ export function SchoolTable({
   yourLine,
   emptyWeek,
   paused,
+  sampleNote = null,
 }: SchoolTableProps) {
   return (
     <div>
@@ -169,6 +176,12 @@ export function SchoolTable({
             Joined and left count people who retook the quiz and changed school. No
             names are shown, here or anywhere else.
           </p>
+          {sampleNote && (
+            <p className="mt-2 text-sm leading-relaxed text-ink-mid">
+              {sampleNote}{" "}
+              <TextLink href="/method#samples">What a sample account is</TextLink>
+            </p>
+          )}
         </section>
       </div>
     </div>

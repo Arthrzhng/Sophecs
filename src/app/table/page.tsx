@@ -14,6 +14,8 @@ import {
   type SchoolChangeCounts,
 } from "@/lib/school-table";
 import type { SchoolId } from "@/lib/types";
+import { readAll } from "@/lib/read-all";
+import { TABLE_SAMPLE_NOTE } from "@/lib/sample";
 
 export const metadata = {
   title: "School table · Sophecs",
@@ -49,6 +51,7 @@ export default async function SchoolTablePage() {
   let judged: JudgedArgument[] = [];
   let changes = NO_CHANGES;
   let yoursThisWeek = 0;
+  let includesSamples = false;
 
   if (isSupabaseConfigured()) {
     const supabase = await createSupabaseServerClient();
@@ -63,39 +66,57 @@ export default async function SchoolTablePage() {
 
     // The verdict's fidelity is inside the jsonb; only `score` is
     // denormalized onto its own column, and adding a second one would be
-    // a migration this stage does not take.
+    // a migration this stage does not take. It is read out of the jsonb
+    // rather than reading the whole verdict, which is most of the row.
+    //
+    // Both reads go through readAll: a plain select stops at the Data
+    // API's 1,000 rows without saying so (src/lib/read-all.ts). On a
+    // failed read the table shows the week as empty, as it did before.
     const [week_, histories, profile] = await Promise.all([
-      admin
-        .from("debates")
-        .select("user_id, school, verdict")
-        // Originals only. A revision is a second attempt at the same
-        // motion after feedback and does not move the reader's rating, so
-        // it does not move their school's row either. See countsOnTable.
-        .eq("kind", "original")
-        .eq("rejected", false)
-        .not("verdict", "is", null)
-        .gte("created_at", start.toISOString())
-        .lt("created_at", end.toISOString()),
-      admin.from("profiles").select("school_history"),
+      readAll<{ user_id: string; school: SchoolId; fidelity: unknown; is_sample: boolean }>(
+        (from, to) =>
+          admin
+            .from("debates")
+            .select("user_id, school, fidelity:verdict->fidelity, is_sample", { count: "exact" })
+            // Originals only. A revision is a second attempt at the same
+            // motion after feedback and does not move the reader's rating,
+            // so it does not move their school's row either. See
+            // countsOnTable.
+            .eq("kind", "original")
+            .eq("rejected", false)
+            .not("verdict", "is", null)
+            .gte("created_at", start.toISOString())
+            .lt("created_at", end.toISOString())
+            .order("id")
+            .range(from, to)
+      ),
+      // Only profiles that have changed school have anything to count.
+      readAll<{ school_history: unknown }>((from, to) =>
+        admin
+          .from("profiles")
+          .select("school_history", { count: "exact" })
+          .neq("school_history", "[]")
+          .order("id")
+          .range(from, to)
+      ),
       userId
         ? admin.from("profiles").select("school").eq("id", userId).maybeSingle()
         : Promise.resolve({ data: null }),
     ]);
 
-    const rows = (week_.data ?? []) as {
-      user_id: string;
-      school: SchoolId;
-      verdict: { fidelity?: number | null } | null;
-    }[];
+    const rows = week_.rows ?? [];
 
     judged = rows.map((row) => ({
       school: row.school,
-      fidelity: typeof row.verdict?.fidelity === "number" ? row.verdict.fidelity : null,
+      fidelity: typeof row.fidelity === "number" ? row.fidelity : null,
     }));
     yoursThisWeek = userId ? rows.filter((row) => row.user_id === userId).length : 0;
+    // Sample accounts (migration 0021) are counted like anyone else, and
+    // the table says so in any week they are part of it.
+    includesSamples = rows.some((row) => row.is_sample);
 
-    const entries = ((histories.data ?? []) as { school_history: unknown }[]).flatMap(
-      (p) => (Array.isArray(p.school_history) ? (p.school_history as SchoolChange[]) : [])
+    const entries = (histories.rows ?? []).flatMap((p) =>
+      Array.isArray(p.school_history) ? (p.school_history as SchoolChange[]) : []
     );
     changes = schoolChanges(entries, start, end);
     yourSchool = ((profile.data as { school?: SchoolId } | null)?.school ?? null) as SchoolId | null;
@@ -124,6 +145,7 @@ export default async function SchoolTablePage() {
           }
           emptyWeek={judged.length === 0}
           paused={paused}
+          sampleNote={includesSamples ? TABLE_SAMPLE_NOTE : null}
         />
     </Page>
   );

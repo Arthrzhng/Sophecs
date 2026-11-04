@@ -94,6 +94,8 @@ revoke all on public.public_results from public, anon, authenticated;
 grant select on public.public_results to anon, authenticated;
 grant all on public.public_results to service_role;
 
+drop index public.debates_created_at_idx;
+
 drop trigger profiles_guard_sample on public.profiles;
 drop trigger quiz_results_guard_sample on public.quiz_results;
 drop trigger debates_guard_sample on public.debates;

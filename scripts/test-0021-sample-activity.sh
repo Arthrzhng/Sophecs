@@ -135,6 +135,7 @@ after() {
   expect "$1: service_role reads seed_runs" allowed "$(as_role service_role "select * from public.seed_runs")"
   expect "$1: seed_runs has row level security" t "$(q "select relrowsecurity from pg_class where oid = 'public.seed_runs'::regclass")"
   expect "$1: seed_run_items has row level security" t "$(q "select relrowsecurity from pg_class where oid = 'public.seed_run_items'::regclass")"
+  expect "$1: debates has a created_at index" 1 "$(q "select count(*) from pg_indexes where schemaname='public' and indexname='debates_created_at_idx'")"
 }
 after "after 0021"
 
@@ -192,6 +193,7 @@ expect "elo_percentile as before" "$PCT_BEFORE" "$(q "select elo_percentile(1150
 expect "no is_sample column left" 0 "$(q "select count(*) from information_schema.columns where table_schema='public' and column_name in ('is_sample','verdict_is_template')")"
 expect "no registry left" 0 "$(q "select count(*) from pg_class where relname in ('seed_runs','seed_run_items')")"
 expect "no guard left" 0 "$(q "select count(*) from pg_proc where proname = 'guard_sample_marker'")"
+expect "no created_at index left" 0 "$(q "select count(*) from pg_indexes where indexname='debates_created_at_idx'")"
 
 say "re-apply 0021"
 apply "$REPO/supabase/migrations/0021_sample_activity.sql"

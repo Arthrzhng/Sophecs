@@ -13,7 +13,7 @@ async function getChallenge(id: string) {
   const admin = createAdminClient();
   const { data: challenge } = await admin
     .from("challenges")
-    .select("id, challenger_result_id")
+    .select("id, challenger_result_id, is_sample")
     .eq("id", id)
     .single();
   if (!challenge) return null;
@@ -25,7 +25,7 @@ async function getChallenge(id: string) {
     .single();
   if (!result) return null;
 
-  return { school: result.school as SchoolId };
+  return { school: result.school as SchoolId, isSample: Boolean(challenge.is_sample) };
 }
 
 export default async function ChallengePage({ params }: { params: Promise<{ id: string }> }) {
@@ -38,11 +38,14 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
   // route has had since it was redrawn.
   return (
     <Page width="read" rhythm="path">
-        <ChallengeViewTracker challengeId={id} />
+        {/* A sample account's challenge is labelled and not counted as a
+            challenge being opened (docs/sample-activity.md, "Metrics"). */}
+        {!challenge.isSample && <ChallengeViewTracker challengeId={id} />}
         <ChallengeInvite
           challengeId={id}
           school={challenge.school}
           content={getSchool(challenge.school)}
+          isSample={challenge.isSample}
         />
     </Page>
   );

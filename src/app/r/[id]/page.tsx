@@ -14,7 +14,7 @@ async function getResult(id: string): Promise<QuizResultRow | null> {
   const admin = createAdminClient();
   const { data } = await admin
     .from("public_results")
-    .select("id, school, secondary, vector, challenge_from, created_at")
+    .select("id, school, secondary, vector, challenge_from, created_at, is_sample")
     .eq("id", id)
     .single();
   return (data as QuizResultRow) ?? null;
@@ -118,7 +118,11 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
 
   return (
     <>
-      <CardViewTracker resultId={id} school={result.school} isOwner={isOwner} referrer={referrer} />
+      {/* A view of a sample result is not a share converting, so it is
+          not counted (docs/sample-activity.md, "Metrics"). */}
+      {!result.is_sample && (
+        <CardViewTracker resultId={id} school={result.school} isOwner={isOwner} referrer={referrer} />
+      )}
       <SharePage
         resultId={id}
         school={result.school}
@@ -133,6 +137,7 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
         isSignedIn={Boolean(user)}
         shareLine={shareLine}
         shareLineIndex={shareLineIndex}
+        isSample={Boolean(result.is_sample)}
       />
     </>
   );
