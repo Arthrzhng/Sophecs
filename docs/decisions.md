@@ -627,16 +627,22 @@ of 2026-11-04. `seekCounterpart` made the waiting seeker `user_a` and set
 `user_a` (`authorForSeq`) and refuses unless `next_turn` agrees. On turn 1
 the newer seeker passed the `next_turn` check and failed the author check,
 and the waiting seeker failed the first: no exchange could ever start.
-Production had no exchange, so nobody was caught in one.
+Production had no exchange (a read-only count of `exchanges` on
+2026-11-04 at about 03:30 UTC returned 0), so nobody was caught in one.
 
 The fix keeps who opens, which the code's own comment attributes to the
 brief ("`next_turn` is the newer seeker"): the newer seeker is now
 `user_a`, with their own debate and school on the `_a` side, and
-`next_turn` names them. The route is frozen and unchanged. Every other
-reader of an exchange works out "mine" and "theirs" from `user_a` and
-`user_b` symmetrically. `tests/counterpart-pairing.test.ts` checks the
+`next_turn` names them. The route is frozen and unchanged. The other
+readers of an exchange (`/me`, the verdict page, `blockCounterpart`,
+`scripts/review-turns.ts`, the turn route's quote source) work out
+"mine" and "theirs" from `user_a` and `user_b` symmetrically. One is
+not: `/counterpart/[id]` shows the motion wording of `debate_a`, "the
+opener's words", which is now the newer seeker's, as that page's own
+comment intends. `tests/counterpart-pairing.test.ts` checks the
 invariant itself: the opened exchange's `next_turn` is
 `authorForSeq(1, user_a, user_b)`; it fails on the old code.
+
 ### What is not verified
 
 The four-turn end-to-end run with two real accounts, and `KILL_SWITCH_SCREEN=true` stopping delivery, could not be exercised here: this sandbox's proxy does not allow the app's own server to reach Supabase (the constraint recorded in Phase 1), so authenticated flows can only be run against the deployed site. The pieces they depend on are each verified separately — RLS by direct SQL, the screen by the fixture suite, the turn and quote rules by unit tests (`tests/counterpart.test.ts`, 30 tests passing) — but the assembled path is untested until it runs on Vercel.
