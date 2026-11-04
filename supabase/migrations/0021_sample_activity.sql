@@ -22,9 +22,10 @@
 --
 -- Locks, until commit: ACCESS EXCLUSIVE, briefly, on profiles,
 -- quiz_results, debates, challenges and exchanges for the column adds and
--- the triggers, and on the two views. No row is rewritten. No transaction
--- of its own: the Supabase runner wraps the file, and by hand it is
--- `psql --single-transaction`.
+-- the triggers, and on the two views; SHARE ROW EXCLUSIVE on
+-- class_members, blocks and reports for their triggers. No row is
+-- rewritten. No transaction of its own: the Supabase runner wraps the
+-- file, and by hand it is `psql --single-transaction`.
 
 set local lock_timeout = '5s';
 
@@ -123,8 +124,13 @@ create trigger exchanges_guard_sample before insert or update on public.exchange
 -- a sample account, a member joining a sample class) would let anyone stop
 -- a teardown. Sample ids are listable through the public views and
 -- derivable from the public seed tooling, so this refuses those writes for
--- anon and authenticated callers. The site makes all of these writes with
--- the server role, which this lets through, as it does migrations.
+-- anon and authenticated callers. The site's server code writes with the
+-- server role, which this lets through, as it does migrations: each of its
+-- writes checks first that the reader is a party to what they point at
+-- (their own debate, their own exchange, joinClass's owner check), except
+-- createChallenge (src/app/actions.ts), which inserts whatever result id
+-- it is given. So a genuine challenge is checked whoever writes it; the
+-- seed writes only marked challenges.
 --
 -- SECURITY DEFINER to read sample rows past row level security. The
 -- caller's role is the `role` setting, which the Data API sets with SET
@@ -137,6 +143,18 @@ as $$
 declare
   hit boolean := false;
 begin
+  -- A genuine challenge, whoever writes it. (Nested: SQL does not promise
+  -- to skip the second half of an and, and new has no is_sample on most
+  -- of these tables.)
+  if tg_table_name = 'challenges' then
+    if not new.is_sample then
+      hit := exists (select 1 from quiz_results r where r.is_sample and r.id in (new.challenger_result_id, new.challengee_result_id))
+          or exists (select 1 from debates d where d.is_sample and d.id in (new.challenger_debate_id, new.challengee_debate_id));
+      if hit then
+        raise exception 'sample rows cannot be referenced from here';
+      end if;
+    end if;
+  end if;
   if coalesce(current_setting('role', true), 'none') not in ('anon', 'authenticated') then
     return new;
   end if;

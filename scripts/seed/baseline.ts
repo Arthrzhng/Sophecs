@@ -44,15 +44,18 @@ export async function snapshot(adapter: Adapter): Promise<Baseline> {
   for (const t of MARKED_TABLES) genuine[t] = await adapter.count(t, { sample: false });
   const totals: Record<string, number> = {};
   for (const t of OTHER_TABLES) totals[t] = await adapter.count(t);
-  // Read in the order that keeps each pair consistent under live writes:
-  // the percentile straight after the profiles it is compared with, and the
-  // debates before the topics, since /api/judge writes a debate's rating
-  // before it moves the topic's par.
+  // The percentile straight after the profiles it is compared with, and
+  // the topics before the debates: /api/judge writes a debate's rating
+  // before it moves the topic's par, so a par read first always has its
+  // rating in the debates read after. A judging that lands between the two
+  // reads still differs for a moment, which is what settledChecks reads
+  // again for.
   const profiles = await adapter.scan("profiles", ["id", "elo", "streak", "school"], { sample: false });
   const percentile1200 = await adapter.percentile(1200);
+  const topicRows = await adapter.scan("debate_topics", ["slug", "motion", "active", "par_elo", "par_n"]);
   const debates = await adapter.scan("debates", ["user_id", "topic_slug", "kind", "elo_before", "created_at"], { sample: false });
   const genuineProfiles = Object.fromEntries(profiles.map((p) => [String(p.id), `${Number(p.elo)}|${p.streak}|${p.school}`]));
-  const topics = (await adapter.scan("debate_topics", ["slug", "motion", "active", "par_elo", "par_n"])).map((t) => ({
+  const topics = topicRows.map((t) => ({
     slug: String(t.slug),
     motion: String(t.motion),
     active: Boolean(t.active),

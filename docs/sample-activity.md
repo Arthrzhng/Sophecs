@@ -61,15 +61,19 @@ challenges." `/method#samples` explains the rest.
   must filter on it. `scripts/review-verdicts.ts` already does.
 - **Classes, challenges and other references.** No reader can attach a
   row of their own to a sample row, even with an id worked out from the
-  public generator: `joinClass` answers a sample class's code as a wrong
-  code, and a trigger in 0021 refuses the same thing on every path a
-  signed-in or anonymous request has through the Data API: joining a
-  sample class or adding a sample member, a challenge or quiz result
-  pointing at a sample's result or debate, a debate whose parent or
-  challenge is a sample's, a block naming a sample account, a report on a
-  sample exchange's turn (`scripts/test-0021-sample-activity.sh` tries
-  each). So no genuine row can come to depend on a sample row, and
-  teardown is never left choosing between the two.
+  public generator. A trigger in 0021 refuses it on every path a signed-in
+  or anonymous request has through the Data API, inserts and updates
+  alike: joining a sample class or adding a sample member, a challenge or
+  quiz result pointing at a sample's result or debate, a debate whose
+  parent or challenge is a sample's, a block naming a sample account, a
+  report on a sample exchange's turn. The site's server code checks that
+  the reader is a party before it writes (their own debate, their own
+  exchange; `joinClass` answers a sample class's code as a wrong code),
+  except `createChallenge`, which takes any result id; so a genuine
+  challenge is checked by the trigger whoever writes it.
+  `scripts/test-0021-sample-activity.sh` tries each path. So no genuine
+  row can come to depend on a sample row, and teardown is never left
+  choosing between the two.
 - **Email and sign-in.** Sample users are created through the Auth admin
   API with `email_confirm: true` (no confirmation mail), no password, a
   ban of 876,000 hours, and addresses on `sophecs.test`, a domain reserved
@@ -89,9 +93,10 @@ challenges." `/method#samples` explains the rest.
   clear the marker, so a reader editing their own profile cannot mark or
   unmark anything. Six (`*_guard_reference`, on `class_members`,
   `challenges`, `quiz_results`, `debates`, `blocks` and `reports`) refuse
-  an anonymous or signed-in write that would point at a sample row; the
-  server role, which the app's own server code and the seed use, is not
-  affected. The function behind them runs as its owner so it can see
+  an anonymous or signed-in write that would point at a sample row, and a
+  genuine challenge naming a sample result or debate whoever writes it;
+  otherwise the server role, which the app's own server code and the seed
+  use, is not affected. The function behind them runs as its owner so it can see
   sample rows the caller cannot, and no client role may call it directly.
 - `seed_runs` (one row per run: plan hash, generator version, seed,
   window, status, lock) and `seed_run_items` (one row per row a run
@@ -232,7 +237,7 @@ created. An auth user with an intent from an earlier attempt is looked up
 before it is created. A lost response, a crash or Ctrl-C leaves a state
 the same command resumes without writing anything twice. One run at a
 time: a run takes a lock, refreshes it before every batch, before marking
-anything and at least once a minute while it creates auth users one at a
+anything and about once a minute while it creates auth users one at a
 time, writes the run's own row only while holding it, and stops without
 writing more the moment it finds the lock taken. Teardown holds the same
 lock the same way. A lock
@@ -276,7 +281,12 @@ genuine originals alone (or be unchanged where there are none), and
 alone. A failing check is read again five seconds later before it is
 reported, since one read can land inside a reader's judging (the rating
 is written before the par moves). The dry run runs the same checks first,
-so a failure afterwards is the run's. Genuine row counts and changed genuine profiles
+so a failure afterwards is almost certainly the run's. The exception is
+two judgings on one topic finishing together: each can compute the par
+from a window that misses the other, and the stored par then stays off
+until the next judging on that topic. A par check that fails twice is a
+stop either way; compare that topic's last genuine judgings before
+deciding it was the run. Genuine row counts and changed genuine profiles
 are reported as information, since sign-ups, deletions, challenges and late
 verdicts move them. That the run writes no genuine row is proven where it
 writes: every row is read back and must be marked or owned by the run, and

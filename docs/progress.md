@@ -219,5 +219,6 @@ entry names.
   of the repository with its seed, since the generator is public and the
   seed fixes every row id. Waiting on Arthur's approval with everything
   else that run needs; the plan is remade in the minute before the run.
-- Reviewed three times by fresh reviewers (#57 lists the findings and
-  fixes).
+- Reviewed four times by fresh reviewers, one past the charter's cap of
+  three; the last round's fixes were verified by the agent, not a fresh
+  reviewer (#57 lists the findings and fixes).

@@ -178,6 +178,8 @@ psql -X -q -v ON_ERROR_STOP=1 -d "$DB" >/dev/null <<REF
 insert into auth.users (id) values ('88888888-8888-8888-8888-888888888888');
 insert into profiles (id, display_name, school, elo, streak) values ('88888888-8888-8888-8888-888888888888', 'Reader Two', 'stoicism', 1200, 0);
 insert into quiz_results (id, school, vector, answers, anon_id) values ('GENRES001', 'stoicism', '{}', '[]', gen_random_uuid());
+insert into quiz_results (id, school, vector, answers, anon_id, user_id) values ('GENRESR', 'stoicism', '{}', '[]', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', '88888888-8888-8888-8888-888888888888');
+insert into challenges (id, challenger_result_id) values ('gchal', 'GENRESR');
 insert into classes (id, code, owner_id, name) values ('sclass', 'samplecd', '66666666-6666-6666-6666-666666666666', 'Sample class');
 insert into classes (id, code, owner_id, name) values ('gclass', 'genuinec', '$U', 'Genuine class');
 insert into quiz_results (id, school, vector, answers, anon_id, is_sample) values ('sres', 'stoicism', '{}', '[]', gen_random_uuid(), true);
@@ -192,19 +194,35 @@ refused() { printf '%s' "$1" | grep -q 'cannot be referenced' && echo refused ||
 expect "authenticated joins a sample class" refused "$(refused "$(as_role authenticated "insert into class_members (class_id, user_id) values ('sclass', '$R')" $R)")"
 expect "authenticated joins a genuine class" allowed "$(as_role authenticated "insert into class_members (class_id, user_id) values ('gclass', '$R')" $R)"
 expect "anon challenges from a sample result" refused "$(refused "$(as_role anon "insert into challenges (id, challenger_result_id) values ('c1', 'sres')")")"
-# Updates run through the same trigger function as these inserts; row
-# level security already hides every challenge from a caller who is not a
-# party to it, so an update by anon or authenticated matches no row here.
+expect "anon names a sample challengee result" refused "$(refused "$(as_role anon "insert into challenges (id, challenger_result_id, challengee_result_id) values ('c2', 'GENRES001', 'sres')")")"
+expect "anon names a sample challenger debate" refused "$(refused "$(as_role anon "insert into challenges (id, challenger_result_id, challenger_debate_id) values ('c3', 'GENRES001', 'sdeb')")")"
+# The update policy on challenges is using (true), and a select policy only
+# narrows an update that reads a column, so an update with no filter
+# reaches every row; a party, who can read its own challenge, can also
+# filter to it. Both are refused once they would name a sample row.
+expect "anon updates every challenge to name a sample result" refused "$(refused "$(as_role anon "update challenges set challengee_result_id = 'sres'")")"
+# A party sees its challenge through its own result, which it reads with
+# the x-anon-id header the site sends.
+PARTY="select set_config('request.headers', '{\"x-anon-id\": \"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa\"}', true)"
+expect "a party reaches its own challenge" "gchal" "$(psql -X -At -d "$DB" -c "begin; set local role authenticated; select set_config('request.jwt.claim.sub', '$R', true); $PARTY; update challenges set status = 'open' where id = 'gchal' returning id; rollback;" 2>&1 | grep -x gchal)"
+expect "a party updates its challenge to name a sample result" refused "$(refused "$(as_role authenticated "$PARTY; update challenges set challengee_result_id = 'sres' where id = 'gchal'" $R)")"
+expect "a party updates its challenge to name a sample debate" refused "$(refused "$(as_role authenticated "$PARTY; update challenges set challengee_debate_id = 'sdeb' where id = 'gchal'" $R)")"
+# createChallenge (src/app/actions.ts) inserts any result id with the
+# server role, so a genuine challenge is checked whoever writes it.
+expect "the server role cannot make a genuine challenge name a sample result" refused "$(refused "$(as_role service_role "insert into challenges (id, challenger_result_id) values ('c4', 'sres')")")"
+expect "the server role can write a sample challenge (the seed)" allowed "$(as_role service_role "insert into challenges (id, challenger_result_id, is_sample) values ('c5', 'sres', true)")"
+expect "the server role's genuine challenge" allowed "$(as_role service_role "insert into challenges (id, challenger_result_id) values ('c6', 'GENRES001')")"
 expect "anon result naming a sample challenger" refused "$(refused "$(as_role anon "insert into quiz_results (id, school, vector, answers, anon_id, challenge_from) values ('q1', 'stoicism', '{}', '[]', gen_random_uuid(), 'sres')")")"
 expect "anon result claiming a sample user" refused "$(refused "$(as_role anon "insert into quiz_results (id, school, vector, answers, anon_id, user_id) values ('q2', 'stoicism', '{}', '[]', gen_random_uuid(), '66666666-6666-6666-6666-666666666666')")")"
 expect "anon genuine result" allowed "$(as_role anon "insert into quiz_results (id, school, vector, answers, anon_id) values ('q3', 'stoicism', '{}', '[]', gen_random_uuid())")"
 expect "authenticated revision of a sample debate" refused "$(refused "$(as_role authenticated "insert into debates (id, user_id, topic_slug, school, argument, kind, parent_debate_id) values ('d1', '$R', 'st', 'stoicism', 'x', 'revision', 'sdeb')" $R)")"
+expect "authenticated argues a sample challenge" refused "$(refused "$(as_role authenticated "insert into debates (id, user_id, topic_slug, school, argument, kind, challenge_id) values ('d2', '$R', 'st', 'stoicism', 'x', 'original', 'schal')" $R)")"
 expect "authenticated blocks a sample account" refused "$(refused "$(as_role authenticated "insert into blocks (blocker_id, blocked_id) values ('$R', '66666666-6666-6666-6666-666666666666')" $R)")"
 expect "authenticated reports a sample turn" refused "$(refused "$(as_role authenticated "insert into reports (id, turn_id, reporter_id, reason) values ('r1', 'sturn', '$R', 'spam')" $R)")"
 expect "the server role may (the site's own writes)" allowed "$(as_role service_role "insert into class_members (class_id, user_id) values ('sclass', '77777777-7777-7777-7777-777777777777')")"
 expect "a migration or the SQL editor may (no role set)" allowed "$(psql -X -At -d "$DB" -c "begin; insert into blocks (blocker_id, blocked_id) values ('$R', '66666666-6666-6666-6666-666666666666'); rollback;" >/dev/null 2>&1 && echo allowed || echo refused)"
 expect "anon and authenticated cannot call the guard" "f f" "$(q "select has_function_privilege('anon', 'public.guard_sample_reference()', 'EXECUTE') || ' ' || has_function_privilege('authenticated', 'public.guard_sample_reference()', 'EXECUTE')" | sed 's/false/f/g')"
-q "delete from turns where id = 'sturn'; delete from exchanges where id = 'sex'; delete from challenges where id = 'schal'; delete from quiz_results where id = 'sres'; delete from classes where id in ('sclass','gclass'); delete from quiz_results where id = 'GENRES001'; delete from profiles where id = '$R'; delete from auth.users where id = '$R'" >/dev/null
+q "delete from turns where id = 'sturn'; delete from exchanges where id = 'sex'; delete from challenges where id in ('schal', 'gchal'); delete from quiz_results where id = 'GENRESR'; delete from quiz_results where id = 'sres'; delete from classes where id in ('sclass','gclass'); delete from quiz_results where id = 'GENRES001'; delete from profiles where id = '$R'; delete from auth.users where id = '$R'" >/dev/null
 
 say "rollback refuses while a run is not torn down"
 # The run alone: its one item is already deleted, so only the run's status

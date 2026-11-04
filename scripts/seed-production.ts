@@ -48,6 +48,8 @@ main(async () => {
     // No default seed for production: with a public generator, a public
     // seed would publish every id the run will write.
     if (!str(f, "seed")) throw new GuardError("--seed is required for a production plan; choose a number that is not written down anywhere public");
+    // The local default, and in the repository's history.
+    if (int(f, "seed", -1, 0, 2 ** 31 - 1) === 20261104) throw new GuardError("--seed 20261104 is public (the local default); choose another");
     const to = isoFlag(f, "to", nowFloored());
     const gen = {
       seed: int(f, "seed", -1, 0, 2 ** 31 - 1),
