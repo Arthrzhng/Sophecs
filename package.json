@@ -15,7 +15,14 @@
     "review:verdicts": "tsx --env-file=.env.local scripts/review-verdicts.ts",
     "review:turns": "tsx --env-file=.env.local scripts/review-turns.ts",
     "screen:check": "tsx --require ./scripts/preload-server-only-shim.cjs --env-file=.env.local tests/screen/run-screen.ts",
-    "restore:topics": "tsx --require ./scripts/preload-server-only-shim.cjs --env-file=.env.local scripts/restore-topics.ts"
+    "restore:topics": "tsx --require ./scripts/preload-server-only-shim.cjs --env-file=.env.local scripts/restore-topics.ts",
+    "seed:banks": "tsx scripts/seed/build-banks.ts",
+    "seed:plan": "tsx --require ./scripts/preload-server-only-shim.cjs scripts/seed-production.ts plan",
+    "seed:production": "tsx --require ./scripts/preload-server-only-shim.cjs scripts/seed-production.ts",
+    "unseed:production": "tsx --require ./scripts/preload-server-only-shim.cjs scripts/unseed-production.ts",
+    "seed:local": "tsx --require ./scripts/preload-server-only-shim.cjs scripts/seed-local.ts",
+    "unseed:local": "tsx --require ./scripts/preload-server-only-shim.cjs scripts/unseed-local.ts",
+    "test:seed-db": "bash scripts/test-0021-sample-activity.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",

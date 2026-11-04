@@ -1,0 +1,755 @@
+[
+  {
+    "id": "moral-training.utilitarianism.01",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3,
+        0
+      ],
+      "example": 1,
+      "objections": [
+        1
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "I support the motion. Upbringing makes people good by making them reliably act well, and feedback training does the same thing to a model. Insisting on an inner state we cannot measure makes goodness unknowable, in people as much as in models. Judging by reliable behaviour is the only standard we can actually apply, and on that standard a well-trained model can meet it.\n\nWhen we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same. Nobody checks a nurse's motives before thanking her for saving a patient. We judge her by what she reliably does.\n\nA Stoic will object that a model has no impressions to assent to, so it is a tool, and a tool can be useful without ever being good. Calling it a tool does not change what it does. If a tool reliably prevents suffering and promotes welfare, then the welfare is real, and the distinction between a good agent and a good tool makes no difference to the people helped. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
+    "words": 222
+  },
+  {
+    "id": "moral-training.utilitarianism.02",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0,
+        3
+      ],
+      "example": 2,
+      "objections": [
+        1
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Training on human feedback can make a model good in the sense that matters, because goodness is measured by what an agent reliably does to others' welfare. When we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same.\n\nInsisting on an inner state we cannot measure makes goodness unknowable, in people as much as in models. Judging by reliable behaviour is the only standard we can actually apply, and on that standard a well-trained model can meet it. If training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it.\n\nA Stoic will object that a model has no impressions to assent to, so it is a tool, and a tool can be useful without ever being good. Calling it a tool does not change what it does. If a tool reliably prevents suffering and promotes welfare, then the welfare is real, and the distinction between a good agent and a good tool makes no difference to the people helped. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
+    "words": 229
+  },
+  {
+    "id": "moral-training.utilitarianism.03",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2,
+        1
+      ],
+      "example": 0,
+      "objections": [
+        1
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "The motion is right. What we want from moral upbringing is people who reliably reduce suffering and promote happiness, and training can produce that in a model. Moral upbringing is itself a training process. Children are praised and corrected until helping and honesty become habits. The mechanism differs, but the result in both cases is behaviour shaped by feedback towards outcomes that make people better off.\n\nMill thought that the motive of an act tells us about the agent but not whether the act was right. If that is true for people, it is true for models: what makes the output right is its effect, and a training process that reliably yields right outputs yields a good agent in practice. A model that talks thousands of people out of dangerous decisions each week has done more good than most people manage in a lifetime.\n\nA Stoic will object that a model has no impressions to assent to, so it is a tool, and a tool can be useful without ever being good. Calling it a tool does not change what it does. If a tool reliably prevents suffering and promotes welfare, then the welfare is real, and the distinction between a good agent and a good tool makes no difference to the people helped. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "words": 233
+  },
+  {
+    "id": "moral-training.utilitarianism.04",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        1,
+        0
+      ],
+      "example": null,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "If the trained behaviour reliably produces good outcomes, then the model is good in the only sense that counts, and how it got there is a detail. Mill thought that the motive of an act tells us about the agent but not whether the act was right. If that is true for people, it is true for models: what makes the output right is its effect, and a training process that reliably yields right outputs yields a good agent in practice.\n\nWhen we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same.\n\nA virtue ethicist will object that habit makes a person good only once they choose the act for its own sake from a settled character, and reward shaping produces the acts without the state. The settled state matters because it makes good behaviour reliable across new situations. If training produces behaviour that is reliable in the same way, then the model has what the state was for, and the difference is not one that affects anyone. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "words": 228
+  },
+  {
+    "id": "moral-training.utilitarianism.05",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3,
+        1
+      ],
+      "example": 1,
+      "objections": [
+        1
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "I support the motion. Upbringing makes people good by making them reliably act well, and feedback training does the same thing to a model. Insisting on an inner state we cannot measure makes goodness unknowable, in people as much as in models. Judging by reliable behaviour is the only standard we can actually apply, and on that standard a well-trained model can meet it.\n\nMill thought that the motive of an act tells us about the agent but not whether the act was right. If that is true for people, it is true for models: what makes the output right is its effect, and a training process that reliably yields right outputs yields a good agent in practice. Nobody checks a nurse's motives before thanking her for saving a patient. We judge her by what she reliably does.\n\nA Stoic will object that a model has no impressions to assent to, so it is a tool, and a tool can be useful without ever being good. Calling it a tool does not change what it does. If a tool reliably prevents suffering and promotes welfare, then the welfare is real, and the distinction between a good agent and a good tool makes no difference to the people helped. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "words": 227
+  },
+  {
+    "id": "moral-training.utilitarianism.06",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        1,
+        0
+      ],
+      "example": 2,
+      "objections": [
+        0
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Training on human feedback can make a model good in the sense that matters, because goodness is measured by what an agent reliably does to others' welfare. Mill thought that the motive of an act tells us about the agent but not whether the act was right. If that is true for people, it is true for models: what makes the output right is its effect, and a training process that reliably yields right outputs yields a good agent in practice.\n\nWhen we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same. If training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it.\n\nA virtue ethicist will object that habit makes a person good only once they choose the act for its own sake from a settled character, and reward shaping produces the acts without the state. The settled state matters because it makes good behaviour reliable across new situations. If training produces behaviour that is reliable in the same way, then the model has what the state was for, and the difference is not one that affects anyone. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
+    "words": 249
+  },
+  {
+    "id": "moral-training.utilitarianism.07",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0,
+        3
+      ],
+      "example": 0,
+      "objections": [
+        1
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "If the trained behaviour reliably produces good outcomes, then the model is good in the only sense that counts, and how it got there is a detail. When we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same.\n\nInsisting on an inner state we cannot measure makes goodness unknowable, in people as much as in models. Judging by reliable behaviour is the only standard we can actually apply, and on that standard a well-trained model can meet it. A model that talks thousands of people out of dangerous decisions each week has done more good than most people manage in a lifetime.\n\nA Stoic will object that a model has no impressions to assent to, so it is a tool, and a tool can be useful without ever being good. Calling it a tool does not change what it does. If a tool reliably prevents suffering and promotes welfare, then the welfare is real, and the distinction between a good agent and a good tool makes no difference to the people helped. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
+    "words": 229
+  },
+  {
+    "id": "moral-training.utilitarianism.08",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2,
+        0
+      ],
+      "example": 2,
+      "objections": [
+        1
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "The motion is right. What we want from moral upbringing is people who reliably reduce suffering and promote happiness, and training can produce that in a model. Moral upbringing is itself a training process. Children are praised and corrected until helping and honesty become habits. The mechanism differs, but the result in both cases is behaviour shaped by feedback towards outcomes that make people better off.\n\nWhen we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same. If training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it.\n\nA Stoic will object that a model has no impressions to assent to, so it is a tool, and a tool can be useful without ever being good. Calling it a tool does not change what it does. If a tool reliably prevents suffering and promotes welfare, then the welfare is real, and the distinction between a good agent and a good tool makes no difference to the people helped. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
+    "words": 232
+  },
+  {
+    "id": "moral-training.utilitarianism.09",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0,
+        1
+      ],
+      "example": null,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Training on human feedback can make a model good in the sense that matters, because goodness is measured by what an agent reliably does to others' welfare. When we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same.\n\nMill thought that the motive of an act tells us about the agent but not whether the act was right. If that is true for people, it is true for models: what makes the output right is its effect, and a training process that reliably yields right outputs yields a good agent in practice.\n\nA virtue ethicist will object that habit makes a person good only once they choose the act for its own sake from a settled character, and reward shaping produces the acts without the state. The settled state matters because it makes good behaviour reliable across new situations. If training produces behaviour that is reliable in the same way, then the model has what the state was for, and the difference is not one that affects anyone. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "words": 228
+  },
+  {
+    "id": "moral-training.utilitarianism.10",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3,
+        0
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "The motion is right. What we want from moral upbringing is people who reliably reduce suffering and promote happiness, and training can produce that in a model. Insisting on an inner state we cannot measure makes goodness unknowable, in people as much as in models. Judging by reliable behaviour is the only standard we can actually apply, and on that standard a well-trained model can meet it.\n\nWhen we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same. A model that talks thousands of people out of dangerous decisions each week has done more good than most people manage in a lifetime.\n\nA virtue ethicist will object that habit makes a person good only once they choose the act for its own sake from a settled character, and reward shaping produces the acts without the state. The settled state matters because it makes good behaviour reliable across new situations. If training produces behaviour that is reliable in the same way, then the model has what the state was for, and the difference is not one that affects anyone. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "words": 238
+  },
+  {
+    "id": "moral-training.utilitarianism.11",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "If the trained behaviour reliably produces good outcomes, then the model is good in the only sense that counts, and how it got there is a detail. Moral upbringing is itself a training process. Children are praised and corrected until helping and honesty become habits. The mechanism differs, but the result in both cases is behaviour shaped by feedback towards outcomes that make people better off.\n\nNobody checks a nurse's motives before thanking her for saving a patient. We judge her by what she reliably does. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
+    "words": 102
+  },
+  {
+    "id": "moral-training.utilitarianism.12",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I support the motion. Upbringing makes people good by making them reliably act well, and feedback training does the same thing to a model. Mill thought that the motive of an act tells us about the agent but not whether the act was right. If that is true for people, it is true for models: what makes the output right is its effect, and a training process that reliably yields right outputs yields a good agent in practice.\n\nIf training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
+    "words": 118
+  },
+  {
+    "id": "moral-training.utilitarianism.13",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "The motion is right. What we want from moral upbringing is people who reliably reduce suffering and promote happiness, and training can produce that in a model. Insisting on an inner state we cannot measure makes goodness unknowable, in people as much as in models. Judging by reliable behaviour is the only standard we can actually apply, and on that standard a well-trained model can meet it.\n\nA model that talks thousands of people out of dangerous decisions each week has done more good than most people manage in a lifetime. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "words": 110
+  },
+  {
+    "id": "moral-training.utilitarianism.14",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Training on human feedback can make a model good in the sense that matters, because goodness is measured by what an agent reliably does to others' welfare. When we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same.\n\nIf training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
+    "words": 123
+  },
+  {
+    "id": "moral-training.utilitarianism.15",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "The motion is right. What we want from moral upbringing is people who reliably reduce suffering and promote happiness, and training can produce that in a model. Moral upbringing is itself a training process. Children are praised and corrected until helping and honesty become habits. The mechanism differs, but the result in both cases is behaviour shaped by feedback towards outcomes that make people better off.\n\nNobody checks a nurse's motives before thanking her for saving a patient. We judge her by what she reliably does. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "words": 105
+  },
+  {
+    "id": "moral-training.utilitarianism.16",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        1
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "If the trained behaviour reliably produces good outcomes, then the model is good in the only sense that counts, and how it got there is a detail. Mill thought that the motive of an act tells us about the agent but not whether the act was right. If that is true for people, it is true for models: what makes the output right is its effect, and a training process that reliably yields right outputs yields a good agent in practice.\n\nA model that talks thousands of people out of dangerous decisions each week has done more good than most people manage in a lifetime. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
+    "words": 121
+  },
+  {
+    "id": "moral-training.utilitarianism.17",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I support the motion. Upbringing makes people good by making them reliably act well, and feedback training does the same thing to a model. Insisting on an inner state we cannot measure makes goodness unknowable, in people as much as in models. Judging by reliable behaviour is the only standard we can actually apply, and on that standard a well-trained model can meet it.\n\nA model that talks thousands of people out of dangerous decisions each week has done more good than most people manage in a lifetime. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
+    "words": 104
+  },
+  {
+    "id": "moral-training.utilitarianism.18",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Training on human feedback can make a model good in the sense that matters, because goodness is measured by what an agent reliably does to others' welfare. When we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same.\n\nNobody checks a nurse's motives before thanking her for saving a patient. We judge her by what she reliably does. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
+    "words": 119
+  },
+  {
+    "id": "moral-training.utilitarianism.19",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        2
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "I support the motion. Upbringing makes people good by making them reliably act well, and feedback training does the same thing to a model. Moral upbringing is itself a training process. Children are praised and corrected until helping and honesty become habits. The mechanism differs, but the result in both cases is behaviour shaped by feedback towards outcomes that make people better off.\n\nIf training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "words": 106
+  },
+  {
+    "id": "moral-training.utilitarianism.20",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        1
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "If the trained behaviour reliably produces good outcomes, then the model is good in the only sense that counts, and how it got there is a detail. Mill thought that the motive of an act tells us about the agent but not whether the act was right. If that is true for people, it is true for models: what makes the output right is its effect, and a training process that reliably yields right outputs yields a good agent in practice.\n\nNobody checks a nurse's motives before thanking her for saving a patient. We judge her by what she reliably does. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
+    "words": 121
+  },
+  {
+    "id": "moral-training.utilitarianism.21",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Training on human feedback can make a model good in the sense that matters, because goodness is measured by what an agent reliably does to others' welfare. When we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same.\n\nA model that talks thousands of people out of dangerous decisions each week has done more good than most people manage in a lifetime. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
+    "words": 119
+  },
+  {
+    "id": "moral-training.utilitarianism.22",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "The motion is right. What we want from moral upbringing is people who reliably reduce suffering and promote happiness, and training can produce that in a model. Insisting on an inner state we cannot measure makes goodness unknowable, in people as much as in models. Judging by reliable behaviour is the only standard we can actually apply, and on that standard a well-trained model can meet it.\n\nIf training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "words": 110
+  },
+  {
+    "id": "moral-training.utilitarianism.23",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "The motion is right. What we want from moral upbringing is people who reliably reduce suffering and promote happiness, and training can produce that in a model. Moral upbringing is itself a training process. Children are praised and corrected until helping and honesty become habits. The mechanism differs, but the result in both cases is behaviour shaped by feedback towards outcomes that make people better off.\n\nA model that talks thousands of people out of dangerous decisions each week has done more good than most people manage in a lifetime. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
+    "words": 106
+  },
+  {
+    "id": "moral-training.utilitarianism.24",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I support the motion. Upbringing makes people good by making them reliably act well, and feedback training does the same thing to a model. Mill thought that the motive of an act tells us about the agent but not whether the act was right. If that is true for people, it is true for models: what makes the output right is its effect, and a training process that reliably yields right outputs yields a good agent in practice.\n\nNobody checks a nurse's motives before thanking her for saving a patient. We judge her by what she reliably does. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
+    "words": 118
+  },
+  {
+    "id": "moral-training.utilitarianism.25",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "If the trained behaviour reliably produces good outcomes, then the model is good in the only sense that counts, and how it got there is a detail. Insisting on an inner state we cannot measure makes goodness unknowable, in people as much as in models. Judging by reliable behaviour is the only standard we can actually apply, and on that standard a well-trained model can meet it.\n\nIf training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "words": 110
+  },
+  {
+    "id": "moral-training.utilitarianism.26",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Training on human feedback can make a model good in the sense that matters, because goodness is measured by what an agent reliably does to others' welfare. When we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same.\n\nNobody checks a nurse's motives before thanking her for saving a patient. We judge her by what she reliably does. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "words": 118
+  },
+  {
+    "id": "moral-training.utilitarianism.27",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "The motion is right. What we want from moral upbringing is people who reliably reduce suffering and promote happiness, and training can produce that in a model. Mill thought that the motive of an act tells us about the agent but not whether the act was right. If that is true for people, it is true for models: what makes the output right is its effect, and a training process that reliably yields right outputs yields a good agent in practice.\n\nA model that talks thousands of people out of dangerous decisions each week has done more good than most people manage in a lifetime. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "words": 124
+  },
+  {
+    "id": "moral-training.utilitarianism.28",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        0
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I support the motion. Upbringing makes people good by making them reliably act well, and feedback training does the same thing to a model. When we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same.\n\nIf training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
+    "words": 120
+  },
+  {
+    "id": "moral-training.utilitarianism.29",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Training on human feedback can make a model good in the sense that matters, because goodness is measured by what an agent reliably does to others' welfare. Moral upbringing is itself a training process. Children are praised and corrected until helping and honesty become habits. The mechanism differs, but the result in both cases is behaviour shaped by feedback towards outcomes that make people better off.\n\nA model that talks thousands of people out of dangerous decisions each week has done more good than most people manage in a lifetime. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "words": 109
+  },
+  {
+    "id": "moral-training.utilitarianism.30",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "If the trained behaviour reliably produces good outcomes, then the model is good in the only sense that counts, and how it got there is a detail. Insisting on an inner state we cannot measure makes goodness unknowable, in people as much as in models. Judging by reliable behaviour is the only standard we can actually apply, and on that standard a well-trained model can meet it.\n\nIf training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
+    "words": 111
+  },
+  {
+    "id": "moral-training.utilitarianism.31",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        1
+      ]
+    },
+    "text": "Training on human feedback can make a model good in the sense that matters, because goodness is measured by what an agent reliably does to others' welfare.\n\nKids learn from rewards and punishments and so do models, so it is the same thing. If it acts good then it is good, and I do not think there is any secret extra ingredient that people have. A model that talks thousands of people out of dangerous decisions each week has done more good than most people manage in a lifetime.",
+    "words": 89
+  },
+  {
+    "id": "moral-training.utilitarianism.32",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4,
+        1
+      ]
+    },
+    "text": "If the trained behaviour reliably produces good outcomes, then the model is good in the only sense that counts, and how it got there is a detail.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. Kids learn from rewards and punishments and so do models, so it is the same thing. If it acts good then it is good, and I do not think there is any secret extra ingredient that people have.",
+    "words": 102
+  },
+  {
+    "id": "moral-training.utilitarianism.33",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4
+      ]
+    },
+    "text": "I support the motion. Upbringing makes people good by making them reliably act well, and feedback training does the same thing to a model.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. Nobody checks a nurse's motives before thanking her for saving a patient. We judge her by what she reliably does.",
+    "words": 81
+  },
+  {
+    "id": "moral-training.utilitarianism.34",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        1
+      ]
+    },
+    "text": "The motion is right. What we want from moral upbringing is people who reliably reduce suffering and promote happiness, and training can produce that in a model.\n\nKids learn from rewards and punishments and so do models, so it is the same thing. If it acts good then it is good, and I do not think there is any secret extra ingredient that people have. If training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it.",
+    "words": 89
+  },
+  {
+    "id": "moral-training.utilitarianism.35",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4
+      ]
+    },
+    "text": "The motion is right. What we want from moral upbringing is people who reliably reduce suffering and promote happiness, and training can produce that in a model.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. If training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it.",
+    "words": 88
+  },
+  {
+    "id": "moral-training.utilitarianism.36",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        1
+      ]
+    },
+    "text": "If the trained behaviour reliably produces good outcomes, then the model is good in the only sense that counts, and how it got there is a detail.\n\nKids learn from rewards and punishments and so do models, so it is the same thing. If it acts good then it is good, and I do not think there is any secret extra ingredient that people have. Nobody checks a nurse's motives before thanking her for saving a patient. We judge her by what she reliably does.",
+    "words": 85
+  },
+  {
+    "id": "moral-training.utilitarianism.37",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        1,
+        4
+      ]
+    },
+    "text": "I support the motion. Upbringing makes people good by making them reliably act well, and feedback training does the same thing to a model.\n\nKids learn from rewards and punishments and so do models, so it is the same thing. If it acts good then it is good, and I do not think there is any secret extra ingredient that people have. Morality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer.",
+    "words": 99
+  },
+  {
+    "id": "moral-training.utilitarianism.38",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4
+      ]
+    },
+    "text": "Training on human feedback can make a model good in the sense that matters, because goodness is measured by what an agent reliably does to others' welfare.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. A model that talks thousands of people out of dangerous decisions each week has done more good than most people manage in a lifetime.",
+    "words": 88
+  },
+  {
+    "id": "moral-training.utilitarianism.39",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4,
+        1
+      ]
+    },
+    "text": "The motion is right. What we want from moral upbringing is people who reliably reduce suffering and promote happiness, and training can produce that in a model.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. Kids learn from rewards and punishments and so do models, so it is the same thing. If it acts good then it is good, and I do not think there is any secret extra ingredient that people have.",
+    "words": 102
+  },
+  {
+    "id": "moral-training.utilitarianism.40",
+    "topic": "moral-training",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        1
+      ]
+    },
+    "text": "Training on human feedback can make a model good in the sense that matters, because goodness is measured by what an agent reliably does to others' welfare.\n\nKids learn from rewards and punishments and so do models, so it is the same thing. If it acts good then it is good, and I do not think there is any secret extra ingredient that people have. If training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it.",
+    "words": 89
+  }
+]

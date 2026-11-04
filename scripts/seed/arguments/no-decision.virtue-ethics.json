@@ -1,0 +1,755 @@
+[
+  {
+    "id": "no-decision.virtue-ethics.01",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3,
+        0
+      ],
+      "example": 1,
+      "objections": [
+        1
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "The motion is right: choice is deliberate desire formed by character, and a system with no character cannot choose. A practically wise person sees the particular case and deliberates about it. A model produces what its training makes probable. When we say it decided, we invite people to stop looking for the human deliberation that really happened, or failed to happen.\n\nAristotle defines choice as deliberate desire: we wish for an end, deliberate about the means, and choose the act. A model has no ends of its own and does not deliberate; it continues text. Calling that a choice borrows the dignity of an agent without any of the agency. A child who shares because she has been praised for sharing has not yet chosen generosity. A model that outputs kindness is further from choosing still.\n\nA Stoic will object that character is beside the point: the model fails to decide because it has no faculty of assent, and that is true before any question of character arises. Assent without character would be a strange kind of choosing, an isolated yes with no one behind it. The Stoic point is part of the truth, but choice is the work of a whole character, and that is what is plainly missing here. A good answer has to come from good character, and good character cannot be replaced by a formula.",
+    "words": 229
+  },
+  {
+    "id": "no-decision.virtue-ethics.02",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        0,
+        1
+      ],
+      "example": 2,
+      "objections": [
+        1
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "A model does not decide. Aristotle's choice, prohairesis, needs a character that wants ends and deliberates about means, and the model has neither. Aristotle defines choice as deliberate desire: we wish for an end, deliberate about the means, and choose the act. A model has no ends of its own and does not deliberate; it continues text. Calling that a choice borrows the dignity of an agent without any of the agency.\n\nThe word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does. We would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly.\n\nA Stoic will object that character is beside the point: the model fails to decide because it has no faculty of assent, and that is true before any question of character arises. Assent without character would be a strange kind of choosing, an isolated yes with no one behind it. The Stoic point is part of the truth, but choice is the work of a whole character, and that is what is plainly missing here. A good answer has to come from good character, and good character cannot be replaced by a formula.",
+    "words": 226
+  },
+  {
+    "id": "no-decision.virtue-ethics.03",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1,
+        0
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "I agree with the motion. Calling a model's output a decision quietly moves responsibility off the people who trained and deployed it. The word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does.\n\nAristotle defines choice as deliberate desire: we wish for an end, deliberate about the means, and choose the act. A model has no ends of its own and does not deliberate; it continues text. Calling that a choice borrows the dignity of an agent without any of the agency. When a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function.\n\nA utilitarian will object that the vocabulary changes nothing about outcomes, so policing the word decide is a distraction from reducing the harm these systems do. Vocabulary shapes who is held to account, and accountability shapes outcomes. But beyond that, how we describe agency shapes how we understand ourselves, and a culture that lets machines decide is training people out of the habit of deciding. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
+    "words": 211
+  },
+  {
+    "id": "no-decision.virtue-ethics.04",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2,
+        1
+      ],
+      "example": 1,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "It is a mistake to say a language model decides, because deciding belongs to agents with settled characters who deliberate about what to do. Choices express character; they reveal what kind of person someone is. Nothing about a model's output reveals a character, because it has none to reveal. The people who trained it do have characters, and their choices are visible in its behaviour.\n\nThe word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does. A child who shares because she has been praised for sharing has not yet chosen generosity. A model that outputs kindness is further from choosing still.\n\nA utilitarian will object that the vocabulary changes nothing about outcomes, so policing the word decide is a distraction from reducing the harm these systems do. Vocabulary shapes who is held to account, and accountability shapes outcomes. But beyond that, how we describe agency shapes how we understand ourselves, and a culture that lets machines decide is training people out of the habit of deciding. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
+    "words": 208
+  },
+  {
+    "id": "no-decision.virtue-ethics.05",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3,
+        1
+      ],
+      "example": 0,
+      "objections": [
+        1
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A model does not decide. Aristotle's choice, prohairesis, needs a character that wants ends and deliberates about means, and the model has neither. A practically wise person sees the particular case and deliberates about it. A model produces what its training makes probable. When we say it decided, we invite people to stop looking for the human deliberation that really happened, or failed to happen.\n\nThe word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does. When a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function.\n\nA Stoic will object that character is beside the point: the model fails to decide because it has no faculty of assent, and that is true before any question of character arises. Assent without character would be a strange kind of choosing, an isolated yes with no one behind it. The Stoic point is part of the truth, but choice is the work of a whole character, and that is what is plainly missing here. That is why the virtue ethicist asks not only what happens next but who we become by doing it.",
+    "words": 218
+  },
+  {
+    "id": "no-decision.virtue-ethics.06",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1,
+        2
+      ],
+      "example": 2,
+      "objections": [
+        1
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I agree with the motion. Calling a model's output a decision quietly moves responsibility off the people who trained and deployed it. The word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does.\n\nChoices express character; they reveal what kind of person someone is. Nothing about a model's output reveals a character, because it has none to reveal. The people who trained it do have characters, and their choices are visible in its behaviour. We would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly.\n\nA Stoic will object that character is beside the point: the model fails to decide because it has no faculty of assent, and that is true before any question of character arises. Assent without character would be a strange kind of choosing, an isolated yes with no one behind it. The Stoic point is part of the truth, but choice is the work of a whole character, and that is what is plainly missing here. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "words": 221
+  },
+  {
+    "id": "no-decision.virtue-ethics.07",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0,
+        1
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "The motion is right: choice is deliberate desire formed by character, and a system with no character cannot choose. Aristotle defines choice as deliberate desire: we wish for an end, deliberate about the means, and choose the act. A model has no ends of its own and does not deliberate; it continues text. Calling that a choice borrows the dignity of an agent without any of the agency.\n\nThe word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does. When a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function.\n\nA utilitarian will object that the vocabulary changes nothing about outcomes, so policing the word decide is a distraction from reducing the harm these systems do. Vocabulary shapes who is held to account, and accountability shapes outcomes. But beyond that, how we describe agency shapes how we understand ourselves, and a culture that lets machines decide is training people out of the habit of deciding. That is why the virtue ethicist asks not only what happens next but who we become by doing it.",
+    "words": 211
+  },
+  {
+    "id": "no-decision.virtue-ethics.08",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2,
+        1
+      ],
+      "example": 1,
+      "objections": [
+        0
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "It is a mistake to say a language model decides, because deciding belongs to agents with settled characters who deliberate about what to do. Choices express character; they reveal what kind of person someone is. Nothing about a model's output reveals a character, because it has none to reveal. The people who trained it do have characters, and their choices are visible in its behaviour.\n\nThe word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does. A child who shares because she has been praised for sharing has not yet chosen generosity. A model that outputs kindness is further from choosing still.\n\nA utilitarian will object that the vocabulary changes nothing about outcomes, so policing the word decide is a distraction from reducing the harm these systems do. Vocabulary shapes who is held to account, and accountability shapes outcomes. But beyond that, how we describe agency shapes how we understand ourselves, and a culture that lets machines decide is training people out of the habit of deciding. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "words": 214
+  },
+  {
+    "id": "no-decision.virtue-ethics.09",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0,
+        3
+      ],
+      "example": 2,
+      "objections": [
+        0
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "It is a mistake to say a language model decides, because deciding belongs to agents with settled characters who deliberate about what to do. Aristotle defines choice as deliberate desire: we wish for an end, deliberate about the means, and choose the act. A model has no ends of its own and does not deliberate; it continues text. Calling that a choice borrows the dignity of an agent without any of the agency.\n\nA practically wise person sees the particular case and deliberates about it. A model produces what its training makes probable. When we say it decided, we invite people to stop looking for the human deliberation that really happened, or failed to happen. We would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly.\n\nA utilitarian will object that the vocabulary changes nothing about outcomes, so policing the word decide is a distraction from reducing the harm these systems do. Vocabulary shapes who is held to account, and accountability shapes outcomes. But beyond that, how we describe agency shapes how we understand ourselves, and a culture that lets machines decide is training people out of the habit of deciding. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "words": 227
+  },
+  {
+    "id": "no-decision.virtue-ethics.10",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1,
+        3
+      ],
+      "example": 0,
+      "objections": [
+        1
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A model does not decide. Aristotle's choice, prohairesis, needs a character that wants ends and deliberates about means, and the model has neither. The word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does.\n\nA practically wise person sees the particular case and deliberates about it. A model produces what its training makes probable. When we say it decided, we invite people to stop looking for the human deliberation that really happened, or failed to happen. When a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function.\n\nA Stoic will object that character is beside the point: the model fails to decide because it has no faculty of assent, and that is true before any question of character arises. Assent without character would be a strange kind of choosing, an isolated yes with no one behind it. The Stoic point is part of the truth, but choice is the work of a whole character, and that is what is plainly missing here. That is why the virtue ethicist asks not only what happens next but who we become by doing it.",
+    "words": 218
+  },
+  {
+    "id": "no-decision.virtue-ethics.11",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I agree with the motion. Calling a model's output a decision quietly moves responsibility off the people who trained and deployed it. Choices express character; they reveal what kind of person someone is. Nothing about a model's output reveals a character, because it has none to reveal. The people who trained it do have characters, and their choices are visible in its behaviour.\n\nA child who shares because she has been praised for sharing has not yet chosen generosity. A model that outputs kindness is further from choosing still. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "words": 111
+  },
+  {
+    "id": "no-decision.virtue-ethics.12",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A model does not decide. Aristotle's choice, prohairesis, needs a character that wants ends and deliberates about means, and the model has neither. The word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does.\n\nWhen a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function. That is why the virtue ethicist asks not only what happens next but who we become by doing it.",
+    "words": 101
+  },
+  {
+    "id": "no-decision.virtue-ethics.13",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "It is a mistake to say a language model decides, because deciding belongs to agents with settled characters who deliberate about what to do. A practically wise person sees the particular case and deliberates about it. A model produces what its training makes probable. When we say it decided, we invite people to stop looking for the human deliberation that really happened, or failed to happen.\n\nWe would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "words": 113
+  },
+  {
+    "id": "no-decision.virtue-ethics.14",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "The motion is right: choice is deliberate desire formed by character, and a system with no character cannot choose. Aristotle defines choice as deliberate desire: we wish for an end, deliberate about the means, and choose the act. A model has no ends of its own and does not deliberate; it continues text. Calling that a choice borrows the dignity of an agent without any of the agency.\n\nWhen a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
+    "words": 107
+  },
+  {
+    "id": "no-decision.virtue-ethics.15",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        0
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "A model does not decide. Aristotle's choice, prohairesis, needs a character that wants ends and deliberates about means, and the model has neither. Aristotle defines choice as deliberate desire: we wish for an end, deliberate about the means, and choose the act. A model has no ends of its own and does not deliberate; it continues text. Calling that a choice borrows the dignity of an agent without any of the agency.\n\nWe would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly. A good answer has to come from good character, and good character cannot be replaced by a formula.",
+    "words": 115
+  },
+  {
+    "id": "no-decision.virtue-ethics.16",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        1
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "It is a mistake to say a language model decides, because deciding belongs to agents with settled characters who deliberate about what to do. The word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does.\n\nA child who shares because she has been praised for sharing has not yet chosen generosity. A model that outputs kindness is further from choosing still. A good answer has to come from good character, and good character cannot be replaced by a formula.",
+    "words": 104
+  },
+  {
+    "id": "no-decision.virtue-ethics.17",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "The motion is right: choice is deliberate desire formed by character, and a system with no character cannot choose. A practically wise person sees the particular case and deliberates about it. A model produces what its training makes probable. When we say it decided, we invite people to stop looking for the human deliberation that really happened, or failed to happen.\n\nWhen a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "words": 106
+  },
+  {
+    "id": "no-decision.virtue-ethics.18",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I agree with the motion. Calling a model's output a decision quietly moves responsibility off the people who trained and deployed it. Choices express character; they reveal what kind of person someone is. Nothing about a model's output reveals a character, because it has none to reveal. The people who trained it do have characters, and their choices are visible in its behaviour.\n\nA child who shares because she has been praised for sharing has not yet chosen generosity. A model that outputs kindness is further from choosing still. A good answer has to come from good character, and good character cannot be replaced by a formula.",
+    "words": 107
+  },
+  {
+    "id": "no-decision.virtue-ethics.19",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "I agree with the motion. Calling a model's output a decision quietly moves responsibility off the people who trained and deployed it. The word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does.\n\nWe would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
+    "words": 99
+  },
+  {
+    "id": "no-decision.virtue-ethics.20",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        0
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A model does not decide. Aristotle's choice, prohairesis, needs a character that wants ends and deliberates about means, and the model has neither. Aristotle defines choice as deliberate desire: we wish for an end, deliberate about the means, and choose the act. A model has no ends of its own and does not deliberate; it continues text. Calling that a choice borrows the dignity of an agent without any of the agency.\n\nA child who shares because she has been praised for sharing has not yet chosen generosity. A model that outputs kindness is further from choosing still. That is why the virtue ethicist asks not only what happens next but who we become by doing it.",
+    "words": 117
+  },
+  {
+    "id": "no-decision.virtue-ethics.21",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "It is a mistake to say a language model decides, because deciding belongs to agents with settled characters who deliberate about what to do. Choices express character; they reveal what kind of person someone is. Nothing about a model's output reveals a character, because it has none to reveal. The people who trained it do have characters, and their choices are visible in its behaviour.\n\nWhen a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
+    "words": 104
+  },
+  {
+    "id": "no-decision.virtue-ethics.22",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "The motion is right: choice is deliberate desire formed by character, and a system with no character cannot choose. A practically wise person sees the particular case and deliberates about it. A model produces what its training makes probable. When we say it decided, we invite people to stop looking for the human deliberation that really happened, or failed to happen.\n\nWe would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "words": 108
+  },
+  {
+    "id": "no-decision.virtue-ethics.23",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I agree with the motion. Calling a model's output a decision quietly moves responsibility off the people who trained and deployed it. Aristotle defines choice as deliberate desire: we wish for an end, deliberate about the means, and choose the act. A model has no ends of its own and does not deliberate; it continues text. Calling that a choice borrows the dignity of an agent without any of the agency.\n\nWhen a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "words": 116
+  },
+  {
+    "id": "no-decision.virtue-ethics.24",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "The motion is right: choice is deliberate desire formed by character, and a system with no character cannot choose. Choices express character; they reveal what kind of person someone is. Nothing about a model's output reveals a character, because it has none to reveal. The people who trained it do have characters, and their choices are visible in its behaviour.\n\nA child who shares because she has been praised for sharing has not yet chosen generosity. A model that outputs kindness is further from choosing still. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
+    "words": 102
+  },
+  {
+    "id": "no-decision.virtue-ethics.25",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A model does not decide. Aristotle's choice, prohairesis, needs a character that wants ends and deliberates about means, and the model has neither. A practically wise person sees the particular case and deliberates about it. A model produces what its training makes probable. When we say it decided, we invite people to stop looking for the human deliberation that really happened, or failed to happen.\n\nWe would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "words": 112
+  },
+  {
+    "id": "no-decision.virtue-ethics.26",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        1
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "It is a mistake to say a language model decides, because deciding belongs to agents with settled characters who deliberate about what to do. The word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does.\n\nWe would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
+    "words": 101
+  },
+  {
+    "id": "no-decision.virtue-ethics.27",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "The motion is right: choice is deliberate desire formed by character, and a system with no character cannot choose. Aristotle defines choice as deliberate desire: we wish for an end, deliberate about the means, and choose the act. A model has no ends of its own and does not deliberate; it continues text. Calling that a choice borrows the dignity of an agent without any of the agency.\n\nA child who shares because she has been praised for sharing has not yet chosen generosity. A model that outputs kindness is further from choosing still. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
+    "words": 110
+  },
+  {
+    "id": "no-decision.virtue-ethics.28",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A model does not decide. Aristotle's choice, prohairesis, needs a character that wants ends and deliberates about means, and the model has neither. Choices express character; they reveal what kind of person someone is. Nothing about a model's output reveals a character, because it has none to reveal. The people who trained it do have characters, and their choices are visible in its behaviour.\n\nWhen a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
+    "words": 103
+  },
+  {
+    "id": "no-decision.virtue-ethics.29",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I agree with the motion. Calling a model's output a decision quietly moves responsibility off the people who trained and deployed it. A practically wise person sees the particular case and deliberates about it. A model produces what its training makes probable. When we say it decided, we invite people to stop looking for the human deliberation that really happened, or failed to happen.\n\nWe would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "words": 111
+  },
+  {
+    "id": "no-decision.virtue-ethics.30",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        1
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "It is a mistake to say a language model decides, because deciding belongs to agents with settled characters who deliberate about what to do. The word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does.\n\nWhen a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function. A good answer has to come from good character, and good character cannot be replaced by a formula.",
+    "words": 101
+  },
+  {
+    "id": "no-decision.virtue-ethics.31",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4,
+        3
+      ]
+    },
+    "text": "A model does not decide. Aristotle's choice, prohairesis, needs a character that wants ends and deliberates about means, and the model has neither.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. Whether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything.",
+    "words": 87
+  },
+  {
+    "id": "no-decision.virtue-ethics.32",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0
+      ]
+    },
+    "text": "The motion is right: choice is deliberate desire formed by character, and a system with no character cannot choose.\n\nA language model is just predicting the next word. It is maths, not a mind, so of course it does not decide anything, and anyone who says it does has been fooled by the marketing. A child who shares because she has been praised for sharing has not yet chosen generosity. A model that outputs kindness is further from choosing still.",
+    "words": 80
+  },
+  {
+    "id": "no-decision.virtue-ethics.33",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3
+      ]
+    },
+    "text": "It is a mistake to say a language model decides, because deciding belongs to agents with settled characters who deliberate about what to do.\n\nWhether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything. We would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly.",
+    "words": 81
+  },
+  {
+    "id": "no-decision.virtue-ethics.34",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0
+      ]
+    },
+    "text": "I agree with the motion. Calling a model's output a decision quietly moves responsibility off the people who trained and deployed it.\n\nA language model is just predicting the next word. It is maths, not a mind, so of course it does not decide anything, and anyone who says it does has been fooled by the marketing. When a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function.",
+    "words": 80
+  },
+  {
+    "id": "no-decision.virtue-ethics.35",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3,
+        4
+      ]
+    },
+    "text": "A model does not decide. Aristotle's choice, prohairesis, needs a character that wants ends and deliberates about means, and the model has neither.\n\nWhether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything. This matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not.",
+    "words": 87
+  },
+  {
+    "id": "no-decision.virtue-ethics.36",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4
+      ]
+    },
+    "text": "I agree with the motion. Calling a model's output a decision quietly moves responsibility off the people who trained and deployed it.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. A child who shares because she has been praised for sharing has not yet chosen generosity. A model that outputs kindness is further from choosing still.",
+    "words": 80
+  },
+  {
+    "id": "no-decision.virtue-ethics.37",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0
+      ]
+    },
+    "text": "It is a mistake to say a language model decides, because deciding belongs to agents with settled characters who deliberate about what to do.\n\nA language model is just predicting the next word. It is maths, not a mind, so of course it does not decide anything, and anyone who says it does has been fooled by the marketing. We would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly.",
+    "words": 84
+  },
+  {
+    "id": "no-decision.virtue-ethics.38",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4,
+        0
+      ]
+    },
+    "text": "The motion is right: choice is deliberate desire formed by character, and a system with no character cannot choose.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. A language model is just predicting the next word. It is maths, not a mind, so of course it does not decide anything, and anyone who says it does has been fooled by the marketing.",
+    "words": 86
+  },
+  {
+    "id": "no-decision.virtue-ethics.39",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3
+      ]
+    },
+    "text": "A model does not decide. Aristotle's choice, prohairesis, needs a character that wants ends and deliberates about means, and the model has neither.\n\nWhether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything. We would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly.",
+    "words": 80
+  },
+  {
+    "id": "no-decision.virtue-ethics.40",
+    "topic": "no-decision",
+    "school": "virtue-ethics",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0
+      ]
+    },
+    "text": "It is a mistake to say a language model decides, because deciding belongs to agents with settled characters who deliberate about what to do.\n\nA language model is just predicting the next word. It is maths, not a mind, so of course it does not decide anything, and anyone who says it does has been fooled by the marketing. When a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function.",
+    "words": 82
+  }
+]

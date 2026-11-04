@@ -14,3 +14,11 @@ next-env.d.ts
 # CONTRIBUTING.md. Each is a full nested git worktree and is removed when
 # its agent finishes. Project config under .claude/ stays trackable.
 .claude/worktrees/
+
+# Seed tooling credentials (scripts/seed/env.ts). Never committed; read
+# only by the seed scripts, never by the app.
+.env.seed.local
+.env.seed.production
+.env.seed.*
+
+scripts/seed/reports/

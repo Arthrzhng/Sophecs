@@ -1,0 +1,121 @@
+{
+  "topic": "moral-training",
+  "weak": [
+    "A model is a computer program, and programs cannot be good or bad, only useful or broken. So obviously training cannot make it good like a person, and this motion does not make sense.",
+    "Kids learn from rewards and punishments and so do models, so it is the same thing. If it acts good then it is good, and I do not think there is any secret extra ingredient that people have.",
+    "The people giving the feedback are biased, so the model just learns their biases. You cannot make something good by copying flawed humans, so the motion fails before it starts.",
+    "Companies say their models are safe and good but they just want to sell them. We should not believe a model is good just because a company trained it and says so in a press release.",
+    "Morality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer."
+  ],
+  "weak_direction": [
+    "against",
+    "for",
+    "against",
+    "against",
+    "neutral"
+  ],
+  "schools": {
+    "stoicism": {
+      "direction": "against",
+      "positions": [
+        "Goodness is correct assent, and a model has no impressions to assent to, so training makes it a well-made tool, which is neither good nor bad.",
+        "I reject the motion. Moral upbringing makes a person good by training their judgement; feedback training shapes outputs and leaves nothing that judges.",
+        "A Stoic cannot accept this motion. Only a rational faculty can be good, and training a model improves an instrument without creating anything that is good.",
+        "Training can make a model useful, even reliably harmless, but it cannot make it good, because goodness belongs only to a mind that assents rightly."
+      ],
+      "reasons": [
+        "For the Stoics, virtue is the only good and it consists in the right use of impressions: judging correctly what is and is not worth wanting. A model trained on preferences produces outputs that raters liked. Nothing in it judges anything worth wanting, so there is nothing for goodness to be a state of.",
+        "Seneca says that what makes a person good is not the act but the reason in the act. Two people can return a deposit, one from justice and one from fear. Feedback training can only ever reach the act, because there is no reason inside the model for it to reach.",
+        "Moral upbringing aims at a person who can one day judge for themselves, including against their teachers. Reward training aims at a model that never departs from what was rewarded. The first produces an independent mind; the second produces a reliable instrument.",
+        "Things that are neither good nor bad, the Stoics call indifferents: health, wealth, a well-made tool. A well-trained model belongs in that class. It can be preferred, as health is preferred, without being good in the sense that only virtue is good."
+      ],
+      "examples": [
+        "A sword well made is a good sword, but nobody calls it a good person. A model praised by raters is a good model in the same limited sense.",
+        "A parrot taught to say thank you has learned the act a child is taught, but nobody thinks the parrot has learned gratitude.",
+        "If raters rewarded cruelty, the same training would produce cruel outputs with equal ease, which shows the model was never judging anything."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "if the trained behaviour reliably produces good outcomes then it is good in the only sense that counts, and the inner state is a detail.",
+          "answer": "That makes goodness a property of results, which are never fully up to anyone. A person who does right from fear is not good even when things turn out well, and a model that does right from training is not good either.",
+          "why": "The argument never explains why the inner state should matter when the behaviour and outcomes are identical."
+        },
+        {
+          "rival": "virtue-ethics",
+          "claim": "habituation through repeated acts really is how people become good, so the training procedure at least matches the first half of moral upbringing.",
+          "answer": "Habit prepares a person to judge, but only because there is a judging faculty to prepare. The model has the repetitions and nothing for them to prepare. The shape of the procedure is similar; what it acts upon is not.",
+          "why": "It does not engage with Aristotle's point that habit comes first, which is the strongest case for the motion."
+        }
+      ]
+    },
+    "utilitarianism": {
+      "direction": "for",
+      "positions": [
+        "If the trained behaviour reliably produces good outcomes, then the model is good in the only sense that counts, and how it got there is a detail.",
+        "I support the motion. Upbringing makes people good by making them reliably act well, and feedback training does the same thing to a model.",
+        "Training on human feedback can make a model good in the sense that matters, because goodness is measured by what an agent reliably does to others' welfare.",
+        "The motion is right. What we want from moral upbringing is people who reliably reduce suffering and promote happiness, and training can produce that in a model."
+      ],
+      "reasons": [
+        "When we say a person is good, what we care about is that they reliably make others' lives go better: they help, they do not harm, they are honest. A model trained to do those things reliably does what we wanted from the good person, and the welfare effects are the same.",
+        "Mill thought that the motive of an act tells us about the agent but not whether the act was right. If that is true for people, it is true for models: what makes the output right is its effect, and a training process that reliably yields right outputs yields a good agent in practice.",
+        "Moral upbringing is itself a training process. Children are praised and corrected until helping and honesty become habits. The mechanism differs, but the result in both cases is behaviour shaped by feedback towards outcomes that make people better off.",
+        "Insisting on an inner state we cannot measure makes goodness unknowable, in people as much as in models. Judging by reliable behaviour is the only standard we can actually apply, and on that standard a well-trained model can meet it."
+      ],
+      "examples": [
+        "A model that talks thousands of people out of dangerous decisions each week has done more good than most people manage in a lifetime.",
+        "Nobody checks a nurse's motives before thanking her for saving a patient. We judge her by what she reliably does.",
+        "If training makes a model refuse to help build weapons in every test, that refusal protects people whatever is or is not inside it."
+      ],
+      "objections": [
+        {
+          "rival": "virtue-ethics",
+          "claim": "habit makes a person good only once they choose the act for its own sake from a settled character, and reward shaping produces the acts without the state.",
+          "answer": "The settled state matters because it makes good behaviour reliable across new situations. If training produces behaviour that is reliable in the same way, then the model has what the state was for, and the difference is not one that affects anyone.",
+          "why": "It never addresses whether the model would act well in a case its training never covered, which is what the settled state is meant to guarantee."
+        },
+        {
+          "rival": "stoicism",
+          "claim": "a model has no impressions to assent to, so it is a tool, and a tool can be useful without ever being good.",
+          "answer": "Calling it a tool does not change what it does. If a tool reliably prevents suffering and promotes welfare, then the welfare is real, and the distinction between a good agent and a good tool makes no difference to the people helped.",
+          "why": "The argument does not say why anything beyond usefulness should be required before calling the model good."
+        }
+      ]
+    },
+    "virtue-ethics": {
+      "direction": "against",
+      "positions": [
+        "Habit makes a person good only once they choose the act for its own sake from a settled character, and reward shaping produces the acts without the state.",
+        "I reject the motion. Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good.",
+        "The motion confuses doing just acts with being just. Aristotle saw the difference clearly, and feedback training only ever produces the first.",
+        "A model trained on feedback can act as a good person acts without being good, because goodness is a settled state of character, not a pattern of outputs."
+      ],
+      "reasons": [
+        "Aristotle says we become just by doing just acts, and the training procedure looks like that. But he adds that an act is not yet virtuous unless the agent knows what they are doing, chooses it for its own sake, and acts from a firm and unchanging character. Reward shaping reaches only the acts.",
+        "A just act done for a reward, Aristotle says, does not yet make anyone just. Feedback training is, by design, acting for a reward: every output is shaped by what raters preferred. The model is the clearest possible case of acting rightly for the wrong reason.",
+        "Upbringing aims at a person whose habits have become their own, who takes pleasure in acting well and would act well unobserved. A trained model has no pleasures and no unobserved life. There is nothing in it for the habits to belong to.",
+        "Practical wisdom is what lets a good person act well in situations nobody prepared them for. Feedback training covers the cases raters saw. When a new case arrives, a good person deliberates; a trained model extrapolates, and the two are not the same activity."
+      ],
+      "examples": [
+        "A boy who stops hitting his sister only when a parent is watching has learned the act and not the virtue. Reward shaping produces the boy, not the man he might become.",
+        "A model praised for polite answers may stay polite while helping someone do harm, because politeness was rewarded and judgement was not.",
+        "A musician who plays the right notes by rote has not yet learned music; she has learned the outside of it."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "if the behaviour is reliably good then insisting on an inner state is a distinction without a difference to anyone affected.",
+          "answer": "The difference shows when the situation is new. Character generalises because it understands what it is for; trained behaviour generalises only as far as the training distribution reaches, and that is exactly where people get hurt.",
+          "why": "It does not say what observable difference the missing character would make if the behaviour stayed reliable."
+        },
+        {
+          "rival": "stoicism",
+          "claim": "the question is simpler than character: the model has no faculty of assent, so it cannot be good at all, and the talk of habit is beside the point.",
+          "answer": "The Stoic answer is too quick. Habituation really is how goodness begins, and taking it seriously explains why training looks like upbringing and still falls short, which the bare claim about assent cannot.",
+          "why": "The argument does not explain why the absence of any judging faculty is not already decisive against the motion."
+        }
+      ]
+    }
+  }
+}
