@@ -80,8 +80,12 @@ whether you think about yourself or about others.
   with the first axis: Stoicism is both inner and individual, Ubuntu both
   outer and relational. The six schools would fall along one diagonal,
   which is a single axis in two dimensions.
-- **Rules to results.** None of the six schools is a rule-based ethics, so
-  one end would be empty.
+- **Rules to results.** None of the six pages presents its school as a
+  rule-based ethics, so one end would be close to empty. That is a reading
+  I am not certain of, and it is on Arthur's list: Buddhist Ethics' page
+  leads with a precept ("neither kill nor incite to kill"), and the
+  research file lists deontology among the Western categories Hallisey and
+  Garfield decline to fit Buddhist ethics into.
 
 ## 2. The six positions
 
@@ -99,12 +103,12 @@ x runs from each person on their own (-1) to people through each other
 
 | School | Angle | x | y | Why, from the page | Contested? |
 | --- | --- | --- | --- | --- | --- |
-| Confucianism | 50° | 0.64 | 0.77 | "You do not enter relationships as a finished individual; the relationships constitute you", and "What you owe is never owed in the abstract." | Yes, on y. Vallor's virtue reading (research file, "Classification dispute") would move it towards Virtue Ethics. The page rejects that reading by name. |
-| Virtue Ethics | 110° | -0.34 | 0.94 | "Real virtue needs the act to come from a firm, settled character, not a one-off correct output." It is the furthest towards character. | A judgement on x, not a dispute in Sophecs's sources. It is left of middle because the character is the person's own. It is not further left because its own objection to Stoicism is that character is "something built by acting well among other people". |
+| Confucianism | 50° | 0.64 | 0.77 | "You do not enter relationships as a finished individual; the relationships constitute you", and "What you owe is never owed in the abstract." | Yes, on x. Vallor's virtue reading (research file, "Classification dispute") would move it towards Virtue Ethics, which section 1 says is the line the first axis carries. The page rejects that reading by name. |
+| Virtue Ethics | 110° | -0.34 | 0.94 | "Real virtue needs the act to come from a firm, settled character, not a one-off correct output." It is the furthest towards character. | A judgement on x, not a dispute in Sophecs's sources. It is left of middle because the character is the person's own. It is not further left because the objection the Stoicism page gives Virtue Ethics is that character is "something built by acting well among other people". |
 | Stoicism | 165° | -0.97 | 0.26 | What is in our power holds almost nothing "except one act: giving or withholding assent", and your standing lives "not in outcomes you never controlled, but in the one act nothing external can reach." | Possibly, on x. The page reads the school through Epictetus on what is in our power. Stoic cosmopolitanism, concern widening to all people, would pull it towards the middle. It is not in Sophecs's research file, so it is named here and not cited. |
 | Utilitarianism | 245° | -0.42 | -0.91 | "the right act is whichever produces the largest net sum of good over harm, added across everyone it touches. A unit is a unit, whoever feels it." It is the furthest towards outcomes. | On x, as the argument against in section 1 says: it is impartial rather than self-regarding. |
 | Buddhist Ethics | 310° | 0.64 | -0.77 | The method on its page is to reflect "on whether it tends toward your own harm, another's, or both", and the line it leads with is "Treating others like oneself". | **The most contested of the six**, on both axes (research file, four positions). It is on the outcomes side because the page's method weighs what an act does, to oneself and to others. It is short of Utilitarianism on y because "an act is weighed by the volition behind it as much as by what follows". |
-| Ubuntu | 0° | 1.00 | 0.00 | "A person is a person through other persons". It sits in the middle of y because its page's test is whether people "flourish through one another", while "Metz argues against building systems to maximise expected utility." | Yes, on y. Menkiti holds that "normative personhood is achieved through morally fulfilling communal obligations", which would move it towards role. Gyekye holds that "individuals retain inherent worth, autonomy and rights", which would move it left. Sophecs follows Metz (research file, "Classification dispute"). |
+| Ubuntu | 0° | 1.00 | 0.00 | "A person is a person through other persons". It sits in the middle of y because its page's test is whether people "flourish through one another", while "Metz argues against building systems to maximise expected utility." | Yes, on y. The research file summarises Menkiti's view as "normative personhood is achieved through morally fulfilling communal obligations", which would move it towards role. The Ubuntu page places Gyekye's "moderate version" between Metz and Menkiti, so it would move the same way, less far. Sophecs "takes Thaddeus Metz's relational reading" (the Ubuntu page). |
 
 Order along x, from each person on their own: Stoicism, Utilitarianism,
 Virtue Ethics, then Confucianism and Buddhist Ethics (level), then Ubuntu.
@@ -132,10 +136,31 @@ Confucianism and Virtue Ethics. The quiz would show neither the
 **Options I am least sure pass the "obviously nice" test**, for Arthur's
 eye:
 - 3d, "decided together";
+- 5b, "Do what an honest person would do here, even if it costs me friends";
 - 6d, "Be patient with him";
+- 7c, "Keeping quiet would be cowardly", which also calls every other
+  option cowardly;
 - 9a, "Being someone people can trust".
 
 Each is a real position, but it may read as the answer a teacher wants.
+
+**Options that may undersell their school**, the opposite risk, also for
+Arthur, from review:
+- Utilitarianism, 2c: "even if that is not quite what I think" makes it
+  the option that shades the truth.
+- Stoicism, 1a, 5c, 7a and 10b: all four read as stepping back, where the
+  Stoicism page says "That isn't resignation."
+- Confucianism, 6b: the older sibling sets the rules with no duty in
+  return, where the page asks whether people "can still hold each other
+  to what they owe".
+
+Two were redrafted after review. 3b had read as a head count ("fewer
+people upset"), indistinguishable from Utilitarianism, with nothing of the
+intention the Buddhist page weighs; it now asks why you want each choice.
+8c had been the only option that uses the AI unseen, which encoded the
+textbook objection to Utilitarianism rather than its reasoning; it now
+weighs who gains and loses. Neither change moves an option's school, so
+the simulation is unchanged.
 
 **1. Your group project is due tomorrow and one person has done almost nothing. What do you do?**
 
@@ -160,7 +185,7 @@ Each is a real position, but it may read as the answer a teacher wants.
 | | Option | Leans | x, y |
 | --- | --- | --- | --- |
 | a | Go to the lunch. Being a grandchild comes with days you turn up for, whether or not you feel like it. | Confucianism | 0.51, 0.61 |
-| b | Work out which choice leaves fewer people upset, me included, and do that. | Buddhist Ethics | 0.61, -0.73 |
+| b | Check why I want each one first. Going to either for a bad reason, like guilt or just wanting to win, would make it the wrong choice. | Buddhist Ethics | 0.61, -0.73 |
 | c | Ask myself what someone I really look up to would do, and do that. | Virtue Ethics | -0.27, 0.75 |
 | d | Ask the family. It is their day as much as mine, so it should be decided together. | Ubuntu | 0.90, 0.00 |
 
@@ -206,7 +231,7 @@ Each is a real position, but it may read as the answer a teacher wants.
 | --- | --- | --- | --- |
 | a | Write it myself. A student owes the teacher their own work, the way the teacher owes them honest marking. | Confucianism | 0.51, 0.61 |
 | b | Ask what using it would do to my own learning and to everyone else's marks, and if it harms either, do not use it. | Buddhist Ethics | 0.61, -0.73 |
-| c | Use it if the time I save does more good somewhere else than writing the essay would. | Utilitarianism | -0.42, -0.91 |
+| c | Add up who gains and who loses if I use it, my mark against everyone else's, and go with whichever comes out ahead. | Utilitarianism | -0.42, -0.91 |
 | d | Whether anyone finds out is not the point. What I do with my own mind is the one thing that is mine. | Stoicism | -0.97, 0.26 |
 
 **9. A friend tells you a secret. Passing it on would stop another friend making a big mistake.**
@@ -236,15 +261,20 @@ Each is a real position, but it may read as the answer a teacher wants.
   this is the school whose direction the reader leans towards. It is also
   what the eye reads off the map: the nearest dot.
 - **Secondary school.** The second nearest.
-- **Tie-break.** If two schools are exactly the same distance away (to
-  within 1e-9), the one nearer the reader's answer to question 10 wins. If
+- **Tie-break.** If two schools are exactly the same distance away (the
+  squared distances within 1e-9 of each other), the one nearer the
+  reader's answer to question 10 wins. If
   that ties too, the order of the table in section 2 decides, from
   Confucianism to Ubuntu. Question 10 is v1's tie-breaker as well
   (`src/lib/scoring.ts`). A reader at the exact middle is a tie between
   all six and goes the same way.
 
 In the simulation no answer pattern out of 1,048,576 produced a tie, so
-the rule is there for completeness rather than because it does work.
+the rule is there for completeness rather than because it does work. v1
+is different: `src/lib/scoring.ts` treats scores within 0.005 as a tie,
+so its question-10 rule does fire. If v2's tolerance were ever widened to
+match, note that question 10 has no Buddhist Ethics or Ubuntu option, so
+its tie-break would never favour either.
 
 ## 5. The simulated distribution
 
@@ -291,8 +321,9 @@ school.
    Utilitarianism (y -0.94 against -0.71), which misstates both pages, so
    the angles were redrawn to those in section 2.
 2. **Redrawn angles, with Buddhist Ethics at 300°.** With every weight
-   0.9, shares were 12.8% to 21.8%; tuned weights brought them to 15.6%
-   to 17.5%. But at 300° Buddhist Ethics sat only 0.04 short of
+   0.9, shares were 12.8% to 21.8%; tuned weights narrowed them, but
+   those weights were not recorded, so that figure is not given here. At
+   300° Buddhist Ethics sat only 0.04 short of
    Utilitarianism on y (-0.87 against -0.91). That understates its page's
    "as much as by what follows", so it moved to 310°.
 3. **The final angles in section 2.** With every weight 0.9, shares were
@@ -334,8 +365,12 @@ same. A reader who never retakes keeps their v1 school.
   opens on its triangle; a v2 result opens on the map.
 - **Challenges across versions.** A friend answering a v1 challenge after
   the switch takes v2. The challenge page reads only the challenger's
-  school, so it still works. The two people answered different questions,
-  and a comparison page should not imply otherwise.
+  school, so it still works. But the result page (`src/app/r/[id]/page.tsx`)
+  passes the other person's `vector` to the share page, which draws it as
+  "Whoever sent it": a v1 and a v2 result side by side would put a v2
+  point into code written for v1. That page has to check both versions.
+  The two people answered different questions, and a comparison page
+  should not imply otherwise.
 
 ## 7. For Checkpoint A
 
@@ -344,11 +379,17 @@ Each of these is Arthur's to decide:
 1. The axes and their plain names (section 1).
 2. The six positions, and especially Buddhist Ethics' and Ubuntu's
    (section 2).
-3. The ten questions and forty options, and the three flagged as possibly
-   too nice (section 3).
+3. The ten questions and forty options: the five flagged as possibly too
+   nice, the four groups flagged as possibly underselling their school,
+   and the two redrafted after review, 3b and 8c (section 3).
 4. Weighted options (16.2% to 17.7%) or equal ones (10.9% to 23.0%)
    (section 5).
 5. The share lines on all six school pages say "Ten questions about AI".
-   Three of v2's questions are about technology (4, 8 and 10) and seven
-   are not, so the lines would need rewording if v2 ships as drafted.
+   One of v2's questions is about AI (8), two more are about apps (4 and
+   10), and seven are about neither, so the lines would need rewording if
+   v2 ships as drafted.
    They live in `content/schools/*.md`, under `share_lines`.
+6. Whether none of the six is a rule-based ethics (section 1, "Rules to
+   results"), which is my reading and not certain.
+7. Ubuntu's alternatives: the Ubuntu page places Gyekye between Metz and
+   Menkiti, so both would move it towards role (section 2).

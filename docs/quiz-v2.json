@@ -138,7 +138,7 @@
         },
         {
           "id": "3b",
-          "label": "Work out which choice leaves fewer people upset, me included, and do that.",
+          "label": "Check why I want each one first. Going to either for a bad reason, like guilt or just wanting to win, would make it the wrong choice.",
           "leans": "buddhist",
           "vector": {
             "x": 0.61,
@@ -357,7 +357,7 @@
         },
         {
           "id": "8c",
-          "label": "Use it if the time I save does more good somewhere else than writing the essay would.",
+          "label": "Add up who gains and who loses if I use it, my mark against everyone else's, and go with whichever comes out ahead.",
           "leans": "utilitarianism",
           "vector": {
             "x": -0.42,

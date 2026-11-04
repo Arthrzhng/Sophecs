@@ -9,10 +9,12 @@
 // - a reader's position is the mean of their ten options' vectors;
 // - each school sits on the unit circle at its angle;
 // - the nearest school wins and the second nearest is the secondary;
-// - an exact tie on distance (to 1e-9) goes to whichever tied school is
-//   nearer the reader's answer to the last question, then to the order the
-//   schools are listed in.
-// Exits non-zero if any school is unreachable or lands outside 8% to 30%.
+// - an exact tie on distance (squared distances within 1e-9) goes to
+//   whichever tied school is nearer the reader's answer to the last
+//   question, then to the order the schools are listed in.
+// Exits non-zero if any school is unreachable, lands outside 8% to 30%,
+// or a school's persona (always the option leaning towards it) misses it,
+// and if an option's vector disagrees with its school's angle and weight.
 import fs from "node:fs";
 
 const file = process.argv[2] ?? "docs/quiz-v2.json";
@@ -45,7 +47,8 @@ function rank(p, last) {
 // changed without the vectors or the other way round, fails here.
 for (const q of Q) {
   for (const o of q.options) {
-    const w = quiz.radius_by_school?.[o.leans] ?? 0.9;
+    const w = quiz.radius_by_school?.[o.leans];
+    if (typeof w !== "number") throw new Error(`no weight for ${o.leans} in radius_by_school`);
     const want = { x: pos[o.leans].x * w, y: pos[o.leans].y * w };
     if (Math.abs(want.x - o.vector.x) > 0.006 || Math.abs(want.y - o.vector.y) > 0.006) {
       throw new Error(`option ${o.id}: vector is not ${o.leans}'s direction times ${w}`);
