@@ -52,8 +52,9 @@
 --
 -- A REVOKE that finds nothing it may revoke (a privilege granted by
 -- another role) still succeeds, so the file ends by checking what anon
--- and authenticated actually hold, and fails, undoing all of it, if any
--- privilege meant to go is still there.
+-- and authenticated actually hold, on the table or on any of its columns,
+-- and fails, undoing all of it, if any privilege meant to go is still
+-- there.
 --
 -- No row changes. Locks: REVOKE and GRANT are catalogue updates. They
 -- take no lock on the tables' rows and wait for no reader or writer. No
@@ -103,7 +104,14 @@ begin
     foreach t in array array['debates', 'challenges', 'quiz_results', 'profiles', 'class_members'] loop
       foreach p in array array['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER'] || case when pg17 then array['MAINTAIN'] else '{}'::text[] end loop
         continue when t = 'class_members' and p = 'DELETE' and r = 'authenticated';
-        if has_table_privilege(r, 'public.' || t, p) then left_over := left_over || (r || ' ' || p || ' on ' || t); end if;
+        -- profiles' UPDATE for authenticated is checked column by column below.
+        continue when t = 'profiles' and p = 'UPDATE' and r = 'authenticated';
+        -- INSERT, UPDATE and REFERENCES can also be granted on columns alone,
+        -- which has_table_privilege does not see.
+        if (case when p in ('INSERT', 'UPDATE', 'REFERENCES') then has_any_column_privilege(r, 'public.' || t, p)
+                 else has_table_privilege(r, 'public.' || t, p) end) then
+          left_over := left_over || (r || ' ' || p || ' on ' || t);
+        end if;
       end loop;
     end loop;
     if pg17 then

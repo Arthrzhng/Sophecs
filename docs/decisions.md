@@ -2554,7 +2554,8 @@ The policies stay, unreachable without the grant; dropping them is a
 second change to review, and the grant alone is what decides. A REVOKE
 that finds nothing it may take (a privilege another role granted) still
 succeeds, so the migration ends by reading what anon and authenticated
-hold and fails as a whole if anything meant to go is left.
+hold, on each table and on any of its columns, and fails as a whole if
+anything meant to go is left.
 
 **Beyond the wording Arthur approved.** The proposal he said yes to named
 INSERT, UPDATE and DELETE on `debates`, `challenges` and `quiz_results`,
@@ -2580,22 +2581,28 @@ default privileges on local Postgres 16, applies every migration before
 is refused after; that the client writes the site makes and its reads
 still work, as anon, signed in and as the server role; each object's
 exact ACL after it; that the rollback restores every ACL as it was, and
-0022 applies again; and that a privilege granted by another role makes
-0022 fail without changing anything. Breaking it on purpose, each caught:
-no column grant (5 checks fail), DELETE on `class_members` revoked too
-(3), the rollback keeping the column grant (1), the rollback leaving out
-`class_members` (2), the closing check removed (2); and `profiles` left
-out of the revoke, or the column grant given to anon too, each make 0022
-refuse to apply. Postgres 16 has no MAINTAIN: in production 0022's closing
+0022 applies again; and that privileges granted by another role, one of
+each shape (both roles, a table privilege, TRUNCATE, an INSERT on columns
+only, an UPDATE of a profiles column other than the two kept), make 0022
+fail naming each, without changing anything. Breaking it on purpose,
+each caught: no column grant (5 checks fail), DELETE on `class_members`
+revoked too (3), the rollback keeping the column grant (1), the rollback
+leaving out `class_members` (2), the closing check removed (2), and the
+closing check narrowed to one role (3), one table (2), one privilege (1),
+no profiles columns (1) or table-level privileges only (1); and `profiles`
+left out of the revoke, or the column grant given to anon too, each make
+0022 refuse to apply. Postgres 16 has no MAINTAIN: in production 0022's closing
 check fails the migration if MAINTAIN is left and the read-back confirms
 it, but the rollback's MAINTAIN half is not tested anywhere.
-`tests/client-writes.test.ts` finds every `.from(...)` chain ending in a
-write, and every `.rpc(...)`, in `src/`, works out whether the receiver
-is the admin client, and holds the rest to the site's four client writes,
-so a new signed-in write fails a unit test rather than production. It
-cannot follow a client through an untraced variable (it accepts a
-parameter only when named `admin` and typed `SupabaseClient`), and says
-so in its header.
+`tests/client-writes.test.ts` finds every `.from(...)` and `.rpc(...)` in
+`src/`, works out whether the receiver is the admin client, reports every
+other one that is not a read (its first method is not `.select(`, a
+builder kept in a variable included), with the columns an update sets
+(a spread or a non-literal shows as `?`), and checks that every helper
+taking `admin: SupabaseClient` is given the admin client. The report is
+held to the site's four client writes, so a new signed-in write fails a
+unit test rather than production. Its header lists what it cannot see,
+none of which `src/` does today.
 
 For a later list: the column grant lets the Data API set `display_name`
 without `setDisplayName`'s trim and 60-character limit, as "own update"

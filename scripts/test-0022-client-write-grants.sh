@@ -11,8 +11,9 @@
 # - each object's privileges after 0022 are exactly the ones meant;
 # - the rollback restores each object's privileges as they were, and 0022
 #   applies again;
-# - a privilege the REVOKE cannot take (granted by another role) makes
-#   0022 fail as a whole, changing nothing.
+# - privileges the REVOKE cannot take (granted by another role, on a
+#   table or on columns only, to either role) make 0022 fail as a whole,
+#   naming each, and change nothing.
 #
 # Postgres 16 has no MAINTAIN, so on it the MAINTAIN half of 0022 and of
 # its rollback is a no-op and its checks print as skipped. Production runs
@@ -180,20 +181,39 @@ apply "$REPO/supabase/migrations/0022_client_write_grants.sql"
 closed "re-applied" denied
 kept "re-applied"
 
-say "a privilege REVOKE cannot take makes 0022 fail, changing nothing"
-# As if a role other than the owner had granted it (production's default
+say "privileges REVOKE cannot take make 0022 fail, naming each, changing nothing"
+# As if a role other than the owner had granted them (production's default
 # privileges name supabase_admin as a grantor for objects it owns): the
-# owner's REVOKE does not take another grantor's grant.
+# owner's REVOKE does not take another grantor's grant. One of each shape:
+# both roles, a table privilege, a column-only INSERT that has_table_privilege
+# would miss, and a profiles column other than the two kept.
 apply "$REPO/supabase/rollback/0022_client_write_grants.down.sql"
 q "do \$\$ begin if not exists (select 1 from pg_roles where rolname = 'grantor_0022_test') then create role grantor_0022_test nologin; end if; end \$\$" >/dev/null
-q "grant insert on public.debates to grantor_0022_test with grant option" >/dev/null
-q "set role grantor_0022_test; grant insert on public.debates to anon" >/dev/null
+for t in debates quiz_results class_members profiles; do q "grant all on public.$t to grantor_0022_test with grant option" >/dev/null; done
+psql -X -q -v ON_ERROR_STOP=1 -d "$DB" >/dev/null <<'STUCK'
+set role grantor_0022_test;
+grant insert on public.debates to anon;
+grant truncate on public.quiz_results to anon;
+grant insert on public.class_members to authenticated;
+grant insert (id, user_id, topic_slug, school, argument, verdict, score, elo_after) on public.debates to authenticated;
+grant update (elo) on public.profiles to authenticated;
+STUCK
 ACL_STUCK=$(acls)
 OUT=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/migrations/0022_client_write_grants.sql" 2>&1 || true)
-expect "0022 stops on it, naming it" 1 "$(printf '%s' "$OUT" | grep -c 'still held after the revokes: anon INSERT on debates')"
+for want in "anon INSERT on debates" "anon TRUNCATE on quiz_results" "authenticated INSERT on class_members" "authenticated INSERT on debates" "authenticated UPDATE of profiles.elo"; do
+  expect "0022 stops, naming $want" 1 "$(printf '%s' "$OUT" | grep 'still held after the revokes' | grep -c "$want")"
+done
 expect "and changes nothing" "$ACL_STUCK" "$(acls)"
-q "revoke all on public.debates from grantor_0022_test cascade" >/dev/null
-expect "with that grant gone, 0022 applies" "" "$(apply "$REPO/supabase/migrations/0022_client_write_grants.sql" 2>&1)"
+# Column grants are not taken by a table-level REVOKE ... CASCADE; the
+# grantor takes them back itself.
+psql -X -q -v ON_ERROR_STOP=1 -d "$DB" >/dev/null <<'UNSTUCK'
+set role grantor_0022_test;
+revoke insert (id, user_id, topic_slug, school, argument, verdict, score, elo_after) on public.debates from authenticated;
+revoke update (elo) on public.profiles from authenticated;
+UNSTUCK
+for t in debates quiz_results class_members profiles; do q "revoke all on public.$t from grantor_0022_test cascade" >/dev/null; done
+expect "with those grants gone, 0022 applies" "" "$(apply "$REPO/supabase/migrations/0022_client_write_grants.sql" 2>&1)"
+closed "applied after the stuck grants went" denied
 
 if [ "$FAILED" -ne 0 ]; then echo; echo "== FAILED =="; exit 1; fi
 echo; echo "== all checks passed =="

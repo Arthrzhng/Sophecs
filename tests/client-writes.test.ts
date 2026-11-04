@@ -1,19 +1,23 @@
 // Migration 0022 leaves anon and authenticated only the table writes the
 // site makes with a client key. A new write through the signed-in client
 // would pass every other unit test and then fail in production with
-// "permission denied", so this finds every `.from(...)` chain in src/ that
-// ends in a write, and every `.rpc(...)`, works out whether its receiver
-// is the admin client, and holds the rest to the site's client writes:
-// the three 0022 keeps and the reading-answer upsert it does not touch.
+// "permission denied". So this finds every `.from(...)` and `.rpc(...)` in
+// src/, works out whether its receiver is the admin client, and reports
+// every one that is not unless it is a read (its first method is
+// `.select(`). The report is held to the site's client writes: the three
+// 0022 keeps and the reading-answer upsert it does not touch.
 // scripts/test-0022-client-write-grants.sh proves each still works against
 // the migrated database.
 //
-// What it cannot see: a client passed through a variable it cannot trace
-// (it accepts a parameter only when it is named `admin` and typed
-// SupabaseClient, as the helpers in src/lib are, and only if no variable
-// named `admin` in that file comes from another factory), a table name
-// built at run time on the admin client, or a write made by a library on
-// the site's behalf. Anything it cannot classify is reported, not passed.
+// The admin client is a variable made by createAdminClient() in that file,
+// or a parameter named `admin` typed SupabaseClient; for those helpers,
+// every call's first argument must itself be the admin client.
+//
+// What it cannot see, none of which src/ does today: `from` destructured
+// off a client, a `let` reassigned from one client to another, a client
+// held on `this`, a parameter that shares its name with a variable made by
+// createAdminClient() elsewhere in the same file, `.from<T>(`, and a write
+// a library makes on the site's behalf.
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -27,7 +31,9 @@ function files(dir: string): string[] {
 
 /** Index of the bracket matching the one at `open`, scanning forward or back. */
 function match(src: string, open: number, dir: 1 | -1): number {
-  const [o, c] = dir === 1 ? ["(", ")"] : [")", "("];
+  const pairs: Record<string, string> = dir === 1 ? { "(": ")", "{": "}", "[": "]" } : { ")": "(", "}": "{", "]": "[" };
+  const o = src[open];
+  const c = pairs[o];
   let depth = 0;
   for (let i = open; i >= 0 && i < src.length; i += dir) {
     if (src[i] === o) depth++;
@@ -36,21 +42,30 @@ function match(src: string, open: number, dir: 1 | -1): number {
   return -1;
 }
 
+/** Skips whitespace and comments forward from `i`. */
+function skip(src: string, i: number): number {
+  for (;;) {
+    while (i < src.length && /\s/.test(src[i])) i++;
+    if (src.startsWith("//", i)) i = src.indexOf("\n", i) === -1 ? src.length : src.indexOf("\n", i);
+    else if (src.startsWith("/*", i)) i = src.indexOf("*/", i) + 2;
+    else return i;
+  }
+}
+
 /** The receiver of a call at `at` (the index of its `.`): a variable, or "call:<callee>". */
 function receiverOf(src: string, at: number): string {
   let i = at - 1;
   for (;;) {
-    while (i >= 0 && /\s/.test(src[i])) i--;
+    while (i >= 0 && /[\s!?]/.test(src[i])) i--;
     if (src[i] === ")") {
       const open = match(src, i, -1);
       let j = open - 1;
       while (j >= 0 && /[\w$]/.test(src[j])) j--;
       const callee = src.slice(j + 1, open);
       if (src[j] === ".") {
-        i = j - 1; // a method on something: keep walking left
+        i = src[j - 1] === "?" ? j - 2 : j - 1; // a method on something (`.` or `?.`): keep walking left
         continue;
       }
-      // (await f()) or f() or (x)
       if (!callee) {
         const inner = src.slice(open + 1, i).replace(/^\s*await\s+/, "").trim();
         const m = /^([\w$.]+)\(/.exec(inner);
@@ -64,9 +79,37 @@ function receiverOf(src: string, at: number): string {
   }
 }
 
-const KEPT = new Set(["createAdminClient"]);
+/** Top-level keys of an object literal argument; "?" for a spread or anything not a literal. */
+function keysOf(arg: string): string[] {
+  const a = arg.trim();
+  if (!a.startsWith("{")) return ["?"];
+  const body = a.slice(1, match(a, 0, 1));
+  const keys: string[] = [];
+  let depth = 0;
+  let part = "";
+  const flush = () => {
+    const p = part.trim();
+    part = "";
+    if (!p) return;
+    if (p.startsWith("...")) keys.push("?");
+    else if (p.startsWith("[")) keys.push("?");
+    else keys.push((/^["']?([\w$]+)["']?/.exec(p) ?? [, "?"])[1]!);
+  };
+  for (const ch of body) {
+    if ("([{".includes(ch)) depth++;
+    else if (")]}".includes(ch)) depth--;
+    if (ch === "," && depth === 0) flush();
+    else part += ch;
+  }
+  flush();
+  return keys;
+}
 
-function clientWritesIn(file: string, src: string, seen?: { admin: number }): string[] {
+const HELPERS = new Set<string>();
+for (const f of files("src"))
+  for (const m of readFileSync(f, "utf8").matchAll(/function\s+([\w$]+)\s*\(\s*admin\s*:\s*SupabaseClient\b/g)) HELPERS.add(m[1]);
+
+function clientWritesIn(file: string, src: string, seen?: { admin: number }, helpers: Set<string> = HELPERS): string[] {
   const declared = new Map<string, string>();
   for (const m of src.matchAll(/(?:const|let|var)\s+([\w$]+)\s*(?::[^=;]+)?=\s*(?:await\s+)?([\w$.]+)\(/g)) {
     if (declared.has(m[1]) && declared.get(m[1]) !== m[2]) declared.set(m[1], "(several)");
@@ -74,47 +117,52 @@ function clientWritesIn(file: string, src: string, seen?: { admin: number }): st
   }
   const adminParam = /\badmin\s*:\s*SupabaseClient\b/.test(src) && (declared.get("admin") ?? "createAdminClient") === "createAdminClient";
   const isAdmin = (r: string) =>
-    r === "call:createAdminClient" || KEPT.has(declared.get(r) ?? "") || (r === "admin" && !declared.has("admin") && adminParam);
+    r === "call:createAdminClient" || declared.get(r) === "createAdminClient" || (r === "admin" && !declared.has("admin") && adminParam);
 
   const out: string[] = [];
   for (const m of src.matchAll(/\.(from|rpc)\s*\(/g)) {
     const dot = m.index!;
+    const receiver = receiverOf(src, dot);
+    if (/^[A-Z]/.test(receiver)) continue; // Array.from, Buffer.from and the like
     const open = dot + m[0].length - 1;
     const close = match(src, open, 1);
     const arg = src.slice(open + 1, close).trim();
-    const receiver = receiverOf(src, dot);
-    if (m[1] === "rpc") {
-      if (!isAdmin(receiver)) out.push(`${file}: rpc ${arg.split(",")[0]} (receiver ${receiver})`);
-      continue;
-    }
-    // Array.from, Buffer.from and the like.
-    if (/^[A-Z]/.test(receiver)) continue;
-    // The rest of this chain, up to the end of the statement.
-    let end = close + 1;
-    for (let depth = 0; end < src.length; end++) {
-      const ch = src[end];
-      if (ch === "(" || ch === "{" || ch === "[") depth++;
-      else if (ch === ")" || ch === "}" || ch === "]") {
-        if (depth === 0) break;
-        depth--;
-      } else if (ch === ";" && depth === 0) break;
-    }
-    const chain = src.slice(close + 1, end);
-    const w = /^\s*(?:\.\s*\w+\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)\s*)*?\.\s*(insert|update|upsert|delete)\s*\(/.exec(chain);
-    if (!w) continue;
     if (isAdmin(receiver)) {
       if (seen) seen.admin++;
       continue;
     }
+    const who = receiver === "supabase" ? "" : ` (receiver ${receiver})`;
+    if (m[1] === "rpc") {
+      out.push(`${file}: rpc ${arg.split(",")[0]}${who}`);
+      continue;
+    }
     const lit = /^(["'`])([\w]+)\1$/.exec(arg);
     const table = lit ? lit[2] : `dynamic(${arg})`;
-    let cols = "";
-    if (w[1] === "update") {
-      const at = close + 1 + w.index! + w[0].length - 1;
-      const body = src.slice(at + 1, match(src, at, 1));
-      cols = ` ${[...body.matchAll(/([\w$]+)\s*:/g)].map((c) => c[1]).join(",")}`;
+    let next = skip(src, close + 1);
+    if (src[next] === "!") next = skip(src, next + 1);
+    if (src.startsWith("?.", next)) next++;
+    const method = /^\.\s*([\w$]+)\s*\(/.exec(src.slice(next));
+    if (method?.[1] === "select") continue;
+    if (!method) {
+      out.push(`${file}: ${table} (builder kept, not read at once)${who}`);
+      continue;
     }
-    out.push(`${file}: ${table} ${w[1]}${cols}${receiver === "supabase" ? "" : ` (receiver ${receiver})`}`);
+    let cols = "";
+    if (method[1] === "update") {
+      const at = next + method[0].length - 1;
+      cols = ` ${keysOf(src.slice(at + 1, match(src, at, 1))).join(",")}`;
+    }
+    out.push(`${file}: ${table} ${method[1]}${cols}${who}`);
+  }
+  // A helper that takes the admin client must be given it.
+  for (const name of helpers) {
+    for (const m of src.matchAll(new RegExp(`(?<![\\w$.])${name}\\s*\\(`, "g"))) {
+      const before = src.slice(Math.max(0, m.index! - 20), m.index!);
+      if (/function\s+$/.test(before)) continue;
+      const open = m.index! + m[0].length - 1;
+      const first = src.slice(open + 1, match(src, open, 1)).split(",")[0].trim();
+      if (!isAdmin(first)) out.push(`${file}: ${name} called with ${first}`);
+    }
   }
   return out;
 }
@@ -135,22 +183,37 @@ describe("writes made with a client key (migration 0022)", () => {
       "src/app/me/actions.ts: profiles update argument_default_public",
       "src/app/me/actions.ts: profiles update display_name",
     ]);
-    // And it does see the server's own writes, so the list above is not
+    // And it does see the server's own calls, so the list above is not
     // short because the scan found nothing.
-    expect(seen.admin).toBeGreaterThan(40);
+    expect(seen.admin).toBeGreaterThan(100);
   });
 
   it("sees a write through a session client however it is reached", () => {
+    const S = "const supabase = await createSupabaseServerClient();\n";
     const cases: [string, string][] = [
-      ['const supabase = await createSupabaseServerClient();\nawait supabase\n  .from("debates")\n  .insert({ id });', "debates insert"],
+      [`${S}await supabase\n  .from("debates")\n  .insert({ id });`, "debates insert"],
       ['const admin = await createSupabaseServerClient();\nawait admin.from("debates").insert({ id });', "debates insert (receiver admin)"],
       ['await (await createSupabaseServerClient()).from("debates").insert({ id });', "debates insert (receiver call:createSupabaseServerClient)"],
-      ["const supabase = await createSupabaseServerClient();\nawait supabase.from('quiz_results').insert({ id });", "quiz_results insert"],
-      ['const supabase = await createSupabaseServerClient();\nawait supabase.schema("public").from("challenges").update({ status: "x" }).eq("id", id);', "challenges update status"],
-      ["const supabase = await createSupabaseServerClient();\nawait supabase.from(t).delete().eq('id', id);", "dynamic(t) delete"],
-      ['const supabase = await createSupabaseServerClient();\nawait supabase.rpc("anything", {});', 'rpc "anything" (receiver supabase)'],
+      [`${S}await supabase.from('quiz_results').insert({ id });`, "quiz_results insert"],
+      [`${S}await supabase.schema("public").from("challenges").update({ status: "x" }).eq("id", id);`, "challenges update status"],
+      [`${S}await supabase.from(t).delete().eq('id', id);`, "dynamic(t) delete"],
+      [`${S}await supabase.rpc("anything", {});`, 'rpc "anything"'],
+      [`${S}await supabase\n  .from("debates") // a note\n  .insert({ id });`, "debates insert"],
+      [`${S}const t = supabase.from("debates");\nawait t.insert({ id });`, "debates (builder kept, not read at once)"],
+      [`${S}await supabase.from("profiles").update({ display_name: n, updated_at }).eq("id", id);`, "profiles update display_name,updated_at"],
+      [`${S}await supabase.from("profiles").update({ display_name: n, ...extra }).eq("id", id);`, "profiles update display_name,?"],
+      [`${S}await supabase.from("profiles").update(patch).eq("id", id);`, "profiles update ?"],
+      [`${S}await supabase.schema("public")?.from("debates")!.insert({ id });`, "debates insert"],
     ];
     for (const [src, want] of cases) expect(clientWritesIn("x.ts", src), src).toEqual([`x.ts: ${want}`]);
+  });
+
+  it("sees a helper that takes the admin client being given another", () => {
+    const helpers = new Set(["ensureProfileSchool"]);
+    const src = "const supabase = await createSupabaseServerClient();\nawait ensureProfileSchool(supabase, id, school);";
+    expect(clientWritesIn("x.ts", src, undefined, helpers)).toEqual(["x.ts: ensureProfileSchool called with supabase"]);
+    const ok = "const admin = createAdminClient();\nawait ensureProfileSchool(admin, id, school);";
+    expect(clientWritesIn("x.ts", ok, undefined, helpers)).toEqual([]);
   });
 
   it("passes the admin client, a helper's admin parameter and reads", () => {
@@ -158,6 +221,7 @@ describe("writes made with a client key (migration 0022)", () => {
       'const admin = createAdminClient();\nawait admin.from("debates").insert({ id });',
       'async function f(admin: SupabaseClient) { await admin.from("profiles").update({ elo: 1 }).eq("id", id); }',
       'const supabase = await createSupabaseServerClient();\nconst { data } = await supabase.from("profiles").select("id").eq("id", id);',
+      'const supabase = await createSupabaseServerClient();\nconst { data } = await supabase\n  .from("profiles") // mine\n  .select("id");',
       "const xs = Array.from({ length: 3 }, (_, i) => i);",
     ];
     for (const src of ok) expect(clientWritesIn("x.ts", src), src).toEqual([]);
