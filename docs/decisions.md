@@ -2394,21 +2394,25 @@ of 2026-11-04. `/c/<id>` sends a reader to `/quiz?c=<challenge id>`, and
 `submitQuizResult` wrote that challenge id into `quiz_results.challenge_from`.
 The column references `quiz_results(id)` (0001), so the insert failed the
 foreign key and the reader's whole result was lost: no challenge could be
-accepted. Production has no result with `challenge_from` set and no
-accepted challenge, which fits. Shown on local Postgres: the challenge id
+accepted. Production has no accepted challenge (a read-only query on
+2026-11-04 at about 03:30 UTC: 3 challenges, none past `open`), which
+fits. Shown on local Postgres: the challenge id
 fails `quiz_results_challenge_from_fkey`, the challenger's result id
 inserts.
 
 `/r/[id]` reads the column as the challenger's result, so that is what is
 now stored, looked up from the challenge first; an unknown challenge id
-is treated as no challenge. The acceptance that follows now applies only
+is treated as no challenge, and so is a challenger opening their own link
+(same browser or account), who would otherwise take the slot meant for
+the friend they sent it to. The acceptance that follows now applies only
 to an open challenge with no challengee yet: the table holds one
 challengee per challenge, and without the condition a link shared widely
 would let each later reader replace the first and reopen a finished
-challenge. Nobody could accept a challenge before this fix, so the
-condition changes nothing production has seen.
+challenge. Only the reader whose update took the slot reports
+`challenge_accepted` to analytics. Nobody could accept a challenge before
+this fix, so these conditions change nothing production has seen.
 `tests/challenge-accept.test.ts`, whose fake enforces the foreign key;
-four of its five cases fail on the old code.
+four of its six cases fail on the old code.
 
 ### For Checkpoint A, from the security work
 

@@ -11,9 +11,13 @@ const tables: Record<string, Row[]> = {};
 function query(table: string) {
   const filters: ((r: Row) => boolean)[] = [];
   let patch: Row | null = null;
+  let returning = false;
   const rows = () => (tables[table] ?? []).filter((r) => filters.every((f) => f(r)));
   const b: Record<string, unknown> = {};
-  b.select = () => b;
+  b.select = () => {
+    if (patch) returning = true;
+    return b;
+  };
   b.eq = (c: string, v: unknown) => (filters.push((r) => r[c] === v), b);
   b.is = (c: string, v: unknown) => (filters.push((r) => (r[c] ?? null) === v), b);
   b.update = (p: Row) => ((patch = p), b);
@@ -26,8 +30,12 @@ function query(table: string) {
   b.maybeSingle = async () => ({ data: rows()[0] ?? null });
   b.single = async () => ({ data: rows()[0] ?? null });
   b.then = (resolve: (v: unknown) => unknown) => {
-    if (patch) for (const r of rows()) Object.assign(r, patch);
-    return resolve({ data: patch ? null : rows(), error: null });
+    if (patch) {
+      const hit = rows();
+      for (const r of hit) Object.assign(r, patch);
+      return resolve({ data: returning ? hit.map((r) => ({ id: r.id })) : null, error: null });
+    }
+    return resolve({ data: rows(), error: null });
   };
   return b;
 }
@@ -50,7 +58,7 @@ const answers = {
 };
 
 beforeEach(() => {
-  tables.quiz_results = [{ id: "r-challenger", school: "utilitarianism" }];
+  tables.quiz_results = [{ id: "r-challenger", school: "utilitarianism", anon_id: "challenger-browser", user_id: null }];
   tables.challenges = [{ id: "c1", challenger_result_id: "r-challenger", challengee_result_id: null, status: "open" }];
 });
 
@@ -67,6 +75,8 @@ describe("submitQuizResult from a challenge link", () => {
     const first = (await submitQuizResult({ ...answers, challengeId: "c1" })) as { id: string };
     const second = await submitQuizResult({ ...answers, challengeId: "c1" });
     expect(second).toMatchObject({ ok: true });
+    // The second reader did not accept it, so reports no acceptance.
+    expect((second as { challengerSchool?: string }).challengerSchool).toBeUndefined();
     expect(tables.challenges[0]).toMatchObject({ challengee_result_id: first.id, status: "accepted" });
   });
 
@@ -86,5 +96,14 @@ describe("submitQuizResult from a challenge link", () => {
   it("is unchanged without a challenge", async () => {
     expect(await submitQuizResult(answers)).toMatchObject({ ok: true });
     expect(tables.quiz_results.at(-1)).toMatchObject({ challenge_from: null });
+  });
+
+  it("does not make a challenger their own challengee", async () => {
+    tables.quiz_results[0].anon_id = "11111111-1111-4111-8111-111111111111"; // this browser
+    const res = await submitQuizResult({ ...answers, challengeId: "c1" });
+    expect(res).toMatchObject({ ok: true });
+    expect((res as { challengerSchool?: string }).challengerSchool).toBeUndefined();
+    expect(tables.quiz_results.at(-1)).toMatchObject({ challenge_from: null });
+    expect(tables.challenges[0]).toMatchObject({ challengee_result_id: null, status: "open" });
   });
 });
