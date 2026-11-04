@@ -619,6 +619,30 @@ Test rows and test users deleted afterwards.
 
 The route refuses unless `next_turn` is the caller **and** the seq-derived author matches. They should never disagree; if they do, something wrote `next_turn` wrongly, and letting the wrong person consume one of four slots is not recoverable. The unique index on `(exchange_id, seq)` is the real guard against two concurrent submissions taking the same slot — the read-then-insert above it only saves a model call in the common case.
 
+### The newer seeker is user_a (2026-11-04)
+
+Found while building sample activity (#57), and fixed on Arthur's ruling
+of 2026-11-04. `seekCounterpart` made the waiting seeker `user_a` and set
+`next_turn` to the newer seeker, while the turn route takes odd turns from
+`user_a` (`authorForSeq`) and refuses unless `next_turn` agrees. On turn 1
+the newer seeker passed the `next_turn` check and failed the author check,
+and the waiting seeker failed the first: no exchange could ever start.
+Production had no exchange (a read-only count of `exchanges` on
+2026-11-04 at about 03:30 UTC returned 0), so nobody was caught in one.
+
+The fix keeps who opens, which the code's own comment attributes to the
+brief ("`next_turn` is the newer seeker"): the newer seeker is now
+`user_a`, with their own debate and school on the `_a` side, and
+`next_turn` names them. The route is frozen and unchanged. The other
+readers of an exchange (`/me`, the verdict page, `blockCounterpart`,
+`scripts/review-turns.ts`, the turn route's quote source) work out
+"mine" and "theirs" from `user_a` and `user_b` symmetrically. One is
+not: `/counterpart/[id]` shows the motion wording of `debate_a`, "the
+opener's words", which is now the newer seeker's, as that page's own
+comment intends. `tests/counterpart-pairing.test.ts` checks the
+invariant itself: the opened exchange's `next_turn` is
+`authorForSeq(1, user_a, user_b)`; it fails on the old code.
+
 ### What is not verified
 
 The four-turn end-to-end run with two real accounts, and `KILL_SWITCH_SCREEN=true` stopping delivery, could not be exercised here: this sandbox's proxy does not allow the app's own server to reach Supabase (the constraint recorded in Phase 1), so authenticated flows can only be run against the deployed site. The pieces they depend on are each verified separately — RLS by direct SQL, the screen by the fixture suite, the turn and quote rules by unit tests (`tests/counterpart.test.ts`, 30 tests passing) — but the assembled path is untested until it runs on Vercel.
@@ -2387,6 +2411,59 @@ standing. The share line drops its "The judge's note:" sentence for them
 (`src/lib/verdict-share.ts`). The OG image reads only school, score and
 topic, so 0018 does not touch it.
 
+### A challenge link stores the challenger's result (2026-11-04)
+
+Found while building sample activity (#57), and fixed on Arthur's ruling
+of 2026-11-04. `/c/<id>` sends a reader to `/quiz?c=<challenge id>`, and
+`submitQuizResult` wrote that challenge id into `quiz_results.challenge_from`.
+The column references `quiz_results(id)` (0001), so the insert failed the
+foreign key and the reader's whole result was lost: no challenge could be
+accepted. Production has no accepted challenge (a read-only query on
+2026-11-04 at about 03:30 UTC: 3 challenges, none past `open`), which
+fits. Shown on local Postgres: the challenge id
+fails `quiz_results_challenge_from_fkey`, the challenger's result id
+inserts.
+
+`/r/[id]` reads the column as the challenger's result, so that is what is
+now stored, looked up from the challenge first; an unknown challenge id
+is treated as no challenge, and so is a challenger opening their own link
+(same browser or account), who would otherwise take the slot meant for
+the friend they sent it to. The acceptance that follows now applies only
+to an open challenge with no challengee yet: the table holds one
+challengee per challenge, and without the condition a link shared widely
+would let each later reader replace the first and reopen a finished
+challenge. Only the reader whose update took the slot reports
+`challenge_accepted` to analytics. Nobody could accept a challenge before
+this fix, so these conditions change nothing production has seen.
+`tests/challenge-accept.test.ts`, whose fake enforces the foreign key;
+four of its six cases fail on the old code.
+
+### Only a result's owner can challenge from it (2026-11-04)
+
+Found while building sample activity (#57), and fixed on Arthur's ruling
+of 2026-11-04. `createChallenge` inserted a challenge for whatever result
+id it was given, with the server role, so anyone could open a challenge
+in another reader's name: the result's owner then showed as the
+challenger to whoever opened the link. `/r/[id]` also offered the
+"Challenge a friend" button to a visitor looking at someone else's result
+that came from a challenge, which did exactly that.
+
+The action now checks ownership the way `/r/[id]` already tells an owner
+apart: the `anon_id` cookie the quiz was taken under, or the signed-in
+account the result is saved to. Anyone else gets "Unknown result.", the
+answer an unknown id gets. `/r/[id]` offers "Challenge a friend" only to
+the owner (by cookie or by saved account, the latter newly treated as an
+owner rather than as a first-time visitor); a visitor who is not the
+owner gets "Debate them" where the page shows it, and "Take the quiz"
+otherwise. `tests/create-challenge.test.ts`; two of its four cases fail
+on the old code.
+
+**What this does not close.** The action was one path to this. Another
+goes through the database's own permissions and is part of the wider
+write-permission fix reported to Arthur on 2026-11-03, which waits on his
+"yes, the grants fix"; its details stay out of this public file until it
+is closed.
+
 ### No client may update a challenge (migration 0021)
 
 Part of the write permissions reported to Arthur under STOP NOW on
@@ -2426,8 +2503,8 @@ stranger as it answers a missing challenge, using the same party test
 `/api/judge` applies (`resolveChallengeSide`); `tests/challenge-topic.test.ts`.
 `/r/[id]` shows "Debate them" only to the two parties
 (`viewerIsChallengeParty`), since anyone else would now get an error from
-it; they get the ordinary challenge button as the main action, as on a
-result with no challenge. A party whose result is not saved to their
+it; they get what the page offers without it ("Challenge a friend" to
+the result's owner, "Take the quiz" to anyone else, since #60). A party whose result is not saved to their
 account is refused, as `/api/judge` would not record their debate either.
 
 **Snapshot, read-back and advisor:** recorded in `docs/progress.md` when

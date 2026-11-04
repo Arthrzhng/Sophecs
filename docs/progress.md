@@ -191,6 +191,37 @@ entry names.
   `/styleguide/phase3/card/confucian` answered 404, as it should in
   production, and `/robots.txt` 200.
 
+## 2026-11-04: a counterpart exchange can take its first turn
+
+- `seekCounterpart` opened exchanges whose first turn the turn route
+  refused from both sides. The newer seeker is now `user_a`, who opens.
+  `docs/decisions.md`, "The newer seeker is user_a (2026-11-04)".
+  `tests/counterpart-pairing.test.ts`, which fails on the old code.
+- #58 merged as `0d27bec`, after one review pass. Production deploy
+  `dpl_EN7wdCkr5A8swchrj232XD2vgd2a`, Ready and aliased to sophecs.com
+  (read from Vercel).
+
+## 2026-11-04: a challenge can be accepted
+
+- `submitQuizResult` wrote a challenge's id into `challenge_from`, which
+  references `quiz_results(id)`, so taking the quiz from a challenge link
+  lost the result. It now stores the challenger's result id, and accepts
+  an open challenge once. `docs/decisions.md`, "A challenge link stores
+  the challenger's result (2026-11-04)". `tests/challenge-accept.test.ts`.
+  `src/app/actions.ts` is frozen; Arthur's ruling of 2026-11-04 asked for
+  this fix.
+- #59 merged as `759b0bd`, after one review pass. Production deploy
+  `dpl_4q3FDcdbaPcTvCpirGPPEek6igvr`, Ready (read from Vercel).
+
+## 2026-11-04: only a result's owner can challenge from it
+
+- `createChallenge` checks the caller owns the result (cookie or saved
+  account), and `/r/[id]` offers "Challenge a friend" to the owner only,
+  "Take the quiz" to anyone else. `docs/decisions.md`, "Only a result's
+  owner can challenge from it (2026-11-04)". `tests/create-challenge.test.ts`.
+  `src/app/actions.ts` is frozen; Arthur's ruling of 2026-11-04 asked for
+  this fix.
+
 ## 2026-11-04: no client may update a challenge (migration 0021)
 
 - Arthur's ruling of 2026-11-04, ahead of sample activity: drop the
