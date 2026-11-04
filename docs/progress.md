@@ -233,7 +233,7 @@ entry names.
 
 - Arthur approved the run on 2026-11-04 in a revised form: 3,278 accounts;
   permanent, with new activity on a schedule; a GitHub Actions workflow
-  holding the service key and the seed as repository secrets; "Sample" on
+  holding the service key and the seed as secrets; "Sample" on
   every surface, share and link-preview images included; no synthetic
   referrers and nothing in PostHog; real numbers kept real; a reader's
   own rating, percentile and streak against real readers only; class
@@ -260,3 +260,28 @@ entry names.
   that wrote only the 59 new arguments and the 24 profiles they moved, the
   earlier plan then refused, validation passing, and teardown leaving the
   genuine reader as it was.
+- A fifth review (Arthur waived the three-pass cap for this PR) found nine
+  things, all fixed:
+  - PostHog still loaded on sample pages, and autocapture, `$identify`,
+    and the project's session replay and heatmaps (on, read from PostHog)
+    sent from them. Now `before_send` drops anything from a sample page or
+    recorded on one, replay pauses while one is open, and a visit that
+    starts on one loads nothing.
+  - A killed job's lock stopped every later scheduled run; the workflow now
+    clears a lock older than 15 minutes.
+  - A failed validation did not stop the schedule; it now halts the run
+    until a full stage run by hand passes.
+  - The secrets move to a GitHub environment limited to main, since any
+    branch's workflow can read a repository secret.
+  - The checks read every genuine profile, debate and result into the
+    runner; they now read counts and each topic's par window only.
+  - Exact duplicates are now a validation check (5%), and the docs give
+    the measured timescale (about 16 months).
+  - Link previews of sample verdicts and challenges now say Sample.
+  - Sample addresses carry a seed-derived tag, so they cannot be worked
+    out from the public run id.
+  - The docs say the motions and passages are fixed for a run's life.
+- Retested after the fixes: the five gates, the 0022 test, and the 600
+  account end-to-end run with the extension and teardown. That run caught
+  the local adapter still reading the old address format at teardown,
+  which refused rather than deleted; fixed.

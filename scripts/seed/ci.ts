@@ -3,7 +3,7 @@
 // adapter. See seed-ci.ts for the modes and why the log says so little.
 
 import type { Adapter } from "./adapter";
-import { buildPlan } from "./plan";
+import { buildPlan, describe } from "./plan";
 import { DEFAULTS, type GenConfig } from "./generate";
 import { contentTopics } from "./topics";
 import { execute } from "./engine";
@@ -13,6 +13,16 @@ import { GuardError } from "./env";
 import { preview, teardown } from "./teardown";
 
 export const CANARY_ACCOUNTS = 40;
+/** Arthur, 2026-11-04: exact duplicate argument texts under 5%. */
+export const MAX_EXACT_DUPLICATE_PCT = 5;
+/**
+ * A failed validation halts the run: seed_runs.status "failed", with
+ * last_error starting with this. The schedule (extend) then writes nothing
+ * until a full stage, run by hand, passes validation again. A run that
+ * failed for any other reason (a lost runner, a timeout) is resumed by the
+ * next scheduled run, as before.
+ */
+export const HALTED = "halted: validation failed";
 export const MODES = ["canary", "full", "extend", "teardown"] as const;
 export type Mode = (typeof MODES)[number];
 
@@ -34,7 +44,7 @@ export interface CiOptions {
 export interface CiOutcome {
   ok: boolean;
   /** What happened, in a word: nothing to do, refused by the dry run, written. */
-  outcome: "idle" | "dry-run-failed" | "written" | "torn-down" | "teardown-stopped";
+  outcome: "idle" | "halted" | "dry-run-failed" | "written" | "torn-down" | "teardown-stopped";
   runId?: string;
 }
 
@@ -61,6 +71,10 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
     if (o.mode === "extend" && run.counts?.stage !== "full") {
       log(`run ${run.id} has not had its full stage; nothing to do until it has`);
       return { ok: true, outcome: "idle", runId: run.id };
+    }
+    if (o.mode === "extend" && run.status === "failed" && run.last_error?.startsWith(HALTED)) {
+      log(`run ${run.id} is halted after a failed validation; nothing written until a full stage, run by hand, passes`);
+      return { ok: false, outcome: "halted", runId: run.id };
     }
     baseTo = new Date(run.base_to).toISOString();
   }
@@ -96,17 +110,30 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
   }
   log("dry-run checks passed");
 
-  const result = await execute({ dataset, plan, adapter, cohortLimit, log, batchSize: o.batchSize ?? 250, authConcurrency: 4 });
+  // A job the runner killed (the timeout, a cancel, a lost machine) leaves
+  // its lock behind. The workflow's concurrency group runs one job at a
+  // time, so a lock untouched for STALE_LOCK_MINUTES is a dead job's.
+  const result = await execute({ dataset, plan, adapter, cohortLimit, log, batchSize: o.batchSize ?? 250, authConcurrency: 4, breakStaleLock: true });
   log(
     `wrote ${JSON.stringify(result.written)} in ${result.seconds.toFixed(1)} s (${result.rowsPerSecond.toFixed(0)} rows/s${
       result.authUsersPerSecond ? `, ${result.authUsersPerSecond.toFixed(1)} auth users/s` : ""
     })`
   );
   const v = await validate(adapter, dataset, result.before, { cohortLimit });
-  for (const c of v.checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}`);
-  await record({ written: result.written, seconds: result.seconds, ok: v.ok, checks: v.checks });
-  if (!v.ok) log("validation failed: stop here (docs/sample-activity.md, \"Stop conditions\"); details in seed_runs.last_report");
-  return { ok: v.ok, outcome: "written", runId: plan.runId };
+  const dupPct = Number((describe(dataset) as { exactDuplicateArgumentsPct: number }).exactDuplicateArgumentsPct);
+  const checks = [
+    ...v.checks,
+    { name: `exact duplicate argument texts under ${MAX_EXACT_DUPLICATE_PCT}%`, ok: dupPct < MAX_EXACT_DUPLICATE_PCT, detail: `${dupPct}%` },
+  ];
+  const ok = checks.every((c) => c.ok);
+  for (const c of checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}`);
+  await record({ written: result.written, seconds: result.seconds, ok, checks });
+  if (!ok) {
+    const failed = checks.filter((c) => !c.ok).map((c) => c.name);
+    await adapter.updateRun(plan.runId, { status: "failed", last_error: `${HALTED}: ${failed.join("; ")}`.slice(0, 500) });
+    log("validation failed: the run is halted, and the schedule writes nothing until a full stage passes (docs/sample-activity.md, \"Stop conditions\"); details in seed_runs.last_report");
+  }
+  return { ok, outcome: "written", runId: plan.runId };
 }
 
 // Teardown, on Arthur's instruction only: by hand, with the run's id typed
@@ -126,7 +153,7 @@ async function tearDown(o: CiOptions, active: Awaited<ReturnType<CiOptions["adap
   log(`genuine references to sample rows: ${p.entanglements.length} (${p.blocking.length} that teardown cannot keep)`);
   const report: Record<string, unknown> = { mode: "teardown", at: new Date().toISOString(), preview: p };
   try {
-    const r = await teardown(adapter, run.id, { log: (line) => log(line) });
+    const r = await teardown(adapter, run.id, { log: (line) => log(line), breakStaleLock: true });
     for (const c of r.checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}`);
     const ok = r.checks.every((c) => c.ok);
     await adapter.updateRun(run.id, { last_report: { ...report, deleted: r.deleted, checks: r.checks, ok } });

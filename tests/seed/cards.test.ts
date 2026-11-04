@@ -31,3 +31,16 @@ describe("share images", () => {
     }
   });
 });
+
+describe("link previews of sample pages", () => {
+  it("say Sample in the Open Graph and Twitter titles, not only the tab", async () => {
+    const { sampleMetadata } = await import("../../src/lib/sample");
+    const m = sampleMetadata("Sample verdict · Sophecs");
+    expect(m.openGraph.title).toBe("Sample verdict · Sophecs");
+    expect(m.twitter.title).toBe("Sample verdict · Sophecs");
+    const { readFileSync } = await import("node:fs");
+    expect(readFileSync("src/app/debate/[slug]/[debateId]/page.tsx", "utf8")).toContain('sampleMetadata("Sample verdict · Sophecs")');
+    expect(readFileSync("src/app/c/[id]/page.tsx", "utf8")).toContain(`sampleMetadata("A sample account's challenge · Sophecs")`);
+    expect(readFileSync("src/app/r/[id]/page.tsx", "utf8")).toMatch(/twitter: \{ card: "summary_large_image", title \}/);
+  });
+});

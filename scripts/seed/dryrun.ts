@@ -23,7 +23,7 @@ export async function dryRun(adapter: Adapter, plan: Plan, opts: { rereadMs?: nu
   // failure is read again before it is reported (baseline.ts).
   const { now: baseline, checks } = await settledChecks(adapter, (now) => isolationChecks(now), { waitMs: opts.rereadMs });
   lines.push(`genuine rows: ${JSON.stringify(baseline.genuine)}; other tables: ${JSON.stringify(baseline.totals)}`);
-  lines.push(`genuine profiles: ${Object.keys(baseline.genuineProfiles).length}; elo_percentile(1200) = ${baseline.percentile1200}`);
+  lines.push(`genuine profiles: ${baseline.genuine.profiles}; elo_percentile(1200) = ${baseline.percentile1200}`);
   for (const c of checks) {
     if (!c.ok) ok = false;
     lines.push(`  ${c.ok ? "ok  " : "FAIL"} ${c.name}: ${c.detail}`);

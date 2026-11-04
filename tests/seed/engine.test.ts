@@ -252,6 +252,16 @@ describe("the lock while a run is alive", () => {
 });
 
 describe("genuine-state checks on a live site", () => {
+  it("read counts and par windows only: a snapshot holds no reader's id or row", async () => {
+    const { snapshot } = await import("../../scripts/seed/baseline");
+    const db = freshDb();
+    db.table("debates").set("GEN000DEB8", { id: "GEN000DEB8", user_id: "g1", topic_slug: "no-decision", kind: "original", elo_before: 1216, created_at: new Date().toISOString(), is_sample: false });
+    const s = await snapshot(db);
+    const text = JSON.stringify(s);
+    for (const id of ["g1", "GEN000DEB8"]) expect(text).not.toContain(id);
+    expect(s.expectedPar["no-decision"]).toEqual({ par: 1216, n: 1 });
+  });
+
   it("pass through ordinary reader activity, and fail when the par is not the genuine par", async () => {
     const { snapshot, compareBaselines } = await import("../../scripts/seed/baseline");
     const db = freshDb();

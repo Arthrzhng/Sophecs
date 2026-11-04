@@ -81,9 +81,19 @@ export class LocalAdapter implements Adapter {
     return this.query(`select ${cols} from public.${ident(table)}${filter}`);
   }
 
-  async count(table: ScanTable, where?: { sample?: boolean }) {
-    const filter = where?.sample === undefined ? "" : ` where is_sample = ${where.sample ? "true" : "false"}`;
+  async count(table: ScanTable, where?: { sample?: boolean; eloBelow?: number }) {
+    const conds = [
+      ...(where?.sample === undefined ? [] : [`is_sample = ${where.sample ? "true" : "false"}`]),
+      ...(where?.eloBelow === undefined ? [] : [`elo < ${Number(where.eloBelow)}`]),
+    ];
+    const filter = conds.length ? ` where ${conds.join(" and ")}` : "";
     return Number(this.sql(`select count(*) from public.${ident(table)}${filter};`).trim());
+  }
+
+  async parWindow(topic: string, n: number) {
+    return this.query<{ elo_before: string }>(
+      `select elo_before from public.debates where topic_slug = ${json(topic)}::json #>> '{}' and kind = 'original' and not is_sample and elo_before is not null order by created_at desc limit ${Number(n)}`
+    ).map((r) => Number(r.elo_before));
   }
 
   async percentile(elo: number) {
@@ -161,7 +171,7 @@ export class LocalAdapter implements Adapter {
   async getAuthUser(id: string) {
     const [r] = this.query<{ id: string; email: string }>(`select id::text, email from auth.users where id::text = ${json(id)}::json #>> '{}'`);
     if (!r) return null;
-    const m = /^seed\+(.+)-\d+@sophecs\.test$/.exec(r.email ?? "");
+    const m = /^seed\+(.+)-\d+-[a-z0-9]{12}@sophecs\.test$/.exec(r.email ?? "");
     // A bare Postgres has no sign-in at all; nothing here can log in.
     return { id: r.id, email: r.email, runId: m ? m[1] : null, loginBlocked: true };
   }

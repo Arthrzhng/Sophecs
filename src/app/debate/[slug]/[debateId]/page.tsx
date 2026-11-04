@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { SamplePageMarker } from "@/components/sample/SamplePageMarker";
+import { sampleMetadata } from "@/lib/sample";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { Verdict, type VerdictData, type RevisionComparison } from "@/components/debate/Verdict";
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ debateId:
   const { debateId } = await params;
   if (!isAdminConfigured()) return { title: "Verdict · Sophecs" };
   const { data } = await createAdminClient().from("debates_public").select("is_sample").eq("id", debateId).maybeSingle();
-  return { title: data?.is_sample ? "Sample verdict · Sophecs" : "Verdict · Sophecs" };
+  return data?.is_sample ? sampleMetadata("Sample verdict · Sophecs") : { title: "Verdict · Sophecs" };
 }
 
 // Public — anyone with the link can view a verdict. Argument text is

@@ -27,6 +27,9 @@ describe("every row is marked and nothing is matched", () => {
   });
   it("uses addresses that can never receive mail", () => {
     for (const u of ds.authUsers) expect(u.row.email.endsWith("@sophecs.test")).toBe(true);
+    // Not derivable from the public run id: a seed-derived tag in every address.
+    for (const u of ds.authUsers) expect(u.row.email).toMatch(new RegExp(`^seed\\+${ds.runId}-\\d+-[a-z0-9]{12}@sophecs\\.test$`));
+    expect(new Set(ds.authUsers.map((u) => u.row.email.split("-").at(-1))).size).toBe(ds.authUsers.length);
   });
 });
 

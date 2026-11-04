@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { SamplePageMarker } from "@/components/sample/SamplePageMarker";
+import { sampleMetadata } from "@/lib/sample";
 import { Page } from "@/components/layout/Page";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { ChallengeInvite } from "@/components/share/ChallengeInvite";
@@ -12,7 +13,7 @@ import type { SchoolId } from "@/lib/types";
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const challenge = await getChallenge(id);
-  return { title: challenge?.isSample ? "A sample account's challenge · Sophecs" : "You've been challenged · Sophecs" };
+  return challenge?.isSample ? sampleMetadata("A sample account's challenge · Sophecs") : { title: "You've been challenged · Sophecs" };
 }
 
 async function getChallenge(id: string) {

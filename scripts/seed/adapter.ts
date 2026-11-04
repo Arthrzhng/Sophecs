@@ -105,7 +105,14 @@ export interface Adapter {
   checkSchema(): Promise<void>;
   /** Every row of a table, paginated by the adapter, optionally only genuine or only sample rows. */
   scan(table: ScanTable, columns: string[], where?: { sample?: boolean }): Promise<Record<string, unknown>[]>;
-  count(table: ScanTable, where?: { sample?: boolean }): Promise<number>;
+  /** `eloBelow` counts profiles whose rating is under it (profiles only). */
+  count(table: ScanTable, where?: { sample?: boolean; eloBelow?: number }): Promise<number>;
+  /**
+   * The ratings /api/judge averages into a topic's par: elo_before of the
+   * topic's genuine originals, newest first, at most `n`. Numbers only, so
+   * no reader's row leaves the database to check the par.
+   */
+  parWindow(topic: string, n: number): Promise<number[]>;
   /** public.elo_percentile(elo). */
   percentile(elo: number): Promise<number | null>;
 

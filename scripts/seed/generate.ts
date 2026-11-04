@@ -233,8 +233,13 @@ export function runIdFor(baseTo: string): string {
   return `sample-${stamp}`;
 }
 
-export function emailFor(runId: string, n: number): string {
-  return `seed+${runId}-${n}@sophecs.test`;
+/**
+ * `tag` comes from the seed, so an address cannot be worked out from the
+ * run id, which the public workflow log prints: nobody can sign up with a
+ * sample account's address first and block the run from creating it.
+ */
+export function emailFor(runId: string, n: number, tag: string): string {
+  return `seed+${runId}-${n}-${tag}@sophecs.test`;
 }
 
 // ---- internal working types ----
@@ -403,7 +408,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     logicalId: `user:${u.n}`,
     rowId: u.id,
     cohort: u.n,
-    row: { id: u.id, email: emailFor(runId, u.n) },
+    row: { id: u.id, email: emailFor(runId, u.n, root.fork(`email/${u.n}`).token("abcdefghijklmnopqrstuvwxyz0123456789", 12)) },
   }));
 
   // Cohort for rows that belong to no user: the number of users who had

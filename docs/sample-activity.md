@@ -64,11 +64,24 @@ challenges." `/method#samples` explains the rest.
   Today, both with the note; the site has no per-person rank.
 - **Analytics.** PostHog never receives anything from a page showing a
   sample's verdict, result or challenge: such a page renders
-  `SamplePageMarker`, and `track()` (`src/lib/analytics/client.ts`)
-  returns before loading PostHog whenever the marker is present, so
-  `page_viewed`, `verdict_viewed`, `card_viewed`, `challenge_viewed` and
-  every other event are not sent from it. The seed writes rows directly
-  and emits no event. Sample quiz results carry no referrer.
+  `SamplePageMarker`, and `src/lib/analytics/client.ts` checks for it
+  twice. `track()` returns before loading PostHog, so `page_viewed`,
+  `verdict_viewed`, `card_viewed`, `challenge_viewed` and the rest are not
+  sent; and PostHog's `before_send` drops whatever PostHog would send by
+  itself while the marker is on the page (autocapture, `$identify`, web
+  vitals), since PostHog stays loaded when a reader moves from a genuine
+  page to a sample one. The project has session replay, heatmaps and
+  dead-click capture on (read from PostHog on 2026-11-04), and those send
+  in batches, sometimes after the reader has left: `before_send` also
+  drops any event carrying a sample page's address and any replay chunk
+  recorded while one was open, and replay is paused for as long as a
+  sample page is open. A visit that starts on a sample page does not load
+  PostHog at all; the reader is identified on their first genuine page.
+  `tests/seed/analytics-sample.test.ts`. The seed writes
+  rows directly and emits no event. Sample quiz results carry no
+  referrer. One thing remains: a genuine page opened from a sample page
+  by a full page load reports that page's address as its `referrer`, as
+  it would for any page on the site; it is the reader's own view.
 - **Matching.** No sample argument has `seeking_counterpart_at` set, so
   `seekCounterpart` never offers one to a reader.
 - **Challenges.** A sample never answers. A reader who opens a sample
@@ -224,8 +237,10 @@ argument does not answer, and a revision adds that answer.
 
 `.github/workflows/sample-activity.yml` runs `npm run seed:ci` on main,
 every six hours at minute 41, and by hand from the Actions tab. It never
-runs on a push or a pull request, so no fork or branch can reach its
-secrets (`tests/seed/isolation.test.ts` checks the triggers).
+runs on a push or a pull request, and its secrets belong to the GitHub
+environment `sample-activity`, which only main may use, so no fork, branch
+or other workflow can reach them (`tests/seed/isolation.test.ts` checks the
+triggers and the environment).
 
 Every six hours rather than weekly: a sample row is never dated in the
 future, and the table shows only the current week, so a weekly run would
@@ -249,8 +264,14 @@ seed; the full report, genuine figures included, goes to
 
 ## Credentials
 
-The workflow writes `.env.seed.production` from two repository secrets,
-with owner-only permissions, and removes it whatever happens:
+The workflow writes `.env.seed.production` from two secrets of the
+environment `sample-activity`, with owner-only permissions, and removes it
+whatever happens. Environment secrets, not repository secrets: a
+repository secret can be read by a workflow on any branch pushed to the
+repository, and branches are pushed here routinely. Set up once, in
+GitHub, Settings, Environments, New environment `sample-activity`;
+Deployment branches and tags: Selected branches, add `main`; then add the
+two as environment secrets there (and none as a repository secret):
 
 - `SEED_SUPABASE_SERVICE_ROLE_KEY`: the project's service key (Supabase,
   Project Settings, API keys: the `service_role` key, or a secret key
@@ -284,7 +305,11 @@ already does.
 One run at a time: the workflow's concurrency group, and a lock in
 `seed_runs` that a run refreshes before every batch and about once a
 minute while it creates auth users. A lock untouched for 15 minutes
-belongs to a process that died and can be cleared.
+belongs to a process that died and can be cleared. In the workflow a run
+clears one itself (a job the runner killed, by the timeout, a cancel or a
+lost machine, leaves its lock behind), which is safe there because the
+concurrency group runs one job at a time; from a machine it takes
+`--break-stale-lock`.
 
 ## Teardown
 
@@ -313,7 +338,14 @@ path does not need one: every sample row is in the registry and removable
 by id, and the run never writes a genuine row (every row is read back and
 must be marked or owned by the run, and every update is scoped to the
 marker). Readers' data never leaves Supabase: there is no export, and the
-reports a command writes to disk leave out the baselines.
+checks read counts, the topics, and each topic's par window, which is the
+ratings alone, by the query `/api/judge` makes for the par; no reader's
+id or row reaches the runner for them. Teardown, run only on Arthur's
+instruction, is the exception: to find genuine rows that point at a
+sample row it reads the reference columns (ids) of the tables involved
+into the runner's memory, and keeps any it finds in
+`seed_runs.last_report`, not the log. The reports a command writes to
+disk leave out the baselines.
 
 Validation fails only on checks that hold whatever readers do: each
 topic's stored par must equal the par computed from genuine originals
@@ -333,7 +365,8 @@ Each step only after the one before has passed:
    new ERROR stops here.
 2. Merge the pull request; confirm the merge commit and that the
    production deploy is Ready.
-3. Arthur adds the two repository secrets.
+3. Arthur creates the environment `sample-activity`, limited to main, and
+   adds the two secrets to it (Credentials).
 4. Actions tab, "Sample activity", run with `canary`. Read the log and
    `seed_runs.last_report`; fetch a sample verdict, result and challenge
    page and their images.
@@ -344,7 +377,8 @@ Each step only after the one before has passed:
 
 Stop and report, without retrying past the engine's own retries, if:
 
-- any validation check fails;
+- any validation check fails, exact duplicate argument texts reaching 5%
+  among them;
 - the run refuses to adopt a row;
 - auth user creation is refused, or any created user comes back without
   its ban;
@@ -352,9 +386,13 @@ Stop and report, without retrying past the engine's own retries, if:
   or the plan is not the run's;
 - the canary's rate puts the full run beyond an hour.
 
-A failed scheduled run is retried by the next one, which resumes; a run
-that keeps failing shows as failed runs in the Actions tab, and GitHub
-emails the account that set the schedule.
+A failed validation halts the run: `seed_runs.status` becomes `failed`
+with `last_error` starting "halted: validation failed", and from then on
+each scheduled run writes nothing and fails, until a `full` stage run by
+hand passes validation again. Any other failure (a lost runner, the
+timeout, a database error) is retried by the next scheduled run, which
+resumes. A run that keeps failing shows as failed runs in the Actions
+tab, and GitHub emails the account that set the schedule.
 
 ## Limits
 
@@ -364,8 +402,18 @@ emails the account that set the schedule.
   with no commit; a commit, or re-enabling it in the Actions tab, turns
   it back on.
 - Streaks use UTC days, as the app does.
-- Exact duplicates rise once a composition list runs out, after many
-  months at the current rate; the plan reports the figure every run.
+- Exact duplicates rise once a composition list runs out. Measured in
+  review on 2026-11-04 at production volumes: 0.02% at the start, 0.28%
+  after 90 days, 3.29% after a year and 9.85% after two, so the 5% check
+  halts the run after about 16 months unless the passages grow. Making
+  the plan takes 14 s at the start and about 3 minutes after a year.
+- The motions and the passages are fixed for the life of a run. Each
+  motion's text is part of the run's base hash, so rewording, adding or
+  retiring a motion makes every later run refuse at the dry run, writing
+  nothing; and an edit to the passages changes the texts planned for rows
+  already written, which the spot checks then fail on, halting the run.
+  Either way the way on is teardown and a new run, which ends every
+  existing sample link. Say before changing either while a run is live.
 
 ## Decisions taken
 

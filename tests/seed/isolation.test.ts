@@ -61,6 +61,9 @@ describe("the seed never runs by itself", () => {
     // or into an echo, and the file is removed whatever happened.
     expect(wf).not.toMatch(/echo[^\n]*secrets\./);
     expect(wf.match(/\$\{\{ secrets\./g)).toHaveLength(2);
+    // The secrets live in an environment limited to main, not in the
+    // repository, where any branch's workflow could read them.
+    expect(wf).toMatch(/^ {4}environment: sample-activity$/m);
     expect(wf).toMatch(/if: always\(\)\n\s*run: rm -f \.env\.seed\.production/);
     expect(wf).toMatch(/persist-credentials: false/);
   });

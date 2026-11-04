@@ -4,7 +4,7 @@
 // write; and a log with nothing in it that is secret or a reader's.
 import { describe, expect, it } from "vitest";
 import { MemoryAdapter } from "../../scripts/seed/adapter-memory";
-import { runCi, CANARY_ACCOUNTS, type Mode } from "../../scripts/seed/ci";
+import { runCi, CANARY_ACCOUNTS, HALTED, type Mode } from "../../scripts/seed/ci";
 import { teardown } from "../../scripts/seed/teardown";
 import { contentTopics } from "../../scripts/seed/topics";
 
@@ -65,6 +65,59 @@ describe("the scheduled workflow's path", () => {
     expect((await step(db, "extend", 24 * 9)).out.outcome).toBe("idle");
   });
 
+  it("clears a lock a killed job left, so the next scheduled run resumes", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    // The runner was stopped mid-write three hours ago: its lock is still there.
+    await db.updateRun(run.id, { lock_token: "dead-job", locked_at: new Date(Date.now() - 3 * 3_600_000).toISOString() });
+    const ext = await step(db, "extend", 6);
+    expect(ext.out).toMatchObject({ ok: true, outcome: "written" });
+    expect(ext.lines.join("\n")).toContain("cleared a stale lock");
+    expect((await db.getRun(run.id))!.lock_token).toBeNull();
+  });
+
+  it("does not clear a lock a live job may still hold", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    await db.updateRun(run.id, { lock_token: "live-job", locked_at: new Date(Date.now() - 60_000).toISOString() });
+    await expect(step(db, "extend", 6)).rejects.toThrow(/less than 15 minutes old/);
+  });
+
+  it("halts the schedule after a failed validation, until a full stage passes", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    // Stored texts no longer match the plan (as after an edit to the passages).
+    const debates = db.table("debates");
+    const kept = new Map<string, unknown>();
+    for (const [id, r] of debates) {
+      if (!r.is_sample) continue;
+      kept.set(id, r.argument);
+      debates.set(id, { ...r, argument: "edited" });
+    }
+    const bad = await step(db, "extend", 24);
+    expect(bad.out).toMatchObject({ ok: false, outcome: "written" });
+    expect(bad.lines.join("\n")).toMatch(/^FAIL {2}spot check: debates$/m);
+    expect((await db.getRun(run.id))!).toMatchObject({ status: "failed" });
+    expect((await db.getRun(run.id))!.last_error).toMatch(new RegExp(`^${HALTED}`));
+
+    const before = samples(db, "debates");
+    const held = await step(db, "extend", 30);
+    expect(held.out).toMatchObject({ ok: false, outcome: "halted" });
+    expect(samples(db, "debates")).toBe(before);
+
+    // Put right, a full stage run by hand clears the halt, and the schedule resumes.
+    for (const [id, a] of kept) debates.set(id, { ...debates.get(id)!, argument: a });
+    expect((await step(db, "full", 31)).out).toMatchObject({ ok: true });
+    expect((await db.getRun(run.id))!.last_error).toBeNull();
+    expect((await step(db, "extend", 36)).out).toMatchObject({ ok: true, outcome: "written" });
+  });
+
   it("refuses another seed before writing anything", async () => {
     const db = freshDb();
     await step(db, "canary", 0);
@@ -91,6 +144,7 @@ describe("the scheduled workflow's path", () => {
     expect(lines).not.toMatch(/genuine rows: |genuine profiles: |elo_percentile\(1200\) = |profiles \d+ -> \d+/);
     // The checks are named, without their figures.
     expect(lines).toMatch(/^ok {2}\s*elo_percentile\(1200\) counts genuine profiles only$/m);
+    expect(lines).toMatch(/^ok {4}exact duplicate argument texts under 5%$/m);
   });
 
   it("tears down only with the run's id typed in, and logs counts only", async () => {

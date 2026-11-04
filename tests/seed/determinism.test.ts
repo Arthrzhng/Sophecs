@@ -25,6 +25,6 @@ describe("determinism", () => {
     // From the base window's end alone: no seed in a public id.
     expect(ds.runId).toBe("sample-202611041200");
     expect(ds.runId).toMatch(/^[a-z0-9-]{6,64}$/);
-    for (const u of ds.authUsers) expect(u.row.email).toMatch(/^seed\+sample-202611041200-\d+@sophecs\.test$/);
+    for (const u of ds.authUsers) expect(u.row.email).toMatch(/^seed\+sample-202611041200-\d+-[a-z0-9]{12}@sophecs\.test$/);
   });
 });

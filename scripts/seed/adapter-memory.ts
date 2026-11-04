@@ -74,8 +74,17 @@ export class MemoryAdapter implements Adapter {
       .map((r) => (columns[0] === "*" ? { ...r } : Object.fromEntries(columns.map((c) => [c, r[c] ?? null]))));
   }
 
-  async count(table: ScanTable, where?: { sample?: boolean }) {
-    return (await this.scan(table, ["id"], where)).length;
+  async count(table: ScanTable, where?: { sample?: boolean; eloBelow?: number }) {
+    const rows = await this.scan(table, ["id", "elo"], where);
+    return where?.eloBelow === undefined ? rows.length : rows.filter((r) => Number(r.elo) < where.eloBelow!).length;
+  }
+
+  async parWindow(topic: string, n: number) {
+    return [...this.table("debates").values()]
+      .filter((d) => d.topic_slug === topic && d.kind === "original" && !d.is_sample && d.elo_before !== null && d.elo_before !== undefined)
+      .sort((a, b) => Date.parse(String(b.created_at)) - Date.parse(String(a.created_at)))
+      .slice(0, n)
+      .map((d) => Number(d.elo_before));
   }
 
   async percentile(elo: number) {

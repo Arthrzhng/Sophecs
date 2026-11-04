@@ -10,10 +10,15 @@
 //   no genuine originals must keep the par it had before the run;
 // - elo_percentile(1200) must equal the share computed from genuine
 //   profiles alone.
-// Row counts and changed genuine profiles are information. That the run
-// writes no genuine row is proven where it writes: every row is read back
-// and must be marked or owned by the run (engine.ts), and every update is
-// scoped to the marker (the adapters).
+// Row counts are information. That the run writes no genuine row is proven
+// where it writes: every row is read back and must be marked or owned by
+// the run (engine.ts), and every update is scoped to the marker (the
+// adapters).
+//
+// No reader's row leaves the database for any of this: the snapshot reads
+// counts, the topics, and each topic's par window, the ratings alone that
+// /api/judge reads for it (Arthur, 2026-11-04: genuine rows do not go to a
+// runner or a laptop).
 
 import type { Adapter } from "./adapter";
 
@@ -23,15 +28,11 @@ export interface Baseline {
   at: string;
   genuine: Record<string, number>;
   totals: Record<string, number>;
-  /** id -> "elo|streak|school" for every genuine profile. */
-  genuineProfiles: Record<string, string>;
   topics: { slug: string; motion: string; active: boolean; par_elo: number; par_n: number }[];
   /** The par /api/judge would store, from genuine originals; null with none. */
   expectedPar: Record<string, { par: number; n: number } | null>;
   percentile1200: number | null;
   expectedPercentile1200: number;
-  /** Genuine readers' arguments and quiz results: who, and when. */
-  activity: { userId: string; at: string }[];
 }
 
 const MARKED_TABLES = ["profiles", "quiz_results", "challenges", "debates", "exchanges"] as const;
@@ -44,17 +45,16 @@ export async function snapshot(adapter: Adapter): Promise<Baseline> {
   for (const t of MARKED_TABLES) genuine[t] = await adapter.count(t, { sample: false });
   const totals: Record<string, number> = {};
   for (const t of OTHER_TABLES) totals[t] = await adapter.count(t);
-  // The percentile straight after the profiles it is compared with, and
-  // the topics before the debates: /api/judge writes a debate's rating
+  // The percentile straight after the counts it is compared with, and the
+  // topics before their par windows: /api/judge writes a debate's rating
   // before it moves the topic's par, so a par read first always has its
-  // rating in the debates read after. A judging that lands between the two
+  // rating in the window read after. A judging that lands between the two
   // reads still differs for a moment, which is what settledChecks reads
   // again for.
-  const profiles = await adapter.scan("profiles", ["id", "elo", "streak", "school"], { sample: false });
+  const genuineProfiles = await adapter.count("profiles", { sample: false });
+  const genuineBelow1200 = await adapter.count("profiles", { sample: false, eloBelow: 1200 });
   const percentile1200 = await adapter.percentile(1200);
   const topicRows = await adapter.scan("debate_topics", ["slug", "motion", "active", "par_elo", "par_n"]);
-  const debates = await adapter.scan("debates", ["user_id", "topic_slug", "kind", "elo_before", "created_at"], { sample: false });
-  const genuineProfiles = Object.fromEntries(profiles.map((p) => [String(p.id), `${Number(p.elo)}|${p.streak}|${p.school}`]));
   const topics = topicRows.map((t) => ({
     slug: String(t.slug),
     motion: String(t.motion),
@@ -65,28 +65,17 @@ export async function snapshot(adapter: Adapter): Promise<Baseline> {
   topics.sort((a, b) => a.slug.localeCompare(b.slug));
   const expectedPar: Baseline["expectedPar"] = {};
   for (const t of topics) {
-    const window = debates
-      .filter((d) => d.topic_slug === t.slug && d.kind === "original" && d.elo_before !== null)
-      .sort((a, b) => Date.parse(String(b.created_at)) - Date.parse(String(a.created_at)))
-      .slice(0, PAR_ELO_WINDOW)
-      .map((d) => Number(d.elo_before));
+    const window = await adapter.parWindow(t.slug, PAR_ELO_WINDOW);
     expectedPar[t.slug] = window.length ? { par: window.reduce((s, v) => s + v, 0) / window.length, n: window.length } : null;
   }
-  const results = await adapter.scan("quiz_results", ["user_id", "created_at"], { sample: false });
-  const activity = [...debates, ...results]
-    .filter((r) => r.user_id)
-    .map((r) => ({ userId: String(r.user_id), at: String(r.created_at) }));
-  const elos = profiles.map((p) => Number(p.elo));
   return {
     at,
     genuine,
     totals,
-    genuineProfiles,
     topics,
     expectedPar,
     percentile1200,
-    expectedPercentile1200: elos.length ? elos.filter((e) => e < 1200).length / elos.length : 0,
-    activity,
+    expectedPercentile1200: genuineProfiles ? genuineBelow1200 / genuineProfiles : 0,
   };
 }
 
@@ -160,18 +149,6 @@ export function compareBaselines(before: Baseline, after: Baseline): BaselineChe
   const checks: BaselineCheck[] = [];
   const counts = Object.keys(before.genuine).map((t) => `${t} ${before.genuine[t]} -> ${after.genuine[t]}`);
   checks.push({ name: "genuine rows", ok: true, detail: `${counts.join(", ")} (information: readers may add or delete)` });
-  const since = Date.parse(before.at);
-  const activeSince = new Set(after.activity.filter((a) => Date.parse(a.at) >= since).map((a) => a.userId));
-  const existing = Object.keys(before.genuineProfiles);
-  const changed = existing.filter((id) => id in after.genuineProfiles && before.genuineProfiles[id] !== after.genuineProfiles[id]);
-  const added = Object.keys(after.genuineProfiles).filter((id) => !(id in before.genuineProfiles)).length;
-  const removed = existing.filter((id) => !(id in after.genuineProfiles)).length;
-  const quiet = changed.filter((id) => !activeSince.has(id)).length;
-  checks.push({
-    name: "genuine profiles",
-    ok: true,
-    detail: `${changed.length} changed (${quiet} with no new argument or result of their own, e.g. a challenge's other side or a late verdict), ${added} new, ${removed} removed (information)`,
-  });
   checks.push(...isolationChecks(after, before));
   return checks;
 }

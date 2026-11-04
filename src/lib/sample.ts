@@ -22,3 +22,17 @@ export const TABLE_SAMPLE_NOTE = "This week's table includes sample accounts.";
 
 // Under Today's school rank, in a week whose ranked arguments include one.
 export const RANK_SAMPLE_NOTE = "This week's ranks include sample accounts.";
+
+/**
+ * Metadata for a page that shows a sample, so the link preview says so
+ * too: a page that sets only `title` inherits the root layout's Open Graph
+ * and Twitter titles ("Sophecs"), which is what most previews show. The
+ * page's own opengraph-image, where it has one, still supplies the image.
+ */
+export function sampleMetadata(title: string) {
+  return {
+    title,
+    openGraph: { title, siteName: "Sophecs", type: "website" as const },
+    twitter: { card: "summary_large_image" as const, title },
+  };
+}

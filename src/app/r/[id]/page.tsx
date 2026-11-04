@@ -77,7 +77,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       description: school.one_line,
       images: [`/r/${id}/opengraph-image`],
     },
-    twitter: { card: "summary_large_image" },
+    twitter: { card: "summary_large_image", title },
   };
 }
 

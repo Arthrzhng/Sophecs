@@ -107,12 +107,28 @@ export class SupabaseAdapter implements Adapter {
     return res.rows;
   }
 
-  async count(table: ScanTable, where?: { sample?: boolean }) {
+  async count(table: ScanTable, where?: { sample?: boolean; eloBelow?: number }) {
     let q = this.db.from(table).select("*", { count: "exact", head: true });
     if (where?.sample !== undefined) q = q.eq("is_sample", where.sample);
+    if (where?.eloBelow !== undefined) q = q.lt("elo", where.eloBelow);
     const { count, error } = await q;
     fail(`count ${table}`, error);
     return count ?? 0;
+  }
+
+  // The query /api/judge makes for a topic's par.
+  async parWindow(topic: string, n: number) {
+    const { data, error } = await this.db
+      .from("debates")
+      .select("elo_before")
+      .eq("topic_slug", topic)
+      .eq("kind", "original")
+      .eq("is_sample", false)
+      .not("elo_before", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(n);
+    fail(`par window ${topic}`, error);
+    return ((data ?? []) as { elo_before: number | string }[]).map((r) => Number(r.elo_before));
   }
 
   async percentile(elo: number) {

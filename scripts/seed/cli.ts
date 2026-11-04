@@ -66,10 +66,10 @@ export function refuseUnsupported(f: Flags) {
     );
 }
 
-// Readers' data stays in Supabase (Arthur, 2026-11-04): a report on disk
-// keeps counts and check results, and leaves out the baselines, which hold
-// genuine profiles' ids, ratings and activity times.
-const GENUINE_KEYS = new Set(["baseline", "before", "after", "genuineProfiles", "activity"]);
+// Readers' data stays in Supabase (Arthur, 2026-11-04). A baseline holds
+// counts and each topic's par window (ratings, no ids) and nothing per
+// reader, and a report on disk still leaves the baselines out.
+const GENUINE_KEYS = new Set(["baseline", "before", "after"]);
 
 export function writeReport(name: string, body: unknown): string {
   mkdirSync(REPORT_DIR, { recursive: true });
