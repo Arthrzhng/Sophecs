@@ -19,7 +19,7 @@ import { DEFAULTS } from "./seed/generate";
 import { contentTopics } from "./seed/topics";
 import { execute } from "./seed/engine";
 import { validate } from "./seed/validate";
-import { dryRun } from "./seed/dryrun";
+import { dryRun, exportGenuine } from "./seed/dryrun";
 import { getAllTopicFiles } from "../src/lib/topics";
 import { REPORT_DIR, cancelSignal, int, isoFlag, log, main, nowFloored, parseFlags, refuseUnsupported, str, writeReport } from "./seed/cli";
 
@@ -108,6 +108,7 @@ main(async () => {
   if (!f.execute) {
     const report = await dryRun(db, plan);
     for (const line of report.lines) log(line);
+    log(`genuine rows exported to ${writeReport(`genuine-export-${plan.runId}`, await exportGenuine(db))}`);
     if (!report.ok) process.exitCode = 1;
     return;
   }

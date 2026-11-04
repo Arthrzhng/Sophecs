@@ -97,6 +97,8 @@ export class SupabaseAdapter implements Adapter {
       for (const o of order) q = q.order(o);
       return q.range(from, to) as unknown as PromiseLike<{ data: Record<string, unknown>[] | null; error: { message: string } | null; count: number | null }>;
     });
+    // readAll fails on any short page, so a scan is never silently partial:
+    // teardown's search for genuine rows that point at sample rows relies on it.
     if (res.error !== null) throw new Error(`scan ${table}: ${res.error}`);
     return res.rows;
   }
@@ -147,6 +149,16 @@ export class SupabaseAdapter implements Adapter {
     const { error } = await this.db.from("seed_runs").update({ lock_token: null, locked_at: null }).eq("id", id).eq("lock_token", token);
     fail("unlock", error);
   }
+  async refreshLock(id: string, token: string) {
+    const { data, error } = await this.db
+      .from("seed_runs")
+      .update({ locked_at: new Date().toISOString() })
+      .eq("id", id)
+      .eq("lock_token", token)
+      .select("id");
+    fail("refresh lock", error);
+    return (data ?? []).length === 1;
+  }
   async breakStaleLock(id: string, minutes: number) {
     const { data, error } = await this.db
       .from("seed_runs")
@@ -193,6 +205,11 @@ export class SupabaseAdapter implements Adapter {
     const { data, error } = await this.db.auth.admin.createUser(sampleUserAttributes(u));
     fail("auth createUser", error);
     if (data.user?.id !== u.id || data.user?.email !== u.email) throw new Error("auth createUser returned a different user");
+    // Every user is checked for its ban as it is made. A response without
+    // one throws, and the engine then reads the user back and stops if it
+    // is not banned: fail closed, whatever the response shape.
+    const banned = (data.user as { banned_until?: string | null }).banned_until;
+    if (!banned || Date.parse(banned) <= Date.now()) throw new Error("auth createUser returned a user without a ban");
   }
   async getAuthUser(id: string) {
     const { data, error } = await this.db.auth.admin.getUserById(id);

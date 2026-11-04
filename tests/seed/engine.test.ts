@@ -213,3 +213,66 @@ describe("teardown", () => {
     expect((await db.getRun(plan.runId))!.counts).toMatchObject({ deleted: { auth_user: dataset.authUsers.length } });
   });
 });
+
+describe("the lock while a run is alive", () => {
+  it("stops writing the moment another process takes the lock", async () => {
+    const db = freshDb();
+    let batches = 0;
+    const realRefresh = db.refreshLock.bind(db);
+    db.refreshLock = async (id: string, token: string) => {
+      batches++;
+      // After a few batches, someone breaks the lock and takes it.
+      if (batches === 4) {
+        db.runs.get(id)!.lock_token = "someone-else";
+        return false;
+      }
+      return realRefresh(id, token);
+    };
+    await expect(execute({ dataset, plan, adapter: db, ...quiet })).rejects.toThrow(/taken by another process/);
+    const written = sampleRows(db);
+    expect(written).toBeLessThan(total(dataset));
+    // And it did not release the other process's lock, or mark its run
+    // failed, on the way out.
+    expect(db.runs.get(plan.runId)!.lock_token).toBe("someone-else");
+    expect(db.runs.get(plan.runId)!.status).toBe("running");
+  });
+
+  it("refreshes the lock on every batch, so a live run never looks stale", async () => {
+    const db = freshDb();
+    const stamps: string[] = [];
+    const realRefresh = db.refreshLock.bind(db);
+    db.refreshLock = async (id: string, token: string) => {
+      const ok = await realRefresh(id, token);
+      stamps.push(db.runs.get(id)!.locked_at!);
+      return ok;
+    };
+    await execute({ dataset, plan, adapter: db, ...quiet });
+    expect(stamps.length).toBeGreaterThan(10);
+  });
+});
+
+describe("genuine-state checks on a live site", () => {
+  it("pass when a reader's own new argument changed their profile, and fail when nothing explains a change", async () => {
+    const { snapshot, compareBaselines } = await import("../../scripts/seed/baseline");
+    const db = freshDb();
+    const before = await snapshot(db);
+    // A reader argues during the run: their rating changes, and so does
+    // the genuine par for the topic, through /api/judge as normal.
+    await new Promise((r) => setTimeout(r, 5));
+    db.table("debates").set("GEN000DEB9", { id: "GEN000DEB9", user_id: "g1", topic_slug: "no-decision", kind: "original", elo_before: 1216, created_at: new Date().toISOString(), is_sample: false });
+    db.table("profiles").get("g1")!.elo = 1230;
+    db.table("debate_topics").get("no-decision")!.par_elo = 1216;
+    db.table("debate_topics").get("no-decision")!.par_n = 1;
+    const after = await snapshot(db);
+    expect(compareBaselines(before, after).filter((c) => !c.ok)).toEqual([]);
+    // Now a change nobody's activity explains.
+    db.table("profiles").set("g2", { id: "g2", elo: 1100, streak: 0, school: "stoicism", is_sample: false });
+    db.table("profiles").get("g2")!.elo = 1100;
+    const before2 = await snapshot(db);
+    db.table("profiles").get("g2")!.elo = 1500;
+    db.table("debate_topics").get("crash-arithmetic")!.par_elo = 1300;
+    const failed = compareBaselines(before2, await snapshot(db)).filter((c) => !c.ok).map((c) => c.name);
+    expect(failed).toContain("every changed genuine profile is explained by that reader's own activity");
+    expect(failed).toContain("debate_topics crash-arithmetic par is the genuine par");
+  });
+});

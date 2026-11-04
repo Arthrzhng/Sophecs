@@ -63,12 +63,15 @@ describe("production target", () => {
 
   it("never puts the key in an error", () => {
     const secret = jwt({ role: "service_role", ref: "aaaaaaaaaaaaaaaaaaaa", marker: "do-not-print" });
+    let message = "";
     try {
       checkProduction(`https://${REF}.supabase.co`, secret, REF, REF);
     } catch (e) {
-      expect(String((e as Error).message)).not.toContain(secret);
-      expect(String((e as Error).message)).not.toContain("do-not-print");
+      message = String((e as Error).message);
     }
+    expect(message).toMatch(/different project/);
+    expect(message).not.toContain(secret);
+    expect(message).not.toContain("do-not-print");
   });
 
   it("reads only .env.seed.production, never the environment or .env.local", () => {

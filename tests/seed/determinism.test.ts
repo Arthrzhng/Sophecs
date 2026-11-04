@@ -10,10 +10,14 @@ describe("determinism", () => {
     expect(a.debates.map((d) => d.rowId)).toEqual(b.debates.map((d) => d.rowId));
   });
 
-  it("a different seed or window gives a different dataset and run", () => {
+  it("a different seed or window gives a different dataset, run and ids", () => {
     expect(manifestHash(small({ seed: 43 }))).not.toBe(manifestHash(small()));
     const later = small({ to: "2026-11-04T13:00:00.000Z" });
     expect(later.runId).not.toBe(small().runId);
+    // No row id is reused, so a rebuilt plan never collides with the
+    // registry rows a torn-down run keeps.
+    const before = new Set(small().authUsers.map((u) => u.rowId).concat(small().debates.map((d) => d.rowId)));
+    expect(later.authUsers.concat(later.debates as never[]).filter((i: { rowId: string }) => before.has(i.rowId))).toEqual([]);
   });
 
   it("names runs and addresses as documented", () => {

@@ -173,6 +173,21 @@ expect "two low sample ratings do not move a genuine percentile" "$PCT_BEFORE" "
 expect "debates_public carries the marker" "t t" "$(q "select is_sample || ' ' || verdict_is_template from debates_public where id = 'sdeb'" | sed 's/true/t/g')"
 expect "genuine rows read false" "f f" "$(q "select is_sample || ' ' || verdict_is_template from debates_public where id = 'gpub'" | sed 's/false/f/g')"
 
+say "rollback refuses while a run is not torn down"
+q "insert into seed_runs (id, status, plan_hash, generator_version, seed, window_from, window_to) values ('run-cccccc','complete','h','g',1,now(),now())" >/dev/null
+q "insert into seed_run_items (run_id, kind, logical_id, row_id, state) values ('run-cccccc','turn','t1','turn1','created')" >/dev/null
+q "delete from debates where is_sample; delete from profiles where is_sample" >/dev/null
+held=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/rollback/0021_sample_activity.down.sql" 2>&1 || true)
+expect "refused for an open run" refused "$(printf '%s' "$held" | grep -q 'not torn down' && echo refused || echo "$held")"
+q "update seed_runs set status = 'torn_down'" >/dev/null
+held=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/rollback/0021_sample_activity.down.sql" 2>&1 || true)
+expect "refused for an item not deleted" refused "$(printf '%s' "$held" | grep -q 'not torn down' && echo refused || echo "$held")"
+q "update seed_run_items set state = 'deleted'" >/dev/null
+psql -X -q -v ON_ERROR_STOP=1 -d "$DB" >/dev/null <<SAMPLES2
+insert into profiles (id, handle, display_name, school, elo, streak, is_sample) values
+  ('66666666-6666-6666-6666-666666666666', 'sample-a', 'Sample A', 'stoicism', 900, 0, true);
+SAMPLES2
+
 say "rollback refuses while sample rows remain"
 held=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/rollback/0021_sample_activity.down.sql" 2>&1 || true)
 expect "refused" refused "$(printf '%s' "$held" | grep -q 'sample rows remain' && echo refused || echo "$held")"

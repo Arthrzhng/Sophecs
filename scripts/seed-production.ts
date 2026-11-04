@@ -22,7 +22,7 @@ import { DEFAULTS } from "./seed/generate";
 import { contentTopics } from "./seed/topics";
 import { execute } from "./seed/engine";
 import { validate } from "./seed/validate";
-import { dryRun } from "./seed/dryrun";
+import { dryRun, exportGenuine } from "./seed/dryrun";
 import { cancelSignal, int, isoFlag, log, main, nowFloored, parseFlags, refuseUnsupported, str, writeReport } from "./seed/cli";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -94,6 +94,8 @@ main(async () => {
     const report = await dryRun(adapter, plan);
     for (const line of report.lines) log(line);
     log(`baseline: ${writeReport(`dryrun-${plan.runId}`, report)}`);
+    // Kept on this machine only (scripts/seed/reports/ is git-ignored).
+    log(`genuine rows exported to ${writeReport(`genuine-export-${plan.runId}`, await exportGenuine(adapter))}`);
     if (!report.ok) process.exitCode = 1;
     else log("Add --execute to run it.");
     return;

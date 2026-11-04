@@ -91,10 +91,10 @@ export default async function SchoolTablePage() {
             .range(from, to)
       ),
       // Only profiles that have changed school have anything to count.
-      readAll<{ school_history: unknown }>((from, to) =>
+      readAll<{ school_history: unknown; is_sample: boolean }>((from, to) =>
         admin
           .from("profiles")
-          .select("school_history", { count: "exact" })
+          .select("school_history, is_sample", { count: "exact" })
           .neq("school_history", "[]")
           .order("id")
           .range(from, to)
@@ -111,13 +111,18 @@ export default async function SchoolTablePage() {
       fidelity: typeof row.fidelity === "number" ? row.fidelity : null,
     }));
     yoursThisWeek = userId ? rows.filter((row) => row.user_id === userId).length : 0;
-    // Sample accounts (migration 0021) are counted like anyone else, and
-    // the table says so in any week they are part of it.
-    includesSamples = rows.some((row) => row.is_sample);
-
     const entries = (histories.rows ?? []).flatMap((p) =>
       Array.isArray(p.school_history) ? (p.school_history as SchoolChange[]) : []
     );
+    // Sample accounts (migration 0021) are counted like anyone else, in
+    // both the arguments and the joined and left columns, and the table
+    // says so in any week either includes one.
+    const inWeek = (at: string) => Date.parse(at) >= start.getTime() && Date.parse(at) < end.getTime();
+    includesSamples =
+      rows.some((row) => row.is_sample) ||
+      (histories.rows ?? []).some(
+        (p) => p.is_sample && Array.isArray(p.school_history) && (p.school_history as SchoolChange[]).some((e) => inWeek(e.at))
+      );
     changes = schoolChanges(entries, start, end);
     yourSchool = ((profile.data as { school?: SchoolId } | null)?.school ?? null) as SchoolId | null;
   }

@@ -15,6 +15,11 @@
 -- gain columns at the end, which create or replace allows, and keep their
 -- owner and grants. elo_percentile keeps its signature.
 --
+-- What becomes readable: debates_public.is_sample and verdict_is_template,
+-- and public_results.is_sample, are readable with the anon key like every
+-- other column of those views. That is the point: a page reading a row
+-- can label it. They say whether a row is a sample, and nothing else.
+--
 -- Locks, until commit: ACCESS EXCLUSIVE, briefly, on profiles,
 -- quiz_results, debates, challenges and exchanges for the column adds and
 -- the triggers, and on the two views. No row is rewritten. No transaction
@@ -31,8 +36,9 @@ alter table public.challenges add column is_sample boolean not null default fals
 alter table public.exchanges add column is_sample boolean not null default false;
 
 -- A verdict written from a template rather than by the judge. The verdict
--- page shows "Sample assessment" for these. A sample debate judged by the
--- real judge (scripts/seed-production.ts --real-judge) keeps false.
+-- page shows "Sample assessment" for these. A sample debate the real judge
+-- had judged would keep false; the seed tooling has no such path today
+-- (--real-judge is refused, docs/sample-activity.md).
 alter table public.debates add column verdict_is_template boolean not null default false;
 
 -- 2. The registry. One row per seed run, and one per row a run intends to

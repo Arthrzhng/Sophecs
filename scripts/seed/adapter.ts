@@ -109,6 +109,8 @@ export interface Adapter {
   /** Takes the run's lock if nobody holds it. True when taken. */
   acquireLock(id: string, token: string): Promise<boolean>;
   releaseLock(id: string, token: string): Promise<void>;
+  /** Moves locked_at to now while `token` still holds the lock. False when it does not. */
+  refreshLock(id: string, token: string): Promise<boolean>;
   /**
    * Clears a lock left by a process that died, only if it was taken more
    * than `minutes` ago. True when a lock was cleared.

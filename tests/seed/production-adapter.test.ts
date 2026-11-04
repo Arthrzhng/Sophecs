@@ -16,7 +16,7 @@ describe("sample users cannot sign in", () => {
         admin: {
           createUser: async (attrs: Record<string, unknown>) => {
             calls.push(attrs);
-            return { data: { user: { id: attrs.id, email: attrs.email } }, error: null };
+            return { data: { user: { id: attrs.id, email: attrs.email, banned_until: "2126-01-01T00:00:00Z" } }, error: null };
           },
         },
       },
@@ -32,6 +32,15 @@ describe("sample users cannot sign in", () => {
     expect(attrs).not.toHaveProperty("password_hash");
     expect(String(attrs.email)).toMatch(/@sophecs\.test$/);
     expect(attrs.app_metadata).toMatchObject({ sophecs_sample: true, seed_run: "sample-1-202611041200" });
+  });
+
+  it("refuses a created user that comes back without a ban", async () => {
+    const fake = {
+      auth: { admin: { createUser: async (a: Record<string, unknown>) => ({ data: { user: { id: a.id, email: a.email } }, error: null }) } },
+    } as unknown as SupabaseClient;
+    await expect(
+      new SupabaseAdapter(target, fake).createAuthUser({ id: "00000000-0000-4000-8000-000000000002", email: "seed+x-1@sophecs.test", runId: "x", n: 1 })
+    ).rejects.toThrow(/without a ban/);
   });
 
   it("never invites, links, signs in, resets or backdates", () => {

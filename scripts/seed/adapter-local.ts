@@ -76,7 +76,7 @@ export class LocalAdapter implements Adapter {
   }
 
   async scan(table: ScanTable, columns: string[], where?: { sample?: boolean }) {
-    const cols = columns.map(ident).join(", ");
+    const cols = columns.length === 1 && columns[0] === "*" ? "*" : columns.map(ident).join(", ");
     const filter = where?.sample === undefined ? "" : ` where is_sample = ${where.sample ? "true" : "false"}`;
     return this.query(`select ${cols} from public.${ident(table)}${filter}`);
   }
@@ -112,6 +112,12 @@ export class LocalAdapter implements Adapter {
   }
   async releaseLock(id: string, token: string) {
     this.sql(`update public.seed_runs set lock_token = null, locked_at = null where id = ${json(id)}::json #>> '{}' and lock_token = ${json(token)}::json #>> '{}';`);
+  }
+  async refreshLock(id: string, token: string) {
+    const out = this.sql(
+      `update public.seed_runs set locked_at = now() where id = ${json(id)}::json #>> '{}' and lock_token = ${json(token)}::json #>> '{}' returning id;`
+    ).trim();
+    return out.length > 0;
   }
   async breakStaleLock(id: string, minutes: number) {
     const out = this.sql(

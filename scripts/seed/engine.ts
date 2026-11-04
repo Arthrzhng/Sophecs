@@ -21,6 +21,8 @@ import type { Plan } from "./plan";
 import { snapshot, compareBaselines, type Baseline } from "./baseline";
 
 export class StopError extends Error {}
+/** This process no longer holds the run's lock: it must not touch the run row again. */
+export class LockLostError extends StopError {}
 
 export interface Phase {
   kind: Kind;
@@ -66,7 +68,15 @@ export interface ExecuteOptions {
   breakStaleLock?: boolean;
 }
 
+// A live run refreshes its lock before every batch, and a batch takes
+// seconds, so a lock untouched for this long belongs to a process that died.
 export const STALE_LOCK_MINUTES = 15;
+
+/** Before every batch: still ours, and fresh. Stops the run if another process took it. */
+export async function heartbeat(adapter: Adapter, runId: string, token: string) {
+  if (!(await adapter.refreshLock(runId, token)))
+    throw new LockLostError(`run ${runId}'s lock was taken by another process; stopping without writing more`);
+}
 
 export interface ExecuteReport {
   runId: string;
@@ -198,6 +208,7 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
           break;
         }
         const batch = pending.slice(i, i + batchSize);
+        await heartbeat(adapter, run.id, token);
         await retry(
           () => adapter.recordIntents(batch.map((b) => ({ run_id: run!.id, kind: phase.kind, logical_id: b.logicalId, row_id: b.rowId }))),
           attempts, baseMs, log, `${phase.kind} intents`
@@ -228,6 +239,7 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
       // own debate ids go on once the debates exist.
       if (phase.kind === "debate") {
         const links = ds.challengeLinks.filter((l) => l.cohort < limit);
+        await heartbeat(adapter, run.id, token);
         for (const l of links)
           await retry(() => adapter.linkChallenge(l.rowId, l.row.challenger_debate_id, l.row.challengee_debate_id), attempts, baseMs, log, "challenge link");
         log(`challenge links: ${links.length} set`);
@@ -240,7 +252,8 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
       counts: { ...plan.counts, cohortLimit: Number.isFinite(limit) ? limit : null },
     });
   } catch (err) {
-    await adapter.updateRun(run.id, { status: "failed", last_error: String((err as Error).message).slice(0, 500) });
+    if (!(err instanceof LockLostError))
+      await adapter.updateRun(run.id, { status: "failed", last_error: String((err as Error).message).slice(0, 500) });
     throw err;
   } finally {
     await adapter.releaseLock(run.id, token);
@@ -278,6 +291,7 @@ async function writeAuthUsers(
       if (!existing) return false;
       if (existing.email !== email || existing.runId !== runId)
         throw new StopError(`auth user ${b.rowId} exists and is not this run's; refusing to adopt it`);
+      if (!existing.loginBlocked) throw new StopError(`auth user ${b.rowId} exists without a sign-in ban; stopping`);
       return true;
     };
     // An intent left by an earlier attempt may or may not have become a

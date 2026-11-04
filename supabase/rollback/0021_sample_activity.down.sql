@@ -1,7 +1,9 @@
 -- Rolls back 0021. Run only after every seed run is torn down
 -- (scripts/unseed-production.ts): dropping the columns removes the marker,
--- and a sample row left behind would then look genuine. The rollback
--- refuses while any row is still marked.
+-- and dropping the registry removes the only record of which unmarked rows
+-- (turns, reading responses, classes, members, auth users) were samples.
+-- The rollback refuses while any row is still marked, while any run is not
+-- torn down, and while any registry item is not deleted.
 --
 -- Deploy the code that does not read these columns first.
 
@@ -12,6 +14,10 @@ do $$ begin
      or exists (select 1 from public.challenges where is_sample)
      or exists (select 1 from public.exchanges where is_sample) then
     raise exception 'sample rows remain; tear the runs down first';
+  end if;
+  if exists (select 1 from public.seed_runs where status <> 'torn_down')
+     or exists (select 1 from public.seed_run_items where state <> 'deleted') then
+    raise exception 'a seed run is not torn down; tear it down first';
   end if;
 end $$;
 

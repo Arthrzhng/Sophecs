@@ -142,6 +142,12 @@ export async function joinClass(
   // Same message for a wrong code and a real one: a distinguishable error
   // turns this into an oracle for walking the code space.
   if (!klass) return { ok: false, error: "That code doesn't look right." };
+  // A sample account's class (docs/sample-activity.md) takes no genuine
+  // members: its codes can be worked out from the public seed tooling, and
+  // a reader in it would be a genuine row tied to sample data. Answered as
+  // a wrong code, for the same reason as above.
+  const { data: owner } = await admin.from("profiles").select("is_sample").eq("id", klass.owner_id).maybeSingle();
+  if (owner?.is_sample) return { ok: false, error: "That code doesn't look right." };
   if (klass.owner_id === user.id) {
     return { ok: false, error: "You own this class." };
   }

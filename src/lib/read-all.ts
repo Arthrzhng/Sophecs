@@ -45,12 +45,19 @@ export async function readAll<T>(
   }
   if (total > MAX_ROWS) return { rows: null, error: `${total} rows is more than ${MAX_ROWS}` };
 
+  // Every page but the last must be full. A shorter one means the server
+  // caps responses below pageSize (its max-rows), which is the truncation
+  // this function exists to prevent, so it is an error, not a result.
+  const short = (got: number, from: number) => from + got < total && got < pageSize;
+  if (short(rows.length, 0)) return { rows: null, error: `a page returned ${rows.length} of ${pageSize} rows; max-rows is below the page size` };
   const starts: number[] = [];
   for (let from = pageSize; from < total; from += pageSize) starts.push(from);
   const rest = await Promise.all(starts.map((from) => page(from, from + pageSize - 1)));
-  for (const r of rest) {
+  for (const [i, r] of rest.entries()) {
     if (r.error) return { rows: null, error: r.error.message };
-    rows.push(...(r.data ?? []));
+    const got = r.data ?? [];
+    if (short(got.length, starts[i])) return { rows: null, error: `a page returned ${got.length} of ${pageSize} rows; max-rows is below the page size` };
+    rows.push(...got);
   }
   return { rows, error: null };
 }

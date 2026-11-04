@@ -53,9 +53,15 @@ challenges." `/method#samples` explains the rest.
   challenge takes the quiz without accepting it.
 - **Metrics.** A sample verdict, result or challenge page sends no
   `verdict_viewed`, `objection_viewed`, `card_viewed`, `share_page_viewed`
-  or `challenge_viewed` event. The seed itself writes rows directly and
-  emits no event, so acquisition referrers on sample results are never
-  counted.
+  or `challenge_viewed` event. The seed writes rows directly and emits no
+  analytics event. Sample quiz results do carry synthetic referrers
+  (TikTok, Instagram, X, direct, a challenge link) in
+  `quiz_results.referrer`, as the brief allows; they are marked
+  `is_sample`, and any query of referrers or sign-ups from the database
+  must filter on it. `scripts/review-verdicts.ts` already does.
+- **Classes.** `joinClass` answers a sample class's code as a wrong code,
+  so no reader can join one, even with a code worked out from the public
+  generator.
 - **Email and sign-in.** Sample users are created through the Auth admin
   API with `email_confirm: true` (no confirmation mail), no password, a
   ban of 876,000 hours, and addresses on `sophecs.test`, a domain reserved
@@ -209,8 +215,11 @@ reader's `challenge_from`, a debate's `challenge_id`) is cleared so the
 genuine row stays; anything that would be deleted with the sample row (a
 reader's turn in a sample exchange, a reader in a sample class, a report,
 a block) stops the teardown and is listed. It never restores old state.
-Afterwards it proves by id that none of the run's rows remain, and keeps
-the run and its registry rows, marked deleted, as the audit record.
+An intent left by a crash is acted on only if its row reads back as the
+run's (marked, or owned by the run's users); an intent whose id turned out
+to be a genuine row is ignored. Afterwards it proves by id that none of the
+run's rows remain, auth users included, and keeps the run and its registry
+rows, marked deleted, as the audit record.
 
 ## Backup and recovery
 
@@ -218,11 +227,48 @@ Production is on the free plan, which has no restorable backups
 (`docs/decisions.md`, "Open pre-pilot item: there is no restorable
 backup"). The recovery path does not need one: every sample row is in the
 registry and removable by id, and the genuine data the run could affect is
-small enough to snapshot first. Before the run the dry run records a
-baseline (genuine row counts, a hash of every genuine profile's rating,
-streak and school, each topic's par, `elo_percentile(1200)`), and
-validation compares against it. A JSON export of the genuine rows of the
-affected tables is part of the rollout below.
+small enough to keep a copy of. The dry run writes every genuine row of
+the affected tables to `scripts/seed/reports/genuine-export-<run>.json` on
+the operator's machine (git-ignored, never printed), and records a
+baseline. Validation then checks, in a way that still holds while readers
+keep using the site: no genuine row removed; every genuine profile that
+changed has that reader's own new argument or quiz result to explain it;
+each topic's stored par equals the par computed from genuine originals
+alone; `elo_percentile(1200)` equals the share computed from genuine
+profiles alone. The dry run runs the same checks first, so a failure
+afterwards is the run's.
+
+## Rollout
+
+In this order, each step only after the one before has passed. The
+migration goes first because the code reads its columns: merged first, the
+verdict, result and challenge pages would 404, the table would show an
+empty week, and the par query in `/api/judge` would fail and stop updating.
+
+1. Security advisor, read and recorded (`docs/review-charter.md` rule 10).
+2. Apply `0021_sample_activity` to production. Read it back: the six
+   columns, the two registry tables with RLS on and no anon or
+   authenticated grants, the five triggers, the two views' columns and
+   grants, `elo_percentile(1200)` unchanged. Security advisor again; any
+   new finding stops here.
+3. Merge this pull request. The merge deploys `main` to production on
+   Vercel; it applies no migration and runs no seed. Confirm the merge
+   commit and the deploy Ready, then fetch `/table`, a genuine verdict
+   page and `/method`.
+4. Dry run against production: the plan's rows regenerated and matched to
+   its hash, the schema, the motions, no other run, the genuine export and
+   baseline, every baseline check passing.
+5. Canary: `--execute --canary 40`. The first 40 accounts and everything
+   that depends only on them. Automated validation, then a sample verdict,
+   result and challenge page fetched from production with the label
+   present, and the measured rates used to re-estimate the full run.
+6. Full run: `--execute`, the same command without `--canary`, which
+   continues from the canary. Automated validation.
+7. Live checks: the pages, the table note, the query timings.
+
+If the run is not approved, steps 4 to 7 do not happen and nothing is
+seeded: the migration and the code are inert with no sample row, and
+`/method` describes the label without claiming samples exist.
 
 ## Stop conditions
 
@@ -232,10 +278,46 @@ Stop and report, without retrying past the engine's own retries, if:
 - the run refuses to adopt a row;
 - a genuine count falls, or a genuine profile, topic par or percentile
   changes with no genuine activity to explain it;
-- auth user creation is refused, or any sample user reads back unbanned;
+- auth user creation is refused, or any created user comes back without
+  its ban (checked on every user as it is made);
 - the dry run shows the motions differ from the plan, or another run holds
   a lock;
 - the canary's measured rate puts the full run beyond an hour.
+
+## What is not labelled
+
+The share images (`/debate/<slug>/<id>/opengraph-image`, `/r/<id>`'s card
+and `card.png`) and the verdict page's `<title>` carry no Sample mark. They
+name no account and claim no judge, sample pages show no share controls,
+and no page links to a sample's verdict, result or challenge; the images
+are reachable only by someone who already has a sample's link.
+
+## Decisions for Arthur
+
+Content and product calls this branch makes, batched as CONTRIBUTING.md
+asks, with where each lives:
+
+1. **The argument passages.** `scripts/seed/arguments/fragments/*.json`:
+   positions, reasons, examples and objection answers for each school on
+   each motion, with attributions to Epictetus, Seneca, Marcus Aurelius,
+   Chrysippus, Mill, Bentham, Aristotle, Anscombe and Williams. They render
+   on public sample verdict pages.
+2. **The template verdict wording.** `scripts/seed/verdicts.ts`: the
+   phrase for each school's own ground, the verdict lines, the rejection
+   reasons.
+3. **The reading answers.** `scripts/seed/reading-responses.json`.
+4. **The visible wording.** "Sample", the explanation (the brief's own
+   words), "Sample assessment", "This week's rankings include sample
+   accounts.", the `/method#samples` section (`src/app/method/page.tsx`),
+   "A sample account's result" and "A sample account's challenge".
+5. **Counting samples on the table and in Today's rank at all.** In the
+   week of the run a few hundred sample arguments decide the order; after
+   that week, only genuine arguments count.
+6. **"No invented copy" (CLAUDE.md) and labelled samples.** Generated
+   arguments are invented by definition; the label is what makes them
+   honest.
+7. **The class names** (`scripts/seed/names.ts`): generic, naming no real
+   school or teacher.
 
 ## Findings from building this
 

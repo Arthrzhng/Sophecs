@@ -94,7 +94,7 @@ export default function MethodPage() {
           <h2 className="text-lg font-extrabold tracking-tight text-ink">Sample accounts</h2>
           <div className="prose-reading mt-4">
             <p>
-              Some accounts on Sophecs are samples: illustrative accounts with
+              Sophecs can show sample accounts: illustrative accounts with
               generated activity, not active members. Each one is labelled Sample
               wherever it is named, and the label opens to say so.
             </p>

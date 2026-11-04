@@ -71,7 +71,7 @@ export class MemoryAdapter implements Adapter {
   async scan(table: ScanTable, columns: string[], where?: { sample?: boolean }) {
     return [...this.table(table).values()]
       .filter((r) => where?.sample === undefined || Boolean(r.is_sample) === where.sample)
-      .map((r) => Object.fromEntries(columns.map((c) => [c, r[c] ?? null])));
+      .map((r) => (columns[0] === "*" ? { ...r } : Object.fromEntries(columns.map((c) => [c, r[c] ?? null]))));
   }
 
   async count(table: ScanTable, where?: { sample?: boolean }) {
@@ -113,6 +113,12 @@ export class MemoryAdapter implements Adapter {
     }
   }
 
+  async refreshLock(id: string, token: string) {
+    const r = this.runs.get(id);
+    if (!r || r.lock_token !== token) return false;
+    r.locked_at = new Date().toISOString();
+    return true;
+  }
   async breakStaleLock(id: string, minutes: number) {
     const r = this.runs.get(id);
     if (!r || !r.lock_token || !r.locked_at || Date.parse(r.locked_at) > Date.now() - minutes * 60_000) return false;

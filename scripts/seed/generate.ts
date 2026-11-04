@@ -261,7 +261,10 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
   const to = Date.parse(cfg.to);
   if (!(to > from)) throw new Error("the window ends before it starts");
   const runId = runIdFor(cfg.seed, cfg.to);
-  const root = new Rng(`sophecs-sample/${GENERATOR_VERSION}/${cfg.seed}`);
+  // The window is part of the root: the same seed with another end gives
+  // other ids, so a new plan never collides with a torn-down run's ids,
+  // which the registry keeps for its audit.
+  const root = new Rng(`sophecs-sample/${GENERATOR_VERSION}/${cfg.seed}/${cfg.from}/${cfg.to}`);
   const days = Math.ceil((to - from) / DAY);
   const id = (r: Rng) => r.token(ID_ALPHABET, ID_LENGTH);
   const topicBySlug = new Map(cfg.topics.map((t) => [t.slug, t]));

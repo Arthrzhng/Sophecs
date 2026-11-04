@@ -47,6 +47,14 @@ describe("readAll", () => {
     expect(result).toEqual({ rows: null, error: "boom" });
   });
 
+  it("treats a short page that is not the last as truncation", async () => {
+    // A server whose max-rows is 500 answers a 1,000-row request with 500.
+    const { page } = fakeTable(2500, 500);
+    const result = await readAll(page);
+    expect(result.rows).toBeNull();
+    expect(result.error).toMatch(/max-rows/);
+  });
+
   it("refuses to guess past a full first page with no count", async () => {
     const { page } = fakeTable(1500, 1000, { count: false });
     const result = await readAll(page);

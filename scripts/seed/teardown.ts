@@ -17,7 +17,7 @@
 
 import { randomUUID } from "node:crypto";
 import type { Adapter, Entanglement, Kind, RegistryItem, Table } from "./adapter";
-import { StopError, STALE_LOCK_MINUTES } from "./engine";
+import { StopError, LockLostError, STALE_LOCK_MINUTES, heartbeat } from "./engine";
 import { snapshot, type Baseline } from "./baseline";
 
 export interface TeardownPreview {
@@ -41,9 +41,43 @@ const ORDER: { kind: Kind; table: Table | null }[] = [
   { kind: "auth_user", table: null },
 ];
 
+const MARKED_KIND: Partial<Record<Kind, true>> = { profile: true, quiz_result: true, challenge: true, debate: true, exchange: true };
+const OWNER_OF: Partial<Record<Kind, string>> = { turn: "exchange_id", reading_response: "user_id", class: "owner_id", class_member: "user_id" };
+
+/**
+ * The run's registry items, keeping an item only when its row is proven to
+ * be the run's: created items were proven when they were written; an
+ * intended item is kept only if its row reads back marked, or owned by one
+ * of the run's users or exchanges. An intent whose id turned out to be a
+ * genuine row (the collision the engine stops on) is dropped here, so
+ * nothing that points at that genuine row is treated as a sample reference.
+ */
 async function loadItems(adapter: Adapter, runId: string) {
   const out = {} as Record<Kind, RegistryItem[]>;
   for (const { kind } of ORDER) out[kind] = await adapter.items(runId, kind);
+  const owners = new Set([
+    ...out.auth_user.map((i) => i.row_id),
+    ...out.exchange.filter((i) => i.state === "created").map((i) => i.row_id),
+  ]);
+  for (const { kind, table } of ORDER) {
+    const unproven = out[kind].filter((i) => i.state === "intended");
+    if (!unproven.length) continue;
+    let proven = new Set<string>();
+    if (table) {
+      const rows = await adapter.selectByIds(table, unproven.map((i) => i.row_id));
+      proven = new Set(
+        rows
+          .filter((r) => (MARKED_KIND[kind] ? r.is_sample === true : owners.has(String(r[OWNER_OF[kind]!]))))
+          .map((r) => (table === "class_members" ? `${r.class_id}:${r.user_id}` : String(r.id)))
+      );
+    } else {
+      for (const i of unproven) {
+        const u = await adapter.getAuthUser(i.row_id);
+        if (u && u.runId === runId) proven.add(i.row_id);
+      }
+    }
+    out[kind] = out[kind].filter((i) => i.state !== "intended" || proven.has(i.row_id));
+  }
   return out;
 }
 
@@ -163,6 +197,7 @@ export async function teardown(
       if (kind === "quiz_result") await adapter.clearSampleChallengeFrom(list.map((i) => i.row_id));
       for (let i = 0; i < list.length; i += size) {
         const batch = list.slice(i, i + size);
+        await heartbeat(adapter, runId, token);
         if (table) await adapter.deleteOwned(table, batch.map((b) => b.row_id), owners);
         else
           for (const b of batch) {
@@ -185,6 +220,9 @@ export async function teardown(
       for (let i = 0; i < ids.length; i += size) n += (await adapter.selectByIds(table, ids.slice(i, i + size))).length;
       leftOver[kind] = n;
     }
+    let authLeft = 0;
+    for (const i of items.auth_user) if (await adapter.getAuthUser(i.row_id)) authLeft++;
+    leftOver.auth_user = authLeft;
     const remaining = Object.values(leftOver).reduce((a, b) => a + b, 0);
     if (remaining) throw new StopError(`${remaining} of the run's rows are still present after teardown`);
     // The audit count is what the registry now says is deleted, so a
@@ -195,7 +233,8 @@ export async function teardown(
     const after = await snapshot(adapter);
     return { deleted, cleared: p.entanglements.length, before, after, leftOver };
   } catch (err) {
-    await adapter.updateRun(runId, { last_error: `teardown: ${String((err as Error).message).slice(0, 480)}` });
+    if (!(err instanceof LockLostError))
+      await adapter.updateRun(runId, { last_error: `teardown: ${String((err as Error).message).slice(0, 480)}` });
     throw err;
   } finally {
     await adapter.releaseLock(runId, token);
