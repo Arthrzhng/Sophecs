@@ -197,6 +197,9 @@ entry names.
   refused from both sides. The newer seeker is now `user_a`, who opens.
   `docs/decisions.md`, "The newer seeker is user_a (2026-11-04)".
   `tests/counterpart-pairing.test.ts`, which fails on the old code.
+- #58 merged as `0d27bec`, after one review pass. Production deploy
+  `dpl_EN7wdCkr5A8swchrj232XD2vgd2a`, Ready and aliased to sophecs.com
+  (read from Vercel).
 
 ## 2026-11-04: a challenge can be accepted
 
