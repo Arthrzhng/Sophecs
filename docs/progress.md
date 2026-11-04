@@ -190,3 +190,10 @@ entry names.
   (read from Vercel). Fetched through Vercel at 00:43 UTC on 2026-11-04:
   `/styleguide/phase3/card/confucian` answered 404, as it should in
   production, and `/robots.txt` 200.
+
+## 2026-11-04: a counterpart exchange can take its first turn
+
+- `seekCounterpart` opened exchanges whose first turn the turn route
+  refused from both sides. The newer seeker is now `user_a`, who opens.
+  `docs/decisions.md`, "The newer seeker is user_a (2026-11-04)".
+  `tests/counterpart-pairing.test.ts`, which fails on the old code.
