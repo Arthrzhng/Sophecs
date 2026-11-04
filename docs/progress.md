@@ -101,6 +101,18 @@ entry names.
   five gates, the judge request fixtures, `check:bundle`, a dry run of the
   golden set under v3 (no calls, no spend). Eval key total unchanged at
   $4.6563.
+- #51 merged as `8490b96`. Production deploy
+  `dpl_FpKc3kRUFBCk2Mu3fVfKF7AkcQ1i`, Ready and aliased to sophecs.com
+  (read from Vercel); `/robots.txt` answered 200 at 00:03 UTC on
+  2026-11-04.
+- The rerun Arthur asked for, on `8490b96`: run file
+  `2026-11-04T00-02-04-581Z-v3.json`, 76 calls, $1.1371, under a watchdog
+  set to stop the runner at $2.00. Eval key total $5.7934 of $8.00. On my
+  reading, which is Arthur's to confirm on the power question, every part
+  of the pass test now holds except `confucian-hierarchy-school`, out of
+  band on score and engagement as in both earlier runs; the power
+  objection is now returned, in Utilitarianism's voice. Details in
+  `docs/decisions.md`, "2F, the rerun after the objection voices".
 
 ## 2026-11-03: Stage 2, `motion_text` into `debates_public`
 
@@ -115,6 +127,20 @@ entry names.
   breaks of the migration and its rollback, each caught
   (`docs/decisions.md`, "Phase 3 item: move `motion_text` into
   `debates_public`").
+- 0020 applied in production at 00:13:54 UTC on 2026-11-04 (migration
+  version `20261104001354`), after a check that nothing was being judged,
+  the security advisor, and a snapshot of the view's definition, rows and
+  ACL. Read back: `motion_text` last, every other column of every row
+  unchanged by digest, `motion_text` equal to `debates.motion_text` for
+  every row, owner, options and ACL unchanged; advisor unchanged.
+- #54 merged as `bbb9390`. Production deploy
+  `dpl_7sFvLWk1ojKEc29bwkjEeqLsCyLE`, Ready and aliased to sophecs.com
+  (read from Vercel). The private verdict page
+  (`/debate/opaque-benefit/jjSZVZFBmu`) fetched through Vercel at 00:17
+  UTC, just after Vercel reported sophecs.com aliased to
+  `dpl_7sFvLWk1ojKEc29bwkjEeqLsCyLE`: 200, the private heading, and the
+  debate's stored wording, which differs from the topic's current wording.
+  That deployment's code reads the stored wording only from the view.
 
 ## 2026-11-03: Stage 3, the quiz v2 design
 
@@ -125,6 +151,20 @@ entry names.
   the JSON and exits non-zero if a school is unreachable, lands outside
   8% to 30%, or a school's own persona misses it; it exits 0 on the
   draft.
+- #53 merged as `d283316`, after two review passes. Production deploy
+  `dpl_466taYAkDfiFcHAqxVaMoJbz6DxB`, Ready (read from Vercel); docs and
+  a script only, nothing served changes. Vercel reported sophecs.com
+  aliased to it.
+- `backup_20261022` (the open item in `docs/decisions.md`): on 2026-11-04,
+  after 00:17 UTC, a read through the Supabase tool (`execute_sql`,
+  counting `pg_class` rows in that namespace) found the schema with its 4
+  relations: `debates`, `exchanges`, `profiles`, `quiz_results`. Arthur's
+  ruling said the drop had been done on retry; it had not. `drop schema
+  backup_20261022 cascade;` was retried through the same tool, which asked
+  Arthur to confirm; no answer came within its 230-second limit, and the
+  tool reported the question unanswered, so the drop should not have run.
+  That has not been read back yet. It waits on his approval and a
+  read-back.
 
 ## 2026-11-03: Stage 4, the Phase 3.0 items on `/styleguide/phase3`
 
@@ -145,3 +185,8 @@ entry names.
   the draft cards' attribution at 3.86:1, which led to the derived card
   surfaces.)
   The colour choice, and everything shown, is Arthur's at Checkpoint A.
+- #55 merged as `0729d1f`, after two review passes. Production deploy
+  `dpl_EwjphTGXXpsSApZqtUcB36ojUVs8`, Ready and aliased to sophecs.com
+  (read from Vercel). Fetched through Vercel at 00:43 UTC on 2026-11-04:
+  `/styleguide/phase3/card/confucian` answered 404, as it should in
+  production, and `/robots.txt` 200.
