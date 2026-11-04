@@ -199,3 +199,14 @@ entry names.
 - Tested on local Postgres: `scripts/test-0021-challenges-update.sh`, all
   checks passed; `tests/challenge-topic.test.ts`, which fails two of its
   five cases with the check removed.
+- The private verdict check that 0018 left open (Arthur, 2026-11-04:
+  "Finish 0018 and the private verdict check"). Production's page for the
+  one genuine argument, which is private, fetched as a stranger through
+  Vercel at 08:06 UTC on 2026-11-04: status 200, not from cache. It shows
+  the score and the three sub-scores, "The verdict on a private
+  argument", the withheld-note line and "The author has not published
+  this argument." The verdict the page receives has exactly `rejected`,
+  `score`, `fidelity`, `rigor`, `engagement` and `prompt_version`, with
+  `argument: null` and `textWithheld: true`: no field that can quote the
+  argument reaches a stranger, as 0018 and 0020's keep-list intend.
+
