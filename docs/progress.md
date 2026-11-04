@@ -221,6 +221,8 @@ entry names.
   owner can challenge from it (2026-11-04)". `tests/create-challenge.test.ts`.
   `src/app/actions.ts` is frozen; Arthur's ruling of 2026-11-04 asked for
   this fix.
+- #60 merged as `fc42fdf`, after one review pass. Production deploy
+  `dpl_64CL9LcFpwZtU8i5kzAi3MGC35yg`, Ready (read from Vercel).
 
 ## 2026-11-04: no client may update a challenge (migration 0021)
 
