@@ -22,9 +22,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ school:
 
   const content = getAllSchools({ includeDrafts: true })[school];
   const draft = (DRAFT_SCHOOL_IDS as readonly SchoolId[]).includes(school);
-  // The recommended candidate's card surface: darker than the marker, as
-  // the live schools' --color-*-surface is, so the card's ink reads at AA
-  // even at its lowest opacity (scripts/colour-candidates.mjs).
+  // The recommended candidate's card surface: the marker, darkened only
+  // where the card's ink would fall below AA at its lowest opacity
+  // (scripts/colour-candidates.mjs; only Confucianism's needed it).
   const surface = draft
     ? (() => {
         const colours = JSON.parse(

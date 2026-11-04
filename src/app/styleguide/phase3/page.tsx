@@ -207,9 +207,10 @@ export default function Phase3Page() {
       <Section title="Result cards, six schools">
         <p className="mb-4 max-w-[62ch] text-sm text-ink-mid">
           Each school&apos;s own one_line at the card&apos;s 1200 by 630. The new schools use a card
-          surface derived from the recommended candidate: the same hue, darkened until the card&apos;s
-          text reads at AA at its lowest opacity, as the live schools&apos; surfaces are darker than
-          their markers.
+          surface derived from the recommended candidate: the same hue, darkened only where the
+          card&apos;s text would otherwise fall below AA at its lowest opacity. Of the three, only
+          Confucianism&apos;s needed it. The live schools&apos; surfaces are all darker than their
+          markers; whether the new ones should be too is Arthur&apos;s to decide.
         </p>
         <div className="grid gap-6">
           {ALL.map((id) => {
@@ -356,6 +357,9 @@ function CandidateCard({
           <br />
           Live schools {c.minDeltaE} &middot; blue/orange {c.minDeltaEBlueOrange} &middot; deut{" "}
           {c.minDeltaEDeuteranopia} &middot; prot {c.minDeltaEProtanopia}
+          <br />
+          Card surface {c.cardSurface === c.hex ? "as marker" : c.cardSurface} &middot; card text at 0.8{" "}
+          {c.cardInkAtLowestOpacity}:1
         </p>
         <p className="flex items-center gap-3 text-xs text-ink-mid">
           <span className="flex items-center gap-1">

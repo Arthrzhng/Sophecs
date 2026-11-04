@@ -460,7 +460,8 @@ The axis names are `docs/quiz-v2.md`'s, and change if that draft does.
 
 | Element | Copy |
 |---|---|
-| In place of the rank | `Unranked` |
+| In place of the rank, on screen | the live table's null glyph, `NOTHING` in `src/components/table/SchoolTable.tsx` |
+| In place of the rank, read aloud | `Not ranked yet` (the live table's words) |
 | Under the name | `Ranked once it has {N} judged original arguments. {n} so far.` |
 
 {N} is a threshold Arthur has not set; the preview shows a fixture value
@@ -482,7 +483,8 @@ The passage's own title and source come from its file in `content/micro/`.
 
 ### Navigation
 
-The School table link keeps its label, `School table`. The brief asks for
+The School table link keeps its label, `School table`. The brief of
+2026-11-03 (Arthur's instructions, not in the repo) asks for
 "a neutral nav icon for School table (the triangle no longer means
 anything)"; the header's links carry no icons today, so this would add
 one beside the label, and the preview shows candidates for it.

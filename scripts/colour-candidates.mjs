@@ -266,7 +266,8 @@ const round = (n, d = 1) => Math.round(n * 10 ** d) / 10 ** d;
 // lowest opacity still reads at AA.
 const inkOn = (surface, opacity) => contrast(over(CARD_INK, surface, opacity), surface);
 function cardSurfaceFor(c) {
-  for (let L = c.L; L > 0.1; L -= 0.005) {
+  for (let step = 0; c.L - step * 0.005 > 0.1; step++) {
+    const L = c.L - step * 0.005;
     const rgb = oklchToRgb(L, c.C, c.H);
     if (!rgb) continue;
     const q = hexToRgb(rgbToHex(rgb));

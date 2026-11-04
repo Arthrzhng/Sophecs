@@ -1,6 +1,7 @@
 /**
  * Candidates for the School table's navigation icon: Phase 3.0 preview
- * only. The brief of 2026-11-03 asks for "a neutral nav icon for School
+ * only. The brief of 2026-11-03 (Arthur's instructions to the session that
+ * built this, not committed to the repo) asks for "a neutral nav icon for School
  * table (the triangle no longer means anything)". The site header's links
  * carry no icons today (src/components/nav/SiteHeader.tsx), so this would
  * add one rather than replace one; the only triangle in src/ is the quiz's
