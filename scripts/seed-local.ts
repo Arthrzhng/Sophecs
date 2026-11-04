@@ -19,7 +19,7 @@ import { DEFAULTS } from "./seed/generate";
 import { contentTopics } from "./seed/topics";
 import { execute } from "./seed/engine";
 import { validate } from "./seed/validate";
-import { snapshot } from "./seed/baseline";
+import { dryRun } from "./seed/dryrun";
 import { getAllTopicFiles } from "../src/lib/topics";
 import { REPORT_DIR, cancelSignal, int, isoFlag, log, main, nowFloored, parseFlags, refuseUnsupported, str, writeReport } from "./seed/cli";
 
@@ -106,8 +106,9 @@ main(async () => {
     return;
   }
   if (!f.execute) {
-    await db.checkSchema();
-    log(`dry run, reads only: ${JSON.stringify((await snapshot(db)).genuine)} genuine rows; nothing written.`);
+    const report = await dryRun(db, plan);
+    for (const line of report.lines) log(line);
+    if (!report.ok) process.exitCode = 1;
     return;
   }
   const result = await execute({ dataset, plan, adapter: db, cohortLimit, batchSize: int(f, "batch-size", 500, 1, 2000), log, signal: cancelSignal(log), breakStaleLock: Boolean(f["break-stale-lock"]) });

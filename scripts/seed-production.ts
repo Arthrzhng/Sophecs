@@ -2,6 +2,7 @@
 // and the rollout; the short version:
 //
 //   plan     npm run seed:plan -- --expected-project-ref <ref> [--seed N] [--from ISO] [--to ISO]
+//            or npm run seed:production -- --dry-run --expected-project-ref <ref> --seed N
 //            Writes docs/seed-plans/<run-id>.json. No network, no writes.
 //   dry run  npm run seed:production -- --expected-project-ref <ref> --confirm-production <ref>
 //              --run-id <id> --plan <file>
@@ -21,22 +22,24 @@ import { DEFAULTS } from "./seed/generate";
 import { contentTopics } from "./seed/topics";
 import { execute } from "./seed/engine";
 import { validate } from "./seed/validate";
-import { snapshot } from "./seed/baseline";
+import { dryRun } from "./seed/dryrun";
 import { cancelSignal, int, isoFlag, log, main, nowFloored, parseFlags, refuseUnsupported, str, writeReport } from "./seed/cli";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 const [command, ...rest] = process.argv.slice(2);
-const isPlan = command === "plan";
-const argv = isPlan ? rest : process.argv.slice(2);
+const argv = command === "plan" ? rest : process.argv.slice(2);
 
 main(async () => {
   const f = parseFlags(argv, {
     values: ["expected-project-ref", "confirm-production", "run-id", "plan", "seed", "from", "to", "users", "anon-results", "challenges", "exchanges", "classes", "canary", "out", "real-judge", "concurrency", "batch-size", "rows-per-second", "auth-per-second"],
-    booleans: ["execute", "validate", "six-schools", "break-stale-lock"],
+    booleans: ["execute", "validate", "six-schools", "break-stale-lock", "dry-run"],
   });
   refuseUnsupported(f);
   const ref = str(f, "expected-project-ref");
+  if (f["dry-run"] && (f.execute || f.validate)) throw new GuardError("--dry-run cannot be combined with --execute or --validate");
+  // A dry run with no plan makes the plan: nothing but the plan file is written.
+  const isPlan = command === "plan" || (Boolean(f["dry-run"]) && !str(f, "plan"));
 
   if (isPlan) {
     if (!ref || !/^[a-z]{20}$/.test(ref)) throw new GuardError("--expected-project-ref must be a 20-letter project ref");
@@ -88,18 +91,11 @@ main(async () => {
   log(`target: ${describeTarget(target)}`);
 
   if (!f.execute && !f.validate) {
-    await adapter.checkSchema();
-    const base = await snapshot(adapter);
-    const runs = await adapter.listRuns();
-    const run = runs.find((r) => r.id === plan.runId);
-    log(`dry run, reads only. Schema has migration 0021. Genuine rows: ${JSON.stringify(base.genuine)}`);
-    log(`runs on target: ${runs.map((r) => `${r.id} ${r.status}${r.lock_token ? " (locked)" : ""}`).join(", ") || "none"}`);
-    log(run ? `this run exists: ${run.status}` : "this run has not started");
-    for (const t of plan.topics) {
-      const live = base.topics.find((x) => x.slug === t.slug);
-      log(`  ${t.slug}: ${live && live.active && live.motion === t.motion ? "motion matches" : "DIFFERS: make a new plan"}`);
-    }
-    log("nothing written. Add --execute to run it.");
+    const report = await dryRun(adapter, plan);
+    for (const line of report.lines) log(line);
+    log(`baseline: ${writeReport(`dryrun-${plan.runId}`, report)}`);
+    if (!report.ok) process.exitCode = 1;
+    else log("Add --execute to run it.");
     return;
   }
 

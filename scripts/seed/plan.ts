@@ -133,6 +133,10 @@ export function describe(ds: Dataset): Record<string, unknown> {
     },
     words: { min: Math.min(...words), max: Math.max(...words), mean: Math.round(words.reduce((a, b) => a + b, 0) / words.length) },
     exactDuplicateArgumentsPct: share(exactDup, deb.length),
+    argumentsWithATypoPct: share(
+      deb.filter((d) => /\b(becuase|definately|thier|wich|arguement|realy|doesnt|seperate|responsable|wether|the the)\b/.test(d.argument)).length,
+      deb.length
+    ),
     distinctArgumentTexts: textCount.size,
     nearDuplicateArgumentsPct: share(nearDup, deb.length),
     readingResponsesSharingTextPct: share(rr.filter((r) => rrCount.get(r)! > 1).length, rr.length),

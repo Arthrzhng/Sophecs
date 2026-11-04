@@ -588,7 +588,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         topic_slug: topic,
         challenge_id: null,
         school,
-        argument: compose(fr, banks.closings, school, parts),
+        argument: withTypos(compose(fr, banks.closings, school, parts), verdict, r),
         rejected,
         rejection_reason: null,
         verdict: verdict ?? rejection!,
@@ -1115,6 +1115,49 @@ function writeTurn(
   body = body.replace(/\s+/g, " ").trim();
   if (checkBody(body)) body = `${body} ${objectionSentence(r.pick(mine.objections))}`.slice(0, 1150);
   return { quote, body };
+}
+
+// The slips people make typing fast. Applied to about one argument in
+// twelve, never inside a phrase the verdict quotes, so the quote still
+// matches the argument exactly.
+const TYPOS: [RegExp, string][] = [
+  [/\bbecause\b/, "becuase"],
+  [/\bdefinitely\b/, "definately"],
+  [/\btheir\b/, "thier"],
+  [/\bwhich\b/, "wich"],
+  [/\bargument\b/, "arguement"],
+  [/\breally\b/, "realy"],
+  [/\bdoesn't\b/, "doesnt"],
+  [/\bit's\b/, "its"],
+  [/\bseparate\b/, "seperate"],
+  [/\bresponsible\b/, "responsable"],
+  [/\bthe\b/, "the the"],
+  [/\bwhether\b/, "wether"],
+];
+
+function withTypos(text: string, verdict: Verdict | null, r: Rng): string {
+  if (!r.chance(0.08)) return text;
+  const quoted = verdict
+    ? [verdict.strongest_move, verdict.weakest_move].flatMap((s) => [...s.matchAll(/"([^"]+)"/g)].map((m) => m[1]))
+    : [];
+  const protectedSpans = quoted
+    .map((q) => {
+      const at = text.indexOf(q);
+      return at === -1 ? null : ([at, at + q.length] as const);
+    })
+    .filter((x): x is readonly [number, number] => x !== null);
+  let out = text;
+  for (const [pattern, replacement] of r.shuffle(TYPOS).slice(0, r.int(1, 2))) {
+    const m = pattern.exec(out);
+    if (!m) continue;
+    const at = m.index;
+    if (protectedSpans.some(([a, b]) => at < b && at + m[0].length > a)) continue;
+    const next = out.slice(0, at) + replacement + out.slice(at + m[0].length);
+    // Only a change of the same length keeps the protected spans in place.
+    if (replacement.length !== m[0].length && protectedSpans.some(([a]) => a > at)) continue;
+    out = next;
+  }
+  return quoted.every((q) => out.includes(q)) && wordCount(out) <= 250 ? out : text;
 }
 
 function capital(s: string): string {
