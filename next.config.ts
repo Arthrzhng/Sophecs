@@ -27,10 +27,18 @@ const SIX_SCHOOLS = process.env.SIX_SCHOOLS === "1" ? "1" : "0";
 // three with every gate green. That is Arthur's decision (c), taken at
 // launch, and the launch merge removes this refusal; until then a
 // production deploy with the flag fails to build and the live one stays.
-if (SIX_SCHOOLS === "1" && process.env.VERCEL_ENV === "production") {
+//
+// It fails closed: a build on Vercel (`VERCEL=1`) that cannot say which
+// environment it is for is refused as well, rather than let through. It
+// covers builds only. Promoting a flag-on preview deployment to Production
+// does not rebuild, so it would publish the three without passing here;
+// docs/review-charter.md, rule 4, counts that as publishing.
+const onVercelUnsure = process.env.VERCEL === "1" && !process.env.VERCEL_ENV;
+if (SIX_SCHOOLS === "1" && (process.env.VERCEL_ENV === "production" || onVercelUnsure)) {
   throw new Error(
-    "SIX_SCHOOLS is set for a production build. The six schools are not published: " +
-      "unset it for Production in Vercel (docs/stage5-plan.md)."
+    "SIX_SCHOOLS is set for a production build, or for a Vercel build that does not say " +
+      "which environment it is for. The six schools are not published: unset it for " +
+      "Production in Vercel (docs/stage5-plan.md)."
   );
 }
 
@@ -49,7 +57,9 @@ const nextConfig: NextConfig = {
   env: { SIX_SCHOOLS },
   // `npm run check:bundle:six` builds with the flag into a directory of its
   // own, so the flag-on build never overwrites the .next that
-  // `npm run check:bundle` reads. Unset everywhere else, Vercel included.
+  // `npm run check:bundle` reads. Unset everywhere else, Vercel included,
+  // and never in .env.local: `next build` would read it there, but the
+  // check, run by tsx, does not load .env.local, and would read .next.
   ...(process.env.SOPHECS_DIST_DIR ? { distDir: process.env.SOPHECS_DIST_DIR } : {}),
   webpack(config) {
     config.resolve.alias = {
