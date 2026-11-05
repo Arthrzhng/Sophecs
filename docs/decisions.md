@@ -3349,15 +3349,31 @@ reader who reached one of them stayed there.
   sophecs.com, and 5 on a deployment's own URL in September.
 - **The fix in code (`next.config.ts`).** A production build sends every
   page request on any host other than sophecs.com to the same path and
-  query there, with a 308. Not moved: `/api/` (Vercel's cron calls one,
-  and a POST does not survive the hop), the deployment's own URL (behind
-  Vercel's login; it lets a past deployment be opened), and previews and
-  local builds. A sign-in that falls back to the Site URL arrives at the
-  root with `?code=`, which the home page would drop; it is sent to
-  `/auth/callback` with a 307, so it completes, at `/me`.
+  query there, with a 308. Not moved: `/api/` (Vercel's cron calls one and
+  does not follow redirects, and a fetch from a tab left open on an old
+  host could not follow one: sophecs.com sees none of that host's cookies
+  and answers no cross-origin request), `/_next/` (the same files on every
+  host, and left alone by Next's own router, so Vercel's router, which
+  runs the rules in production, is told the same), the deployment's own
+  URL (behind Vercel's login; it lets a past deployment be opened), and
+  previews and local builds. A sign-in that falls back to the Site URL
+  arrives at the root with `?code=`, which the home page would drop; it
+  is sent to `/auth/callback` with a 307, so it completes, at `/me`, or at
+  the quiz for a reader who has not taken it.
+- **Where a sign-in may land.** `/auth/callback` followed `next` from the
+  query string wherever it pointed: `/login?next=//evil.example` sent a
+  reader who had just signed in to evil.example. It now keeps only a path
+  that resolves on the same site (`src/lib/local-path.ts`), and otherwise
+  lands where it would with no `next`.
 - **The fix outside the code, which is Arthur's to click**: Supabase
   Auth's Site URL and redirect allow-list, and the Vercel domains' own
   redirects. The steps are in the pull request. The code's redirect does
   not depend on them, and they do not depend on it.
-- **Cookies are per host.** A reader signed in on sophecs.vercel.app is
-  signed out on sophecs.com and signs in once more.
+- **Cookies and storage are per host.** A reader signed in on
+  sophecs.vercel.app is signed out on sophecs.com and signs in once more,
+  and an unsent argument the editor saved in that host's local storage
+  stays there, out of reach now that every page there redirects.
+- **A loop to avoid.** A Vercel domain redirect from sophecs.com to
+  another host (www, say) would loop with these rules, which send that
+  host back. Today no domain redirects; the steps in the pull request
+  point www at sophecs.com, the way that agrees.

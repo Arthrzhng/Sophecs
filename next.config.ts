@@ -63,8 +63,14 @@ const SIX_SCHOOLS_TOKENS = path.join(
 //
 // So a production build sends every page request on any other host to the
 // same path and query on sophecs.com, permanently. Not redirected:
-// - /api/, which no reader sees as an address. Vercel's cron calls one, and
-//   a POST from a tab left open on an old host would not survive the hop.
+// - /api/, which no reader sees as an address. Vercel's cron calls one and
+//   does not follow redirects, and a fetch from a tab left open on an old
+//   host could not follow one either: sophecs.com would see none of that
+//   host's cookies, and answers no cross-origin request.
+// - /_next/, the scripts and styles a page already on an old host loads.
+//   They are the same files on every host, and Next's own router leaves
+//   them alone, so Vercel's router, which runs these rules in production,
+//   is told the same and both behave alike.
 // - the deployment's own URL (VERCEL_URL), so a past deployment can still
 //   be opened at its own address; Vercel asks for a login there.
 // - previews and local builds, whose VERCEL_ENV is not "production".
@@ -72,9 +78,13 @@ const SIX_SCHOOLS_TOKENS = path.join(
 // A sign-in that fell back to the Site URL arrives at the root with ?code=,
 // which only /auth/callback can exchange, and the root would drop it. It is
 // sent there on sophecs.com, wherever it landed, so the sign-in completes
-// (at /me, since the page the reader started from is not in the fallback).
-// The exchange needs the cookie the sign-in set when it started, which is
-// on sophecs.com once readers can no longer start one anywhere else.
+// (at /me, or at the quiz for a reader who has not taken it, since the page
+// the reader started from is not in the fallback). The exchange needs the
+// cookie the sign-in set when it started, which is on sophecs.com once
+// readers can no longer start one anywhere else.
+//
+// Never point a Vercel domain redirect from sophecs.com to another host
+// (www, say): these rules send that host back, and the two would loop.
 //
 // Host values are regular expressions. Next anchors them; the anchors here
 // say so for any reader or router that does not.
@@ -92,7 +102,7 @@ export function canonicalRedirects(env: NodeJS.ProcessEnv) {
       permanent: false,
     },
     {
-      source: "/:path((?!api/).*)",
+      source: "/:path((?!api/|_next/).*)",
       missing: kept.map((host) => ({ type: "host" as const, value: exactly(host) })),
       destination: `https://${CANONICAL_HOST}/:path`,
       permanent: true,
