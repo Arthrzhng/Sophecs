@@ -571,3 +571,43 @@ as Ready.
 - Open: #71, the judge's caps and budget (rulings 6, 7, 8), three passes
   done, waiting on Arthur's yes to migration 0026 before it is applied
   and merged.
+
+## 2026-11-05: Stage 5, the flag and the pages that only read
+
+Each pull request had one to three fresh review passes; the findings and
+fixes are in each. The fixes from the last pass of #78, #79, #80 and
+#81 were made after it, and each pull request says so. Every production
+deploy below was read from Vercel as Ready.
+
+- #77 merged as `d9ec035`: the entry above. Deploy
+  `dpl_4xL5QRpN7MNPnBuau38ctoPF6awi`.
+- #78 merged as `de35849`: `docs/stage5-plan.md`, the plan for building
+  the six schools behind a build-time `SIX_SCHOOLS` flag, in six steps
+  with four gates. Three passes. Deploy
+  `dpl_ATcouqnPoLLmdLvtSDovnWU9m6PA`.
+- #79 merged as `d733c59`: step 1, the flag. A flag-on build shows the
+  three after the live schools; a flag-off build is unchanged, which
+  `npm run check:bundle` now checks over nineteen strings, colours
+  included, and `npm run check:bundle:six` checks the other way. The
+  judge reads the published list, which does not move. Review found
+  webpack's cache carrying the flag-on stylesheet into a flag-off build;
+  the flag is now in the cache's version. `next.config.ts` refuses a
+  flag-on production build. Deploy `dpl_GzthwxDF9xovry1oWNFcyYsefBUV`,
+  and sophecs.com read at 17:48 UTC showed three schools and the same
+  stylesheet as before.
+- `SIX_SCHOOLS=1` set in Vercel for Preview only, at 19:11 UTC.
+- #80 merged as `979d9d8`: step 2a. On a flag-on build the three have
+  pages, modules on `/lessons`, rows on the table, and places on the
+  landing page and in the footer. Its preview, the first flag-on Vercel
+  build, served `/s/ubuntu` with "The other five". Deploy
+  `dpl_Ch8vXgMsrppWuKuLxALpafN7VUNb`.
+- #81 merged as `132a7bd`: step 2b. On a flag-on build Today offers the
+  week's view from elsewhere after step 4, and each of the six passages
+  has a page; the before and after pages still number their pair 1 and 2
+  of 2. Review found the passages keyed on the three being drafts, which
+  would have hidden them at launch; they are keyed on the flag. Deploy
+  `dpl_5uMbDJm478A2ZAtxYcBh9m4fGLVS`.
+- Not done: migration 0025 is still with Arthur (all five policies
+  present at 19:41 UTC), #71 waits on his yes to 0026, and the sample
+  workflow's 18:41 UTC run had not started by 19:41. Checkpoint B
+  (`docs/checkpoint-b.md`) lists everything open.
