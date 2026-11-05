@@ -4,7 +4,7 @@
 // write; and a log with nothing in it that is secret or a reader's.
 import { describe, expect, it, vi } from "vitest";
 import { MemoryAdapter } from "../../scripts/seed/adapter-memory";
-import { runCi, CANARY_ACCOUNTS, HALTED, REFUSED, VALIDATING, type Mode } from "../../scripts/seed/ci";
+import { runCi, CANARY_ACCOUNTS, HALTED, REFUSED, VALIDATING, type Mode, type CiOptions } from "../../scripts/seed/ci";
 import { teardown } from "../../scripts/seed/teardown";
 import { contentTopics } from "../../scripts/seed/topics";
 
@@ -22,9 +22,9 @@ function freshDb() {
   return db;
 }
 
-async function step(db: MemoryAdapter, mode: Mode, hours: number, seed = SEED, maxExactDuplicatePct?: number) {
+async function step(db: MemoryAdapter, mode: Mode, hours: number, seed = SEED, maxExactDuplicatePct?: number, extra: Partial<CiOptions> = {}) {
   const lines: string[] = [];
-  const out = await runCi({ mode, adapter: db, seed, projectRef: "tekifezydjlgxgndkxul", now: () => at(hours), log: (l) => lines.push(l), config: SMALL, batchSize: 100, maxExactDuplicatePct });
+  const out = await runCi({ mode, adapter: db, seed, projectRef: "tekifezydjlgxgndkxul", now: () => at(hours), log: (l) => lines.push(l), config: SMALL, batchSize: 100, maxExactDuplicatePct, ...extra });
   return { out, lines };
 }
 
@@ -290,6 +290,43 @@ describe("the scheduled workflow's path", () => {
     // Refused, not halted: the next extension under the limit goes through.
     expect((await db.getRun(run.id))!.status).toBe("complete");
     expect((await step(db, "extend", 24 * 8)).out).toMatchObject({ ok: true, outcome: "written" });
+  });
+
+  it("refuses an extension whose rule-2 scores land on multiples of 5 too often, before writing anything", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    const before = samples(db, "debates");
+    // A limit of 0% from the first rule-2 verdict: a week on, past the cutover, some land on one.
+    const over = await step(db, "extend", 24 * 7, SEED, undefined, { maxRoundScorePct: 0, minRoundScoreSample: 1 });
+    expect(over.out).toMatchObject({ ok: false, outcome: "dry-run-failed" });
+    expect(over.lines.join("\n")).toMatch(/sample scores on a multiple of 5 at most 0%: rule 2: \d+ verdicts.*over 0%/);
+    expect(samples(db, "debates")).toBe(before);
+    expect((await db.getRun(run.id))!.status).toBe("complete");
+    expect((await step(db, "extend", 24 * 7)).out).toMatchObject({ ok: true, outcome: "written" });
+  });
+
+  it("refuses a run whose stored scores differ from its plan, however few, before writing anything", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    // Both checks are on the full stage's record.
+    const names = ((await db.getRun(run.id))!.last_report as { checks: { name: string; ok: boolean }[] }).checks;
+    expect(names.filter((c) => /stored sample scores|multiple of 5/.test(c.name)).map((c) => c.ok)).toEqual([true, true]);
+    // One stored score moved, as a write by code with another score rule would leave it.
+    const debates = db.table("debates");
+    const [id, row] = [...debates].find(([, r]) => r.is_sample && typeof r.score === "number")!;
+    debates.set(id, { ...row, score: Number(row.score) + 1 });
+    const before = samples(db, "debates");
+    const refused = await step(db, "extend", 24 * 3);
+    expect(refused.out).toMatchObject({ ok: false, outcome: "dry-run-failed" });
+    expect(refused.lines.join("\n")).toMatch(/stored sample scores match the plan: 1 of \d+ stored sample debates differ/);
+    expect(refused.lines.join("\n")).not.toContain(id);
+    expect(samples(db, "debates")).toBe(before);
+    debates.set(id, row);
+    expect((await step(db, "extend", 24 * 3)).out).toMatchObject({ ok: true, outcome: "written" });
   });
 
   it("refuses another seed before writing anything", async () => {
