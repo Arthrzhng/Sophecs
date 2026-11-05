@@ -77,16 +77,20 @@ Eval key spend: $5.7934 of the $8.00 cap. No further run is planned.
 
 1. **New. A check on `profiles.display_name`.** Since 0022 a signed-in
    reader may still update their own display name through the Data API,
-   since `/me` needs it. Doing it that way skips `setDisplayName`'s trim
-   and 60-character limit, as the old "own update" policy already
-   allowed, and class owners see the name. A check constraint on the
+   since `/me` needs it, through the "own update" policy, which still
+   governs those two columns. Doing it that way skips `setDisplayName`'s
+   trim and 60-character limit, as it could before 0022, and class owners
+   see the name. A check constraint on the
    column would hold the limit in the database. `docs/decisions.md`,
    "Clients keep only the writes the site makes (migration 0022)".
-2. **New. The six policies 0022 made unreachable.** "debates insert own",
-   "own update", "own insert", the two "anon insert own" and "member join
-   self" stay in place, reached by nothing since the grants went. Dropping
-   them would tidy the policy list; 0022 left that as a second change to
-   review. Same entry.
+2. **New. The five policies 0022 made unreachable.** "debates insert
+   own", "own insert" on `profiles`, the two "anon insert own" and "member
+   join self" stay in place, reached by nothing since the grants went.
+   Dropping them would tidy the policy list; 0022 left that as a second
+   change to review. Not "own update" on `profiles`: `setDisplayName` and
+   `setArgumentDefaultPublic` (`src/app/me/actions.ts`) write through it
+   with the signed-in client, and without it both would change nothing
+   and still report success. Same entry.
 
 ## Spending, rate limits and budget: (d)
 
@@ -207,20 +211,24 @@ The choice is Arthur's: one of these, or loosen a constraint.
 
 ## Sample activity (New)
 
-`docs/sample-activity.md` has the design.
+`docs/sample-activity.md` has the design. None of these is one of the
+five categories; each is listed because it turns on Arthur's ruling of
+2026-11-04 on sample activity.
 
 1. **Content changes now end the run.** The motions, the argument
    passages and the quiz are fixed for the life of a run. Rewording,
-   adding or retiring a motion, or editing a passage, halts the schedule.
-   So does shipping Quiz v2: the generator replays the live quiz questions
+   adding or retiring a motion makes every later run refuse at its dry
+   run, writing nothing; editing a passage fails the spot checks and halts
+   the run. So does shipping Quiz v2: the generator replays the live quiz questions
    and `scoreQuiz` to give each sample its school, and the spot checks
    compare those schools. The only way on is teardown and a new run,
    which breaks every existing sample link. This bears on the content
    items above: say before changing any of them.
 2. **A referrer from a sample page.** A genuine page opened from a sample
    page by a full page load reports the sample page's address to PostHog
-   as its referrer, as any page on the site would. No sample event is
-   sent. To decide: accept it, or add a `no-referrer` policy to sample
+   as its referrer, as any page on the site would
+   (`docs/sample-activity.md`, "What a sample can never touch",
+   Analytics). No sample event is sent. To decide: accept it, or add a `no-referrer` policy to sample
    pages, which would stop it.
 3. **#57's last fixes went in without a fresh review.** The fifth
    review's fixes (`da74d20`) and the renumbering to 0023 were tested

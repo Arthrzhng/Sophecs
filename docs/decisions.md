@@ -2555,8 +2555,10 @@ both to `authenticated` only. SELECT is unchanged. On Postgres 17 it also
 revokes MAINTAIN from these tables and from the four public views, which
 0016 missed ("Phase 3 item: move `motion_text` into `debates_public`").
 `reading_responses`, which the site writes signed in, is not touched.
-The policies stay, unreachable without the grant; dropping them is a
-second change to review, and the grant alone is what decides. A REVOKE
+The policies stay. Five are unreachable without the grant; "own update"
+on `profiles` still governs the two columns kept, which `/me` updates
+through it. Dropping the five is a second change to review, and the
+grant alone is what decides. A REVOKE
 that finds nothing it may take (a privilege another role granted) still
 succeeds, so the migration ends by reading what anon and authenticated
 hold, on each table and on any of its columns, and fails as a whole if
