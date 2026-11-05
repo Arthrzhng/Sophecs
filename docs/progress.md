@@ -518,3 +518,51 @@ are in each pull request.
   - Not checked live: the card image's pixels (the fetch returns a PNG as
     text); the mark rests on `tests/seed/challenge-preview.test.ts`, which
     runs the routes.
+
+## 2026-11-05: Arthur's rulings on Checkpoint A
+
+Each pull request had one to three fresh review passes; the findings and
+fixes are in each. Every production deploy below was read from Vercel
+as Ready.
+
+- #67 merged as `82fbffe`: the rulings recorded in `docs/decisions.md`.
+  Deploy `dpl_77cYToNKoHMQPNr9BgCUkDpSyzSD`.
+- #68 merged as `a5ee501`: judge v3's engagement cap tied to its own
+  reply, comments stripped before v3 is sent, Utilitarianism's
+  virtue-ethics voice (rulings 2/11, 12, 14). v3 is not live. Deploy
+  `dpl_HcvfPv5KGmqQWTpc8UBUc8gLdL5J`.
+- #69 merged as `5f95ad2`: migration 0024 (rulings 4, 21, 22, 23),
+  applied through the Supabase tool at 20261105145333, before the merge,
+  with the security advisor before and after and a read-back (the
+  display_name check, the narrowed class policies, the class functions
+  and `exchanges_public` closed to clients, `elo_percentile`'s search
+  path). 0025, which drops the five unreachable insert policies (ruling
+  5), is with Arthur for the SQL Editor; not yet run (read at 16:40 UTC).
+  Deploy `dpl_x9X8rtfSy3pk3uZ2dvQGLjUYB8Eu`.
+- #70 merged as `9003c1b`: sample pages pass no referrer on (ruling 18).
+  Live: a sample result carries `<meta name="referrer"
+  content="no-referrer">`, a genuine one `strict-origin-when-cross-origin`.
+  Deploy `dpl_APWR1Ybh5fTCTcd9ihQWkDq2eAvh`.
+- #73 merged as `bfadb6d`: zod 4.6.7 (ruling 13), the six request
+  fixtures unchanged, a 91-reply corpus parsing the same on zod 3 and 4;
+  `schema.ts` and `screen.ts` keep zod 3's UTF-16 count for their
+  200-character caps. Deploy `dpl_ECaMA5sGPQmGPRUu7DBSEBg8AJgP`.
+- #74 merged as `99744fe`: the new schools' colours, Confucianism
+  `#562b05`, Ubuntu `#1e3b4f`, Buddhist Ethics `#7d56b8` (ruling 16), on
+  `/styleguide/phase3`. Deploy `dpl_HKH9Yj851bjdXvaDAUVRC7cRBtg9`.
+- #75 merged as `0dd59cf`: Quiz v2 as ruled (ruling 15), and the live
+  copy no longer calls the quiz "about AI". Deploy
+  `dpl_BsD2uG8bYyp4B3SiBpnyWkA3TuoA`.
+- #72 merged as `ac5ceec`: the fresh review of #57's last fixes (ruling
+  19): a sample run's halt now holds until a validation passes, refusals
+  halt, the duplicate check runs before writing, console logs and
+  `return_visit` on sample pages. The scheduled job uses it from its next
+  run. Deploy `dpl_3K6kxcR6EhKSgDdB2ZLt2fibb3tz`.
+- #76 merged as `099c3b1`: the sample workflow's actions on Node 24,
+  pinned by commit; follow-redirects, vite and vitest within range.
+  `npm audit` lists 10 packages. Deploy
+  `dpl_Ccd4XCRVK5o4WALuxPey627jxDgj`, building when this was written;
+  the next entry records it.
+- Open: #71, the judge's caps and budget (rulings 6, 7, 8), three passes
+  done, waiting on Arthur's yes to migration 0026 before it is applied
+  and merged.
