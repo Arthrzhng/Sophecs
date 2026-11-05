@@ -43,17 +43,23 @@ export async function getMonthlySpend(): Promise<number | null> {
 }
 
 /**
- * Whether judging should stop for the month. Fails closed both ways: an
- * unset ceiling blocks judging rather than allowing unlimited spend, and
- * so does a spend that could not be read. AI_MONTHLY_BUDGET_USD=50 is the
- * current value; see docs/decisions.md for the math behind that number.
+ * The month's budget: "ok", "over", or "unread" when the spend could not
+ * be read. An unset ceiling, or one that is not a positive number, is
+ * "over": it blocks rather than allowing unlimited spend.
+ * AI_MONTHLY_BUDGET_USD=50 is the current value; see docs/decisions.md for
+ * the math behind that number.
  */
-export async function isBudgetExceeded(): Promise<boolean> {
+export async function budgetState(): Promise<"ok" | "over" | "unread"> {
   const ceiling = Number(process.env.AI_MONTHLY_BUDGET_USD ?? "0");
-  if (!(ceiling > 0)) return true;
+  if (!(ceiling > 0)) return "over";
   const spent = await getMonthlySpend();
-  if (spent === null) return true;
-  return spent >= ceiling;
+  if (spent === null) return "unread";
+  return spent >= ceiling ? "over" : "ok";
+}
+
+/** Whether to stop: fails closed, so a spend that could not be read stops too. */
+export async function isBudgetExceeded(): Promise<boolean> {
+  return (await budgetState()) !== "ok";
 }
 
 /** Tests only: forget the cached total. */

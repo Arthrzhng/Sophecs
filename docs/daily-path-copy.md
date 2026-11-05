@@ -325,6 +325,7 @@ lost. Try again in a moment.") carries this detail line: `The new text could not
 If the daily cap itself cannot be checked, nothing is sent to the judge,
 and the generic error ("The judge could not be reached.") carries this
 detail line: `The daily limit could not be checked, so nothing was sent to the judge.`
+The monthly spending limit the same way, since 2026-11-05: `The spending limit could not be checked, so nothing was sent to the judge.`
 
 ### A verdict on a private argument, seen by someone else
 

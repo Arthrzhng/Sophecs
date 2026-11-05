@@ -15,7 +15,7 @@ vi.mock("@/lib/supabase/admin", () => ({
   }),
 }));
 
-const { getMonthlySpend, isBudgetExceeded, resetBudgetCacheForTests } = await import("../src/lib/budget");
+const { budgetState, getMonthlySpend, isBudgetExceeded, resetBudgetCacheForTests } = await import("../src/lib/budget");
 
 beforeEach(() => {
   resetBudgetCacheForTests();
@@ -71,6 +71,19 @@ describe("the monthly budget", () => {
       vi.stubEnv("AI_MONTHLY_BUDGET_USD", v);
       expect(await isBudgetExceeded(), v).toBe(true);
     }
+  });
+
+  it("tells a spend it could not read from a limit that was reached", async () => {
+    reply = { data: null, error: { message: "boom" } };
+    expect(await budgetState()).toBe("unread");
+    resetBudgetCacheForTests();
+    reply = { data: 50, error: null };
+    expect(await budgetState()).toBe("over");
+    resetBudgetCacheForTests();
+    reply = { data: 1, error: null };
+    expect(await budgetState()).toBe("ok");
+    vi.stubEnv("AI_MONTHLY_BUDGET_USD", "");
+    expect(await budgetState()).toBe("over");
   });
 
   it("caches a good total for a minute", async () => {

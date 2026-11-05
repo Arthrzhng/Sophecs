@@ -57,7 +57,7 @@ expect "the bound includes a row at exactly since" 15.01 "$(as_role service_role
 expect "nothing since is zero, not null" 0 "$(as_role service_role "select public.ai_spend_since('2030-01-01T00:00:00Z')")"
 expect "anon refused" denied "$(as_role anon "select public.ai_spend_since('2026-11-01T00:00:00Z')")"
 expect "authenticated refused" denied "$(as_role authenticated "select public.ai_spend_since('2026-11-01T00:00:00Z')")"
-expect "an empty caller search_path" 15.00 "$(q "set search_path = ''; select public.ai_spend_since('2026-11-01T00:00:00Z')" | tail -1)"
+expect "its own search_path is empty" 'search_path=""' "$(q "select array_to_string(proconfig, ',') from pg_proc where proname = 'ai_spend_since'")"
 
 say "rollback, and 0026 again"
 apply "$REPO/supabase/rollback/0026_ai_spend_since.down.sql"

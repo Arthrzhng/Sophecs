@@ -46,6 +46,15 @@ describe("/api/judge's daily call ceiling", () => {
     expect(ceiling).toBeLessThan(route.indexOf("judged = await judgeDebate("));
   });
 
+  it("stops on a budget it could not read with its own line, not the 'limit reached' notice", () => {
+    expect(route).toContain(
+      'const BUDGET_UNCHECKED = "The spending limit could not be checked, so nothing was sent to the judge.";'
+    );
+    expect(route).toContain(
+      'const budget = await budgetState(); if (budget === "unread") { return NextResponse.json({ ok: false, error: BUDGET_UNCHECKED }, { status: 503 }); } if (budget === "over") { return paused("budget"); }'
+    );
+  });
+
   it("has its own copy on the argue screen and its own analytics reason", () => {
     const editor = read("src/components/debate/ArgumentEditor.tsx");
     expect(editor).toContain("call_ceiling: {");

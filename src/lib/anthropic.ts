@@ -429,8 +429,9 @@ export async function judgeDebate(params: {
 }): Promise<JudgeCallResult> {
   const kind = params.kind ?? "judge";
   const logged: string[] = [];
+  let judged: JudgeCallResult;
   try {
-    const judged = await judgeWithRetries(
+    judged = await judgeWithRetries(
       () => callJudgeModel(params.motion, params.school, params.argument, params.revisionOf),
       async (attempt) => {
         logged.push(
@@ -445,16 +446,17 @@ export async function judgeDebate(params: {
         );
       }
     );
-    // The last row is the call that validated; any before it were retries.
-    // If taking them out fails, the reader loses a slot for the day, which
-    // excludeFromDailyCap reports; the verdict stands either way.
-    await excludeFromDailyCap(logged.slice(0, -1));
-    return judged;
   } catch (err) {
     const offCap = await excludeFromDailyCap(logged);
     if (offCap && typeof err === "object" && err !== null) TAKEN_OFF_CAP.add(err);
     throw err;
   }
+  // Outside the try, so nothing here can send a judged submission down the
+  // failure path. The last row is the call that validated; any before it
+  // were retries. If taking them out fails, the reader loses a slot for the
+  // day, which excludeFromDailyCap reports; the verdict stands either way.
+  await excludeFromDailyCap(logged.slice(0, -1));
+  return judged;
 }
 
 export { PROMPT_VERSION };

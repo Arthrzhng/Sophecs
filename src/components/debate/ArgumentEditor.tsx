@@ -71,8 +71,8 @@ const PAUSE_COPY: Record<string, { title: string; body: string }> = {
     body: "Judging is paused while we check the quality of the verdicts. Your draft stays in this browser, so you can come back and send it once judging resumes. It has not reached the judge yet, so no verdict is on its way.",
   },
   budget: {
-    title: "Judging is paused for today.",
-    body: "The judge has a daily spending limit and it has been reached. Your draft stays in this browser; send it again once the limit resets and it goes through.",
+    title: "Judging is paused for the month.",
+    body: "The judge has a monthly spending limit and it has been reached. Your draft stays in this browser; send it again once the limit resets at the start of next month and it goes through.",
   },
   daily_cap: {
     title: "That is your last argument for today.",

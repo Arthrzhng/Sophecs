@@ -3,7 +3,7 @@ import { createClient as createSupabaseServerClient } from "@/lib/supabase/serve
 import { createAdminClient } from "@/lib/supabase/admin";
 import { newId } from "@/lib/ids";
 import { judgeDebate, JudgeValidationError, MAX_JUDGE_ATTEMPTS, PROMPT_VERSION, wasTakenOffDailyCap } from "@/lib/anthropic";
-import { isBudgetExceeded } from "@/lib/budget";
+import { budgetState } from "@/lib/budget";
 import { soloElo } from "@/lib/elo";
 import { applyStreakDay, isStreakEligible } from "@/lib/streak";
 import { recordChallengeDebate, resolveChallengeSide } from "@/lib/challenge";
@@ -36,14 +36,17 @@ const DAILY_CAP = 5;
 // 5-argument cap. Pick a sensible number and state it." 20 judge calls in
 // any 24 hours, every call counted, the ones taken off the argument cap
 // included. A submission starts only if all of its possible attempts fit
-// under it, so the ceiling is never passed: five judged arguments at three
-// attempts each are 15 calls and always fit, with room for at least one
-// failed submission besides. At most $0.20 or so a reader a day at the
+// under it, so one submission at a time never passes it (two sent at once
+// can both read the same count): five judged arguments at three attempts
+// each are 15 calls and always fit, with room for at least one failed
+// submission besides. At most $0.20 or so a reader a day at the
 // COST comment's rate. docs/decisions.md, "The judge's caps and budget".
 const JUDGE_CALL_CEILING = 20;
 // docs/daily-path-copy.md, "Judging failed": the detail line under the
 // argue screen's generic error when the cap cannot be checked.
 const CAP_UNCHECKED = "The daily limit could not be checked, so nothing was sent to the judge.";
+// The same line for the monthly spending limit (docs/daily-path-copy.md).
+const BUDGET_UNCHECKED = "The spending limit could not be checked, so nothing was sent to the judge.";
 
 const TOPIC_LOCK_DAYS = 7;
 const PAR_ELO_WINDOW = 50;
@@ -82,9 +85,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Not signed in." }, { status: 401 });
   }
 
-  // Allowlisted reviewers (JUDGE_ALLOWLIST_USER_IDS) bypass the kill switch
-  // and the daily cap only — budget, length, and the topic lock still
-  // apply. Checked here, right after the session check and before the
+  // Allowlisted reviewers (JUDGE_ALLOWLIST_USER_IDS) bypass the kill switch,
+  // the daily cap and, with it, the daily call ceiling only — budget,
+  // length, and the topic lock still apply. Checked here, right after the session check and before the
   // kill switch, per how this was asked for.
   const isAllowlisted = isJudgeAllowlisted(user.id);
   const isRevision = typeof body.parentDebateId === "string" && body.parentDebateId.length > 0;
@@ -92,7 +95,13 @@ export async function POST(request: Request) {
   if (!isAllowlisted && process.env.KILL_SWITCH_JUDGE === "true") {
     return paused("kill_switch");
   }
-  if (await isBudgetExceeded()) {
+  // Fails closed (Arthur, 2026-11-05): a spend that could not be read stops
+  // the submission, with its own message, since the limit was not reached.
+  const budget = await budgetState();
+  if (budget === "unread") {
+    return NextResponse.json({ ok: false, error: BUDGET_UNCHECKED }, { status: 503 });
+  }
+  if (budget === "over") {
     return paused("budget");
   }
 

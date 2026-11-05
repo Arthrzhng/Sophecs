@@ -2878,26 +2878,41 @@ needed.
 above the 5-argument cap. Pick a sensible number and state it."** 20 judge
 calls in any 24 hours, every call counted, the ones taken off the argument
 cap included. A submission starts only if all of its possible attempts fit
-(`count + MAX_JUDGE_ATTEMPTS > 20` refuses), so the ceiling is never
-passed. Why 20: five judged arguments at the most attempts each are 15
+(`count + MAX_JUDGE_ATTEMPTS > 20` refuses), so one submission at a time
+never passes it. Two sent at the same moment can both read the same count
+and pass it together, as the five-argument cap already can; each extra
+costs about $0.03 and the monthly budget still bounds the total, so it is
+left as it is, and an atomic reservation is on Checkpoint B's list. Why 20: five judged arguments at the most attempts each are 15
 calls and always fit, which keeps the ceiling above the argument cap as
 asked, with room for at least one failed submission besides; past that,
 a reader is resending arguments the judge cannot mark. At the COST
 comment's $0.0098 a call, 20 calls are about $0.20 a reader a day. It has
 its own pause reason, `call_ceiling`, and copy (`docs/daily-path-copy.md`,
 "The daily call ceiling"). Allowlisted reviewers skip it as they skip the
-daily cap: what the allowlist bypasses is frozen env handling, and the
-ruling is about readers. A count that fails stops the submission (503),
+daily cap, and the route's comment on the allowlist says so: what the
+allowlist bypasses is frozen env handling, and the ruling is about
+readers. Whether reviewers should be held to it is on Checkpoint B's
+list. A count that fails stops the submission (503),
 as the cap's does.
 
 **7. "Budget check totals spend in the database and fails closed."**
-`ai_spend_since(since)` (migration 0026) returns the sum of `cost_usd`
+Totalling in the database needs something there to do it, so the ruling
+carries the function that does: Supabase's PostgREST has aggregates
+switched off, and the alternative, reading every row, is what this
+replaces. `ai_spend_since(since)` (migration 0026) returns the sum of `cost_usd`
 over every `ai_calls` row since `since`, the same rows `budget.ts` read
 before. Only the server role may call it. `getMonthlySpend` calls it for
 the first of the month and returns null on an error, a missing value or a
 throw, without caching it, and `isBudgetExceeded` treats null as over
-budget. Before, a month past 1,000 rows was undercounted (one response's
-rows) and an error read as zero spend. A ceiling that is not a positive
+budget. `budgetState` tells "unread" from "over", so the argue screen
+says the limit could not be checked rather than that it was reached, and
+the notice for a limit reached now says monthly, which it is (it said
+daily). The counterpart turn route uses the same check: a spend it cannot
+read now holds the turn as pending, as the kill switch, the budget and a
+failed screening call already do. Nothing re-screens a pending turn
+today, so the exchange waits until someone acts; that predates this and
+is on Checkpoint B's list. Before, a month past 1,000 rows was
+undercounted (one response's rows) and an error read as zero spend. A ceiling that is not a positive
 number now blocks too; before, a non-numeric `AI_MONTHLY_BUDGET_USD` was
 read as no limit.
 
