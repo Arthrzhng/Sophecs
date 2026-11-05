@@ -32,6 +32,12 @@ async function ensureClient(): Promise<PostHog | null> {
         // loads on a genuine page and stays loaded when the reader moves on
         // to a sample one, so track()'s own check is not enough.
         before_send: (event) => (fromSamplePage(event) ? null : event),
+        // The site uses no product tours. Off here rather than only in the
+        // PostHog project, so a dashboard switch cannot load the extension
+        // and the DOMPurify it bundles (critical advisory
+        // GHSA-cg2g-xh64-v4q7; docs/decisions.md, "Dependency audit
+        // (2026-11-05)").
+        disable_product_tours: true,
       });
       if (pendingIdentify) posthog.identify(pendingIdentify);
       pendingIdentify = null;
