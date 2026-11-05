@@ -306,14 +306,76 @@ describe("the prompt version override", () => {
   });
 });
 
+describe("v3 as sent (Arthur's rulings of 2026-11-05)", () => {
+  function sentV3(): Promise<string> {
+    created.length = 0;
+    return callJudgeModel(MOTION, "stoicism", ARGUMENT, undefined, "v3").then(() => String(created[0].system));
+  }
+
+  it("leaves out the file's HTML comments", async () => {
+    // "Strip comments from judge.v3.md before it is sent (v3 only)."
+    const system = await sentV3();
+    expect(system).not.toContain("<!--");
+    expect(system).not.toContain("-->");
+    expect(system).not.toContain("v3 differs from v2");
+    expect(system.startsWith("You are a philosophy tutor")).toBe(true);
+    // The file still has its comment; only the request loses it.
+    expect(fs.readFileSync(path.join(process.cwd(), "content/prompts/judge.v3.md"), "utf-8").startsWith("<!--")).toBe(true);
+  });
+
+  it("ties the engagement cap to the objection the judge returns", async () => {
+    // "Strengthen the v3 engagement-cap instruction." Pinned whole, inside
+    // the engagement criterion and in the note on the scores.
+    const flat = (await sentV3()).replace(/\s+/g, " ");
+    const criterion = flat.slice(flat.indexOf("3. **Engagement**"), flat.indexOf("The school's specific fidelity criteria"));
+    expect(criterion).toContain(
+      "scores no more than 4 on engagement, however well it answers any other. The cap binds your own reply. " +
+        "Decide `unanswered_objection` first, as the response format below orders it, and if it is that " +
+        "best-known objection, your `engagement` " +
+        "score must be 4 or lower. Do not change which objection you return to stay under the cap."
+    );
+    expect(flat).toContain(
+      "`engagement` is at most 4 when `unanswered_objection` is the assigned school's best-known objection, as its criteria name it."
+    );
+    // The judge writes its reply in order with no thinking step, so the
+    // objection has to come before the scores it caps.
+    const shape = JSON.parse(flat.slice(flat.indexOf("```json") + 7, flat.indexOf("```", flat.indexOf("```json") + 7)));
+    const keys = Object.keys(shape);
+    expect(keys.indexOf("unanswered_objection")).toBeLessThan(keys.indexOf("score"));
+    expect(keys.indexOf("unanswered_objection")).toBeLessThan(keys.indexOf("engagement"));
+  });
+
+  it("gives Utilitarianism's Virtue Ethics voice Arthur's wording, under v3 only", () => {
+    const words = "what is done to one person must be justifiable to that person, not only to the total";
+    expect(fidelityCriteriaFor("utilitarianism", "v3")).toContain(words);
+    expect(fidelityCriteriaFor("utilitarianism", "v3")).not.toContain("a total owes nobody anything");
+    expect(fidelityCriteriaFor("utilitarianism", "v2")).not.toContain(words);
+  });
+
+  it("keeps both Buddhist Ethics voices as they were ('Buddhist voices stay')", async () => {
+    const { OBJECTION_VOICES } = await import("../src/lib/judge/objection-voices");
+    expect(OBJECTION_VOICES.buddhist).toEqual([
+      {
+        rival: "utilitarianism",
+        why: "deciding who audits a model and how an appeal is weighed takes a way of comparing everyone's claims, which compassion alone does not supply",
+      },
+      {
+        rival: "confucian",
+        why: "who answers to whom for a model is a question of roles and what each owes, which non-harm leaves unassigned",
+      },
+    ]);
+  });
+});
+
 describe("every judge prompt file", () => {
   // The invariant `fillPlaceholders` enforces at call time, checked here at the
   // file level so it fails on the prompt rather than on a run.
   //
   // This is the test that would have caught judge.v3.md naming both of its
-  // placeholders in its own header comment: the comment is sent to the
-  // model with the rest of the file, and filling a placeholder by name
-  // filled the mention instead of the placeholder.
+  // placeholders in its own header comment: the comment was then sent to
+  // the model with the rest of the file, and filling a placeholder by name
+  // filled the mention instead of the placeholder. v3's comment is now
+  // stripped before filling, and this still checks the raw file.
   const dir = path.join(process.cwd(), "content", "prompts");
   const versions = fs
     .readdirSync(dir)
