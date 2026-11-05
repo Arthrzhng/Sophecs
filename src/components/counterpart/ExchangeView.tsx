@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { TurnComposer } from "./TurnComposer";
 import { TurnActions } from "./TurnActions";
+import { REPLY_SAVED_COPY } from "@/lib/counterpart";
 import { ExchangePublishToggle } from "./PublishToggle";
 import { SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
@@ -14,6 +15,8 @@ export interface ViewTurn {
   body: string;
   /** Screened and not cleared. Only its own author sees it at all. */
   held: boolean;
+  /** Not screened yet (src/lib/rescreen.ts). Only its own author sees it. */
+  pending?: boolean;
 }
 
 export type ExchangeStatus = "open" | "complete" | "lapsed" | "blocked";
@@ -63,6 +66,7 @@ export function ExchangeView({
   counterpartLeft,
   anyRemoved,
   myHeld,
+  myPending = false,
   status,
   myTurn,
   nextSeq,
@@ -85,6 +89,8 @@ export function ExchangeView({
   anyRemoved: boolean;
   /** The reader's own reply is held: they see it, nobody else does yet. */
   myHeld: boolean;
+  /** The reader's own reply is saved and not yet screened. */
+  myPending?: boolean;
   status: ExchangeStatus;
   myTurn: boolean;
   nextSeq: number;
@@ -138,7 +144,7 @@ export function ExchangeView({
                 }`}
               >
                 {turn.mine ? "You" : "Counterpart"} &middot; Reply {turn.seq}
-                {turn.held && " · held for review"}
+                {turn.pending ? " · waiting to be checked" : turn.held && " · held for review"}
               </p>
               <blockquote className="mt-3 max-w-[60ch] border-l-2 border-rule pl-4 font-serif text-base italic leading-relaxed text-ink-mid">
                 {turn.quotedClaim}
@@ -155,6 +161,8 @@ export function ExchangeView({
       <div className="mt-12 border-t-2 border-rule pt-10">
         {myHeld ? (
           <p className="text-sm text-ink-mid">This reply was held for review.</p>
+        ) : myPending && status === "open" ? (
+          <p className="text-sm text-ink-mid">{REPLY_SAVED_COPY}</p>
         ) : status === "blocked" ? (
           <p className="text-sm text-ink-mid">This exchange is closed.</p>
         ) : status === "lapsed" ? (
