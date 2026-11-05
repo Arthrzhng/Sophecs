@@ -24,9 +24,14 @@ describe("sample activity stays out of genuine calibration", () => {
     expect(src).toMatch(/if \(challengerDebate\.is_sample \|\| challengeeDebate\.is_sample\) return \{ completed: false \};/);
     expect(src.indexOf("is_sample) return")).toBeLessThan(src.indexOf("pairwiseElo(\n"));
   });
-  it("elo_percentile counts genuine profiles only (migration 0023)", () => {
+  it("elo_percentile counts genuine profiles only (migration 0023, redefined by 0024)", () => {
     const sql = readFileSync("supabase/migrations/0023_sample_activity.sql", "utf8");
     expect(sql).toMatch(/from profiles where not is_sample and elo < user_elo/);
+    // 0024 is the definition that stands: the same filter, every time the
+    // table is counted.
+    const now = readFileSync("supabase/migrations/0024_checkpoint_a_database.sql", "utf8");
+    const body = now.slice(now.indexOf("create or replace function public.elo_percentile"), now.indexOf("$$;", now.indexOf("create or replace function public.elo_percentile")));
+    expect(body.match(/from public\.profiles where not is_sample/g)).toHaveLength(3);
   });
 });
 

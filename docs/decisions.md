@@ -2860,3 +2860,59 @@ work"), so this risk is accepted unmeasured.
 The quiz's axes were drawn on the reading that none of the six schools is
 a rule-based ethics (`docs/quiz-v2.md`, section 1). Arthur accepted that
 reading. A duty-based school is the obvious seventh, later.
+
+### Checkpoint A's database items (migrations 0024 and 0025)
+
+Arthur's rulings of 2026-11-05 on Checkpoint A, items 4, 5, 21, 22 and 23
+("Arthur's rulings of 2026-11-05 on Checkpoint A"). Two migrations,
+because one of them drops:
+
+- **0024, through the Supabase tool** (no DROP):
+  - **4.** `profiles_display_name_length`: `display_name` is null or at
+    most 60 characters. Production's rows were checked first: 3,280, none
+    over 60, the longest 12. Added last, so `profiles` is locked for the
+    shortest time.
+  - **21.** No signed-in path needs `is_class_member` or `is_class_owner`.
+    Every class read in `src/` uses the server role; the one signed-in
+    class write, `leaveClass`, deletes the reader's own `class_members`
+    row, which needs only "auth.uid() = user_id". So the two class read
+    policies narrow to the reader's own rows (ALTER POLICY, renamed "class
+    read owner" and "member read own"), and clients can no longer execute
+    either function. The functions stay, unused; dropping them is a DROP
+    for later. The closing check also fails if any policy still calls
+    either. Checkpoint A and "For Checkpoint A, from the security work"
+    said a revoke "would break class pages": it would not have, since
+    class pages read with the server role; it would only have broken the
+    two policies for a direct signed-in read through the API.
+  - **22.** `elo_percentile` runs with `search_path = ''` and names
+    `public.profiles` in full. Same signature, logic and results.
+  - **23.** Nothing in `src/` or `scripts/` reads `exchanges_public`, and
+    in production no database object depends on it (`pg_depend`, read on
+    2026-11-05), so anon and authenticated lose SELECT on it. The server
+    role keeps it.
+  - It ends by checking what clients hold and fails as a whole if a revoke
+    took nothing.
+- **0025, run by Arthur in the SQL Editor** (his instruction: "Database
+  statements with DROP: post them for me to run in the SQL Editor"): drops
+  "debates insert own", "own insert" on `profiles`, "anon insert own" on
+  `challenges` and on `quiz_results`, and "member join self". Not "own
+  update", which `/me`'s two signed-in updates go through.
+
+**Tests.** `scripts/test-0024-checkpoint-a-database.sh` applies every
+migration before 0024 under Supabase's default privileges, then checks 41
+things: the constraint at 60 and 61 characters, from the server role and
+signed in; a member no longer reading the class and an owner no longer
+reading others' memberships, while each still reads their own and
+`leaveClass` still deletes; both functions refused to anon and
+authenticated; `elo_percentile` counting genuine profiles only, its results unchanged
+and its body running under an empty caller search path; `exchanges_public` refused to clients
+and read by the server role; the rollback restoring every policy, grant,
+function and constraint exactly (compared as text); 0024 refused, naming
+the privilege, when another role has granted one of the functions, and
+naming the policy when any other policy calls one; 0025
+dropping the five and keeping "own update", with `/me`'s two updates and
+the server role's join still working; and 0025's rollback restoring the
+five exactly. `scripts/test-migrations.sh` passes.
+
+**Snapshot:** `docs/seed-snapshots/2026-11-05-before-0024.json`, read from
+production at 06:00 UTC on 2026-11-05.
