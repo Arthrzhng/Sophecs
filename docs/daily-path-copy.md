@@ -282,6 +282,20 @@ they do not change it.
 Argue screen panel heading: `What the judge looks for`. Link under it:
 `Read the full rubric` → `/debate/rubric`.
 
+### The daily call ceiling
+
+Shown on the argue screen when a submission could take a reader past 20
+judge calls in 24 hours, retries and failed submissions included (Arthur's
+ruling of 2026-11-05 on Checkpoint A, item 6). It can only be reached by
+submissions the judge struggled to mark: five arguments at three attempts
+each fit under it. Lives in `PAUSE_COPY` in
+`src/components/debate/ArgumentEditor.tsx`, reason `call_ceiling`.
+
+| Element | Copy |
+|---|---|
+| Title | `That is all the judging for today.` |
+| Body | `Your arguments today needed more tries than usual to judge, and there is a limit on those too. Your draft stays in this browser; come back tomorrow and send it again.` |
+
 ### Judging failed
 
 Shown on the argue screen when a submission ends without a verdict: the
@@ -311,6 +325,7 @@ lost. Try again in a moment.") carries this detail line: `The new text could not
 If the daily cap itself cannot be checked, nothing is sent to the judge,
 and the generic error ("The judge could not be reached.") carries this
 detail line: `The daily limit could not be checked, so nothing was sent to the judge.`
+The monthly spending limit the same way, since 2026-11-05: `The spending limit could not be checked, so nothing was sent to the judge.`
 
 ### A verdict on a private argument, seen by someone else
 

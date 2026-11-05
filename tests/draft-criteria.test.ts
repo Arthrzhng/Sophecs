@@ -70,7 +70,7 @@ vi.mock("@/lib/supabase/server", () => ({
   }),
 }));
 
-vi.mock("@/lib/budget", () => ({ isBudgetExceeded: async () => false }));
+vi.mock("@/lib/budget", () => ({ isBudgetExceeded: async () => false, budgetState: async () => "ok" }));
 
 const { POST } = await import("../src/app/api/judge/route");
 const { callJudgeModel } = await import("../src/lib/anthropic");

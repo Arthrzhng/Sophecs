@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { newId } from "@/lib/ids";
-import { judgeDebate, JudgeValidationError, PROMPT_VERSION, wasTakenOffDailyCap } from "@/lib/anthropic";
-import { isBudgetExceeded } from "@/lib/budget";
+import { judgeDebate, JudgeValidationError, MAX_JUDGE_ATTEMPTS, PROMPT_VERSION, wasTakenOffDailyCap } from "@/lib/anthropic";
+import { budgetState } from "@/lib/budget";
 import { soloElo } from "@/lib/elo";
 import { applyStreakDay, isStreakEligible } from "@/lib/streak";
 import { recordChallengeDebate, resolveChallengeSide } from "@/lib/challenge";
@@ -31,9 +31,22 @@ import type { SchoolId } from "@/lib/types";
 export const maxDuration = 60;
 
 const DAILY_CAP = 5;
+// Arthur's ruling of 2026-11-05 on Checkpoint A, item 6: "a hard daily
+// ceiling on judge calls per reader, retries included, above the
+// 5-argument cap. Pick a sensible number and state it." 20 judge calls in
+// any 24 hours, every logged call counted, the ones taken off the argument
+// cap included. A submission starts only if all of its possible attempts fit
+// under it, so one submission at a time never passes it (two sent at once
+// can both read the same count): five judged arguments at three attempts
+// each are 15 calls and always fit, with room for at least one failed
+// submission besides. At most $0.20 or so a reader a day at the
+// COST comment's rate. docs/decisions.md, "The judge's caps and budget".
+const JUDGE_CALL_CEILING = 20;
 // docs/daily-path-copy.md, "Judging failed": the detail line under the
 // argue screen's generic error when the cap cannot be checked.
 const CAP_UNCHECKED = "The daily limit could not be checked, so nothing was sent to the judge.";
+// The same line for the monthly spending limit (docs/daily-path-copy.md).
+const BUDGET_UNCHECKED = "The spending limit could not be checked, so nothing was sent to the judge.";
 
 const TOPIC_LOCK_DAYS = 7;
 const PAR_ELO_WINDOW = 50;
@@ -42,6 +55,7 @@ type PauseReason =
   | "kill_switch"
   | "budget"
   | "daily_cap"
+  | "call_ceiling"
   | "topic_lock"
   | "already_revised"
   | "no_criteria";
@@ -50,8 +64,9 @@ function paused(reason: PauseReason) {
   return NextResponse.json({ ok: false, paused: true, reason });
 }
 
-// Order follows the brief exactly: session, kill switch, budget, daily cap,
-// topic lock, length, insert, call the model, validate, elo, return. The
+// Order follows the brief exactly: session, kill switch, budget, daily cap
+// (and after it the daily call ceiling), topic lock, length, insert, call
+// the model, validate, elo, return. The
 // only two deviations are unavoidable data lookups (profile/topic) needed
 // to perform the checks after them, interleaved rather than done upfront.
 export async function POST(request: Request) {
@@ -71,9 +86,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Not signed in." }, { status: 401 });
   }
 
-  // Allowlisted reviewers (JUDGE_ALLOWLIST_USER_IDS) bypass the kill switch
-  // and the daily cap only — budget, length, and the topic lock still
-  // apply. Checked here, right after the session check and before the
+  // Allowlisted reviewers (JUDGE_ALLOWLIST_USER_IDS) bypass the kill switch,
+  // the daily cap and, with it, the daily call ceiling only; budget,
+  // length, and the topic lock still apply. Checked here, right after the session check and before the
   // kill switch, per how this was asked for.
   const isAllowlisted = isJudgeAllowlisted(user.id);
   const isRevision = typeof body.parentDebateId === "string" && body.parentDebateId.length > 0;
@@ -81,7 +96,13 @@ export async function POST(request: Request) {
   if (!isAllowlisted && process.env.KILL_SWITCH_JUDGE === "true") {
     return paused("kill_switch");
   }
-  if (await isBudgetExceeded()) {
+  // Fails closed (Arthur, 2026-11-05): a spend that could not be read stops
+  // the submission, with its own message, since the limit was not reached.
+  const budget = await budgetState();
+  if (budget === "unread") {
+    return NextResponse.json({ ok: false, error: BUDGET_UNCHECKED }, { status: 503 });
+  }
+  if (budget === "over") {
     return paused("budget");
   }
 
@@ -144,6 +165,23 @@ export async function POST(request: Request) {
     }
     if ((dailyCount ?? 0) >= DAILY_CAP) {
       return paused("daily_cap");
+    }
+
+    // The hard ceiling: every judge call in the window, whether or not it
+    // counts toward the five. Like the cap above, a count that failed stops
+    // the submission rather than waving it through.
+    const { count: callCount, error: ceilingError } = await admin
+      .from("ai_calls")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("kind", "judge")
+      .gte("created_at", sinceDaily);
+    if (ceilingError) {
+      console.error("[judge] daily call ceiling could not be checked:", ceilingError.message);
+      return NextResponse.json({ ok: false, error: CAP_UNCHECKED }, { status: 503 });
+    }
+    if ((callCount ?? 0) + MAX_JUDGE_ATTEMPTS > JUDGE_CALL_CEILING) {
+      return paused("call_ceiling");
     }
   }
 

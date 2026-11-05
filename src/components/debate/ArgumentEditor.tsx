@@ -59,7 +59,8 @@ interface JudgeResponse {
 // it. "Judging is paused" on its own tells the reader nothing about whether
 // their four hundred words survived.
 //
-// These three reasons all return from /api/judge before it writes anything,
+// These reasons (the kill switch, the budget, the daily cap and the call
+// ceiling) all return from /api/judge before it writes anything,
 // so there is no saved row and nothing queued: the only copy of the text is
 // the localStorage draft this component autosaves. Saying "saved and will be
 // judged when judging resumes" promised a queue that does not exist, and
@@ -71,12 +72,19 @@ const PAUSE_COPY: Record<string, { title: string; body: string }> = {
     body: "Judging is paused while we check the quality of the verdicts. Your draft stays in this browser, so you can come back and send it once judging resumes. It has not reached the judge yet, so no verdict is on its way.",
   },
   budget: {
-    title: "Judging is paused for today.",
-    body: "The judge has a daily spending limit and it has been reached. Your draft stays in this browser; send it again once the limit resets and it goes through.",
+    title: "Judging is paused for the month.",
+    body: "The judge has a monthly spending limit and it has been reached. Your draft stays in this browser; send it again once the limit resets at the start of next month and it goes through.",
   },
   daily_cap: {
     title: "That is your last argument for today.",
     body: "There is a cap on how many arguments one person can send the judge in a day. Your draft stays in this browser; come back tomorrow and send it again.",
+  },
+  // The hard ceiling on judge calls (docs/decisions.md, "The judge's caps
+  // and budget"): reached by submissions the judge could not mark, which
+  // do not use an argument but still cost a call each.
+  call_ceiling: {
+    title: "That is all the judging for today.",
+    body: "Your arguments today needed more tries than usual to judge, and there is a limit on those too. Your draft stays in this browser; come back tomorrow and send it again.",
   },
   topic_lock: {
     title: "You have already argued this motion.",

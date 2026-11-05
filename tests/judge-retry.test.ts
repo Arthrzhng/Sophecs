@@ -162,7 +162,7 @@ describe("judgeDebate retries a reply that fails validation, up to twice", () =>
     expect(JSON.stringify(inserted)).not.toContain(PARAMS.argument);
   });
 
-  it("takes a third reply when the first two fail, and leaves every call in the cap", async () => {
+  it("takes a third reply when the first two fail, and counts the submission once", async () => {
     replies.push(OVER_CAP, OVER_CAP, WITHIN_CAP);
     const judged = await judgeDebate(PARAMS);
 
@@ -171,7 +171,23 @@ describe("judgeDebate retries a reply that fails validation, up to twice", () =>
     expect(inserted).toHaveLength(3);
     expect(judged.verdict).toEqual(JSON.parse(WITHIN_CAP));
     // A submission that ends with a verdict is one of the reader's
-    // arguments, so nothing is taken out of the cap.
+    // arguments, once: the two retries before it are taken out of the cap
+    // (Arthur, 2026-11-05: "Retries must not use a reader's arguments"),
+    // and the call that validated stays in it. All three stay logged.
+    expect(updated).toEqual([
+      {
+        table: "ai_calls",
+        values: { counts_toward_cap: false },
+        column: "id",
+        ids: inserted.slice(0, 2).map((row) => row.id),
+      },
+    ]);
+  });
+
+  it("takes nothing out of the cap when the first reply validates", async () => {
+    replies.push(WITHIN_CAP);
+    await judgeDebate(PARAMS);
+    expect(inserted).toHaveLength(1);
     expect(updated).toHaveLength(0);
   });
 

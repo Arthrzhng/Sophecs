@@ -1848,6 +1848,10 @@ change to how the limit works, so Arthur's to choose (d):
 **Decide before the Winchester pilot.** Until then the cap stays as it is:
 it can cost a reader an extra slot on the rare retried submission.
 
+**Closed on 2026-11-05** by Arthur's rulings 6 and 8 ("The judge's caps and
+budget (migration 0026)"): retries no longer use a reader's arguments, and
+a ceiling of 20 judge calls a day sits above the five.
+
 *Superseded in part, the same evening.* Arthur's ruling on retries (the
 next entry) allows two retries and takes a submission that ends without a
 verdict out of the cap. So a retried submission that succeeds now uses two
@@ -1925,7 +1929,9 @@ How it was carried out:
 **What it does not change.** A submission that ends with a verdict still
 counts once per call. One that needed retries uses two or three of the
 reader's five, the open pre-pilot item above, which stays Arthur's. Every
-billed call still counts toward the monthly budget.
+billed call still counts toward the monthly budget. (Superseded on
+2026-11-05: a judged submission now counts once, whatever its retries;
+"The judge's caps and budget (migration 0026)".)
 
 **One case it does not cover.** If Vercel stops the function partway
 (the route's `maxDuration` is 60 seconds), the calls already logged stay
@@ -3481,3 +3487,106 @@ from generated answers, by the product's own functions.
   again. Do not revert this change to recover: old code has no stored
   check, and its 50-row spot checks would rarely see the rule-2 rows
   already written.
+
+### The judge's caps and budget (migration 0026)
+
+Arthur's rulings of 2026-11-05 on Checkpoint A, items 6, 7 and 8
+("Arthur's rulings of 2026-11-05 on Checkpoint A").
+
+**8. "Retries must not use a reader's arguments."** The five-argument cap
+counts `ai_calls` rows with `counts_toward_cap` (migration 0019), one per
+call, so a judged submission that needed a retry used two or three of the
+five. `judgeDebate` now takes the calls before the one that validated out
+of the cap, so a judged submission counts once. A failed one still counts
+not at all. Every call stays logged and in the budget. No schema change was
+needed.
+
+**6. "A hard daily ceiling on judge calls per reader, retries included,
+above the 5-argument cap. Pick a sensible number and state it."** 20 judge
+calls in any 24 hours, every logged call counted, the ones taken off the
+argument cap included. A call the API refused or that never answered
+writes no row, so it counts toward neither the ceiling nor the budget;
+those are mostly not billed. A submission starts only if all of its possible attempts fit
+(`count + MAX_JUDGE_ATTEMPTS > 20` refuses), so one submission at a time
+never passes it. Two sent at the same moment can both read the same count
+and pass it together, as the five-argument cap already can; each extra
+costs about $0.03 and the monthly budget still bounds the total, so it is
+left as it is, and an atomic reservation is for Checkpoint B (below). Why 20: five judged arguments at the most attempts each are 15
+calls and always fit, which keeps the ceiling above the argument cap as
+asked, with room for at least one failed submission besides; past that,
+a reader is resending arguments the judge cannot mark. At the COST
+comment's $0.0098 a call, 20 calls are about $0.20 a reader a day. It has
+its own pause reason, `call_ceiling`, and copy (`docs/daily-path-copy.md`,
+"The daily call ceiling"). Allowlisted reviewers skip it as they skip the
+daily cap, and the route's comment on the allowlist says so: what the
+allowlist bypasses is frozen env handling, and the ruling is about
+readers. Whether reviewers should be held to it is for Checkpoint B
+(below). A count that fails stops the submission (503),
+as the cap's does.
+
+**7. "Budget check totals spend in the database and fails closed."**
+Totalling in the database needs something there to do it: Supabase's
+PostgREST has aggregates switched off, and the alternative, reading every
+row, is what this replaces. The ruling did not say a migration was
+approved, as item 8's did, so Arthur was asked for a yes to 0026 itself
+before it is applied. `ai_spend_since(since)` (migration 0026) returns the sum of `cost_usd`
+over every `ai_calls` row since `since`, the same rows `budget.ts` read
+before. Only the server role may call it. `getMonthlySpend` calls it for
+the first of the month and returns null on an error, a missing value or a
+throw, without caching it, and `isBudgetExceeded` treats null as over
+budget. `budgetState` tells "unread" from "over", so the argue screen
+says the limit could not be checked rather than that it was reached, and
+the notice for a limit reached now says monthly, which it is (it said
+daily). The counterpart turn route uses the same check: a spend it cannot
+read now holds the turn as pending, as the kill switch, the budget and a
+failed screening call already do. Nothing re-screens a pending turn
+today, so the exchange waits until someone acts; that predates this and
+is for Checkpoint B (below). Before, a month past 1,000 rows was
+undercounted (one response's rows) and an error read as zero spend. A ceiling that is unset or not a positive
+number now blocks too, as "unread", so the reader is told the limit could
+not be checked rather than that it was reached and resets next month,
+which a bad setting never does; before, a non-numeric
+`AI_MONTHLY_BUDGET_USD` was read as no limit.
+
+**Order.** Arthur's yes to 0026, then 0026 is applied (security advisor
+before and after, read back), then this merges: without the function,
+every budget check is an error, so nothing is sent to the judge and
+counterpart turns are held. The rollback is the reverse: revert this
+PR's merge commit, confirm that deploy is Ready, then drop the function.
+Reverting `budget.ts` alone does not build, since the judge route
+imports `budgetState` from it.
+
+**Tests.** `tests/judge-ceiling-route.test.ts` runs the route's `POST`
+with the database, session and budget mocked: a submission at 17 calls
+reaches the model and one at 18 is paused before anything is written; a
+ceiling count that fails is a 503; the cap is checked first; an
+allowlisted reviewer skips the ceiling but not the budget; an unread
+spend is a 503 and a spent budget pauses, both before anything is read
+or written. `tests/budget.test.ts` (the month's first day, month and
+year; the three states; nothing cached on a failure);
+`tests/judge-retry.test.ts` (a judged submission after two retries takes
+the two retries out, and one that validates first takes nothing out);
+`tests/judge-caps.test.ts` (the constants, the query's filters and the
+copy, read from the source); `scripts/test-0026-ai-spend-since.sh` (the
+sum over 1,500 rows, the date bound, security invoker, client roles
+refused, the rollback and a second apply).
+
+### For Checkpoint B, from the judge's caps (#71)
+
+- **An atomic reservation for the ceiling and the cap.** Two submissions
+  sent at the same moment can both read the same count and pass
+  together. Each extra costs about $0.03 and the monthly budget bounds
+  the total. `src/app/api/judge/route.ts`.
+- **Whether allowlisted reviewers face the ceiling.** Today they have no
+  daily bound on calls, only the monthly budget. A (d) question: the
+  allowlist's handling is frozen. `src/lib/judge-allowlist.ts`, whose
+  first comment ("bypasses kill switch/daily cap") now also covers the
+  ceiling.
+- **Pending counterpart turns are never re-screened.** A turn held
+  because screening was paused, over budget, over its cap, failed, or
+  (since #71) could not read the spend stays pending, and the author is
+  told "Your reply is saved and will be delivered once it has been
+  checked", which nothing does. Resending hits the unique
+  `(exchange_id, seq)` index and gets a 409.
+  `src/app/api/counterpart/turn/route.ts`,
+  `src/components/counterpart/TurnComposer.tsx`.

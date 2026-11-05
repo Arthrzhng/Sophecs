@@ -111,7 +111,7 @@ vi.mock("@/lib/supabase/server", () => ({
     auth: { getUser: async () => ({ data: { user: { id: "reader-1" } } }) },
   }),
 }));
-vi.mock("@/lib/budget", () => ({ isBudgetExceeded: async () => false }));
+vi.mock("@/lib/budget", () => ({ isBudgetExceeded: async () => false, budgetState: async () => "ok" }));
 
 const { POST } = await import("../src/app/api/judge/route");
 
