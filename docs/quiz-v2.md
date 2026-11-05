@@ -1,8 +1,18 @@
-# Quiz v2: a draft for Arthur to decide
+# Quiz v2
 
-Stage 3 of the brief of 2026-11-03. **Nothing here is built.** Every
+Stage 3 of the brief of 2026-11-03. **Nothing here is built yet.** Every
 choice below is a philosophy or content judgement and is Arthur's (CLAUDE.md
-item (e)). Checkpoint A asks for those decisions in one list.
+item (e)).
+
+**Ruled on 2026-11-05** (Checkpoint A, item 15; `docs/decisions.md`,
+"Arthur's rulings of 2026-11-05 on Checkpoint A"): the axes, their plain
+names and the six positions are accepted as drafted, Ubuntu at 0 degrees
+and Buddhist Ethics at 310 included; the weighted options (section 5) are
+accepted; five options are reworded, keeping their schools and vectors
+(section 3, "The rulings' option edits"), and the simulation
+re-run, with the same results; 1a, 10b, 3d, 5b, 6d, 9a and 8c stay as
+written; and there is no rule-based school. Quiz v2 ships at launch.
+The copy's AI framing is reworded now (section 8).
 
 - The questions, options, school positions and weights are in
   `docs/quiz-v2.json`.
@@ -134,6 +144,14 @@ Utilitarianism, 0.95 for Buddhist Ethics, 0.9 for Ubuntu, and 0.8 for
 Confucianism and Virtue Ethics. The quiz would show neither the
 "Leans" column nor the vectors. Option order would be fixed as written.
 
+**The rulings' option edits (2026-11-05).** Arthur reworded five of the
+options below, each keeping its school and its vector: 2c no longer
+shades the truth; 5c and 7a now speak up once and let the outcome go,
+rather than stepping back; 7c no longer calls staying quiet cowardly;
+and 6b gives the older sibling a duty as well as a claim. He kept 1a,
+10b, 3d, 5b, 6d, 9a and 8c as written. The two lists that follow are the
+review notes he ruled on, kept as they were.
+
 **Options I am least sure pass the "obviously nice" test**, for Arthur's
 eye:
 - 3d, "decided together";
@@ -163,7 +181,8 @@ led with using the AI unseen, which encoded the textbook objection to
 Utilitarianism rather than its reasoning; it now weighs good and harm to
 everyone, the reader's own learning included. It is still the only
 option under which using the tool could come out right, because only a
-sum can favour it; Arthur may want that kept or changed. Neither change
+sum can favour it; Arthur may want that kept or changed (he kept it, on
+2026-11-05). Neither change
 moves an option's school, so the simulation is unchanged.
 
 **1. Your group project is due tomorrow and one person has done almost nothing. What do you do?**
@@ -181,7 +200,7 @@ moves an option's school, so the simulation is unchanged.
 | --- | --- | --- | --- |
 | a | Tell them it is weak. A friend who only flatters is not the kind of friend I want to be. | Virtue Ethics | -0.27, 0.75 |
 | b | Offer to go through it together. When one of us does badly, the rest of us have let it happen. | Ubuntu | 0.90, 0.00 |
-| c | Say whatever is most likely to get the essay improved before it is handed in, even if that is not quite what I think. | Utilitarianism | -0.42, -0.91 |
+| c | Say whatever is most likely to get the essay improved before it is handed in. | Utilitarianism | -0.42, -0.91 |
 | d | Give my honest view once and leave it there. What they do with it is up to them. | Stoicism | -0.97, 0.26 |
 
 **3. Your gran wants you at a family lunch on the day of a match you really want to play in.**
@@ -208,7 +227,7 @@ moves an option's school, so the simulation is unchanged.
 | --- | --- | --- | --- |
 | a | Think about who this is going to hurt, them included, before I decide whether to say anything. | Buddhist Ethics | 0.61, -0.73 |
 | b | Do what an honest person would do here, even if it costs me friends. | Virtue Ethics | -0.27, 0.75 |
-| c | Keep my eyes on my own paper. Their choices are theirs to answer for. | Stoicism | -0.97, 0.26 |
+| c | Tell them once, privately, what I saw. What they do next is theirs to answer for; what I say is mine. | Stoicism | -0.97, 0.26 |
 | d | Report it if that makes the results fairer for everyone else in the year. | Utilitarianism | -0.42, -0.91 |
 
 **6. Your younger brother keeps using your phone without asking.**
@@ -216,7 +235,7 @@ moves an option's school, so the simulation is unchanged.
 | | Option | Leans | x, y |
 | --- | --- | --- | --- |
 | a | Raise it with the whole family. People who live together sort things out together. | Ubuntu | 0.90, 0.00 |
-| b | I am the older one, so I set how we treat each other's things and expect him to follow it. | Confucianism | 0.51, 0.61 |
+| b | I am the older one, so it is on me to show him how we treat each other's things, and on him to learn to ask. | Confucianism | 0.51, 0.61 |
 | c | Say no without making a scene. Getting angry would do more damage than a borrowed phone. | Buddhist Ethics | 0.61, -0.73 |
 | d | Be patient with him. I would rather be generous with my things than someone who keeps score. | Virtue Ethics | -0.27, 0.75 |
 
@@ -224,9 +243,9 @@ moves an option's school, so the simulation is unchanged.
 
 | | Option | Leans | x, y |
 | --- | --- | --- | --- |
-| a | Play as well as I can wherever I am put. Who gets picked is not up to me. | Stoicism | -0.97, 0.26 |
+| a | Tell the captain once, calmly, what I think is fair, then play as well as I can wherever I am put. Whether they listen is not up to me. | Stoicism | -0.97, 0.26 |
 | b | Push for picks based on results, because that wins the most games for all of us. | Utilitarianism | -0.42, -0.91 |
-| c | Tell the captain to their face that it is unfair. Keeping quiet would be cowardly. | Virtue Ethics | -0.27, 0.75 |
+| c | Tell the captain to their face that it is unfair. Going along with it would make me someone I don't want to be. | Virtue Ethics | -0.27, 0.75 |
 | d | Get the whole team to agree how picks should work, so nobody is left out of deciding. | Ubuntu | 0.90, 0.00 |
 
 **8. An AI tool could write your whole history essay, and nobody would ever know.**
@@ -381,7 +400,7 @@ same. A reader who never retakes keeps their v1 school.
 
 ## 7. For Checkpoint A
 
-Each of these is Arthur's to decide:
+Ruled on 2026-11-05; see the note at the top. Kept as it was put:
 
 1. The axes and their plain names (section 1).
 2. The six positions, and especially Buddhist Ethics' and Ubuntu's
@@ -405,3 +424,73 @@ Each of these is Arthur's to decide:
    The Ubuntu page places Gyekye between Metz and Menkiti, which points
    the same way, but its gloss on him, individuals keeping "their own
    worth and rights", points towards the individual end (section 2).
+
+## 8. The quiz's copy
+
+Arthur, 2026-11-05: "Reword the share lines, site description, SharePage
+and ChallengeInvite away from 'ten questions about AI', to something true
+of v2 (e.g. ten questions about how you decide what's right)."
+
+**Done now, on the live site.** "Ten questions on how AI should decide
+things" is not true of v1 either: three of v1's ten questions involve AI
+(an algorithm and a loan, an AI tool, a self-driving car) and seven do
+not. v2 has one (8), and two more about apps (4 and 10). "Ten questions
+about how you decide what's right" is true of both, so the AI framing
+goes now rather than waiting for launch:
+
+| Where | Was | Now |
+| --- | --- | --- |
+| Site description, `src/app/layout.tsx` | Ten questions on how AI should decide things. Find out which school of ethics you actually argue from. | Ten questions about how you decide what's right. Find out which school of ethics you actually argue from. |
+| `src/components/share/SharePage.tsx` | Ten questions on how AI should decide things. No account needed, about eighty seconds. | Ten questions about how you decide what's right. No account needed, about eighty seconds. |
+| `src/components/share/ChallengeInvite.tsx` | Sophecs asks ten questions about how AI should decide things and places you in one of three schools of ethics, ... | Sophecs asks ten questions about how you decide what's right and places you in one of three schools of ethics, ... |
+| The share line that opened "Ten questions about AI", in each of the six `content/schools/*.md` | Ten questions about AI and ... | Ten questions about how I decide what's right, and ... |
+
+Only those words change; the rest of each line is as it was. The three
+draft schools' lines are not shown to readers until they are published.
+
+**At launch, with the six schools.** These lines are true of v1 and
+become untrue only when v2 and the six schools ship, so they change in
+the launch work (Stage 5, behind `SIX_SCHOOLS`; front matter such as the
+share lines cannot be switched by a runtime flag, so those edits go in
+the launch merge itself):
+
+- **The time.** v2's prompts and options run to 879 words against v1's
+  483, so at v1's claimed pace v2 takes about two and a half minutes.
+  "About eighty seconds" (`SharePage.tsx`, `ChallengeInvite.tsx`) and
+  "About 80 seconds" (`src/app/page.tsx`) become, as proposed, "a few
+  minutes".
+- **Three schools become six.** `ChallengeInvite.tsx` ("one of three
+  schools"); the quiz page's description (`src/app/quiz/page.tsx`,
+  "Stoicism, Utilitarianism or Virtue Ethics"); the landing page
+  (`src/app/page.tsx`, "the Stoics, the Utilitarians or the Virtue
+  Ethicists", the heading "The three schools", and "Every answer moves
+  you across the triangle", which v2's two-axis map replaces); the
+  site's sharing image (`src/app/opengraph-image.tsx`, "Ten scenarios.
+  Three schools."); and, outside the site, `README.md` ("one of three
+  schools").
+
+**For Arthur, on the phase's decision list (e).** Share lines are the
+text a reader posts when they share a result (to X, WhatsApp, the
+clipboard), so they describe the quiz, and many describe it as about AI
+or name v1's questions. None is changed here beyond its opening words.
+By file, with each line's index in `share_lines`:
+
+- `stoicism.md`: [0] "the only thing an AI can't take from me"; [2]
+  "including the algorithm's verdict".
+- `utilitarianism.md`: [1] "My verdict on the self-driving car problem",
+  v1's question 8, which v2 does not ask; [2], edited here, "count
+  everyone it touches", where "it" meant the AI the line no longer
+  names.
+- `virtue-ethics.md`: [1] "I judge an algorithm the same way I judge a
+  person".
+- `confucian.md`: [0] "I judge an AI by what it does to the relationships
+  around it"; [1], edited here, "does this system let them pay it"
+  (proposed: "can they still pay it"); [2] "a word that flatters a
+  system".
+- `buddhist.md`: [0] "what a system was built to do, not just what it
+  scored"; [1], edited here, "are we still checking", which means
+  watching an AI after release; [2] "keep looking after it ships".
+- `ubuntu.md`: [0] "my answer to every AI question"; [1], edited here,
+  "the data was only mine" (proposed: "the choice was only mine"); [2]
+  "judge a system by the relationships it leaves behind".
+- The time wording above, "a few minutes".

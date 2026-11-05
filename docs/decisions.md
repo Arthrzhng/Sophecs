@@ -3050,3 +3050,35 @@ score, and this way round was the search's first.
 
 Nothing live changes: the colours reach the site with Phase 3, behind
 `SIX_SCHOOLS`.
+
+### Quiz v2, as ruled
+
+Arthur's ruling 15 of 2026-11-05 ("Arthur's rulings of 2026-11-05 on
+Checkpoint A"), carried into `docs/quiz-v2.json` and `docs/quiz-v2.md`:
+
+- The axes, their plain names and the six positions stand as drafted,
+  Ubuntu at 0 degrees and Buddhist Ethics at 310 included, and so do the
+  weighted options.
+- 2c, 5c, 7a, 7c and 6b take Arthur's wording, each keeping its school
+  and vector. The simulation, re-run, gives the same figures to the
+  digit, as it must: it never reads an option's wording. Every school lands as
+  primary for 16.2% to 17.7% of answer patterns.
+- 1a, 10b, 3d, 5b, 6d, 9a and 8c stay as written. No rule-based school;
+  a duty-based one is the obvious seventh, later (noted above).
+- The copy's AI framing is reworded now, on the live site: "ten
+  questions on how AI should decide things" was not true of v1 either
+  (three of its ten questions involve AI), and "ten questions about how
+  you decide what's right" is true of both. That covers the site
+  description, `SharePage`, `ChallengeInvite` and the opening of one
+  share line on each school page (`content/schools/*.md`, which the
+  ruling names). The time ("about eighty seconds", which v2's longer
+  options would make untrue) and three schools becoming six change at
+  launch, and the share lines that describe v1's questions go to Arthur
+  as content judgements (`docs/quiz-v2.md`, section 8).
+- PostHog's `share_clicked` records a share line by its index, and three
+  of those indices now hold new text (stoicism 1, utilitarianism 2,
+  virtue-ethics 0) from this PR's production deploy on 2026-11-05.
+  A comparison of share lines should split on that date.
+
+Quiz v2 ships at launch, after the sample teardown, and the fresh run
+follows it (`docs/sample-activity.md`, "At launch").

@@ -95,8 +95,8 @@ export function SharePage({
               Take the quiz
             </ChunkyLink>
             <p className="mt-6 max-w-[54ch] text-sm leading-relaxed text-ink-mid">
-              Ten questions on how AI should decide things. No account needed,
-              about eighty seconds.
+              Ten questions about how you decide what&apos;s right. No account
+              needed, about eighty seconds.
             </p>
           </div>
         ) : (

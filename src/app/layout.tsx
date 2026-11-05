@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/nav/SiteFooter";
 import "./globals.css";
 
 const DESCRIPTION =
-  "Ten questions on how AI should decide things. Find out which school of ethics you actually argue from.";
+  "Ten questions about how you decide what's right. Find out which school of ethics you actually argue from.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sophecs.com"),

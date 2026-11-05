@@ -33,8 +33,9 @@ gets_wrong: |-
   audience, is actually yours.
 share_lines:
   - >-
-    Ten questions about AI and my answers all came down to the same
-    thing: what does this make of me. Sophecs says that's Virtue Ethics.
+    Ten questions about how I decide what's right, and my answers all came
+    down to the same thing: what does this make of me. Sophecs says that's
+    Virtue Ethics.
   - >-
     Apparently I judge an algorithm the same way I judge a person — not by
     the rule it follows, but by the character it reveals. Sophecs called

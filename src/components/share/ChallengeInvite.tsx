@@ -47,10 +47,10 @@ export function ChallengeInvite({
       </h1>
 
       <p className="mt-5 max-w-[54ch] text-base leading-relaxed text-ink-mid">
-        Sophecs asks ten questions about how AI should decide things and places
-        you in one of three schools of ethics, then asks you to argue for yours
-        against a motion. No account needed for the questions, and about eighty
-        seconds.
+        Sophecs asks ten questions about how you decide what&apos;s right and
+        places you in one of three schools of ethics, then asks you to argue
+        for yours against a motion. No account needed for the questions, and
+        about eighty seconds.
       </p>
 
       <div className="mt-8">
