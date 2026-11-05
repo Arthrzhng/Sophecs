@@ -30,9 +30,10 @@ runtime read would not do: `school-registry.ts`, `school-colors.ts` and
 the quiz result, the verdict), which cannot read a server variable, so a
 page would render six schools on the server and hydrate with three.
 Every module that holds one of the three's ids, names, adherent nouns or
-colours holds it behind that constant, so a build without the flag drops it as dead code, and
-`npm run check:bundle` confirms that it did. The colour tokens are a
-stylesheet the build swaps in with the flag, and an empty one without it.
+colours holds it behind that constant, so a build without the flag drops
+it as dead code, and `npm run check:bundle` confirms that it did. The
+colour tokens are a stylesheet the build swaps in with the flag, and an
+empty one without it.
 The image routes cannot read a stylesheet, so their colours stay
 literals in `card-tokens.ts`, behind the same constant.
 
