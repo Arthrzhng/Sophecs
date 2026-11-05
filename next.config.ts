@@ -3,7 +3,8 @@ import type { NextConfig } from "next";
 
 // SIX_SCHOOLS=1 builds the six-school product: the three schools that are
 // not yet published are shown on that build, and on no other
-// (docs/stage5-plan.md). Vercel sets it for Preview only, until launch.
+// (docs/stage5-plan.md). It is meant for Vercel's Preview environment
+// only, until launch.
 //
 // It is read here, once, when the build starts, and handed to the code
 // through `env`, which writes the value into server and client code alike
@@ -20,6 +21,18 @@ import type { NextConfig } from "next";
 // `process.env.SIX_SCHOOLS` unreplaced in client code, which is no
 // constant at all.
 const SIX_SCHOOLS = process.env.SIX_SCHOOLS === "1" ? "1" : "0";
+
+// Vercel's production build is a plain `next build`, which runs no bundle
+// check, so a flag ticked for Production by mistake would publish the
+// three with every gate green. That is Arthur's decision (c), taken at
+// launch, and the launch merge removes this refusal; until then a
+// production deploy with the flag fails to build and the live one stays.
+if (SIX_SCHOOLS === "1" && process.env.VERCEL_ENV === "production") {
+  throw new Error(
+    "SIX_SCHOOLS is set for a production build. The six schools are not published: " +
+      "unset it for Production in Vercel (docs/stage5-plan.md)."
+  );
+}
 
 // The new schools' colour tokens are a stylesheet of their own, and a
 // build without the flag gets an empty one in its place, so their names
@@ -43,6 +56,17 @@ const nextConfig: NextConfig = {
       ...config.resolve.alias,
       "@six-schools/tokens.css": SIX_SCHOOLS_TOKENS,
     };
+    // Webpack's build cache keys on Next's own config, which leaves out
+    // both `env` and this alias, and on this file's text, which does not
+    // change when the variable does. Without the flag in the cache's
+    // version, a build reusing the other kind's cache kept the stylesheet
+    // that cache resolved: a flag-off build over a flag-on cache shipped
+    // the three's tokens. Vercel restores .next/cache between deploys, so
+    // each kind of build now reads only a cache written by its own kind.
+    // Only a filesystem cache has a version; a memory cache starts empty.
+    if (config.cache && typeof config.cache === "object" && config.cache.type === "filesystem") {
+      config.cache.version = `${config.cache.version ?? ""}|six-schools:${SIX_SCHOOLS}`;
+    }
     return config;
   },
   // Every image route (the two card routes, both OG images, and the two icon

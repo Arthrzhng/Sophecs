@@ -120,7 +120,10 @@ While Stage 5 builds the new schools behind `SIX_SCHOOLS`
 imports also runs `npm run check:bundle:six`. It builds with the flag into
 `.next-six`, which leaves `.next` alone, and fails unless every one of
 those strings is in that build's client bundle: the flag-on build has to
-show what the flag-off build must not.
+show what the flag-off build must not. Each check needs its own kind of
+build, read from the build: `npm run check:bundle` fails on a `.next`
+built with the flag, so a `SIX_SCHOOLS=1` left in your shell or in
+`.env.local` shows up as a failure, not as a green gate.
 
 ## Things that are frozen
 

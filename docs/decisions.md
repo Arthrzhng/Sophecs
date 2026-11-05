@@ -3209,11 +3209,29 @@ build without it is the production build it was, which
 - **The bundle check** now looks for nineteen strings rather than six:
   the ids and names, the proposed adherent nouns (added to
   `DRAFT_SCHOOLS`, which does not depend on the flag), and every colour
-  in `six-schools.css`. It reads which kind of build it has from the
-  build itself (`config.env` in `required-server-files.json`); on a
-  flag-on build it fails unless all nineteen are in the client bundle.
-  `npm run check:bundle:six` makes that build into `.next-six` and checks
-  it. Both builds take about 35 seconds here.
+  in `six-schools.css`. It throws if a draft lacks an adherent noun or
+  any of its three colour tokens. It reads which kind of build it has
+  from the build itself (`config.env` in `required-server-files.json`),
+  and each script needs its own kind: `npm run check:bundle` fails on a
+  flag-on build, and `npm run check:bundle:six` makes one into
+  `.next-six` and fails unless all nineteen are in it whole, a name or
+  id as a quoted string of its own and not inside a longer one. Both
+  builds take about 35 seconds here.
+- **The build cache.** Webpack's cache is keyed on Next's own config,
+  which leaves out `env` and the stylesheet alias, and on the text of
+  `next.config.ts`, which does not change with the variable. The review
+  of #79 built with the flag and then without it into one directory, and
+  the flag-off build kept the flag-on stylesheet: all seven colours and
+  the three ids in its CSS. JavaScript was rebuilt correctly. Vercel
+  restores `.next/cache` between deploys and runs no bundle check, so the
+  flag is now part of the cache's version, and each kind of build reads
+  only a cache its own kind wrote. Rebuilt both ways over one cache, and
+  back, the checks pass each time.
+- **No flag in production before launch.** `next.config.ts` refuses to
+  build when the flag is on and `VERCEL_ENV` is `production`, so a wrong
+  tick in Vercel fails the deploy and the live one stays, rather than
+  publishing the three with every gate green. The launch merge removes
+  the refusal.
 
 Vercel's Preview environment gets `SIX_SCHOOLS=1` once this is merged;
 Production does not until launch.

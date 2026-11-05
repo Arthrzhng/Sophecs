@@ -15,7 +15,8 @@ import {
 // school's name or id appears in any of these on a build without
 // SIX_SCHOOLS, which is what keeps them out of production's client bundle.
 // Each map enumerates SHOWN_SCHOOL_IDS rather than naming schools, so the
-// flag is tested in the registry alone, apart from TEXT_CLASS_BY_SCHOOL.
+// flag is tested in the registry, and again only where a module holds
+// literals of its own: TEXT_CLASS_BY_SCHOOL here, and card-tokens.ts.
 //
 // The saturated surfaces are read from card-tokens.ts, not restated here:
 // that file is the single place the globals.css literals are mirrored for

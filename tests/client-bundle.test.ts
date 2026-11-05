@@ -5,6 +5,7 @@ import {
   CLIENT_DIR,
   buildDir,
   builtWithSixSchools,
+  SIX_SCHOOLS_CSS,
   colourNeedles,
   draftNeedles,
   findDraftLeaks,
@@ -69,11 +70,47 @@ describe("the client bundle", () => {
   it("would notice a school missing from a SIX_SCHOOLS build", () => {
     const dir = fs.mkdtempSync(path.join(process.cwd(), ".tmp-bundle-check-"));
     try {
-      fs.writeFileSync(path.join(dir, "chunk.js"), `var a={${DRAFT_SCHOOLS[0].id}:1};`);
+      fs.writeFileSync(path.join(dir, "chunk.js"), `var a={id:"${DRAFT_SCHOOLS[0].id}"};`);
       const missing = findMissing(dir);
       expect(missing).not.toContain(DRAFT_SCHOOLS[0].id);
       expect(missing).toContain(DRAFT_SCHOOLS[1].id);
       expect(missing).toContain(colourNeedles()[0]);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("counts a string as present only whole, not inside a longer one", () => {
+    // The leak check is deliberately loose; presence is not. "Confucian"
+    // inside "Confucianism", or an id inside a CSS custom property's name,
+    // is not the registry entry a flag-on build is meant to carry.
+    const entry = DRAFT_SCHOOLS[0];
+    const dir = fs.mkdtempSync(path.join(process.cwd(), ".tmp-bundle-check-"));
+    try {
+      fs.writeFileSync(path.join(dir, "a.js"), `var n="${entry.name}";`);
+      fs.writeFileSync(path.join(dir, "b.css"), `:root{--color-${entry.id}:#000000}`);
+      const missing = findMissing(dir);
+      expect(missing).not.toContain(entry.name);
+      expect(missing).toContain(entry.id);
+      if (entry.name.includes(entry.adherent!)) expect(missing).toContain(entry.adherent);
+      // The leak check, by contrast, finds the id in the property name.
+      expect(findDraftLeaks(dir).map((l) => l.needle)).toContain(entry.id);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("refuses to run when the stylesheet lacks one of a draft's colour tokens", () => {
+    const dir = fs.mkdtempSync(path.join(process.cwd(), ".tmp-bundle-check-"));
+    try {
+      const css = fs.readFileSync(SIX_SCHOOLS_CSS, "utf8");
+      const id = DRAFT_SCHOOLS[2].id;
+      const without = css.replace(new RegExp(`\\s*--color-${id}-deep:[^;]*;`), "");
+      expect(without).not.toBe(css);
+      const file = path.join(dir, "six-schools.css");
+      fs.writeFileSync(file, without);
+      expect(() => draftNeedles(file)).toThrowError(new RegExp(`--color-${id}-deep`));
+      expect(() => draftNeedles()).not.toThrow();
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
@@ -105,6 +142,8 @@ describe("the client bundle", () => {
       return;
     }
     if (builtWithSixSchools()) {
+      // `npm run check:bundle` itself refuses this build; the suite only
+      // reports what is in it.
       expect(findMissing(), "a SIX_SCHOOLS build shows the three schools").toEqual([]);
       return;
     }

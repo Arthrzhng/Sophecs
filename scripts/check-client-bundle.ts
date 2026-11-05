@@ -24,11 +24,17 @@ import { DRAFT_SCHOOLS } from "../src/lib/school-registry.drafts";
  * environment the check runs in, so a flag-on shell cannot excuse a
  * flag-off build or the other way round.
  *
- * - Without the flag, any of the strings below in .next/static fails the
- *   check, as it always has.
- * - With it, the three are meant to be there, and the check fails unless
- *   every one of the strings is, so a flag that did not take is noticed
- *   rather than passed as a quiet production build.
+ * - `npm run check:bundle`, the pre-push gate, needs a build without the
+ *   flag, and any of the strings below in .next/static fails it, as it
+ *   always has. A flag-on build fails it too, rather than passing: a
+ *   `SIX_SCHOOLS=1` left in a shell or in .env.local would otherwise turn
+ *   the gate green without checking the production direction at all.
+ * - `npm run check:bundle:six` (`--six`) needs a build with the flag, and
+ *   fails unless every one of the strings is there as a whole: each name,
+ *   id and adherent noun as a quoted string of its own, not merely inside
+ *   a longer one ("Confucian" inside "Confucianism"), and each colour. So
+ *   a flag that did not take, or took for the scripts and not the
+ *   stylesheet, is noticed.
  *
  * The strings come from the drafts module, which is the same whatever the
  * flag says, and from src/app/six-schools.css, so a school added as a
@@ -73,20 +79,28 @@ export function builtWithSixSchools(dir: string = buildDir()): boolean {
   return flag === "1";
 }
 
+/** The colour tokens the flag-only stylesheet defines: name to hex, lower-cased. */
+export function colourTokens(cssFile: string = SIX_SCHOOLS_CSS): Record<string, string> {
+  const css = fs.readFileSync(cssFile, "utf8");
+  return Object.fromEntries(
+    [...css.matchAll(/--color-([a-z-]+):\s*(#[0-9a-f]{6})\b/gi)].map((m) => [m[1], m[2].toLowerCase()])
+  );
+}
+
 /** Every hex colour the flag-only stylesheet defines, lower-cased. */
 export function colourNeedles(cssFile: string = SIX_SCHOOLS_CSS): string[] {
-  const css = fs.readFileSync(cssFile, "utf8");
-  return [...new Set((css.match(/#[0-9a-f]{6}\b/gi) ?? []).map((h) => h.toLowerCase()))];
+  return [...new Set(Object.values(colourTokens(cssFile)))];
 }
 
 /**
  * Every string that would give a draft school away.
  *
  * Throws rather than return a short list: a draft with no adherent noun,
- * or a flag-only stylesheet with no colour, would let both directions of
- * the check pass without looking for what a flag-on build actually holds.
+ * or missing any of its three colour tokens (marker, card surface, deep
+ * shade) from the flag-only stylesheet, would let both directions of the
+ * check pass without looking for what a flag-on build actually holds.
  */
-export function draftNeedles(): string[] {
+export function draftNeedles(cssFile: string = SIX_SCHOOLS_CSS): string[] {
   const out = new Set<string>();
   for (const entry of DRAFT_SCHOOLS) {
     if (!entry.adherent || !entry.adherentPlural) {
@@ -100,11 +114,18 @@ export function draftNeedles(): string[] {
     out.add(entry.adherent);
     out.add(entry.adherentPlural);
   }
-  const colours = colourNeedles();
-  if (DRAFT_SCHOOLS.length > 0 && colours.length === 0) {
-    throw new Error(`${path.relative(process.cwd(), SIX_SCHOOLS_CSS)} defines no colour to look for.`);
+  const tokens = colourTokens(cssFile);
+  for (const entry of DRAFT_SCHOOLS) {
+    for (const name of [entry.id, `${entry.id}-surface`, `${entry.id}-deep`]) {
+      if (!tokens[name]) {
+        throw new Error(
+          `${path.relative(process.cwd(), cssFile)} defines no --color-${name}, ` +
+            `so the check could not look for it.`
+        );
+      }
+    }
   }
-  for (const hex of colours) out.add(hex);
+  for (const hex of colourNeedles(cssFile)) out.add(hex);
   return [...out];
 }
 
@@ -143,14 +164,24 @@ export function findDraftLeaks(clientDir: string = CLIENT_DIR): BundleLeak[] {
   return leaks;
 }
 
-/** The needles a SIX_SCHOOLS build should hold and does not. */
+/**
+ * The needles a SIX_SCHOOLS build should hold and does not. Stricter than
+ * a leak: a colour in either case, and anything else only as a whole
+ * quoted string, so that "Confucian" is not found by way of
+ * "Confucianism", nor an id by way of a CSS custom property's name.
+ */
 export function findMissing(clientDir: string = CLIENT_DIR): string[] {
-  const found = new Set(findDraftLeaks(clientDir).map((l) => l.needle));
-  return draftNeedles().filter((n) => !found.has(n));
+  const texts = filesUnder(clientDir).map((file) => fs.readFileSync(file, "latin1"));
+  const whole = (needle: string) =>
+    needle.startsWith("#")
+      ? texts.some((t) => t.toLowerCase().includes(needle))
+      : texts.some((t) => [`"${needle}"`, `'${needle}'`, `\`${needle}\``].some((q) => t.includes(q)));
+  return draftNeedles().filter((n) => !whole(n));
 }
 
 function main() {
   const dir = buildDir();
+  const expectSix = process.argv.includes("--six");
   if (!fs.existsSync(CLIENT_DIR)) {
     console.error(
       `No client bundle at ${path.relative(process.cwd(), CLIENT_DIR)}. ` +
@@ -162,7 +193,21 @@ function main() {
   const needles = draftNeedles();
   const files = filesUnder(CLIENT_DIR).length;
 
-  if (builtWithSixSchools(dir)) {
+  const builtSix = builtWithSixSchools(dir);
+  if (builtSix !== expectSix) {
+    console.error(
+      builtSix
+        ? `The build in ${path.relative(process.cwd(), dir)} was made with SIX_SCHOOLS=1, and ` +
+            `this is the production check, which needs a build without it. Unset SIX_SCHOOLS ` +
+            `(in the shell and in .env.local) and run \`npm run build\` again; the flag-on ` +
+            `build is \`npm run check:bundle:six\`'s.`
+        : `The build in ${path.relative(process.cwd(), dir)} was made without SIX_SCHOOLS, and ` +
+            `--six checks a build with it. Run \`npm run check:bundle:six\`, which makes one.`
+    );
+    process.exit(1);
+  }
+
+  if (builtSix) {
     const missing = findMissing();
     if (missing.length === 0) {
       console.log(

@@ -221,11 +221,18 @@ describe("a school the client registry does not hold", () => {
 });
 
 describe("shownLookup", () => {
-  it("holds only the published schools, which is what keeps drafts out of the bundle", () => {
-    const lookup = shownLookup({ stoicism: "kept" }, () => "neutral");
+  it("holds only the schools this build shows, which is what keeps drafts out of the bundle", () => {
+    // Every draft is offered an entry; a build without SIX_SCHOOLS, which
+    // the suite runs as, must drop each of them.
+    const offered = Object.fromEntries([
+      ["stoicism", "kept"],
+      ...DRAFT_SCHOOL_IDS.map((id) => [id, `entry for ${id}`]),
+    ]) as Partial<Record<SchoolId, string>>;
+    const lookup = shownLookup(offered, () => "neutral");
     expect(Object.keys(lookup)).toEqual(["stoicism"]);
     for (const id of DRAFT_SCHOOL_IDS) {
       expect(Object.keys(lookup), `${id} must not be a key`).not.toContain(id);
+      expect(lookup[id], `${id} gets the neutral, not the entry offered`).toBe("neutral");
     }
   });
 

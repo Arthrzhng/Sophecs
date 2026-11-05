@@ -130,9 +130,10 @@ const PUBLISHED_BY_ID = new Map<SchoolId, SchoolEntry>(
  * drops. That is what keeps these ids and names out of production's client
  * bundle, which `npm run check:bundle` confirms on every build. Written out
  * here rather than imported, because an import would carry them across a
- * module boundary the build cannot see through. The flag is tested in this
- * file only; `card-tokens.ts` tests it again for its literals, for the same
- * reason.
+ * module boundary the build cannot see through. For the same reason the
+ * two other modules with literals of their own test the flag again:
+ * `card-tokens.ts` for its colours and `school-colors.ts` for its text
+ * classes. Everything else reads these entries through the lists below.
  *
  * Still `status: "draft"`: they are drafts that this build shows, and
  * `content/schools/*.md`, which is frozen, says so. Their names match the
@@ -258,8 +259,9 @@ export function schoolShadeVar(id: SchoolId): string {
  * A map over every school, built from the ones this build shows alone.
  *
  * Reads as an ordinary `Record<SchoolId, T>`, which is what the sixty-odd
- * call sites and the judge path expect, but holds only the published
- * entries. A school it does not hold gets `neutral`, computed from the id
+ * call sites and the judge path expect, but holds only the entries for
+ * the schools this build shows. A school it does not hold gets `neutral`,
+ * computed from the id
  * so a name can fall back to the id while a colour falls back to ink.
  *
  * A plain object cannot do this job. To answer for every `SchoolId` it

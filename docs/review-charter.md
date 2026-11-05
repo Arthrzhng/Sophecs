@@ -108,17 +108,21 @@ in `src/app/six-schools.css`, the new schools' tokens.
 
 Today that is nineteen strings, and the script prints the count: three
 ids, three names, six adherent nouns (proposals, Checkpoint B (e)) and
-seven colours. It throws rather than run on fewer, if a draft loses its
-adherent nouns or the stylesheet its colours. Read the printed count
-rather than assuming the coverage.
+seven colours. It throws rather than run without one of them: if a draft
+loses an adherent noun, or the stylesheet any of a draft's three colour
+tokens (marker, card surface, deep shade). Read the printed count rather
+than assuming the coverage.
 
 Stage 5 builds the new schools behind a build-time `SIX_SCHOOLS` flag
 (`docs/stage5-plan.md`). The check reads which kind of build it has from
 the build (`config.env` in `required-server-files.json`), and on a
-flag-on build fails unless every one of the strings is there, so a flag
-that did not take is not passed as a production build.
-`npm run check:bundle:six` makes that build, into `.next-six`, and checks
-it. A change to the registry, a school map, `next.config.ts`, the flag's
+flag-on build fails unless every one of the strings is there whole (a
+name or id as a quoted string of its own, a colour in any case), so a
+flag that did not take is not passed as a production build. Each script
+needs its own kind of build: `npm run check:bundle` fails on a flag-on
+`.next` rather than checking it, so a `SIX_SCHOOLS=1` left in a shell or
+in `.env.local` cannot turn the gate green. `npm run check:bundle:six`
+makes the flag-on build, into `.next-six`, and checks it. A change to the registry, a school map, `next.config.ts`, the flag's
 stylesheet, or anything a client component imports runs it as well as
 the five gates, and its output is read like the first's.
 
