@@ -82,10 +82,18 @@ challenges." `/method#samples` explains the rest.
   rows directly and emits no event. Sample quiz results carry no
   referrer. A page showing a sample passes no referrer on (`referrer:
   "no-referrer"` in its metadata, `SAMPLE_PAGE_REFERRER` in
-  `src/lib/sample.ts`; Arthur, 2026-11-05), so a page opened from one by a
-  full page load does not report the sample page's address, to PostHog's
-  `page_viewed` or on a reader's own quiz result, which stores
-  `document.referrer` (`tests/seed/sample-referrer.test.ts`).
+  `src/lib/sample.ts`; `docs/decisions.md`, "Arthur's rulings of
+  2026-11-05 on Checkpoint A", 18), so a page opened from one does not
+  report the sample page's address: not in `document.referrer`, which
+  reaches PostHog's `page_viewed` and is stored on a reader's own quiz
+  result, and not in the Referer header, which `/r/[id]` reads into
+  `card_viewed` and `share_page_viewed`. The root layout states the
+  browsers' default for every other page, which puts it back after a
+  client-side navigation away from a sample page
+  (`tests/seed/sample-referrer.test.ts`). One gap: Next.js streams
+  metadata to browsers after the page's content, so a click made before
+  that part arrives and before the page hydrates is a full load without
+  the policy yet.
 - **Matching.** No sample argument has `seeking_counterpart_at` set, so
   `seekCounterpart` never offers one to a reader.
 - **Challenges.** A sample never answers. A reader who opens a sample

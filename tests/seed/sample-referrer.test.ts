@@ -28,6 +28,13 @@ vi.mock("@/lib/supabase/admin", () => ({
   }),
 }));
 
+// The root layout is imported for its metadata; next/font only runs under
+// the Next.js compiler.
+vi.mock("@/lib/fonts", () => {
+  const font = { className: "", variable: "", style: {} };
+  return { spectral: font, plexSans: font, plexMono: font, bricolage: font };
+});
+
 const result = (await import("../../src/app/r/[id]/page")).generateMetadata;
 const challenge = (await import("../../src/app/c/[id]/page")).generateMetadata;
 const verdict = (await import("../../src/app/debate/[slug]/[debateId]/page")).generateMetadata;
@@ -45,6 +52,9 @@ beforeEach(() => {
   tables.challenges = [
     { id: "c-sample", challenger_result_id: "r-sample", is_sample: true },
     { id: "c-genuine", challenger_result_id: "r-genuine", is_sample: false },
+    // A sample challenge whose challenger is not a sample: the policy
+    // follows the challenge, not the challenger.
+    { id: "c-sample-genuine-challenger", challenger_result_id: "r-genuine", is_sample: true },
   ];
   tables.debates_public = [
     { id: "d-sample", is_sample: true },
@@ -58,12 +68,17 @@ describe("the referrer a page passes on", () => {
     expect(sampleMetadata("x").referrer).toBe("no-referrer");
     expect(await result(p("r-sample"))).toMatchObject({ referrer: "no-referrer" });
     expect(await challenge(p("c-sample"))).toMatchObject({ referrer: "no-referrer" });
+    expect(await challenge(p("c-sample-genuine-challenger"))).toMatchObject({ referrer: "no-referrer" });
     expect(await verdict(pv("d-sample"))).toMatchObject({ referrer: "no-referrer" });
   });
 
-  it("is left as it was on a reader's own pages", async () => {
+  it("is left to the root layout on a reader's own pages, which states the browsers' default", async () => {
     for (const m of [await result(p("r-genuine")), await challenge(p("c-genuine")), await verdict(pv("d-genuine"))]) {
       expect(m).not.toHaveProperty("referrer");
     }
+    // So that a client-side navigation away from a sample page, which
+    // leaves the tab's policy as no-referrer, puts the default back.
+    const { metadata } = await import("../../src/app/layout");
+    expect(metadata.referrer).toBe("strict-origin-when-cross-origin");
   });
 });

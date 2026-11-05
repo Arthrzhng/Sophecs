@@ -25,10 +25,15 @@ export const RANK_SAMPLE_NOTE = "This week's ranks include sample accounts.";
 
 /**
  * A page showing a sample passes no referrer to the next page (Arthur,
- * 2026-11-05: "no-referrer policy on sample pages"). Without it, a page
- * opened from one by a full page load would report the sample page's
- * address as its document.referrer, which reaches PostHog's page_viewed
- * and is stored on a reader's own quiz result (QuizShell, submitQuizResult).
+ * 2026-11-05: "no-referrer policy on sample pages"; docs/decisions.md,
+ * "Arthur's rulings of 2026-11-05 on Checkpoint A", 18). Without it, a page
+ * opened from one would report the sample page's address: as its
+ * document.referrer, which reaches PostHog's page_viewed and is stored on
+ * a reader's own quiz result (QuizShell, submitQuizResult), and as the
+ * Referer header, which /r/[id] reads into card_viewed and
+ * share_page_viewed. The root layout states the browsers' default for
+ * every other page, which puts it back after a client-side navigation
+ * away from a sample page.
  */
 export const SAMPLE_PAGE_REFERRER = "no-referrer" as const;
 
