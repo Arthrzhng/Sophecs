@@ -124,7 +124,7 @@ expect "signed in, is_class_owner refused" denied "$(as_role authenticated "sele
 expect "anon, is_class_member refused" denied "$(as_role anon "select public.is_class_member('c1', '$MEMBER')")"
 expect "the server role still reads every class" 1 "$(as_role service_role "select count(*) from classes")"
 expect "elo_percentile's search_path" 'search_path=""' "$(q "select array_to_string(proconfig, ',') from pg_proc where proname = 'elo_percentile'")"
-expect "elo_percentile still counts genuine profiles only" "0.00000000000000000000 0.50000000000000000000 1.00000000000000000000" "$PCT_BEFORE"
+expect "before 0024, elo_percentile counts genuine profiles only" "0.00000000000000000000 0.50000000000000000000 1.00000000000000000000" "$PCT_BEFORE"
 expect "elo_percentile's results unchanged" "$PCT_BEFORE" "$(q "select elo_percentile(1100) || ' ' || elo_percentile(1200) || ' ' || elo_percentile(1300)")"
 # Called with no search_path at all, so the body must name its table in
 # full. (As anon it would return 0 either way: it runs with the caller's
@@ -149,6 +149,13 @@ expect "0024 is refused, naming it" yes "$(printf '%s' "$OUT" | grep -q 'authent
 same "and changes nothing" "$STATE_BEFORE" "$(q "$STATE" | sed 's/,grantor_0024_test=X\*\/postgres//; s/authenticated=X\/grantor_0024_test,//')"
 q "set role grantor_0024_test; revoke execute on function public.is_class_owner(text, uuid) from authenticated; reset role" >/dev/null
 q "revoke execute on function public.is_class_owner(text, uuid) from grantor_0024_test cascade; drop role grantor_0024_test" >/dev/null
+
+say "0024's closing check fails on any other policy that calls a class function"
+q "create policy stray_0024_test on debates for select using (public.is_class_member('c1', auth.uid()))" >/dev/null
+OUT=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/migrations/0024_checkpoint_a_database.sql" 2>&1 || true)
+expect "0024 is refused, naming the policy" yes "$(printf '%s' "$OUT" | grep -q 'policies still call the class functions: debates "stray_0024_test"' && echo yes || echo no)"
+same "and changes nothing" "$STATE_BEFORE" "$(q "$STATE" | grep -v stray_0024_test)"
+q "drop policy stray_0024_test on debates" >/dev/null
 apply "$REPO/supabase/migrations/0024_checkpoint_a_database.sql"
 expect "0024 applies again" denied "$(as_role authenticated "select public.is_class_member('c1', '$MEMBER')" "$MEMBER")"
 STATE_BEFORE_0025=$(q "$STATE")

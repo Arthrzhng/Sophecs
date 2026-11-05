@@ -2899,7 +2899,7 @@ because one of them drops:
   update", which `/me`'s two signed-in updates go through.
 
 **Tests.** `scripts/test-0024-checkpoint-a-database.sh` applies every
-migration before 0024 under Supabase's default privileges, then checks 39
+migration before 0024 under Supabase's default privileges, then checks 41
 things: the constraint at 60 and 61 characters, from the server role and
 signed in; a member no longer reading the class and an owner no longer
 reading others' memberships, while each still reads their own and
@@ -2908,7 +2908,8 @@ authenticated; `elo_percentile` counting genuine profiles only, its results unch
 and its body running under an empty caller search path; `exchanges_public` refused to clients
 and read by the server role; the rollback restoring every policy, grant,
 function and constraint exactly (compared as text); 0024 refused, naming
-the privilege, when another role has granted one of the functions; 0025
+the privilege, when another role has granted one of the functions, and
+naming the policy when any other policy calls one; 0025
 dropping the five and keeping "own update", with `/me`'s two updates and
 the server role's join still working; and 0025's rollback restoring the
 five exactly. `scripts/test-migrations.sh` passes.

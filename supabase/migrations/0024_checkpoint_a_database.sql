@@ -41,7 +41,9 @@
 -- on profiles while it checks the rows (3,280, milliseconds), and every
 -- lock is held to the end of the transaction. lock_timeout keeps any of
 -- them from queueing behind a long reader and holding every read behind
--- it. REVOKE and CREATE OR REPLACE FUNCTION take no table lock. No
+-- it. CREATE OR REPLACE FUNCTION takes ACCESS SHARE on profiles while it
+-- checks the body, which conflicts only with ACCESS EXCLUSIVE. REVOKE
+-- takes no table lock. No
 -- transaction of its own: the Supabase runner wraps the file, and by hand
 -- it is `psql --single-transaction`. The rollback is
 -- supabase/rollback/0024_checkpoint_a_database.down.sql, and
@@ -115,6 +117,7 @@ begin
   select array_agg(pol.polrelid::regclass || ' "' || pol.polname || '"') into left_over
     from pg_depend d join pg_policy pol on pol.oid = d.objid
     where d.classid = 'pg_policy'::regclass
+      and d.refclassid = 'pg_proc'::regclass
       and d.refobjid in ('public.is_class_member(text, uuid)'::regprocedure,
                          'public.is_class_owner(text, uuid)'::regprocedure);
   if cardinality(left_over) > 0 then
