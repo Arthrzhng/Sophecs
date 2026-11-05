@@ -65,15 +65,17 @@ q "insert into quiz_results (id, anon_id, school, secondary, vector, answers)
    select 'old' || g, gen_random_uuid(), 'stoicism', 'utilitarianism', '$V', '[]'
    from generate_series(1, 3) g" >/dev/null
 BEFORE_GRANTS="$(grants)"
+BEFORE_NODE="$(q "select pg_relation_filenode('quiz_results')")"
 BEFORE_ROWS="$(q "select string_agg(id || ':' || vector::text, ';' order by id) from quiz_results")"
 
 say "0027"
 apply "$REPO/supabase/migrations/0027_quiz_results_versions.sql"
 expect "existing rows are v1" "3" "$(q "select count(*) from quiz_results where quiz_version = 1")"
+expect "the table was not rewritten (same file)" "$BEFORE_NODE" "$(q "select pg_relation_filenode('quiz_results')")"
 expect "existing rows keep their vector, with no point" "$BEFORE_ROWS" "$(q "select string_agg(id || ':' || vector::text, ';' order by id) from quiz_results where map_x is null and map_y is null")"
 expect "an insert naming no version is v1, as today's code writes" accepted "$(try "insert into quiz_results (id, anon_id, school, vector, answers) values ('new1', gen_random_uuid(), 'stoicism', '$V', '[]')")"
 expect "a v2 row with a point and no vector" accepted "$(try "insert into quiz_results (id, anon_id, school, quiz_version, map_x, map_y, answers) values ('v2', gen_random_uuid(), 'ubuntu', 2, -0.4, 0.31, '[]')")"
-expect "a v2 row on the edge of the map" accepted "$(try "insert into quiz_results (id, anon_id, school, quiz_version, map_x, map_y, answers) values ('v2e', gen_random_uuid(), 'ubuntu', 2, -1, 1, '[]')")"
+expect "a v2 row at a corner of the bound" accepted "$(try "insert into quiz_results (id, anon_id, school, quiz_version, map_x, map_y, answers) values ('v2e', gen_random_uuid(), 'ubuntu', 2, -1, 1, '[]')")"
 expect "a v1 row with no vector" refused "$(try "insert into quiz_results (id, anon_id, school, answers) values ('x1', gen_random_uuid(), 'stoicism', '[]')")"
 expect "a v1 row with a point" refused "$(try "insert into quiz_results (id, anon_id, school, vector, map_x, map_y, answers) values ('x2', gen_random_uuid(), 'stoicism', '$V', 0, 0, '[]')")"
 expect "a v2 row with a vector" refused "$(try "insert into quiz_results (id, anon_id, school, quiz_version, vector, map_x, map_y, answers) values ('x3', gen_random_uuid(), 'ubuntu', 2, '$V', 0, 0, '[]')")"
@@ -90,6 +92,7 @@ expect "anon still cannot write through the view" denied "$(as_role anon "update
 
 say "rollback refuses over a v2 row"
 q "insert into quiz_results (id, anon_id, school, quiz_version, map_x, map_y, answers) values ('kept', gen_random_uuid(), 'ubuntu', 2, 0.1, 0.2, '[]')" >/dev/null
+expect "anon reads a v2 row's version and point, and no vector" "kept:2:0.1:0.2:" "$(as_role anon "select id || ':' || quiz_version || ':' || map_x || ':' || map_y || ':' || coalesce(vector::text, '') from public.public_results where id = 'kept'")"
 OUT=$(psql -X --single-transaction -v ON_ERROR_STOP=1 -q -d "$DB" -f "$REPO/supabase/rollback/0027_quiz_results_versions.down.sql" 2>&1 || true)
 expect "refused, naming the count" yes "$(printf '%s' "$OUT" | grep -q '1 v2 result(s) exist' && echo yes || echo no)"
 expect "and nothing changed" "quiz_version" "$(q "select column_name from information_schema.columns where table_schema = 'public' and table_name = 'quiz_results' and column_name = 'quiz_version'")"

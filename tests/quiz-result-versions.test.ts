@@ -184,3 +184,44 @@ describe("pending challenges on /me", () => {
     ]);
   });
 });
+
+describe("the share page's comparison", () => {
+  const props = {
+    resultId: "r1", school: "stoicism" as const, oneLine: "A line.", oneLineAttribution: "Someone",
+    isOwner: false, isSavedToProfile: false, showDebateThem: false, challengeId: null,
+    isSignedIn: false, shareLine: "A share line.", shareLineIndex: 0,
+  };
+  // Only the cold-recipient page says how long the quiz takes.
+  const COLD = "about eighty seconds";
+  const render = async (extra: Record<string, unknown>) => {
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const { createElement } = await import("react");
+    const { SharePage } = await import("../src/components/share/SharePage");
+    return renderToStaticMarkup(createElement(SharePage, { ...props, ...extra } as never));
+  };
+
+  it("shows both results' weights beside two v1 results, and not the cold-recipient page", async () => {
+    const html = await render({ vector: V, otherVector: V, hasOtherResult: true });
+    expect(html).toContain("Whoever sent it");
+    expect(html).not.toContain(COLD);
+  });
+
+  it("shows no weights beside a result from the other version, and still not the cold-recipient page", async () => {
+    // /r/[id] on a SIX_SCHOOLS build, a v1 result beside a v2 one: compareWith is null.
+    const html = await render({ vector: null, otherVector: null, hasOtherResult: true });
+    expect(html).not.toContain("Whoever sent it");
+    expect(html).not.toContain("This result");
+    expect(html).not.toContain(COLD);
+  });
+
+  it("is the cold-recipient page when there is no other result, as on a build that hides the v2 side", async () => {
+    const html = await render({ vector: null, otherVector: null, hasOtherResult: false });
+    expect(html).toContain(COLD);
+    expect(html).not.toContain("Whoever sent it");
+  });
+
+  it("works out hasOtherResult from the other vector when a caller passes none, as before", async () => {
+    expect(await render({ vector: V, otherVector: V })).toContain("Whoever sent it");
+    expect(await render({ vector: V, otherVector: null })).toContain(COLD);
+  });
+});

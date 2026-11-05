@@ -7,6 +7,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 type Row = Record<string, unknown>;
 const tables: Record<string, Row[]> = {};
+// What the code itself sent, before the fake's defaults.
+const inserted: { table: string; row: Row }[] = [];
 
 function query(table: string) {
   const filters: ((r: Row) => boolean)[] = [];
@@ -24,6 +26,7 @@ function query(table: string) {
   b.insert = async (row: Row) => {
     if (table === "quiz_results" && row.challenge_from != null && !tables.quiz_results.some((r) => r.id === row.challenge_from))
       return { error: { message: 'insert or update on table "quiz_results" violates foreign key constraint "quiz_results_challenge_from_fkey"' } };
+    inserted.push({ table, row: { ...row } });
     // quiz_version defaults to 1, as migration 0027 declares it.
     tables[table].push(table === "quiz_results" ? { quiz_version: 1, ...row } : { ...row });
     return { error: null };
@@ -110,6 +113,8 @@ describe("submitQuizResult from a challenge link", () => {
 
   it("writes a v1 result, naming no version, as before migration 0027", async () => {
     const res = (await submitQuizResult(answers)) as { id: string };
+    const sent = inserted.find((i) => i.table === "quiz_results" && i.row.id === res.id)!.row;
+    expect(sent).not.toHaveProperty("quiz_version");
     const row = tables.quiz_results.find((r) => r.id === res.id)!;
     expect(row.quiz_version).toBe(1);
     expect(row.vector).toEqual(answers.vector);

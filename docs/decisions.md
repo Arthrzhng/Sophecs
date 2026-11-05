@@ -3622,14 +3622,21 @@ version, and it has three rules:
   is v1, since it writes a v1 result; a v2 challenger's challenge is
   treated as no challenge.
 - **Compared**: the share page's weight columns appear only for two v1
-  results. A result beside one from the other version is still a challenge
-  in play, so the reader does not get the cold-recipient page, but no
-  weights are shown.
+  results. On a SIX_SCHOOLS build, a result beside one from the other
+  version is still a challenge in play, so the reader does not get the
+  cold-recipient page, but no weights are shown. Without the flag the v2
+  side is not found, so the page is as for a result with no other side.
 
 A version this module does not know, a missing column included, is
 neither: nothing shows it and nothing takes a school from it. So the code
-must reach production after the migration: a read of `quiz_version`
-before the column exists fails, and the page answers not found.
+must reach production after the migration. Before it, a read of
+`quiz_version` fails, and some paths would then write as if there were
+no v1 result: a sign-in would create a schoolless account and still count
+as claimed; a quiz taken from a challenge link would save without
+accepting the challenge; `/me` would show the other side's school blank;
+every result page would answer not found. This branch's Vercel preview
+reads production's database, so it is not used until 0027 is applied.
+The rollback, likewise, comes after a deploy without this code.
 
 **What waits for step 4.** The plan says a v2 result opens on the map on a
 flag-on build. Here it opens with its school and card and no map: the map
