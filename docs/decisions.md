@@ -3126,3 +3126,34 @@ sample page (the flag was set before `track()` dropped the event), and is
 now sent from the first genuine page; the docs say what web vitals and
 the heatmap's mouse-move timer can still carry; and the stop conditions
 say what each one does.
+
+### Node 24 actions and the in-range fixes
+
+Checkpoint A's housekeeping, "mine to do next" (`docs/checkpoint-a.md`):
+
+- **The sample workflow's actions.** `actions/checkout` and
+  `actions/setup-node` go from v4, which targets the Node 20 runtime that
+  GitHub now runs on Node 24 with a warning (the last run's log says so),
+  to v5, which targets Node 24, and are pinned to their commits
+  (checkout v5.1.0, setup-node v5.0.0) rather than to tags, since this
+  job holds the production service key and a tag can be moved without a
+  commit here. v5 is the smallest step to Node 24; v6 and v7 of both
+  exist, and their breaking changes touch nothing this job uses, so
+  moving to them is a later choice. The job's own Node
+  (`node-version: 22`) is unchanged.
+- **follow-redirects, vite, vitest.** Each moves within its parent's
+  range: follow-redirects 1.16.0 to 1.16.2, the only release with the
+  fix (published 2026-10-25); vitest 5.0.0 to 5.0.5 and vite 8.2.2 to
+  8.3.5, taken with `npm update --before=2026-10-22` so nothing is newer
+  than two weeks (vite 8.3.6 and vitest 5.1.0 came out this week). Their
+  dependencies moved with them, among them postcss 8.5.31 and
+  source-map-js 1.2.2, which clears that advisory too, and two majors
+  within vitest's own ranges (obug 3.0.0, why-is-node-running 3.2.1).
+  `package.json` is unchanged; no dependency is added, and two
+  (siginfo, stackback) drop out.
+
+`npm audit` now lists 10 packages, down from 15 on main before this
+(16 at the audit; zod went in #73): `dompurify` (not loaded, product
+tours are off), `js-yaml` (our own front matter), `next` and its pinned
+`postcss` 8.4.31 (build only, fixed in Next 16), `minimatch` and the
+`@typescript-eslint` packages (lint only, moderate).
