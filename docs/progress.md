@@ -262,3 +262,28 @@ entry names.
   chain, a builder kept in a variable, and update keys it could not read.
   After the third: the scan read strings and comments as code, reported
   storage buckets, and trusted any `admin` parameter; two stale counts.
+- Arthur said yes to the revokes beyond the approved wording on
+  2026-11-05 ("Yes, with the extras").
+- **Applied in production at 03:00:50 UTC on 2026-11-05**, migration
+  version `20261105030050`, through the Supabase tool, with no prompt
+  (it has no DROP). Applied before 0021, which Arthur applies by hand; the
+  two are independent, and 0022 alone already takes UPDATE on
+  `challenges` from both roles.
+  - Before: security advisor run (3 `security_definer_view` errors, the
+    known warnings and one info); no active session, no `ai_calls` row and
+    no unjudged debate in the previous 10 minutes; snapshot taken,
+    `docs/seed-snapshots/2026-11-05-client-grants-before-0022.json`. Every
+    grant's grantor was `postgres`, the owner and the runner, with no
+    column privileges: the state the local test models and the rollback
+    restores.
+  - The migration's own closing check passed.
+  - Read back at 03:01 UTC: each table `anon=r`, `authenticated=r`
+    (`class_members`: `authenticated=rd`); the views `anon=r`,
+    `authenticated=r`, `profiles_public` nothing; column grants only
+    `authenticated=w` on `profiles.display_name` and
+    `profiles.argument_default_public`; owner and `service_role` unchanged
+    (`arwdDxtm`). Privilege probes: no INSERT, UPDATE or DELETE left for
+    either role on the five tables but the kept three; no MAINTAIN;
+    SELECT kept on the tables and views; `reading_responses` unchanged.
+    13 policies and every row count unchanged.
+  - Security advisor after: the same findings as before.

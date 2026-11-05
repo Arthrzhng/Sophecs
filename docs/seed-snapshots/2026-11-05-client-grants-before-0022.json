@@ -1,0 +1,36 @@
+{
+  "what": "Privileges, policies and row counts on the five tables and four public views that migration 0022 changes, production (tekifezydjlgxgndkxul), before 0022.",
+  "taken_at": "2026-11-05T02:59:43Z",
+  "how": "One read-only query through the Supabase tool (scratchpad sql/grants-snapshot.sql plus session checks): pg_class.relacl and owner for the nine objects, pg_attribute.attacl for the five tables, pg_policies, row counts.",
+  "postgres": "PostgreSQL 17.6",
+  "runner_role": "postgres",
+  "note": "Every grant's grantor is postgres, the owner and the migration runner, and there are no column privileges: the state scripts/test-0022-client-write-grants.sh models, and the one supabase/rollback/0022_client_write_grants.down.sql restores (GRANT ALL on the tables, MAINTAIN back on the views). No active session, no ai_calls row and no unjudged debate in the 10 minutes before. backup_20261022 still existed.",
+  "objects": [
+    { "name": "challenges", "kind": "table", "owner": "postgres", "rls": true, "acl": "anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres" },
+    { "name": "class_members", "kind": "table", "owner": "postgres", "rls": true, "acl": "anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres" },
+    { "name": "debates", "kind": "table", "owner": "postgres", "rls": true, "acl": "anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres" },
+    { "name": "debates_public", "kind": "view", "owner": "postgres", "acl": "anon=rm/postgres,authenticated=rm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres" },
+    { "name": "exchanges_public", "kind": "view", "owner": "postgres", "acl": "anon=rm/postgres,authenticated=rm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres" },
+    { "name": "profiles", "kind": "table", "owner": "postgres", "rls": true, "acl": "anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres" },
+    { "name": "profiles_public", "kind": "view", "owner": "postgres", "acl": "anon=m/postgres,authenticated=m/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres" },
+    { "name": "public_results", "kind": "view", "owner": "postgres", "acl": "anon=rm/postgres,authenticated=rm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres" },
+    { "name": "quiz_results", "kind": "table", "owner": "postgres", "rls": true, "acl": "anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres" }
+  ],
+  "column_acls": [],
+  "policies": [
+    { "table": "challenges", "policy": "accept sets challengee", "cmd": "UPDATE", "roles": "{anon,authenticated}" },
+    { "table": "challenges", "policy": "anon insert own", "cmd": "INSERT", "roles": "{anon,authenticated}" },
+    { "table": "challenges", "policy": "challenges read party", "cmd": "SELECT", "roles": "{public}" },
+    { "table": "class_members", "policy": "member join self", "cmd": "INSERT", "roles": "{public}" },
+    { "table": "class_members", "policy": "member leave self", "cmd": "DELETE", "roles": "{public}" },
+    { "table": "class_members", "policy": "member read own or owner", "cmd": "SELECT", "roles": "{public}" },
+    { "table": "debates", "policy": "debates insert own", "cmd": "INSERT", "roles": "{public}" },
+    { "table": "debates", "policy": "debates read own", "cmd": "SELECT", "roles": "{public}" },
+    { "table": "profiles", "policy": "own insert", "cmd": "INSERT", "roles": "{public}" },
+    { "table": "profiles", "policy": "own update", "cmd": "UPDATE", "roles": "{public}" },
+    { "table": "profiles", "policy": "profiles read own", "cmd": "SELECT", "roles": "{public}" },
+    { "table": "quiz_results", "policy": "anon insert own", "cmd": "INSERT", "roles": "{anon,authenticated}" },
+    { "table": "quiz_results", "policy": "read own", "cmd": "SELECT", "roles": "{anon,authenticated}" }
+  ],
+  "rows": { "debates": 1, "challenges": 3, "quiz_results": 28, "profiles": 1, "class_members": 0 }
+}
