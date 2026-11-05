@@ -225,3 +225,22 @@ describe("the share page's comparison", () => {
     expect(await render({ vector: V, otherVector: null })).toContain(COLD);
   });
 });
+
+describe("the wiring the render tests cannot see", () => {
+  it("/r/[id] compares only comparable results, and tells the page there is another", async () => {
+    const { readFileSync } = await import("node:fs");
+    const page = readFileSync("src/app/r/[id]/page.tsx", "utf8");
+    expect(page).toContain("const compareWith = otherResult && comparable(result, otherResult) ? otherResult : null;");
+    expect(page).toContain("vector={compareWith ? result.vector : null}");
+    expect(page).toContain("otherVector={compareWith?.vector ?? null}");
+    expect(page).toContain("hasOtherResult={otherResult !== null}");
+  });
+
+  it("/me's result_claimed event takes the newest v1 result, the one the profile's school came from", async () => {
+    const { readFileSync } = await import("node:fs");
+    const me = readFileSync("src/app/me/page.tsx", "utf8");
+    const start = me.indexOf('if (welcome === "1" && school) {');
+    expect(start).toBeGreaterThan(-1);
+    expect(me.slice(start, me.indexOf("claimedResultId =", start))).toContain('.eq("quiz_version", 1)');
+  });
+});

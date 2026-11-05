@@ -3605,7 +3605,7 @@ vector. `public_results` gains the three columns, appended, with its grants
 unchanged. Code that names no version, which is all of it until step 4,
 writes v1 rows exactly as before. The rollback refuses while a v2 row
 exists. `scripts/test-0027-quiz-results-versions.sh` checks both on a
-throwaway database (26 checks), and `scripts/test-migrations.sh` now rolls
+throwaway database (28 checks), and `scripts/test-migrations.sh` now rolls
 0027 back before 0023 and applies it again last.
 
 **The readers.** `src/lib/quiz-result.ts` is the one place that reads a
@@ -3637,6 +3637,21 @@ accepting the challenge; `/me` would show the other side's school blank;
 every result page would answer not found. This branch's Vercel preview
 reads production's database, so it is not used until 0027 is applied.
 The rollback, likewise, comes after a deploy without this code.
+
+**Applied** to production as version 20261105225938 on 2026-11-05 at
+22:59 UTC, before this code merged. Read back against a snapshot taken at
+22:53: 8,528 rows with the same checksum of id, vector, school, secondary
+and is_sample; all of them v1 in shape; the table's file unchanged (not
+rewritten); the view's grants the same and its options none, before and
+after; both new checks validated. The security advisor listed the same
+six findings before and after.
+
+**On step 4's list.** On a build without SIX_SCHOOLS, a party to a
+challenge whose other side is a v2 result is still offered "Debate them"
+on `/r/[id]` (`getChallengeInfo` reads no version), and `/me` lists
+challenges on a reader's own v2 results. Neither can happen before step 4
+writes a v2 row, and a v1 quiz never takes up a v2 challenger; step 4
+closes both.
 
 **What waits for step 4.** The plan says a v2 result opens on the map on a
 flag-on build. Here it opens with its school and card and no map: the map

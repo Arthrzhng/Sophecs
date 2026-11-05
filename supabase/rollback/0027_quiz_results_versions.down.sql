@@ -1,8 +1,11 @@
 -- Undoes 0027_quiz_results_versions.sql.
 --
--- Deploy the code that does not read these columns first: the readers in
--- src/lib/quiz-result.ts select quiz_version, and with it gone every
--- result page answers not found and a new sign-in gets no school.
+-- Deploy the code that does not read these columns first: the result
+-- pages and images, the challenge page, the claim (src/lib/claim.ts),
+-- /me's pending challenges (src/lib/challenge.ts) and submitQuizResult
+-- (src/app/actions.ts) all select quiz_version. With it gone every result
+-- page answers not found, a new sign-in gets no school, and a challenge
+-- link is no longer taken up (docs/decisions.md, "Stage 5, step 3").
 --
 -- Refuses while any v2 result exists: `vector` cannot be made not null
 -- again over a row that has none, and dropping the point would lose the
