@@ -91,7 +91,7 @@ recorded in `docs/decisions.md` and is not revisited here.
 
 **These figures were wrong in an earlier version of this document, and
 low by about a sixth.** They priced every call at v2's size. The whole
-prompt file is sent, header comment included, and `judge.v3.md` is 10,701
+prompt file was then sent, header comment included, and `judge.v3.md` was 10,701
 bytes against v2's 4,794, so a v3 call carries roughly 1,480 more input
 tokens. A reviewer found it. The estimate is now computed per version:
 

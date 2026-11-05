@@ -72,7 +72,10 @@ function promptTemplateFor(version: RunnablePromptVersion): string {
 // module-scope default included, so v3 is stripped whichever way it is
 // reached.
 export function asSent(version: RunnablePromptVersion, raw: string): string {
-  return version === "v3" ? raw.replace(/<!--[\s\S]*?-->\n*/g, "") : raw;
+  if (version !== "v3") return raw;
+  // The head comment and the blank lines after it; any other comment
+  // without the lines around it, so paragraphs either side stay apart.
+  return raw.replace(/^\s*<!--[\s\S]*?-->\s*/, "").replace(/<!--[\s\S]*?-->/g, "");
 }
 
 // The schools an `unanswered_objection` may name, for v3's

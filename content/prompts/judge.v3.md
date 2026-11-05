@@ -47,10 +47,12 @@ docs/decisions.md.
 Changed on 2026-11-05, by Arthur's ruling on Checkpoint A ("strengthen the
 v3 engagement-cap instruction"): in the 2F runs the judge returned the
 school's best-known objection as unanswered and still scored engagement
-5. The criterion now ties the cap to the judge's own reply: if the
-objection returned as unanswered is that one, engagement is 4 or lower,
-and the two are to be checked against each other before responding. The
-response format's note on the scores says the same. The cap is still 4.
+5. The criterion now ties the cap to the judge's own reply: decide the
+objection first, and if it is that one, engagement is 4 or lower, without
+changing the objection to escape the cap. The response format now puts
+`unanswered_objection` before the scores, because the judge writes its
+reply in order with no thinking step, and its note on the scores says the
+same. The cap is still 4.
 
 Also from 2026-11-05 (Arthur: "strip comments from judge.v3.md before it
 is sent (v3 only)"): src/lib/anthropic.ts removes HTML comments from this
@@ -90,11 +92,11 @@ Score in this order of priority:
    Check first the objection the school's criteria below name as the one
    it is best known for having to answer. An argument that leaves that
    objection unmet scores no more than 4 on engagement, however well it
-   answers any other. The cap binds your own reply: if the objection you
-   return as `unanswered_objection` is that best-known objection, your
-   `engagement` score must be 4 or lower. Check the two against each other
-   before you respond, and if they disagree, lower `engagement`; do not
-   change which objection you return.
+   answers any other. The cap binds your own reply. Decide
+   `unanswered_objection` first, as the response format below orders it,
+   and if it is that best-known objection, your `engagement` score must be
+   4 or lower. Do not change which objection you return to stay under the
+   cap.
 
 The school's specific fidelity criteria for this debate:
 
@@ -252,6 +254,11 @@ fence. Match this shape exactly:
 {
   "rejected": false,
   "rejection_reason": null,
+  "unanswered_objection": {
+    "school": "RIVAL_SCHOOL",
+    "claim": "",
+    "why_it_stands": ""
+  },
   "score": 0,
   "fidelity": 0,
   "rigor": 0,
@@ -259,12 +266,7 @@ fence. Match this shape exactly:
   "strongest_move": "",
   "weakest_move": "",
   "a_stronger_version_would": "",
-  "verdict_line": "",
-  "unanswered_objection": {
-    "school": "RIVAL_SCHOOL",
-    "claim": "",
-    "why_it_stands": ""
-  }
+  "verdict_line": ""
 }
 ```
 
@@ -275,7 +277,9 @@ the school the argument was assigned. Do not return the word
 
 `score` is 0-100 (null if rejected). `fidelity`, `rigor`, and `engagement`
 are each 0-10, and `engagement` is at most 4 when `unanswered_objection`
-is the school's best-known objection, as its criteria name it. `strongest_move` and `weakest_move` should quote or closely
+is the assigned school's best-known objection, as its criteria name it.
+`unanswered_objection` comes first so that it is decided before the
+scores. `strongest_move` and `weakest_move` should quote or closely
 paraphrase the argument. `verdict_line` is the one sentence a user might
 actually want to share, in at most 20 words.
 

@@ -1124,8 +1124,9 @@ judging is live.
 
 **The substitution had a bug, and it is worth recording because the shape
 of it will recur.** `String.prototype.replace` with a string pattern fills
-the first occurrence and says nothing about the rest. A prompt file is sent
-to the model whole, header comment included, and `judge.v3.md` named both
+the first occurrence and says nothing about the rest. A prompt file was
+then sent to the model whole, header comment included (v3's comment is
+stripped since 2026-11-05), and `judge.v3.md` named both
 of its placeholders in that comment before using them. So the first naive
 `.replace("{{RUBRIC}}", criteria)` filled the mention in the comment and
 left the real placeholder standing: the model would have been asked to
@@ -2007,7 +2008,9 @@ of 2026-10-26, still tells the model that "5 of 72 v3 samples returned a
 verdict_line over its cap". It predates #51 and is left for
 Checkpoint A, with the wider question of whether the comment should reach
 the model at all: removing it from what is sent means changing how
-`src/lib/anthropic.ts` reads the file.
+`src/lib/anthropic.ts` reads the file. **Ruled on 2026-11-05:** "Strip
+comments from judge.v3.md before it is sent (v3 only)". Since then v3's
+comment does not reach the model.
 
 **Run 2, `2026-11-03T21-35-58-347Z-v3.json`**, at `e0e75ae`, 78 calls,
 $1.1559:
@@ -2088,7 +2091,9 @@ therefore reaches the judge the day Ubuntu is published, without an edit.
 v1, v2 and the six request fixtures are unchanged.
 
 The five Arthur did not set are drafted from the school pages, and are his
-to confirm at Checkpoint A:
+to confirm at Checkpoint A. **Ruled on 2026-11-05:** Utilitarianism's
+voice became his wording (in the table below), and "Buddhist voices
+stay"; the other three stand as drafted.
 
 | School | Objection (in short) | Voiced by | Why, as the judge receives it | Once published | Source on the page |
 | --- | --- | --- | --- | --- | --- |
