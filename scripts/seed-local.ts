@@ -118,6 +118,7 @@ main(async () => {
   log(`wrote ${JSON.stringify(result.written)} in ${result.seconds.toFixed(1)} s (${result.rowsPerSecond.toFixed(0)} rows/s)`);
   if (result.cancelled) {
     await releaseHeld(db, result);
+    log("cancelled. Run the same command to resume; the run stays halted until a run of it passes validation.");
     process.exitCode = 1;
     return;
   }
@@ -126,7 +127,10 @@ main(async () => {
     report = await validate(db, dataset, result.before, { cohortLimit });
     for (const c of report.checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}: ${c.detail}`);
     log(`report: ${writeReport(`seed-local-${plan.runId}`, { result, validation: report })}`);
-    if (!(await finishValidation(db, result, report.checks.filter((c) => !c.ok).map((c) => c.name)))) process.exitCode = 1;
+    if (!(await finishValidation(db, result, report.checks.filter((c) => !c.ok).map((c) => c.name)))) {
+      log("the validation's result could not be recorded (the run's lock was lost); the run stays halted");
+      process.exitCode = 1;
+    }
   } finally {
     await releaseHeld(db, result);
   }

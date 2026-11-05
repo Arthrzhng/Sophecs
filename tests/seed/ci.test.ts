@@ -177,7 +177,7 @@ describe("the scheduled workflow's path", () => {
     await expect(step(db, "extend", 24 * 7)).rejects.toThrow(/read timed out/);
     spy.mockRestore();
     expect(samples(db, "debates")).toBeGreaterThan(debatesBefore);
-    expect((await db.getRun(run.id))!).toMatchObject({ status: "failed", last_error: VALIDATING });
+    expect((await db.getRun(run.id))!).toMatchObject({ status: "failed", last_error: VALIDATING, lock_token: null });
     const before = samples(db, "debates");
     expect((await step(db, "extend", 24 * 8)).out).toMatchObject({ ok: false, outcome: "halted" });
     expect(samples(db, "debates")).toBe(before);
@@ -208,6 +208,24 @@ describe("the scheduled workflow's path", () => {
     // The log names the halt, not the refused row.
     expect(held.lines.join("\n")).toContain(`(${REFUSED})`);
     expect(held.lines.join("\n")).not.toMatch(/refusing/);
+  });
+
+  it("writes nothing to a run halted after the schedule's own check", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    const acquire = db.acquireLock.bind(db);
+    const spy = vi.spyOn(db, "acquireLock").mockImplementation(async (...args: Parameters<MemoryAdapter["acquireLock"]>) => {
+      await db.updateRun(run.id, { status: "failed", last_error: `${HALTED}: spot check: debates` });
+      return acquire(...args);
+    });
+    const before = samples(db, "debates");
+    const out = await step(db, "extend", 24 * 7);
+    spy.mockRestore();
+    expect(out.out).toMatchObject({ ok: false, outcome: "halted" });
+    expect(samples(db, "debates")).toBe(before);
+    expect((await db.getRun(run.id))!).toMatchObject({ status: "failed", last_error: `${HALTED}: spot check: debates`, lock_token: null });
   });
 
   it("fails the schedule for a halted run at any stage, the canary's included", async () => {

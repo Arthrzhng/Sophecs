@@ -341,7 +341,13 @@ belongs to a process that died and can be cleared. In the workflow a run
 clears one itself (a job the runner killed, by the timeout, a cancel or a
 lost machine, leaves its lock behind), which is safe there because the
 concurrency group runs one job at a time; from a machine it takes
-`--break-stale-lock`.
+`--break-stale-lock`. One exception: a run keeps its lock, unrefreshed,
+from the end of its writes until its validation is recorded, which
+takes minutes. The schedule cannot break it then, since the run is
+halted ("validation not finished") and an `extend` stops at the halt
+before it touches the lock; a `full` or teardown started by hand could
+after 15 minutes, and the validation would then leave the run's status
+and halt as they were (its report still goes to `last_report`).
 
 ## Teardown
 
@@ -354,7 +360,9 @@ with the service key:
         # preview: what would go, and any genuine row that points at a sample row
     ... --execute --confirm-teardown <id>
 
-It works from the registry, so no plan is needed. It deletes the run's
+It works from the registry, so no plan is needed, and it takes the run's
+lock: while another process holds it, teardown is refused (if that
+process died, the lock can be cleared after 15 minutes). It deletes the run's
 registry items in dependency order, scoped again by the marker or the
 run's own users, clears a genuine row's nullable reference to a sample row
 first, and stops on anything it could only keep by deleting it. It keeps
@@ -483,8 +491,10 @@ the next scheduled run clears once it is 15 minutes old, then resumes. A
 runner lost after the writes leaves the run halted, "validation not
 finished", as above. The schedule resumes only an `extend`: a `canary`
 or `full` stage that fails or is lost leaves the run short of its full
-stage, and the schedule does nothing (a green job) until `full` is run
-by hand again. `tests/seed/ci.test.ts` and
+stage, and the schedule does nothing (a green job, unless the run was
+left halted, when every scheduled run fails) until `full` is run by hand
+again. An `extend` also refuses a run halted by another process in the
+minutes between its own check and taking the lock. `tests/seed/ci.test.ts` and
 `tests/seed/engine.test.ts` cover each case. A run that keeps failing
 shows as failed runs in the Actions tab, and GitHub emails the account
 that set the schedule.

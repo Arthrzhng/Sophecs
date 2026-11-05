@@ -6,7 +6,7 @@ import type { Adapter } from "./adapter";
 import { buildPlan, describe } from "./plan";
 import { DEFAULTS, type GenConfig } from "./generate";
 import { contentTopics } from "./topics";
-import { execute, finishValidation, isHalted, recordedOnRun, releaseHeld, StopError, thrownWhileWriting, VALIDATING } from "./engine";
+import { execute, finishValidation, HaltedError, isHalted, LockLostError, recordedOnRun, releaseHeld, StopError, thrownWhileWriting, VALIDATING } from "./engine";
 import { validate } from "./validate";
 import { dryRun } from "./dryrun";
 import { GuardError } from "./env";
@@ -128,14 +128,31 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
   // finishes, leaves the schedule writing nothing.
   let result: Awaited<ReturnType<typeof execute>>;
   try {
-    result = await execute({ dataset, plan, adapter, cohortLimit, log, batchSize: o.batchSize ?? 250, authConcurrency: 4, breakStaleLock: true, endHalted: VALIDATING });
+    result = await execute({
+      dataset,
+      plan,
+      adapter,
+      cohortLimit,
+      log,
+      batchSize: o.batchSize ?? 250,
+      authConcurrency: 4,
+      breakStaleLock: true,
+      endHalted: VALIDATING,
+      // The schedule checked for a halt before its plan, minutes ago.
+      refuseHalted: o.mode === "extend",
+    });
   } catch (err) {
+    if (err instanceof HaltedError) {
+      log(`run ${plan.runId} was halted before this run took its lock; nothing written`);
+      return { ok: false, outcome: "halted", runId: plan.runId };
+    }
     // An error from the writes can name row ids, and this log is public:
     // execute writes it to seed_runs.last_error, which only the server role
     // reads, so the log gets a line of its own, whether or not that write
     // succeeded.
     if (!thrownWhileWriting(err)) throw err;
-    const line = `the run ${err instanceof StopError ? "stopped on a refusal" : "failed while writing"}; ${
+    const what = err instanceof LockLostError ? "lost its lock" : err instanceof StopError ? "stopped on a refusal" : "failed while writing";
+    const line = `the run ${what}; ${
       recordedOnRun(err) ? "seed_runs.last_error has the detail" : "the detail could not be recorded on the run"
     }`;
     log(line);

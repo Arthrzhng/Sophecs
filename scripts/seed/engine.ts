@@ -23,6 +23,8 @@ import { snapshot, compareBaselines, type Baseline } from "./baseline";
 export class StopError extends Error {}
 /** This process no longer holds the run's lock: it must not touch the run row again. */
 export class LockLostError extends StopError {}
+/** The run is halted, and this caller does not write to a halted run (refuseHalted). */
+export class HaltedError extends StopError {}
 
 export interface Phase {
   kind: Kind;
@@ -76,6 +78,12 @@ export interface ExecuteOptions {
    * validation throws.
    */
   endHalted?: string;
+  /**
+   * Refuse a halted run (HaltedError) rather than write to it with the halt
+   * kept: the schedule's extend, which checks for a halt before making its
+   * plan, minutes before it takes the lock.
+   */
+  refuseHalted?: boolean;
 }
 
 /**
@@ -140,6 +148,9 @@ export const recordedOnRun = (err: unknown): boolean => typeof err === "object" 
 
 // A live run refreshes its lock before every batch, and a batch takes
 // seconds, so a lock untouched for this long belongs to a process that died.
+// The exception is a lock kept for validation (endHalted), which is not
+// refreshed; the run is halted meanwhile, so the schedule never breaks it,
+// and if a run by hand does, the validation records nothing.
 export const STALE_LOCK_MINUTES = 15;
 
 /** Before every batch: still ours, and fresh. Stops the run if another process took it. */
@@ -313,27 +324,35 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
   }
   if (!(await adapter.acquireLock(run.id, token)))
     throw new StopError(`run ${run.id} is locked by another process (if that process died, add --break-stale-lock after ${STALE_LOCK_MINUTES} minutes)`);
-  const racing = (await adapter.listRuns()).filter((r) => r.id !== run!.id && r.lock_token);
-  if (racing.length) {
-    await adapter.releaseLock(run.id, token);
-    throw new StopError(`run ${racing[0].id} took a lock at the same time; stopping`);
+  // Everything from here to the writes is under the lock: a throw releases
+  // it, so it is not left to go stale.
+  let keep: string | null;
+  try {
+    const racing = (await adapter.listRuns()).filter((r) => r.id !== run!.id && r.lock_token);
+    if (racing.length) throw new StopError(`run ${racing[0].id} took a lock at the same time; stopping`);
+    // Decided from the run as it is now that the lock is held.
+    run = (await adapter.getRun(run.id)) ?? run;
+    if (opts.refuseHalted && isHalted(run)) throw new HaltedError(`run ${run.id} was halted before this run could take its lock`);
+    // A canary validates only its first cohorts, so on a run that has had
+    // its full stage, or on a halted canary of more cohorts, it could pass
+    // while the rest is wrong, and lift a halt. A halted canary of the same
+    // cohorts, or more, is resumed: it validates everything written.
+    if (Number.isFinite(limit)) {
+      if (String(run.counts?.stage ?? "") === "full")
+        throw new StopError(`run ${run.id} has had its full stage; a canary cannot be run on it`);
+      const earlier = Number(run.counts?.cohortLimit ?? 0);
+      if (isHalted(run) && limit < earlier)
+        throw new StopError(`run ${run.id} is halted after a canary of ${earlier}; a smaller canary cannot be run on it`);
+    }
+    // A halted run stays halted while it is written to, whatever happens
+    // here: only a validation that passes afterwards lifts it.
+    keep = isHalted(run) ? run.last_error! : null;
+    if (!(await adapter.updateRunLocked(run.id, token, keep ? { status: "failed", last_error: keep } : { status: "running", last_error: null })))
+      throw new LockLostError(`run ${run.id}'s lock was taken before the run began`);
+  } catch (err) {
+    if (!(err instanceof LockLostError)) await releaseQuietly(adapter, run.id, token, log);
+    throw err;
   }
-  // Decided from the run as it is now that the lock is held.
-  run = (await adapter.getRun(run.id)) ?? run;
-  // A canary validates only its first cohorts, so on a run that has had its
-  // full stage, or a halted one, it could pass while the rest is wrong, and
-  // lift a halt.
-  if (Number.isFinite(limit) && (String(run.counts?.stage ?? "") === "full" || isHalted(run))) {
-    await releaseQuietly(adapter, run.id, token, log);
-    throw new StopError(
-      `run ${run.id} ${isHalted(run) ? "is halted" : "has had its full stage"}; a canary cannot be run on it`
-    );
-  }
-  // A halted run stays halted while it is written to, whatever happens
-  // here: only a validation that passes afterwards lifts it.
-  const keep = isHalted(run) ? run.last_error! : null;
-  if (!(await adapter.updateRunLocked(run.id, token, keep ? { status: "failed", last_error: keep } : { status: "running", last_error: null })))
-    throw new LockLostError(`run ${run.id}'s lock was taken before the run began`);
 
   const owners = ownerIds(ds);
   const written: Record<string, number> = {};
@@ -449,7 +468,9 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     if (!ended) throw new LockLostError(`run ${run.id}'s lock was taken before the run could record its end`);
     // Kept for the caller's validation, and fresh, so a stale-lock check
     // elsewhere does not take it meanwhile.
-    if (opts.endHalted) keepLock = await adapter.refreshLock(run.id, token);
+    // A refresh that fails leaves the lock to be released below and the
+    // run halted, never the end record overwritten by the catch.
+    if (opts.endHalted) keepLock = await adapter.refreshLock(run.id, token).catch(() => false);
   } catch (err) {
     if (typeof err === "object" && err !== null) fromWriting.add(err);
     // Only while still holding the lock: a process that lost it must not
