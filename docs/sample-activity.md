@@ -80,9 +80,27 @@ challenges." `/method#samples` explains the rest.
   PostHog at all; the reader is identified on their first genuine page.
   `tests/seed/analytics-sample.test.ts`. The seed writes
   rows directly and emits no event. Sample quiz results carry no
-  referrer. One thing remains: a genuine page opened from a sample page
-  by a full page load reports that page's address as its `referrer`, as
-  it would for any page on the site; it is the reader's own view.
+  referrer. A page showing a sample passes no referrer on (`referrer:
+  "no-referrer"` in its metadata, `SAMPLE_PAGE_REFERRER` in
+  `src/lib/sample.ts`; `docs/decisions.md`, "Arthur's rulings of
+  2026-11-05 on Checkpoint A", 18), so a page opened from one does not
+  report the sample page's address: not in `document.referrer`, which
+  reaches PostHog's `page_viewed` and is stored on a reader's own quiz
+  result, and not in the Referer header, which `/r/[id]` reads into
+  `card_viewed` and `share_page_viewed`. The root layout states the
+  browsers' default for every other page, which puts it back after a
+  client-side navigation away from a sample page. That relies on how
+  Next.js 15.5 handles metadata: each navigation's metadata is sent
+  afresh, React inserts a new `<meta name="referrer">` element for it,
+  and inserting one re-applies the policy.
+  `tests/seed/sample-referrer.test.ts` pins both values, not that
+  mechanism, so a Next.js upgrade should be checked by hand on a sample
+  page. Two gaps remain. First, Next.js streams metadata to browsers
+  after the page's content, so until that part arrives the page runs
+  under the browser's default: a link followed in that window, as a full
+  load or as a client-side navigation, still sends the sample page's
+  address. Second, the root layout's stated policy replaces a stricter
+  one a reader may have set in their own browser, on every page.
 - **Matching.** No sample argument has `seeking_counterpart_at` set, so
   `seekCounterpart` never offers one to a reader.
 - **Challenges.** A sample never answers. A reader who opens a sample
