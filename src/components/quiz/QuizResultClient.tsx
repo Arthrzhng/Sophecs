@@ -28,7 +28,9 @@ interface PendingResult {
   // Carried from /auth/callback's /quiz?next= redirect. Not yet consumed —
   // /debate doesn't exist until 2b/2c, and redirecting a first-time quiz
   // taker to a "still developing" stub would be worse than showing the
-  // normal result card. See docs/decisions.md.
+  // normal result card. See docs/decisions.md. Anyone can write it, so the
+  // redirect that consumes it must pass it through localPath
+  // (src/lib/local-path.ts), as /auth/callback does.
   next: string | null;
   referrer: string;
 }

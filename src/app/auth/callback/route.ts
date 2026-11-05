@@ -2,12 +2,15 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { claimAnonymousResults } from "@/lib/claim";
+import { localPath } from "@/lib/local-path";
 
 // Magic link and Google OAuth both land here.
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next");
+  // Only a path on this site: `next` comes from a query string anyone can
+  // write, and the redirects below would follow it anywhere.
+  const next = localPath(searchParams.get("next"), origin);
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login`);
