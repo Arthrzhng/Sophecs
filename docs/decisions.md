@@ -2640,3 +2640,43 @@ advisor are in `docs/progress.md`.
   break class pages. Moving them out of the API's schema is the usual fix.
 - **`exchanges_public`** is readable and unused. Kept, since it is meant
   to be public and exposes nothing private.
+
+### Dependency audit (2026-11-05)
+
+The sample-activity workflow's `npm ci` reported 17 vulnerabilities (2
+critical, 7 high, 8 moderate). Arthur, 2026-11-05: fix the two critical
+ones if they affect anything we ship or run, and list the rest.
+
+**Fixed: `next` 15.5.24 to 15.5.29** (and `eslint-config-next` with it). We
+ship and run it. 15.5.29 is the latest 15.x; it clears the critical
+"Unauthenticated Remote Code Execution in Image Optimization API when SVG
+files are used" (GHSA-2464-fhr4-w9xw, up to 15.5.27), the high "Denial of
+Service in App Router using Server Actions" (GHSA-p3m5-59mp-jv5r; the site
+uses server actions), and the two moderate cache-poisoning advisories.
+The RCE needs Next's own image optimizer serving SVGs; the site has no
+`next/image`, no `remotePatterns` and no `dangerouslyAllowSVG`, and Vercel
+serves `/_next/image` itself, so it was likely not reachable, but the DoS
+was. The lockfile otherwise moves only Next's own packages and `sharp`
+0.35.3 to 0.35.5 (Next's optional image dependency), which also clears
+sharp's high advisory. Five gates pass on 15.5.29, and a local
+`next start` serves every page and image route checked.
+
+**Not fixed: `dompurify` 3.4.14 (critical, GHSA-cg2g-xh64-v4q7).** It is in
+the lockfile only as a dependency of `posthog-js`, for PostHog's
+product-tours extension, which PostHog loads from its own servers when a
+project uses product tours; this one does not. No chunk of the built site
+(`.next/static`, `.next/server`) contains DOMPurify. It does not affect
+anything we ship or run. `npm update dompurify` would move it to 3.4.17
+within `posthog-js`'s range if wanted.
+
+**The rest, not fixed, for a later list:**
+
+| Package | Severity | Reaches | Why it matters or not |
+| --- | --- | --- | --- |
+| `zod` 3.x | high (memory exhaustion validating oversized constrained collections) | direct; it parses only the model's replies, the judge's (`src/lib/judge/schema.ts`) and the turn screener's (`src/lib/screen.ts`), never a reader's input | Those replies are capped by `max_tokens` (850 for the judge), which bounds the collections. Fixed only in zod 4, a major upgrade, which touches the frozen judge schema: worth doing deliberately. |
+| `follow-redirects` 1.16.0 | high (credential headers can follow cross-origin redirects) | `posthog-node` (server analytics) through `axios` | posthog-node sends only to PostHog's EU host, which does not redirect cross-origin today. An `npm update` moves it to a fixed release within range. |
+| `postcss` 8.4.31 (inside `next`) and 8.5.26 (`@tailwindcss/postcss`) | high and moderate (source-map path traversal, `</style>` escaping) | build only | Reads CSS we write; nothing attacker-controlled. Next 15 pins its own copy; fixed in Next 16. |
+| `js-yaml` 3.15.1 | high (CPU with empty merge keys) | `gray-matter`, reading our own content frontmatter at build and request time | Only reads files in `content/`, which we write. |
+| `source-map-js` 1.2.1 | high (DoS with crafted source maps) | build only | Our own source maps. |
+| `vite` 8.2.2, `vitest` 5.0.0, `@vitest/mocker` | high and moderate (dev server and editor launch, mostly Windows) | tests only | Never served. A patch release of vitest clears them. |
+| `minimatch`, `@typescript-eslint/*` | moderate (glob DoS) | lint only | Our own globs. |
