@@ -139,7 +139,7 @@ export function SchoolTable({
                       Your school
                     </span>
                   )}
-                  {row.rank == null && (
+                  {row.rank == null && !emptyWeek && (
                     <span className="mt-0.5 text-sm text-ink-mid">{unrankedNote(row.arguments)}</span>
                   )}
                 </span>

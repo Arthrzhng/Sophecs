@@ -10,7 +10,7 @@ UNVERIFIED below is not to be used. Where a content slot needs a source
 this file does not supply, the slot is written as TODO-SOURCE and reported
 rather than filled.
 
-> Arthur's ruling (e)9 of 2026-11-05, on what UNVERIFIED bars (both rounds):
+> Arthur's ruling (e)9 of 2026-11-05, on what UNVERIFIED bars:
 > an UNVERIFIED item may not be used as a citation or an attribution.
 > Wording verified elsewhere in this file may be used, with that verified
 > source credited. The Ubuntu `one_line` stays, attributed to Metz 2007,

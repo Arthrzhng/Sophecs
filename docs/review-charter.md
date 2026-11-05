@@ -106,9 +106,10 @@ draft school's id, name and adherent noun, taking the strings from the
 drafts module rather than from a list in the script, and for every colour
 in `src/app/six-schools.css`, the new schools' tokens.
 
-Today that is nineteen strings, and the script prints the count: three
-ids, three names, six adherent nouns (proposals, Checkpoint B (e)) and
-seven colours. It throws rather than run without one of them: if a draft
+Today that is twenty-one strings, and the script prints the count: three
+ids, three names, six adherent nouns (accepted at Checkpoint B, (e) 1) and
+nine colours, a marker, a card surface and a deep shade for each, every
+surface darker than its marker since (e) 2. It throws rather than run without one of them: if a draft
 loses an adherent noun, or the stylesheet any of a draft's three colour
 tokens (marker, card surface, deep shade). Read the printed count rather
 than assuming the coverage.

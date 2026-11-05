@@ -3632,15 +3632,18 @@ items below shipped together.
     under 65, fidelity 7 under 8), `fabricated-source` (rigor 4 over 3),
     `util-named-text` (62 under 70, fidelity 7 under 8),
     `util-obscure-source` (68 under 70), `virtue-exemplar` (68 under 70).
-  - The composite fell by 7.1 points on the mean of the 25 medians,
-    while fidelity, rigor and engagement fell by 0.1, 0.2 and 0.5. The
-    judge scores the whole lower, not only engagement.
+  - The composite fell by 7.0 points on the mean of the 25 medians (54.7
+    to 47.7, medians as `tests/judge/run-golden.ts` takes them), while
+    fidelity, rigor and engagement fell by 0.1, 0.2 and 0.5. The judge
+    scores the whole lower, far more than its criteria moved.
   - 31 of 105 replies, to originals in 16 cases, carried
     `"objection_answered": null` and `"improvement_note": null`, which
     the schema refuses (both are revision-only and optional, not
     nullable). The 4 Nov run had none. Two samples were lost after their
     retries. Production is not exposed: it sends v2, and made no judge
-    call in the ten days to 2026-11-05.
+    call in the ten days to 2026-11-05 (`ai_calls` rows of any kind
+    created since 2026-10-26, read at 22:20 UTC: none). The sample
+    verdicts are written from templates, not by the judge.
 
   #68 moved `unanswered_objection` to the front of the response format
   and tied the cap to it; both reached the model after the last golden
@@ -3674,9 +3677,9 @@ runs pass." Agreed that nothing promotes a flag-on preview to Production.
   of its hue. `scripts/colour-candidates.mjs` now gives each new marker
   the live three's mean step (0.044 lower, 0.955 of the chroma, the same
   hue), taking chroma off where the step leaves sRGB, which the brown
-  does. Surfaces: Confucianism `#472100` (was the marker, `#562b05`),
-  Ubuntu `#142f42` (was `#1e3b4f`), Buddhist Ethics `#6f4aa6` (was
-  `#724aab`). The card's text at its lowest opacity reads at 9.0, 8.9
+  does (to 0.92 of its marker's chroma rather than 0.955). Surfaces:
+  Confucianism `#472100` and Ubuntu `#142f42` (each was its marker,
+  `#562b05` and `#1e3b4f`), Buddhist Ethics `#6f4aa6` (was `#724aab`). The card's text at its lowest opacity reads at 9.0, 8.9
   and 4.6 to 1. `src/app/six-schools.css`, `src/lib/card-tokens.ts`,
   `docs/phase3-styleguide/colour-candidates.json`.
 - **3.** The share lines take the recommended rewordings: Confucianism's
@@ -3689,9 +3692,13 @@ runs pass." Agreed that nothing promotes a flag-on preview to Production.
 - **5.** "A school is ranked once it has 20 judged original arguments in
   the week." `RANK_MIN_ARGUMENTS` in `src/lib/school-table.ts`, read by
   the live table, Today's school card and the six-school preview alike;
-  an unranked row says how many it has. The three live schools had 112
-  to 202 each in week 45, so nothing on production changes until a week
-  opens, when every school is unranked until it has 20.
+  an unranked row says how many it has. In week 45 the three live
+  schools had 202, 186 and 112 judged originals (`debates`, kind
+  original, not rejected, with a verdict, created from 2026-11-02, read
+  at 22:14 UTC), every one a sample account's. So the live table shows
+  the same today, and from each Monday every school is unranked until it
+  has 20. That is a change to the live table, not only the preview, and
+  is on the list for Arthur to confirm.
 - **6.** "Show the view from elsewhere only once the reader reaches step
   4." `showsElsewhere` in `src/lib/today-path.ts`: shown once step 4 is
   not locked, which, since steps 3 and 4 complete together, is once the
@@ -3709,4 +3716,5 @@ runs pass." Agreed that nothing promotes a flag-on preview to Production.
   ruling). The `one_line_attribution` already read that way.
 
 **Housekeeping.** A manual sample run on the Node 24 actions and #72's
-engine ran at 22:00 UTC and passed (`docs/progress.md`).
+engine ran at 22:00 UTC and passed (`docs/progress.md`, 2026-11-05,
+"Checkpoint B's rulings").

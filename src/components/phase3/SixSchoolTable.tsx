@@ -2,11 +2,14 @@ import { RANK_MIN_ARGUMENTS, unrankedNote } from "@/lib/school-table";
 
 /**
  * The school table with six rows: Phase 3.0 preview only (Stage 4 of the
- * brief of 2026-11-03).
+ * brief of 2026-11-03), from fixture averages.
  *
  * A school is ranked once it has RANK_MIN_ARGUMENTS judged original
  * arguments in the week (Arthur's ruling (e)5 of 2026-11-05), the live
- * table's rule; until then its row says so instead of showing a rank.
+ * table's threshold; until then its row says so instead of showing a
+ * rank. Unlike the live table it does not share tied ranks or order the
+ * unranked rows: the live table on a SIX_SCHOOLS build
+ * (src/components/table/SchoolTable.tsx) is the one readers see.
  * Copy: docs/daily-path-copy.md, "School table, a school not yet ranked".
  */
 

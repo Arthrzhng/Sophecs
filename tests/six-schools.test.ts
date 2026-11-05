@@ -133,8 +133,20 @@ describe("a build with SIX_SCHOOLS=1", () => {
       expect(colours.SCHOOL_ADHERENT[id]).toBe(draft.adherent);
       expect(colours.SCHOOL_ADHERENT_PLURAL[id]).toBe(draft.adherentPlural);
       expect(colours.SCHOOL_TEXT_CLASS[id]).toBe(`text-${id}`);
+      // Ruling (e)1 of 2026-11-05: "an Ubuntu Ethicist", and "a" for the rest.
+      expect(colours.SCHOOL_ARTICLE[id], id).toBe(id === "ubuntu" ? "an" : "a");
       expect(chunky.SCHOOL_CHUNKY[id]).toEqual({ bg: `var(--color-${id})`, shade: `var(--color-${id}-deep)` });
     }
+  });
+
+  it("starts each school's name with its adherent noun's sound, so one article serves both", async () => {
+    // Verdict.tsx writes SCHOOL_ARTICLE before a school's name ("an Ubuntu
+    // objection"); that holds only while name and noun begin alike.
+    const { colours } = await load("1");
+    for (const id of Object.keys(colours.SCHOOL_COLORS) as (keyof typeof colours.SCHOOL_COLORS)[]) {
+      expect(colours.SCHOOL_COLORS[id].name.slice(0, 4), id).toBe(colours.SCHOOL_ADHERENT[id].slice(0, 4));
+    }
+    expect(Object.keys(colours.SCHOOL_COLORS)).toHaveLength(6);
   });
 
   it("keeps every live school's lookups as they are without the flag", async () => {

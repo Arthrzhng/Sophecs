@@ -324,8 +324,9 @@ const round = (n, d = 1) => Math.round(n * 10 ** d) / 10 ** d;
 // lowest opacity still fall below AA on that, darker in 0.005 steps until
 // it does not; none of the chosen three needs that. A step that leaves
 // sRGB (the darkened brown would need a blue below zero) keeps its
-// lightness and hue and gives up chroma until it is back in, which is how
-// CSS Color 4 maps a colour into gamut.
+// lightness and hue and gives up chroma until it is back in, a simplified
+// form of how CSS Color 4 maps a colour into gamut (it searches chroma
+// by halves, and clips once within a just-noticeable difference).
 const inkOn = (surface, opacity) => contrast(over(CARD_INK, surface, opacity), surface);
 const SURFACE_STEP = (() => {
   const pairs = Object.keys(SCHOOLS).map((k) => [rgbToOklch(hexToRgb(SCHOOLS[k])), rgbToOklch(hexToRgb(SCHOOL_SURFACES[k]))]);
@@ -339,8 +340,9 @@ function cardSurfaceFor(c) {
     const L = L0 + SURFACE_STEP.dL - step * 0.005;
     let c2 = C;
     let rgb = oklchToRgb(L, c2, H0);
+    // Terminates: at chroma 0 the colour is a grey, inside sRGB at any
+    // lightness from 0 to 1.
     while (!rgb && c2 > 0) rgb = oklchToRgb(L, (c2 = Math.max(0, c2 - 0.001)), H0);
-    if (!rgb) continue;
     const q = hexToRgb(rgbToHex(rgb));
     if (inkOn(q, CARD_INK_LOWEST_OPACITY) >= MIN_WHITE_TEXT) return q;
   }
