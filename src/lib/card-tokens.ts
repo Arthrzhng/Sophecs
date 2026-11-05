@@ -66,10 +66,11 @@ const CARD_SURFACE_BY_SCHOOL: Partial<Record<SchoolId, string>> = {
   utilitarianism: "#7a5518",
   "virtue-ethics": "#6b2c37",
   // --color-confucian-surface, --color-ubuntu-surface,
-  // --color-buddhist-surface: the card text's lowest opacity clears AA on
-  // each (colour-candidates.json, cardInkAtLowestOpacity).
+  // --color-buddhist-surface: darker than each marker by the live three's
+  // step, and the card text's lowest opacity clears AA on each
+  // (colour-candidates.json, cardInkAtLowestOpacity).
   ...(process.env.SIX_SCHOOLS === "1"
-    ? { confucian: "#562b05", ubuntu: "#1e3b4f", buddhist: "#724aab" }
+    ? { confucian: "#472100", ubuntu: "#142f42", buddhist: "#6f4aa6" }
     : {}),
 };
 

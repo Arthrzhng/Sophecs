@@ -95,10 +95,8 @@ describe("with SIX_SCHOOLS=1", () => {
 
   it("gives the school table six rows, the three new ones unranked with no average", async () => {
     const { table } = await load("1");
-    const rows = table.rankSchools(
-      [{ school: "stoicism", fidelity: 7 } as never, { school: "utilitarianism", fidelity: 6 } as never],
-      {}
-    );
+    const twenty = (school: string, fidelity: number) => Array.from({ length: 20 }, () => ({ school, fidelity }) as never);
+    const rows = table.rankSchools([...twenty("stoicism", 7), ...twenty("utilitarianism", 6)], {});
     expect(rows.map((r) => r.school).sort()).toEqual([...LIVE, ...NEW].sort());
     for (const id of NEW) {
       const row = rows.find((r) => r.school === id);

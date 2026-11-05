@@ -61,6 +61,18 @@ function oklchToRgb(L, C, hDeg) {
   return lin.map((c) => toSrgb(Math.min(1, Math.max(0, c))));
 }
 
+// sRGB to OKLCH, the inverse of the above, with the hue in degrees.
+function rgbToOklch(rgb) {
+  const [r, g, b] = rgb.map(toLin);
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  const L = 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s;
+  const a = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+  const bb = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+  return [L, Math.hypot(a, bb), ((Math.atan2(bb, a) * 180) / Math.PI + 360) % 360];
+}
+
 // sRGB to CIELAB (D65), for CIEDE2000.
 function rgbToLab(rgb) {
   const [r, g, b] = rgb.map(toLin);
@@ -147,6 +159,12 @@ const WHITE = [1, 1, 1];
 const PAPER = hexToRgb("#f7f3ea");
 const SCHOOLS = { stoic: "#3e5c4b", utilitarian: "#8a6320", virtue: "#7a3540" };
 const OTHERS = { "correct (judge blue)": "#1e5fa0", "step-done orange": "#d9822b" };
+
+// Their result-card surfaces (--color-*-surface), each darker than its
+// marker. In OKLCH every one sits 0.041 to 0.050 lower in lightness than
+// its marker, at 0.93 to 1.00 of its chroma and within 2 degrees of its
+// hue; a new school's surface takes the same step (cardSurfaceFor).
+const SCHOOL_SURFACES = { stoic: "#33503f", utilitarian: "#7a5518", virtue: "#6b2c37" };
 
 // src/lib/card-tokens.ts CARD_INK: the near-white the result card sets its
 // text in, at as little as 0.8 opacity (src/components/card/CardLayout.tsx).
@@ -298,15 +316,30 @@ NEW.forEach((school, k) => {
 
 const round = (n, d = 1) => Math.round(n * 10 ** d) / 10 ** d;
 
-// The result card's own surface, as the live schools have one darker than
-// their marker (--color-*-surface): the candidate's hue and chroma at the
-// highest lightness, in 0.005 steps down, where the card's ink at its
-// lowest opacity still reads at AA.
+// The result card's own surface, darker than the marker the same way the
+// live schools' are (Arthur's ruling (e)2 of 2026-11-05: "treated the same
+// as the live three"). The step is the live three's mean: their surfaces'
+// OKLCH lightness less their markers', and their chroma over their
+// markers', at the marker's own hue. Then, should the card's ink at its
+// lowest opacity still fall below AA on that, darker in 0.005 steps until
+// it does not; none of the chosen three needs that. A step that leaves
+// sRGB (the darkened brown would need a blue below zero) keeps its
+// lightness and hue and gives up chroma until it is back in, which is how
+// CSS Color 4 maps a colour into gamut.
 const inkOn = (surface, opacity) => contrast(over(CARD_INK, surface, opacity), surface);
+const SURFACE_STEP = (() => {
+  const pairs = Object.keys(SCHOOLS).map((k) => [rgbToOklch(hexToRgb(SCHOOLS[k])), rgbToOklch(hexToRgb(SCHOOL_SURFACES[k]))]);
+  const mean = (xs) => xs.reduce((x, y) => x + y, 0) / xs.length;
+  return { dL: mean(pairs.map(([m, s]) => s[0] - m[0])), cRatio: mean(pairs.map(([m, s]) => s[1] / m[1])) };
+})();
 function cardSurfaceFor(c) {
-  for (let step = 0; c.L - step * 0.005 > 0.1; step++) {
-    const L = c.L - step * 0.005;
-    const rgb = oklchToRgb(L, c.C, c.H);
+  const [L0, C0, H0] = rgbToOklch(c.rgb);
+  const C = C0 * SURFACE_STEP.cRatio;
+  for (let step = 0; L0 + SURFACE_STEP.dL - step * 0.005 > 0.1; step++) {
+    const L = L0 + SURFACE_STEP.dL - step * 0.005;
+    let c2 = C;
+    let rgb = oklchToRgb(L, c2, H0);
+    while (!rgb && c2 > 0) rgb = oklchToRgb(L, (c2 = Math.max(0, c2 - 0.001)), H0);
     if (!rgb) continue;
     const q = hexToRgb(rgbToHex(rgb));
     if (inkOn(q, CARD_INK_LOWEST_OPACITY) >= MIN_WHITE_TEXT) return q;

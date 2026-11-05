@@ -31,12 +31,27 @@ export interface SchoolChange {
   at: string;
 }
 
+/**
+ * A school is ranked once it has this many judged original arguments in
+ * the week (Arthur's ruling (e)5 of 2026-11-05). Below it, an average of
+ * a handful reads as a standing it has not earned, so the row says how
+ * many it has instead (docs/daily-path-copy.md, "School table, a school
+ * not yet ranked").
+ */
+export const RANK_MIN_ARGUMENTS = 20;
+
+/** The line under an unranked school's name. */
+export function unrankedNote(argumentCount: number): string {
+  return `Ranked once it has ${RANK_MIN_ARGUMENTS} judged original arguments. ${argumentCount} so far.`;
+}
+
 export interface SchoolTableRow {
   /**
-   * Null for a school with no average to be ranked on. Rank is by average
-   * fidelity, so a school that has none has no place in the order: with
-   * nothing judged all week, "1, 1, 1" reads as a fault rather than as
-   * nothing having happened yet.
+   * Null for a school not yet ranked: one with fewer than
+   * RANK_MIN_ARGUMENTS judged original arguments this week, or with no
+   * average to be ranked on. Rank is by average fidelity, so a school that
+   * has none has no place in the order: with nothing judged all week,
+   * "1, 1, 1" reads as a fault rather than as nothing having happened yet.
    */
   rank: number | null;
   school: SchoolId;
@@ -95,8 +110,10 @@ export function schoolChanges(
  *
  * Rank is by average fidelity, then by number of arguments, and ties share
  * a rank: two schools level on both are both second, and the next is
- * fourth. A school with nothing judged has no average and sorts last
- * whatever its argument count, because an empty average is not a zero.
+ * fourth. Only a school with RANK_MIN_ARGUMENTS judged original arguments
+ * and an average is ranked; the rest follow, unranked, by argument count.
+ * A school with nothing judged has no average and is never ranked,
+ * because an empty average is not a zero.
  */
 export function rankSchools(
   judged: JudgedArgument[],
@@ -119,18 +136,20 @@ export function rankSchools(
     };
   });
 
+  const rankable = (t: (typeof tallies)[number]) =>
+    t.avgFidelity != null && t.arguments >= RANK_MIN_ARGUMENTS;
   const ordered = [...tallies].sort((a, b) => {
-    if (a.avgFidelity == null && b.avgFidelity == null) return b.arguments - a.arguments;
-    if (a.avgFidelity == null) return 1;
-    if (b.avgFidelity == null) return -1;
-    return b.avgFidelity - a.avgFidelity || b.arguments - a.arguments;
+    if (!rankable(a) && !rankable(b)) return b.arguments - a.arguments;
+    if (!rankable(a)) return 1;
+    if (!rankable(b)) return -1;
+    return (b.avgFidelity as number) - (a.avgFidelity as number) || b.arguments - a.arguments;
   });
 
   const key = (t: (typeof tallies)[number]) => `${t.avgFidelity}:${t.arguments}`;
   let rank = 0;
   let previous = "";
   return ordered.map((tally, i) => {
-    if (tally.avgFidelity == null) return { rank: null, ...tally };
+    if (!rankable(tally)) return { rank: null, ...tally };
     const k = key(tally);
     if (k !== previous) {
       rank = i + 1;

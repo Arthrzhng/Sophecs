@@ -4,7 +4,9 @@ import {
   isoWeekRange,
   joinedLeftLabel,
   rankSchools,
+  RANK_MIN_ARGUMENTS,
   schoolChanges,
+  unrankedNote,
   yourTableLine,
   type JudgedArgument,
   type SchoolChange,
@@ -64,13 +66,16 @@ describe("schoolChanges", () => {
 describe("rankSchools", () => {
   const judged = (school: string, ...marks: (number | null)[]): JudgedArgument[] =>
     marks.map((fidelity) => ({ school: school as JudgedArgument["school"], fidelity }));
+  // `n` arguments for one school, every one marked `mark`.
+  const many = (school: string, n: number, mark: number | null): JudgedArgument[] =>
+    judged(school, ...Array.from({ length: n }, () => mark));
 
   it("ranks by average fidelity, then by argument count", () => {
     const rows = rankSchools(
       [
-        ...judged("stoicism", 6, 6),
-        ...judged("utilitarianism", 9),
-        ...judged("virtue-ethics", 6, 6, 6),
+        ...many("stoicism", 20, 6),
+        ...many("utilitarianism", 20, 9),
+        ...many("virtue-ethics", 30, 6),
       ],
       NONE
     );
@@ -82,7 +87,7 @@ describe("rankSchools", () => {
   });
 
   it("gives tied schools the same rank, and none at all to a school with no average", () => {
-    const rows = rankSchools([...judged("stoicism", 7), ...judged("utilitarianism", 7)], NONE);
+    const rows = rankSchools([...many("stoicism", 20, 7), ...many("utilitarianism", 20, 7)], NONE);
     expect(rows.map((r) => r.rank)).toEqual([1, 1, null]);
     expect(rows[2].avgFidelity).toBeNull();
   });
@@ -92,8 +97,9 @@ describe("rankSchools", () => {
   });
 
   it("sorts a school with no judged argument last, below a zero average", () => {
-    const rows = rankSchools(judged("stoicism", 0), NONE);
+    const rows = rankSchools(many("stoicism", 20, 0), NONE);
     expect(rows[0].school).toBe("stoicism");
+    expect(rows[0].rank).toBe(1);
     expect(rows[0].avgFidelity).toBe(0);
     expect(rows.slice(1).every((r) => r.avgFidelity === null)).toBe(true);
   });
@@ -105,6 +111,34 @@ describe("rankSchools", () => {
     expect(stoic.avgFidelity).toBe(8);
   });
 
+  it(`ranks a school once it has ${RANK_MIN_ARGUMENTS} judged original arguments in the week, and not before`, () => {
+    expect(RANK_MIN_ARGUMENTS).toBe(20);
+    const rows = rankSchools(
+      [
+        ...many("stoicism", 19, 9),
+        ...many("utilitarianism", 20, 5),
+        ...many("virtue-ethics", 3, 10),
+      ],
+      NONE
+    );
+    // The best average and the second most arguments, one short: unranked,
+    // below the one school that is ranked, then the rest by count.
+    expect(rows.map((r) => [r.school, r.rank])).toEqual([
+      ["utilitarianism", 1],
+      ["stoicism", null],
+      ["virtue-ethics", null],
+    ]);
+    expect(rows[1].avgFidelity).toBe(9);
+    expect(rows[1].arguments).toBe(19);
+  });
+
+  it("counts an argument with no fidelity mark towards the threshold", () => {
+    const rows = rankSchools([...many("stoicism", 19, 7), ...many("stoicism", 1, null)], NONE);
+    const stoic = rows.find((r) => r.school === "stoicism")!;
+    expect(stoic.arguments).toBe(20);
+    expect(stoic.rank).toBe(1);
+  });
+
   it("carries the joined and left counts through", () => {
     const rows = rankSchools([], { ...NONE, stoicism: { joined: 2, left: 1 } });
     const stoic = rows.find((r) => r.school === "stoicism")!;
@@ -113,6 +147,13 @@ describe("rankSchools", () => {
 
   it("always returns all three schools, even with nothing judged", () => {
     expect(rankSchools([], NONE)).toHaveLength(3);
+  });
+});
+
+describe("unrankedNote", () => {
+  it("is the copy doc's line, with the threshold and the count", () => {
+    expect(unrankedNote(4)).toBe("Ranked once it has 20 judged original arguments. 4 so far.");
+    expect(unrankedNote(0)).toBe("Ranked once it has 20 judged original arguments. 0 so far.");
   });
 });
 

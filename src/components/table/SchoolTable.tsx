@@ -1,6 +1,6 @@
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
-import { joinedLeftLabel, type SchoolTableRow } from "@/lib/school-table";
+import { joinedLeftLabel, unrankedNote, type SchoolTableRow } from "@/lib/school-table";
 import type { SchoolId } from "@/lib/types";
 import { TextLink } from "@/components/ui/TextLink";
 
@@ -138,6 +138,9 @@ export function SchoolTable({
                     >
                       Your school
                     </span>
+                  )}
+                  {row.rank == null && (
+                    <span className="mt-0.5 text-sm text-ink-mid">{unrankedNote(row.arguments)}</span>
                   )}
                 </span>
 

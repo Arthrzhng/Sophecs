@@ -15,13 +15,15 @@
   --color-ubuntu: #1e3b4f;
   --color-buddhist: #7d56b8;
 
-  /* The result card's surface: the marker, darkened only where the card's
-     text would otherwise fall below AA at its lowest opacity, which of the
-     three is Buddhist Ethics alone (colour-candidates.json, cardSurface).
+  /* The result card's surface, darker than the marker by the step the
+     live three's surfaces take from theirs: in OKLCH, 0.044 lower in
+     lightness at 0.955 of the chroma, the same hue (Arthur's ruling (e)2
+     of 2026-11-05; scripts/colour-candidates.mjs, cardSurfaceFor). The
+     card's text at its lowest opacity reads at 9.0 / 8.9 / 4.6 : 1.
      Mirrored for Satori in src/lib/card-tokens.ts. */
-  --color-confucian-surface: #562b05;
-  --color-ubuntu-surface: #1e3b4f;
-  --color-buddhist-surface: #724aab;
+  --color-confucian-surface: #472100;
+  --color-ubuntu-surface: #142f42;
+  --color-buddhist-surface: #6f4aa6;
 
   /* The pressed-shadow shade under a chunky control. The live three's are
      their markers at about three quarters of the lightness (0.73 to 0.77)

@@ -189,11 +189,10 @@ export default function Phase3Page() {
 
       <Section title="School table, six rows">
         <p className="mb-4 max-w-[62ch] text-sm text-ink-mid">
-          Fixture rows. The threshold for ranking a school is Arthur&apos;s to set; this preview uses
-          20.
+          Fixture rows. A school is ranked once it has 20 judged original arguments in the week
+          (Arthur&apos;s ruling of 2026-11-05), as on the live table.
         </p>
         <SixSchoolTable
-          threshold={20}
           rows={ALL.map((id, i) => ({
             id,
             name: nameOf(id),
@@ -221,11 +220,10 @@ export default function Phase3Page() {
 
       <Section title="Result cards, six schools">
         <p className="mb-4 max-w-[62ch] text-sm text-ink-mid">
-          Each school&apos;s own one_line at the card&apos;s 1200 by 630. The new schools use a card
-          surface derived from its chosen colour: the same hue, darkened only where the card&apos;s
-          text would otherwise fall below AA at its lowest opacity. The live schools&apos; surfaces
-          are all darker than their markers; whether the new ones should be too is Arthur&apos;s to
-          decide.
+          Each school&apos;s own one_line at the card&apos;s 1200 by 630. The new schools&apos; card
+          surfaces are darker than their markers by the same step the live schools&apos; are: in
+          OKLCH, 0.044 lower in lightness at 0.955 of the chroma, the same hue (Arthur&apos;s
+          ruling of 2026-11-05).
         </p>
         <div className="grid gap-6">
           {ALL.map((id) => {

@@ -370,8 +370,10 @@ verdict page is unchanged.
 | Judging paused | the empty-week line, then `Judging is paused while we check the quality of the verdicts.` |
 
 Ties share a rank. Rank is by average fidelity, then by number of arguments.
-A school with no average has no rank. Week is the ISO week, the same one
-the weekly motion uses.
+A school with no average, or with fewer than 20 judged original arguments in
+the week, has no rank, and its row says how many it has (`School table, a
+school not yet ranked`, below). Week is the ISO week, the same one the
+weekly motion uses.
 
 Originals only. A revision is a second attempt at the same motion after
 feedback and does not move the reader's rating, so it does not move their
@@ -479,12 +481,16 @@ The axis names are `docs/quiz-v2.md`'s, and change if that draft does.
 | In place of the rank, read aloud | `Not ranked yet` (the live table's words) |
 | Under the name | `Ranked once it has {N} judged original arguments. {n} so far.` |
 
-{N} is a threshold Arthur has not set; the preview shows a fixture value
-and says so.
+{N} is 20, Arthur's ruling (e)5 of 2026-11-05: a school is ranked once it
+has 20 judged original arguments in the week. It is `RANK_MIN_ARGUMENTS`
+in `src/lib/school-table.ts`, and holds on the live table and Today's
+school card as well as the six-school preview.
 
 ### Today, the view from elsewhere
 
-An optional card after the after-reading, not a seventh step.
+An optional card after the after-reading, not a seventh step. Shown only
+once the reader reaches step 4 (Arthur's ruling (e)6 of 2026-11-05), which
+is once they have argued the week's motion.
 
 | Element | Copy |
 |---|---|

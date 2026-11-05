@@ -177,18 +177,18 @@ predate the research file, and the test reports on them without failing. A
 slot with no verified source gets `TODO-SOURCE` and a note to Arthur, never
 a quotation from memory.
 
-What `UNVERIFIED` bars may be narrower than "not used", **and this is not
-settled.** The frozen research file states the broad rule twice in its own
-words ("UNVERIFIED below is not to be used"), so narrowing it is an (e)
-judgement against a frozen file and Arthur has not ruled on it. It is on
-the Phase 2 decision list. What follows is the reading the content
-currently implies, not a licence: An `UNVERIFIED` item may not be a **citation or an
-attribution**, because an attribution has to be a citable text; the Nguni
-maxim's English gloss has an UNVERIFIED translator and date and is still the
-`one_line` of `content/schools/ubuntu.md`, quoted from the philosopher who
-reports it rather than from a translator. The check is a read of the
-research row, not a test: `quoteProblems` in `src/lib/quote-check.ts`
-checks verbatim presence and never reads the markers.
+What `UNVERIFIED` bars is settled by Arthur's ruling (e)9 of 2026-11-05:
+**an `UNVERIFIED` item may not be used as a citation or an attribution.**
+Wording that is verified elsewhere in the research file may be used, with
+that verified source credited. So the Nguni maxim's English gloss, whose
+translator and date are UNVERIFIED, stays the `one_line` of
+`content/schools/ubuntu.md`, attributed to Thaddeus Metz, "Toward an
+African Moral Theory", 2007, p. 322, which round 2 of the research file
+verifies; it is never attributed to the unverified gloss. The ruling is
+noted under the research file's own statement of the rule, which reads
+more broadly. The check is a read of the research row, not a test:
+`quoteProblems` in `src/lib/quote-check.ts` checks verbatim presence and
+never reads the markers.
 
 **Doctrinal description is not under this rule.** Arthur amended it on
 2026-10-24: the live Stoic criteria describe indifferents without quoting

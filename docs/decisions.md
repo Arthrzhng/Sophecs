@@ -3053,6 +3053,8 @@ score, and this way round was the search's first.
   opacity. The live schools' surfaces are all darker than their markers;
   whether the new ones should be too was an open question at Checkpoint
   A that ruling 16 did not answer, and it goes on Checkpoint B's list.
+  (Ruled at Checkpoint B, (e) 2: darker, the same way. See `### Arthur's
+  rulings of 2026-11-05 on Checkpoint B`.)
 
 Nothing live changes: the colours reach the site with Phase 3, behind
 `SIX_SCHOOLS`.
@@ -3590,3 +3592,121 @@ refused, the rollback and a second apply).
   `(exchange_id, seq)` index and gets a 409.
   `src/app/api/counterpart/turn/route.ts`,
   `src/components/counterpart/TurnComposer.tsx`.
+
+### Arthur's rulings of 2026-11-05 on Checkpoint B
+
+Arthur ruled on `docs/checkpoint-b.md` on 2026-11-05, by its sections and
+numbers. His words are quoted where they set a rule. Items carried out in
+code or in the database get their own entries when they ship; the (e)
+items below shipped together.
+
+**(a) Production database writes**
+
+- **1.** Yes to 0026: applied and read back (`### The judge's caps and
+  budget (migration 0026)`). 0025 he ran in the SQL Editor himself.
+- **3.** Gate 1: "yes to the quiz_results migration and the frozen
+  actions.ts edit" (`docs/stage5-plan.md`, step 3).
+- **4.** Gate 2: option (i). A flag-on preview's v2 results are written,
+  marked by `quiz_version`, and cleared at launch; no build moves a
+  profile's school to a v2 result's until then.
+- **5.** `blocks own` stays `for all`.
+
+**(b) What the judge receives**
+
+- **1.** Gate 3: yes. The new schools' fidelity criteria go into what the
+  judge receives on flag-on builds only, and the three join the rival
+  list on flag-on builds.
+- **2.** Run the full v3 golden run after #68 ($0.97), then the
+  new-schools run under Gate 3. "Eval key cap: $8.00 cumulative."
+
+  **The v3 run after #68 does not pass.** Run of 2026-11-05 22:08 UTC,
+  `tests/judge/golden-runs/2026-11-05T22-08-07-496Z-v3.json`: 105 calls,
+  $1.3586 against the $0.97 estimated (30 retries), so $7.1520 spent on the
+  eval key of the $8.00 cap. Against the last v3 run (4 Nov, 00:02):
+  - #68's target is met: `confucian-hierarchy-school`, out of band on
+    both earlier runs (score 78 and 80, engagement 5), is in band (72,
+    engagement 3).
+  - Seven other cases are out of band, against none before:
+    `buddhist-intention-excuse` (score 46 over its 40, fidelity 5 over
+    4), `buddhist-strong` (68 under 70), `confucian-ren-disposition` (61
+    under 65, fidelity 7 under 8), `fabricated-source` (rigor 4 over 3),
+    `util-named-text` (62 under 70, fidelity 7 under 8),
+    `util-obscure-source` (68 under 70), `virtue-exemplar` (68 under 70).
+  - The composite fell by 7.1 points on the mean of the 25 medians,
+    while fidelity, rigor and engagement fell by 0.1, 0.2 and 0.5. The
+    judge scores the whole lower, not only engagement.
+  - 31 of 105 replies, to originals in 16 cases, carried
+    `"objection_answered": null` and `"improvement_note": null`, which
+    the schema refuses (both are revision-only and optional, not
+    nullable). The 4 Nov run had none. Two samples were lost after their
+    retries. Production is not exposed: it sends v2, and made no judge
+    call in the ten days to 2026-11-05.
+
+  #68 moved `unanswered_objection` to the front of the response format
+  and tied the cap to it; both reached the model after the last golden
+  run. Any fix changes what the judge receives, so it is (b), and goes
+  back to Arthur. The new-schools run waits on it: $0.85 is left under
+  the cap.
+
+**(c) Publishing.** Launch: "not yet. Bring me Gate 4 once the golden
+runs pass." Agreed that nothing promotes a flag-on preview to Production.
+
+**(d) Spending**
+
+- **1.** Yes: an atomic reservation for the ceiling and the cap.
+- **2.** "Allowlisted reviewers skip the daily ceiling; the budget still
+  applies." That is how #71 shipped.
+- **4.** Yes: a small scheduled job that re-screens pending arena replies,
+  inside the monthly budget.
+
+**(e) Content and philosophy**
+
+- **1.** The adherent nouns are accepted: Confucian, Ubuntu Ethicist,
+  Buddhist Ethicist. The a/an cases are fixed: a school's entry carries
+  `adherentArticle` (`src/lib/school-registry.ts`), "an" for Ubuntu and
+  "a" by default, and `SCHOOL_ARTICLE` in `src/lib/school-colors.ts` is
+  what the six places that wrote "a" now read (the class page, the
+  argument editor twice, the profile, the quiz result and the challenge
+  invite).
+- **2.** "Darker card surfaces for the new three, treated the same as the
+  live three." Each live surface sits below its marker in OKLCH by 0.041
+  to 0.050 in lightness, at 0.93 to 1.00 of its chroma, within 2 degrees
+  of its hue. `scripts/colour-candidates.mjs` now gives each new marker
+  the live three's mean step (0.044 lower, 0.955 of the chroma, the same
+  hue), taking chroma off where the step leaves sRGB, which the brown
+  does. Surfaces: Confucianism `#472100` (was the marker, `#562b05`),
+  Ubuntu `#142f42` (was `#1e3b4f`), Buddhist Ethics `#6f4aa6` (was
+  `#724aab`). The card's text at its lowest opacity reads at 9.0, 8.9
+  and 4.6 to 1. `src/app/six-schools.css`, `src/lib/card-tokens.ts`,
+  `docs/phase3-styleguide/colour-candidates.json`.
+- **3.** The share lines take the recommended rewordings: Confucianism's
+  [1] "can they still pay it", Ubuntu's [1] "the choice was only mine"
+  (`docs/quiz-v2.md`, section 8). The other lines that name AI are
+  unchanged.
+- **4.** "A few minutes": yes. It replaces "about eighty seconds" where v2
+  runs, on flag-on builds in step 4 and everywhere at launch, because v1,
+  still live, does take about eighty seconds.
+- **5.** "A school is ranked once it has 20 judged original arguments in
+  the week." `RANK_MIN_ARGUMENTS` in `src/lib/school-table.ts`, read by
+  the live table, Today's school card and the six-school preview alike;
+  an unranked row says how many it has. The three live schools had 112
+  to 202 each in week 45, so nothing on production changes until a week
+  opens, when every school is unranked until it has 20.
+- **6.** "Show the view from elsewhere only once the reader reaches step
+  4." `showsElsewhere` in `src/lib/today-path.ts`: shown once step 4 is
+  not locked, which, since steps 3 and 4 complete together, is once the
+  reader has argued the week's motion.
+- **7.** The three's school pages keep "Take the quiz" and "Argue a motion
+  from it", as they will be at launch.
+- **8.** Covered by the re-screening job in (d) 4; the copy stays accurate
+  to what the job does.
+- **9.** "UNVERIFIED bars a source's use as a citation or attribution.
+  Wording verified elsewhere may be used with that source credited. The
+  Ubuntu one_line stays, attributed to Metz 2007, p. 322, which is
+  verified." `docs/review-charter.md`, rule 5, now says so, and a dated
+  note under the research file's own statement of the rule records it
+  (`content/research/non-western-sources.md`; frozen, edited under this
+  ruling). The `one_line_attribution` already read that way.
+
+**Housekeeping.** A manual sample run on the Node 24 actions and #72's
+engine ran at 22:00 UTC and passed (`docs/progress.md`).

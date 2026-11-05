@@ -236,3 +236,12 @@ of the three; Gate 2 is about that.
    `docs/decisions.md`), and the adherent nouns from step 1.
 
 Steps 1 and 2 need no gate and start now.
+
+**Ruled at Checkpoint B, 2026-11-05.** Gate 1: yes, the migration and the
+edit to `src/app/actions.ts`. Gate 2: option (i). Gate 3: yes, the new
+schools' criteria on flag-on builds only, and the three in the rival list
+on flag-on builds; the new-schools golden run follows the full v3 run,
+within an $8.00 cumulative cap on the eval key. Gate 4: not yet; it is
+brought to Arthur once the golden runs pass. Nothing promotes a flag-on
+preview to Production (`docs/decisions.md`, `### Arthur's rulings of
+2026-11-05 on Checkpoint B`).
