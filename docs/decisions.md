@@ -3321,6 +3321,76 @@ lessons index serve the markup they did.
   always has) and the sitemap, whose sophecs.com addresses have no such
   page.
 
+### One address (2026-11-05)
+
+Arthur saw the site move from sophecs.com to sophecs.vercel.app on his
+phone, signed in, on `/debate`. Every production deployment also answers
+at www.sophecs.com, sophecs.vercel.app and two vercel.app aliases Vercel
+assigns (`sophecs-arthurrzhang-1874s-projects`, `sophecs-git-main-...`),
+none of which redirected, and every link on the site is relative, so a
+reader who reached one of them stayed there.
+
+- **How readers reached it: signing in.** Supabase Auth sends a sign-in
+  whose return address is not on its allow-list to its Site URL, and the
+  Site URL was `https://sophecs.vercel.app`. Its logs show it: the
+  `referer` GoTrue logs for the sample engine's admin calls, which carry
+  no return address, is the Site URL, `https://sophecs.vercel.app`; and
+  at 05:42:07 UTC on 2026-11-05 a Google sign-in started three seconds
+  after a page view on sophecs.com (PostHog) was sent to that bare
+  address, not to `/auth/callback`. The reader landed on sophecs.vercel.app
+  signed out, signed in again from `/debate/opaque-benefit` there, and
+  every page after it was on vercel.app.
+- **Nothing in the code or the database pointed there.** No site-URL
+  variable exists in Vercel; the share sheet, challenge links, sitemap and
+  `metadataBase` all write `https://sophecs.com`; no stored row names
+  vercel.app except one quiz result's `referrer` (a reader who arrived
+  from a vercel.app page). PostHog counts 98 page views on
+  sophecs.vercel.app by 6 people since 10 September, against 281 by 28 on
+  sophecs.com, and 5 on a deployment's own URL in September.
+- **The fix in code (`next.config.ts`).** A production build sends every
+  page request on any host other than sophecs.com to the same path and
+  query there: a 307 until a live check has shown that production leaves
+  sophecs.com alone, then a 308 (a browser keeps a 308, so a rule Vercel's
+  router read differently from Next's could otherwise leave readers in a
+  loop no rollback reaches). Not moved: `/api/` (Vercel's cron calls one and
+  does not follow redirects, and a fetch from a tab left open on an old
+  host could not follow one: sophecs.com sees none of that host's cookies
+  and answers no cross-origin request), `/_next` and anything under it
+  (the same files on every host; Next adds the same exclusion to every
+  redirect it runs itself, so the rule tells Vercel's router, which runs
+  the rules in production), the deployment's own
+  URL (behind Vercel's login; it lets a past deployment be opened), and
+  previews and local builds. A sign-in that falls back to the Site URL
+  arrives at the root with `?code=`, which the home page would drop; it
+  is sent to `/auth/callback` with a 307, so it completes, at `/me`, or at
+  the quiz for a reader who has not taken it.
+- **Where a sign-in may land.** `/auth/callback` followed `next` from the
+  query string wherever it pointed: `/login?next=//evil.example` sent a
+  reader who had just signed in to evil.example. It now keeps a value only
+  if it resolves on the site and the path it normalises to still does, on
+  any origin (`src/lib/local-path.ts`): `/..//evil.example` normalises to
+  `//evil.example`, which a first version of the check let through. Any
+  other value lands where no `next` would. The quiz still carries its own
+  `next` unused; the redirect that one day consumes it must use the same
+  check.
+- **The fix outside the code, which is Arthur's to click**: Supabase
+  Auth's Site URL and redirect allow-list, and the Vercel domains' own
+  redirects. The steps are in the pull request. The code's redirect does
+  not depend on them, and they do not depend on it.
+- **Cookies and storage are per host.** A reader signed in on
+  sophecs.vercel.app is signed out on sophecs.com and signs in once more,
+  and an unsent argument the editor saved in that host's local storage
+  stays there, out of reach now that every page there redirects. A tab
+  left open there across the deploy fails its next server action (they
+  post to page paths, which redirect), and a quiz finished in it loses
+  its pending result, kept in that host's session storage; reloading
+  lands on sophecs.com. Submitting an argument goes through `/api/judge`
+  and is not affected.
+- **A loop to avoid.** A Vercel domain redirect from sophecs.com to
+  another host (www, say) would loop with these rules, which send that
+  host back. Today no domain redirects; the steps in the pull request
+  point www at sophecs.com, the way that agrees.
+
 ### Sample scores that do not look generated (2026-11-05)
 
 Arthur: no sample score should look generated, and none should cluster on

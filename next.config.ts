@@ -53,8 +53,73 @@ const SIX_SCHOOLS_TOKENS = path.join(
   SIX_SCHOOLS === "1" ? "six-schools.css" : "six-schools.off.css"
 );
 
+// One address: readers see sophecs.com and no other (docs/decisions.md,
+// "One address"). A production deployment also answers at www.sophecs.com,
+// sophecs.vercel.app and two vercel.app aliases Vercel assigns, and a
+// reader who arrived at one stayed there, because every link on the site is
+// relative. Signing in is how they arrived: Supabase Auth sends a sign-in
+// whose return address it does not recognise to its Site URL, which was
+// sophecs.vercel.app.
+//
+// So a production build sends every page request on any other host to the
+// same path and query on sophecs.com. Not redirected:
+// - /api/, which no reader sees as an address. Vercel's cron calls one and
+//   does not follow redirects, and a fetch from a tab left open on an old
+//   host could not follow one either: sophecs.com would see none of that
+//   host's cookies, and answers no cross-origin request.
+// - /_next and anything under it, the scripts and styles a page already
+//   on an old host loads: the same files on every host. Next adds this
+//   exclusion to every redirect it runs itself, so it is written into the
+//   rule for Vercel's router, which runs these rules in production.
+// - the deployment's own URL (VERCEL_URL), so a past deployment can still
+//   be opened at its own address; Vercel asks for a login there.
+// - previews and local builds, whose VERCEL_ENV is not "production".
+//
+// A sign-in that fell back to the Site URL arrives at the root with ?code=,
+// which only /auth/callback can exchange, and the root would drop it. It is
+// sent there on sophecs.com, wherever it landed, so the sign-in completes
+// (at /me, or at the quiz for a reader who has not taken it, since the page
+// the reader started from is not in the fallback). The exchange needs the
+// cookie the sign-in set when it started, which is on sophecs.com once
+// readers can no longer start one anywhere else.
+//
+// Never point a Vercel domain redirect from sophecs.com to another host
+// (www, say): these rules send that host back, and the two would loop.
+//
+// The host rule is a 307 until a live check has shown sophecs.com is left
+// alone in production (to be recorded in docs/progress.md), and a 308 after. A browser keeps
+// a 308, so a rule Vercel read differently from Next could otherwise leave
+// readers in a loop that no rollback reaches.
+//
+// Host values are regular expressions. Next anchors them; the anchors here
+// say so for any reader or router that does not.
+export const CANONICAL_HOST = "sophecs.com";
+
+export function canonicalRedirects(env: NodeJS.ProcessEnv) {
+  if (env.VERCEL_ENV !== "production") return [];
+  const exactly = (host: string) => `^${host.replace(/\./g, "\\.")}$`;
+  const kept = [CANONICAL_HOST, env.VERCEL_URL].filter((h): h is string => Boolean(h));
+  return [
+    {
+      source: "/",
+      has: [{ type: "query" as const, key: "code" }],
+      destination: `https://${CANONICAL_HOST}/auth/callback`,
+      permanent: false,
+    },
+    {
+      source: "/:path((?!api/|_next).*)",
+      missing: kept.map((host) => ({ type: "host" as const, value: exactly(host) })),
+      destination: `https://${CANONICAL_HOST}/:path`,
+      permanent: false,
+    },
+  ];
+}
+
 const nextConfig: NextConfig = {
   env: { SIX_SCHOOLS },
+  async redirects() {
+    return canonicalRedirects(process.env);
+  },
   // `npm run check:bundle:six` builds with the flag into a directory of its
   // own, so the flag-on build never overwrites the .next that
   // `npm run check:bundle` reads. Unset everywhere else, Vercel included,
