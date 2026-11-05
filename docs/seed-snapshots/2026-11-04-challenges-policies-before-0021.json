@@ -1,0 +1,19 @@
+{
+  "what": "Row level security policies and client grants on public.challenges, production (tekifezydjlgxgndkxul), before migration 0021.",
+  "taken_at": "2026-11-04, about 07:55 UTC",
+  "how": "Read-only queries through the Supabase tool: pg_policies for public.challenges; has_table_privilege for anon and authenticated; counts of rows and of rows past open.",
+  "note": "Taken as part of the approval round and kept as the before-state of 0021, which changes no row. The rollback (supabase/rollback/0021_challenges_no_client_update.down.sql) recreates the dropped policy exactly as it reads here.",
+  "policies": [
+    { "policyname": "accept sets challengee", "cmd": "UPDATE", "roles": "{anon,authenticated}", "qual": "true", "with_check": "true" },
+    { "policyname": "anon insert own", "cmd": "INSERT", "roles": "{anon,authenticated}", "qual": null, "with_check": "true" },
+    {
+      "policyname": "challenges read party",
+      "cmd": "SELECT",
+      "roles": "{public}",
+      "qual": "(EXISTS ( SELECT 1 FROM quiz_results r WHERE (((r.id = challenges.challenger_result_id) OR (r.id = challenges.challengee_result_id)) AND (r.user_id = auth.uid()))))",
+      "with_check": null
+    }
+  ],
+  "grants": { "anon_update": true, "authenticated_update": true },
+  "rows": { "challenges": 3, "past_open": 0 }
+}

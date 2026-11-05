@@ -221,3 +221,50 @@ entry names.
   owner can challenge from it (2026-11-04)". `tests/create-challenge.test.ts`.
   `src/app/actions.ts` is frozen; Arthur's ruling of 2026-11-04 asked for
   this fix.
+- #60 merged as `fc42fdf`, after one review pass. Production deploy
+  `dpl_64CL9LcFpwZtU8i5kzAi3MGC35yg`, Ready (read from Vercel).
+
+## 2026-11-04: no client may update a challenge (migration 0021)
+
+- Arthur's ruling of 2026-11-04, ahead of sample activity: drop the
+  `challenges` update policy, and a party check in `assignChallengeTopic`.
+  `docs/decisions.md`, "No client may update a challenge (migration 0021)".
+- Tested on local Postgres: `scripts/test-0021-challenges-update.sh`, all
+  checks passed; `tests/challenge-topic.test.ts`, which fails two of its
+  five cases with the check removed.
+- The private verdict check that 0018 left open (Arthur, 2026-11-04:
+  "Finish 0018 and the private verdict check"). Production's page for the
+  one genuine argument, which is private, fetched as a stranger through
+  Vercel at 08:06 UTC on 2026-11-04: status 200, not from cache. It shows
+  the score and the three sub-scores, "The verdict on a private
+  argument", the withheld-note line and "The author has not published
+  this argument." The verdict the page receives has exactly `rejected`,
+  `score`, `fidelity`, `rigor`, `engagement` and `prompt_version`, with
+  `argument: null` and `textWithheld: true`: no field that can quote the
+  argument reaches a stranger, as 0018 and 0020's keep-list intend.
+- **0021 applied by hand.** The Supabase tool's confirmation prompt for
+  a DROP timed out unanswered four times, so on 2026-11-05 Arthur ran the
+  file himself in the Supabase SQL Editor, the whole of it as reviewed
+  (`supabase/migrations/0021_challenges_no_client_update.sql`, sha256
+  `16ac74c0...6358d0a`), and reported "Success. No rows returned". **It
+  is not in Supabase's migration list** (`supabase_migrations`), which
+  goes from 0020 to 0022: the SQL Editor runs a statement without
+  recording a migration. Anyone comparing that list with the repository
+  should expect the gap. 0022 had gone in first, at 03:00:50 UTC; the two
+  are independent.
+  - Before: the snapshot is
+    `docs/seed-snapshots/2026-11-04-challenges-policies-before-0021.json`,
+    re-checked at 02:59 UTC on 2026-11-05 (the same three policies). The
+    security advisor before is the one run for 0022 that morning.
+  - Read back at 03:10 UTC: the policies on `challenges` are
+    "anon insert own" and "challenges read party", none for UPDATE; row
+    level security on; grants as 0022 left them (`anon=r`,
+    `authenticated=r`); 3 rows, none past open.
+  - Security advisor after: the same findings as before.
+- **`backup_20261022` dropped by hand.** For the same reason Arthur ran
+  `drop schema backup_20261022 cascade;` in the SQL Editor on
+  2026-11-05. Before, a read found only its four tables, their TOAST
+  tables and array types, with nothing outside the schema depending on
+  them. Read back at 03:05 UTC: no schema named `backup%`; the live
+  tables keep their rows (1 debate, 1 profile, 28 quiz results, 3
+  challenges). The open item in `docs/decisions.md` is closed.

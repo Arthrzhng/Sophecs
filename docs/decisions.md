@@ -987,6 +987,9 @@ Nothing in the repository holds any of it: the committed snapshot,
 `docs/seed-snapshots/2026-10-21-phase2c-pre-migration.json`, is schema and
 shape only, because this repository is public.
 
+**Closed 2026-11-05.** Arthur dropped it in the SQL Editor; read back at
+03:05 UTC, gone, with the live tables unchanged (`docs/progress.md`).
+
 ### Open pre-pilot item: there is no restorable backup
 
 The project is on Supabase's free plan, which has no daily backups and no
@@ -2463,6 +2466,54 @@ goes through the database's own permissions and is part of the wider
 write-permission fix reported to Arthur on 2026-11-03, which waits on his
 "yes, the grants fix"; its details stay out of this public file until it
 is closed.
+
+### No client may update a challenge (migration 0021)
+
+Part of the write permissions reported to Arthur under STOP NOW on
+2026-11-03, and named again while building sample activity (#57), since
+it is live in production and the site never needs it. Arthur's ruling of
+2026-11-04 takes this one piece of the wider grants fix on its own:
+"drop the 'accept sets challengee' policy and add a caller-is-a-party
+check to assignChallengeTopic, under the views process (local test,
+snapshot, apply, read-back, advisor before/after)". The rest of the
+grants fix still waits on his "yes, the grants fix".
+
+**The hole.** 0001 gave `anon` and `authenticated` an update policy on
+`challenges`, "accept sets challengee", with `using (true)` and
+`with check (true)`, and the table grants UPDATE to both. A select policy
+narrows an update only when the statement reads a column. Through the
+Data API every update carries a filter (Supabase runs it with
+`safeupdate`), so the reach there is the rows the caller can read: a
+signed-in party could rewrite any column of its own challenges, the other
+side's result and the debate ids included, and `recordChallengeDebate`
+trusts those debate ids when it moves both readers' ratings. In SQL as
+the anon role an update with no filter reached every row; the message of
+2026-11-03 said "anyone ... can edit any existing challenge", which holds
+for that SQL session and overstates what the Data API allows. Every
+challenge write the site makes is through the server role:
+`createChallenge`, `submitQuizResult`, `assignChallengeTopic` and
+`recordChallengeDebate`.
+
+**The fix.** `0021_challenges_no_client_update.sql` drops the policy, so
+row level security refuses every client update; grants and the other two
+policies are unchanged. `scripts/test-0021-challenges-update.sh` shows on
+local Postgres with production's grants that before it anon reaches all
+three challenges with an unfiltered update and a party its own, that
+after it neither reaches any while the server role still writes and a
+party still reads, and that the rollback restores the policy exactly and
+0021 applies again. `assignChallengeTopic` now answers a signed-in
+stranger as it answers a missing challenge, using the same party test
+`/api/judge` applies (`resolveChallengeSide`); `tests/challenge-topic.test.ts`.
+`/r/[id]` shows "Debate them" only to the two parties
+(`viewerIsChallengeParty`), since anyone else would now get an error from
+it; they get what the page offers without it ("Challenge a friend" to
+the result's owner, "Take the quiz" to anyone else, since #60). A party whose result is not saved to their
+account is refused, as `/api/judge` would not record their debate either.
+
+**Applied by hand on 2026-11-05**, in the Supabase SQL Editor, after the
+tool's confirmation prompt timed out four times: so it is not in
+Supabase's migration list. Snapshot, read-back and advisor are in
+`docs/progress.md`.
 
 ### For Checkpoint A, from the security work
 
