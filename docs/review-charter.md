@@ -109,8 +109,9 @@ in `src/app/six-schools.css`, the new schools' tokens.
 Today that is twenty-one strings, and the script prints the count: three
 ids, three names, six adherent nouns (accepted at Checkpoint B, (e) 1) and
 nine colours, a marker, a card surface and a deep shade for each, every
-surface darker than its marker since (e) 2. It throws rather than run without one of them: if a draft
-loses an adherent noun, or the stylesheet any of a draft's three colour
+surface darker than its marker since (e) 2. It throws rather than run
+without one of them: if a draft loses an adherent noun, or the
+stylesheet any of a draft's three colour
 tokens (marker, card surface, deep shade). Read the printed count rather
 than assuming the coverage.
 

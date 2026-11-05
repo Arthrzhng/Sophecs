@@ -3624,8 +3624,8 @@ items below shipped together.
   $1.3586 against the $0.97 estimated (30 retries), so $7.1520 spent on the
   eval key of the $8.00 cap. Against the last v3 run (4 Nov, 00:02):
   - #68's target is met: `confucian-hierarchy-school`, out of band on
-    both earlier runs (score 78 and 80, engagement 5), is in band (72,
-    engagement 3).
+    all three earlier runs that had it (score 86, 78 and 80; engagement
+    7, 5 and 5), is in band (72, engagement 3).
   - Seven other cases are out of band, against none before:
     `buddhist-intention-excuse` (score 46 over its 40, fidelity 5 over
     4), `buddhist-strong` (68 under 70), `confucian-ren-disposition` (61
@@ -3635,7 +3635,7 @@ items below shipped together.
   - The composite fell by 7.0 points on the mean of the 25 medians (54.7
     to 47.7, medians as `tests/judge/run-golden.ts` takes them), while
     fidelity, rigor and engagement fell by 0.1, 0.2 and 0.5. The judge
-    scores the whole lower, far more than its criteria moved.
+    scores the whole lower, far more than its sub-scores moved.
   - 31 of 105 replies, to originals in 16 cases, carried
     `"objection_answered": null` and `"improvement_note": null`, which
     the schema refuses (both are revision-only and optional, not
@@ -3668,9 +3668,10 @@ runs pass." Agreed that nothing promotes a flag-on preview to Production.
   Buddhist Ethicist. The a/an cases are fixed: a school's entry carries
   `adherentArticle` (`src/lib/school-registry.ts`), "an" for Ubuntu and
   "a" by default, and `SCHOOL_ARTICLE` in `src/lib/school-colors.ts` is
-  what the six places that wrote "a" now read (the class page, the
-  argument editor twice, the profile, the quiz result and the challenge
-  invite).
+  what the seven places that wrote "a" now read (the class page, the
+  argument editor twice, the profile, the quiz result, the challenge
+  invite, and the verdict's line for a withheld objection, which writes
+  "an Ubuntu objection").
 - **2.** "Darker card surfaces for the new three, treated the same as the
   live three." Each live surface sits below its marker in OKLCH by 0.041
   to 0.050 in lightness, at 0.93 to 1.00 of its chroma, within 2 degrees
@@ -3679,10 +3680,11 @@ runs pass." Agreed that nothing promotes a flag-on preview to Production.
   hue), taking chroma off where the step leaves sRGB, which the brown
   does (to 0.92 of its marker's chroma rather than 0.955). Surfaces:
   Confucianism `#472100` and Ubuntu `#142f42` (each was its marker,
-  `#562b05` and `#1e3b4f`), Buddhist Ethics `#6f4aa6` (was `#724aab`). The card's text at its lowest opacity reads at 9.0, 8.9
-  and 4.6 to 1. `src/app/six-schools.css`, `src/lib/card-tokens.ts`,
+  `#562b05` and `#1e3b4f`), Buddhist Ethics `#6f4aa6` (was `#724aab`).
+  The card's text at its lowest opacity reads at 9.0, 8.9 and 4.6 to 1. `src/app/six-schools.css`, `src/lib/card-tokens.ts`,
   `docs/phase3-styleguide/colour-candidates.json`.
-- **3.** The share lines take the recommended rewordings: Confucianism's
+- **3.** "Share lines: use your recommended rewording." The share lines
+  take the recommended rewordings: Confucianism's
   [1] "can they still pay it", Ubuntu's [1] "the choice was only mine"
   (`docs/quiz-v2.md`, section 8). The other lines that name AI are
   unchanged.
@@ -3697,23 +3699,30 @@ runs pass." Agreed that nothing promotes a flag-on preview to Production.
   original, not rejected, with a verdict, created from 2026-11-02, read
   at 22:14 UTC), every one a sample account's. So the live table shows
   the same today, and from each Monday every school is unranked until it
-  has 20. That is a change to the live table, not only the preview, and
-  is on the list for Arthur to confirm.
+  has 20. The ruling is stated for any school, with no build named, so
+  it holds on the live table as on the preview; that is a change
+  production readers see from Monday 9 November, and the report to
+  Arthur says so.
 - **6.** "Show the view from elsewhere only once the reader reaches step
   4." `showsElsewhere` in `src/lib/today-path.ts`: shown once step 4 is
   not locked, which, since steps 3 and 4 complete together, is once the
   reader has argued the week's motion.
 - **7.** The three's school pages keep "Take the quiz" and "Argue a motion
   from it", as they will be at launch.
-- **8.** Covered by the re-screening job in (d) 4; the copy stays accurate
-  to what the job does.
+- **8.** "Covered by the re-screening job; keep the copy accurate." The
+  copy is unchanged here. The job is (d) 4's own pull request, which
+  adds the one line the copy then needs ("A check that could not run is
+  tried again once a day."); until it ships, nothing re-screens.
 - **9.** "UNVERIFIED bars a source's use as a citation or attribution.
   Wording verified elsewhere may be used with that source credited. The
   Ubuntu one_line stays, attributed to Metz 2007, p. 322, which is
   verified." `docs/review-charter.md`, rule 5, now says so, and a dated
   note under the research file's own statement of the rule records it
   (`content/research/non-western-sources.md`; frozen, edited under this
-  ruling). The `one_line_attribution` already read that way.
+  ruling, because the file's own statement of the rule, "Anything marked
+  UNVERIFIED below is not to be used", is broader than the ruling and
+  would otherwise contradict it). The note quotes the ruling word for
+  word. The `one_line_attribution` already read that way.
 
 **Housekeeping.** A manual sample run on the Node 24 actions and #72's
 engine ran at 22:00 UTC and passed (`docs/progress.md`, 2026-11-05,

@@ -238,13 +238,14 @@ is given in full to a screen reader rather than the letter.
 
 | State | Copy |
 |---|---|
-| ranked | `{First\|Second\|Third} on the table this week` |
-| the school has nothing judged this week | `Not ranked yet this week` |
+| ranked | `{First\|Second\|...\|Sixth} on the table this week` |
+| the school is not ranked: fewer than 20 judged original arguments this week, or none with a fidelity mark | `Not ranked yet this week` |
 
 The place is a word, not `1st`: the rating on the line above is a numeral
 set in mono, and two numerals one under the other saying different kinds of
 thing read as a table of figures. Ties share a rank and no school can place
-below third, so three words cover it.
+below the number of schools shown, three or, on a SIX_SCHOOLS build, six,
+so six words cover it.
 
 - Link: `See the school table` → school table
 

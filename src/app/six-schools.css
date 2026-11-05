@@ -17,7 +17,8 @@
 
   /* The result card's surface, darker than the marker by the step the
      live three's surfaces take from theirs: in OKLCH, 0.044 lower in
-     lightness at 0.955 of the chroma, the same hue (Arthur's ruling (e)2
+     lightness at 0.955 of the chroma (0.92 for the brown, which needs
+     some taken off to stay in sRGB), the same hue (Arthur's ruling (e)2
      of 2026-11-05; scripts/colour-candidates.mjs, cardSurfaceFor). The
      card's text at its lowest opacity reads at 9.0 / 8.9 / 4.6 : 1.
      Mirrored for Satori in src/lib/card-tokens.ts. */

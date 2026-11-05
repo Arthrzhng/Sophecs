@@ -10,11 +10,11 @@ UNVERIFIED below is not to be used. Where a content slot needs a source
 this file does not supply, the slot is written as TODO-SOURCE and reported
 rather than filled.
 
-> Arthur's ruling (e)9 of 2026-11-05, on what UNVERIFIED bars:
-> an UNVERIFIED item may not be used as a citation or an attribution.
-> Wording verified elsewhere in this file may be used, with that verified
-> source credited. The Ubuntu `one_line` stays, attributed to Metz 2007,
-> p. 322, which round 2 verifies. `docs/review-charter.md`, rule 5.
+> Arthur's ruling (e)9 of 2026-11-05, which narrows the rule above:
+> "UNVERIFIED bars a source's use as a citation or attribution. Wording
+> verified elsewhere may be used with that source credited. The Ubuntu
+> one_line stays, attributed to Metz 2007, p. 322, which is verified."
+> `docs/review-charter.md`, rule 5.
 
 It is research input, not published content: no loader reads
 `content/research/`, and nothing here is rendered to a reader.

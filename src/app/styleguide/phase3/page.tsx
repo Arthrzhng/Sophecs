@@ -10,6 +10,7 @@ import { SixSchoolTable } from "@/components/phase3/SixSchoolTable";
 import { ElsewhereCard } from "@/components/phase3/ElsewhereCard";
 import { PodiumIcon, RankedListIcon, StandingsIcon } from "@/components/phase3/NavIcons";
 import { getAllSchools } from "@/lib/schools";
+import { RANK_MIN_ARGUMENTS } from "@/lib/school-table";
 import { getAllMicroLessons } from "@/lib/micro-lessons";
 import { PUBLISHED_SCHOOL_IDS, schoolColourVar, type SchoolId } from "@/lib/school-registry";
 import { DRAFT_SCHOOL_IDS, schoolDisplayName } from "@/lib/school-registry.drafts";
@@ -189,8 +190,8 @@ export default function Phase3Page() {
 
       <Section title="School table, six rows">
         <p className="mb-4 max-w-[62ch] text-sm text-ink-mid">
-          Fixture rows. A school is ranked once it has 20 judged original arguments in the week
-          (Arthur&apos;s ruling of 2026-11-05), as on the live table.
+          Fixture rows. A school is ranked once it has {RANK_MIN_ARGUMENTS} judged original arguments
+          in the week (Arthur&apos;s ruling of 2026-11-05), as on the live table.
         </p>
         <SixSchoolTable
           rows={ALL.map((id, i) => ({
@@ -222,7 +223,8 @@ export default function Phase3Page() {
         <p className="mb-4 max-w-[62ch] text-sm text-ink-mid">
           Each school&apos;s own one_line at the card&apos;s 1200 by 630. The new schools&apos; card
           surfaces are darker than their markers by the same step the live schools&apos; are: in
-          OKLCH, 0.044 lower in lightness at 0.955 of the chroma, the same hue (Arthur&apos;s
+          OKLCH, 0.044 lower in lightness at 0.955 of the chroma (0.92 for the brown, to stay in
+          sRGB), the same hue (Arthur&apos;s
           ruling of 2026-11-05).
         </p>
         <div className="grid gap-6">
