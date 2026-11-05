@@ -8,19 +8,24 @@ import { getSchool, pickShareLine } from "@/lib/schools";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { viewerIsChallengeParty } from "@/lib/challenge";
+import { PUBLIC_RESULT_COLUMNS, comparable, shownOnThisBuild } from "@/lib/quiz-result";
 import type { QuizResultRow } from "@/lib/types";
 
 export const revalidate = 86400; // s-maxage=86400 — result rows never change
 
+// A result this build does not show (a v2 result on a build without
+// SIX_SCHOOLS, src/lib/quiz-result.ts) is answered as not found, as an
+// unknown id is, and so is one as the other side of a comparison.
 async function getResult(id: string): Promise<QuizResultRow | null> {
   if (!isAdminConfigured()) return null;
   const admin = createAdminClient();
   const { data } = await admin
     .from("public_results")
-    .select("id, school, secondary, vector, challenge_from, created_at, is_sample")
+    .select(PUBLIC_RESULT_COLUMNS)
     .eq("id", id)
     .single();
-  return (data as QuizResultRow) ?? null;
+  const row = (data as QuizResultRow | null) ?? null;
+  return row && shownOnThisBuild(row) ? row : null;
 }
 
 async function getOwnerAnonId(id: string): Promise<string | null> {
@@ -126,6 +131,9 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
   const challengerFromLink = result.challenge_from ? await getResult(result.challenge_from) : null;
   const otherResult =
     challengerFromLink ?? (challengeInfo ? await getResult(challengeInfo.otherResultId) : null);
+  // The weights side by side only for two v1 results: a v2 result has none,
+  // and the two quizzes asked different questions.
+  const compareWith = otherResult && comparable(result, otherResult) ? otherResult : null;
   const { text: shareLine, index: shareLineIndex } = pickShareLine(result.school, result.id);
   // "Debate them" is for the challenge's two parties only. assignChallengeTopic
   // refuses anyone else, so for them it would end in an error; they get
@@ -153,8 +161,9 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
         school={result.school}
         oneLine={school.one_line}
         oneLineAttribution={school.one_line_attribution}
-        vector={result.vector}
-        otherVector={otherResult?.vector ?? null}
+        vector={compareWith ? result.vector : null}
+        otherVector={compareWith?.vector ?? null}
+        hasOtherResult={otherResult !== null}
         isOwner={isOwner}
         isSavedToProfile={isSavedToProfile}
         showDebateThem={showDebateThem}

@@ -7,6 +7,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 type Row = Record<string, unknown>;
 const tables: Record<string, Row[]> = {};
+// What the code itself sent, before the fake's defaults.
+const inserted: { table: string; row: Row }[] = [];
 
 function query(table: string) {
   const filters: ((r: Row) => boolean)[] = [];
@@ -24,7 +26,9 @@ function query(table: string) {
   b.insert = async (row: Row) => {
     if (table === "quiz_results" && row.challenge_from != null && !tables.quiz_results.some((r) => r.id === row.challenge_from))
       return { error: { message: 'insert or update on table "quiz_results" violates foreign key constraint "quiz_results_challenge_from_fkey"' } };
-    tables[table].push({ ...row });
+    inserted.push({ table, row: { ...row } });
+    // quiz_version defaults to 1, as migration 0027 declares it.
+    tables[table].push(table === "quiz_results" ? { quiz_version: 1, ...row } : { ...row });
     return { error: null };
   };
   b.maybeSingle = async () => ({ data: rows()[0] ?? null });
@@ -58,7 +62,7 @@ const answers = {
 };
 
 beforeEach(() => {
-  tables.quiz_results = [{ id: "r-challenger", school: "utilitarianism", anon_id: "challenger-browser", user_id: null }];
+  tables.quiz_results = [{ id: "r-challenger", school: "utilitarianism", anon_id: "challenger-browser", user_id: null, quiz_version: 1 }];
   tables.challenges = [{ id: "c1", challenger_result_id: "r-challenger", challengee_result_id: null, status: "open" }];
 });
 
@@ -105,6 +109,31 @@ describe("submitQuizResult from a challenge link", () => {
     expect((res as { challengerSchool?: string }).challengerSchool).toBeUndefined();
     expect(tables.quiz_results.at(-1)).toMatchObject({ challenge_from: null });
     expect(tables.challenges[0]).toMatchObject({ challengee_result_id: null, status: "open" });
+  });
+
+  it("writes a v1 result, naming no version, as before migration 0027", async () => {
+    const res = (await submitQuizResult(answers)) as { id: string };
+    const sent = inserted.find((i) => i.table === "quiz_results" && i.row.id === res.id)!.row;
+    expect(sent).not.toHaveProperty("quiz_version");
+    const row = tables.quiz_results.find((r) => r.id === res.id)!;
+    expect(row.quiz_version).toBe(1);
+    expect(row.vector).toEqual(answers.vector);
+  });
+
+  it("treats a v2 challenger's challenge as no challenge, and never reads its school", async () => {
+    Object.assign(tables.quiz_results[0], { quiz_version: 2, vector: null, map_x: 0.2, map_y: -0.3, school: "ubuntu" });
+    const res = await submitQuizResult({ ...answers, challengeId: "c1" });
+    expect(res).toMatchObject({ ok: true });
+    expect((res as { challengerSchool?: string }).challengerSchool).toBeUndefined();
+    expect(tables.quiz_results.at(-1)).toMatchObject({ challenge_from: null });
+    expect(tables.challenges[0]).toMatchObject({ challengee_result_id: null, status: "open" });
+  });
+
+  it("treats a challenger whose version is unknown as no challenge", async () => {
+    delete tables.quiz_results[0].quiz_version;
+    const res = await submitQuizResult({ ...answers, challengeId: "c1" });
+    expect((res as { challengerSchool?: string }).challengerSchool).toBeUndefined();
+    expect(tables.challenges[0]).toMatchObject({ status: "open" });
   });
 
   it("never accepts a sample account's challenge", async () => {

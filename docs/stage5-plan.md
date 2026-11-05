@@ -150,7 +150,9 @@ of the three; Gate 2 is about that.
    `submitQuizResult` is in `src/app/actions.ts`, which is frozen, so
    this step edits a frozen file too. It reads the version column, so it
    follows **Gate 1**, and it is deployed to production before step 4's
-   branch is pushed.
+   branch is pushed. Done as migration 0027 and `src/lib/quiz-result.ts`
+   (`docs/decisions.md`, "Stage 5, step 3"); the map on a v2 result page
+   comes with step 4, which brings the v2 quiz's data it draws from.
 4. **Quiz v2.** On flag-on builds: the questions from
    `docs/quiz-v2.json`, the map (`SchoolMap`) in place of the triangle,
    the nearest-school result logic of `scripts/simulate-quiz-v2.mjs`,

@@ -5,6 +5,7 @@ import { newId } from "@/lib/ids";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { retakeQuizSchool } from "@/lib/claim";
+import { schoolFromResult } from "@/lib/quiz-result";
 import type { SchoolId, SchoolVector } from "@/lib/types";
 
 export interface SubmitQuizResultInput {
@@ -75,15 +76,21 @@ export async function submitQuizResult(
     // A sample account's challenge is never accepted (docs/sample-activity.md):
     // its page sends readers to the quiz without it, and a link made by hand
     // is treated as no challenge.
+    //
+    // This writes a v1 result, so only a v1 challenger's challenge is taken
+    // up (Stage 5, Gate 1; src/lib/quiz-result.ts): a v2 challenger made on
+    // a SIX_SCHOOLS preview is treated as no challenge, and its school is
+    // never read into a v1 reader's result.
     if (c && !c.is_sample) {
       const { data: challenger } = await admin
         .from("quiz_results")
-        .select("school, anon_id, user_id")
+        .select("school, anon_id, user_id, quiz_version")
         .eq("id", c.challenger_result_id)
         .maybeSingle();
       const own = Boolean(challenger && (challenger.anon_id === anonId || (user && challenger.user_id === user.id)));
-      if (challenger && !own)
-        challenge = { challengerResultId: c.challenger_result_id as string, challengerSchool: challenger.school as SchoolId };
+      const challengerSchool = challenger ? schoolFromResult(challenger) : null;
+      if (challenger && !own && challengerSchool)
+        challenge = { challengerResultId: c.challenger_result_id as string, challengerSchool };
     }
   }
 

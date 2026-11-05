@@ -14,9 +14,17 @@ export interface SharePageProps {
   school: SchoolId;
   oneLine: string;
   oneLineAttribution: string;
+  /** This result's weights, when there is a comparable second result. */
   vector: QuizResultRow["vector"];
   /** The other side of a challenge, when there is one. */
   otherVector: QuizResultRow["vector"] | null;
+  /**
+   * Whether this result has a second one beside it (the challenger's, or
+   * the challenge's other side), comparable or not. A result from the other
+   * quiz version is still a challenge in play: it keeps the reader off the
+   * cold-recipient page, but its weights are not shown.
+   */
+  hasOtherResult?: boolean;
   isOwner: boolean;
   isSavedToProfile: boolean;
   showDebateThem: boolean;
@@ -51,6 +59,7 @@ export function SharePage({
   oneLineAttribution,
   vector,
   otherVector,
+  hasOtherResult = otherVector !== null,
   isOwner,
   isSavedToProfile,
   showDebateThem,
@@ -66,7 +75,7 @@ export function SharePage({
   // and one action. Everything else on this page is for someone who already
   // has a result of their own; showing a stranger four competing next steps
   // is how a shared link stops converting.
-  const coldRecipient = isSample || (!isOwner && !isSavedToProfile && !showDebateThem && !otherVector);
+  const coldRecipient = isSample || (!isOwner && !isSavedToProfile && !showDebateThem && !hasOtherResult);
 
   return (
     <main className="flex-1">
@@ -104,7 +113,7 @@ export function SharePage({
             {/* Percentages live here and nowhere else: beside a second
                 result, where a three-way split is a comparison rather than
                 decoration. */}
-            {otherVector && (
+            {vector && otherVector && (
               <div className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(min(13rem,100%),1fr))] gap-4">
                 <VectorColumn label="This result" vector={vector} />
                 <VectorColumn label="Whoever sent it" vector={otherVector} />
@@ -186,7 +195,7 @@ export function SharePage({
 // registry: a vector has a number for each school the quiz sorts into.
 const ORDER = QUIZ_SCHOOLS;
 
-function VectorColumn({ label, vector }: { label: string; vector: QuizResultRow["vector"] }) {
+function VectorColumn({ label, vector }: { label: string; vector: NonNullable<QuizResultRow["vector"]> }) {
   return (
     <div className="rounded-card border-2 border-rule bg-surface px-5 py-4">
       <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">{label}</p>

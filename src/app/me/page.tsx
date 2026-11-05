@@ -95,6 +95,9 @@ export default async function MePage({
         .from("quiz_results")
         .select("id")
         .eq("user_id", user.id)
+        // The result the profile's school came from: a v1 one, until
+        // launch (src/lib/quiz-result.ts).
+        .eq("quiz_version", 1)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();

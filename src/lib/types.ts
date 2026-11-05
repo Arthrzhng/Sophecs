@@ -41,9 +41,15 @@ export interface QuizResultRow {
   id: string;
   school: SchoolId;
   secondary: SchoolId | null;
-  vector: SchoolVector;
+  /** A v1 result's three weights; null on a v2 result (migration 0027). */
+  vector: SchoolVector | null;
   challenge_from: string | null;
   created_at: string;
   /** A sample account's result (migration 0023). Absent where not read. */
   is_sample?: boolean;
+  /** 1 or 2 (migration 0027). Read through src/lib/quiz-result.ts. */
+  quiz_version?: number;
+  /** A v2 result's point on the map; null on a v1 result. */
+  map_x?: number | null;
+  map_y?: number | null;
 }

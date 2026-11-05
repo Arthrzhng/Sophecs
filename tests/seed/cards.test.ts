@@ -61,7 +61,7 @@ describe("link previews of sample pages", () => {
     expect(page).toMatch(/challengerIsSample: Boolean\(result\.is_sample\)/);
     // ...whose image draws the mark from the result's own marker.
     const og = readFileSync("src/app/r/[id]/opengraph-image.tsx", "utf8");
-    expect(og).toMatch(/\.select\("school, is_sample"\)/);
+    expect(og).toMatch(/\.select\("school, is_sample, quiz_version"\)/);
     expect(og).toMatch(/sample=\{sample\}/);
   });
 });
