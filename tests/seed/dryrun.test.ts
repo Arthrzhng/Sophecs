@@ -67,11 +67,16 @@ describe("quiz results", () => {
 });
 
 describe("background work", () => {
-  it("the only scheduled job touches no sample table", async () => {
+  it("no scheduled job writes a sample row", async () => {
     const { readFileSync } = await import("node:fs");
     const crons = JSON.parse(readFileSync("vercel.json", "utf8")).crons as { path: string }[];
-    expect(crons.map((c) => c.path)).toEqual(["/api/cron/keepalive"]);
+    expect(crons.map((c) => c.path)).toEqual(["/api/cron/keepalive", "/api/cron/rescreen"]);
     const route = readFileSync("src/app/api/cron/keepalive/route.ts", "utf8");
     for (const table of ["profiles", "debates", "challenges", "exchanges", "turns", "quiz_results"]) expect(route).not.toContain(`from("${table}")`);
+    // The re-screening job reads turns and exchanges, and leaves a sample
+    // account's exchange alone: tests/rescreen.test.ts runs it.
+    const rescreen = readFileSync("src/lib/rescreen.ts", "utf8");
+    expect(rescreen).toContain("if (exchange?.is_sample) {");
+    for (const table of ["profiles", "debates", "challenges", "quiz_results"]) expect(rescreen).not.toContain(`from("${table}")`);
   });
 });

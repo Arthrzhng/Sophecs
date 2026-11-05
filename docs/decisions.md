@@ -3590,3 +3590,38 @@ refused, the rollback and a second apply).
   `(exchange_id, seq)` index and gets a 409.
   `src/app/api/counterpart/turn/route.ts`,
   `src/components/counterpart/TurnComposer.tsx`.
+
+### Re-screening pending arena replies (the daily job)
+
+Arthur's ruling of 2026-11-05 on Checkpoint B, (d) 4: "Yes: a small
+scheduled re-screening job for pending replies, inside the monthly
+budget", and (e) 8: "Covered by the re-screening job; keep the copy
+accurate."
+
+A reply is saved as `pending` before it is screened, and stays pending
+when screening is paused, over budget, over the author's daily cap, or the
+call fails. Until now nothing screened it again, and its author was told
+it "will be delivered once it has been checked".
+
+`src/lib/rescreen.ts`, run by `/api/cron/rescreen` at 05:43 UTC each day
+(`vercel.json`; Vercel's Hobby plan runs a cron at most once a day),
+follows the turn route's own rules:
+- nothing runs while `KILL_SWITCH_SCREEN` is on, or while the month's
+  budget is spent or unread, and the budget is checked again before each
+  call;
+- an author at the screen cap waits for the next run;
+- only a screen of `ok` delivers;
+- delivery goes only into an exchange that is open and waiting on that
+  author, and only if the reply is still pending when written;
+- a sample account's exchange is never touched.
+
+A run takes at most 20 replies, oldest first, each at least ten minutes
+old, so the route's own screen is never doubled. At $0.0006 a call that is
+at most about a cent a day. The report it returns holds counts only.
+
+The copy keeps its sentence and adds one, so it says what now happens:
+"Your reply is saved and will be delivered once it has been checked. A
+check that could not run is tried again once a day."
+
+Production held no pending reply on 2026-11-05: all 1,700 turns were
+delivered sample turns, read at 22:45 UTC.
