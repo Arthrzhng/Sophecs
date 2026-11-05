@@ -26,15 +26,28 @@ vi.mock("@/lib/anthropic", async (orig) => ({
   },
 }));
 
-// The database: the two counts the route takes on ai_calls are told apart
-// by their filters, the cap's carrying counts_toward_cap.
+// The database: reserve_judge_submission (migration 0028) answers as its
+// SQL does from the two counts it takes, the arguments that count toward
+// the cap and every judge call; scripts/test-0028-judge-reservations.sh
+// runs the SQL itself. capCount and ceilingCount are those two counts.
 let capCount = 0;
 let ceilingCount = 0;
-let capError: { message: string } | null = null;
-let ceilingError: { message: string } | null = null;
+let reserveError: { message: string } | null = null;
+let released: number[] = [];
 const touched: string[] = [];
 vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => ({
+    rpc: async (fn: string, args: Record<string, number | string>) => {
+      touched.push(`rpc:${fn}`);
+      if (fn === "release_judge_reservation") {
+        released.push(Number(args.p_id));
+        return { data: null, error: null };
+      }
+      if (reserveError) return { data: null, error: reserveError };
+      if (capCount >= Number(args.p_cap)) return { data: "daily_cap", error: null };
+      if (ceilingCount + Number(args.p_attempts) > Number(args.p_ceiling)) return { data: "call_ceiling", error: null };
+      return { data: "41", error: null };
+    },
     from: (table: string) => {
       const filters: string[] = [];
       let op = "select";
@@ -49,13 +62,7 @@ vi.mock("@/lib/supabase/admin", () => ({
         if (table === "debate_topics") return { data: { slug: "t1", motion: "This house would test it.", active: true, par_elo: 1200 } };
         return { data: null };
       };
-      b.then = (resolve: (v: unknown) => unknown) => {
-        if (table === "ai_calls" && op === "select") {
-          touched.push(filters.includes("counts_toward_cap") ? "ai_calls:cap" : "ai_calls:ceiling");
-          return resolve(filters.includes("counts_toward_cap") ? { count: capCount, error: capError } : { count: ceilingCount, error: ceilingError });
-        }
-        return resolve({ data: null, count: 0, error: null });
-      };
+      b.then = (resolve: (v: unknown) => unknown) => resolve({ data: null, count: 0, error: null });
       return b;
     },
   }),
@@ -75,8 +82,8 @@ const send = () =>
 beforeEach(() => {
   capCount = 0;
   ceilingCount = 0;
-  capError = null;
-  ceilingError = null;
+  reserveError = null;
+  released = [];
   budget = "ok";
   judged.length = 0;
   touched.length = 0;
@@ -99,6 +106,18 @@ describe("/api/judge's daily call ceiling, run", () => {
     expect((await res.json()).reason).not.toBe("call_ceiling");
   });
 
+  it("releases the submission's reservation when it ends, judged or not", async () => {
+    await send();
+    expect(judged).toHaveLength(1);
+    expect(released).toEqual([41]);
+  });
+
+  it("releases nothing when nothing was reserved", async () => {
+    capCount = 5;
+    await send();
+    expect(released).toEqual([]);
+  });
+
   it("stops one at 18 calls, before anything is written or sent to the model", async () => {
     ceilingCount = 18;
     capCount = 4;
@@ -108,8 +127,8 @@ describe("/api/judge's daily call ceiling, run", () => {
     expect(wrote()).toEqual([]);
   });
 
-  it("stops one when the ceiling cannot be counted, with the cap's message", async () => {
-    ceilingError = { message: "boom" };
+  it("stops one when the reservation cannot be made, with the cap's message", async () => {
+    reserveError = { message: "boom" };
     const res = await send();
     expect(res.status).toBe(503);
     expect((await res.json()).error).toBe("The daily limit could not be checked, so nothing was sent to the judge.");
@@ -121,7 +140,8 @@ describe("/api/judge's daily call ceiling, run", () => {
     capCount = 5;
     ceilingCount = 20;
     expect(await (await send()).json()).toMatchObject({ paused: true, reason: "daily_cap" });
-    expect(touched).not.toContain("ai_calls:ceiling");
+    expect(judged).toEqual([]);
+    expect(wrote()).toEqual([]);
   });
 
   it("does not apply to an allowlisted reviewer", async () => {
@@ -130,7 +150,8 @@ describe("/api/judge's daily call ceiling, run", () => {
     capCount = 9;
     await send();
     expect(judged).toHaveLength(1);
-    expect(touched).not.toContain("ai_calls:ceiling");
+    expect(touched).not.toContain("rpc:reserve_judge_submission");
+    expect(released).toEqual([]);
   });
 });
 
