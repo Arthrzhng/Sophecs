@@ -3603,25 +3603,44 @@ when screening is paused, over budget, over the author's daily cap, or the
 call fails. Until now nothing screened it again, and its author was told
 it "will be delivered once it has been checked".
 
-`src/lib/rescreen.ts`, run by `/api/cron/rescreen` at 05:43 UTC each day
-(`vercel.json`; Vercel's Hobby plan runs a cron at most once a day),
-follows the turn route's own rules:
+`src/lib/rescreen.ts`, run by `/api/cron/rescreen` once a day
+(`vercel.json`, `43 5 * * *`; Vercel's Hobby plan runs a cron at most
+daily, and may fire it anywhere in that hour), follows the turn route's
+own rules:
 - nothing runs while `KILL_SWITCH_SCREEN` is on, or while the month's
-  budget is spent or unread, and the budget is checked again before each
-  call;
-- an author at the screen cap waits for the next run;
+  budget is spent or unread; the budget is checked again before each
+  call, though `budgetState` caches for a minute, so a run can pass the
+  limit by at most its own 20 calls, about $0.01;
+- an author at the screen cap, or whose count cannot be read, waits for
+  the next run;
 - only a screen of `ok` delivers;
-- delivery goes only into an exchange that is open and waiting on that
-  author, and only if the reply is still pending when written;
-- a sample account's exchange is never touched.
+- only a reply the route could have delivered is read at all: in an
+  open, unlapsed exchange that is not a sample account's, by an author
+  who still has an account, whose turn it is by sequence and by
+  `next_turn`. Filtering in the query keeps replies that can never be
+  delivered from filling every run;
+- every write is conditional on what was read, and a reply whose
+  exchange will not take the hand-over goes back to pending, which the
+  route reports as a non-2xx.
 
-A run takes at most 20 replies, oldest first, each at least ten minutes
-old, so the route's own screen is never doubled. At $0.0006 a call that is
-at most about a cent a day. The report it returns holds counts only.
+A run screens at most 20 replies, oldest first, each at least ten
+minutes old so the route's own screen is never doubled, and starts none
+after 40 seconds, inside the route's 60. At $0.0006 a call that is at
+most about a cent a day. The report it returns holds counts only.
+
+The route is a new file under the frozen `src/app/api/**`. The ruling's
+"scheduled re-screening job" is its authority: a scheduled job on Vercel
+is a route, and the site's other cron, `/api/cron/keepalive`, lives
+there, where the canonical-host redirect leaves it alone.
 
 The copy keeps its sentence and adds one, so it says what now happens:
 "Your reply is saved and will be delivered once it has been checked. A
-check that could not run is tried again once a day."
+check that could not run is tried again once a day." The exchange page
+used to call such a reply "held for review", which nobody does to a
+pending one, and offered its author the composer again, which the route
+would then refuse. It now marks the reply "waiting to be checked", shows
+the same sentence, and offers no second reply until the first is
+decided.
 
 Production held no pending reply on 2026-11-05: all 1,700 turns were
 delivered sample turns, read at 22:45 UTC.

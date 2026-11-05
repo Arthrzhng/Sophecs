@@ -10,6 +10,7 @@ import {
   MAX_TURN_CHARS,
   MIN_QUOTE_CHARS,
   MIN_TURN_CHARS,
+  REPLY_SAVED_COPY,
   checkQuote,
 } from "@/lib/counterpart";
 
@@ -156,10 +157,7 @@ export function TurnComposer({
   }
   if (status.kind === "saved") {
     return (
-      <p className="text-sm text-ink-mid">
-        Your reply is saved and will be delivered once it has been checked. A
-        check that could not run is tried again once a day.
-      </p>
+      <p className="text-sm text-ink-mid">{REPLY_SAVED_COPY}</p>
     );
   }
 

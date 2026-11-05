@@ -76,7 +76,7 @@ describe("background work", () => {
     // The re-screening job reads turns and exchanges, and leaves a sample
     // account's exchange alone: tests/rescreen.test.ts runs it.
     const rescreen = readFileSync("src/lib/rescreen.ts", "utf8");
-    expect(rescreen).toContain("if (exchange?.is_sample) {");
+    expect(rescreen).toContain('.eq("exchanges.is_sample", false)');
     for (const table of ["profiles", "debates", "challenges", "quiz_results"]) expect(rescreen).not.toContain(`from("${table}")`);
   });
 });

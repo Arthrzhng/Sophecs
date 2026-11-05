@@ -4,7 +4,10 @@ import { rescreenPending } from "@/lib/rescreen";
 
 // Re-screens arena replies left pending, once a day (vercel.json), under
 // the route's own rules: src/lib/rescreen.ts. Arthur's ruling of
-// 2026-11-05 on Checkpoint B, (d) 4.
+// 2026-11-05 on Checkpoint B, (d) 4, is the authority for this new file
+// under the frozen src/app/api/**: a scheduled job on Vercel is a route,
+// and the site's other cron is /api/cron/keepalive, which the canonical-
+// host redirect leaves alone (next.config.ts).
 //
 // Vercel sends the cron secret as `Authorization: Bearer $CRON_SECRET`,
 // checked here as /api/cron/keepalive checks it. The report holds counts
@@ -23,7 +26,9 @@ export async function GET(request: Request) {
   const admin = createAdminClient();
   try {
     const report = await rescreenPending(admin);
-    return NextResponse.json({ ok: true, ...report });
+    // A reply screened ok whose exchange would not take the hand-over is
+    // put back to pending; a non-2xx makes that show in the cron log.
+    return NextResponse.json({ ok: report.failed === 0, ...report }, { status: report.failed ? 500 : 200 });
   } catch (err) {
     // A non-2xx is what shows in Vercel's cron log.
     return NextResponse.json(
