@@ -621,8 +621,9 @@ deploy below was read from Vercel as Ready.
   profiles is kept, and the other policies on the five tables are as
   before. Security advisor after: the same findings as before, nothing
   new.
-- #83 merged as `c682e82`: one address. Every host but sophecs.com sends
-  a page to the same path and query on sophecs.com; a sign-in that falls
+- #83 merged as `c682e82`: one address. Every host but sophecs.com and
+  the deployment's own URL sends a page to the same path and query on
+  sophecs.com; a sign-in that falls
   back to Supabase's Site URL (`https://sophecs.vercel.app`, which is how
   readers reached that host) completes on sophecs.com; `/auth/callback`
   keeps `next` on the site, closing an open redirect. Three review
@@ -638,12 +639,14 @@ deploy below was read from Vercel as Ready.
   | `https://www.sophecs.com/lessons` | 307 to `https://sophecs.com/lessons` |
   | `https://sophecs-arthurrzhang-1874s-projects.vercel.app/table` | 307 to `https://sophecs.com/table` |
   | `https://sophecs.vercel.app/?code=x` | 307 to `https://sophecs.com/auth/callback?code=x` |
-  | `https://sophecs.com/auth/callback?next=/..//evil.example` (no code) | ends at `/login` on sophecs.com, 200 |
+  | `https://sophecs.com/auth/callback?next=/..//evil.example` (no code) | ends at `/login` on sophecs.com, 200 (with no code the route never reads `next`; `tests/auth-callback.test.ts` checks `next` itself) |
   | `https://sophecs.com/api/cron/keepalive` | 401, the route's own, not redirected |
 
   The fetch tool adds a `_vercel_share` parameter to the Locations it
-  reports; the site does not. sophecs.com is left alone, so this pull
-  request makes the host rule a 308, as Arthur asked.
+  reports; the site does not. sophecs.com is left alone, so #85 makes the
+  host rule a 308: Arthur's message of 2026-11-05 asked for
+  "sophecs.vercel.app permanently redirecting to it (www too)".
 - Still Arthur's (#83 lists the clicks): Supabase Auth's Site URL and
   redirect allow-list, and Vercel's domain redirect for www. Until then
-  a sign-in returns to `/me` rather than to the page it started from.
+  a sign-in returns to `/me`, or to the quiz for a reader who has not
+  taken it, rather than to the page it started from.

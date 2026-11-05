@@ -4,8 +4,9 @@
 // matchers (path-to-regexp for the path, matchHas for the host and query),
 // their status read as Next reads it, and Next's own validation run on
 // them. In production Vercel's router runs them, after converting them; no
-// check before a merge can reach production-only rules, so the check made
-// on the live hosts after the merge will be recorded in docs/progress.md.
+// check before a merge can reach production-only rules, so the live hosts
+// are checked after each merge that changes them (docs/progress.md,
+// "2026-11-05: one address").
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getPathMatch } from "next/dist/shared/lib/router/utils/path-match";
 import { matchHas } from "next/dist/shared/lib/router/utils/prepare-destination";

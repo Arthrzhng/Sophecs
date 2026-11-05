@@ -86,12 +86,13 @@ const SIX_SCHOOLS_TOKENS = path.join(
 // Never point a Vercel domain redirect from sophecs.com to another host
 // (www, say): these rules send that host back, and the two would loop.
 //
-// The host rule shipped as a 307, because a browser keeps a 308 and a rule
-// Vercel read differently from Next could have left readers in a loop no
-// rollback reaches. It is a 308 since the live check of 2026-11-05 21:41
-// UTC showed production leaving sophecs.com alone (docs/progress.md). The
-// sign-in rule stays a 307: it answers one request, and its target may
-// change with Supabase's settings.
+// The host rule shipped as a 307 (#83), because a browser keeps a 308 and
+// a rule Vercel read differently from Next could have left readers in a
+// loop no rollback reaches. It became a 308 (#85) after the live check of
+// 2026-11-05 21:41 UTC showed production leaving sophecs.com alone
+// (docs/progress.md). The sign-in rule stays a 307: it is one hop for a
+// single-use code, and whether codes reach the root at all depends on
+// Supabase's Site URL.
 //
 // Host values are regular expressions. Next anchors them; the anchors here
 // say so for any reader or router that does not.
