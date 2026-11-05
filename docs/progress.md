@@ -650,3 +650,21 @@ deploy below was read from Vercel as Ready.
   redirect allow-list, and Vercel's domain redirect for www. Until then
   a sign-in returns to `/me`, or to the quiz for a reader who has not
   taken it, rather than to the page it started from.
+
+## 2026-11-05: sample scores that do not look generated
+
+- #84 merged as `ebacb28`. Sample verdicts dated from 2026-11-06 06:00
+  UTC, and every verdict of a run begun after then, follow score rule 2:
+  whole-number criteria, as the judge gives, and composites on a multiple
+  of 5 about 13% of the time (23.3% of the live run's 8,111 before it;
+  the judge's own replies 16.3%). The live run's earlier rows keep rule
+  1, regenerate unchanged, and go at launch. Every run now checks every
+  stored sample score against its plan, and refuses a run whose rule-2
+  scores are more than 20% on a multiple of 5. Two review passes; the
+  first found that a late merge would not have failed safely, which the
+  stored check fixes. At merge (21:48 UTC) the live run's `window_to` was
+  2026-11-05 14:57 UTC, before the cutover. Deploy
+  `dpl_Dziy9W1qdng5Cu4czFodCyp4Bor1`, Ready (the engine runs from GitHub
+  Actions, not from the deploy).
+- Not yet seen: the first scheduled run on #84's code. The 18:41 UTC slot
+  had not run by 21:48; the schedule has fired once since #57 merged.
