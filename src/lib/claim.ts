@@ -1,6 +1,7 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { schoolFromResult } from "@/lib/quiz-result";
 import type { SchoolId } from "@/lib/types";
 
 export interface ClaimResult {
@@ -99,15 +100,30 @@ export async function claimAnonymousResults(
       .is("user_id", null);
   }
 
-  const { data: latest } = await admin
-    .from("quiz_results")
-    .select("school")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  // Any result counts as claimed. Only a v1 result gives the account a
+  // school, on every build, until launch (Stage 5, Gate 2 option (i);
+  // src/lib/quiz-result.ts): a v2 result made on a SIX_SCHOOLS preview is
+  // in production's table, and its school may be one production does not
+  // publish.
+  const [{ data: latest }, { data: latestV1 }] = await Promise.all([
+    admin
+      .from("quiz_results")
+      .select("id")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    admin
+      .from("quiz_results")
+      .select("school, quiz_version")
+      .eq("user_id", userId)
+      .eq("quiz_version", 1)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
-  const latestSchool = (latest?.school as SchoolId | undefined) ?? null;
+  const latestSchool = latestV1 ? schoolFromResult(latestV1) : null;
   const school = await ensureProfileSchool(admin, userId, latestSchool);
 
   return { claimed: Boolean(latest), school };
