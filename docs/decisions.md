@@ -2945,7 +2945,7 @@ its error summary cuts.
 and `tests/judge-request.test.ts` holds all six byte for byte; nothing
 under `tests/judge-request/` or `content/` changed.
 
-**v2's behaviour.** One corpus of 73 model replies, 56 to the judge and
+**v2's behaviour.** One corpus of 91 model replies, 74 to the judge and
 17 to the screener, run through the real parse paths (`callJudgeModel`
 and `screenTurn`, the model replaced by a stub) under zod 3 and under
 zod 4: every reply is accepted or refused the same way, every accepted
@@ -2958,17 +2958,21 @@ one as the objection's school; keys the schema does not name (dropped,
 as before); and replies that are not objects or not JSON.
 `tests/model-reply-parsing.test.ts` keeps it, with the outcomes taken
 from zod 3; without the caps' new check, its two astral cases fail on
-zod 4. The review's own 77 further cases, run the same way (numbers
-from `1e309` to `-0`, `__proto__` keys, lone surrogates, unknown keys
-nested deep and many more), differed only in those two cases. One
+zod 4. The reviews' own 179 further cases, run the same way (numbers
+from `1e309` to `-0`, `__proto__` keys, lone and split surrogates,
+combining marks, unknown keys nested deep and many more), differed only
+in those two cases before the check and in none after it. One
 difference outside production: the golden runner's fixture schema now
 refuses an Infinity in a band, which zod 3 let through; no fixture has
 one.
 
 **What does change** is zod's wording of a refusal: "Too big: expected
 number to be <=100" where it said "Number must be less than or equal to
-100", and so on. The judge's summary is logged (`ai_calls`'
-`validation_error`, and the production log) and read by nobody. One
+100", and so on, and a refusal can name a field twice (an array in a
+string field is refused for its type and again for its length). The
+judge's summary is logged (`ai_calls`' `validation_error`, and the
+production log) and printed by the golden runner, and no code parses
+it. One
 change is a fix: zod 3 quoted the value it got for a wrong enum value,
 and the screener's summary kept it, so a screener reply naming no known
 result put the model's text in the message; that message is logged only
