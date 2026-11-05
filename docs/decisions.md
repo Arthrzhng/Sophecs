@@ -2666,7 +2666,7 @@ clears sharp's two high advisories (its bundled libheif and librsvg). In
 review, all 30 prerendered pages built on 15.5.24 and on 15.5.29 had the
 same visible markup, and the five gates pass.
 
-**Fixed: `dompurify` (critical, GHSA-cg2g-xh64-v4q7, with one high and
+**Mitigated, not fixed: `dompurify` (critical, GHSA-cg2g-xh64-v4q7, with one high and
 three lows), by keeping it from loading.** It is in the lockfile only as
 a dependency of `posthog-js`, for PostHog's product-tours extension, and
 the copy that extension bundles (3.4.13) is also inside the range. No

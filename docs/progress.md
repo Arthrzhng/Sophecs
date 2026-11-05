@@ -447,11 +447,12 @@ with read-only SQL; pages fetched from sophecs.com through Vercel.
   - The job ran 04:01:34 to 04:11:10 UTC: 508.4 s of writing, about 55
     rows a second and, as the log reports it, 12.5 auth users a second.
   - 36 checks, none failed. Exact duplicate arguments 0.3%, under the 5%
-    check (read back: 15 of the 8,297 texts repeat one already written).
+    check, which counts every copy of a repeated text, the first
+    included (read back: 15 of the 8,297 texts repeat an earlier one).
     That is above the 0.02% `docs/sample-activity.md` gave for the start;
     re-measured with two other seeds it is 0.2% at the start and 3% after
-    a year, so the doc's estimate of a halt after about 16 months stands. The lock was released, and the run reads `complete`, stage
-    `full`.
+    a year, so the doc's estimate of a halt after about 16 months stands.
+  - The lock was released, and the run reads `complete`, stage `full`.
 - **Read back at 04:11:51 UTC** (reading answers rechecked at 04:16):
   - Sample rows:
 

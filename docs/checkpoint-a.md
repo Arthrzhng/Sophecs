@@ -1,9 +1,10 @@
 # Checkpoint A
 
 The brief of 2026-11-03 ends Phase 3.0's first run of work here: one
-document, one message, then stop. This is the document. Every item below
-is Arthur's to decide. Each names the file it lives in, so a decision can
-be made without hunting. Nothing here is decided by being written down.
+document, one message, then stop. This is the document. Every open item
+below is Arthur's to decide, except the last list under Housekeeping,
+which is mine. Each names the file it lives in, so a decision can be made
+without hunting. Nothing here is decided by being written down.
 
 What shipped to get here is in `docs/progress.md`; why, in
 `docs/decisions.md`.
@@ -13,9 +14,10 @@ What shipped to get here is in `docs/progress.md`; why, in
 On 2026-11-04 I proposed updating this file once sample activity was
 live and sending its decision list again; Arthur's reply that day
 included "Accepted: ... your reading of Checkpoint A". Of the first
-version's items only the grants fix (its section 0) has been ruled on
-since, and it is done; every other item stands. Items added on
-2026-11-05 are marked **New**.
+version's items two are done: the grants fix (its section 0), which
+Arthur ruled on, and the drop of `backup_20261022` (its Housekeeping),
+which he ran. Every other item stands. Items added on 2026-11-05 are
+marked **New**.
 
 Done since the first version:
 
@@ -80,6 +82,11 @@ Eval key spend: $5.7934 of the $8.00 cap. No further run is planned.
    allowed, and class owners see the name. A check constraint on the
    column would hold the limit in the database. `docs/decisions.md`,
    "Clients keep only the writes the site makes (migration 0022)".
+2. **New. The six policies 0022 made unreachable.** "debates insert own",
+   "own update", "own insert", the two "anon insert own" and "member join
+   self" stay in place, reached by nothing since the grants went. Dropping
+   them would tidy the policy list; 0022 left that as a second change to
+   review. Same entry.
 
 ## Spending, rate limits and budget: (d)
 
@@ -120,7 +127,8 @@ Eval key spend: $5.7934 of the $8.00 cap. No further run is planned.
    oversized collections). Here it parses only the model's replies, never
    a reader's input, and `max_tokens` caps those. The fix is zod 4.6.6 or
    later, a major upgrade that touches `src/lib/judge/schema.ts`, frozen
-   under (b). `docs/decisions.md`, "Dependency audit (2026-11-05)", which
+   under (b), and the frozen `src/lib/anthropic.ts`, whose log summary
+   strips zod 3's wording so the model's text stays out of the logs. `docs/decisions.md`, "Dependency audit (2026-11-05)", which
    lists all 16 packages `npm audit` still names.
 
 ## Content and philosophy: (e)
@@ -211,12 +219,14 @@ The choice is Arthur's: one of these, or loosen a constraint.
 2. **A referrer from a sample page.** A genuine page opened from a sample
    page by a full page load reports the sample page's address to PostHog
    as its referrer, as any page on the site would. No sample event is
-   sent. A `no-referrer` policy on sample pages would stop it.
+   sent. To decide: accept it, or add a `no-referrer` policy to sample
+   pages, which would stop it.
 3. **#57's last fixes went in without a fresh review.** The fifth
    review's fixes (`da74d20`) and the renumbering to 0023 were tested
    (gates, the 0023 test under production's grants, the 600-account run)
-   but not reviewed by a fresh reader. Arthur approved the merge as it
-   was. A review after the fact is still possible.
+   but not reviewed by a fresh reader. Arthur, who had already waived
+   the three-pass cap for #57, approved the merge as it was. To decide:
+   whether to have a review after the fact.
 
 ## Security design, no change made
 
