@@ -998,6 +998,9 @@ taking its own copy into `backup_20261022` before applying, by hand, once.
 That is adequate for one migration Arthur is watching. It is not adequate
 for a term's worth of student work.
 
+**Closed on 2026-11-05:** Arthur decided no backups and no Pro, an
+accepted risk ("Arthur's rulings of 2026-11-05 on Checkpoint A").
+
 **Decide before the Winchester pilot puts student data in**, because the
 choice changes what a bad afternoon costs:
 
@@ -2730,9 +2733,9 @@ The numbers map onto `docs/checkpoint-a.md` as follows:
 - **4.** "Yes: display_name 60-char check constraint (verify existing rows
   first)."
 - **5.** "Yes: drop the five unused policies, NOT 'own update'. Usual
-  process." The DROP statements go to Arthur for the SQL Editor rather
-  than through the Supabase tool's prompt (his instruction of the same
-  day).
+  process." The DROP statements go to Arthur, by his instruction in the
+  same message: "Database statements with DROP: post them for me to run
+  in the SQL Editor rather than waiting on the Supabase prompt."
 - **6.** "Yes: a hard daily ceiling on judge calls per reader, retries
   included, above the 5-argument cap. Pick a sensible number and state
   it."
@@ -2756,10 +2759,20 @@ The numbers map onto `docs/checkpoint-a.md` as follows:
   - "Reword the share lines, site description, SharePage and
     ChallengeInvite away from 'ten questions about AI', to something true
     of v2 (e.g. ten questions about how you decide what's right)."
-  - Option edits, "same schools and vectors; re-run the simulation": 2c,
-    5c, 7a, 7c and 6b reworded, in his words, which go into
-    `docs/quiz-v2.json` with the change. "Keep 1a, 10b, 3d, 5b, 6d, 9a,
-    and 8c as written."
+  - Option edits, "same schools and vectors; re-run the simulation", in
+    his words:
+    - 2c: "Say whatever is most likely to get the essay improved before
+      it is handed in."
+    - 5c: "Tell them once, privately, what I saw. What they do next is
+      theirs to answer for; what I say is mine."
+    - 7a: "Tell the captain once, calmly, what I think is fair, then play
+      as well as I can wherever I am put. Whether they listen is not up
+      to me."
+    - 7c: "Tell the captain to their face that it is unfair. Going along
+      with it would make me someone I don't want to be."
+    - 6b: "I am the older one, so it is on me to show him how we treat
+      each other's things, and on him to learn to ask."
+    - "Keep 1a, 10b, 3d, 5b, 6d, 9a, and 8c as written."
   - "No rule-based school: accept the reading and note in decisions.md
     that a duty-based school is the obvious seventh later." Noted below.
 - **16.** "Colours: reject the all-violet set. The three new schools must
@@ -2791,6 +2804,8 @@ The numbers map onto `docs/checkpoint-a.md` as follows:
   as 0023 last defined it, keeps the private verdict fields out (0018,
   0020). Making them `security_invoker` would move every one of those
   choices into policies on the base tables: a redesign with its own risk.
+  `exchanges_public` is the exception in use: nothing reads it, so 23
+  takes its read access away from clients.
 - **24, the 0018 shape.** For a private argument, the withheld verdict
   fields are left out of the public verdict rather than set to null. The
   reason is the one 0018 records: the shape is a list of fields to keep,
@@ -2808,9 +2823,11 @@ The numbers map onto `docs/checkpoint-a.md` as follows:
     also update or delete their own block rows. The site only adds a
     block and offers no way to remove one, and deleting a block makes the
     pair matchable again (`seekCounterpart` in `src/app/debate/actions.ts`
-    reads blocks in both directions). Checkpoint A described all three as
-    "what the site already allows ... minus its limits", which understated
-    this; it was put to Arthur after the ruling.
+    reads blocks in both directions). Checkpoint A said "the site makes
+    those writes through the server, with its own checks", and the earlier
+    message to Arthur that they let a user do "what the site already
+    allows on their own rows, minus its limits"; both understated this,
+    and it was put to Arthur after the ruling.
 
   No other reader's data is reachable through any of them.
 
@@ -2822,8 +2839,8 @@ restorable backup"). Arthur's decision of 2026-11-05: no backups and no
 Pro. A destructive mistake, ours or Supabase's, is unrecoverable beyond
 whatever a migration's own snapshot holds. What limits that: every
 production write goes through the usual process (a snapshot of what it
-touches, a tested rollback, a read-back), and DROP statements are run by
-Arthur himself.
+touches, a tested rollback, a read-back), and statements with DROP are
+run by Arthur himself in the SQL Editor (his instruction quoted under 5).
 
 Leaked-password protection, which also needs Pro, is dropped. The site
 asks for no password; whether password sign-up is reachable through the

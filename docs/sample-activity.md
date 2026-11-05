@@ -382,10 +382,10 @@ sample teardown and a fresh run into the launch steps". In order:
 
 1. **Teardown, on Arthur's instruction, before the launch merges.**
    Actions tab, "Sample activity", `teardown`, with the run's id typed
-   into `confirm_teardown`. Read the run's checks (each ok, none FAIL)
-   and the count of sample rows left over, which must be none. The
-   genuine counts in the report are for information: readers may add or
-   delete rows meanwhile. Teardown has no rollback (Teardown), and every
+   into `confirm_teardown`. It passes when the job is green and its log
+   has no "teardown stopped" line: teardown stops, and the job fails, if
+   any of the run's rows would be left over. The genuine counts in the
+   report are for information: readers may add or delete rows meanwhile. Teardown has no rollback (Teardown), and every
    existing sample link ends here. Doing it first means no scheduled
    `extend` runs against the changed quiz.
 2. **The launch merges**, and its production deploy is confirmed Ready.
