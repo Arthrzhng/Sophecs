@@ -235,7 +235,7 @@ export function buildPlan(input: PlanInput, banks: Banks = loadBanks()): { plan:
     counts: n,
     distributions: describe(ds),
     prerequisites: [
-      "Migration 0022_sample_activity applied to the target (checked before any write).",
+      "Migration 0023_sample_activity applied to the target (checked before any write).",
       "The code that reads is_sample deployed (labels, table note, par-window filter in /api/judge, challenge guard).",
       "debate_topics on the target matches the plan's six motions (checked before any write).",
       prod
@@ -275,7 +275,7 @@ export function buildPlan(input: PlanInput, banks: Banks = loadBanks()): { plan:
       "A failed run is resumed by the same command; nothing is written twice.",
       `Teardown removes exactly this run's rows: npm run unseed:${script} -- ${flags} (preview), then add --execute --confirm-teardown ${ds.runId}.`,
       "Teardown clears any genuine reference to a sample row first, and stops if a genuine row could only be kept by deleting it.",
-      "Rolling back migration 0022 is possible only after teardown (supabase/rollback/0022_sample_activity.down.sql refuses while sample rows remain).",
+      "Rolling back migration 0023 is possible only after teardown (supabase/rollback/0023_sample_activity.down.sql refuses while sample rows remain).",
     ],
     commands: {
       dryRun: `npm run seed:${script} -- ${flags}`,

@@ -17,7 +17,7 @@ export async function dryRun(adapter: Adapter, plan: Plan, opts: { rereadMs?: nu
   const lines: string[] = [];
   let ok = true;
   await adapter.checkSchema();
-  lines.push("schema: migration 0022 is in place");
+  lines.push("schema: migration 0023 is in place");
   // The checks a run is validated against must already hold before it, or
   // a failure afterwards could not be told from one the run caused. A
   // failure is read again before it is reported (baseline.ts).

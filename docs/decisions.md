@@ -2617,8 +2617,8 @@ without `setDisplayName`'s trim and 60-character limit, as "own update"
 already did before 0022, and class owners see that name. A check
 constraint on the column would hold it.
 
-**Snapshot, read-back and advisor:** recorded in `docs/progress.md` when
-0022 is applied.
+**Applied on 2026-11-05** at 03:00:50 UTC. Snapshot, read-back and
+advisor are in `docs/progress.md`.
 
 ### For Checkpoint A, from the security work
 

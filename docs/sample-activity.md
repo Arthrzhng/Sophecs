@@ -18,7 +18,7 @@ Supabase.
 The code is `scripts/seed/`, `scripts/seed-ci.ts` (the workflow's entry
 point), `scripts/seed-production.ts`, `scripts/unseed-production.ts`,
 `scripts/seed-local.ts` and `scripts/unseed-local.ts`; the schema is
-`supabase/migrations/0022_sample_activity.sql`; the workflow is
+`supabase/migrations/0023_sample_activity.sql`; the workflow is
 `.github/workflows/sample-activity.yml`.
 
 ## Where a sample account can be seen
@@ -90,7 +90,7 @@ challenges." `/method#samples` explains the rest.
   hand. `createChallenge` only opens a challenge from the caller's own
   result, which a sample's never is.
 - **References.** No reader can attach a row of their own to a sample row,
-  even with an id worked out from the public generator. A trigger in 0022
+  even with an id worked out from the public generator. A trigger in 0023
   refuses it on every path a signed-in or anonymous request has through
   the Data API: joining a sample class or adding a sample member, a
   challenge or quiz result pointing at a sample's result or debate, a
@@ -98,7 +98,7 @@ challenges." `/method#samples` explains the rest.
   account, a report on a sample exchange's turn. A genuine challenge
   naming a sample row is refused whoever writes it. So no genuine row can
   come to depend on a sample row, and teardown is never left choosing
-  between the two (`scripts/test-0022-sample-activity.sh` tries each path).
+  between the two (`scripts/test-0023-sample-activity.sh` tries each path).
 - **Email and sign-in.** Sample users are created through the Auth admin
   API with `email_confirm: true` (no confirmation mail), no password, a
   ban of 876,000 hours, and addresses on `sophecs.test`, a domain reserved
@@ -137,7 +137,7 @@ union all select 'classes',
 
 `scripts/review-verdicts.ts` reads genuine verdicts only.
 
-## The marker and the registry (migration 0022)
+## The marker and the registry (migration 0023)
 
 - `is_sample boolean not null default false` on `profiles`,
   `quiz_results`, `debates`, `challenges` and `exchanges`, and
@@ -164,7 +164,7 @@ union all select 'classes',
 - The rollback refuses while any sample row remains, any run is not torn
   down, or any registry item is still intended or created.
 
-`scripts/test-0022-sample-activity.sh` proves all of it on a throwaway
+`scripts/test-0023-sample-activity.sh` proves all of it on a throwaway
 local database, including the rollback and re-apply.
 
 ## The dataset
@@ -359,7 +359,7 @@ next judging there; a par check that fails twice is a stop either way.
 
 Each step only after the one before has passed:
 
-1. Security advisor before; apply `0022_sample_activity`; read back the
+1. Security advisor before; apply `0023_sample_activity`; read back the
    columns, the registry tables (RLS on, no client grants), the eleven
    triggers, the two views and `elo_percentile(1200)`; advisor after. Any
    new ERROR stops here.

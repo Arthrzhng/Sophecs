@@ -134,7 +134,7 @@ export default async function TodayPage() {
         elo={Number(profile?.elo ?? 1200)}
         rank={ranks.find((r) => r.school === school)?.rank ?? null}
         // The same disclosure as the table's, when this week's rank counts
-        // a sample account's argument (migration 0022).
+        // a sample account's argument (migration 0023).
         includesSamples={(judgedRows.rows ?? []).some((row) => row.is_sample)}
       />
       <LessonsCard modules={modules} />

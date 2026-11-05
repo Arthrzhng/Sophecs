@@ -146,7 +146,7 @@ export async function joinClass(
   // members: its codes can be worked out from the public seed tooling, and
   // a reader in it would be a genuine row tied to sample data. Answered as
   // a wrong code, for the same reason as above.
-  // The database refuses the same join for any other path (migration 0022's
+  // The database refuses the same join for any other path (migration 0023's
   // class_members trigger); this answers it before trying.
   const { data: owner, error: ownerError } = await admin
     .from("profiles")

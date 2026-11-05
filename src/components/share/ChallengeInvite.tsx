@@ -31,7 +31,7 @@ export function ChallengeInvite({
   challengeId: string;
   school: SchoolId;
   content: SchoolContent;
-  /** Sent by a sample account (migration 0022), which will not answer. */
+  /** Sent by a sample account (migration 0023), which will not answer. */
   isSample?: boolean;
 }) {
   const adherent = SCHOOL_ADHERENT[school].toLowerCase();

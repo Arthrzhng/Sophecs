@@ -89,7 +89,7 @@ export default function MethodPage() {
 
         {/* Linked from the school table in any week a sample account's
             argument is counted there. Every sentence is what the code does:
-            src/lib/sample.ts, migration 0022, docs/sample-activity.md. */}
+            src/lib/sample.ts, migration 0023, docs/sample-activity.md. */}
         <section id="samples" className="mt-12 scroll-mt-8">
           <h2 className="text-lg font-extrabold tracking-tight text-ink">Sample accounts</h2>
           <div className="prose-reading mt-4">

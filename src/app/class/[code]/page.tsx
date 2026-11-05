@@ -67,7 +67,7 @@ export default async function ClassPage({ params }: { params: Promise<{ code: st
       .select("id, display_name, school, is_sample")
       .in("id", userIds);
     // A class page never shows a sample account (Arthur, 2026-11-04). A
-    // reader's class cannot hold one (migration 0022 refuses the join),
+    // reader's class cannot hold one (migration 0023 refuses the join),
     // and a sample class is owned by a sample account, which cannot sign
     // in; this keeps it so whatever the data says.
     const sampleIds = new Set<string>();

@@ -248,7 +248,7 @@ export default async function VerdictPage({
         comparison={comparison}
         counterpart={counterpart}
         textWithheld={textWithheld}
-        // A sample account's argument (migration 0022): labelled, and a
+        // A sample account's argument (migration 0023): labelled, and a
         // template verdict says it is one.
         sample={
           publicRow.is_sample

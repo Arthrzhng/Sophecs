@@ -1,4 +1,4 @@
--- Rolls back 0022. Run only after every seed run is torn down
+-- Rolls back 0023. Run only after every seed run is torn down
 -- (scripts/unseed-production.ts): dropping the columns removes the marker,
 -- and dropping the registry removes the only record of which unmarked rows
 -- (turns, reading responses, classes, members, auth users) were samples.

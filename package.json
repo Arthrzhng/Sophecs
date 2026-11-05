@@ -23,7 +23,7 @@
     "unseed:production": "tsx --require ./scripts/preload-server-only-shim.cjs scripts/unseed-production.ts",
     "seed:local": "tsx --require ./scripts/preload-server-only-shim.cjs scripts/seed-local.ts",
     "unseed:local": "tsx --require ./scripts/preload-server-only-shim.cjs scripts/unseed-local.ts",
-    "test:seed-db": "bash scripts/test-0022-sample-activity.sh"
+    "test:seed-db": "bash scripts/test-0023-sample-activity.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",

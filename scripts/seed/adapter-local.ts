@@ -72,7 +72,7 @@ export class LocalAdapter implements Adapter {
                 and table_name in ('profiles','quiz_results','debates','challenges','exchanges'))::int as marked,
               (select count(*) from information_schema.tables where table_schema = 'public' and table_name in ('seed_runs','seed_run_items'))::int as registry`
     );
-    if (r.marked !== 5 || r.registry !== 2) throw new Error("migration 0022_sample_activity is not applied to this database");
+    if (r.marked !== 5 || r.registry !== 2) throw new Error("migration 0023_sample_activity is not applied to this database");
   }
 
   async scan(table: ScanTable, columns: string[], where?: { sample?: boolean }) {

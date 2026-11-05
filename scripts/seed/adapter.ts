@@ -101,7 +101,7 @@ export interface Adapter {
   describe(): string;
 
   // Read-only.
-  /** Throws unless migration 0022 is in place. */
+  /** Throws unless migration 0023 is in place. */
   checkSchema(): Promise<void>;
   /** Every row of a table, paginated by the adapter, optionally only genuine or only sample rows. */
   scan(table: ScanTable, columns: string[], where?: { sample?: boolean }): Promise<Record<string, unknown>[]>;
