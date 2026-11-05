@@ -31,7 +31,7 @@ afterEach(() => {
 it("starts PostHog with product tours disabled", async () => {
   const a = await import("../src/lib/analytics/client");
   a.initAnalytics("anon-1");
-  await new Promise((r) => setTimeout(r, 10));
-  expect(inits).toHaveLength(1);
+  // init runs after a dynamic import, so wait for it rather than a fixed time.
+  await vi.waitFor(() => expect(inits).toHaveLength(1));
   expect(inits[0].disable_product_tours).toBe(true);
 });

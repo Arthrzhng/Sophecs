@@ -2675,9 +2675,12 @@ extension from PostHog's servers whenever the project's remote config
 turns product tours on, so a switch in the PostHog dashboard would have
 run it on sophecs.com. `src/lib/analytics/client.ts` now starts PostHog
 with `disable_product_tours: true` (`tests/analytics-product-tours.test.ts`).
-The audit line stays: `npm update dompurify` would move the lockfile's
-copy to 3.4.17, but it would not change the copy the extension bundles,
-and with tours off neither loads.
+One path is not covered by the switch: posthog-js's
+`productTours.previewTour()` loads the extension without checking it.
+Nothing in `src/` calls it; PostHog's toolbar, opened by a project member
+from the PostHog app, might, which could not be checked from here. The
+audit line stays: `npm update dompurify` would move the lockfile's copy
+to 3.4.17, but not the copy the extension bundles.
 
 **The rest, not fixed, for a later list.** `npm audit` on this branch
 lists 16 packages (1 critical, 6 high, 9 moderate):
@@ -2686,7 +2689,7 @@ lists 16 packages (1 critical, 6 high, 9 moderate):
 | --- | --- | --- | --- |
 | `dompurify` | critical | `posthog-js` product tours | Above: not loaded. |
 | `zod` 3.x | high (memory exhaustion validating oversized constrained collections) | direct; it parses only the model's replies, the judge's (`src/lib/judge/schema.ts`) and the turn screener's (`src/lib/screen.ts`), never a reader's input | Those replies are capped by `max_tokens` (850 for the judge, 60 for the screener), which bounds the collections. Fixed from zod 4.6.6, a major upgrade that touches the frozen judge schema: worth doing deliberately. |
-| `follow-redirects` 1.16.0 | high (credential headers can follow cross-origin redirects) | `posthog-node` (`src/lib/analytics/server.ts`) through `axios` | Shipped in the server bundle, never called: posthog-node 4.18 uses `axios` only when there is no global `fetch`, and Vercel's Node 22 has one. An `npm update` moves it to a fixed release within range. |
+| `follow-redirects` 1.16.0 | high (credential headers can follow cross-origin redirects) | `posthog-node` (`src/lib/analytics/server.ts`) through `axios` | Shipped in the server bundle, never called: posthog-node 4.18 uses `axios` only when there is no global `fetch`, and the Vercel project runs Node 24.x (its setting; the repository pins none), which has one. An `npm update` moves it to a fixed release within range. |
 | `next` and its pinned `postcss` 8.4.31 | moderate and high (source-map path traversal, `</style>` escaping) | build only | Reads CSS we write; nothing attacker-controlled. Next 15 pins its own copy; fixed in Next 16. The site's own `postcss` 8.5.26 is outside the range. |
 | `js-yaml` 3.15.1 | high (CPU with empty merge keys) | `gray-matter`, reading our own content frontmatter at build and request time | Only reads files in `content/`, which we write. |
 | `source-map-js` 1.2.1 | high (DoS with crafted source maps) | build only | Our own source maps. |
