@@ -3,6 +3,7 @@ import {
   SHOWN_SCHOOL_IDS,
   shownLookup,
   schoolAdherent,
+  schoolAdherentArticle,
   schoolAdherentPlural,
   schoolName,
   type SchoolId,
@@ -52,6 +53,14 @@ export const SCHOOL_ADHERENT: Record<SchoolId, string> = shownLookup(
     ])
   ),
   (id) => schoolAdherent(id)
+);
+
+// The article each noun takes, by sound rather than spelling: "a
+// Utilitarian", "an Ubuntu Ethicist". Write `${SCHOOL_ARTICLE[s]}
+// ${SCHOOL_ADHERENT[s]}` wherever a noun follows an article.
+export const SCHOOL_ARTICLE: Record<SchoolId, "a" | "an"> = shownLookup(
+  Object.fromEntries(SHOWN_SCHOOL_IDS.map((id) => [id, schoolAdherentArticle(id)])),
+  (id) => schoolAdherentArticle(id)
 );
 
 // The same, in the plural, for talking about a school's side rather than

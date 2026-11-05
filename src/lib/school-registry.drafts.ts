@@ -24,9 +24,9 @@ import {
  * The same list whether or not the build has `SIX_SCHOOLS`: a draft that
  * a flag-on build shows is still a draft, and `npm run check:bundle` takes
  * its strings from here, so the check never runs on an empty list. The
- * adherent nouns are proposals for Arthur (Checkpoint B, (e)), the same as
- * the registry's `SHOWN_DRAFTS`, which shows them on flag-on builds; here
- * they are what the bundle check looks for. The colour tokens stay null,
+ * adherent nouns, accepted by Arthur at Checkpoint B (e) 1, are the same
+ * as the registry's `SHOWN_DRAFTS`, which shows them on flag-on builds;
+ * here they are what the bundle check looks for. The colour tokens stay null,
  * as the content files have none; a flag-on build's tokens are the
  * registry's.
  *
@@ -50,6 +50,7 @@ export const DRAFT_SCHOOLS: readonly SchoolEntry[] = [
     name: "Ubuntu",
     adherent: "Ubuntu Ethicist",
     adherentPlural: "Ubuntu Ethicists",
+    adherentArticle: "an",
     colourToken: null,
   },
   {

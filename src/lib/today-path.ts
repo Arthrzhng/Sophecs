@@ -66,6 +66,24 @@ export function todayDoneFlags(
   ];
 }
 
+/**
+ * Step 4, "Face an objection", 0-based. The view from elsewhere is shown
+ * only once the reader reaches it (Arthur's ruling (e)6 of 2026-11-05):
+ * it follows the after-reading, which step 4 brings, and before that it
+ * would be a passage on a motion the reader has not argued yet.
+ */
+export const ELSEWHERE_FROM_STEP = 3;
+
+/**
+ * Whether the reader has reached step 4. Steps 3 and 4 complete together,
+ * so in practice that is "has argued this week's motion"; a step finished
+ * while judging was on stays reached if the kill switch is later thrown.
+ */
+export function showsElsewhere(states: StepStatus[]): boolean {
+  const step = states[ELSEWHERE_FROM_STEP];
+  return step !== undefined && step.state !== "locked";
+}
+
 /** True when there is a step the reader can actually act on right now. */
 export function hasActionableStep(states: StepStatus[]): boolean {
   return states.some((s) => s.state === "current");

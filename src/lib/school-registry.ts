@@ -68,6 +68,11 @@ export interface SchoolEntry {
   adherent?: string;
   adherentPlural?: string;
   /**
+   * The article the adherent noun takes, by its sound: "a Utilitarian",
+   * "an Ubuntu Ethicist". "a" when unset.
+   */
+  adherentArticle?: "a" | "an";
+  /**
    * The globals.css custom property carrying the school's colour, matching
    * `colour_token` in the content file. Null for a school that has none.
    */
@@ -139,10 +144,11 @@ const PUBLISHED_BY_ID = new Map<SchoolId, SchoolEntry>(
  * `content/schools/*.md`, which is frozen, says so. Their names match the
  * drafts module and their content files (`tests/six-schools.test.ts`).
  *
- * The adherent nouns are proposals, shown on flag-on builds only, and are
- * Arthur's to rule on at Checkpoint B (e). "Ubuntu" has no settled English
- * noun for one of its arguers, and an arguer from Buddhist Ethics is not
- * thereby a Buddhist, so those two follow "Virtue Ethicist".
+ * The adherent nouns are Arthur's, ruled at Checkpoint B (e) 1 on
+ * 2026-11-05: "accept Confucian, Ubuntu Ethicist, Buddhist Ethicist; fix
+ * the a/an cases". "Ubuntu" has no settled English noun for one of its
+ * arguers, and an arguer from Buddhist Ethics is not thereby a Buddhist,
+ * so those two follow "Virtue Ethicist"; "Ubuntu Ethicist" takes "an".
  */
 const SHOWN_DRAFTS: readonly SchoolEntry[] =
   process.env.SIX_SCHOOLS === "1"
@@ -161,6 +167,7 @@ const SHOWN_DRAFTS: readonly SchoolEntry[] =
           name: "Ubuntu",
           adherent: "Ubuntu Ethicist",
           adherentPlural: "Ubuntu Ethicists",
+          adherentArticle: "an",
           colourToken: "--color-ubuntu",
         },
         {
@@ -232,6 +239,11 @@ export function schoolName(id: SchoolId): string {
 export function schoolAdherent(id: SchoolId): string {
   const entry = shownEntry(id);
   return entry?.adherent ?? schoolName(id);
+}
+
+/** "a" or "an", for the adherent noun: "an Ubuntu Ethicist". */
+export function schoolAdherentArticle(id: SchoolId): "a" | "an" {
+  return shownEntry(id)?.adherentArticle ?? "a";
 }
 
 /** "Stoics". The display name where nobody has written one. */
