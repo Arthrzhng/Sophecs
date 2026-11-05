@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { newId } from "@/lib/ids";
-import { judgeDebate, JudgeValidationError, PROMPT_VERSION, wasTakenOffDailyCap } from "@/lib/anthropic";
+import { judgeDebate, JudgeValidationError, MAX_JUDGE_ATTEMPTS, PROMPT_VERSION, wasTakenOffDailyCap } from "@/lib/anthropic";
 import { isBudgetExceeded } from "@/lib/budget";
 import { soloElo } from "@/lib/elo";
 import { applyStreakDay, isStreakEligible } from "@/lib/streak";
@@ -31,6 +31,16 @@ import type { SchoolId } from "@/lib/types";
 export const maxDuration = 60;
 
 const DAILY_CAP = 5;
+// Arthur's ruling of 2026-11-05 on Checkpoint A, item 6: "a hard daily
+// ceiling on judge calls per reader, retries included, above the
+// 5-argument cap. Pick a sensible number and state it." 20 judge calls in
+// any 24 hours, every call counted, the ones taken off the argument cap
+// included. A submission starts only if all of its possible attempts fit
+// under it, so the ceiling is never passed: five judged arguments at three
+// attempts each are 15 calls and always fit, with room for at least one
+// failed submission besides. At most $0.20 or so a reader a day at the
+// COST comment's rate. docs/decisions.md, "The judge's caps and budget".
+const JUDGE_CALL_CEILING = 20;
 // docs/daily-path-copy.md, "Judging failed": the detail line under the
 // argue screen's generic error when the cap cannot be checked.
 const CAP_UNCHECKED = "The daily limit could not be checked, so nothing was sent to the judge.";
@@ -42,6 +52,7 @@ type PauseReason =
   | "kill_switch"
   | "budget"
   | "daily_cap"
+  | "call_ceiling"
   | "topic_lock"
   | "already_revised"
   | "no_criteria";
@@ -144,6 +155,23 @@ export async function POST(request: Request) {
     }
     if ((dailyCount ?? 0) >= DAILY_CAP) {
       return paused("daily_cap");
+    }
+
+    // The hard ceiling: every judge call in the window, whether or not it
+    // counts toward the five. Like the cap above, a count that failed stops
+    // the submission rather than waving it through.
+    const { count: callCount, error: ceilingError } = await admin
+      .from("ai_calls")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("kind", "judge")
+      .gte("created_at", sinceDaily);
+    if (ceilingError) {
+      console.error("[judge] daily call ceiling could not be checked:", ceilingError.message);
+      return NextResponse.json({ ok: false, error: CAP_UNCHECKED }, { status: 503 });
+    }
+    if ((callCount ?? 0) + MAX_JUDGE_ATTEMPTS > JUDGE_CALL_CEILING) {
+      return paused("call_ceiling");
     }
   }
 

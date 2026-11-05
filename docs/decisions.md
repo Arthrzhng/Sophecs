@@ -2860,3 +2860,54 @@ work"), so this risk is accepted unmeasured.
 The quiz's axes were drawn on the reading that none of the six schools is
 a rule-based ethics (`docs/quiz-v2.md`, section 1). Arthur accepted that
 reading. A duty-based school is the obvious seventh, later.
+
+### The judge's caps and budget (migration 0026)
+
+Arthur's rulings of 2026-11-05 on Checkpoint A, items 6, 7 and 8
+("Arthur's rulings of 2026-11-05 on Checkpoint A").
+
+**8. "Retries must not use a reader's arguments."** The five-argument cap
+counts `ai_calls` rows with `counts_toward_cap` (migration 0019), one per
+call, so a judged submission that needed a retry used two or three of the
+five. `judgeDebate` now takes the calls before the one that validated out
+of the cap, so a judged submission counts once. A failed one still counts
+not at all. Every call stays logged and in the budget. No schema change was
+needed.
+
+**6. "A hard daily ceiling on judge calls per reader, retries included,
+above the 5-argument cap. Pick a sensible number and state it."** 20 judge
+calls in any 24 hours, every call counted, the ones taken off the argument
+cap included. A submission starts only if all of its possible attempts fit
+(`count + MAX_JUDGE_ATTEMPTS > 20` refuses), so the ceiling is never
+passed. Why 20: five judged arguments at the most attempts each are 15
+calls and always fit, which keeps the ceiling above the argument cap as
+asked, with room for at least one failed submission besides; past that,
+a reader is resending arguments the judge cannot mark. At the COST
+comment's $0.0098 a call, 20 calls are about $0.20 a reader a day. It has
+its own pause reason, `call_ceiling`, and copy (`docs/daily-path-copy.md`,
+"The daily call ceiling"). Allowlisted reviewers skip it as they skip the
+daily cap: what the allowlist bypasses is frozen env handling, and the
+ruling is about readers. A count that fails stops the submission (503),
+as the cap's does.
+
+**7. "Budget check totals spend in the database and fails closed."**
+`ai_spend_since(since)` (migration 0026) returns the sum of `cost_usd`
+over every `ai_calls` row since `since`, the same rows `budget.ts` read
+before. Only the server role may call it. `getMonthlySpend` calls it for
+the first of the month and returns null on an error, a missing value or a
+throw, without caching it, and `isBudgetExceeded` treats null as over
+budget. Before, a month past 1,000 rows was undercounted (one response's
+rows) and an error read as zero spend. A ceiling that is not a positive
+number now blocks too; before, a non-numeric `AI_MONTHLY_BUDGET_USD` was
+read as no limit.
+
+**Order.** 0026 is applied before this merges: without the function, every
+budget check is an error, so judging and counterpart turns pause. The
+rollback is the reverse: revert `budget.ts`, then drop the function.
+
+**Tests.** `tests/budget.test.ts`; `tests/judge-retry.test.ts` (a judged
+submission after two retries takes the two retries out, and one that
+validates first takes nothing out); `tests/judge-caps.test.ts` (the route's
+ceiling, its query, its order and its copy);
+`scripts/test-0026-ai-spend-since.sh` (the sum over 1,500 rows, the date
+bound, client roles refused, the rollback and a second apply).

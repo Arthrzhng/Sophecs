@@ -18,9 +18,10 @@ import type { SchoolId } from "@/lib/types";
 // COST: model=claude-sonnet-5 | trigger=debate submission | est_in=1700 est_out=650
 // est_usd_per_call=0.0098 | cap=5/user/day | kill_switch=KILL_SWITCH_JUDGE | logged_to=ai_calls
 // retries=2 on a reply that fails validation, each attempt logged (see judgeWithRetries):
-// a submission makes at most 3 calls. The cap is checked before a submission, not between
-// attempts, so a reader's day can pass 5 calls; a submission that ends without a verdict
-// does not count toward the cap at all (counts_toward_cap, migration 0019)
+// a submission makes at most 3 calls. The cap counts arguments, not calls: a judged
+// submission counts once however many attempts it took, and one that ends without a
+// verdict not at all (counts_toward_cap, migration 0019). /api/judge also holds every
+// reader to 20 judge calls a day, retries included (Arthur, 2026-11-05)
 export const MODEL = "claude-sonnet-5";
 const INPUT_COST_PER_TOKEN = 2 / 1_000_000;
 const OUTPUT_COST_PER_TOKEN = 10 / 1_000_000;
@@ -406,10 +407,12 @@ export function wasTakenOffDailyCap(err: unknown): boolean {
 // passes "judge_allowlist" so those calls are distinguishable in ai_calls.
 //
 // Each attempt is its own ai_calls row, the ones that failed validation
-// included, so every billed call counts toward the monthly budget. A
-// submission that ends with a verdict counts toward the daily cap once per
-// call, as before: one that needed a retry uses two or three of the
-// reader's five. The route checks the cap once, before the call. A
+// included, so every billed call counts toward the monthly budget and the
+// route's daily call ceiling. A submission that ends with a verdict counts
+// toward the five-argument cap once: the attempts before the one that
+// validated are taken out of it (Arthur's ruling of 2026-11-05: "Retries
+// must not use a reader's arguments"). The route checks the cap once,
+// before the call. A
 // submission that ends without one, every reply failing validation or the
 // API failing, has its calls taken out of the cap (Arthur's ruling of
 // 2026-11-03): the reader is told it did not use one of their arguments,
@@ -427,7 +430,7 @@ export async function judgeDebate(params: {
   const kind = params.kind ?? "judge";
   const logged: string[] = [];
   try {
-    return await judgeWithRetries(
+    const judged = await judgeWithRetries(
       () => callJudgeModel(params.motion, params.school, params.argument, params.revisionOf),
       async (attempt) => {
         logged.push(
@@ -442,6 +445,11 @@ export async function judgeDebate(params: {
         );
       }
     );
+    // The last row is the call that validated; any before it were retries.
+    // If taking them out fails, the reader loses a slot for the day, which
+    // excludeFromDailyCap reports; the verdict stands either way.
+    await excludeFromDailyCap(logged.slice(0, -1));
+    return judged;
   } catch (err) {
     const offCap = await excludeFromDailyCap(logged);
     if (offCap && typeof err === "object" && err !== null) TAKEN_OFF_CAP.add(err);

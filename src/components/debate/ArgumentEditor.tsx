@@ -78,6 +78,13 @@ const PAUSE_COPY: Record<string, { title: string; body: string }> = {
     title: "That is your last argument for today.",
     body: "There is a cap on how many arguments one person can send the judge in a day. Your draft stays in this browser; come back tomorrow and send it again.",
   },
+  // The hard ceiling on judge calls (docs/decisions.md, "The judge's caps
+  // and budget"): reached by submissions the judge could not mark, which
+  // do not use an argument but still cost a call each.
+  call_ceiling: {
+    title: "That is all the judging for today.",
+    body: "Your arguments today needed more tries than usual to judge, and there is a limit on those too. Your draft stays in this browser; come back tomorrow and send it again.",
+  },
   topic_lock: {
     title: "You have already argued this motion.",
     body: `A motion locks for ${TOPIC_LOCK_DAYS} days after a judged argument, so the second attempt is a fresh case rather than a rewrite. Take a different motion in the meantime.`,

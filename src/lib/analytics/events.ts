@@ -88,6 +88,7 @@ export type AnalyticsEvent =
           | "kill_switch"
           | "budget"
           | "daily_cap"
+          | "call_ceiling"
           | "topic_lock"
           | "already_revised"
           | "no_criteria";
