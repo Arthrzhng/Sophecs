@@ -3235,3 +3235,35 @@ build without it is the production build it was, which
 
 Vercel's Preview environment gets `SIX_SCHOOLS=1` once this is merged;
 Production does not until launch.
+
+### Stage 5, step 2a: the school pages, lessons and table for six (2026-11-05)
+
+The first half of step 2 of `docs/stage5-plan.md`. On a `SIX_SCHOOLS`
+build the three new schools have pages and appear wherever the product
+lists the schools a reader can read about; on any other build every page
+is as it was, and the landing page, a school page and the lessons index
+were compared with the step 1 build to show it: the same markup once
+scripts and build ids are set aside.
+
+- **Loaders.** `src/lib/drafts.ts` gains one rule: on a `SIX_SCHOOLS`
+  build, a draft that belongs to one of the three is shown with them, by
+  every loader, without `includeDrafts`. A school file belongs to its
+  `id`, a module to its `school`. On any other build there is no such
+  school, so nothing loads that did not before. A draft that belongs to
+  no school, such as an elsewhere passage, stays hidden; Today's view
+  from elsewhere is step 2b's, with the lesson page it opens.
+- **Pages moved to `SHOWN_SCHOOL_IDS`:** `/s/[school]` (with its static
+  params, so a flag-on build prerenders the three), the landing page's
+  schools section, the footer, the lessons index's order, chips and
+  empty state, Today's lessons card, and the school table, whose new rows
+  sit unranked with no average until someone argues for them. The
+  table's "ranked once it has N judged arguments" rule from
+  `/styleguide/phase3` is not used: N is Arthur's to set (Checkpoint B).
+- **Counted headings.** "The three schools" and "The other two" are now
+  counted from the list (`src/lib/count-word.ts`), so a flag-on build
+  says six and five, and each is one string, so the markup a flag-off
+  build serves is unchanged.
+- **Left on the published three:** the sitemap, which lists sophecs.com
+  URLs where the three do not exist; `/debate/rubric`, which is the
+  judge's; the sharing image, whose "Three schools." is step 4's copy;
+  and everything the judge reads.

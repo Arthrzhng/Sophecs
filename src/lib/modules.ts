@@ -52,7 +52,9 @@ export function getAllModules(options: LoadOptions = {}): ModuleContent[] {
     const where = `content/modules/${file}`;
     const { data } = matter(fs.readFileSync(path.join(MODULES_DIR, file), "utf8"));
 
-    if (excluded(data, options)) continue;
+    // A module belongs to its school: on a SIX_SCHOOLS build, a draft for
+    // one of the three loads with it (src/lib/drafts.ts).
+    if (excluded(data, options, data.school)) continue;
     const draft = isDraft(data);
 
     const missing = REQUIRED.filter((key) => data[key] == null || data[key] === "");
@@ -67,8 +69,9 @@ export function getAllModules(options: LoadOptions = {}): ModuleContent[] {
     // A draft may name a school the product does not teach yet; that is
     // the point of drafting one. A published module may not, and a draft
     // only gets this far when the caller asked for drafts, which only
-    // /styleguide/drafts does. The cast below is therefore the one place
-    // a ModuleContent.school can hold a string outside the union, and the
+    // /styleguide/drafts does, or when its school is one this build shows,
+    // which is a SchoolId. The cast below is therefore the one place a
+    // ModuleContent.school can hold a string outside the union, and the
     // review route must put it through knownSchool() before using it to
     // index anything keyed by SchoolId.
     if (!draft && !PUBLISHED_SCHOOL_IDS.includes(data.school as SchoolId)) {

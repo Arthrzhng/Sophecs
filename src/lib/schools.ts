@@ -41,16 +41,18 @@ function loadAll(): SchoolContent[] {
 export function getAllSchools(options: LoadOptions = {}): Record<SchoolId, SchoolContent> {
   const result = {} as Record<SchoolId, SchoolContent>;
   for (const school of loadAll()) {
-    if (excluded(school, options)) continue;
+    // A school file belongs to itself: on a SIX_SCHOOLS build the three
+    // drafts load as the schools that build shows (src/lib/drafts.ts).
+    if (excluded(school, options, school.id)) continue;
     result[school.id] = school;
   }
   return result;
 }
 
 // Deliberately has no `includeDrafts`. Every caller looks a school up by a
-// `SchoolId`, which no draft can be until the union is widened, so an
-// opt-in here would be unreachable. The review route reads drafts through
-// getAllSchools instead.
+// school a page can show, so an opt-in here would be unreachable: the
+// published schools, and on a SIX_SCHOOLS build the three as well. The
+// review route reads drafts through getAllSchools instead.
 export function getSchool(id: SchoolId): SchoolContent {
   const school = getAllSchools()[id];
   if (!school) throw new Error(`No content for school "${id}"`);
