@@ -6,6 +6,7 @@ import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { getAllMicroLessons, getMicroLesson } from "@/lib/micro-lessons";
 import { getAllTopicFiles } from "@/lib/topics";
 import { formatSource, readingMinutes } from "@/lib/footnotes";
+import { passagePlace } from "@/lib/passage-place";
 
 export function generateStaticParams() {
   return getAllMicroLessons().map((lesson) => ({ slug: lesson.slug }));
@@ -28,24 +29,11 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const lesson = getMicroLesson(slug);
   if (!lesson) notFound();
 
-  // The motion's pair, before and after. An "elsewhere" passage, which a
-  // SIX_SCHOOLS build loads (src/lib/micro-lessons.ts), is not part of the
-  // pair: it is optional and has no place in the count.
-  const elsewhere = lesson.position === "elsewhere";
-  const inTopic = getAllMicroLessons().filter(
-    (l) => l.topic === lesson.topic && l.position !== "elsewhere"
-  );
-  // From the pair, the other passage; from an elsewhere passage, the one
-  // that frames the question.
-  const sibling = elsewhere
-    ? inTopic.find((l) => l.position === "before") ?? null
-    : inTopic.find((l) => l.position !== lesson.position) ?? null;
+  // Its place among the motion's passages: the pair is numbered, and an
+  // "elsewhere" passage, which a SIX_SCHOOLS build loads, sits outside it
+  // with no number (src/lib/passage-place.ts).
+  const { sibling, index, total } = passagePlace(lesson, getAllMicroLessons());
   const topic = getAllTopicFiles().find((t) => t.slug === lesson.topic) ?? null;
-
-  // getAllMicroLessons sorts "before" ahead of "after", so a passage's place
-  // in its own topic is the reading number. Derived rather than written
-  // down: a third passage on a motion would number itself.
-  const index = inTopic.findIndex((l) => l.slug === lesson.slug) + 1;
   // docs/daily-path-copy.md, "Today, the view from elsewhere".
   const placeLabel =
     lesson.position === "before"
@@ -56,7 +44,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
   return (
     <main className="flex flex-1 flex-col">
-      <ReadingTopBar position={elsewhere ? undefined : { index, total: inTopic.length }} />
+      <ReadingTopBar position={index === null ? undefined : { index, total }} />
 
       <div className="mx-auto w-full max-w-read flex-1 px-6 pb-12">
         <article className="rounded-panel border-2 border-rule bg-surface p-6 sm:p-10">

@@ -5,8 +5,9 @@ import { formatSource } from "@/lib/footnotes";
 /**
  * Today's optional "view from elsewhere", on a SIX_SCHOOLS build
  * (docs/stage5-plan.md, step 2), and on /styleguide/phase3, where Stage 4
- * of the brief of 2026-11-03 first drew it. It sits after the after-reading and is not
- * a seventh step: it has no check, and nothing on the path waits for it.
+ * of the brief of 2026-11-03 first drew it. It sits after the
+ * after-reading and is not a seventh step: it has no check, and nothing on
+ * the path waits for it.
  * Copy: docs/daily-path-copy.md, "Today, the view from elsewhere". The
  * passage's title and source are its own, from content/micro.
  */
@@ -14,7 +15,8 @@ export function ElsewhereCard({ lesson }: { lesson: MicroLessonContent }) {
   return (
     <section className="rounded-panel border-2 border-dashed border-rule-strong bg-surface p-5">
       <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">Optional</p>
-      <h3 className="mt-2 text-base font-extrabold text-ink">A view from elsewhere</h3>
+      {/* h2: on Today it follows the page's h1, as "Case closed." does. */}
+      <h2 className="mt-2 text-base font-extrabold text-ink">A view from elsewhere</h2>
       <p className="mt-2 max-w-[52ch] text-sm leading-relaxed text-ink-mid">
         Another tradition on this week&apos;s motion. There is no check, and it is not a step.
       </p>

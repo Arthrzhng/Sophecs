@@ -9,7 +9,9 @@
  * rather than a second set of functions: one `includeDrafts`, passed by one
  * caller. That caller is `/styleguide/drafts`, which is gated on
  * SOPHECS_PREVIEW or VERCEL_ENV exactly as `/styleguide/arena` is, and so
- * builds as a 404 on every deployment. If a second caller ever appears,
+ * builds as a 404 on every deployment. The one other is
+ * `src/lib/micro-lessons.ts`, which passes it for the "elsewhere" passages
+ * on a SIX_SCHOOLS build only (Stage 5). If a third caller ever appears,
  * this comment is wrong and the gate is worth re-checking.
  *
  * One more reader, on a `SIX_SCHOOLS` build only (docs/stage5-plan.md):
@@ -29,7 +31,8 @@ export interface DraftStatus {
 export interface LoadOptions {
   /**
    * Load draft files as well as published ones. Only `/styleguide/drafts`
-   * passes this. A production route that passes it is a bug.
+   * passes this, and src/lib/micro-lessons.ts for the "elsewhere"
+   * passages on a SIX_SCHOOLS build. Any other production caller is a bug.
    */
   includeDrafts?: boolean;
 }

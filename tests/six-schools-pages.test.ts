@@ -154,6 +154,51 @@ describe("the school pages", () => {
   });
 });
 
+describe("which passages the loaders hide", () => {
+  // Synthetic passages, because the content cannot test the position rule:
+  // tests/drafts.test.ts allows no draft passage other than an elsewhere.
+  it("shows an elsewhere draft on a SIX_SCHOOLS build only, and no other draft", async () => {
+    const on = (await load("1")).micro;
+    expect(on.hiddenMicroLesson({ position: "elsewhere", status: "draft" })).toBe(false);
+    expect(on.hiddenMicroLesson({ position: "before", status: "draft" })).toBe(true);
+    expect(on.hiddenMicroLesson({ position: "after", status: "draft" })).toBe(true);
+    expect(on.hiddenMicroLesson({ position: "before" })).toBe(false);
+    const off = (await load("0")).micro;
+    expect(off.hiddenMicroLesson({ position: "elsewhere", status: "draft" })).toBe(true);
+    expect(off.hiddenMicroLesson({ position: "elsewhere", status: "draft" }, { includeDrafts: true })).toBe(false);
+  });
+});
+
+describe("a passage's place among its motion's passages", () => {
+  const p = (slug: string, position: "before" | "after" | "elsewhere", topic = "t") => ({ slug, topic, position });
+  const all = [p("t-before", "before"), p("t-after", "after"), p("t-elsewhere", "elsewhere"), p("u-before", "before", "u")];
+
+  it("numbers the pair 1 and 2 of 2, whatever else the motion has", async () => {
+    const { passagePlace } = await import("../src/lib/passage-place");
+    expect(passagePlace(all[0], all)).toMatchObject({ index: 1, total: 2, elsewhere: false });
+    expect(passagePlace(all[1], all)).toMatchObject({ index: 2, total: 2, elsewhere: false });
+    expect(passagePlace(all[0], all).sibling?.slug).toBe("t-after");
+    expect(passagePlace(all[1], all).sibling?.slug).toBe("t-before");
+  });
+
+  it("gives an elsewhere passage no number, and the before passage as its sibling", async () => {
+    const { passagePlace } = await import("../src/lib/passage-place");
+    expect(passagePlace(all[2], all)).toMatchObject({ index: null, elsewhere: true });
+    expect(passagePlace(all[2], all).sibling?.slug).toBe("t-before");
+  });
+
+  it("numbers every real passage 1 or 2 of 2 on a SIX_SCHOOLS build", async () => {
+    const { micro } = await load("1");
+    const { passagePlace } = await import("../src/lib/passage-place");
+    const lessons = micro.getAllMicroLessons();
+    for (const l of lessons.filter((x) => x.position !== "elsewhere")) {
+      const place = passagePlace(l, lessons);
+      expect(place.total, l.slug).toBe(2);
+      expect(place.index, l.slug).toBe(l.position === "before" ? 1 : 2);
+    }
+  });
+});
+
 describe("countWord", () => {
   it("writes the counts the pages use as words, and larger ones as digits", async () => {
     const { countWord } = await import("../src/lib/count-word");

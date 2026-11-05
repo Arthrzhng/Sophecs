@@ -3296,8 +3296,11 @@ lessons index serve the markup they did.
 - **Which passages.** The six "elsewhere" passages in `content/micro`
   are drafts that belong to no school: their traditions are not all the
   three's (one is the Zhuangzi). They are Phase 3's, so the loader shows
-  them on a `SIX_SCHOOLS` build and on no other. A draft in any other
-  position stays hidden everywhere.
+  them on a `SIX_SCHOOLS` build and on no other, keyed on the flag itself
+  and not on which schools are drafts, so that they stay at launch, when
+  the three are published and the flag is on for Production. A draft in
+  any other position stays hidden everywhere. When the flag is retired
+  after launch, their `status: draft` goes with it.
 - **Today.** The card from `/styleguide/phase3` sits in the path after
   step 4, "Face an objection", which brings the after-reading. It is a
   list item and not a seventh step: it has no check and nothing waits for
@@ -3308,7 +3311,12 @@ lessons index serve the markup they did.
 - **The passage's page.** `/lessons/[slug]` labels it "A view from
   elsewhere", leaves out the reading counter, and links to the passage
   that frames the question. The before and after pages count only their
-  pair, so a flag-on build still numbers them 1 and 2 of 2.
+  pair, so a flag-on build still numbers them 1 and 2 of 2
+  (`src/lib/passage-place.ts`, tested on every real passage).
+- **On Today**, the card is a list item in the path's `<ol>`, as the
+  paused note is; each step's button names itself "Step N", so the card
+  is not counted as one, and its title is an `<h2>` under the page's
+  `<h1>`.
 - **Kept out:** the lessons index (which pairs before and after, as it
   always has) and the sitemap, whose sophecs.com addresses have no such
   page.
