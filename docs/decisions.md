@@ -2916,3 +2916,26 @@ five exactly. `scripts/test-migrations.sh` passes.
 
 **Snapshot:** `docs/seed-snapshots/2026-11-05-before-0024.json`, read from
 production at 06:00 UTC on 2026-11-05.
+
+### Quiz v2, as ruled
+
+Arthur's ruling 15 of 2026-11-05 ("Arthur's rulings of 2026-11-05 on
+Checkpoint A"), carried into `docs/quiz-v2.json` and `docs/quiz-v2.md`:
+
+- The axes, their plain names and the six positions stand as drafted,
+  Ubuntu at 0 degrees and Buddhist Ethics at 310 included, and so do the
+  weighted options.
+- 2c, 5c, 7a, 7c and 6b take Arthur's wording, each keeping its school
+  and vector. The simulation, re-run, gives the same figures to the
+  digit, as it must: it reads only the vectors. Every school lands as
+  primary for 16.2% to 17.7% of answer patterns.
+- 1a, 10b, 3d, 5b, 6d, 9a and 8c stay as written. No rule-based school;
+  a duty-based one is the obvious seventh, later (noted above).
+- The copy that says "ten questions about AI", and "about eighty
+  seconds", which v2's longer options would make untrue, has its v2
+  wording in `docs/quiz-v2.md`, section 8, to replace it at launch
+  behind `SIX_SCHOOLS`. Until then v1 is live and the live copy is true
+  of it.
+
+Quiz v2 ships at launch, after the sample teardown, and the fresh run
+follows it (`docs/sample-activity.md`, "At launch").

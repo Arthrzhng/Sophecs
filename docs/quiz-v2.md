@@ -1,8 +1,17 @@
-# Quiz v2: a draft for Arthur to decide
+# Quiz v2
 
-Stage 3 of the brief of 2026-11-03. **Nothing here is built.** Every
+Stage 3 of the brief of 2026-11-03. **Nothing here is built yet.** Every
 choice below is a philosophy or content judgement and is Arthur's (CLAUDE.md
-item (e)). Checkpoint A asks for those decisions in one list.
+item (e)).
+
+**Ruled on 2026-11-05** (Checkpoint A, item 15; `docs/decisions.md`,
+"Arthur's rulings of 2026-11-05 on Checkpoint A"): the axes, their plain
+names and the six positions are accepted as drafted, Ubuntu at 0 degrees
+and Buddhist Ethics at 310 included; the weighted options (section 5) are
+accepted; five options are reworded, keeping their schools and vectors
+(section 4, and "The rulings' option edits" below), and the simulation
+re-run, with the same results; 1a, 10b, 3d, 5b, 6d, 9a and 8c stay as
+written; and there is no rule-based school. Quiz v2 ships at launch.
 
 - The questions, options, school positions and weights are in
   `docs/quiz-v2.json`.
@@ -134,6 +143,14 @@ Utilitarianism, 0.95 for Buddhist Ethics, 0.9 for Ubuntu, and 0.8 for
 Confucianism and Virtue Ethics. The quiz would show neither the
 "Leans" column nor the vectors. Option order would be fixed as written.
 
+**The rulings' option edits (2026-11-05).** Arthur reworded five of the
+options below, each keeping its school and its vector: 2c no longer
+shades the truth; 5c and 7a now speak up once and let the outcome go,
+rather than stepping back; 7c no longer calls staying quiet cowardly;
+and 6b gives the older sibling a duty as well as a claim. He kept 1a,
+10b, 3d, 5b, 6d, 9a and 8c as written. The two lists that follow are the
+review notes he ruled on, kept as they were.
+
 **Options I am least sure pass the "obviously nice" test**, for Arthur's
 eye:
 - 3d, "decided together";
@@ -181,7 +198,7 @@ moves an option's school, so the simulation is unchanged.
 | --- | --- | --- | --- |
 | a | Tell them it is weak. A friend who only flatters is not the kind of friend I want to be. | Virtue Ethics | -0.27, 0.75 |
 | b | Offer to go through it together. When one of us does badly, the rest of us have let it happen. | Ubuntu | 0.90, 0.00 |
-| c | Say whatever is most likely to get the essay improved before it is handed in, even if that is not quite what I think. | Utilitarianism | -0.42, -0.91 |
+| c | Say whatever is most likely to get the essay improved before it is handed in. | Utilitarianism | -0.42, -0.91 |
 | d | Give my honest view once and leave it there. What they do with it is up to them. | Stoicism | -0.97, 0.26 |
 
 **3. Your gran wants you at a family lunch on the day of a match you really want to play in.**
@@ -208,7 +225,7 @@ moves an option's school, so the simulation is unchanged.
 | --- | --- | --- | --- |
 | a | Think about who this is going to hurt, them included, before I decide whether to say anything. | Buddhist Ethics | 0.61, -0.73 |
 | b | Do what an honest person would do here, even if it costs me friends. | Virtue Ethics | -0.27, 0.75 |
-| c | Keep my eyes on my own paper. Their choices are theirs to answer for. | Stoicism | -0.97, 0.26 |
+| c | Tell them once, privately, what I saw. What they do next is theirs to answer for; what I say is mine. | Stoicism | -0.97, 0.26 |
 | d | Report it if that makes the results fairer for everyone else in the year. | Utilitarianism | -0.42, -0.91 |
 
 **6. Your younger brother keeps using your phone without asking.**
@@ -216,7 +233,7 @@ moves an option's school, so the simulation is unchanged.
 | | Option | Leans | x, y |
 | --- | --- | --- | --- |
 | a | Raise it with the whole family. People who live together sort things out together. | Ubuntu | 0.90, 0.00 |
-| b | I am the older one, so I set how we treat each other's things and expect him to follow it. | Confucianism | 0.51, 0.61 |
+| b | I am the older one, so it is on me to show him how we treat each other's things, and on him to learn to ask. | Confucianism | 0.51, 0.61 |
 | c | Say no without making a scene. Getting angry would do more damage than a borrowed phone. | Buddhist Ethics | 0.61, -0.73 |
 | d | Be patient with him. I would rather be generous with my things than someone who keeps score. | Virtue Ethics | -0.27, 0.75 |
 
@@ -224,9 +241,9 @@ moves an option's school, so the simulation is unchanged.
 
 | | Option | Leans | x, y |
 | --- | --- | --- | --- |
-| a | Play as well as I can wherever I am put. Who gets picked is not up to me. | Stoicism | -0.97, 0.26 |
+| a | Tell the captain once, calmly, what I think is fair, then play as well as I can wherever I am put. Whether they listen is not up to me. | Stoicism | -0.97, 0.26 |
 | b | Push for picks based on results, because that wins the most games for all of us. | Utilitarianism | -0.42, -0.91 |
-| c | Tell the captain to their face that it is unfair. Keeping quiet would be cowardly. | Virtue Ethics | -0.27, 0.75 |
+| c | Tell the captain to their face that it is unfair. Going along with it would make me someone I don't want to be. | Virtue Ethics | -0.27, 0.75 |
 | d | Get the whole team to agree how picks should work, so nobody is left out of deciding. | Ubuntu | 0.90, 0.00 |
 
 **8. An AI tool could write your whole history essay, and nobody would ever know.**
@@ -381,7 +398,7 @@ same. A reader who never retakes keeps their v1 school.
 
 ## 7. For Checkpoint A
 
-Each of these is Arthur's to decide:
+Ruled on 2026-11-05; see the note at the top. Kept as it was put:
 
 1. The axes and their plain names (section 1).
 2. The six positions, and especially Buddhist Ethics' and Ubuntu's
@@ -405,3 +422,36 @@ Each of these is Arthur's to decide:
    The Ubuntu page places Gyekye between Metz and Menkiti, which points
    the same way, but its gloss on him, individuals keeping "their own
    worth and rights", points towards the individual end (section 2).
+
+## 8. Copy at launch
+
+Arthur, 2026-11-05: "Reword the share lines, site description, SharePage
+and ChallengeInvite away from 'ten questions about AI', to something true
+of v2 (e.g. ten questions about how you decide what's right)." v1 is
+about AI, so the live copy stays true until v2 ships; these lines replace
+it then, behind `SIX_SCHOOLS` with the rest of Phase 3, and are wired in
+Stage 5. Only the AI framing moves: each line keeps the rest of its
+wording, except where that wording was itself about AI (Confucianism's
+"does this system let them pay it", Ubuntu's "the data").
+
+**Time.** v1's copy says "about eighty seconds". v2's prompts and
+options run to 879 words against v1's 483, so at the same pace it would
+take about two and a half minutes, and slower readers longer. The v2
+copy says "a few minutes".
+
+| Where | Now (v1) | At launch (v2) |
+| --- | --- | --- |
+| Site description, `src/app/layout.tsx` | Ten questions on how AI should decide things. Find out which school of ethics you actually argue from. | Ten questions about how you decide what's right. Find out which school of ethics you actually argue from. |
+| `src/components/share/SharePage.tsx` | Ten questions on how AI should decide things. No account needed, about eighty seconds. | Ten questions about how you decide what's right. No account needed, a few minutes. |
+| `src/components/share/ChallengeInvite.tsx` | Sophecs asks ten questions about how AI should decide things and places you in one of three schools of ethics, then asks you to argue for yours against a motion. No account needed for the questions, and about eighty seconds. | Sophecs asks ten questions about how you decide what's right and places you in one of six schools of ethics, then asks you to argue for yours against a motion. No account needed for the questions, and a few minutes. |
+| The quiz page's description, `src/app/quiz/page.tsx` | Ten questions that place you in Stoicism, Utilitarianism or Virtue Ethics, by what you already think rather than what you have read. | Ten questions that place you in one of six schools of ethics, by what you already think rather than what you have read. |
+| Share line, `content/schools/stoicism.md` | Ten questions about AI and my answer kept coming back to: that part was never up to me anyway. Sophecs called it Stoic. | Ten questions about how I decide what's right, and my answer kept coming back to: that part was never up to me anyway. Sophecs called it Stoic. |
+| Share line, `content/schools/utilitarianism.md` | Ten questions about AI and I kept landing on the same answer: count everyone it touches, not just the person in front of you. Sophecs says that's Utilitarianism. | Ten questions about how I decide what's right, and I kept landing on the same answer: count everyone it touches, not just the person in front of you. Sophecs says that's Utilitarianism. |
+| Share line, `content/schools/virtue-ethics.md` | Ten questions about AI and my answers all came down to the same thing: what does this make of me. Sophecs says that's Virtue Ethics. | Ten questions about how I decide what's right, and my answers all came down to the same thing: what does this make of me. Sophecs says that's Virtue Ethics. |
+| Share line, `content/schools/confucian.md` | Ten questions about AI and I kept asking the same one: who owes what to whom here, and does this system let them pay it. Sophecs called that Confucian role ethics. | Ten questions about how I decide what's right, and I kept asking the same one: who owes what to whom here, and can they still pay it. Sophecs called that Confucian role ethics. |
+| Share line, `content/schools/buddhist.md` | Ten questions about AI and my answer kept being: who is this hurting, and are we still checking. Sophecs called that Buddhist. | Ten questions about how I decide what's right, and my answer kept being: who is this hurting, and are we still checking. Sophecs called that Buddhist. |
+| Share line, `content/schools/ubuntu.md` | Ten questions about AI and I never once thought the data was only mine. Sophecs called that Ubuntu. | Ten questions about how I decide what's right, and I never once thought the choice was only mine. Sophecs called that Ubuntu. |
+
+The footer's "Ten questions place you in a school of ethics" is true of
+both and stays. The other share lines speak of algorithms and systems,
+which the arena's motions still are, and stay too.
