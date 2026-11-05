@@ -79,10 +79,13 @@ challenges." `/method#samples` explains the rest.
   sample page is open. Console logs, which PostHog captures only if that
   is switched on in the project, go out by another path that
   `before_send` does not see, so the `logs` setting's own `beforeSend`
-  drops each one logged while a sample page is open. A visit that starts
+  drops every one once the page load has shown a sample page (a record
+  logged before PostHog's logs script loads is filtered later, when it is
+  replayed, and by then carries no address to check). A visit that starts
   on a sample page does not load PostHog at all; the reader is
   identified on their first genuine page, which also sends
-  `return_visit` (`tests/seed/return-visit.test.ts`). Two things can
+  `return_visit` when their first visit was more than a day before
+  (`tests/seed/return-visit.test.ts`). Two things can
   still carry a trace of a sample page, though no sample content: when a
   visit starts on one, web vitals (if switched on) can report that page's
   load timings and the element last touched under the first genuine
@@ -463,14 +466,29 @@ Three things halt it (`scripts/seed/engine.ts`, `HALT_PREFIX`):
 
 A run by hand on a halted run keeps the halt while it writes, and if it
 fails partway, the halt stays in front of the new error; only its
-passing validation lifts it. The duplicate check runs with the dry-run
+passing validation lifts it, and a canary cannot be run on a run that
+has had its full stage, since it validates only its first cohorts. The
+validation's result is recorded under the run's lock and only if the
+run is as the writes left it, so a teardown or another process's run in
+between is not written over. The duplicate check runs with the dry-run
 checks, before anything is written, so an extension that would cross 5%
-is refused rather than written and halted. Any other failure (a lost
-runner, the timeout, a database error during the writes) leaves the run
-failed but not halted, and the next scheduled run resumes it.
-`tests/seed/ci.test.ts` covers each case. A run that keeps failing
+is refused rather than written and halted.
+
+Everything else resumes. A database error during the writes, past the
+engine's retries, leaves the run `failed` but not halted, and the next
+scheduled run resumes it. A runner lost during the writes (the timeout,
+a cancel, a lost machine) leaves the run `running` with its lock, which
+the next scheduled run clears once it is 15 minutes old, then resumes. A
+runner lost after the writes leaves the run halted, "validation not
+finished", as above. `tests/seed/ci.test.ts` and
+`tests/seed/engine.test.ts` cover each case. A run that keeps failing
 shows as failed runs in the Actions tab, and GitHub emails the account
 that set the schedule.
+
+The workflow's log is public, so an error from the writes, which can
+name a row, is logged as a line of its own ("the run stopped on a
+refusal and is halted" or "the run failed while writing"), and the
+detail goes to `seed_runs.last_error`.
 
 ## Limits
 

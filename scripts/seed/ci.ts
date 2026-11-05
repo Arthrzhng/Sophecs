@@ -6,7 +6,7 @@ import type { Adapter } from "./adapter";
 import { buildPlan, describe } from "./plan";
 import { DEFAULTS, type GenConfig } from "./generate";
 import { contentTopics } from "./topics";
-import { execute, finishValidation, isHalted, VALIDATING } from "./engine";
+import { execute, finishValidation, isHalted, recordedOnRun, StopError, VALIDATING } from "./engine";
 import { validate } from "./validate";
 import { dryRun } from "./dryrun";
 import { GuardError } from "./env";
@@ -70,13 +70,14 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
     }
     if (active.length > 1) throw new GuardError(`${active.length} sample runs are active; expected one`);
     const run = active[0];
-    if (o.mode === "extend" && run.counts?.stage !== "full") {
-      log(`run ${run.id} has not had its full stage; nothing to do until it has`);
-      return { ok: true, outcome: "idle", runId: run.id };
-    }
+    // The halt first, so a halted run fails the schedule at every stage.
     if (o.mode === "extend" && isHalted(run)) {
       log(`run ${run.id} is halted (${run.last_error?.split(":").slice(0, 2).join(":")}); nothing written until a full stage, run by hand, passes`);
       return { ok: false, outcome: "halted", runId: run.id };
+    }
+    if (o.mode === "extend" && run.counts?.stage !== "full") {
+      log(`run ${run.id} has not had its full stage; nothing to do until it has`);
+      return { ok: true, outcome: "idle", runId: run.id };
     }
     baseTo = new Date(run.base_to).toISOString();
   }
@@ -125,7 +126,18 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
   // The run ends halted (VALIDATING) and stays so until the validation
   // below passes: a validation that throws, or a job lost before it
   // finishes, leaves the schedule writing nothing.
-  const result = await execute({ dataset, plan, adapter, cohortLimit, log, batchSize: o.batchSize ?? 250, authConcurrency: 4, breakStaleLock: true, endHalted: VALIDATING });
+  let result: Awaited<ReturnType<typeof execute>>;
+  try {
+    result = await execute({ dataset, plan, adapter, cohortLimit, log, batchSize: o.batchSize ?? 250, authConcurrency: 4, breakStaleLock: true, endHalted: VALIDATING });
+  } catch (err) {
+    // An error from the writes can name row ids, and this log is public:
+    // execute has written it to seed_runs.last_error, which only the server
+    // role reads, so the log gets a line of its own.
+    if (!recordedOnRun(err)) throw err;
+    const line = `the run ${err instanceof StopError ? "stopped on a refusal and is halted" : "failed while writing"}; seed_runs.last_error has the detail`;
+    log(line);
+    throw err instanceof StopError ? new StopError(line) : new Error(line);
+  }
   log(
     `wrote ${JSON.stringify(result.written)} in ${result.seconds.toFixed(1)} s (${result.rowsPerSecond.toFixed(0)} rows/s${
       result.authUsersPerSecond ? `, ${result.authUsersPerSecond.toFixed(1)} auth users/s` : ""
@@ -136,8 +148,9 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
   const ok = checks.every((c) => c.ok);
   for (const c of checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}`);
   await record({ written: result.written, seconds: result.seconds, ok, checks });
-  await finishValidation(adapter, plan.runId, result.endStatus, checks.filter((c) => !c.ok).map((c) => c.name));
-  if (!ok)
+  if (!(await finishValidation(adapter, result, checks.filter((c) => !c.ok).map((c) => c.name))))
+    log("the run changed while it was validated (another process or a teardown); it is left as that left it");
+  else if (!ok)
     log("validation failed: the run is halted, and the schedule writes nothing until a full stage passes (docs/sample-activity.md, \"Stop conditions\"); details in seed_runs.last_report");
   return { ok, outcome: "written", runId: plan.runId };
 }

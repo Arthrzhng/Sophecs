@@ -95,11 +95,41 @@ export function isHalted(run: Pick<SeedRun, "status" | "last_error"> | null | un
 /**
  * After a validation: a pass lifts the halt and gives the run the status
  * execute ended it on; a failure halts it, naming the checks that failed.
+ *
+ * Under the run's lock, and only if the run is still as execute left it:
+ * a teardown, or another process's run or halt, between the end of the
+ * writes and here is not written over. Returns whether it recorded; when
+ * it did not, the run keeps whatever state it has, which for the state
+ * execute left is still a halt.
  */
-export async function finishValidation(adapter: Adapter, runId: string, endStatus: "complete" | "running", failed: string[]) {
-  if (failed.length === 0) await adapter.updateRun(runId, { status: endStatus, last_error: null });
-  else await adapter.updateRun(runId, { status: "failed", last_error: `${HALTED}: ${failed.join("; ")}`.slice(0, 500) });
+export async function finishValidation(
+  adapter: Adapter,
+  run: Pick<ExecuteReport, "runId" | "endStatus" | "heldWith">,
+  failed: string[]
+): Promise<boolean> {
+  const token = randomUUID();
+  if (!(await adapter.acquireLock(run.runId, token))) return false;
+  try {
+    const now = await adapter.getRun(run.runId);
+    const expected = run.heldWith ? { status: "failed", last_error: run.heldWith } : { status: run.endStatus, last_error: null };
+    if (!now || now.status !== expected.status || (now.last_error ?? null) !== expected.last_error) return false;
+    return await adapter.updateRunLocked(
+      run.runId,
+      token,
+      failed.length === 0
+        ? { status: run.endStatus, last_error: null }
+        : { status: "failed", last_error: `${HALTED}: ${failed.join("; ")}`.slice(0, 500) }
+    );
+  } finally {
+    await adapter.releaseLock(run.runId, token).catch(() => {});
+  }
 }
+
+// Errors execute has already written to the run's last_error: their
+// messages can name row ids, so a caller that prints to a public log
+// prints a line of its own instead (scripts/seed/ci.ts).
+const recorded = new WeakSet<object>();
+export const recordedOnRun = (err: unknown): boolean => typeof err === "object" && err !== null && recorded.has(err);
 
 // A live run refreshes its lock before every batch, and a batch takes
 // seconds, so a lock untouched for this long belongs to a process that died.
@@ -144,6 +174,8 @@ export interface ExecuteReport {
   cancelled: boolean;
   /** The status a passing validation gives the run (finishValidation). */
   endStatus: "complete" | "running";
+  /** The halt execute left the run under, if any: last_error, with status "failed". */
+  heldWith: string | null;
 }
 
 async function retry<T>(fn: () => Promise<T>, attempts: number, baseMs: number, log: (s: string) => void, what: string): Promise<T> {
@@ -265,6 +297,10 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     throw new StopError(`run ${run.id} already reaches ${run.window_to}; this plan ends earlier, at ${plan.window.to}`);
   if (run.status === "tearing_down" || run.status === "torn_down")
     throw new StopError(`run ${run.id} is ${run.status}; it cannot be resumed`);
+  // A canary validates only its first cohorts, so on a run that has had its
+  // full stage it could pass while the rest is wrong, and lift a halt.
+  if (Number.isFinite(limit) && String(run.counts?.stage ?? "") === "full")
+    throw new StopError(`run ${run.id} has had its full stage; a canary cannot be run on it`);
   if (run.lock_token && opts.breakStaleLock) {
     if (!(await adapter.breakStaleLock(run.id, STALE_LOCK_MINUTES)))
       throw new StopError(`run ${run.id}'s lock is less than ${STALE_LOCK_MINUTES} minutes old; another process may still be running`);
@@ -291,6 +327,7 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
   let authCount = 0;
   let cancelled = false;
   let endStatus: "complete" | "running" = "running";
+  let hold: string | null = null;
 
   try {
     for (const phase of phases(ds)) {
@@ -378,7 +415,7 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     }
     const complete = !cancelled && limit === Infinity;
     endStatus = complete ? "complete" : "running";
-    const hold = keep ?? opts.endHalted ?? null;
+    hold = keep ?? opts.endHalted ?? null;
     const recorded = await adapter.updateRunLocked(run.id, token, {
       status: hold ? "failed" : endStatus,
       last_error: hold ?? (cancelled ? "cancelled; run the same command again to resume" : null),
@@ -403,7 +440,8 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     if (!(err instanceof LockLostError)) {
       const message = String((err as Error).message);
       const error = keep ? `${keep.slice(0, 200)}; then: ${message}` : err instanceof StopError ? `${REFUSED}: ${message}` : message;
-      await adapter.updateRunLocked(run.id, token, { status: "failed", last_error: error.slice(0, 500) }).catch(() => false);
+      if (await adapter.updateRunLocked(run.id, token, { status: "failed", last_error: error.slice(0, 500) }).catch(() => false))
+        if (typeof err === "object" && err !== null) recorded.add(err);
     }
     throw err;
   } finally {
@@ -419,6 +457,7 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     rowsPerSecond: rows / Math.max(seconds, 0.001),
     authUsersPerSecond: authCount ? authCount / Math.max(authSeconds, 0.001) : null,
     endStatus,
+    heldWith: hold,
     before,
     cancelled,
   };

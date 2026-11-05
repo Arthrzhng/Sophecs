@@ -2933,15 +2933,22 @@ fixes. It found nothing blocking, and four things to fix:
   row it would not adopt or update, a user without its ban) halts the
   run rather than leaving the schedule to try again every six hours,
   which is what `docs/sample-activity.md`, "Stop conditions", already
-  said it did. `scripts/seed-production.ts` does the same, so a run by
-  hand from the command line cannot lift a halt either.
+  said it did. `scripts/seed-production.ts` does the same, and a canary
+  cannot be run on a run that has had its full stage, so a run by hand
+  from the command line cannot lift a halt either. The result is recorded
+  under the run's lock and only on the run as the writes left it, so a
+  teardown in between is not undone. An error from the writes goes to
+  `last_error`, and the public log gets a line of its own, since the
+  message can name a row.
 - **The 5% duplicate check ran after the writes.** The rate is the
   plan's own, so it now runs with the dry-run checks: an extension that
   would cross it is refused before anything is written.
 - **Console logs skipped `before_send`.** posthog-js sends console log
   records by their own path, and console capture can be switched on from
   the PostHog project. The `logs` setting's own `beforeSend` now drops
-  each one logged while a sample page is open.
+  every one once the page load has shown a sample page: a record logged
+  before the logs script loads is filtered only when it is replayed,
+  without the address it was logged at.
 - **The sample users' email tag** comes from the generator's random
   streams, which are not meant for secrets. Changing it would break the
   live run's spot checks, so it becomes an HMAC for the fresh run at

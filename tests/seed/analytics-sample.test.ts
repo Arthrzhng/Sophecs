@@ -78,9 +78,13 @@ describe("PostHog and sample pages", () => {
     const record = { body: "hydrated", level: "info" };
     expect(beforeSend!(record)).toBe(record);
     marked = true;
+    const leave = a.enterSamplePage("/r/SAMPLE04");
     expect(beforeSend!(record)).toBeNull();
+    // A record buffered on the sample page and replayed after the reader
+    // left it carries no address, so nothing goes for the rest of the load.
     marked = false;
-    expect(beforeSend!(record)).toBe(record);
+    leave();
+    expect(beforeSend!(record)).toBeNull();
   });
 
   it("drops batches recorded on a sample page and sent after the reader left it", async () => {

@@ -4,7 +4,7 @@
 // genuine rows and other runs alone.
 import { describe, expect, it } from "vitest";
 import { MemoryAdapter } from "../../scripts/seed/adapter-memory";
-import { execute, StopError } from "../../scripts/seed/engine";
+import { execute, finishValidation, HALTED, StopError, VALIDATING } from "../../scripts/seed/engine";
 import { validate } from "../../scripts/seed/validate";
 import { preview, teardown } from "../../scripts/seed/teardown";
 import { smallPlan } from "./fixture";
@@ -125,6 +125,32 @@ describe("execute", () => {
     expect(v.checks.filter((c) => !c.ok)).toEqual([]);
     await execute({ dataset, plan, adapter: db, ...quiet });
     expect(sampleRows(db)).toBe(total(dataset));
+  });
+
+  it("refuses a canary on a run that has had its full stage, which could lift a halt on a partial check", async () => {
+    const db = freshDb();
+    await execute({ dataset, plan, adapter: db, ...quiet });
+    await db.updateRun(plan.runId, { status: "failed", last_error: `${HALTED}: spot check: debates` });
+    await expect(execute({ dataset, plan, adapter: db, ...quiet, cohortLimit: 25, endHalted: VALIDATING })).rejects.toThrow(/has had its full stage; a canary cannot be run on it/);
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: `${HALTED}: spot check: debates`, lock_token: null });
+  });
+
+  it("records a validation only on the run as execute left it, and under its lock", async () => {
+    const db = freshDb();
+    const r = await execute({ dataset, plan, adapter: db, ...quiet, endHalted: VALIDATING });
+    expect(r.heldWith).toBe(VALIDATING);
+    // A teardown, or another process, got there first.
+    await db.updateRun(plan.runId, { status: "torn_down", last_error: null });
+    expect(await finishValidation(db, r, [])).toBe(false);
+    expect((await db.getRun(plan.runId))!.status).toBe("torn_down");
+    // Another process holds the lock.
+    await db.updateRun(plan.runId, { status: "failed", last_error: VALIDATING, lock_token: "other", locked_at: new Date().toISOString() });
+    expect(await finishValidation(db, r, [])).toBe(false);
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: VALIDATING, lock_token: "other" });
+    // As execute left it: recorded, and the lock is free again.
+    await db.updateRun(plan.runId, { lock_token: null, locked_at: null });
+    expect(await finishValidation(db, r, ["spot check: debates"])).toBe(true);
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: `${HALTED}: spot check: debates`, lock_token: null });
   });
 
   it("stops cleanly when cancelled and resumes", async () => {

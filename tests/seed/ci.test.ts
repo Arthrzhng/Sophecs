@@ -146,7 +146,7 @@ describe("the scheduled workflow's path", () => {
       if ((await db.getRun(run.id))!.lock_token) throw new Error("connection lost");
       return items(...args);
     });
-    await expect(step(db, "full", 31)).rejects.toThrow(/connection lost/);
+    await expect(step(db, "full", 31)).rejects.toThrow(/^the run failed while writing; seed_runs.last_error has the detail$/);
     spy.mockRestore();
     const after = (await db.getRun(run.id))!;
     expect(after.status).toBe("failed");
@@ -189,16 +189,56 @@ describe("the scheduled workflow's path", () => {
     await step(db, "full", 1);
     const run = (await db.listRuns())[0];
     // The run's profiles are no longer marked as samples: it must not touch them.
+    const ids = [...db.table("profiles").values()].filter((r) => r.is_sample).map((r) => String(r.id));
     for (const [id, r] of db.table("profiles")) if (r.is_sample) db.table("profiles").set(id, { ...r, is_sample: false });
-    await expect(step(db, "extend", 24 * 7)).rejects.toThrow(/refusing/);
+    const lines: string[] = [];
+    const err = await runCi({ mode: "extend", adapter: db, seed: SEED, projectRef: "tekifezydjlgxgndkxul", now: () => at(24 * 7), log: (l) => lines.push(l), config: SMALL, batchSize: 100 }).catch((e: Error) => e);
+    // The public log and the error main() prints carry no row id; the run
+    // keeps the detail.
+    expect((err as Error).message).toBe("the run stopped on a refusal and is halted; seed_runs.last_error has the detail");
+    for (const text of [...lines, (err as Error).message]) {
+      expect(text).not.toMatch(/refusing/);
+      for (const id of ids) expect(text).not.toContain(id);
+    }
     const after = (await db.getRun(run.id))!;
     expect(after.status).toBe("failed");
-    expect(after.last_error).toMatch(new RegExp(`^${REFUSED}: `));
+    expect(after.last_error).toMatch(new RegExp(`^${REFUSED}: .*refusing`));
     const held = await step(db, "extend", 24 * 8);
     expect(held.out).toMatchObject({ ok: false, outcome: "halted" });
     // The log names the halt, not the refused row.
     expect(held.lines.join("\n")).toContain(`(${REFUSED})`);
     expect(held.lines.join("\n")).not.toMatch(/refusing/);
+  });
+
+  it("fails the schedule for a halted run at any stage, the canary's included", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    const run = (await db.listRuns())[0];
+    await db.updateRun(run.id, { status: "failed", last_error: `${HALTED}: spot check: debates` });
+    expect((await step(db, "extend", 6)).out).toMatchObject({ ok: false, outcome: "halted" });
+  });
+
+  it("does not undo a teardown made while the run was being validated", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    // Torn down by hand once the rows are written, mid-validation.
+    const scan = db.scan.bind(db);
+    let done = false;
+    const spy = vi.spyOn(db, "scan").mockImplementation(async (...args: Parameters<MemoryAdapter["scan"]>) => {
+      const written = Date.parse((await db.getRun(run.id))!.window_to) === Date.parse(at(24 * 7));
+      if (written && !done && args[0] === "debates") {
+        done = true;
+        await teardown(db, run.id);
+      }
+      return scan(...args);
+    });
+    const out = await step(db, "extend", 24 * 7);
+    spy.mockRestore();
+    expect(out.lines.join("\n")).toContain("the run changed while it was validated");
+    expect((await db.getRun(run.id))!.status).toBe("torn_down");
+    expect((await step(db, "extend", 24 * 8)).out.outcome).toBe("idle");
   });
 
   it("refuses an extension that would cross the duplicate limit before writing anything", async () => {

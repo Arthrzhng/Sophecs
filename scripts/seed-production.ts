@@ -137,7 +137,8 @@ main(async () => {
   const report = await validate(adapter, dataset, result.before, { cohortLimit });
   for (const c of report.checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}: ${c.detail}`);
   log(`report: ${writeReport(`seed-${plan.runId}`, { result, validation: report })}`);
-  await finishValidation(adapter, plan.runId, result.endStatus, report.checks.filter((c) => !c.ok).map((c) => c.name));
+  if (!(await finishValidation(adapter, result, report.checks.filter((c) => !c.ok).map((c) => c.name))))
+    log("the run changed while it was validated (another process or a teardown); it is left as that left it");
   if (!report.ok) {
     log("validation failed: stop here. See docs/sample-activity.md, \"Stop conditions\".");
     process.exitCode = 1;
