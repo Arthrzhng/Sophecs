@@ -408,13 +408,22 @@ tab, and GitHub emails the account that set the schedule.
   after 90 days, 3.29% after a year and 9.85% after two, so the 5% check
   halts the run after about 16 months unless the passages grow. Making
   the plan takes 14 s at the start and about 3 minutes after a year.
-- The motions and the passages are fixed for the life of a run. Each
-  motion's text is part of the run's base hash, so rewording, adding or
-  retiring a motion makes every later run refuse at the dry run, writing
-  nothing; and an edit to the passages changes the texts planned for rows
-  already written, which the spot checks then fail on, halting the run.
-  Either way the way on is teardown and a new run, which ends every
-  existing sample link. Say before changing either while a run is live.
+  Re-measured on 2026-11-05 with two other seeds and production's base
+  window: 0.2% at the start, 0.5% and 0.7% after 90 days, 3% after a
+  year. The start is higher than the 0.02% above, the year about the
+  same, so the 16-month estimate stands. The production run's own check
+  read 0.3% after its full stage.
+- The motions, the passages and the quiz are fixed for the life of a run.
+  Each motion's text is part of the run's base hash, so rewording, adding
+  or retiring a motion makes every later run refuse at the dry run,
+  writing nothing. An edit to the passages changes the texts planned for
+  rows already written, which the spot checks then fail on, halting the
+  run. The generator replays the live quiz questions and `scoreQuiz` to
+  give each sample its school, so a change to the quiz (Quiz v2, for one)
+  changes the planned schools of rows already written, which the spot
+  checks also fail on. In every case the way on is teardown and a new
+  run, which ends every existing sample link. Say before changing any of
+  them while a run is live.
 
 ## Decisions taken
 

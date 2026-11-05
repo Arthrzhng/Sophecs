@@ -10,12 +10,14 @@ What shipped to get here is in `docs/progress.md`; why, in
 
 ## Updated 2026-11-05
 
-Arthur accepted this reading on 2026-11-04: update this file once sample
-activity is live, and send its decision list again. Nothing in it has
-been ruled on since, so every item from the first version stands. Items
-added on 2026-11-05 are marked **New**.
+On 2026-11-04 I proposed updating this file once sample activity was
+live and sending its decision list again; Arthur's reply that day
+included "Accepted: ... your reading of Checkpoint A". Of the first
+version's items only the grants fix (its section 0) has been ruled on
+since, and it is done; every other item stands. Items added on
+2026-11-05 are marked **New**.
 
-Closed since the first version:
+Done since the first version:
 
 - **The grants fix.** Migration 0022, applied at 03:00:50 UTC on
   2026-11-05 with Arthur's "yes, the grants fix" and "Yes, with the
@@ -26,14 +28,17 @@ Closed since the first version:
   the SQL Editor, so it is not in Supabase's migration list.
 - **`backup_20261022`** is dropped (Arthur, in the SQL Editor; read back at
   03:05 UTC on 2026-11-05).
-- **Sample activity is live.** 0023 is applied, the canary and the full run
-  passed, and the schedule extends the run every six hours.
+- **Sample activity is live.** 0023 is applied and the canary and the full
+  run passed. The schedule is set to extend the run every six hours from
+  06:41 UTC on 2026-11-05; no extension had run when this was written.
   `docs/progress.md`, "the sample canary and the full run".
-- **The two critical dependency advisories.** Next.js moves to 15.5.29.
-  PostHog now starts with its product tours off, so the extension that
-  bundles the vulnerable DOMPurify is not loaded, short of a tour preview
-  that nothing in the site starts. `docs/decisions.md`, "Dependency audit
-  (2026-11-05)".
+- **The two critical dependency advisories.** Next.js's is fixed (15.5.29).
+  DOMPurify's is mitigated, not fixed: PostHog now starts with its product
+  tours off, so the extension that bundles it is not loaded, except
+  through a tour preview, which nothing in the site starts and which
+  PostHog's toolbar, opened by a project member, might; that could not be
+  checked. `npm audit` still lists it. `docs/decisions.md`, "Dependency
+  audit (2026-11-05)".
 
 ## Stage 1 (2F): the result, and two questions
 
@@ -111,6 +116,13 @@ Eval key spend: $5.7934 of the $8.00 cap. No further run is planned.
    one golden statistic from 2026-10-26 ("5 of 72"). Keeping the comment
    from the model means changing how `src/lib/anthropic.ts` reads the file.
 
+3. **New. zod 4.** zod 3 has a high advisory (memory exhaustion on
+   oversized collections). Here it parses only the model's replies, never
+   a reader's input, and `max_tokens` caps those. The fix is zod 4.6.6 or
+   later, a major upgrade that touches `src/lib/judge/schema.ts`, frozen
+   under (b). `docs/decisions.md`, "Dependency audit (2026-11-05)", which
+   lists all 16 packages `npm audit` still names.
+
 ## Content and philosophy: (e)
 
 ### The objection voices (v3)
@@ -184,31 +196,18 @@ Candidates, figures and screenshots are in `docs/phase3-styleguide/`.
 
 The choice is Arthur's: one of these, or loosen a constraint.
 
-## Dependencies (New)
-
-`docs/decisions.md`, "Dependency audit (2026-11-05)", lists all 16
-packages `npm audit` still names, with what each reaches.
-
-1. **zod 4.** zod 3 has a high advisory (memory exhaustion on oversized
-   collections). Here it parses only the model's replies, never a
-   reader's input, and `max_tokens` caps those. The fix is zod 4.6.6 or later, a
-   major upgrade that touches the frozen judge schema
-   (`src/lib/judge/schema.ts`), so it needs Arthur's say-so and its own
-   review.
-2. **In-range updates.** `follow-redirects` (high; shipped under
-   `posthog-node` but never called), `vite` and `vitest` (tests only) have
-   fixed releases within their parents' ranges. That would be one small
-   pull request with no new dependency. Say if you want it.
-
 ## Sample activity (New)
 
 `docs/sample-activity.md` has the design.
 
-1. **Content changes now end the run.** The motions and the argument
-   passages are fixed for the life of a run. Rewording, adding or retiring
-   a motion, or editing a passage, halts the schedule, and the only way on
-   is teardown and a new run, which breaks every existing sample link.
-   This bears on the content items above: say before changing either.
+1. **Content changes now end the run.** The motions, the argument
+   passages and the quiz are fixed for the life of a run. Rewording,
+   adding or retiring a motion, or editing a passage, halts the schedule.
+   So does shipping Quiz v2: the generator replays the live quiz questions
+   and `scoreQuiz` to give each sample its school, and the spot checks
+   compare those schools. The only way on is teardown and a new run,
+   which breaks every existing sample link. This bears on the content
+   items above: say before changing any of them.
 2. **A referrer from a sample page.** A genuine page opened from a sample
    page by a full page load reports the sample page's address to PostHog
    as its referrer, as any page on the site would. No sample event is
@@ -251,7 +250,11 @@ packages `npm audit` still names, with what each reaches.
   anything)", but the site header's links have no icons, triangle or
   otherwise. The preview offers icons that would be added, not swapped
   (`src/components/phase3/NavIcons.tsx`).
-- **New. The sample workflow's actions.** `actions/checkout@v4` and
-  `actions/setup-node@v4` target Node 20, which GitHub now runs on Node 24
-  with a warning (`.github/workflows/sample-activity.yml`). Moving both to
-  their Node 24 releases needs no decision; it is next on my list.
+- **New, needing no decision; mine to do next:**
+  - the sample workflow's `actions/checkout@v4` and `actions/setup-node@v4`
+    target Node 20, which GitHub now runs on Node 24 with a warning
+    (`.github/workflows/sample-activity.yml`);
+  - `follow-redirects` (high; shipped under `posthog-node` but never
+    called), `vite` and `vitest` (tests only) have fixed releases within
+    their parents' ranges: one small pull request, no new dependency
+    (`docs/decisions.md`, "Dependency audit (2026-11-05)").

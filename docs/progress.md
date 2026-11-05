@@ -445,9 +445,12 @@ with read-only SQL; pages fetched from sophecs.com through Vercel.
 - **Full run**, workflow run 41965190975, with Arthur's "run full" of
   2026-11-05.
   - The job ran 04:01:34 to 04:11:10 UTC: 508.4 s of writing, about 55
-    rows a second and 12.5 auth users a second.
+    rows a second and, as the log reports it, 12.5 auth users a second.
   - 36 checks, none failed. Exact duplicate arguments 0.3%, under the 5%
-    check. The lock was released, and the run reads `complete`, stage
+    check (read back: 15 of the 8,297 texts repeat one already written).
+    That is above the 0.02% `docs/sample-activity.md` gave for the start;
+    re-measured with two other seeds it is 0.2% at the start and 3% after
+    a year, so the doc's estimate of a halt after about 16 months stands. The lock was released, and the run reads `complete`, stage
     `full`.
 - **Read back at 04:11:51 UTC** (reading answers rechecked at 04:16):
   - Sample rows:
@@ -456,7 +459,7 @@ with read-only SQL; pages fetched from sophecs.com through Vercel.
     | --- | --- |
     | profiles, and auth users (all banned, none signed in) | 3,278 |
     | quiz_results | 8,500 |
-    | debates, all template verdicts | 8,297 |
+    | debates, all template verdicts (465 of them revisions) | 8,297 |
     | challenges | 328 |
     | exchanges / turns | 492 / 1,700 |
     | reading_responses | 2,398 |
@@ -472,8 +475,9 @@ with read-only SQL; pages fetched from sophecs.com through Vercel.
 - **`/table` at 04:15 UTC** shows all three schools: Utilitarianism 150
   arguments (average fidelity 6.3), Virtue Ethics 90 (6.2), Stoicism 171
   (6.0), with the sample note.
-- From here the schedule extends the run every six hours, at 41 minutes
-  past 06, 12, 18 and 00 UTC.
+- From here the schedule is set to extend the run every six hours, at 41
+  minutes past 06, 12, 18 and 00 UTC. No extension had run when this was
+  written.
 - The job's annotations: `actions/checkout@v4` and `actions/setup-node@v4`
   target Node 20, which GitHub now runs on Node 24 with a deprecation
   warning. Moving both to their Node 24 majors is a small change for a
@@ -491,8 +495,10 @@ are in each pull request.
   (6,912 and 6,480 inputs compared in review). Production deploy
   `dpl_9uzqXfEnBbwJwtLBwG9Tk6PwGzSd`, Ready (read from Vercel).
 - #65 merged as `4703f8e`: Next.js 15.5.24 to 15.5.29 for its critical
-  and high advisories, and PostHog started with product tours off, so the
-  extension bundling a vulnerable DOMPurify does not load.
+  and high advisories; and PostHog started with product tours off, so the
+  extension bundling a vulnerable DOMPurify is not loaded (mitigated, not
+  fixed: a tour preview, which nothing in the site starts, could still
+  load it, and `npm audit` still lists it).
   `docs/decisions.md`, "Dependency audit (2026-11-05)", lists the 16
   packages `npm audit` still names. Production deploy
   `dpl_CVTRWBdd7ma7Bb7MzYa3QyiwCgH6`, Ready.
