@@ -23,7 +23,15 @@ that deploy: sample teardown first, the launch, then a fresh run.
 **Preview deployments share production's database** (the same Supabase
 project), so a preview built with the flag would write v2 quiz results
 and new-school debates into production tables. Gate 2 asks how to handle
-that before anything that writes is built.
+that before anything that writes is built. Checked in Vercel on
+2026-11-05: the Supabase URL, anon key and service-role key are set for
+Production and Preview alike. `ANTHROPIC_API_KEY`, `KILL_SWITCH_JUDGE`,
+`JUDGE_ALLOWLIST_USER_IDS`, `AI_MONTHLY_BUDGET_USD` and the PostHog
+project key are set for Production only. On a preview, then, a call to
+the judge or the screener has no key and fails without reaching a model,
+and no analytics are sent. A preview can show the arena but not judge an
+argument in it; step 5 is tested locally, or on a preview only once
+Gate 3 says how.
 
 ## Steps
 
