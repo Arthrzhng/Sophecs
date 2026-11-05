@@ -16,12 +16,12 @@ plan for the six schools, in `docs/stage5-plan.md`.
   5, which is migration 0025 for the SQL Editor.
 - **The Node 24 actions and the in-range dependency updates** are merged
   (#76).
-- **Stage 5.** The plan (#78) and step 1, the `SIX_SCHOOLS` build flag
-  (#79), are merged. Step 2, the pages that only read, is in two pull
-  requests: 2a, the school pages, lessons and table, and 2b, Today's view
-  from elsewhere. Production shows the three live schools exactly as
-  before; a preview deployment shows six, because `SIX_SCHOOLS=1` is set
-  in Vercel for Preview only. Steps 3 to 6 wait on the gates below.
+- **Stage 5.** The plan (#78), step 1, the `SIX_SCHOOLS` build flag
+  (#79), and step 2, the pages that only read (#80, the school pages,
+  lessons and table; #81, Today's view from elsewhere), are merged.
+  Production shows the three live schools exactly as before; a preview
+  deployment shows six, because `SIX_SCHOOLS=1` is set in Vercel for
+  Preview only. Steps 3 to 6 wait on the gates below.
 
 To see the six schools, open any preview deployment built after 19:11
 UTC on 2026-11-05: `/`, `/s/confucian`, `/s/ubuntu`, `/s/buddhist`,
@@ -36,7 +36,7 @@ UTC on 2026-11-05: `/`, `/s/confucian`, `/s/ubuntu`, `/s/buddhist`,
    `supabase/migrations/0026_ai_spend_since.sql` on branch `judge-caps`.
 2. **Migration 0025, dropping the five unreachable insert policies.**
    Posted for you to run in the SQL Editor. Not run: all five were still
-   present at 19:12 UTC. I read it back once you have.
+   present at 19:41 UTC. I read it back once you have.
    `supabase/migrations/0025_drop_unreachable_policies.sql`, rollback in
    `supabase/rollback/`.
 3. **Stage 5, Gate 1: a migration for quiz v2's results**, before step 3.
@@ -152,7 +152,7 @@ Mine to do, or for your information:
   it; `CONTRIBUTING.md` and `docs/review-charter.md` say it in full.
 - **GitHub's schedule has run one of the sample workflow's three slots
   today.** The 06:41 UTC slot never ran, the 12:41 one started at 14:57,
-  and the 18:41 one had not started at 19:30. So the first run on the
+  and the 18:41 one had not started at 19:41. So the first run on the
   Node 24 actions and #72's engine is still to come. Scheduled runs on
   GitHub are best effort; if extending the run on time matters, a
   manual run from the Actions tab does the same thing.

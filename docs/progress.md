@@ -600,3 +600,13 @@ as Ready.
   landing page and in the footer. Its preview, the first flag-on Vercel
   build, served `/s/ubuntu` with "The other five". Deploy
   `dpl_Ch8vXgMsrppWuKuLxALpafN7VUNb`.
+- #81 merged as `132a7bd`: step 2b. On a flag-on build Today offers the
+  week's view from elsewhere after step 4, and each of the six passages
+  has a page; the before and after pages still number their pair 1 and 2
+  of 2. Review found the passages keyed on the three being drafts, which
+  would have hidden them at launch; they are keyed on the flag. Deploy
+  `dpl_5uMbDJm478A2ZAtxYcBh9m4fGLVS`.
+- Not done: migration 0025 is still with Arthur (all five policies
+  present at 19:41 UTC), #71 waits on his yes to 0026, and the sample
+  workflow's 18:41 UTC run had not started by 19:41. Checkpoint B
+  (`docs/checkpoint-b.md`) lists everything open.
