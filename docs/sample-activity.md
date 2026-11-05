@@ -36,6 +36,7 @@ messaging, so a sample account is seen in fewer places than the word
 | `/r/<id>` (result) | anyone with the link | The Sample label, "A sample account's result", the stranger's view only. Page title "<School> · Sample". |
 | its card (`opengraph-image`, `card.png`) | anyone shown the link | A "Sample" mark above the quotation. |
 | `/c/<id>` (challenge) | anyone with the link | The Sample label, "A sample account's challenge"; "Take the quiz" goes to `/quiz` without accepting it. Page title "A sample account's challenge". |
+| its link preview | anyone shown the link | The challenger's result card (`/r/<id>/opengraph-image`) with its "Sample" mark; no image if the challenger's result is not a sample, or if the card's lookup fails. |
 | `/class/<code>` | the class owner only | Never a sample: a reader's class cannot hold one, and the page leaves out any sample member whatever the data says. |
 | `/counterpart/<id>` | the two participants only | Sample exchanges are between sample accounts only. |
 | `/me` | the reader only | Nothing of a sample's. |

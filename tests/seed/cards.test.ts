@@ -46,15 +46,16 @@ describe("link previews of sample pages", () => {
 
   it("give a sample challenge a preview image that carries the mark", async () => {
     const { sampleMetadata } = await import("../../src/lib/sample");
-    const m = sampleMetadata("A sample account's challenge · Sophecs", "/r/R1/opengraph-image");
-    expect(m.openGraph.images?.[0].url).toBe("/r/R1/opengraph-image");
+    const m = sampleMetadata("A sample account's challenge · Sophecs", { url: "/r/R1/opengraph-image", alt: "A sample account's result card" });
+    expect(m.openGraph.images?.[0]).toMatchObject({ url: "/r/R1/opengraph-image", alt: "A sample account's result card", width: 1200, height: 630 });
     expect(m.twitter.images?.[0].url).toBe("/r/R1/opengraph-image");
     // Without one, no image at all rather than an unmarked one.
     expect(sampleMetadata("x").openGraph.images).toBeUndefined();
     const { readFileSync } = await import("node:fs");
     const page = readFileSync("src/app/c/[id]/page.tsx", "utf8");
-    // The challenger's result card, only when that result is a sample...
-    expect(page).toMatch(/challenge\.challengerIsSample \? `\/r\/\$\{challenge\.challengerResultId\}\/opengraph-image` : undefined/);
+    // The challenger's result card, only when that result is a sample
+    // (tests/seed/challenge-preview.test.ts calls generateMetadata)...
+    expect(page).toMatch(/challengerIsSample: Boolean\(result\.is_sample\)/);
     // ...whose image draws the mark from the result's own marker.
     const og = readFileSync("src/app/r/[id]/opengraph-image.tsx", "utf8");
     expect(og).toMatch(/\.select\("school, is_sample"\)/);

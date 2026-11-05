@@ -20,7 +20,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!challenge?.isSample) return { title: "You've been challenged · Sophecs" };
   return sampleMetadata(
     "A sample account's challenge · Sophecs",
-    challenge.challengerIsSample ? `/r/${challenge.challengerResultId}/opengraph-image` : undefined
+    challenge.challengerIsSample
+      ? { url: `/r/${challenge.challengerResultId}/opengraph-image`, alt: "A sample account's result card" }
+      : undefined
   );
 }
 

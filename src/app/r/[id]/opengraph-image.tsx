@@ -14,8 +14,12 @@ export const contentType = "image/png";
 
 export default async function OGImage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [spectral, spectralItalic, plexSans] = await loadCardFonts();
 
+  // Without a database (a local build with no keys) the card falls back to
+  // Stoicism, unmarked. With one, a result the lookup does not return (a
+  // wrong id, a sample removed by teardown, a failed read) gets no image
+  // and is not cached, rather than a default card that could be the wrong
+  // school, or a sample's without its Sample mark, cached for a year.
   let school: SchoolId = "stoicism";
   let sample = false;
 
@@ -26,11 +30,12 @@ export default async function OGImage({ params }: { params: Promise<{ id: string
       .select("school, is_sample")
       .eq("id", id)
       .single();
-    if (data) {
-      school = data.school as SchoolId;
-      sample = Boolean(data.is_sample);
-    }
+    if (!data) return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+    school = data.school as SchoolId;
+    sample = Boolean(data.is_sample);
   }
+
+  const [spectral, spectralItalic, plexSans] = await loadCardFonts();
 
   const content = getSchool(school);
 
