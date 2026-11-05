@@ -127,30 +127,48 @@ describe("execute", () => {
     expect(sampleRows(db)).toBe(total(dataset));
   });
 
-  it("refuses a canary on a run that has had its full stage, which could lift a halt on a partial check", async () => {
+  it("refuses a canary on a run that has had its full stage, or is halted, since it checks only its first cohorts", async () => {
     const db = freshDb();
-    await execute({ dataset, plan, adapter: db, ...quiet });
+    await execute({ dataset, plan, adapter: db, ...quiet, cohortLimit: 30 });
     await db.updateRun(plan.runId, { status: "failed", last_error: `${HALTED}: spot check: debates` });
-    await expect(execute({ dataset, plan, adapter: db, ...quiet, cohortLimit: 25, endHalted: VALIDATING })).rejects.toThrow(/has had its full stage; a canary cannot be run on it/);
+    // A smaller canary on a halted canary-stage run.
+    await expect(execute({ dataset, plan, adapter: db, ...quiet, cohortLimit: 5, endHalted: VALIDATING })).rejects.toThrow(/is halted; a canary cannot be run on it/);
     expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: `${HALTED}: spot check: debates`, lock_token: null });
+    // Once the full stage has passed, no canary at all.
+    await db.updateRun(plan.runId, { status: "running", last_error: null });
+    await execute({ dataset, plan, adapter: db, ...quiet });
+    await expect(execute({ dataset, plan, adapter: db, ...quiet, cohortLimit: 25 })).rejects.toThrow(/has had its full stage; a canary cannot be run on it/);
+    expect((await db.getRun(plan.runId))!.lock_token).toBeNull();
   });
 
-  it("records a validation only on the run as execute left it, and under its lock", async () => {
+  it("keeps the run locked from the end of its writes until the validation is recorded", async () => {
     const db = freshDb();
     const r = await execute({ dataset, plan, adapter: db, ...quiet, endHalted: VALIDATING });
     expect(r.heldWith).toBe(VALIDATING);
-    // A teardown, or another process, got there first.
-    await db.updateRun(plan.runId, { status: "torn_down", last_error: null });
-    expect(await finishValidation(db, r, [])).toBe(false);
-    expect((await db.getRun(plan.runId))!.status).toBe("torn_down");
-    // Another process holds the lock.
-    await db.updateRun(plan.runId, { status: "failed", last_error: VALIDATING, lock_token: "other", locked_at: new Date().toISOString() });
-    expect(await finishValidation(db, r, [])).toBe(false);
-    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: VALIDATING, lock_token: "other" });
-    // As execute left it: recorded, and the lock is free again.
-    await db.updateRun(plan.runId, { lock_token: null, locked_at: null });
+    expect(r.lockToken).toBeTruthy();
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: VALIDATING, lock_token: r.lockToken });
+    // Another writer, or a teardown, is refused while it is validated.
+    await expect(execute({ dataset, plan, adapter: db, ...quiet, endHalted: VALIDATING })).rejects.toThrow(/locked by another process/);
+    await expect(teardown(db, plan.runId)).rejects.toThrow(/lock/);
+    // The result is recorded under that lock, which is then released.
     expect(await finishValidation(db, r, ["spot check: debates"])).toBe(true);
     expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: `${HALTED}: spot check: debates`, lock_token: null });
+  });
+
+  it("records nothing when the kept lock was taken, and leaves the halt", async () => {
+    const db = freshDb();
+    const r = await execute({ dataset, plan, adapter: db, ...quiet, endHalted: VALIDATING });
+    // Broken as stale and taken by another process.
+    await db.updateRun(plan.runId, { lock_token: "other", locked_at: new Date().toISOString() });
+    expect(await finishValidation(db, r, [])).toBe(false);
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: VALIDATING, lock_token: "other" });
+  });
+
+  it("without endHalted, releases its lock and keeps none", async () => {
+    const db = freshDb();
+    const r = await execute({ dataset, plan, adapter: db, ...quiet });
+    expect(r.lockToken).toBeNull();
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "complete", lock_token: null });
   });
 
   it("stops cleanly when cancelled and resumes", async () => {

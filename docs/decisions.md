@@ -2934,12 +2934,13 @@ fixes. It found nothing blocking, and four things to fix:
   run rather than leaving the schedule to try again every six hours,
   which is what `docs/sample-activity.md`, "Stop conditions", already
   said it did. `scripts/seed-production.ts` does the same, and a canary
-  cannot be run on a run that has had its full stage, so a run by hand
-  from the command line cannot lift a halt either. The result is recorded
-  under the run's lock and only on the run as the writes left it, so a
-  teardown in between is not undone. An error from the writes goes to
-  `last_error`, and the public log gets a line of its own, since the
-  message can name a row.
+  cannot be run on a halted run or one that has had its full stage, so a
+  run by hand from the command line cannot lift a halt either. The run's
+  lock is kept from the end of the writes until the validation's result
+  is recorded, so no teardown or other writer can come in between; if it
+  is lost, nothing is recorded and the halt stays. An error from the
+  writes goes to `last_error`, and the public log gets a line of its
+  own, since the message can name a row.
 - **The 5% duplicate check ran after the writes.** The rate is the
   plan's own, so it now runs with the dry-run checks: an extension that
   would cross it is refused before anything is written.

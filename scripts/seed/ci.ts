@@ -6,7 +6,7 @@ import type { Adapter } from "./adapter";
 import { buildPlan, describe } from "./plan";
 import { DEFAULTS, type GenConfig } from "./generate";
 import { contentTopics } from "./topics";
-import { execute, finishValidation, isHalted, recordedOnRun, StopError, VALIDATING } from "./engine";
+import { execute, finishValidation, isHalted, recordedOnRun, releaseHeld, StopError, thrownWhileWriting, VALIDATING } from "./engine";
 import { validate } from "./validate";
 import { dryRun } from "./dryrun";
 import { GuardError } from "./env";
@@ -131,10 +131,13 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
     result = await execute({ dataset, plan, adapter, cohortLimit, log, batchSize: o.batchSize ?? 250, authConcurrency: 4, breakStaleLock: true, endHalted: VALIDATING });
   } catch (err) {
     // An error from the writes can name row ids, and this log is public:
-    // execute has written it to seed_runs.last_error, which only the server
-    // role reads, so the log gets a line of its own.
-    if (!recordedOnRun(err)) throw err;
-    const line = `the run ${err instanceof StopError ? "stopped on a refusal and is halted" : "failed while writing"}; seed_runs.last_error has the detail`;
+    // execute writes it to seed_runs.last_error, which only the server role
+    // reads, so the log gets a line of its own, whether or not that write
+    // succeeded.
+    if (!thrownWhileWriting(err)) throw err;
+    const line = `the run ${err instanceof StopError ? "stopped on a refusal" : "failed while writing"}; ${
+      recordedOnRun(err) ? "seed_runs.last_error has the detail" : "the detail could not be recorded on the run"
+    }`;
     log(line);
     throw err instanceof StopError ? new StopError(line) : new Error(line);
   }
@@ -143,14 +146,25 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
       result.authUsersPerSecond ? `, ${result.authUsersPerSecond.toFixed(1)} auth users/s` : ""
     })`
   );
-  const v = await validate(adapter, dataset, result.before, { cohortLimit });
-  const checks = [...v.checks, dupCheck];
-  const ok = checks.every((c) => c.ok);
-  for (const c of checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}`);
-  await record({ written: result.written, seconds: result.seconds, ok, checks });
-  if (!(await finishValidation(adapter, result, checks.filter((c) => !c.ok).map((c) => c.name))))
-    log("the run changed while it was validated (another process or a teardown); it is left as that left it");
-  else if (!ok)
+  // The lock execute kept is released by finishValidation, or here if the
+  // validation throws; the run then stays halted, "validation not finished".
+  let ok: boolean;
+  let recorded: boolean;
+  try {
+    const v = await validate(adapter, dataset, result.before, { cohortLimit });
+    const checks = [...v.checks, dupCheck];
+    ok = checks.every((c) => c.ok);
+    for (const c of checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}`);
+    await record({ written: result.written, seconds: result.seconds, ok, checks });
+    recorded = await finishValidation(adapter, result, checks.filter((c) => !c.ok).map((c) => c.name));
+  } finally {
+    await releaseHeld(adapter, result);
+  }
+  if (!recorded) {
+    log("the validation's result could not be recorded (the run's lock was lost); the run stays halted until a full stage, run by hand, passes");
+    return { ok: false, outcome: "written", runId: plan.runId };
+  }
+  if (!ok)
     log("validation failed: the run is halted, and the schedule writes nothing until a full stage passes (docs/sample-activity.md, \"Stop conditions\"); details in seed_runs.last_report");
   return { ok, outcome: "written", runId: plan.runId };
 }

@@ -195,7 +195,7 @@ describe("the scheduled workflow's path", () => {
     const err = await runCi({ mode: "extend", adapter: db, seed: SEED, projectRef: "tekifezydjlgxgndkxul", now: () => at(24 * 7), log: (l) => lines.push(l), config: SMALL, batchSize: 100 }).catch((e: Error) => e);
     // The public log and the error main() prints carry no row id; the run
     // keeps the detail.
-    expect((err as Error).message).toBe("the run stopped on a refusal and is halted; seed_runs.last_error has the detail");
+    expect((err as Error).message).toBe("the run stopped on a refusal; seed_runs.last_error has the detail");
     for (const text of [...lines, (err as Error).message]) {
       expect(text).not.toMatch(/refusing/);
       for (const id of ids) expect(text).not.toContain(id);
@@ -218,27 +218,45 @@ describe("the scheduled workflow's path", () => {
     expect((await step(db, "extend", 6)).out).toMatchObject({ ok: false, outcome: "halted" });
   });
 
-  it("does not undo a teardown made while the run was being validated", async () => {
+  it("refuses a teardown while the run is being validated, then records the validation", async () => {
     const db = freshDb();
     await step(db, "canary", 0);
     await step(db, "full", 1);
     const run = (await db.listRuns())[0];
-    // Torn down by hand once the rows are written, mid-validation.
     const scan = db.scan.bind(db);
-    let done = false;
+    let started = false;
+    let tried: unknown = null;
     const spy = vi.spyOn(db, "scan").mockImplementation(async (...args: Parameters<MemoryAdapter["scan"]>) => {
       const written = Date.parse((await db.getRun(run.id))!.window_to) === Date.parse(at(24 * 7));
-      if (written && !done && args[0] === "debates") {
-        done = true;
-        await teardown(db, run.id);
+      if (written && !started && args[0] === "debates") {
+        started = true;
+        tried = await teardown(db, run.id).catch((e: Error) => e);
       }
       return scan(...args);
     });
     const out = await step(db, "extend", 24 * 7);
     spy.mockRestore();
-    expect(out.lines.join("\n")).toContain("the run changed while it was validated");
-    expect((await db.getRun(run.id))!.status).toBe("torn_down");
-    expect((await step(db, "extend", 24 * 8)).out.outcome).toBe("idle");
+    expect(String((tried as Error).message)).toMatch(/lock/);
+    expect(out.out).toMatchObject({ ok: true, outcome: "written" });
+    expect((await db.getRun(run.id))!).toMatchObject({ status: "complete", last_error: null, lock_token: null });
+  });
+
+  it("resumes, on the next schedule, a run a database error stopped mid-write", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    const items = db.items.bind(db);
+    const spy = vi.spyOn(db, "items").mockImplementation(async (...args: Parameters<MemoryAdapter["items"]>) => {
+      if ((await db.getRun(run.id))!.lock_token) throw new Error("connection reset");
+      return items(...args);
+    });
+    await expect(step(db, "extend", 24 * 7)).rejects.toThrow(/^the run failed while writing; seed_runs.last_error has the detail$/);
+    spy.mockRestore();
+    expect((await db.getRun(run.id))!).toMatchObject({ status: "failed", last_error: "connection reset", lock_token: null });
+    const before = samples(db, "debates");
+    expect((await step(db, "extend", 24 * 8)).out).toMatchObject({ ok: true, outcome: "written" });
+    expect(samples(db, "debates")).toBeGreaterThan(before);
   });
 
   it("refuses an extension that would cross the duplicate limit before writing anything", async () => {

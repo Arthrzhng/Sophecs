@@ -466,13 +466,14 @@ Three things halt it (`scripts/seed/engine.ts`, `HALT_PREFIX`):
 
 A run by hand on a halted run keeps the halt while it writes, and if it
 fails partway, the halt stays in front of the new error; only its
-passing validation lifts it, and a canary cannot be run on a run that
-has had its full stage, since it validates only its first cohorts. The
-validation's result is recorded under the run's lock and only if the
-run is as the writes left it, so a teardown or another process's run in
-between is not written over. The duplicate check runs with the dry-run
-checks, before anything is written, so an extension that would cross 5%
-is refused rather than written and halted.
+passing validation lifts it, and a canary cannot be run on a halted run
+or one that has had its full stage, since it validates only its first
+cohorts. A run that writes keeps the run's lock from the end of its
+writes until its validation's result is recorded, so no teardown or
+other process can write to the run in between; if that lock is lost,
+nothing is recorded and the halt stays. The duplicate check runs with
+the dry-run checks, before anything is written, so an extension that
+would cross 5% is refused rather than written and halted.
 
 Everything else resumes. A database error during the writes, past the
 engine's retries, leaves the run `failed` but not halted, and the next
@@ -480,15 +481,18 @@ scheduled run resumes it. A runner lost during the writes (the timeout,
 a cancel, a lost machine) leaves the run `running` with its lock, which
 the next scheduled run clears once it is 15 minutes old, then resumes. A
 runner lost after the writes leaves the run halted, "validation not
-finished", as above. `tests/seed/ci.test.ts` and
+finished", as above. The schedule resumes only an `extend`: a `canary`
+or `full` stage that fails or is lost leaves the run short of its full
+stage, and the schedule does nothing (a green job) until `full` is run
+by hand again. `tests/seed/ci.test.ts` and
 `tests/seed/engine.test.ts` cover each case. A run that keeps failing
 shows as failed runs in the Actions tab, and GitHub emails the account
 that set the schedule.
 
 The workflow's log is public, so an error from the writes, which can
 name a row, is logged as a line of its own ("the run stopped on a
-refusal and is halted" or "the run failed while writing"), and the
-detail goes to `seed_runs.last_error`.
+refusal" or "the run failed while writing"), and the detail goes to
+`seed_runs.last_error`, or the line says it could not be recorded.
 
 ## Limits
 
@@ -501,7 +505,8 @@ detail goes to `seed_runs.last_error`.
 - Exact duplicates rise once a composition list runs out. Measured in
   review on 2026-11-04 at production volumes: 0.02% at the start, 0.28%
   after 90 days, 3.29% after a year and 9.85% after two, so the 5% check
-  halts the run after about 16 months unless the passages grow. Making
+  refuses every extension from about 16 months on, before writing
+  anything, unless the passages grow. Making
   the plan takes 14 s at the start and about 3 minutes after a year.
   Re-measured on 2026-11-05 with two other seeds and production's base
   window: 0.2% at the start, 0.5% and 0.7% after 90 days, 3% after a
