@@ -1,5 +1,5 @@
 import { isoWeekNumber } from "./weekly-motion";
-import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "./types";
+import { SHOWN_SCHOOL_IDS, type SchoolId } from "./types";
 
 /**
  * The school table's arithmetic, kept pure so it is testable without a
@@ -76,7 +76,7 @@ export function schoolChanges(
   end: Date
 ): SchoolChangeCounts {
   const counts = Object.fromEntries(
-    PUBLISHED_SCHOOL_IDS.map((s) => [s, { joined: 0, left: 0 }])
+    SHOWN_SCHOOL_IDS.map((s) => [s, { joined: 0, left: 0 }])
   ) as SchoolChangeCounts;
 
   for (const entry of entries) {
@@ -102,7 +102,9 @@ export function rankSchools(
   judged: JudgedArgument[],
   changes: SchoolChangeCounts
 ): SchoolTableRow[] {
-  const tallies = PUBLISHED_SCHOOL_IDS.map((school) => {
+  // A row per school this build shows, so a SIX_SCHOOLS build has six,
+  // the three new ones unranked until someone argues for them.
+  const tallies = SHOWN_SCHOOL_IDS.map((school) => {
     const marks = judged
       .filter((a) => a.school === school && a.fidelity != null)
       .map((a) => a.fidelity as number);

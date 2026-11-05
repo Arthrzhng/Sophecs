@@ -16,7 +16,7 @@ import { splitModule } from "@/lib/module-readings";
 import { isoWeekRange, rankSchools, type JudgedArgument } from "@/lib/school-table";
 import { todayUTC } from "@/lib/streak";
 import { readAll } from "@/lib/read-all";
-import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "@/lib/types";
+import { SHOWN_SCHOOL_IDS, type SchoolId } from "@/lib/types";
 
 export const metadata = {
   title: "Today · Sophecs",
@@ -59,7 +59,7 @@ export default async function TodayPage() {
   const modules: LessonsCardModule[] = getAllModules()
     .sort(
       (a, b) =>
-        PUBLISHED_SCHOOL_IDS.indexOf(a.school) - PUBLISHED_SCHOOL_IDS.indexOf(b.school)
+        SHOWN_SCHOOL_IDS.indexOf(a.school) - SHOWN_SCHOOL_IDS.indexOf(b.school)
     )
     .map((m) => ({
       id: m.id,

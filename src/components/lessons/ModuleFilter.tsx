@@ -7,7 +7,7 @@ import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
 import { loadReached, progressAction, progressChip } from "@/lib/module-progress";
 import { useViewerId } from "./useViewerId";
 import type { SchoolId } from "@/lib/types";
-import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
+import { SHOWN_SCHOOL_IDS } from "@/lib/school-registry";
 
 export interface ModuleCard {
   id: string;
@@ -23,7 +23,8 @@ export interface ModuleCard {
 
 type Filter = "all" | SchoolId;
 
-const SCHOOLS = PUBLISHED_SCHOOL_IDS;
+// A chip per school this build shows: six on a SIX_SCHOOLS build.
+const SCHOOLS = SHOWN_SCHOOL_IDS;
 
 function Tick() {
   return (

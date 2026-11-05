@@ -6,7 +6,7 @@ import { getAllTopicFiles } from "@/lib/topics";
 import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
 import { authorList, moduleNumbers } from "@/lib/lesson-index";
-import { PUBLISHED_SCHOOL_IDS } from "@/lib/footnotes";
+import { SHOWN_SCHOOL_IDS } from "@/lib/school-registry";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
 
@@ -35,7 +35,7 @@ export default function LessonsPage() {
   // nothing behind it.
   const modules = getAllModules().sort(
     (a, b) =>
-      PUBLISHED_SCHOOL_IDS.indexOf(a.school) - PUBLISHED_SCHOOL_IDS.indexOf(b.school)
+      SHOWN_SCHOOL_IDS.indexOf(a.school) - SHOWN_SCHOOL_IDS.indexOf(b.school)
   );
   const numbers = moduleNumbers(modules);
 
@@ -90,7 +90,7 @@ export default function LessonsPage() {
               body="Until they land, the case for each school is the thing worth reading — each one is a few hundred words with its own primary source."
               action={
                 <div className="flex flex-wrap items-center gap-6 text-sm">
-                  {PUBLISHED_SCHOOL_IDS.map((school) => (
+                  {SHOWN_SCHOOL_IDS.map((school) => (
                     <Link
                       key={school}
                       href={`/s/${school}`}

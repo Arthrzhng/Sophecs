@@ -3,7 +3,8 @@ import { LandingQuestion } from "@/components/quiz/LandingQuestion";
 import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { getSchool } from "@/lib/schools";
 import { getAllTopicFiles } from "@/lib/topics";
-import { PUBLISHED_SCHOOL_IDS } from "@/lib/types";
+import { SHOWN_SCHOOL_IDS } from "@/lib/types";
+import { countWord } from "@/lib/count-word";
 
 // Static, and it stays static: every string here comes from a content file
 // read at build time, the question is a client component (which does not
@@ -93,13 +94,14 @@ export default function LandingPage() {
         </ol>
 
         <section className="mt-12 border-t-2 border-rule pt-10">
+          {/* Counted from the list, so a SIX_SCHOOLS build says six. */}
           <h2 className="text-lg font-extrabold tracking-tight text-ink">
-            The three schools
+            {`The ${countWord(SHOWN_SCHOOL_IDS.length)} schools`}
           </h2>
           {/* Real quotation with real citation, which is the only thing on
               this page that shows what the schools actually say. */}
           <ul className="mt-6 grid gap-6 sm:grid-cols-3">
-            {PUBLISHED_SCHOOL_IDS.map((id) => {
+            {SHOWN_SCHOOL_IDS.map((id) => {
               const school = getSchool(id);
               return (
                 <li key={id} className="rounded-card border-2 border-rule bg-surface p-5">

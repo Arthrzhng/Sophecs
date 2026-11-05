@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { useViewerId } from "@/components/lessons/useViewerId";
 import { loadReached } from "@/lib/module-progress";
+import { countWord } from "@/lib/count-word";
 
 export interface LessonsCardModule {
   id: string;
@@ -69,7 +70,8 @@ export function LessonsCard({ modules }: { modules: LessonsCardModule[] }) {
       ) : (
         <>
           <p className="mt-2 max-w-[34ch] text-sm leading-relaxed text-ink-mid">
-            All three modules read.
+            {/* Counted, so a SIX_SCHOOLS build, with six modules, says six. */}
+            {`All ${countWord(modules.length)} modules read.`}
           </p>
           <p className="mt-4">
             <ChunkyLink href="/lessons" tone="paper" className="w-full border-2 border-rule-strong">
