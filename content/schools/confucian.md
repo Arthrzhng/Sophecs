@@ -38,7 +38,7 @@ share_lines:
     Apparently I judge an AI by what it does to the relationships around
     it, not by what it scores. Sophecs says that is Confucian.
   - >-
-    Ten questions about AI and I kept asking the same one: who owes what
+    Ten questions about how I decide what's right, and I kept asking the same one: who owes what
     to whom here, and does this system let them pay it. Sophecs called
     that Confucian role ethics.
   - >-

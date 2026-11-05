@@ -9,9 +9,10 @@ item (e)).
 names and the six positions are accepted as drafted, Ubuntu at 0 degrees
 and Buddhist Ethics at 310 included; the weighted options (section 5) are
 accepted; five options are reworded, keeping their schools and vectors
-(section 4, and "The rulings' option edits" below), and the simulation
+(section 3, "The rulings' option edits"), and the simulation
 re-run, with the same results; 1a, 10b, 3d, 5b, 6d, 9a and 8c stay as
 written; and there is no rule-based school. Quiz v2 ships at launch.
+The copy's AI framing is reworded now (section 8).
 
 - The questions, options, school positions and weights are in
   `docs/quiz-v2.json`.
@@ -180,7 +181,8 @@ led with using the AI unseen, which encoded the textbook objection to
 Utilitarianism rather than its reasoning; it now weighs good and harm to
 everyone, the reader's own learning included. It is still the only
 option under which using the tool could come out right, because only a
-sum can favour it; Arthur may want that kept or changed. Neither change
+sum can favour it; Arthur may want that kept or changed (he kept it, on
+2026-11-05). Neither change
 moves an option's school, so the simulation is unchanged.
 
 **1. Your group project is due tomorrow and one person has done almost nothing. What do you do?**
@@ -423,35 +425,61 @@ Ruled on 2026-11-05; see the note at the top. Kept as it was put:
    the same way, but its gloss on him, individuals keeping "their own
    worth and rights", points towards the individual end (section 2).
 
-## 8. Copy at launch
+## 8. The quiz's copy
 
 Arthur, 2026-11-05: "Reword the share lines, site description, SharePage
 and ChallengeInvite away from 'ten questions about AI', to something true
-of v2 (e.g. ten questions about how you decide what's right)." v1 is
-about AI, so the live copy stays true until v2 ships; these lines replace
-it then, behind `SIX_SCHOOLS` with the rest of Phase 3, and are wired in
-Stage 5. Only the AI framing moves: each line keeps the rest of its
-wording, except where that wording was itself about AI (Confucianism's
-"does this system let them pay it", Ubuntu's "the data").
+of v2 (e.g. ten questions about how you decide what's right)."
 
-**Time.** v1's copy says "about eighty seconds". v2's prompts and
-options run to 879 words against v1's 483, so at the same pace it would
-take about two and a half minutes, and slower readers longer. The v2
-copy says "a few minutes".
+**Done now, on the live site.** "Ten questions on how AI should decide
+things" is not true of v1 either: three of v1's ten questions involve AI
+(an algorithm and a loan, an AI tool, a self-driving car) and seven do
+not, the same three in ten as v2. "Ten questions about how you decide
+what's right" is true of both, so the AI framing goes now rather than
+waiting for launch:
 
-| Where | Now (v1) | At launch (v2) |
+| Where | Was | Now |
 | --- | --- | --- |
 | Site description, `src/app/layout.tsx` | Ten questions on how AI should decide things. Find out which school of ethics you actually argue from. | Ten questions about how you decide what's right. Find out which school of ethics you actually argue from. |
-| `src/components/share/SharePage.tsx` | Ten questions on how AI should decide things. No account needed, about eighty seconds. | Ten questions about how you decide what's right. No account needed, a few minutes. |
-| `src/components/share/ChallengeInvite.tsx` | Sophecs asks ten questions about how AI should decide things and places you in one of three schools of ethics, then asks you to argue for yours against a motion. No account needed for the questions, and about eighty seconds. | Sophecs asks ten questions about how you decide what's right and places you in one of six schools of ethics, then asks you to argue for yours against a motion. No account needed for the questions, and a few minutes. |
-| The quiz page's description, `src/app/quiz/page.tsx` | Ten questions that place you in Stoicism, Utilitarianism or Virtue Ethics, by what you already think rather than what you have read. | Ten questions that place you in one of six schools of ethics, by what you already think rather than what you have read. |
-| Share line, `content/schools/stoicism.md` | Ten questions about AI and my answer kept coming back to: that part was never up to me anyway. Sophecs called it Stoic. | Ten questions about how I decide what's right, and my answer kept coming back to: that part was never up to me anyway. Sophecs called it Stoic. |
-| Share line, `content/schools/utilitarianism.md` | Ten questions about AI and I kept landing on the same answer: count everyone it touches, not just the person in front of you. Sophecs says that's Utilitarianism. | Ten questions about how I decide what's right, and I kept landing on the same answer: count everyone it touches, not just the person in front of you. Sophecs says that's Utilitarianism. |
-| Share line, `content/schools/virtue-ethics.md` | Ten questions about AI and my answers all came down to the same thing: what does this make of me. Sophecs says that's Virtue Ethics. | Ten questions about how I decide what's right, and my answers all came down to the same thing: what does this make of me. Sophecs says that's Virtue Ethics. |
-| Share line, `content/schools/confucian.md` | Ten questions about AI and I kept asking the same one: who owes what to whom here, and does this system let them pay it. Sophecs called that Confucian role ethics. | Ten questions about how I decide what's right, and I kept asking the same one: who owes what to whom here, and can they still pay it. Sophecs called that Confucian role ethics. |
-| Share line, `content/schools/buddhist.md` | Ten questions about AI and my answer kept being: who is this hurting, and are we still checking. Sophecs called that Buddhist. | Ten questions about how I decide what's right, and my answer kept being: who is this hurting, and are we still checking. Sophecs called that Buddhist. |
-| Share line, `content/schools/ubuntu.md` | Ten questions about AI and I never once thought the data was only mine. Sophecs called that Ubuntu. | Ten questions about how I decide what's right, and I never once thought the choice was only mine. Sophecs called that Ubuntu. |
+| `src/components/share/SharePage.tsx` | Ten questions on how AI should decide things. No account needed, about eighty seconds. | Ten questions about how you decide what's right. No account needed, about eighty seconds. |
+| `src/components/share/ChallengeInvite.tsx` | Sophecs asks ten questions about how AI should decide things and places you in one of three schools of ethics, ... | Sophecs asks ten questions about how you decide what's right and places you in one of three schools of ethics, ... |
+| The share line that opened "Ten questions about AI", in each of the six `content/schools/*.md` | Ten questions about AI and ... | Ten questions about how I decide what's right, and ... |
 
-The footer's "Ten questions place you in a school of ethics" is true of
-both and stays. The other share lines speak of algorithms and systems,
-which the arena's motions still are, and stay too.
+Only those words change; the rest of each line is as it was. The three
+draft schools' lines are not shown to readers until they are published.
+
+**At launch, with the six schools.** These lines are true of v1 and
+become untrue only when v2 and the six schools ship, so they change in
+the launch work (Stage 5, behind `SIX_SCHOOLS`; front matter such as the
+share lines cannot be switched by a runtime flag, so those edits go in
+the launch merge itself):
+
+- **The time.** v2's prompts and options run to 879 words against v1's
+  483, so at v1's claimed pace v2 takes about two and a half minutes.
+  "About eighty seconds" (`SharePage.tsx`, `ChallengeInvite.tsx`) and
+  "About 80 seconds" (`src/app/page.tsx`) become, as proposed, "a few
+  minutes".
+- **Three schools become six.** `ChallengeInvite.tsx` ("one of three
+  schools"); the quiz page's description (`src/app/quiz/page.tsx`,
+  "Stoicism, Utilitarianism or Virtue Ethics"); the landing page
+  (`src/app/page.tsx`, "the Stoics, the Utilitarians or the Virtue
+  Ethicists", and the heading "The three schools"); and the site's
+  sharing image (`src/app/opengraph-image.tsx`, "Ten scenarios. Three
+  schools.").
+
+**For Arthur, on the phase's decision list (e).** Share lines are shown
+beside a quiz result, so they describe the quiz, and some describe v1's
+questions in particular. None is changed here:
+
+- `content/schools/utilitarianism.md`, "My verdict on the self-driving
+  car problem...": v1's question 8, which v2 does not ask.
+- `content/schools/ubuntu.md`, "my answer to every AI question...", and
+  its first line's "the data was only mine" (proposed: "the choice was
+  only mine").
+- `content/schools/confucian.md`, "does this system let them pay it"
+  (proposed: "can they still pay it"), and its "Apparently I ... an AI"
+  line.
+- `content/schools/stoicism.md`, its "Apparently I ... an AI" line.
+- `content/schools/buddhist.md`, "are we still checking", which means
+  watching an AI after release.
+- The time wording above, "a few minutes".

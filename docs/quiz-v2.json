@@ -1,5 +1,5 @@
 {
-  "what": "Quiz v2 draft for docs/quiz-v2.md: the two axes, the six school positions and the ten questions with their weights. Accepted by Arthur on 2026-11-05 (Checkpoint A, item 15), with five options reworded on the same vectors; not built yet. scripts/simulate-quiz-v2.mjs reads this file. Each option's vector is its school's direction (angle) times that school's weight in radius_by_school.",
+  "what": "Quiz v2 for docs/quiz-v2.md: the two axes, the six school positions and the ten questions with their weights. Accepted by Arthur on 2026-11-05 (Checkpoint A, item 15), with five options reworded on the same vectors; not built yet. scripts/simulate-quiz-v2.mjs reads this file. Each option's vector is its school's direction (angle) times that school's weight in radius_by_school.",
   "axes": {
     "x": {
       "name": "Who it is about",

@@ -41,7 +41,7 @@ share_lines:
     Apparently I care what a system was built to do, not just what it
     scored. Sophecs says that is Buddhist ethics.
   - >-
-    Ten questions about AI and my answer kept being: who is this hurting,
+    Ten questions about how I decide what's right, and my answer kept being: who is this hurting,
     and are we still checking. Sophecs called that Buddhist.
   - >-
     My whole ethics, per this quiz: treat the thing on the other end of
