@@ -9,6 +9,14 @@ export const MAX_TURN_CHARS = 1200;
 export const MAX_SEQ = 4;
 export const LAPSE_DAYS = 14;
 
+// What a reply's author is told while it waits to be screened: on the
+// composer straight after sending, and on the exchange page afterwards.
+// The second sentence is true because of the daily job in
+// src/lib/rescreen.ts (Arthur's ruling of 2026-11-05, (e) 8: "keep the
+// copy accurate").
+export const REPLY_SAVED_COPY =
+  "Your reply is saved and will be delivered once it has been checked. A check that could not run is tried again once a day.";
+
 // Whitespace-insensitive substring test. A student selecting a sentence in
 // the browser picks up whatever line breaks the paragraph happened to have,
 // and a quote that is character-perfect apart from a newline is still the
@@ -45,6 +53,21 @@ export function checkBody(body: string): BodyProblem | null {
 // 1-indexed, so odd is A.
 export function authorForSeq(seq: number, userA: string, userB: string): string {
   return seq % 2 === 1 ? userA : userB;
+}
+
+/**
+ * Whether the reader's own latest reply is saved and not yet screened. Then
+ * the turn is still theirs, and the route would refuse a further reply
+ * until this one is decided. Only the latest reply counts: an older
+ * pending reply of theirs that the exchange has moved past must not lock
+ * them out. `turns` in sequence order.
+ */
+export function latestReplyPending(
+  turns: readonly { author_id: string | null; screen_result: string }[],
+  userId: string
+): boolean {
+  const last = turns[turns.length - 1];
+  return Boolean(last && last.author_id === userId && last.screen_result === "pending");
 }
 
 export function isLapsed(lastTurnAt: string | Date, now: Date = new Date()): boolean {

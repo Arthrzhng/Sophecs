@@ -780,7 +780,7 @@ export default function ArenaPreviewPage() {
         <div className="rounded-panel border-2 border-rule">
           <ExchangeView
             {...exchange}
-            turns={[...FIXTURE_TURNS, FIXTURE_HELD_TURN]}
+            turns={[...FIXTURE_TURNS, { ...FIXTURE_HELD_TURN, held: true, pending: false }]}
             status="open"
             myHeld
           />
@@ -788,7 +788,24 @@ export default function ArenaPreviewPage() {
         <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
           Only the author sees a held reply. The route applies that rule
           itself rather than relying on the policy, because it reads through
-          the admin client; this is what the author sees while it waits.
+          the admin client.
+        </p>
+      </Section>
+
+      <Section title="34b. Counterpart: your reply saved, waiting to be checked">
+        <div className="rounded-panel border-2 border-rule">
+          <ExchangeView
+            {...exchange}
+            turns={[...FIXTURE_TURNS, FIXTURE_HELD_TURN]}
+            status="open"
+            myHeld={false}
+            myPending
+          />
+        </div>
+        <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+          A reply that could not be screened when it was sent: screening was
+          paused, over budget or over the day&apos;s limit, or the call
+          failed. The daily job in src/lib/rescreen.ts checks it again.
         </p>
       </Section>
 

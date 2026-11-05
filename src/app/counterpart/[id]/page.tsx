@@ -5,7 +5,7 @@ import {
   ExchangeView,
   type ExchangeStatus,
 } from "@/components/counterpart/ExchangeView";
-import { isLapsed, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
+import { isLapsed, latestReplyPending, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate } from "@/lib/motion-text";
 
@@ -98,10 +98,12 @@ export default async function CounterpartPage({
   // visible to both, an unscreened one only to its author.
   const visible = turns.filter((t) => t.screen_result === "ok" || t.author_id === user.id);
   const myHeld = turns.find((t) => t.author_id === user.id && t.screen_result === "flagged");
+  // src/lib/counterpart.ts: the reader's own latest reply, not yet screened.
+  const myPending = latestReplyPending(turns, user.id);
   const anyRemoved = turns.some((t) => t.screen_result === "removed");
 
   const nextSeq = turns.length + 1;
-  const myTurn = status === "open" && exchange.next_turn === user.id && nextSeq <= MAX_SEQ;
+  const myTurn = status === "open" && exchange.next_turn === user.id && nextSeq <= MAX_SEQ && !myPending;
 
   // The text the next reply must quote from.
   let sourceText = "";
@@ -139,11 +141,13 @@ export default async function CounterpartPage({
           mine: turn.author_id === user.id,
           quotedClaim: turn.quoted_claim,
           body: turn.body,
-          held: turn.screen_result !== "ok",
+          held: turn.screen_result !== "ok" && turn.screen_result !== "pending",
+          pending: turn.screen_result === "pending",
         }))}
         counterpartLeft={!theirUserId}
         anyRemoved={anyRemoved}
         myHeld={Boolean(myHeld)}
+        myPending={myPending}
         status={status as ExchangeStatus}
         myTurn={myTurn}
         nextSeq={nextSeq}

@@ -52,19 +52,31 @@ export interface ScreenCallResult {
   costUsd: number;
 }
 
-export async function screenTurn(params: {
-  quotedClaim: string;
-  body: string;
-}): Promise<ScreenCallResult> {
+/**
+ * `request` is for a caller with a time limit of its own (the daily
+ * re-screening job, src/lib/rescreen.ts): a timeout and no retries, so one
+ * call cannot outlive the function running it. The turn route passes
+ * none, so its call is as it was.
+ */
+export async function screenTurn(
+  params: {
+    quotedClaim: string;
+    body: string;
+  },
+  request?: { timeout: number; maxRetries: number }
+): Promise<ScreenCallResult> {
   const userTurn = `<quoted_claim>\n${params.quotedClaim}\n</quoted_claim>\n\n<reply>\n${params.body}\n</reply>\n\nClassify the reply. Respond with JSON only.`;
 
   const start = Date.now();
-  const response = await getClient().messages.create({
+  const body = {
     model: SCREEN_MODEL,
     max_tokens: 60,
     system: getPrompt(),
-    messages: [{ role: "user", content: userTurn }],
-  });
+    messages: [{ role: "user" as const, content: userTurn }],
+  };
+  const response = request
+    ? await getClient().messages.create(body, request)
+    : await getClient().messages.create(body);
   const latencyMs = Date.now() - start;
   const costUsd =
     response.usage.input_tokens * INPUT_COST_PER_TOKEN +
@@ -128,13 +140,16 @@ export async function logScreenCall(params: {
 // Screens and logs in one step. The log happens whether or not the response
 // validated — Anthropic billed for the tokens either way, and the call has
 // to count toward the daily cap and the monthly budget.
-export async function screenAndLog(params: {
-  quotedClaim: string;
-  body: string;
-  userId: string;
-}): Promise<ScreenCallResult> {
+export async function screenAndLog(
+  params: {
+    quotedClaim: string;
+    body: string;
+    userId: string;
+  },
+  request?: { timeout: number; maxRetries: number }
+): Promise<ScreenCallResult> {
   try {
-    const result = await screenTurn(params);
+    const result = await screenTurn(params, request);
     await logScreenCall({ userId: params.userId, costUsd: result.costUsd, latencyMs: result.latencyMs });
     return result;
   } catch (err) {

@@ -363,7 +363,8 @@ export const FIXTURE_HELD_TURN: ViewTurn = {
   mine: true,
   quotedClaim: "What is closed is the mechanism, which was never what the judgement was about.",
   body: "This reply is waiting on the screening check. Only its author can see it until that comes back, which is the rule the route applies rather than the policy.",
-  held: true,
+  held: false,
+  pending: true,
 };
 
 /*

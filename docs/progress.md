@@ -692,3 +692,28 @@ deploy below was read from Vercel as Ready.
 - #86: the (e) rulings (a/an, darker surfaces for the three, the two
   share lines, ranking at 20 arguments, the view from elsewhere at step
   4, UNVERIFIED). Its merge commit and deploy go in the next entry.
+
+## 2026-11-05: Stage 5 step 3, the (e) rulings merged, the re-screening job
+
+- Migration 0027 (Gate 1) applied as version 20261105225938 at 22:59 UTC
+  and read back against a snapshot from 22:53: 8,528 rows with the same
+  checksum, all v1 in shape, the table not rewritten (same file), the
+  view's grants and options unchanged. The security advisor showed the
+  same six findings before and after.
+- #87 merged as `41cb359`: every reader of a quiz result knows its
+  version (`src/lib/quiz-result.ts`), and `submitQuizResult` (frozen,
+  under Gate 1) takes up a challenge only from a v1 result. Two review
+  passes. Deploy `dpl_4mbiV5twFNWD6hTziFpJDKGhR7oz`, Ready; a sample
+  result at `https://sophecs.com/r/pDinF29GNH` answered 200 at 23:16
+  UTC, read through the new columns.
+- #86 merged as `79ec12a`: the (e) rulings. Three review passes; the
+  third moved the 20-argument threshold to SIX_SCHOOLS builds, the table
+  Checkpoint B asked about, and put the live table to Arthur. Deploy
+  `dpl_4HNKdj5P8nF11oocZzu3RxsNy4sU`, Ready; `https://sophecs.com/table`
+  at 23:26 UTC ranked the three 1, 2 and 3 on 186, 202 and 112
+  arguments, with no unranked note, as before.
+- #88 (draft): the judge's cap and ceiling reserved in one step,
+  migration 0028. Waiting for Arthur's (a) on 0028.
+- #89: the daily re-screening job for pending arena replies, (d) 4, and
+  the copy that goes with it. Its merge commit and deploy go in the next
+  entry.
