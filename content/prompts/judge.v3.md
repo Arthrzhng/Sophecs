@@ -58,9 +58,10 @@ file before the request is built, so this comment no longer reaches the
 model. v1 and v2 are sent as they are.
 
 Neither placeholder is written out in full anywhere in this comment. The
-comment is removed before the placeholders are filled, but a version that
-named one here would still be a trap the day the stripping changed, and
-`fillOnce` refuses a prompt that names one twice.
+comment is removed before the placeholders are filled, so naming one here
+would no longer reach the model, but "every judge prompt file" in
+tests/judge-request.test.ts checks the raw file and would fail on it, and
+it would be a trap the day the stripping changed.
 
 v3 is not the production default. `PROMPT_VERSION` in
 src/lib/judge/schema.ts is still "v2", and switching it needs fidelity
@@ -92,7 +93,8 @@ Score in this order of priority:
    answers any other. The cap binds your own reply: if the objection you
    return as `unanswered_objection` is that best-known objection, your
    `engagement` score must be 4 or lower. Check the two against each other
-   before you respond.
+   before you respond, and if they disagree, lower the score; do not change
+   which objection you return.
 
 The school's specific fidelity criteria for this debate:
 
@@ -272,8 +274,8 @@ the school the argument was assigned. Do not return the word
 `RIVAL_SCHOOL`.
 
 `score` is 0-100 (null if rejected). `fidelity`, `rigor`, and `engagement`
-are each 0-10, and `engagement` is at most 4 when `unanswered_objection` is
-the objection the school's criteria name as its best known. `strongest_move` and `weakest_move` should quote or closely
+are each 0-10, and `engagement` is at most 4 when `unanswered_objection`
+is the objection the school's criteria name as its best known. `strongest_move` and `weakest_move` should quote or closely
 paraphrase the argument. `verdict_line` is the one sentence a user might
 actually want to share, in at most 20 words.
 

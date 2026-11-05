@@ -312,7 +312,7 @@ describe("v3 as sent (Arthur's rulings of 2026-11-05)", () => {
     return callJudgeModel(MOTION, "stoicism", ARGUMENT, undefined, "v3").then(() => String(created[0].system));
   }
 
-  it("leaves out the file's HTML comments, and v2 keeps its own text", async () => {
+  it("leaves out the file's HTML comments", async () => {
     // "Strip comments from judge.v3.md before it is sent (v3 only)."
     const system = await sentV3();
     expect(system).not.toContain("<!--");
@@ -331,7 +331,8 @@ describe("v3 as sent (Arthur's rulings of 2026-11-05)", () => {
     expect(criterion).toContain(
       "scores no more than 4 on engagement, however well it answers any other. The cap binds your own reply: " +
         "if the objection you return as `unanswered_objection` is that best-known objection, your `engagement` " +
-        "score must be 4 or lower. Check the two against each other before you respond."
+        "score must be 4 or lower. Check the two against each other before you respond, and if they disagree, " +
+        "lower the score; do not change which objection you return."
     );
     expect(flat).toContain(
       "`engagement` is at most 4 when `unanswered_objection` is the objection the school's criteria name as its best known."
@@ -344,6 +345,20 @@ describe("v3 as sent (Arthur's rulings of 2026-11-05)", () => {
     expect(fidelityCriteriaFor("utilitarianism", "v3")).not.toContain("a total owes nobody anything");
     expect(fidelityCriteriaFor("utilitarianism", "v2")).not.toContain(words);
   });
+
+  it("keeps both Buddhist Ethics voices as they were ('Buddhist voices stay')", async () => {
+    const { OBJECTION_VOICES } = await import("../src/lib/judge/objection-voices");
+    expect(OBJECTION_VOICES.buddhist).toEqual([
+      {
+        rival: "utilitarianism",
+        why: "deciding who audits a model and how an appeal is weighed takes a way of comparing everyone's claims, which compassion alone does not supply",
+      },
+      {
+        rival: "confucian",
+        why: "who answers to whom for a model is a question of roles and what each owes, which non-harm leaves unassigned",
+      },
+    ]);
+  });
 });
 
 describe("every judge prompt file", () => {
@@ -351,9 +366,10 @@ describe("every judge prompt file", () => {
   // file level so it fails on the prompt rather than on a run.
   //
   // This is the test that would have caught judge.v3.md naming both of its
-  // placeholders in its own header comment: the comment is sent to the
-  // model with the rest of the file, and filling a placeholder by name
-  // filled the mention instead of the placeholder.
+  // placeholders in its own header comment: the comment was then sent to
+  // the model with the rest of the file, and filling a placeholder by name
+  // filled the mention instead of the placeholder. v3's comment is now
+  // stripped before filling, and this still checks the raw file.
   const dir = path.join(process.cwd(), "content", "prompts");
   const versions = fs
     .readdirSync(dir)

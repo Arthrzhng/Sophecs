@@ -25,6 +25,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
 import {
+  asSent,
   callJudgeModel,
   logAiCall,
   MAX_JUDGE_ATTEMPTS,
@@ -379,8 +380,12 @@ function estimatedUsdPerCall(): {
   const outRate = one(/^const OUTPUT_COST_PER_TOKEN = ([\d_]+) \/ ([\d_]+);/, "OUTPUT_COST_PER_TOKEN");
   const rate = (m: RegExpExecArray) => int(m[1]) / int(m[2]);
 
+  // What is sent, not the file: since 2026-11-05 v3's head comment is
+  // stripped before the request is built (asSent in src/lib/anthropic.ts).
   const bytes = (v: string) =>
-    fs.statSync(path.join(process.cwd(), "content", "prompts", `judge.${v}.md`)).size;
+    Buffer.byteLength(
+      asSent(v as RunnablePromptVersion, fs.readFileSync(path.join(process.cwd(), "content", "prompts", `judge.${v}.md`), "utf-8"))
+    );
   const inputTokens = Math.round(estIn + (bytes(VERSION) - bytes("v2")) / 4);
   return {
     usd: inputTokens * rate(inRate) + estOut * rate(outRate),
@@ -399,7 +404,9 @@ function estimatedUsdPerCall(): {
 // counts bytes; the criteria are almost all ASCII, so the two agree to
 // within a few tokens. Checked against the 3 Nov v3 run, which billed $0.9934:
 // without this the estimate was $0.9657, with it $0.9791, so the rest of
-// the gap is the rule of thumb itself.
+// the gap is the rule of thumb itself. That run still sent v3's head
+// comment; the file-size term now counts only what is sent, so a v3
+// estimate is about 1,000 input tokens a call lower than it was then.
 const V2_CRITERIA_MEAN_LENGTH =
   PUBLISHED_SCHOOL_IDS.reduce((sum, id) => sum + FIDELITY_CRITERIA[id].length, 0) /
   PUBLISHED_SCHOOL_IDS.length;

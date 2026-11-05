@@ -71,7 +71,7 @@ function promptTemplateFor(version: RunnablePromptVersion): string {
 // fixtures in tests/judge-request. Both reads above go through here, the
 // module-scope default included, so v3 is stripped whichever way it is
 // reached.
-function asSent(version: RunnablePromptVersion, raw: string): string {
+export function asSent(version: RunnablePromptVersion, raw: string): string {
   return version === "v3" ? raw.replace(/<!--[\s\S]*?-->\n*/g, "") : raw;
 }
 
@@ -153,7 +153,7 @@ export async function callJudgeModel(
 
   // {{RUBRIC}} is in every version. {{RIVAL_SCHOOLS}} is v3 and later, so
   // it is optional, and its absence leaves v2 byte for byte what it was.
-  // Both are filled in one pass over the raw template: see
+  // Both are filled in one pass over the template as sent: see
   // src/lib/judge/fill-placeholder.ts for the three defects that shape.
   const system = fillPlaceholders(promptTemplateFor(promptVersion), {
     "{{RUBRIC}}": { value: criteria, required: true },
