@@ -6,6 +6,7 @@ import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { getAllMicroLessons, getMicroLesson } from "@/lib/micro-lessons";
 import { getAllTopicFiles } from "@/lib/topics";
 import { formatSource, readingMinutes } from "@/lib/footnotes";
+import { passagePlace } from "@/lib/passage-place";
 
 export function generateStaticParams() {
   return getAllMicroLessons().map((lesson) => ({ slug: lesson.slug }));
@@ -28,18 +29,22 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const lesson = getMicroLesson(slug);
   if (!lesson) notFound();
 
-  const inTopic = getAllMicroLessons().filter((l) => l.topic === lesson.topic);
-  const sibling = inTopic.find((l) => l.position !== lesson.position) ?? null;
+  // Its place among the motion's passages: the pair is numbered, and an
+  // "elsewhere" passage, which a SIX_SCHOOLS build loads, sits outside it
+  // with no number (src/lib/passage-place.ts).
+  const { sibling, index, total } = passagePlace(lesson, getAllMicroLessons());
   const topic = getAllTopicFiles().find((t) => t.slug === lesson.topic) ?? null;
-
-  // getAllMicroLessons sorts "before" ahead of "after", so a passage's place
-  // in its own topic is the reading number. Derived rather than written
-  // down: a third passage on a motion would number itself.
-  const index = inTopic.findIndex((l) => l.slug === lesson.slug) + 1;
+  // docs/daily-path-copy.md, "Today, the view from elsewhere".
+  const placeLabel =
+    lesson.position === "before"
+      ? "Before you argue"
+      : lesson.position === "after"
+        ? "After you argue"
+        : "A view from elsewhere";
 
   return (
     <main className="flex flex-1 flex-col">
-      <ReadingTopBar position={{ index, total: inTopic.length }} />
+      <ReadingTopBar position={index === null ? undefined : { index, total }} />
 
       <div className="mx-auto w-full max-w-read flex-1 px-6 pb-12">
         <article className="rounded-panel border-2 border-rule bg-surface p-6 sm:p-10">
@@ -55,7 +60,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
               citation: that is four paragraphs below under Sources, and
               printing it twice on a page this short reads as padding. */}
           <p className="mt-3 text-sm text-ink-mid">
-            {lesson.position === "before" ? "Before you argue" : "After you argue"} &middot;{" "}
+            {placeLabel} &middot;{" "}
             <span className="font-mono tabular">{readingMinutes(lesson.body)}</span> min
           </p>
 

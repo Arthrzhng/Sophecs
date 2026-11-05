@@ -30,6 +30,12 @@ describe("without SIX_SCHOOLS", () => {
     for (const id of NEW) expect(drafts.shownDraftSchool(id)).toBe(false);
   });
 
+  it("loads no view from elsewhere", async () => {
+    const { micro } = await load("0");
+    expect(micro.getAllMicroLessons().filter((l) => l.position === "elsewhere")).toEqual([]);
+    expect(micro.getMicroLesson("opaque-benefit-elsewhere")).toBeNull();
+  });
+
   it("ranks the three published schools, as before", async () => {
     const { table } = await load("0");
     expect(table.rankSchools([], {}).map((r) => r.school).sort()).toEqual([...LIVE].sort());
@@ -63,9 +69,28 @@ describe("with SIX_SCHOOLS=1", () => {
     );
   });
 
-  it("does not show a draft that belongs to no school, such as an elsewhere passage", async () => {
+  it("shows the views from elsewhere, one per motion, and no other draft passage", async () => {
     const { micro } = await load("1");
-    expect(micro.getAllMicroLessons().filter((l) => l.position === "elsewhere")).toEqual([]);
+    const all = micro.getAllMicroLessons();
+    const elsewhere = all.filter((l) => l.position === "elsewhere");
+    expect(elsewhere.length).toBeGreaterThan(0);
+    expect(new Set(elsewhere.map((l) => l.topic)).size).toBe(elsewhere.length);
+    for (const l of elsewhere) expect(micro.getMicroLesson(l.slug)?.slug).toBe(l.slug);
+    // Every draft that loads is an elsewhere passage.
+    for (const l of all.filter((x) => x.status === "draft")) expect(l.position).toBe("elsewhere");
+    // Each sits on a motion that has its before passage, which its page
+    // links to as the passage that frames the question.
+    for (const l of elsewhere) {
+      expect(all.some((x) => x.topic === l.topic && x.position === "before"), l.slug).toBe(true);
+    }
+  });
+
+  it("keeps the sitemap to sophecs.com's own pages: no elsewhere passage, no new school", async () => {
+    await load("1");
+    const { default: sitemap } = await import("../src/app/sitemap");
+    const urls = sitemap().map((e) => e.url);
+    expect(urls.filter((u) => u.includes("elsewhere"))).toEqual([]);
+    for (const id of NEW) expect(urls).not.toContain(`https://sophecs.com/s/${id}`);
   });
 
   it("gives the school table six rows, the three new ones unranked with no average", async () => {
@@ -126,6 +151,51 @@ describe("the school pages", () => {
     await load("1");
     const on = (await import("../src/app/s/[school]/page")).generateStaticParams();
     expect(on.map((p) => p.school)).toEqual([...LIVE, ...NEW]);
+  });
+});
+
+describe("which passages the loaders hide", () => {
+  // Synthetic passages, because the content cannot test the position rule:
+  // tests/drafts.test.ts allows no draft passage other than an elsewhere.
+  it("shows an elsewhere draft on a SIX_SCHOOLS build only, and no other draft", async () => {
+    const on = (await load("1")).micro;
+    expect(on.hiddenMicroLesson({ position: "elsewhere", status: "draft" })).toBe(false);
+    expect(on.hiddenMicroLesson({ position: "before", status: "draft" })).toBe(true);
+    expect(on.hiddenMicroLesson({ position: "after", status: "draft" })).toBe(true);
+    expect(on.hiddenMicroLesson({ position: "before" })).toBe(false);
+    const off = (await load("0")).micro;
+    expect(off.hiddenMicroLesson({ position: "elsewhere", status: "draft" })).toBe(true);
+    expect(off.hiddenMicroLesson({ position: "elsewhere", status: "draft" }, { includeDrafts: true })).toBe(false);
+  });
+});
+
+describe("a passage's place among its motion's passages", () => {
+  const p = (slug: string, position: "before" | "after" | "elsewhere", topic = "t") => ({ slug, topic, position });
+  const all = [p("t-before", "before"), p("t-after", "after"), p("t-elsewhere", "elsewhere"), p("u-before", "before", "u")];
+
+  it("numbers the pair 1 and 2 of 2, whatever else the motion has", async () => {
+    const { passagePlace } = await import("../src/lib/passage-place");
+    expect(passagePlace(all[0], all)).toMatchObject({ index: 1, total: 2, elsewhere: false });
+    expect(passagePlace(all[1], all)).toMatchObject({ index: 2, total: 2, elsewhere: false });
+    expect(passagePlace(all[0], all).sibling?.slug).toBe("t-after");
+    expect(passagePlace(all[1], all).sibling?.slug).toBe("t-before");
+  });
+
+  it("gives an elsewhere passage no number, and the before passage as its sibling", async () => {
+    const { passagePlace } = await import("../src/lib/passage-place");
+    expect(passagePlace(all[2], all)).toMatchObject({ index: null, elsewhere: true });
+    expect(passagePlace(all[2], all).sibling?.slug).toBe("t-before");
+  });
+
+  it("numbers every real passage 1 or 2 of 2 on a SIX_SCHOOLS build", async () => {
+    const { micro } = await load("1");
+    const { passagePlace } = await import("../src/lib/passage-place");
+    const lessons = micro.getAllMicroLessons();
+    for (const l of lessons.filter((x) => x.position !== "elsewhere")) {
+      const place = passagePlace(l, lessons);
+      expect(place.total, l.slug).toBe(2);
+      expect(place.index, l.slug).toBe(l.position === "before" ? 1 : 2);
+    }
   });
 });
 

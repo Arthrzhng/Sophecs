@@ -31,6 +31,7 @@ export function TodayClient({
   userId,
   passage,
   passageSource,
+  elsewhere,
   children,
 }: {
   slug: string;
@@ -42,6 +43,9 @@ export function TodayClient({
   userId: string;
   passage: string;
   passageSource: string;
+  /** Today's optional view from elsewhere, server-rendered for the same
+      reason as the sidebar. Only a SIX_SCHOOLS build has one to pass. */
+  elsewhere?: ReactNode;
   /** The sidebar cards, passed down as server-rendered children so they
       stay server components and add nothing to the client bundle. */
   children: ReactNode;
@@ -179,6 +183,10 @@ export function TodayClient({
                         </p>
                       </li>
                     )}
+                    {/* After the after-reading, which step 4 brings, and
+                        not a seventh step: it has no check, and nothing on
+                        the path waits for it (docs/daily-path-copy.md). */}
+                    {i === 3 && elsewhere && <li className="w-full max-w-[52ch]">{elsewhere}</li>}
                   </Fragment>
                 );
               })}
