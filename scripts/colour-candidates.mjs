@@ -156,7 +156,9 @@ const MIN_WHITE_TEXT = 4.5;
 const MIN_DOT_ON_PAPER = 3;
 const MIN_DE = 20; // to the three schools, normal vision
 const MIN_DE_OTHERS = 15; // to the blue and the orange, normal vision
-const MIN_DE_CVD = 12; // to the three schools, each simulation
+// Arthur's ruling 16 of 2026-11-05: "relax the colour-blind distance vs the
+// live three from 12 to 8 (names always sit beside colours)".
+const MIN_DE_CVD = 8; // to the three schools, each simulation
 const MIN_DE_BETWEEN = 10; // between any two candidates offered, normal vision
 
 // Hues each school may not take, in OKLCH degrees, with what they cover.
@@ -206,57 +208,92 @@ for (let Li = 0; Li <= 11; Li++) {
   }
 }
 
-// Three candidates per school, nine different colours in all. The schools
-// take turns, one pick each per round, so no school gets all the best
-// ones. Each pick is the allowed colour that stays furthest from the
-// existing schools under the worst of the three views, at least
-// MIN_DE_BETWEEN from every colour already offered, and 10° of hue from
-// its own school's other candidates. Only the three chosen will ever sit
-// together, so it is the recommended set below, not every pair of the
-// nine, that has to survive the simulations. Chroma is capped at 0.15:
-// the existing schools sit at about 0.05 (Stoic) to 0.10 (the other two),
-// and without the cap the search reaches for the loudest violets.
-const worst = (c) => Math.min(c.dENormal, c.dEDeut, c.dEProt);
+// Arthur's ruling 16 of 2026-11-05: "reject the all-violet set. The three
+// new schools must come from different hue families ... Pick the best set
+// under those rules, show it in the styleguide, and proceed."
+//
+// Hue families, in OKLCH degrees, centred on the reference hues above. Two
+// colours either side of a boundary can be a few degrees apart, so the
+// three must also be 40 degrees of hue apart pairwise: a violet at 300 and
+// a magenta at 320 are not different families to the eye.
+const FAMILIES = [
+  [350, 360, "red"],
+  [0, 40, "red"],
+  [40, 65, "orange and brown"],
+  [65, 120, "yellow and gold"],
+  [120, 170, "green"],
+  [170, 225, "cyan and teal"],
+  [225, 280, "blue"],
+  [280, 320, "violet"],
+  [320, 350, "magenta"],
+];
+const MIN_HUE_GAP = 40;
+const familyOf = (H) => FAMILIES.find(([lo, hi]) => H >= lo && H < hi)[2];
 const hueGap = (a, b) => Math.min(Math.abs(a - b), 360 - Math.abs(a - b));
-const NEW = ["confucian", "ubuntu", "buddhist"];
-const byschool = Object.fromEntries(NEW.map((s) => [s, []]));
-const offered = [];
-const ranked = [...pool].filter((c) => c.C <= 0.15).sort((a, b) => worst(b) - worst(a));
-for (let round = 0; round < 3; round++) {
-  for (const school of NEW) {
-    const pick = ranked.find(
-      (c) =>
-        !excludedBy(school, c.H) &&
-        offered.every((o) => dE(o.rgb, c.rgb) >= MIN_DE_BETWEEN) &&
-        byschool[school].every((p) => hueGap(p.H, c.H) >= 10)
-    );
-    if (!pick) throw new Error(`no candidate left for ${school} in round ${round + 1}`);
-    byschool[school].push(pick);
-    offered.push(pick);
-  }
-}
 
-// The recommended set: one per school, chosen so the three new colours
-// are as far from each other as possible under all three views. Nothing
-// holds that distance to MIN_DE_CVD: no set of the 27 reaches 12, and the
-// best one's smallest difference (11.4) is reported as it is.
-let best = null;
-for (const a of byschool.confucian)
-  for (const b of byschool.ubuntu)
-    for (const c of byschool.buddhist) {
-      const set = [a, b, c];
-      let min = Infinity;
-      for (let i = 0; i < 3; i++)
-        for (let j = i + 1; j < 3; j++) {
-          min = Math.min(
-            min,
-            dE(set[i].rgb, set[j].rgb),
-            dECvd(set[i].rgb, set[j].rgb, "deuteranopia"),
-            dECvd(set[i].rgb, set[j].rgb, "protanopia")
-          );
-        }
-      if (!best || min > best.min) best = { set: set.map((s) => s.hex), min };
+// The chosen set is searched for whole: every allowed colour for each
+// school, one per family, every pair of the three at least MIN_HUE_GAP
+// apart. Chroma is capped at 0.15: the existing schools sit at about 0.05
+// (Stoic) to 0.10 (the other two), and without the cap the search reaches
+// for the loudest colours. A set is scored by its worst pair among all six
+// schools, new and live, under the worst of the three views, rounded to a
+// whole unit, since a tenth of a CIEDE2000 unit is far below what anyone
+// can see; ties go to the set whose three new colours are furthest apart
+// from each other. Only these three will ever sit with the live three, so
+// every pair is held to MIN_DE_CVD.
+const worst3 = (a, b) => Math.min(dE(a, b), dECvd(a, b, "deuteranopia"), dECvd(a, b, "protanopia"));
+const NEW = ["confucian", "ubuntu", "buddhist"];
+const live = Object.values(SCHOOLS).map(hexToRgb);
+const allowed = pool.filter((c) => c.C <= 0.15);
+for (const c of allowed) {
+  c.family = familyOf(c.H);
+  c.toLive = Math.min(...live.map((l) => worst3(c.rgb, l)));
+}
+const forSchool = Object.fromEntries(NEW.map((s) => [s, allowed.filter((c) => !excludedBy(s, c.H))]));
+const pairCache = new Map();
+const pair = (a, b) => {
+  const k = a.hex < b.hex ? a.hex + b.hex : b.hex + a.hex;
+  if (!pairCache.has(k)) pairCache.set(k, worst3(a.rgb, b.rgb));
+  return pairCache.get(k);
+};
+const apart = (a, b) => a.family !== b.family && hueGap(a.H, b.H) >= MIN_HUE_GAP;
+const scoreOf = (set) => {
+  let among = Infinity;
+  for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) among = Math.min(among, pair(set[i], set[j]));
+  const all = Math.min(among, ...set.map((c) => c.toLive));
+  return { all, among, rank: [Math.round(all), among] };
+};
+const better = (x, y) => !y || x.rank[0] > y.rank[0] || (x.rank[0] === y.rank[0] && x.rank[1] > y.rank[1]);
+let chosen = null;
+for (const a of forSchool.confucian)
+  for (const b of forSchool.ubuntu) {
+    if (!apart(a, b)) continue;
+    for (const c of forSchool.buddhist) {
+      if (!apart(a, c) || !apart(b, c)) continue;
+      const s = scoreOf([a, b, c]);
+      if (better(s, chosen)) chosen = { ...s, set: [a, b, c] };
     }
+  }
+if (!chosen || chosen.all < MIN_DE_CVD) throw new Error("no set passes: report to Arthur rather than choose");
+
+// Two alternatives per school, for the styleguide: the best colours for
+// that school with the other two chosen held where they are, under the
+// same rules, each at least MIN_DE_BETWEEN from the chosen one.
+const byschool = {};
+NEW.forEach((school, k) => {
+  const others = chosen.set.filter((_, i) => i !== k);
+  const alts = forSchool[school]
+    .filter((c) => c.hex !== chosen.set[k].hex && others.every((o) => apart(o, c)) && dE(c.rgb, chosen.set[k].rgb) >= MIN_DE_BETWEEN)
+    .map((c) => ({ c, s: scoreOf(NEW.map((_, i) => (i === k ? c : chosen.set[i]))) }))
+    .filter(({ s }) => s.all >= MIN_DE_CVD)
+    .sort((x, y) => (better(x.s, y.s) ? -1 : better(y.s, x.s) ? 1 : 0));
+  const picked = [];
+  for (const { c } of alts) {
+    if (picked.every((p) => dE(p.rgb, c.rgb) >= MIN_DE_BETWEEN)) picked.push(c);
+    if (picked.length === 2) break;
+  }
+  byschool[school] = [chosen.set[k], ...picked];
+});
 
 const round = (n, d = 1) => Math.round(n * 10 ** d) / 10 ** d;
 
@@ -277,6 +314,7 @@ function cardSurfaceFor(c) {
 }
 const describe = (c) => ({
   hex: c.hex,
+  family: familyOf(c.H),
   oklch: { L: round(c.L, 2), C: round(c.C, 2), H: c.H },
   textOnHero: round(c.textOnHero, 2),
   dotOnPaper: round(c.dot, 2),
@@ -307,12 +345,19 @@ const existing = Object.fromEntries(
   ])
 );
 const out = {
-  what: "Colour candidates for the three new schools, from scripts/colour-candidates.mjs. Arthur's to choose; nothing here is in use.",
-  thresholds: { MIN_WHITE_TEXT, MIN_DOT_ON_PAPER, MIN_DE, MIN_DE_OTHERS, MIN_DE_CVD, MIN_DE_BETWEEN },
+  what: "The three new schools' colours, from scripts/colour-candidates.mjs, chosen under Arthur's ruling 16 of 2026-11-05. The first candidate for each school is the chosen one; the other two are alternatives under the same rules.",
+  thresholds: { MIN_WHITE_TEXT, MIN_DOT_ON_PAPER, MIN_DE, MIN_DE_OTHERS, MIN_DE_CVD, MIN_DE_BETWEEN, MIN_HUE_GAP },
   excluded: EXCLUDED,
+  families: FAMILIES,
   existing,
   candidates: Object.fromEntries(NEW.map((s) => [s, byschool[s].map(describe)])),
-  recommended: { confucian: best.set[0], ubuntu: best.set[1], buddhist: best.set[2], minPairwiseDeltaE: round(best.min) },
+  chosen: {
+    confucian: chosen.set[0].hex,
+    ubuntu: chosen.set[1].hex,
+    buddhist: chosen.set[2].hex,
+    worstPairAllSix: round(chosen.all),
+    worstPairAmongNew: round(chosen.among),
+  },
   poolSize: pool.length,
 };
 fs.mkdirSync("docs/phase3-styleguide", { recursive: true });
@@ -324,7 +369,7 @@ for (const s of NEW) {
   for (const c of out.candidates[s])
     console.log(
       `  ${c.hex}  H ${String(c.oklch.H).padStart(3)}  white text ${c.textOnHero}:1  dot ${c.dotOnPaper}:1  ` +
-        `dE ${c.minDeltaE}  blue/orange ${c.minDeltaEBlueOrange}  deut ${c.minDeltaEDeuteranopia}  prot ${c.minDeltaEProtanopia}`
+        `${c.family.padEnd(16)} dE ${c.minDeltaE}  blue/orange ${c.minDeltaEBlueOrange}  deut ${c.minDeltaEDeuteranopia}  prot ${c.minDeltaEProtanopia}`
     );
 }
-console.log(`\nrecommended: ${JSON.stringify(out.recommended)}`);
+console.log(`\nchosen: ${JSON.stringify(out.chosen)}`);

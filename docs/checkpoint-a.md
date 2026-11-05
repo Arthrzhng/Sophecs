@@ -213,6 +213,11 @@ blindness. Each candidate has a card surface on which the card's text
 reads at AA; only Confucianism's had to be darkened to get there.
 Candidates, figures and screenshots are in `docs/phase3-styleguide/`.
 
+**Ruled on 2026-11-05 (item 16):** the all-violet set is rejected; the
+three come from different hue families, held to 8 rather than 12 from
+the live three under the simulations. The chosen set is in
+`docs/decisions.md`, "The new schools' colours".
+
 The choice is Arthur's: one of these, or loosen a constraint.
 
 ## Sample activity (New)
