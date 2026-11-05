@@ -128,7 +128,8 @@ Eval key spend: $5.7934 of the $8.00 cap. No further run is planned.
    a reader's input, and `max_tokens` caps those. The fix is zod 4.6.6 or
    later, a major upgrade that touches `src/lib/judge/schema.ts`, frozen
    under (b), and the frozen `src/lib/anthropic.ts`, whose log summary
-   strips zod 3's wording so the model's text stays out of the logs. `docs/decisions.md`, "Dependency audit (2026-11-05)", which
+   strips zod 3's wording so the model's text stays out of the logs.
+   `docs/decisions.md`, "Dependency audit (2026-11-05)", which
    lists all 16 packages `npm audit` still names.
 
 ## Content and philosophy: (e)
