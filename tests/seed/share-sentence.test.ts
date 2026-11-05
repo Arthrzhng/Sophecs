@@ -48,6 +48,27 @@ describe("a verdict page's share sentence", () => {
     );
   });
 
+  it("reads missing values exactly as main did", () => {
+    // These read oddly. A rejected verdict (no score, no line) still gets a
+    // share row, and a revision of a rejected original has no first score.
+    // They are what main produced, pinned so that moving the sentence into
+    // one function changes nothing for a genuine page.
+    for (const verdictLine of [null, undefined]) {
+      expect(verdictShareLine({ ...genuine, score: null, verdictLine })).toBe(
+        "Scored  defending the Stoic line on AI tutors. The judge's note: . sophecs.com/debate/ai-tutors/d1"
+      );
+    }
+    expect(verdictShareLine({ ...genuine, score: 0, verdictLine: "" })).toBe(
+      "Scored 0 defending the Stoic line on AI tutors. The judge's note: . sophecs.com/debate/ai-tutors/d1"
+    );
+    expect(verdictShareLine({ ...answered, answeredObjection: { school: "utilitarianism", firstScore: null } })).toBe(
+      "Answered the Utilitarianism objection to my Stoicism case on AI tutors: null → 72. sophecs.com/debate/ai-tutors/d1"
+    );
+    expect(verdictShareLine({ ...answered, score: null })).toBe(
+      "Answered the Utilitarianism objection to my Stoicism case on AI tutors: 55 → null. sophecs.com/debate/ai-tutors/d1"
+    );
+  });
+
   it("is empty for a sample account's verdict, whichever line it would have been", () => {
     for (const v of [genuine, { ...genuine, textWithheld: true }, answered]) {
       expect(verdictShareLine({ ...v, sample: true })).toBe("");
@@ -59,10 +80,22 @@ describe("a verdict page's share sentence", () => {
     // The marker is read with the row the page renders (generateMetadata's
     // own read of it does not count)...
     expect(page).toMatch(/const \{ data: publicRow \} = await admin \.from\("debates_public"\) \.select\( "[^"]*\bis_sample\b[^"]*" \)/);
-    // ...passed to the one function that builds the sentence...
-    expect(page).toContain("const shareLine = verdictShareLine({ sample: Boolean(publicRow.is_sample),");
-    // ...and nothing else on the page fills in the school's template.
-    expect(page).not.toMatch(/replaceAll\("\{verdict_line\}"/);
+    // ...passed, with every other value exactly as main used it, to the one
+    // function that builds the sentence...
+    expect(page).toContain("const school = publicRow.school as SchoolId;");
+    expect(page).toContain("const shortMotion = shortMotionForShare(motion);");
+    expect(page).toContain(
+      "const shareLine = verdictShareLine({ sample: Boolean(publicRow.is_sample), " +
+        "template: schoolContent.verdict_share_line, textWithheld, school, shortMotion, " +
+        "score: verdict.score, verdictLine: verdict.verdict_line, slug, debateId, " +
+        "answeredObjection: comparison && parentObjectionSchool && verdict.objection_answered " +
+        "? { school: parentObjectionSchool, firstScore: comparison.first.score } : null, });"
+    );
+    // ...and nothing else on the page reads or fills in the school's template.
+    expect(page.match(/verdict_share_line/g)).toHaveLength(1);
+    // (The template's {slug} and {id} also appear as JSX expressions, so only
+    // the three that cannot are looked for.)
+    expect(page).not.toMatch(/\{(score|topic|verdict_line)\}/);
     expect(page).toMatch(/shareLine=\{shareLine\}/);
   });
 });
