@@ -114,11 +114,11 @@ export default function Phase3Page() {
           deuteranopia and protanopia. The other constraints are as before: white hero text at AA, a
           dot that shows on paper, {colours.thresholds.MIN_DE} from the live schools and{" "}
           {colours.thresholds.MIN_DE_OTHERS} from the judge&apos;s blue and the step-done orange in
-          normal vision, and none of a school&apos;s stereotyped hues. Of the sets that pass, this is
-          the one whose closest pair among all six schools is furthest apart (
-          {colours.chosen.worstPairAllSix} under the worst of the three views), and, within a whole
-          unit of that, the one whose three new colours are furthest from each other (
-          {colours.chosen.worstPairAmongNew}). Names always sit beside the colours.
+          normal vision, and none of a school&apos;s stereotyped hues. Each set that passes is scored
+          by its closest pair among all six schools under the worst of the three views, rounded to a
+          whole unit; of the sets with the best score, this is the one whose three new colours are
+          furthest from each other ({colours.chosen.worstPairAmongNew}). Its closest pair is{" "}
+          {colours.chosen.worstPairAllSix}. Names always sit beside the colours.
         </p>
         <h3 className="mt-6 text-base font-extrabold text-ink">The six, side by side</h3>
         <ViewRow
@@ -139,9 +139,10 @@ export default function Phase3Page() {
         ))}
         <p className="mt-8 max-w-[62ch] text-sm leading-relaxed text-ink-mid">
           Beside each chosen colour, the best alternatives for that school with the other two held
-          where they are, under the same rules.
+          where they are, under the same rules, each at least {colours.thresholds.MIN_DE_BETWEEN} from
+          the chosen one.
           {withoutAlternatives.length > 0 &&
-            ` ${withoutAlternatives.join(" and ")} ${withoutAlternatives.length === 1 ? "has" : "have"} none that pass.`}
+            ` ${withoutAlternatives.join(" and ")} ${withoutAlternatives.length === 1 ? "has" : "have"} none that far away.`}
         </p>
         {DRAFT_SCHOOL_IDS.map((id) => (
           <div key={id} className="mt-8">
@@ -222,7 +223,9 @@ export default function Phase3Page() {
         <p className="mb-4 max-w-[62ch] text-sm text-ink-mid">
           Each school&apos;s own one_line at the card&apos;s 1200 by 630. The new schools use a card
           surface derived from its chosen colour: the same hue, darkened only where the card&apos;s
-          text would otherwise fall below AA at its lowest opacity.
+          text would otherwise fall below AA at its lowest opacity. The live schools&apos; surfaces
+          are all darker than their markers; whether the new ones should be too is Arthur&apos;s to
+          decide.
         </p>
         <div className="grid gap-6">
           {ALL.map((id) => {

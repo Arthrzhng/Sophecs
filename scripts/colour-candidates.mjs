@@ -1,7 +1,7 @@
-// Colour candidates for the three new schools, for Checkpoint A.
-//
-// Stage 4 of the brief of 2026-11-03 asks for three candidates for each new
-// school, under constraints this script measures rather than eyeballs:
+// The three new schools' colours. Stage 4 of the brief of 2026-11-03 asked
+// for candidates; Arthur's ruling 16 of 2026-11-05 asked for the best set
+// under his rules, so the script now chooses it (see "The chosen set"
+// below), under constraints it measures rather than eyeballs:
 //
 // - AA contrast for white text on the Today hero banner, which is the
 //   school colour with white text at 90% opacity on it;
@@ -20,8 +20,9 @@
 //   These are hue exclusions, written below with the hues they cover.
 //
 // It writes docs/phase3-styleguide/colour-candidates.json, which the
-// styleguide page renders, and prints a table. It decides nothing: the
-// colours are Arthur's (CLAUDE.md, item (e)).
+// styleguide page renders, and prints a table: the chosen colour for each
+// school first, then up to two alternatives (docs/decisions.md, "The new
+// schools' colours").
 //
 // Usage: node scripts/colour-candidates.mjs
 import fs from "node:fs";

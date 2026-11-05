@@ -2936,9 +2936,9 @@ shows on paper, CIEDE2000 20 from the live schools and 15 from the judge's
 blue and the step-done orange in normal vision, each school's stereotyped
 hues excluded), with the distance to the live three under simulated
 deuteranopia and protanopia lowered from 12 to 8. "Different hue
-families" is nine named sectors of OKLCH hue (red, orange and brown,
-yellow and gold, green, cyan and teal, blue, violet, magenta), one school
-to a sector, and the three also at least 40 degrees of hue apart, so a
+families" is eight named families of OKLCH hue (red, orange and brown,
+yellow and gold, green, cyan and teal, blue, violet, magenta; red takes
+two sectors, since it wraps through 0), one school to a family, and the three also at least 40 degrees of hue apart, so a
 violet at 300 and a magenta at 320 do not count as different.
 
 **Why this set.** The relaxed 8 hardly widens what passes: 1,059 colours
@@ -2946,25 +2946,43 @@ against 1,056, nearly all blue to magenta, because the binding limit is
 the 20 from the live three in normal vision, which shuts out the greens,
 teals, reds, oranges and golds near Stoicism, Virtue Ethics and
 Utilitarianism. Among the sets that do pass, every school's possible
-colours were tried together, and the best is the one whose closest pair
-among all six schools, under the worst of the three views, is furthest
-apart: 12.7. A blue, violet and magenta set scores 12.8, a difference no
-one can see, with its three new colours only 12.8 apart and all within 90
-degrees of hue of each other, which is the all-violet set again in other
-words. So the score is taken to a whole unit and ties go to the set whose
-new colours are furthest from each other: 21.5 for this one. Confucianism
+colours were tried together. Each set is scored by its closest pair
+among all six schools, under the worst of the three views. The highest
+score is 12.8, a blue, violet and magenta set whose three new colours
+are only 12.8 apart and all within 90 degrees of hue of each other,
+which is the all-violet set again in other words; this set scores 12.7,
+a difference no one can see. So the score is rounded to the nearest
+whole unit, and ties go to the set whose new colours are furthest from
+each other: 21.5 for this one. Confucianism
 has to be the brown, since the Ubuntu and Buddhist exclusions both cover
 it; Ubuntu and Buddhist Ethics could swap blue and violet at the same
 score, and this way round was the search's first.
 
-**What to know.** Under both simulations the brown sits closest to
-Utilitarianism's ochre (12.7 under deuteranopia), and Ubuntu's blue to
-the judge's blue in normal vision (15.1, the limit being 15). Names always
-sit beside colours, which is what the relaxed rule rests on. Confucianism
-and Ubuntu have no alternative that passes with the other two held where
-they are; Buddhist Ethics has two, shown beside it. Each card surface is
-the marker itself, except Buddhist Ethics', darkened to `#724aab` so the
-card's text holds AA at its lowest opacity.
+**What to know.**
+- The weakest pair is Confucianism's brown and Virtue Ethics' oxblood
+  under simulated deuteranopia, 12.7, and the two are neighbours on the
+  map (50 and 110 degrees). Under protanopia the brown is nearest
+  Stoicism and Virtue Ethics (17.0 each); in normal vision it is nearest
+  Utilitarianism's ochre (20.1, the limit being 20). Names always sit
+  beside colours, which is what the relaxed rule rests on.
+- The brown's hue is 21 degrees from the ochre's. The ruling's families
+  constrain the three new schools among themselves, so this is no
+  breach, and a reading that applied families across all six would rule
+  the brown out and leave only blue, violet and magenta sets, the kind
+  rejected.
+- The relaxation to 8 turned out not to be needed: this set clears the
+  original 12 (its weakest pair is 12.7), and the search with 12 picks
+  the same set.
+- Ubuntu's blue is 15.1 from the judge's blue in normal vision, the
+  limit being 15.
+- With the other two held where they are, Confucianism and Ubuntu have
+  no alternative at least 10 from the chosen colour (they have near ones,
+  4.6 to 8.5 away); Buddhist Ethics has two, shown beside it.
+- Each card surface is the marker itself, except Buddhist Ethics',
+  darkened to `#724aab` so the card's text holds AA at its lowest
+  opacity. The live schools' surfaces are all darker than their markers;
+  whether the new ones should be too was an open question at Checkpoint
+  A that ruling 16 did not answer, and it goes on Checkpoint B's list.
 
 Nothing live changes: the colours reach the site with Phase 3, behind
 `SIX_SCHOOLS`.
