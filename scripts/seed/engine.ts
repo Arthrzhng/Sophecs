@@ -66,6 +66,39 @@ export interface ExecuteOptions {
   retryBaseMs?: number;
   /** Clear this run's lock if a dead process left it more than STALE_LOCK_MINUTES ago. */
   breakStaleLock?: boolean;
+  /**
+   * End the run halted with this, not "complete", for a caller that
+   * validates next: it stays halted until finishValidation records a pass.
+   * A crash before the end leaves the run failed and resumable, as without it.
+   */
+  endHalted?: string;
+}
+
+/**
+ * A halted run: seed_runs.status "failed", with last_error starting with
+ * this. The schedule writes nothing to a halted run, and a run of it by
+ * hand keeps the halt until a validation after it passes
+ * (docs/sample-activity.md, "Stop conditions").
+ */
+export const HALT_PREFIX = "halted:";
+/** A validation found something wrong. */
+export const HALTED = `${HALT_PREFIX} validation failed`;
+/** Rows were written and no validation has passed since. */
+export const VALIDATING = `${HALT_PREFIX} validation not finished`;
+/** A refusal while writing: a row it would not adopt, a user without its ban. */
+export const REFUSED = `${HALT_PREFIX} stopped`;
+
+export function isHalted(run: Pick<SeedRun, "status" | "last_error"> | null | undefined): boolean {
+  return !!run && run.status === "failed" && (run.last_error ?? "").startsWith(HALT_PREFIX);
+}
+
+/**
+ * After a validation: a pass lifts the halt and gives the run the status
+ * execute ended it on; a failure halts it, naming the checks that failed.
+ */
+export async function finishValidation(adapter: Adapter, runId: string, endStatus: "complete" | "running", failed: string[]) {
+  if (failed.length === 0) await adapter.updateRun(runId, { status: endStatus, last_error: null });
+  else await adapter.updateRun(runId, { status: "failed", last_error: `${HALTED}: ${failed.join("; ")}`.slice(0, 500) });
 }
 
 // A live run refreshes its lock before every batch, and a batch takes
@@ -109,6 +142,8 @@ export interface ExecuteReport {
   authUsersPerSecond: number | null;
   before: Baseline;
   cancelled: boolean;
+  /** The status a passing validation gives the run (finishValidation). */
+  endStatus: "complete" | "running";
 }
 
 async function retry<T>(fn: () => Promise<T>, attempts: number, baseMs: number, log: (s: string) => void, what: string): Promise<T> {
@@ -242,7 +277,10 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     await adapter.releaseLock(run.id, token);
     throw new StopError(`run ${racing[0].id} took a lock at the same time; stopping`);
   }
-  if (!(await adapter.updateRunLocked(run.id, token, { status: "running", last_error: null })))
+  // A halted run stays halted while it is written to, whatever happens
+  // here: only a validation that passes afterwards lifts it.
+  const keep = isHalted(run) ? run.last_error! : null;
+  if (!(await adapter.updateRunLocked(run.id, token, keep ? { status: "failed", last_error: keep } : { status: "running", last_error: null })))
     throw new LockLostError(`run ${run.id}'s lock was taken before the run began`);
 
   const owners = ownerIds(ds);
@@ -252,6 +290,7 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
   let authSeconds = 0;
   let authCount = 0;
   let cancelled = false;
+  let endStatus: "complete" | "running" = "running";
 
   try {
     for (const phase of phases(ds)) {
@@ -338,9 +377,11 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
       log(`profiles brought up to date: ${updated}`);
     }
     const complete = !cancelled && limit === Infinity;
+    endStatus = complete ? "complete" : "running";
+    const hold = keep ?? opts.endHalted ?? null;
     const recorded = await adapter.updateRunLocked(run.id, token, {
-      status: complete ? "complete" : "running",
-      last_error: cancelled ? "cancelled; run the same command again to resume" : null,
+      status: hold ? "failed" : endStatus,
+      last_error: hold ?? (cancelled ? "cancelled; run the same command again to resume" : null),
       // window_to moves only when the whole plan is in: a canary or a
       // cancelled run leaves it where it was.
       ...(complete ? { window_to: plan.window.to } : {}),
@@ -355,8 +396,15 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
   } catch (err) {
     // Only while still holding the lock: a process that lost it must not
     // write over the state of the one that took it.
-    if (!(err instanceof LockLostError))
-      await adapter.updateRunLocked(run.id, token, { status: "failed", last_error: String((err as Error).message).slice(0, 500) }).catch(() => false);
+    // A refusal (StopError) halts the run, so the schedule does not try
+    // again every six hours; anything else, a database error past the
+    // retries, leaves it failed and resumable. A halt already in place is
+    // kept in front.
+    if (!(err instanceof LockLostError)) {
+      const message = String((err as Error).message);
+      const error = keep ? `${keep.slice(0, 200)}; then: ${message}` : err instanceof StopError ? `${REFUSED}: ${message}` : message;
+      await adapter.updateRunLocked(run.id, token, { status: "failed", last_error: error.slice(0, 500) }).catch(() => false);
+    }
     throw err;
   } finally {
     await releaseQuietly(adapter, run.id, token, log);
@@ -370,6 +418,7 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     seconds,
     rowsPerSecond: rows / Math.max(seconds, 0.001),
     authUsersPerSecond: authCount ? authCount / Math.max(authSeconds, 0.001) : null,
+    endStatus,
     before,
     cancelled,
   };

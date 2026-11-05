@@ -4,7 +4,7 @@
 // starts on a sample page does not load PostHog at all.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-type Opts = { before_send?: (e: unknown) => unknown };
+type Opts = { before_send?: (e: unknown) => unknown; logs?: { beforeSend?: (r: unknown) => unknown } };
 const calls: { init: Opts[]; identify: string[]; capture: string[]; recording: string[] } = { init: [], identify: [], capture: [], recording: [] };
 let recording = true;
 vi.mock("posthog-js", () => ({
@@ -67,6 +67,20 @@ describe("PostHog and sample pages", () => {
     marked = true;
     expect(beforeSend!(event)).toBeNull();
     expect(beforeSend!({ event: "$identify", properties: {} })).toBeNull();
+  });
+
+  it("drops console log records logged while a sample page is open, which skip before_send", async () => {
+    const a = await import("../../src/lib/analytics/client");
+    a.initAnalytics("anon-4");
+    await settle();
+    const beforeSend = calls.init[0]?.logs?.beforeSend;
+    expect(beforeSend).toBeTypeOf("function");
+    const record = { body: "hydrated", level: "info" };
+    expect(beforeSend!(record)).toBe(record);
+    marked = true;
+    expect(beforeSend!(record)).toBeNull();
+    marked = false;
+    expect(beforeSend!(record)).toBe(record);
   });
 
   it("drops batches recorded on a sample page and sent after the reader left it", async () => {

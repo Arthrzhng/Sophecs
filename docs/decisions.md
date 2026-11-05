@@ -2916,3 +2916,39 @@ five exactly. `scripts/test-migrations.sh` passes.
 
 **Snapshot:** `docs/seed-snapshots/2026-11-05-before-0024.json`, read from
 production at 06:00 UTC on 2026-11-05.
+
+### Sample activity: halts that hold, and console logs (2026-11-05)
+
+Arthur's ruling 19 of 2026-11-05 asked for one fresh review of #57's last
+fixes. It found nothing blocking, and four things to fix:
+
+- **A halt could be lifted without a validation passing.** `execute`
+  cleared `last_error` before writing, so a `full` run by hand that then
+  crashed left the run failed but not halted, and the next scheduled
+  `extend` wrote; and a validation that threw left the run `complete`.
+  Now every run that writes ends halted ("halted: validation not
+  finished") and only a passing validation lifts it
+  (`finishValidation`); a run by hand on a halted run keeps the halt
+  while it writes, and through a crash; and a refusal while writing (a
+  row it would not adopt or update, a user without its ban) halts the
+  run rather than leaving the schedule to try again every six hours,
+  which is what `docs/sample-activity.md`, "Stop conditions", already
+  said it did. `scripts/seed-production.ts` does the same, so a run by
+  hand from the command line cannot lift a halt either.
+- **The 5% duplicate check ran after the writes.** The rate is the
+  plan's own, so it now runs with the dry-run checks: an extension that
+  would cross it is refused before anything is written.
+- **Console logs skipped `before_send`.** posthog-js sends console log
+  records by their own path, and console capture can be switched on from
+  the PostHog project. The `logs` setting's own `beforeSend` now drops
+  each one logged while a sample page is open.
+- **The sample users' email tag** comes from the generator's random
+  streams, which are not meant for secrets. Changing it would break the
+  live run's spot checks, so it becomes an HMAC for the fresh run at
+  launch (`docs/sample-activity.md`, "At launch").
+
+And from its nits: `return_visit` was lost for a visit that started on a
+sample page (the flag was set before `track()` dropped the event), and is
+now sent from the first genuine page; the docs say what web vitals and
+the heatmap's mouse-move timer can still carry; and the stop conditions
+say what each one does.

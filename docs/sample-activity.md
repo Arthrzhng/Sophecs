@@ -76,8 +76,18 @@ challenges." `/method#samples` explains the rest.
   in batches, sometimes after the reader has left: `before_send` also
   drops any event carrying a sample page's address and any replay chunk
   recorded while one was open, and replay is paused for as long as a
-  sample page is open. A visit that starts on a sample page does not load
-  PostHog at all; the reader is identified on their first genuine page.
+  sample page is open. Console logs, which PostHog captures only if that
+  is switched on in the project, go out by another path that
+  `before_send` does not see, so the `logs` setting's own `beforeSend`
+  drops each one logged while a sample page is open. A visit that starts
+  on a sample page does not load PostHog at all; the reader is
+  identified on their first genuine page, which also sends
+  `return_visit` (`tests/seed/return-visit.test.ts`). Two things can
+  still carry a trace of a sample page, though no sample content: when a
+  visit starts on one, web vitals (if switched on) can report that page's
+  load timings and the element last touched under the first genuine
+  page's address; and the heatmap's mouse-move timer (500 ms) can file one
+  move made on a sample page just after the reader leaves it.
   `tests/seed/analytics-sample.test.ts`. The seed writes
   rows directly and emits no event. Sample quiz results carry no
   referrer. A page showing a sample passes no referrer on (`referrer:
@@ -413,28 +423,54 @@ sample teardown and a fresh run into the launch steps". In order:
 3. **A fresh run:** `canary`, then `full`, as in Rollout steps 4 and 5,
    each with Arthur's go-ahead. The new run has a new id (the canary's
    start time), and the schedule extends it once its full stage has
-   passed.
+   passed. Before its canary, the sample users' email tag becomes
+   HMAC-SHA256 of the run and the user's number, keyed by the seed: the
+   current tag comes from the generator's own random streams, which are
+   not meant for secrets, so someone who reconstructed a stream from
+   public outputs could work out every address. Nothing is exposed by
+   that (the addresses are on `sophecs.test` and the users are banned),
+   and changing it for the live run would break its spot checks, so it
+   waits for the fresh run.
 
 ## Stop conditions
 
 Stop and report, without retrying past the engine's own retries, if:
 
-- any validation check fails, exact duplicate argument texts reaching 5%
-  among them;
-- the run refuses to adopt a row;
-- auth user creation is refused, or any created user comes back without
-  its ban;
+- any validation check fails (the run halts);
+- exact duplicate argument texts would reach 5% (refused with the
+  dry-run checks, before anything is written);
+- the run refuses to adopt or update a row, or a created user comes back
+  without its ban (the run halts);
+- auth user creation fails past the retries (the run fails; the next
+  scheduled run tries again);
 - the dry-run checks find the motions differ, another run holds a lock,
-  or the plan is not the run's;
-- the canary's rate puts the full run beyond an hour.
+  or the plan is not the run's (refused before anything is written; each
+  scheduled run is refused the same way until it is put right);
+- the canary's rate puts the full run beyond an hour (a judgement made by
+  hand at the canary).
 
-A failed validation halts the run: `seed_runs.status` becomes `failed`
-with `last_error` starting "halted: validation failed", and from then on
-each scheduled run writes nothing and fails, until a `full` stage run by
-hand passes validation again. Any other failure (a lost runner, the
-timeout, a database error) is retried by the next scheduled run, which
-resumes. A run that keeps failing shows as failed runs in the Actions
-tab, and GitHub emails the account that set the schedule.
+A halted run has `seed_runs.status` `failed` and a `last_error`
+starting "halted:", and from then on each scheduled run writes nothing
+and fails, until a `full` stage run by hand passes validation again.
+Three things halt it (`scripts/seed/engine.ts`, `HALT_PREFIX`):
+
+- "halted: validation failed", naming the checks that failed;
+- "halted: validation not finished": every run that writes ends halted
+  this way, and only a validation that passes lifts it, so a validation
+  that throws, or a job lost before validating, leaves the run halted;
+- "halted: stopped", with the refusal: a row the run would not adopt or
+  update, or a user without its ban.
+
+A run by hand on a halted run keeps the halt while it writes, and if it
+fails partway, the halt stays in front of the new error; only its
+passing validation lifts it. The duplicate check runs with the dry-run
+checks, before anything is written, so an extension that would cross 5%
+is refused rather than written and halted. Any other failure (a lost
+runner, the timeout, a database error during the writes) leaves the run
+failed but not halted, and the next scheduled run resumes it.
+`tests/seed/ci.test.ts` covers each case. A run that keeps failing
+shows as failed runs in the Actions tab, and GitHub emails the account
+that set the schedule.
 
 ## Limits
 

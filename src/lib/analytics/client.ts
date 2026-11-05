@@ -32,6 +32,11 @@ async function ensureClient(): Promise<PostHog | null> {
         // loads on a genuine page and stays loaded when the reader moves on
         // to a sample one, so track()'s own check is not enough.
         before_send: (event) => (fromSamplePage(event) ? null : event),
+        // Console logs go out by their own path, which before_send does not
+        // see, and console capture can be switched on from the PostHog
+        // project. Each record is filtered when it is logged, so one logged
+        // on a sample page is dropped there.
+        logs: { beforeSend: (record) => (onSamplePage() ? null : record) },
         // The site uses no product tours. Off here rather than only in the
         // PostHog project, so a dashboard switch cannot load the extension
         // and the DOMPurify it bundles (critical advisory
