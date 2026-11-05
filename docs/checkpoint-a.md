@@ -1,5 +1,10 @@
 # Checkpoint A
 
+**Ruled on 2026-11-05.** Arthur ruled on every item below, by the numbers
+of the list sent with it: `docs/decisions.md`, "Arthur's rulings of
+2026-11-05 on Checkpoint A", has each ruling and where it is carried out.
+This file is left as the record of what was asked.
+
 The brief of 2026-11-03 ends Phase 3.0's first run of work here: one
 document, one message, then stop. This is the document. Every open item
 below is Arthur's to decide, except the last list under Housekeeping,

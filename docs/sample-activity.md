@@ -374,6 +374,24 @@ Each step only after the one before has passed:
 5. The same with `full`.
 6. From then on the schedule runs `extend` every six hours.
 
+## At launch
+
+Quiz v2 ships at launch, and a run cannot outlive a change to the quiz,
+the motions or the passages (Limits). Arthur, 2026-11-05: "plan the
+sample teardown and a fresh run into the launch steps". In order, each a
+production write under the usual process:
+
+1. **Teardown, before the launch merges.** Actions tab, "Sample
+   activity", `teardown`, with the run's id typed into
+   `confirm_teardown`. Read back that no sample row is left and that the
+   genuine counts are unchanged. Every existing sample link ends here.
+   Doing it first means no scheduled `extend` runs against the changed
+   quiz.
+2. **The launch merges**, and its production deploy is confirmed Ready.
+3. **A fresh run:** `canary`, then `full`, as in Rollout steps 4 and 5,
+   each with Arthur's go-ahead. The new run has a new id, and the
+   schedule extends it once its full stage has passed.
+
 ## Stop conditions
 
 Stop and report, without retrying past the engine's own retries, if:

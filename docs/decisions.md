@@ -2697,3 +2697,111 @@ lists 16 packages (1 critical, 6 high, 9 moderate):
 | `source-map-js` 1.2.1 | high (DoS with crafted source maps) | build only | Our own source maps. |
 | `vite` 8.2.2, `vitest` 5.0.0, `@vitest/mocker` | high and moderate (dev server and editor launch; three of the eight are Windows-only) | tests only | Never served. `npm update vite vitest` clears them: vite is a peer of vitest and has to move itself, to 8.2.4 or later. |
 | `minimatch`, `@typescript-eslint/*` (five packages) | moderate (glob DoS) | lint only | Our own globs. |
+
+### Arthur's rulings of 2026-11-05 on Checkpoint A
+
+Arthur ruled on every item of `docs/checkpoint-a.md` on 2026-11-05, by
+number. His words are quoted where they set a rule; each item says where
+it is carried out. Items carried out in code get their own entries when
+they ship.
+
+**Stage 1 and the judge**
+
+1. `confucian-hierarchy-school`: "keep the band. It's a judge weakness."
+   The band (`tests/judge/golden/confucian-hierarchy-school.json`) is not
+   widened; the miss stands as the judge's.
+2. and 11. "Yes, strengthen the v3 engagement-cap instruction (v3 isn't
+   live)." In the judge v3 pull request, with the cap of 4 kept.
+3. The power question: "Accept your reading." The readings in "2F, the
+   rerun after the objection voices" stand.
+12. "Strip comments from judge.v3.md before it is sent (v3 only)." In the
+   judge v3 pull request; v2's request is unchanged.
+13. zod 4: "yes, own PR; the six judge request fixtures must stay
+   byte-identical and v2 behaviour unchanged."
+14. Utilitarianism's objection, voiced by Virtue Ethics, becomes "what is
+   done to one person must be justifiable to that person, not only to the
+   total". "Buddhist voices stay." In the judge v3 pull request.
+
+**Production database, under the usual process**
+
+4. A 60-character check constraint on `profiles.display_name`, existing
+   rows verified first.
+5. Drop the five policies 0022 made unreachable, "NOT 'own update'". The
+   DROP statements go to Arthur for the SQL Editor rather than through the
+   Supabase tool's prompt (his instruction of the same day).
+21. "Restrict is_class_member/is_class_owner if any signed-in path doesn't
+   need them."
+22. Fix `elo_percentile`'s `search_path`.
+23. "If nothing reads exchanges_public, revoke its read access."
+
+**Spending and caps**
+
+6. "A hard daily ceiling on judge calls per reader, retries included,
+   above the 5-argument cap. Pick a sensible number and state it."
+7. The budget check totals spend in the database and fails closed.
+8. "Retries must not use a reader's arguments. Additive schema change
+   approved if needed."
+9. and 10. "No backups and no Supabase Pro: Arthur's decision." Recorded
+   below as an accepted risk; leaked-password protection is dropped.
+
+**Content**
+
+15. Quiz v2: the axes, their plain names and the six positions accepted as
+   drafted, Ubuntu at 0 degrees and Buddhist Ethics at 310 included;
+   weighted options (16.2% to 17.7%); the share lines, the site
+   description, `SharePage` and `ChallengeInvite` reworded away from "ten
+   questions about AI" to something true of v2 ("e.g. ten questions about
+   how you decide what's right"); five options reworded (2c, 5c, 7a, 7c,
+   6b, keeping their schools and vectors, with the simulation re-run);
+   1a, 10b, 3d, 5b, 6d, 9a and 8c kept as written. Quiz v2 ships at launch.
+   "No rule-based school: accept the reading", noted below.
+16. Colours: "reject the all-violet set. The three new schools must come
+   from different hue families; relax the colour-blind distance vs the
+   live three from 12 to 8 (names always sit beside colours). Pick the
+   best set under those rules, show it in the styleguide, and proceed."
+17. "Plan the sample teardown and a fresh run into the launch steps (Quiz
+   v2 ships at launch)." `docs/sample-activity.md`, "At launch".
+18. A `no-referrer` policy on sample pages.
+19. One fresh review of #57's last fixes.
+26. "No header icons: drop the item."
+
+**Security design, accepted as is (20, 24, 25)**
+
+- **The three `security_definer_view` errors** (`debates_public`,
+  `exchanges_public`, `public_results`). Each view is the public surface
+  of its table and is meant to show rows the table's own policies hide
+  from a stranger, which is what definer rights are for here. Each lists
+  its columns by name (`docs/decisions.md`, "What each public view exposes
+  on SELECT"), clients can only SELECT from them (0016, 0022), and 0018
+  and 0020 keep the private verdict fields out. Making them
+  `security_invoker` would move every one of those choices into policies
+  on the base tables: a redesign with its own risk, for no reader-facing
+  gain today.
+- **The 0018 shape.** For a private argument, withheld verdict fields are
+  left out of the public verdict rather than set to null. A stranger can
+  read nothing more either way; `verdictForViewer` and its tests
+  (`tests/verdict-privacy.test.ts`) are written against the shape as it
+  is, and changing it would change a live view for no gain.
+- **The client write policies on `blocks`, `reports` and `classes`.** Each
+  lets a signed-in reader write only rows that are their own, the same
+  writes the site makes through the server, without its checks (a class
+  past the limit, for one). No other reader's data is reachable through
+  them.
+
+**Accepted risk: no backups (9, 10)**
+
+The project stays on Supabase's free plan, so there are no daily backups
+and no Point-in-Time Recovery ("Open pre-pilot item: there is no
+restorable backup"). Arthur's decision of 2026-11-05: no backups and no
+Pro. A destructive mistake, ours or Supabase's, is unrecoverable beyond
+whatever a migration's own snapshot holds. What limits that: every
+production write goes through the usual process (a snapshot of what it
+touches, a tested rollback, a read-back), and DROP statements are run by
+Arthur himself. Leaked-password protection, which also needs Pro, is
+dropped: the site asks for no password.
+
+**No rule-based school (15)**
+
+None of the six schools is a rule-based ethics, which the quiz's axes rest
+on (`docs/quiz-v2.md`, section 1). Arthur accepted that reading. A
+duty-based school is the obvious seventh, later.
