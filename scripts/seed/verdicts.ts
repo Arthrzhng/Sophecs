@@ -16,7 +16,7 @@
 // Rule 1, the first, gives criteria in half points and holds the composite
 // inside the tier's range (strong 70-90, mid 50-70, weak 25-50) by
 // clamping. Both read as generated: the judge has never given a half point
-// (836 replies in tests/judge/golden-runs, every criterion a whole number),
+// (418 scored replies in tests/judge/golden-runs, every criterion a whole number),
 // and the clamp piles scores on the range's ends, so 23.3% of the first
 // run's composites were multiples of 5, against the judge's 16.3%.
 //
@@ -30,8 +30,9 @@
 // Which rule a verdict follows is decided by scoreRuleFor: rows dated from
 // SCORE_RULE_2_FROM, and every row of a run begun after it, follow rule 2.
 // The run begun on 2026-11-05 wrote its rows under rule 1 up to then, and
-// those rows regenerate exactly as written, which the schedule's spot
-// checks confirm on every run; they go at launch, with the run.
+// those rows regenerate exactly as written; scripts/seed/ci.ts compares
+// every stored sample score with the plan before each run writes. They go
+// at launch, with the run.
 //
 // Rule 2 makes every draw rule 1 makes, in the same order, and takes its
 // numbers from a stream of its own, so a rule-2 verdict differs from the
@@ -56,8 +57,15 @@ export const TEMPLATE_PROMPT_VERSION_2 = "sample-template-2";
 
 export type ScoreRule = 1 | 2;
 
-/** Rows dated from here, and every row of a run begun from here, follow rule 2. */
-export const SCORE_RULE_2_FROM = "2026-11-06T00:00:00.000Z";
+/**
+ * Rows dated from here, and every row of a run begun from here, follow
+ * rule 2. It must lie after every row a run has written under rule 1: the
+ * live run's window ended at 2026-11-05T14:57Z when rule 2 shipped, and the
+ * margin to here covers a merge made late. Moving it earlier than a written
+ * row would change that row; ci.ts refuses a run whose stored scores
+ * differ from its plan, so such a move fails before it writes.
+ */
+export const SCORE_RULE_2_FROM = "2026-11-06T06:00:00.000Z";
 
 export function scoreRuleFor(rowTime: number, runBaseTo: number): ScoreRule {
   const from = Date.parse(SCORE_RULE_2_FROM);
@@ -158,9 +166,9 @@ function scoreFor(tier: Tier, f: number, r: number, e: number, rng: Rng): number
 // tiers overlap, so that no whole number is rare because it sits where one
 // tier's band stops and the next begins.
 const AXIS_BANDS_2: Record<Tier, { f: [number, number]; r: [number, number]; e: [number, number] }> = {
-  strong: { f: [6.5, 9.4], r: [5.6, 9.2], e: [4.2, 8.4] },
-  mid: { f: [4.2, 8.2], r: [3.6, 7.6], e: [1.6, 6.2] },
-  weak: { f: [1.6, 5.8], r: [1.6, 5.4], e: [0.6, 3.6] },
+  strong: { f: [6.8, 9.4], r: [5.8, 9.2], e: [4.4, 8.4] },
+  mid: { f: [4.6, 8.2], r: [4.2, 7.6], e: [2.4, 6.2] },
+  weak: { f: [1.8, 5.8], r: [1.8, 5.4], e: [0.8, 3.8] },
 };
 
 /** A whole-number criterion: three in ten that land on 0, 5 or 10 move one point, inside 0-10. */
@@ -345,8 +353,9 @@ export function templateRevisionVerdict(
   };
 }
 
-export function templateRejection(rng: Rng): Rejection {
-  return { rejected: true, rejection_reason: rng.pick(REJECTIONS), prompt_version: TEMPLATE_PROMPT_VERSION };
+/** A rejection has no numbers; its prompt_version still names the rule of its row. */
+export function templateRejection(rng: Rng, rule: ScoreRule = 1): Rejection {
+  return { rejected: true, rejection_reason: rng.pick(REJECTIONS), prompt_version: promptVersionFor(rule) };
 }
 
 function shortestSentence(passages: string[]): string {

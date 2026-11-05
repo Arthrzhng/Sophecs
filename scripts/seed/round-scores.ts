@@ -3,8 +3,8 @@
 //
 // A score of 70, 75 or 80 is no less likely from the judge than 71, but a
 // page of sample verdicts where one in four is a multiple of 5 reads as
-// generated; the judge's own replies land there 16.3% of the time (836 in
-// tests/judge/golden-runs). Rule 2 of scripts/seed/verdicts.ts lands there
+// generated; the judge's own replies land there 16.3% of the time (418
+// scored replies in tests/judge/golden-runs). Rule 2 of scripts/seed/verdicts.ts lands there
 // about 12% of the time for the composite and 7-15% for each criterion.
 //
 // Counted over a run's rule-2 verdicts only. The rule-1 verdicts the run
@@ -13,6 +13,7 @@
 // not held to the limit: 23.3% of their composites are multiples of 5, and
 // they go at launch, with the run.
 
+import type { Adapter } from "./adapter";
 import type { Dataset } from "./generate";
 import type { BaselineCheck } from "./baseline";
 import { TEMPLATE_PROMPT_VERSION, TEMPLATE_PROMPT_VERSION_2 } from "./verdicts";
@@ -24,8 +25,9 @@ export const MAX_ROUND_SCORE_PCT = 20;
  * Below this many rule-2 verdicts the share is reported but not judged, so
  * that chance alone does not refuse a run. At 1000, a share of 15.4%, the
  * highest rule 2 gives (rigor, on one seed of three), comes out over 20%
- * by chance about once in forty thousand. The run begun on 2026-11-05 adds
- * about a hundred rule-2 verdicts a day; a fresh run has thousands.
+ * by chance about once in twenty-four thousand (the exact binomial). The
+ * run begun on 2026-11-05 adds about ninety rule-2 verdicts a day; a fresh
+ * run has thousands.
  */
 export const MIN_ROUND_SCORE_SAMPLE = 1000;
 
@@ -74,4 +76,49 @@ export function roundScoreCheck(
     .filter(Boolean)
     .join("; ");
   return { name: `sample scores on a multiple of 5 at most ${max}%`, ok, detail };
+}
+
+/**
+ * Every stored sample debate's score and prompt_version against the plan's.
+ *
+ * The spot checks read 50 rows a table, and so would miss a few rows that
+ * differ: what a merge made after the rule-2 cutover, with old code
+ * writing rule-1 scores past it, would leave behind. This reads them all
+ * (three short columns), so a run whose stored scores and plan disagree is
+ * refused before it writes and fails validation after. Rows the plan does
+ * not hold in scope (another run's, a canary's later cohorts) are left to
+ * the registry checks. The detail names no row: the schedule's log is
+ * public.
+ */
+export async function storedScoreCheck(
+  adapter: Pick<Adapter, "scan">,
+  ds: Pick<Dataset, "debates">,
+  opts: { cohortLimit?: number } = {}
+): Promise<BaselineCheck> {
+  const limit = opts.cohortLimit ?? Infinity;
+  const planned = new Map(
+    ds.debates.filter((d) => d.cohort < limit).map((d) => [d.rowId, { score: d.row.score, version: d.row.prompt_version }])
+  );
+  const stored = await adapter.scan("debates", ["id", "score", "prompt_version", "created_at"], { sample: true });
+  let compared = 0;
+  let differ = 0;
+  let earliest = "";
+  for (const r of stored) {
+    const p = planned.get(String(r.id));
+    if (!p) continue;
+    compared++;
+    const score = r.score === null || r.score === undefined ? null : Number(r.score);
+    if (score !== (p.score === null ? null : Number(p.score)) || r.prompt_version !== p.version) {
+      differ++;
+      const at = new Date(String(r.created_at)).toISOString();
+      if (!earliest || at < earliest) earliest = at;
+    }
+  }
+  return {
+    name: "stored sample scores match the plan",
+    ok: differ === 0,
+    detail: differ
+      ? `${differ} of ${compared} stored sample debates differ from the plan in score or prompt_version, the earliest dated ${earliest}`
+      : `${compared} stored sample debates compared`,
+  };
 }

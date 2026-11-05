@@ -629,7 +629,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     const fr = banks.fragments[topic];
     const parts = compositions.next(topic, school, tier);
     const verdict = slot.rejected ? null : templateVerdict(fr, { school, tier }, parts, u.skill, r, scoreRuleFor(slot.t, to));
-    const rejection = slot.rejected ? templateRejection(r) : null;
+    const rejection = slot.rejected ? templateRejection(r, scoreRuleFor(slot.t, to)) : null;
     const rid = id(r);
     const row: DebateRow = {
       id: rid,
@@ -685,6 +685,8 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         rejection_reason: null,
         verdict,
         score: verdict.score,
+        // Its own rule's, not the parent's: under rule 2 the two can differ.
+        prompt_version: verdict.prompt_version,
         argument_public: r.chance(0.8) ? parent.row.argument_public : !parent.row.argument_public,
         created_at: iso(rt),
         kind: "revision",

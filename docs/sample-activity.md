@@ -143,16 +143,17 @@ challenges." `/method#samples` explains the rest.
 - **Scores.** A template verdict's numbers follow a documented rule
   (`scripts/seed/verdicts.ts`). Rule 2 (`sample-template-2`) gives
   whole-number criteria, as the judge does, and lands on a multiple of 5
-  about 12% of the time for the composite and 7-15% for each criterion;
+  about 13% of the time for the composite and 5-14% for each criterion;
   the judge's own replies land there 16.3% of the time. It applies to
-  rows dated from 2026-11-06 00:00 UTC, and to every row of a run begun
+  rows dated from 2026-11-06 06:00 UTC, and to every row of a run begun
   after then. Rows the run begun on 2026-11-05 wrote before then keep
   rule 1 (half-point criteria; 23.3% of composites on a multiple of 5),
-  since the engine cannot rewrite a row it has written and the schedule's
-  spot checks hold every written row to the plan; they go at launch. A run
-  whose rule-2 scores land on a multiple of 5 more than 20% of the time,
-  for the composite or any criterion, is refused before it writes and
-  fails validation after (`scripts/seed/round-scores.ts`), once it has a
+  since the engine cannot rewrite a row it has written; they go at
+  launch. Every run compares every stored sample score with its plan
+  before it writes, and refuses on any difference. A run whose rule-2
+  scores land on a multiple of 5 more than 20% of the time, for the
+  composite or any criterion, is refused before it writes and fails
+  validation after (`scripts/seed/round-scores.ts`), once it has a
   thousand rule-2 verdicts to judge.
 
 ## Real numbers
@@ -265,7 +266,7 @@ Measured on a plan with the defaults and a test seed, base window to
 | Debaters who revise | about 15% | 12.1% |
 | Arguments in the base window, revisions included | 9,000 to 12,000 at 4,000 accounts | 8,297 (442 revisions) |
 | Rejected | about 3% | 3% |
-| Score bands 70-90 / 50-69 / 25-49 | 25 / 50 / 25 | 26 / 51.2 / 22.8 |
+| Score bands 70-90 / 50-69 / 25-49 | 25 / 50 / 25 | 26 / 51.2 / 22.8 (rule 1); rule 2, a fresh run on three seeds: 25.8-26.3 / 46.4-47.8 / 24.9-26.0, with 1.2-1.7 below 25 and 0.1-0.3 above 90 |
 | Exchanges complete / lapsed / open | 70 / 20 / 10 | 339 / 104 / 49 of 492 |
 | Challenges complete / accepted / open | | 98 / 66 / 164 |
 | Arguments sharing their exact text with another | under 5% | 0% (0.1% after ten more days) |
@@ -275,8 +276,11 @@ Measured on a plan with the defaults and a test seed, base window to
 
 **Verdicts.** The judge's own response shape, validated in the tests
 against `VerdictSchema`. The score is `10 x (0.5 F + 0.25 R + 0.25 E)`
-plus at most 2 points of noise, held in the tier's range (strong 70-90,
-mid 50-70, weak 25-50). The strongest and weakest moves quote the
+plus noise. Under rule 1 that is at most 2 points, with half-point
+criteria, held in the tier's range (strong 70-90, mid 50-70, weak
+25-50). Under rule 2 (Scores, above) it is up to 4 points, with
+whole-number criteria and no range to hold it in, and some scores on a
+multiple of 5 move a point or two. The strongest and weakest moves quote the
 argument verbatim. The named objection is the rival whose objection the
 argument does not answer, and a revision adds that answer.
 
@@ -469,6 +473,9 @@ Stop and report, without retrying past the engine's own retries, if:
 - more than 20% of the run's rule-2 scores, of the composite or of any
   criterion, would land on a multiple of 5 (refused with the dry-run
   checks, and a validation failure after a write);
+- any stored sample debate's score or `prompt_version` differs from the
+  plan (refused with the dry-run checks; what code with another score
+  rule writing past the cutover would leave);
 - the run refuses to adopt or update a row, or a created user comes back
   without its ban (the run halts);
 - auth user creation fails past the retries (the run fails; the next

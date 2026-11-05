@@ -6,7 +6,7 @@ import type { Dataset } from "./generate";
 import { phases } from "./engine";
 import { settledChecks, compareBaselines, isolationChecks, type Baseline, type BaselineCheck } from "./baseline";
 import { Rng } from "./rng";
-import { roundScoreCheck } from "./round-scores";
+import { roundScoreCheck, storedScoreCheck } from "./round-scores";
 
 export interface ValidationReport {
   ok: boolean;
@@ -88,8 +88,10 @@ export async function validate(
     checks.push({ name: "challenge links set", ok, detail: `${links.length} challenges` });
   }
 
-  // 4. Sample scores do not cluster on multiples of 5. Counted from the
-  // plan's rows, which the spot checks above hold equal to what was written.
+  // 4. Every stored sample score is the plan's, and the plan's scores do
+  // not cluster on multiples of 5; with the first, the second holds of what
+  // was written.
+  checks.push(await storedScoreCheck(adapter, ds, { cohortLimit: limit }));
   checks.push(roundScoreCheck(ds, { cohortLimit: limit }));
 
   // 5. No sample argument is waiting for a counterpart.
