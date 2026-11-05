@@ -80,9 +80,12 @@ challenges." `/method#samples` explains the rest.
   PostHog at all; the reader is identified on their first genuine page.
   `tests/seed/analytics-sample.test.ts`. The seed writes
   rows directly and emits no event. Sample quiz results carry no
-  referrer. One thing remains: a genuine page opened from a sample page
-  by a full page load reports that page's address as its `referrer`, as
-  it would for any page on the site; it is the reader's own view.
+  referrer. A page showing a sample passes no referrer on (`referrer:
+  "no-referrer"` in its metadata, `SAMPLE_PAGE_REFERRER` in
+  `src/lib/sample.ts`; Arthur, 2026-11-05), so a page opened from one by a
+  full page load does not report the sample page's address, to PostHog's
+  `page_viewed` or on a reader's own quiz result, which stores
+  `document.referrer` (`tests/seed/sample-referrer.test.ts`).
 - **Matching.** No sample argument has `seeking_counterpart_at` set, so
   `seekCounterpart` never offers one to a reader.
 - **Challenges.** A sample never answers. A reader who opens a sample

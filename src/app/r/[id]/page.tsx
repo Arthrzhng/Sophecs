@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { SamplePageMarker } from "@/components/sample/SamplePageMarker";
+import { SAMPLE_PAGE_REFERRER } from "@/lib/sample";
 import { cookies, headers } from "next/headers";
 import { CardViewTracker } from "@/components/card/CardViewTracker";
 import { SharePage } from "@/components/share/SharePage";
@@ -80,6 +81,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     title,
     description: school.one_line,
+    // A sample's page passes no referrer on (src/lib/sample.ts).
+    ...(result.is_sample && { referrer: SAMPLE_PAGE_REFERRER }),
     openGraph: {
       title,
       description: school.one_line,

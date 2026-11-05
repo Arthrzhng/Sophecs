@@ -24,6 +24,15 @@ export const TABLE_SAMPLE_NOTE = "This week's table includes sample accounts.";
 export const RANK_SAMPLE_NOTE = "This week's ranks include sample accounts.";
 
 /**
+ * A page showing a sample passes no referrer to the next page (Arthur,
+ * 2026-11-05: "no-referrer policy on sample pages"). Without it, a page
+ * opened from one by a full page load would report the sample page's
+ * address as its document.referrer, which reaches PostHog's page_viewed
+ * and is stored on a reader's own quiz result (QuizShell, submitQuizResult).
+ */
+export const SAMPLE_PAGE_REFERRER = "no-referrer" as const;
+
+/**
  * Metadata for a page that shows a sample, so the link preview says so
  * too: a page that sets only `title` inherits the root layout's Open Graph
  * and Twitter titles ("Sophecs"), which is what most previews show. The
@@ -35,6 +44,7 @@ export function sampleMetadata(title: string, image?: { url: string; alt: string
   const images = image ? [{ url: image.url, width: 1200, height: 630, alt: image.alt }] : undefined;
   return {
     title,
+    referrer: SAMPLE_PAGE_REFERRER,
     openGraph: { title, siteName: "Sophecs", type: "website" as const, ...(images && { images }) },
     twitter: { card: "summary_large_image" as const, title, ...(images && { images }) },
   };
