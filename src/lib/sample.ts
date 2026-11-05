@@ -29,10 +29,13 @@ export const RANK_SAMPLE_NOTE = "This week's ranks include sample accounts.";
  * and Twitter titles ("Sophecs"), which is what most previews show. The
  * page's own opengraph-image, where it has one, still supplies the image.
  */
-export function sampleMetadata(title: string) {
+export function sampleMetadata(title: string, image?: { url: string; alt: string }) {
+  // A page whose own segment has no opengraph-image names one here; it
+  // must be a 1200 by 630 image that carries the Sample mark itself.
+  const images = image ? [{ url: image.url, width: 1200, height: 630, alt: image.alt }] : undefined;
   return {
     title,
-    openGraph: { title, siteName: "Sophecs", type: "website" as const },
-    twitter: { card: "summary_large_image" as const, title },
+    openGraph: { title, siteName: "Sophecs", type: "website" as const, ...(images && { images }) },
+    twitter: { card: "summary_large_image" as const, title, ...(images && { images }) },
   };
 }

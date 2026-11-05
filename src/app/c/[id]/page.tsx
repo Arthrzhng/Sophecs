@@ -9,11 +9,21 @@ import { getSchool } from "@/lib/schools";
 import type { SchoolId } from "@/lib/types";
 
 // A sample account's challenge says so in the title too, which is what a
-// link preview shows first.
+// link preview shows first. Its preview image is the challenger's result
+// card, which draws the Sample mark for a sample result
+// (src/app/r/[id]/opengraph-image.tsx); a challenge whose challenger is
+// not a sample (the seed writes none) gets no image rather than an
+// unmarked one.
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const challenge = await getChallenge(id);
-  return challenge?.isSample ? sampleMetadata("A sample account's challenge · Sophecs") : { title: "You've been challenged · Sophecs" };
+  if (!challenge?.isSample) return { title: "You've been challenged · Sophecs" };
+  return sampleMetadata(
+    "A sample account's challenge · Sophecs",
+    challenge.challengerIsSample
+      ? { url: `/r/${challenge.challengerResultId}/opengraph-image`, alt: "A sample account's result card" }
+      : undefined
+  );
 }
 
 async function getChallenge(id: string) {
@@ -28,12 +38,17 @@ async function getChallenge(id: string) {
 
   const { data: result } = await admin
     .from("public_results")
-    .select("school")
+    .select("school, is_sample")
     .eq("id", challenge.challenger_result_id)
     .single();
   if (!result) return null;
 
-  return { school: result.school as SchoolId, isSample: Boolean(challenge.is_sample) };
+  return {
+    school: result.school as SchoolId,
+    isSample: Boolean(challenge.is_sample),
+    challengerResultId: challenge.challenger_result_id as string,
+    challengerIsSample: Boolean(result.is_sample),
+  };
 }
 
 export default async function ChallengePage({ params }: { params: Promise<{ id: string }> }) {

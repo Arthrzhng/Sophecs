@@ -17,8 +17,11 @@ export default async function VerdictOGImage({
   params: Promise<{ slug: string; debateId: string }>;
 }) {
   const { debateId } = await params;
-  const [spectral, plexSans, plexMono] = await loadOgFonts();
 
+  // As on the result card (src/app/r/[id]/opengraph-image.tsx): without a
+  // database the card falls back to a default; with one, a verdict the
+  // lookup does not return gets no image and is not cached, rather than a
+  // default card cached for a year that would carry no Sample mark.
   let school: SchoolId = "stoicism";
   let motion = "Sophecs";
   let score = 0;
@@ -31,23 +34,24 @@ export default async function VerdictOGImage({
       .select("school, score, topic_slug, motion_text, is_sample")
       .eq("id", debateId)
       .maybeSingle();
-    if (data) {
-      school = data.school as SchoolId;
-      score = Number(data.score ?? 0);
-      sample = Boolean(data.is_sample);
-      // The stored wording comes from the view with the rest (migration
-      // 0020), as on the verdict page; the topic's current motion is the
-      // fallback for a debate stored before motion_text existed.
-      const { data: topic } = await admin
-        .from("debate_topics")
-        .select("motion")
-        .eq("slug", data.topic_slug)
-        .maybeSingle();
-      if (topic) {
-        motion = motionForDebate(data.motion_text as string | null, topic.motion);
-      }
+    if (!data) return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+    school = data.school as SchoolId;
+    score = Number(data.score ?? 0);
+    sample = Boolean(data.is_sample);
+    // The stored wording comes from the view with the rest (migration
+    // 0020), as on the verdict page; the topic's current motion is the
+    // fallback for a debate stored before motion_text existed.
+    const { data: topic } = await admin
+      .from("debate_topics")
+      .select("motion")
+      .eq("slug", data.topic_slug)
+      .maybeSingle();
+    if (topic) {
+      motion = motionForDebate(data.motion_text as string | null, topic.motion);
     }
   }
+
+  const [spectral, plexSans, plexMono] = await loadOgFonts();
 
   return new ImageResponse(
     (
