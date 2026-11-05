@@ -987,6 +987,9 @@ Nothing in the repository holds any of it: the committed snapshot,
 `docs/seed-snapshots/2026-10-21-phase2c-pre-migration.json`, is schema and
 shape only, because this repository is public.
 
+**Closed 2026-11-05.** Arthur dropped it in the SQL Editor; read back at
+03:05 UTC, gone, with the live tables unchanged (`docs/progress.md`).
+
 ### Open pre-pilot item: there is no restorable backup
 
 The project is on Supabase's free plan, which has no daily backups and no
@@ -2463,6 +2466,159 @@ goes through the database's own permissions and is part of the wider
 write-permission fix reported to Arthur on 2026-11-03, which waits on his
 "yes, the grants fix"; its details stay out of this public file until it
 is closed.
+
+### No client may update a challenge (migration 0021)
+
+Part of the write permissions reported to Arthur under STOP NOW on
+2026-11-03, and named again while building sample activity (#57), since
+it is live in production and the site never needs it. Arthur's ruling of
+2026-11-04 takes this one piece of the wider grants fix on its own:
+"drop the 'accept sets challengee' policy and add a caller-is-a-party
+check to assignChallengeTopic, under the views process (local test,
+snapshot, apply, read-back, advisor before/after)". The rest of the
+grants fix still waits on his "yes, the grants fix".
+
+**The hole.** 0001 gave `anon` and `authenticated` an update policy on
+`challenges`, "accept sets challengee", with `using (true)` and
+`with check (true)`, and the table grants UPDATE to both. A select policy
+narrows an update only when the statement reads a column. Through the
+Data API every update carries a filter (Supabase runs it with
+`safeupdate`), so the reach there is the rows the caller can read: a
+signed-in party could rewrite any column of its own challenges, the other
+side's result and the debate ids included, and `recordChallengeDebate`
+trusts those debate ids when it moves both readers' ratings. In SQL as
+the anon role an update with no filter reached every row; the message of
+2026-11-03 said "anyone ... can edit any existing challenge", which holds
+for that SQL session and overstates what the Data API allows. Every
+challenge write the site makes is through the server role:
+`createChallenge`, `submitQuizResult`, `assignChallengeTopic` and
+`recordChallengeDebate`.
+
+**The fix.** `0021_challenges_no_client_update.sql` drops the policy, so
+row level security refuses every client update; grants and the other two
+policies are unchanged. `scripts/test-0021-challenges-update.sh` shows on
+local Postgres with production's grants that before it anon reaches all
+three challenges with an unfiltered update and a party its own, that
+after it neither reaches any while the server role still writes and a
+party still reads, and that the rollback restores the policy exactly and
+0021 applies again. `assignChallengeTopic` now answers a signed-in
+stranger as it answers a missing challenge, using the same party test
+`/api/judge` applies (`resolveChallengeSide`); `tests/challenge-topic.test.ts`.
+`/r/[id]` shows "Debate them" only to the two parties
+(`viewerIsChallengeParty`), since anyone else would now get an error from
+it; they get what the page offers without it ("Challenge a friend" to
+the result's owner, "Take the quiz" to anyone else, since #60). A party whose result is not saved to their
+account is refused, as `/api/judge` would not record their debate either.
+
+**Applied by hand on 2026-11-05**, in the Supabase SQL Editor, after the
+tool's confirmation prompt timed out four times: so it is not in
+Supabase's migration list. Snapshot, read-back and advisor are in
+`docs/progress.md`.
+
+### Clients keep only the writes the site makes (migration 0022)
+
+Reported to Arthur under STOP NOW on 2026-11-03 and kept out of the repo
+until closed; his "yes, the grants fix" came on 2026-11-04, "under the
+same process (local test, snapshot, apply, read-back, advisor
+before/after)". 0021 took the challenges update policy on its own first.
+
+**The holes.** Supabase's default privileges give `anon` and
+`authenticated` every privilege on every table made in `public`, so row
+level security is all that stands between the public key and a write.
+Six early policies, on five tables, allowed writes the site never makes
+with a client key:
+
+- `debates`, "debates insert own": a signed-in user could insert rows
+  under their own id with any verdict, score and rating, which
+  `debates_public` then shows on a public verdict page.
+- `profiles`, "own update" and "own insert": no column limit, so a user
+  could set their own rating, streak and school, or create a profile with
+  them before the site made one.
+- `challenges` and `quiz_results`, "anon insert own", `with check (true)`:
+  anyone holding the public key could insert any row, a challenge naming
+  someone else's result included.
+- `class_members`, "member join self": a signed-in user who knew a class's
+  id could join it without the code and past the joining limit.
+
+Every one of these writes goes through the server role in the site:
+`src/app/actions.ts`, `src/app/api/judge/route.ts`,
+`src/app/debate/actions.ts`, `src/app/me/actions.ts`, `src/lib/claim.ts`
+and `src/lib/challenge.ts`.
+
+**The fix.** `0022_client_write_grants.sql` revokes INSERT, UPDATE,
+DELETE, TRUNCATE, REFERENCES and TRIGGER on the five tables from `anon`
+and `authenticated`, and gives back only what the site uses with a client
+key: UPDATE of `profiles.display_name` and
+`profiles.argument_default_public` (`setDisplayName`,
+`setArgumentDefaultPublic`) and DELETE on `class_members` (`leaveClass`),
+both to `authenticated` only. SELECT is unchanged. On Postgres 17 it also
+revokes MAINTAIN from these tables and from the four public views, which
+0016 missed ("Phase 3 item: move `motion_text` into `debates_public`").
+`reading_responses`, which the site writes signed in, is not touched.
+The policies stay, unreachable without the grant; dropping them is a
+second change to review, and the grant alone is what decides. A REVOKE
+that finds nothing it may take (a privilege another role granted) still
+succeeds, so the migration ends by reading what anon and authenticated
+hold, on each table and on any of its columns, and fails as a whole if
+anything meant to go is left.
+
+**Beyond the wording Arthur approved.** The proposal he said yes to named
+INSERT, UPDATE and DELETE on `debates`, `challenges` and `quiz_results`,
+UPDATE on `profiles` limited to two columns, INSERT on `class_members`,
+and MAINTAIN on the views. The migration also revokes TRUNCATE,
+REFERENCES, TRIGGER and MAINTAIN on the five tables (none reachable
+through the Data API, none used); INSERT and DELETE on `profiles` (without
+the INSERT revoke, a signed-in user could create their own profile, with
+any rating, before the server makes it at first sign-in); UPDATE on
+`class_members`; and DELETE on `class_members` for anon. These are put to
+him before it is applied.
+
+Three other tables have client write policies the site also does not use:
+`blocks` ("blocks own"), `reports` ("reports insert own") and `classes`
+("class insert own"). Each lets a signed-in user do to their own rows
+what the site already lets them do, without its validation (a class past
+the limit, a block, a report). They were not in the approved fix and are
+left as they are.
+
+**Tests.** `scripts/test-0022-client-write-grants.sh` sets Supabase's
+default privileges on local Postgres 16, applies every migration before
+0022, and checks that each of the six writes goes through before it and
+is refused after; that the client writes the site makes and its reads
+still work, as anon, signed in and as the server role; each object's
+exact ACL after it; that the rollback restores every ACL as it was, and
+0022 applies again; and that privileges granted by another role, one of
+each shape (both roles, a table privilege, TRUNCATE, an INSERT on columns
+only, an UPDATE of a profiles column other than the two kept, and a
+table-level UPDATE on `profiles`, the one table-level case the check reads
+column by column), make 0022 fail naming each, without changing anything.
+Breaking it on purpose, each caught (rerun on the final version): no
+column grant (5 checks fail), DELETE on `class_members` revoked too (3),
+the rollback keeping the column grant (1), the rollback leaving out
+`class_members` (2), the closing check removed (7), and the closing check
+narrowed to one role (4), one table (2), one privilege (1), no profiles
+columns (2) or table-level privileges only (1); and `profiles` left out
+of the revoke, or the column grant given to anon too, each make 0022
+refuse to apply. Postgres 16 has no MAINTAIN: in production 0022's closing
+check fails the migration if MAINTAIN is left and the read-back confirms
+it, but the rollback's MAINTAIN half is not tested anywhere.
+`tests/client-writes.test.ts` finds every `.from(...)` and `.rpc(...)` in
+`src/`, works out whether the receiver is the admin client, reports every
+other one that is not a read (its first method is not `.select(`, a
+builder kept in a variable included), with the columns an update sets
+(a spread or a non-literal shows as `?`), and checks that every helper
+taking `admin: SupabaseClient` is given the admin client. The report is
+held to the site's four client writes, so a new signed-in write fails a
+unit test rather than production. It reads strings and comments as
+blanks, leaves storage buckets out, and its header lists what it cannot
+see, none of which `src/` does today.
+
+For a later list: the column grant lets the Data API set `display_name`
+without `setDisplayName`'s trim and 60-character limit, as "own update"
+already did before 0022, and class owners see that name. A check
+constraint on the column would hold it.
+
+**Snapshot, read-back and advisor:** recorded in `docs/progress.md` when
+0022 is applied.
 
 ### For Checkpoint A, from the security work
 

@@ -38,6 +38,21 @@ export async function pickChallengeTopic(
 
 export type ChallengeSide = "challenger" | "challengee";
 
+/**
+ * Whether a viewer is one of a challenge's two parties: they own one
+ * side's result, by the anon_id cookie the quiz was taken under or by the
+ * signed-in account the result is saved to. /r/[id] shows "Debate them"
+ * only to a party, since assignChallengeTopic refuses anyone else.
+ */
+export function viewerIsChallengeParty(
+  viewer: { anonId?: string | null; userId?: string | null },
+  owners: ({ anon_id?: string | null; user_id?: string | null } | null)[]
+): boolean {
+  return owners.some(
+    (o) => Boolean(o && ((viewer.anonId && o.anon_id === viewer.anonId) || (viewer.userId && o.user_id === viewer.userId)))
+  );
+}
+
 export async function resolveChallengeSide(
   admin: SupabaseClient,
   challenge: { challenger_result_id: string; challengee_result_id: string | null },

@@ -6,6 +6,7 @@ import { SharePage } from "@/components/share/SharePage";
 import { getSchool, pickShareLine } from "@/lib/schools";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
+import { viewerIsChallengeParty } from "@/lib/challenge";
 import type { QuizResultRow } from "@/lib/types";
 
 export const revalidate = 86400; // s-maxage=86400 — result rows never change
@@ -35,6 +36,13 @@ async function getOwnerUserId(id: string): Promise<string | null> {
   const admin = createAdminClient();
   const { data } = await admin.from("quiz_results").select("user_id").eq("id", id).maybeSingle();
   return (data?.user_id as string | undefined) ?? null;
+}
+
+async function getResultOwners(id: string): Promise<{ anon_id: string | null; user_id: string | null } | null> {
+  if (!isAdminConfigured()) return null;
+  const admin = createAdminClient();
+  const { data } = await admin.from("quiz_results").select("anon_id, user_id").eq("id", id).maybeSingle();
+  return (data as { anon_id: string | null; user_id: string | null } | null) ?? null;
 }
 
 interface ChallengeInfo {
@@ -116,7 +124,16 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
   const otherResult =
     challengerFromLink ?? (challengeInfo ? await getResult(challengeInfo.otherResultId) : null);
   const { text: shareLine, index: shareLineIndex } = pickShareLine(result.school, result.id);
-  const showDebateThem = Boolean(challengeInfo && challengeInfo.status !== "complete");
+  // "Debate them" is for the challenge's two parties only. assignChallengeTopic
+  // refuses anyone else, so for them it would end in an error; they get
+  // the ordinary challenge button as the page's main action instead.
+  const viewerIsParty =
+    challengeInfo !== null &&
+    viewerIsChallengeParty({ anonId: viewerAnonId, userId: user?.id }, [
+      { anon_id: ownerAnonId, user_id: ownerUserId },
+      await getResultOwners(challengeInfo.otherResultId),
+    ]);
+  const showDebateThem = Boolean(challengeInfo && challengeInfo.status !== "complete" && viewerIsParty);
 
 
   return (

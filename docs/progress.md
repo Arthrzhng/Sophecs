@@ -228,6 +228,98 @@ entry names.
   owner can challenge from it (2026-11-04)". `tests/create-challenge.test.ts`.
   `src/app/actions.ts` is frozen; Arthur's ruling of 2026-11-04 asked for
   this fix.
+- #60 merged as `fc42fdf`, after one review pass. Production deploy
+  `dpl_64CL9LcFpwZtU8i5kzAi3MGC35yg`, Ready (read from Vercel).
+
+## 2026-11-04: no client may update a challenge (migration 0021)
+
+- Arthur's ruling of 2026-11-04, ahead of sample activity: drop the
+  `challenges` update policy, and a party check in `assignChallengeTopic`.
+  `docs/decisions.md`, "No client may update a challenge (migration 0021)".
+- Tested on local Postgres: `scripts/test-0021-challenges-update.sh`, all
+  checks passed; `tests/challenge-topic.test.ts`, which fails two of its
+  five cases with the check removed.
+- The private verdict check that 0018 left open (Arthur, 2026-11-04:
+  "Finish 0018 and the private verdict check"). Production's page for the
+  one genuine argument, which is private, fetched as a stranger through
+  Vercel at 08:06 UTC on 2026-11-04: status 200, not from cache. It shows
+  the score and the three sub-scores, "The verdict on a private
+  argument", the withheld-note line and "The author has not published
+  this argument." The verdict the page receives has exactly `rejected`,
+  `score`, `fidelity`, `rigor`, `engagement` and `prompt_version`, with
+  `argument: null` and `textWithheld: true`: no field that can quote the
+  argument reaches a stranger, as 0018 and 0020's keep-list intend.
+- **0021 applied by hand.** The Supabase tool's confirmation prompt for
+  a DROP timed out unanswered four times, so on 2026-11-05 Arthur ran the
+  file himself in the Supabase SQL Editor, the whole of it as reviewed
+  (`supabase/migrations/0021_challenges_no_client_update.sql`, sha256
+  `16ac74c0...6358d0a`), and reported "Success. No rows returned". **It
+  is not in Supabase's migration list** (`supabase_migrations`), which
+  goes from 0020 to 0022: the SQL Editor runs a statement without
+  recording a migration. Anyone comparing that list with the repository
+  should expect the gap. 0022 had gone in first, at 03:00:50 UTC; the two
+  are independent.
+  - Before: the snapshot is
+    `docs/seed-snapshots/2026-11-04-challenges-policies-before-0021.json`,
+    re-checked at 02:59 UTC on 2026-11-05 (the same three policies). The
+    security advisor before is the one run for 0022 that morning.
+  - Read back at 03:10 UTC: the policies on `challenges` are
+    "anon insert own" and "challenges read party", none for UPDATE; row
+    level security on; grants as 0022 left them (`anon=r`,
+    `authenticated=r`); 3 rows, none past open.
+  - Security advisor after: the same findings as before.
+- **`backup_20261022` dropped by hand.** For the same reason Arthur ran
+  `drop schema backup_20261022 cascade;` in the SQL Editor on
+  2026-11-05. Before, a read found only its four tables, their TOAST
+  tables and array types, with nothing outside the schema depending on
+  them. Read back at 03:05 UTC: no schema named `backup%`; the live
+  tables keep their rows (1 debate, 1 profile, 28 quiz results, 3
+  challenges). The open item in `docs/decisions.md` is closed.
+
+## 2026-11-04: clients keep only the writes the site makes (migration 0022)
+
+- Arthur's "yes, the grants fix" of 2026-11-04, under the views process.
+  `docs/decisions.md`, "Clients keep only the writes the site makes
+  (migration 0022)".
+- Tested on local Postgres: `scripts/test-0022-client-write-grants.sh`,
+  all checks passed, and thirteen deliberate breaks each caught (named in
+  `docs/decisions.md`); `scripts/test-migrations.sh`;
+  `tests/client-writes.test.ts`.
+- Three fresh review passes, no blocking finding. Fixed after the first:
+  the test's Postgres 17 check counted every table; a REVOKE that takes
+  nothing passed silently (the migration now checks what is left and
+  fails); the client-writes scan missed five ways of reaching a session
+  client; what goes beyond the approved wording is now listed; four doc
+  errors. After the second: the closing check missed column-only grants
+  and was tested on one case only; the scan passed a comment inside a
+  chain, a builder kept in a variable, and update keys it could not read.
+  After the third: the scan read strings and comments as code, reported
+  storage buckets, and trusted any `admin` parameter; two stale counts.
+- Arthur said yes to the revokes beyond the approved wording on
+  2026-11-05 ("Yes, with the extras").
+- **Applied in production at 03:00:50 UTC on 2026-11-05**, migration
+  version `20261105030050`, through the Supabase tool, with no prompt
+  (it has no DROP). Applied before 0021, which Arthur then ran by hand (above); the
+  two are independent, and 0022 alone already takes UPDATE on
+  `challenges` from both roles.
+  - Before: security advisor run (3 `security_definer_view` errors, the
+    known warnings and one info); no active session, no `ai_calls` row and
+    no unjudged debate in the previous 10 minutes; snapshot taken,
+    `docs/seed-snapshots/2026-11-05-client-grants-before-0022.json`. Every
+    grant's grantor was `postgres`, the owner and the runner, with no
+    column privileges: the state the local test models and the rollback
+    restores.
+  - The migration's own closing check passed.
+  - Read back at 03:01 UTC: each table `anon=r`, `authenticated=r`
+    (`class_members`: `authenticated=rd`); the views `anon=r`,
+    `authenticated=r`, `profiles_public` nothing; column grants only
+    `authenticated=w` on `profiles.display_name` and
+    `profiles.argument_default_public`; owner and `service_role` unchanged
+    (`arwdDxtm`). Privilege probes: no INSERT, UPDATE or DELETE left for
+    either role on the five tables but the kept three; no MAINTAIN;
+    SELECT kept on the tables and views; `reading_responses` unchanged.
+    13 policies and every row count unchanged.
+  - Security advisor after: the same findings as before.
 
 ## 2026-11-04: sample activity, revised to Arthur's ruling, not yet run
 
@@ -240,7 +332,8 @@ entry names.
   pages that never show a sample; exact duplicate arguments under 5%; no
   genuine-row export. `docs/sample-activity.md` has the design.
 - Branch `sample-activity`:
-  - migration 0022 (0021 went to the challenges fix): the marker, the
+  - migration 0023 (0021 went to the challenges fix, 0022 to the client
+    grants fix): the marker, the
     registry (no seed stored; `base_to`, `last_report`), eleven triggers,
     the marker on the two views, `elo_percentile` over genuine profiles,
     an index on `debates(created_at)`;
@@ -255,7 +348,7 @@ entry names.
     three pages' titles; a sample-page marker that stops every analytics
     event; samples left out of class pages; a sample challenge never
     accepted; a query in the doc for real and sample counts.
-- Tested on local Postgres 16: the 0022 test and the migration round trip
+- Tested on local Postgres 16: the sample migration's test and the round trip
   pass; 600 accounts end to end, canary, full, an extension three days on
   that wrote only the 59 new arguments and the 24 profiles they moved, the
   earlier plan then refused, validation passing, and teardown leaving the
@@ -281,7 +374,7 @@ entry names.
   - Sample addresses carry a seed-derived tag, so they cannot be worked
     out from the public run id.
   - The docs say the motions and passages are fixed for a run's life.
-- Retested after the fixes: the five gates, the 0022 test, and the 600
+- Retested after the fixes: the five gates, the migration's test, and the 600
   account end-to-end run with the extension and teardown. That run caught
   the local adapter still reading the old address format at teardown,
   which refused rather than deleted; fixed.

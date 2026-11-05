@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { pickChallengeTopic } from "@/lib/challenge";
+import { pickChallengeTopic, resolveChallengeSide } from "@/lib/challenge";
 import { MAX_RETRIEVAL_RESPONSE_CHARS } from "@/lib/micro-lessons";
 import { newId } from "@/lib/ids";
 
@@ -37,7 +37,10 @@ type AssignTopicResult = { ok: true; topicSlug: string } | { ok: false; error: s
 
 // Called from "Debate them" on /r/[id]. Sets challenges.topic_slug on
 // first click so both sides get the same topic — subsequent clicks (by
-// either side) just return the already-assigned one.
+// either side) just return the already-assigned one. Only a party may: the
+// caller must own the challenger's or the challengee's result, the same
+// test /api/judge applies before it records a debate on the challenge. A
+// stranger gets the same answer as a challenge that does not exist.
 export async function assignChallengeTopic(challengeId: string): Promise<AssignTopicResult> {
   const supabase = await createSupabaseServerClient();
   const {
@@ -52,6 +55,7 @@ export async function assignChallengeTopic(challengeId: string): Promise<AssignT
     .eq("id", challengeId)
     .maybeSingle();
   if (!challenge) return { ok: false, error: "Challenge not found." };
+  if (!(await resolveChallengeSide(admin, challenge, user.id))) return { ok: false, error: "Challenge not found." };
 
   if (challenge.topic_slug) {
     return { ok: true, topicSlug: challenge.topic_slug };
