@@ -4,8 +4,9 @@
 // matchers (path-to-regexp for the path, matchHas for the host and query),
 // their status read as Next reads it, and Next's own validation run on
 // them. In production Vercel's router runs them, after converting them; no
-// check before a merge can reach production-only rules, so the check made
-// on the live hosts after the merge will be recorded in docs/progress.md.
+// check before a merge can reach production-only rules, so the live hosts
+// are checked after each merge that changes them (docs/progress.md,
+// "2026-11-05: one address").
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getPathMatch } from "next/dist/shared/lib/router/utils/path-match";
 import { matchHas } from "next/dist/shared/lib/router/utils/prepare-destination";
@@ -57,7 +58,7 @@ describe("on production", () => {
       for (const path of ["/", "/debate", "/debate/opaque-benefit", "/me"]) expect(route(rules, host, path), `${host}${path}`).toBeNull();
   });
 
-  it("sends every other host to the same path and query on sophecs.com, for now with a 307", () => {
+  it("sends every other host to the same path and query on sophecs.com, with a 308", () => {
     for (const host of [
       "sophecs.vercel.app",
       "www.sophecs.com",
@@ -68,9 +69,9 @@ describe("on production", () => {
       "sophecs.com.evil.example",
       "xsophecs.com",
     ]) {
-      expect(route(rules, host, "/"), host).toEqual({ status: 307, location: "https://sophecs.com/" });
+      expect(route(rules, host, "/"), host).toEqual({ status: 308, location: "https://sophecs.com/" });
       expect(route(rules, host, "/debate/opaque-benefit", { x: "1" }), host).toEqual({
-        status: 307,
+        status: 308,
         location: "https://sophecs.com/debate/opaque-benefit?x=1",
       });
     }
@@ -93,13 +94,13 @@ describe("on production", () => {
     expect(route(rules, "sophecs.com", "/debate", { code: "abc123" })).toBeNull();
   });
 
-  it("passes Next's own validation, and Next builds both as 307s", async () => {
+  it("passes Next's own validation, and Next builds the sign-in rule as a 307 and the host rule as a 308", async () => {
     // What next build does with them: an invalid rule throws here, and the
     // status comes from whichever of permanent or statusCode a rule sets.
     const custom = await loadCustomRoutes({ redirects: async () => rules } as never);
     const ours = custom.redirects.filter((r) => !(r as { internal?: boolean }).internal);
     expect(ours).toHaveLength(2);
-    for (const r of ours) expect(buildCustomRoute("redirect", r, ["/_next"]).statusCode).toBe(307);
+    expect(ours.map((r) => buildCustomRoute("redirect", r, ["/_next"]).statusCode)).toEqual([307, 308]);
     for (const r of rules) expect("statusCode" in r).toBe(false);
   });
 
