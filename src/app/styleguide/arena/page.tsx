@@ -397,7 +397,7 @@ export default function ArenaPreviewPage() {
         />
       </Section>
 
-      <Section title="9. School table: two schools tied, one not ranked yet, your line not argued yet">
+      <Section title="9. School table: two schools tied, your line not argued yet">
         <SchoolTable
           week={FIXTURE_WEEK}
           rows={FIXTURE_TABLE_TIED}

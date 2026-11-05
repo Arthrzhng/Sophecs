@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import {
   countsOnTable,
   isoWeekRange,
@@ -111,7 +111,22 @@ describe("rankSchools", () => {
     expect(stoic.avgFidelity).toBe(8);
   });
 
-  it(`ranks a school once it has ${RANK_MIN_ARGUMENTS} judged original arguments in the week, and not before`, () => {
+  // Arthur's ruling (e)5 holds on SIX_SCHOOLS builds; the live table is
+  // his to rule on (src/lib/school-table.ts).
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("without the flag, ranks every school with an average, however few its arguments", () => {
+    vi.stubEnv("SIX_SCHOOLS", "0");
+    const rows = rankSchools([...many("stoicism", 3, 9), ...many("utilitarianism", 1, 5)], NONE);
+    expect(rows.map((r) => [r.school, r.rank])).toEqual([
+      ["stoicism", 1],
+      ["utilitarianism", 2],
+      ["virtue-ethics", null],
+    ]);
+  });
+
+  it(`on a SIX_SCHOOLS build, ranks a school once it has ${RANK_MIN_ARGUMENTS} judged original arguments in the week, and not before`, () => {
+    vi.stubEnv("SIX_SCHOOLS", "1");
     expect(RANK_MIN_ARGUMENTS).toBe(20);
     const rows = rankSchools(
       [
@@ -133,6 +148,7 @@ describe("rankSchools", () => {
   });
 
   it("counts an argument with no fidelity mark towards the threshold", () => {
+    vi.stubEnv("SIX_SCHOOLS", "1");
     const rows = rankSchools([...many("stoicism", 19, 7), ...many("stoicism", 1, null)], NONE);
     const stoic = rows.find((r) => r.school === "stoicism")!;
     expect(stoic.arguments).toBe(20);

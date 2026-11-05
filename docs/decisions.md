@@ -3692,17 +3692,18 @@ runs pass." Agreed that nothing promotes a flag-on preview to Production.
   runs, on flag-on builds in step 4 and everywhere at launch, because v1,
   still live, does take about eighty seconds.
 - **5.** "A school is ranked once it has 20 judged original arguments in
-  the week." `RANK_MIN_ARGUMENTS` in `src/lib/school-table.ts`, read by
-  the live table, Today's school card and the six-school preview alike;
-  an unranked row says how many it has. In week 45 the three live
-  schools had 202, 186 and 112 judged originals (`debates`, kind
-  original, not rejected, with a verdict, created from 2026-11-02, read
-  at 22:14 UTC), every one a sample account's. So the live table shows
-  the same today, and from each Monday every school is unranked until it
-  has 20. The ruling is stated for any school, with no build named, so
-  it holds on the live table as on the preview; that is a change
-  production readers see from Monday 9 November, and the report to
-  Arthur says so.
+  the week." `RANK_MIN_ARGUMENTS` in `src/lib/school-table.ts`. Checkpoint
+  B's question (`docs/checkpoint-b.md`, (e) 5) was about the Phase 3
+  preview's table, so the threshold holds on SIX_SCHOOLS builds: the
+  six-row table, Today's school card and the preview, where an unranked
+  row says how many it has. A build without the flag ranks as before,
+  every school with an average. Whether the live table takes the same
+  rule is put to Arthur. It would change what production readers see:
+  in week 45 the three live schools had 202, 186 and 112 judged originals
+  (`debates`, kind original, not rejected, with a verdict, created from
+  2026-11-02, read at 22:14 UTC), every one a sample account's, so
+  nothing would show today, but from each Monday every school would be
+  unranked until it reached 20.
 - **6.** "Show the view from elsewhere only once the reader reaches step
   4." `showsElsewhere` in `src/lib/today-path.ts`: shown once step 4 is
   not locked, which, since steps 3 and 4 complete together, is once the
@@ -3710,9 +3711,9 @@ runs pass." Agreed that nothing promotes a flag-on preview to Production.
 - **7.** The three's school pages keep "Take the quiz" and "Argue a motion
   from it", as they will be at launch.
 - **8.** "Covered by the re-screening job; keep the copy accurate." The
-  copy is unchanged here. The job is (d) 4's own pull request, which
-  adds the one line the copy then needs ("A check that could not run is
-  tried again once a day."); until it ships, nothing re-screens.
+  copy is unchanged here. The job is #89, open when this merged; it
+  proposes one sentence for the copy, to match what the job does. Until
+  it merges, nothing re-screens.
 - **9.** "UNVERIFIED bars a source's use as a citation or attribution.
   Wording verified elsewhere may be used with that source credited. The
   Ubuntu one_line stays, attributed to Metz 2007, p. 322, which is

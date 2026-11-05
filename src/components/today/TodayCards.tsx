@@ -138,8 +138,9 @@ export function SchoolCard({
   elo: number;
   /**
    * The school's place on this week's table, or null while it is not
-   * ranked: fewer than RANK_MIN_ARGUMENTS judged original arguments this
-   * week (src/lib/school-table.ts), or none with a fidelity mark.
+   * ranked: none of its arguments has a fidelity mark this week, or, on a
+   * SIX_SCHOOLS build, it has fewer than RANK_MIN_ARGUMENTS
+   * (src/lib/school-table.ts).
    */
   rank: number | null;
   /** This week's ranks count a sample account's argument (migration 0023). */

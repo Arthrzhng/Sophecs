@@ -683,7 +683,7 @@ deploy below was read from Vercel as Ready.
   compared 8,403 rows, and the round-score check read "rule 2: 0
   verdicts; too few to judge", as expected before the 06:00 cutover.
   The schedule itself has fired once (14:57 UTC, for the 12:41 slot);
-  the 18:41 slot did not run.
+  the 18:41 slot had not run by 22:45 UTC.
 - The full v3 golden run after #68, (b) 2: 105 calls, $1.3586, on branch
   `rulings-e` (#86). Eval key spend is now **$7.1520 of $8.00**. It does
   not pass; `docs/decisions.md`, "Arthur's rulings of 2026-11-05 on

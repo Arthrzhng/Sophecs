@@ -239,7 +239,7 @@ is given in full to a screen reader rather than the letter.
 | State | Copy |
 |---|---|
 | ranked | `{First\|Second\|...\|Sixth} on the table this week` |
-| the school is not ranked: fewer than 20 judged original arguments this week, or none with a fidelity mark | `Not ranked yet this week` |
+| the school is not ranked: none of its arguments has a fidelity mark this week, or, on a SIX_SCHOOLS build, fewer than 20 judged original arguments | `Not ranked yet this week` |
 
 The place is a word, not `1st`: the rating on the line above is a numeral
 set in mono, and two numerals one under the other saying different kinds of
@@ -371,10 +371,11 @@ verdict page is unchanged.
 | Judging paused | the empty-week line, then `Judging is paused while we check the quality of the verdicts.` |
 
 Ties share a rank. Rank is by average fidelity, then by number of arguments.
-A school with no average, or with fewer than 20 judged original arguments in
-the week, has no rank, and its row says how many it has (`School table, a
-school not yet ranked`, below). Week is the ISO week, the same one the
-weekly motion uses.
+A school with no average has no rank. On a SIX_SCHOOLS build, neither has
+one with fewer than 20 judged original arguments in the week, and its row
+says how many it has, except in an empty week, whose own line says it
+(`School table, a school not yet ranked`, below). Week is the ISO week,
+the same one the weekly motion uses.
 
 Originals only. A revision is a second attempt at the same motion after
 feedback and does not move the reader's rating, so it does not move their
@@ -484,8 +485,9 @@ The axis names are `docs/quiz-v2.md`'s, and change if that draft does.
 
 {N} is 20, Arthur's ruling (e)5 of 2026-11-05: a school is ranked once it
 has 20 judged original arguments in the week. It is `RANK_MIN_ARGUMENTS`
-in `src/lib/school-table.ts`, and holds on the live table and Today's
-school card as well as the six-school preview.
+in `src/lib/school-table.ts`, and holds on SIX_SCHOOLS builds, the
+question Checkpoint B asked. Whether the live table takes it is Arthur's
+to say.
 
 ### Today, the view from elsewhere
 
