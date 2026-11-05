@@ -3590,3 +3590,71 @@ refused, the rollback and a second apply).
   `(exchange_id, seq)` index and gets a 409.
   `src/app/api/counterpart/turn/route.ts`,
   `src/components/counterpart/TurnComposer.tsx`.
+
+### Stage 5, step 3: v1 and v2 results side by side (migration 0027)
+
+Arthur's ruling of 2026-11-05 on Checkpoint B, (a) 3: "Gate 1: yes to the
+quiz_results migration and the frozen actions.ts edit."
+
+**The migration.** `supabase/migrations/0027_quiz_results_versions.sql`
+gives every result a `quiz_version` (1 or 2, default 1, so the 8,528
+existing rows are v1 without being rewritten) and a nullable point
+(`map_x`, `map_y`, each from -1 to 1). It makes `vector` nullable under a
+check that a v1 row has a vector and no point, and a v2 row a point and no
+vector. `public_results` gains the three columns, appended, with its grants
+unchanged. Code that names no version, which is all of it until step 4,
+writes v1 rows exactly as before. The rollback refuses while a v2 row
+exists. `scripts/test-0027-quiz-results-versions.sh` checks both on a
+throwaway database (28 checks), and `scripts/test-migrations.sh` now rolls
+0027 back before 0023 and applies it again last.
+
+**The readers.** `src/lib/quiz-result.ts` is the one place that reads a
+version, and it has three rules:
+- **Shown**: a v1 result on every build, a v2 one only on a SIX_SCHOOLS
+  build. `/r/[id]`, both of its images and `/c/[id]` answer a result this
+  build does not show as not found, as they answer an unknown id.
+- **A school taken from a result**: from a v1 result only, on every build,
+  until launch (Gate 2, option (i)). The claim on sign-in gives an account
+  the school of its newest v1 result and claims a v2 one without giving it
+  a school. `/me`'s pending challenges name the other side's school from a
+  v1 result only. `submitQuizResult` (`src/app/actions.ts`, frozen, edited
+  under the ruling) takes up a challenge only when the challenger's result
+  is v1, since it writes a v1 result; a v2 challenger's challenge is
+  treated as no challenge.
+- **Compared**: the share page's weight columns appear only for two v1
+  results. On a SIX_SCHOOLS build, a result beside one from the other
+  version is still a challenge in play, so the reader does not get the
+  cold-recipient page, but no weights are shown. Without the flag the v2
+  side is not found, so the page is as for a result with no other side.
+
+A version this module does not know, a missing column included, is
+neither: nothing shows it and nothing takes a school from it. So the code
+must reach production after the migration. Before it, a read of
+`quiz_version` fails, and some paths would then write as if there were
+no v1 result: a sign-in would create a schoolless account and still count
+as claimed; a quiz taken from a challenge link would save without
+accepting the challenge; `/me` would show the other side's school blank;
+every result page would answer not found. This branch's Vercel preview
+reads production's database, so it is not used until 0027 is applied.
+The rollback, likewise, comes after a deploy without this code.
+
+**Applied** to production as version 20261105225938 on 2026-11-05 at
+22:59 UTC, before this code merged. Read back against a snapshot taken at
+22:53: 8,528 rows with the same checksum of id, vector, school, secondary
+and is_sample; all of them v1 in shape; the table's file unchanged (not
+rewritten); the view's grants the same and its options none, before and
+after; both new checks validated. The security advisor listed the same
+six findings before and after.
+
+**On step 4's list.** On a build without SIX_SCHOOLS, a party to a
+challenge whose other side is a v2 result is still offered "Debate them"
+on `/r/[id]` (`getChallengeInfo` reads no version), and `/me` lists
+challenges on a reader's own v2 results. Neither can happen before step 4
+writes a v2 row, and a v1 quiz never takes up a v2 challenger; step 4
+closes both.
+
+**What waits for step 4.** The plan says a v2 result opens on the map on a
+flag-on build. Here it opens with its school and card and no map: the map
+needs the v2 quiz's own data (its schools' angles and axes), which step 4
+brings with the quiz itself. No v2 row can exist before step 4, which is
+the first to write one.
