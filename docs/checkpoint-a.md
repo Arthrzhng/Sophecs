@@ -1,35 +1,46 @@
 # Checkpoint A
 
 The brief of 2026-11-03 ends Phase 3.0's first run of work here: one
-document, one message, then stop. This is the document. Every item below
-is Arthur's to decide. Each names the file it lives in, so a decision can
-be made without hunting. Nothing here is decided by being written down.
+document, one message, then stop. This is the document. Every open item
+below is Arthur's to decide, except the last list under Housekeeping,
+which is mine. Each names the file it lives in, so a decision can be made
+without hunting. Nothing here is decided by being written down.
 
 What shipped to get here is in `docs/progress.md`; why, in
 `docs/decisions.md`.
 
-## 0. Waiting on Arthur already (sent under STOP NOW, 2026-11-03)
+## Updated 2026-11-05
 
-**Write permissions the site never uses.** Some tables accept writes,
-from signed-in users or from anyone, that the site itself only ever makes
-through its server key. The tables, what each allows, and the evidence
-were sent to Arthur on 2026-11-03 under STOP NOW. They are left out of
-this file, because the repository is public and the holes are not yet
-closed.
+On 2026-11-04 I proposed updating this file once sample activity was
+live and sending its decision list again; Arthur's reply that day
+included "Accepted: ... your reading of Checkpoint A". Of the first
+version's items two are done: the grants fix (its section 0), which
+Arthur ruled on, and the drop of `backup_20261022` (its Housekeeping),
+which he ran. Every other item stands. Items added on 2026-11-05 are
+marked **New**.
 
-Found since, and part of the same fix: production runs Postgres 17, and
-anon and authenticated hold its eighth privilege, `MAINTAIN`, on all four
-public views, which 0016 did not revoke. On a view it allows LOCK TABLE,
-which locks the tables the view reads, so a holder could stop reads and
-writes of `debates`. It is not reachable today: anon and authenticated
-cannot log in, the Data API never locks, and no function in `public`
-runs dynamic SQL (`docs/seed-snapshots/2026-11-04-view-acls-and-roles.json`).
+Done since the first version:
 
-Proposed: one migration revoking what the site does not use, MAINTAIN
-included, tested locally as 0016 was. It changes no stored data. **Needs:
-"yes, the grants fix".** Details: the message of 2026-11-03, and
-`docs/decisions.md`, "Phase 3 item: move `motion_text` into
-`debates_public`".
+- **The grants fix.** Migration 0022, applied at 03:00:50 UTC on
+  2026-11-05 with Arthur's "yes, the grants fix" and "Yes, with the
+  extras". Clients keep only the writes the site makes, and MAINTAIN is
+  gone from those tables and the four public views. `docs/decisions.md`,
+  "Clients keep only the writes the site makes (migration 0022)".
+- **No client may update a challenge.** Migration 0021, run by Arthur in
+  the SQL Editor, so it is not in Supabase's migration list.
+- **`backup_20261022`** is dropped (Arthur, in the SQL Editor; read back at
+  03:05 UTC on 2026-11-05).
+- **Sample activity is live.** 0023 is applied and the canary and the full
+  run passed. The schedule is set to extend the run every six hours from
+  06:41 UTC on 2026-11-05; no extension had run when this was written.
+  `docs/progress.md`, "the sample canary and the full run".
+- **The two critical dependency advisories.** Next.js's is fixed (15.5.29).
+  DOMPurify's is mitigated, not fixed: PostHog now starts with its product
+  tours off, so the extension that bundles it is not loaded, except
+  through a tour preview, which nothing in the site starts and which
+  PostHog's toolbar, opened by a project member, might; that could not be
+  checked. `npm audit` still lists it. `docs/decisions.md`, "Dependency
+  audit (2026-11-05)".
 
 ## Stage 1 (2F): the result, and two questions
 
@@ -61,6 +72,25 @@ Eval key spend: $5.7934 of the $8.00 cap. No further run is planned.
 3. **Whether the power question is met.** Which of these objections count
    as naming it is a judgement, mine above and Arthur's to confirm; the
    decisions entry quotes each one.
+
+## Production database writes: (a)
+
+1. **New. A check on `profiles.display_name`.** Since 0022 a signed-in
+   reader may still update their own display name through the Data API,
+   since `/me` needs it, through the "own update" policy, which still
+   governs those two columns. Doing it that way skips `setDisplayName`'s
+   trim and 60-character limit, as it could before 0022, and class owners
+   see the name. A check constraint on the
+   column would hold the limit in the database. `docs/decisions.md`,
+   "Clients keep only the writes the site makes (migration 0022)".
+2. **New. The five policies 0022 made unreachable.** "debates insert
+   own", "own insert" on `profiles`, the two "anon insert own" and "member
+   join self" stay in place, reached by nothing since the grants went.
+   Dropping them would tidy the policy list; 0022 left that as a second
+   change to review. Not "own update" on `profiles`: `setDisplayName` and
+   `setArgumentDefaultPublic` (`src/app/me/actions.ts`) write through it
+   with the signed-in client, and without it both would change nothing
+   and still report success. Same entry.
 
 ## Spending, rate limits and budget: (d)
 
@@ -96,6 +126,15 @@ Eval key spend: $5.7934 of the $8.00 cap. No further run is planned.
 2. **The head comment of `judge.v3.md` reaches the model.** It still holds
    one golden statistic from 2026-10-26 ("5 of 72"). Keeping the comment
    from the model means changing how `src/lib/anthropic.ts` reads the file.
+
+3. **New. zod 4.** zod 3 has a high advisory (memory exhaustion on
+   oversized collections). Here it parses only the model's replies, never
+   a reader's input, and `max_tokens` caps those. The fix is zod 4.6.6 or
+   later, a major upgrade that touches `src/lib/judge/schema.ts`, frozen
+   under (b), and the frozen `src/lib/anthropic.ts`, whose log summary
+   strips zod 3's wording so the model's text stays out of the logs.
+   `docs/decisions.md`, "Dependency audit (2026-11-05)", which
+   lists all 16 packages `npm audit` still names.
 
 ## Content and philosophy: (e)
 
@@ -170,6 +209,34 @@ Candidates, figures and screenshots are in `docs/phase3-styleguide/`.
 
 The choice is Arthur's: one of these, or loosen a constraint.
 
+## Sample activity (New)
+
+`docs/sample-activity.md` has the design. None of these is one of the
+five categories; each is listed because it turns on Arthur's ruling of
+2026-11-04 on sample activity.
+
+1. **Content changes now end the run.** The motions, the argument
+   passages and the quiz are fixed for the life of a run. Rewording,
+   adding or retiring a motion makes every later run refuse at its dry
+   run, writing nothing; editing a passage fails the spot checks and halts
+   the run. So does shipping Quiz v2: the generator replays the live quiz questions
+   and `scoreQuiz` to give each sample its school, and the spot checks
+   compare those schools. The only way on is teardown and a new run,
+   which breaks every existing sample link. This bears on the content
+   items above: say before changing any of them.
+2. **A referrer from a sample page.** A genuine page opened from a sample
+   page by a full page load reports the sample page's address to PostHog
+   as its referrer, as any page on the site would
+   (`docs/sample-activity.md`, "What a sample can never touch",
+   Analytics). No sample event is sent. To decide: accept it, or add a `no-referrer` policy to sample
+   pages, which would stop it.
+3. **#57's last fixes went in without a fresh review.** The fifth
+   review's fixes (`da74d20`) and the renumbering to 0023 were tested
+   (gates, the 0023 test under production's grants, the 600-account run)
+   but not reviewed by a fresh reader. Arthur, who had already waived
+   the three-pass cap for #57, approved the merge as it was. To decide:
+   whether to have a review after the fact.
+
 ## Security design, no change made
 
 1. **Three `security_definer_view` errors** from the advisor
@@ -187,17 +254,26 @@ The choice is Arthur's: one of these, or loosen a constraint.
 5. **The 0018 shape.** For a private argument, withheld verdict fields are
    left out of the public verdict rather than set to null.
    `supabase/migrations/0018_debates_public_private_verdict_text.sql`.
+6. **New. Three client write policies left as they are.** `blocks`
+   ("blocks own"), `reports` ("reports insert own") and `classes` ("class
+   insert own") each let a signed-in reader write their own rows through
+   the Data API. The site makes those writes through the server, with its
+   own checks: for example, a class past the limit. They were outside the
+   grants fix as approved. `docs/decisions.md`, "Clients keep only the
+   writes the site makes (migration 0022)".
 
 ## Housekeeping
 
-- **`backup_20261022` still exists** (4 relations when last read, on
-  2026-11-04). Arthur's ruling said the drop was done on retry, but it had
-  not gone through. It was retried on 2026-11-04; the database tool asked
-  Arthur to confirm, and no answer came in time. It needs his approval of
-  that prompt, then a read-back. `docs/progress.md` logs both. `docs/decisions.md`, "Open item: drop `backup_20261022`
-  after 2026-10-29".
 - **The brief and the repo disagree on one small thing.** The brief asks
   for "a neutral nav icon for School table (the triangle no longer means
   anything)", but the site header's links have no icons, triangle or
   otherwise. The preview offers icons that would be added, not swapped
   (`src/components/phase3/NavIcons.tsx`).
+- **New, needing no decision; mine to do next:**
+  - the sample workflow's `actions/checkout@v4` and `actions/setup-node@v4`
+    target Node 20, which GitHub now runs on Node 24 with a warning
+    (`.github/workflows/sample-activity.yml`);
+  - `follow-redirects` (high; shipped under `posthog-node` but never
+    called), `vite` and `vitest` (tests only) have fixed releases within
+    their parents' ranges: one small pull request, no new dependency
+    (`docs/decisions.md`, "Dependency audit (2026-11-05)").

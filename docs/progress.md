@@ -275,6 +275,8 @@ entry names.
   them. Read back at 03:05 UTC: no schema named `backup%`; the live
   tables keep their rows (1 debate, 1 profile, 28 quiz results, 3
   challenges). The open item in `docs/decisions.md` is closed.
+- #61 merged as `4099df7`, after 0021 was read back. Production deploy
+  `dpl_4YzpiJmPGv56YPGcoBmKjFAVpj4b`, Ready (read from Vercel).
 
 ## 2026-11-04: clients keep only the writes the site makes (migration 0022)
 
@@ -320,6 +322,8 @@ entry names.
     SELECT kept on the tables and views; `reading_responses` unchanged.
     13 policies and every row count unchanged.
   - Security advisor after: the same findings as before.
+- #62 merged as `0fa7177`, after #61. Production deploy
+  `dpl_6XNYtqoou38NHB4975hQxnjc5X8G`, Ready (read from Vercel).
 
 ## 2026-11-04: sample activity, revised to Arthur's ruling
 
@@ -401,3 +405,116 @@ entry names.
   - Security advisor after: no new ERROR or WARN. One INFO added, as
     expected: `seed_runs` and `seed_run_items` have row level security and
     no policy, which is the design (server role only).
+- #57 merged as `d9d09e0`, after 0023 was read back. Production deploy
+  `dpl_4hW6CV31ipCQe4xbSXGQ6rgf4iRY`, Ready (read from Vercel).
+
+## 2026-11-05: the sample canary and the full run
+
+Both through `.github/workflows/sample-activity.yml` on `main`, in the
+`sample-activity` environment, as run `sample-202611050327`. Read back
+with read-only SQL; pages fetched from sophecs.com through Vercel.
+
+- **Canary**, workflow run 41961657900, about 1.5 minutes, with Arthur's
+  go-ahead of the same morning.
+  - Wrote 40 accounts (all banned from signing in), 100 quiz results, 151
+    arguments with template verdicts, 1 challenge, 1 exchange and 26
+    reading answers. All 34 checks passed.
+  - Unchanged: every genuine count, every topic's par, the percentile of
+    a 1200 rating and the `ai_calls` count. No sample result has a
+    referrer.
+  - The public log holds counts and check names only, with both secrets
+    masked.
+- **Live, on the canary's rows:**
+  - A sample verdict shows the Sample mark, "Sample assessment" and "The
+    judge did not read this argument", with "Sample verdict" in the
+    page and preview titles, and no share row.
+  - A sample result and a sample challenge each show the mark and say
+    "A sample account's" result or challenge, in the page and in the
+    preview titles.
+  - All three carry the marker that keeps them out of PostHog.
+  - `/table` shows "This week's table includes sample accounts", linking
+    to `/method#samples`.
+  - Not checked live: what the share and preview images draw (the fetch
+    returns a PNG as text; the mark rests on `tests/seed/cards.test.ts`),
+    and PostHog (no browser visited; the exclusion rests on
+    `tests/seed/analytics-sample.test.ts`).
+- Two things the live check found, fixed in their own pull requests:
+  - a sample verdict page still sent its share sentence, "The judge's
+    note ...", in the page's data;
+  - a sample challenge's link preview had no image.
+- **Full run**, workflow run 41965190975, with Arthur's "run full" of
+  2026-11-05.
+  - The job ran 04:01:34 to 04:11:10 UTC: 508.4 s of writing, about 55
+    rows a second and, as the log reports it, 12.5 auth users a second.
+  - 36 checks, none failed. Exact duplicate arguments 0.3%, under the 5%
+    check, which counts every copy of a repeated text, the first
+    included (read back: 15 of the 8,297 texts repeat an earlier one).
+    That is above the 0.02% `docs/sample-activity.md` gave for the start;
+    re-measured with two other seeds it is 0.2% at the start and 3% after
+    a year, so the doc's estimate of a halt after about 16 months stands.
+  - The lock was released, and the run reads `complete`, stage `full`.
+- **Read back at 04:11:51 UTC** (reading answers rechecked at 04:16):
+  - Sample rows:
+
+    | Table | Sample rows |
+    | --- | --- |
+    | profiles, and auth users (all banned, none signed in) | 3,278 |
+    | quiz_results | 8,500 |
+    | debates, all template verdicts (465 of them revisions) | 8,297 |
+    | challenges | 328 |
+    | exchanges / turns | 492 / 1,700 |
+    | reading_responses | 2,398 |
+    | classes / class_members | 10 / 241 |
+
+  - Genuine rows unchanged: 1 profile, 28 quiz results, 1 debate, 3
+    challenges, 0 exchanges, 2 reading answers; 1 `ai_calls` row.
+  - `elo_percentile(1200)` still 0, and each topic's par as before
+    (`opaque-benefit` 1200 over 1 debate, the rest 1200 over none).
+  - No sample result with a referrer, no sample argument seeking a
+    counterpart, no genuine member of a sample class.
+  - Database size 55 MB.
+- **`/table` at 04:15 UTC** shows all three schools: Utilitarianism 150
+  arguments (average fidelity 6.3), Virtue Ethics 90 (6.2), Stoicism 171
+  (6.0), with the sample note.
+- From here the schedule is set to extend the run every six hours, at 41
+  minutes past 06, 12, 18 and 00 UTC. No extension had run when this was
+  written.
+- The job's annotations: `actions/checkout@v4` and `actions/setup-node@v4`
+  target Node 20, which GitHub now runs on Node 24 with a deprecation
+  warning. Moving both to their Node 24 majors is a small change for a
+  later pull request.
+
+## 2026-11-05: three follow-ups to the sample run
+
+Arthur, 2026-11-05: "do the three follow-ups as their own small PRs".
+Each had three fresh review passes, none blocking; the findings and fixes
+are in each pull request.
+
+- #63 merged as `71a050f`: a sample verdict page sends no share sentence.
+  The sentence is built by `verdictShareLine` (`src/lib/verdict-share.ts`),
+  which gives a sample "" and a genuine verdict exactly main's sentence
+  (6,912 and 6,480 inputs compared in review). Production deploy
+  `dpl_9uzqXfEnBbwJwtLBwG9Tk6PwGzSd`, Ready (read from Vercel).
+- #65 merged as `4703f8e`: Next.js 15.5.24 to 15.5.29 for its critical
+  and high advisories; and PostHog started with product tours off, so the
+  extension bundling a vulnerable DOMPurify is not loaded (mitigated, not
+  fixed: a tour preview, which nothing in the site starts, could still
+  load it, and `npm audit` still lists it).
+  `docs/decisions.md`, "Dependency audit (2026-11-05)", lists the 16
+  packages `npm audit` still names. Production deploy
+  `dpl_CVTRWBdd7ma7Bb7MzYa3QyiwCgH6`, Ready.
+- #64 merged as `680a35b`: a sample challenge's link preview is the
+  challenger's marked result card; and the three card routes answer 404,
+  not cached, for a row they cannot read, instead of an unmarked default
+  cached for a year. Production deploy `dpl_251Cn4rfC19Tor6m4emuSiS6q6hh`,
+  Ready.
+- **Live at 04:51 UTC**, fetched from sophecs.com through Vercel:
+  - the sample challenge `/c/NGYu6MPcLo` names
+    `https://sophecs.com/r/CfgqMNeSa2/opengraph-image` as its `og:image`
+    and `twitter:image`, alt "A sample account's result card";
+  - `/r/zzzzzzzzzz/opengraph-image` answers 404 with `no-store`;
+  - the sample verdict `/debate/no-decision/zJh6SPcchZ` sends
+    `"shareLine":""`, and "The judge's note" is nowhere in the page.
+  - Not checked live: the card image's pixels (the fetch returns a PNG as
+    text); the mark rests on `tests/seed/challenge-preview.test.ts`, which
+    runs the routes.
