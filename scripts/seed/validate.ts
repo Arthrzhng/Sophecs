@@ -6,6 +6,7 @@ import type { Dataset } from "./generate";
 import { phases } from "./engine";
 import { settledChecks, compareBaselines, isolationChecks, type Baseline, type BaselineCheck } from "./baseline";
 import { Rng } from "./rng";
+import { roundScoreCheck, storedScoreCheck } from "./round-scores";
 
 export interface ValidationReport {
   ok: boolean;
@@ -87,11 +88,17 @@ export async function validate(
     checks.push({ name: "challenge links set", ok, detail: `${links.length} challenges` });
   }
 
-  // 4. No sample argument is waiting for a counterpart.
+  // 4. Every stored sample score is the plan's, and the plan's scores do
+  // not cluster on multiples of 5; with the first, the second holds of what
+  // was written.
+  checks.push(await storedScoreCheck(adapter, ds, { cohortLimit: limit }));
+  checks.push(roundScoreCheck(ds, { cohortLimit: limit }));
+
+  // 5. No sample argument is waiting for a counterpart.
   const seeking = (await adapter.scan("debates", ["id", "seeking_counterpart_at"], { sample: true })).filter((d) => d.seeking_counterpart_at !== null).length;
   checks.push({ name: "no sample debate seeks a counterpart", ok: seeking === 0, detail: `${seeking} seeking` });
 
-  // 5. Auth: a sample of users is blocked from signing in and is this run's.
+  // 6. Auth: a sample of users is blocked from signing in and is this run's.
   if (adapter.target !== "local") {
     const pool = ds.authUsers.filter((u) => u.cohort < limit);
     const picked = rng.shuffle(pool).slice(0, opts.authSpot ?? 20);
@@ -103,7 +110,7 @@ export async function validate(
     checks.push({ name: "auth users blocked from signing in and owned by the run", ok: bad === 0, detail: `${picked.length - bad} of ${picked.length}` });
   }
 
-  // 6. Genuine data. With a baseline, the comparison; without one (a
+  // 7. Genuine data. With a baseline, the comparison; without one (a
   // standalone --validate), the par and percentile checks still run, since
   // they need none. Either is read again before a failure is reported.
   const settled = await settledChecks(adapter, (now) => (before ? compareBaselines(before, now) : isolationChecks(now)), { waitMs: opts.rereadMs });

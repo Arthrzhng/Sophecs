@@ -223,10 +223,11 @@ export async function callJudgeModel(
     // message is a multi-line JSON blob that tells neither the golden-set
     // table nor a production log which cap was missed.
     //
-    // zod's own wording for a wrong enum value quotes the value it got
-    // ("received '...'"), which is the model's text, so that clause is cut:
-    // the summary is logged, and it names a field and a rule, never what the
-    // judge wrote.
+    // zod 3's wording for a wrong enum value quoted the value it got
+    // ("received '...'"), which is the model's text. zod 4 names the
+    // options only; the clause is still cut, should a wording quote it
+    // again: the summary is logged, and it names a field and a rule, never
+    // what the judge wrote (tests/model-reply-parsing.test.ts).
     const summary = result.error.issues
       .map(
         (issue) =>

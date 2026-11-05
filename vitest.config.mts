@@ -24,6 +24,10 @@ export default defineConfig({
     // docs/review-charter.md's own rule 1 is about. The incident's
     // numbers live there.
     exclude: [...configDefaults.exclude, ".claude/**"],
+    // Every test sees a build without SIX_SCHOOLS unless it stubs the flag
+    // itself (tests/six-schools.test.ts), so a SIX_SCHOOLS=1 left in the
+    // shell cannot fail unrelated tests under misleading names.
+    env: { SIX_SCHOOLS: "0" },
   },
   // tsconfig sets `jsx: "preserve"`, which is right for Next and leaves
   // vitest unable to parse a component on its own. Vite 8 transforms with
@@ -34,6 +38,13 @@ export default defineConfig({
     alias: {
       "server-only": fileURLToPath(new URL("./scripts/server-only-shim.cjs", import.meta.url)),
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      // The root layout imports the new schools' tokens by a name only
+      // next.config.ts resolves (docs/stage5-plan.md). A test that imports
+      // the layout reads its metadata, never its styles, so the name points
+      // at the empty stylesheet whatever SIX_SCHOOLS says.
+      "@six-schools/tokens.css": fileURLToPath(
+        new URL("./src/app/six-schools.off.css", import.meta.url)
+      ),
     },
   },
 });

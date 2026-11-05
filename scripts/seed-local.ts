@@ -17,7 +17,7 @@ import { LocalAdapter } from "./seed/adapter-local";
 import { buildPlan, readPlan, writePlan, datasetForPlan } from "./seed/plan";
 import { DEFAULTS } from "./seed/generate";
 import { contentTopics } from "./seed/topics";
-import { execute } from "./seed/engine";
+import { execute, finishValidation, releaseHeld, VALIDATING } from "./seed/engine";
 import { validate } from "./seed/validate";
 import { dryRun } from "./seed/dryrun";
 import { getAllTopicFiles } from "../src/lib/topics";
@@ -113,10 +113,26 @@ main(async () => {
     if (!report.ok) process.exitCode = 1;
     return;
   }
-  const result = await execute({ dataset, plan, adapter: db, cohortLimit, batchSize: int(f, "batch-size", 500, 1, 2000), log, signal: cancelSignal(log), breakStaleLock: Boolean(f["break-stale-lock"]) });
+  // Halted until the validation below passes, as production is.
+  const result = await execute({ dataset, plan, adapter: db, cohortLimit, batchSize: int(f, "batch-size", 500, 1, 2000), log, signal: cancelSignal(log), breakStaleLock: Boolean(f["break-stale-lock"]), endHalted: VALIDATING });
   log(`wrote ${JSON.stringify(result.written)} in ${result.seconds.toFixed(1)} s (${result.rowsPerSecond.toFixed(0)} rows/s)`);
-  const report = await validate(db, dataset, result.before, { cohortLimit });
-  for (const c of report.checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}: ${c.detail}`);
-  log(`report: ${writeReport(`seed-local-${plan.runId}`, { result, validation: report })}`);
+  if (result.cancelled) {
+    await releaseHeld(db, result);
+    log("cancelled. Run the same command to resume; the run stays halted until a run of it passes validation.");
+    process.exitCode = 1;
+    return;
+  }
+  let report: Awaited<ReturnType<typeof validate>>;
+  try {
+    report = await validate(db, dataset, result.before, { cohortLimit });
+    for (const c of report.checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}: ${c.detail}`);
+    log(`report: ${writeReport(`seed-local-${plan.runId}`, { result, validation: report })}`);
+    if (!(await finishValidation(db, result, report.checks.filter((c) => !c.ok).map((c) => c.name)))) {
+      log("the validation's result could not be recorded (the run's lock was lost); the run stays halted");
+      process.exitCode = 1;
+    }
+  } finally {
+    await releaseHeld(db, result);
+  }
   if (!report.ok) process.exitCode = 1;
 });

@@ -16,7 +16,8 @@ export interface SchoolContent {
   gets_wrong: string;
   share_lines: string[];
   verdict_share_line: string;
-  /** See lib/drafts.ts. Draft files load only on /styleguide/drafts. */
+  /** See lib/drafts.ts. Draft files load on /styleguide/drafts, and on a
+      SIX_SCHOOLS build when they are the three's. */
   status?: "draft";
 }
 
@@ -41,16 +42,20 @@ function loadAll(): SchoolContent[] {
 export function getAllSchools(options: LoadOptions = {}): Record<SchoolId, SchoolContent> {
   const result = {} as Record<SchoolId, SchoolContent>;
   for (const school of loadAll()) {
-    if (excluded(school, options)) continue;
+    // A school file belongs to itself: on a SIX_SCHOOLS build the three
+    // drafts load as the schools that build shows (src/lib/drafts.ts).
+    if (excluded(school, options, school.id)) continue;
     result[school.id] = school;
   }
   return result;
 }
 
-// Deliberately has no `includeDrafts`. Every caller looks a school up by a
-// `SchoolId`, which no draft can be until the union is widened, so an
-// opt-in here would be unreachable. The review route reads drafts through
-// getAllSchools instead.
+// Deliberately has no `includeDrafts`, and throws for a school this build
+// does not show: a draft on a build without SIX_SCHOOLS. Most callers pass
+// a school a page shows; /r/[id], /c/[id], their images and /today pass a
+// database row's school, which is why a v2 result in one of the three must
+// never reach them on a flag-off build (docs/stage5-plan.md, step 3). The
+// review route reads drafts through getAllSchools instead.
 export function getSchool(id: SchoolId): SchoolContent {
   const school = getAllSchools()[id];
   if (!school) throw new Error(`No content for school "${id}"`);

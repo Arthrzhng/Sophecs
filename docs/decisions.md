@@ -2704,7 +2704,7 @@ lists 16 packages (1 critical, 6 high, 9 moderate):
 | Package | Severity | Reaches | Why it matters or not |
 | --- | --- | --- | --- |
 | `dompurify` | critical | `posthog-js` product tours | Above: not loaded. |
-| `zod` 3.x | high (memory exhaustion validating oversized constrained collections) | direct; it parses only the model's replies, the judge's (`src/lib/judge/schema.ts`) and the turn screener's (`src/lib/screen.ts`), never a reader's input | Those replies are capped by `max_tokens` (850 for the judge, 60 for the screener), which bounds the collections. Fixed from zod 4.6.6, a major upgrade that touches the frozen judge schema: worth doing deliberately. |
+| `zod` 3.x | high (memory exhaustion validating oversized constrained collections) | direct; it parses only the model's replies, the judge's (`src/lib/judge/schema.ts`) and the turn screener's (`src/lib/screen.ts`), never a reader's input | Those replies are capped by `max_tokens` (850 for the judge, 60 for the screener), which bounds the collections. Fixed from zod 4.6.6, a major upgrade that touches the frozen judge schema: worth doing deliberately. Done on 2026-11-05 ("zod 4", below). |
 | `follow-redirects` 1.16.0 | high (credential headers can follow cross-origin redirects) | `posthog-node` (`src/lib/analytics/server.ts`) through `axios` | Shipped in the server bundle, never called: posthog-node 4.18 uses `axios` only when there is no global `fetch`, and the Vercel project runs Node 24.x (its own setting; nothing in the repository overrides it, and the sample workflow's Node 22 is for CI), which has one. An `npm update` moves it to a fixed release within range. |
 | `next` and its pinned `postcss` 8.4.31 | moderate and high (source-map path traversal, `</style>` escaping) | build only | Reads CSS we write; nothing attacker-controlled. Next 15 pins its own copy; fixed in Next 16. The site's own `postcss` 8.5.26 is outside the range. |
 | `js-yaml` 3.15.1 | high (CPU with empty merge keys) | `gray-matter`, reading our own content frontmatter at build and request time | Only reads files in `content/`, which we write. |
@@ -2922,6 +2922,571 @@ five exactly. `scripts/test-migrations.sh` passes.
 
 **Snapshot:** `docs/seed-snapshots/2026-11-05-before-0024.json`, read from
 production at 06:00 UTC on 2026-11-05.
+
+### zod 4
+
+Arthur's ruling 13 of 2026-11-05: "zod 4: yes, own PR; the six judge
+request fixtures must stay byte-identical and v2 behaviour unchanged".
+zod goes from 3.25.76 to 4.6.7, which fixes zod 3's high advisory
+(memory exhaustion validating oversized constrained collections;
+"Dependency audit (2026-11-05)"). zod parses only model replies, the
+judge's (`src/lib/judge/schema.ts`) and the turn screener's
+(`src/lib/screen.ts`), and the golden fixtures in `tests/judge/`.
+
+**One behaviour change in zod, undone here.** From 4.5, zod counts a
+string's `.max()` in Unicode code points; zod 3 counted UTF-16 code
+units, which is what JavaScript's `length` is. Under zod 4 a
+`rejection_reason`, or a screener's `reason`, of 199 letters and an
+emoji (201 units, 200 code points) would pass where zod 3 refused it,
+and any emoji-heavy string could run to twice the cap. No zod 4 release
+that fixes the advisory counts the old way. So both 200-character caps
+are now a check on `length` (`maxUnits` in `schema.ts`, a `refine` in
+`screen.ts`), which counts as before. `.min(1)` is unaffected. This is
+an edit to the frozen `schema.ts`, made under ruling 13 to keep its
+condition; it changes nothing the judge is sent. The only other edit
+to a frozen file is a comment in `src/lib/anthropic.ts`, on the clause
+its error summary cuts.
+
+**The request fixtures.** zod plays no part in what the judge is sent,
+and `tests/judge-request.test.ts` holds all six byte for byte; nothing
+under `tests/judge-request/` or `content/` changed.
+
+**v2's behaviour.** One corpus of 91 model replies, 74 to the judge and
+17 to the screener, run through the real parse paths (`callJudgeModel`
+and `screenTurn`, the model replaced by a stub) under zod 3 and under
+zod 4: every reply is accepted or refused the same way, every accepted
+one parses to the same data, and every refusal names the same fields.
+The corpus covers both verdict shapes, including the nulls `judge.v2.md`
+asks for in the field the other shape uses; every field's type, bounds
+and word caps at and past the limit; the two 200-character caps with an
+astral character at and past the limit; a draft school and a wrong-case
+one as the objection's school; keys the schema does not name (dropped,
+as before); and replies that are not objects or not JSON.
+`tests/model-reply-parsing.test.ts` keeps it, with the outcomes taken
+from zod 3; without the caps' new check, its two astral cases fail on
+zod 4. The reviews' own 179 further cases, run the same way (numbers
+from `1e309` to `-0`, `__proto__` keys, lone and split surrogates,
+combining marks, unknown keys nested deep and many more), differed only
+in those two cases before the check and in none after it. One
+difference outside production: the golden runner's fixture schema now
+refuses an Infinity in a band, which zod 3 let through; no fixture has
+one.
+
+**What does change** is zod's wording of a refusal: "Too big: expected
+number to be <=100" where it said "Number must be less than or equal to
+100", and so on, and a refusal can name a field twice (an array in a
+string field is refused for its type and again for its length). The
+judge's summary is logged (`ai_calls`' `validation_error`, and the
+production log) and printed by the golden runner, and no code parses
+it. One
+change is a fix: zod 3 quoted the value it got for a wrong enum value,
+and the screener's summary kept it, so a screener reply naming no known
+result put the model's text in the message; that message is logged only
+outside production (`src/app/api/counterpart/turn/route.ts`), and zod 4
+names the options only. The test holds the zod refusals of both to
+that; the screener's not-JSON message still quotes the start of the
+reply, by design.
+
+### The new schools' colours
+
+Arthur's ruling 16 of 2026-11-05: "reject the all-violet set. The three
+new schools must come from different hue families; relax the colour-blind
+distance vs the live three from 12 to 8 (names always sit beside colours).
+Pick the best set under those rules, show it in the styleguide, and
+proceed; don't wait for me unless nothing passes."
+
+**Chosen:** Confucianism `#562b05`, a deep brown; Ubuntu `#1e3b4f`, a dark
+blue; Buddhist Ethics `#7d56b8`, a violet. On `/styleguide/phase3`, "The
+new schools' colours" (a preview deployment), with screenshots in
+`docs/phase3-styleguide/`.
+
+**The rules, as `scripts/colour-candidates.mjs` now applies them.** Every
+constraint from Checkpoint A stands (white hero text at AA, a dot that
+shows on paper, CIEDE2000 20 from the live schools and 15 from the judge's
+blue and the step-done orange in normal vision, each school's stereotyped
+hues excluded), with the distance to the live three under simulated
+deuteranopia and protanopia lowered from 12 to 8. "Different hue
+families" is eight named families of OKLCH hue (red, orange and brown,
+yellow and gold, green, cyan and teal, blue, violet, magenta; red takes
+two sectors, since it wraps through 0), one school to a family, and the three also at least 40 degrees of hue apart, so a
+violet at 300 and a magenta at 320 do not count as different.
+
+**Why this set.** The relaxed 8 hardly widens what passes: 1,059 colours
+against 1,056, nearly all blue to magenta, because the binding limit is
+the 20 from the live three in normal vision, which shuts out the greens,
+teals, reds, oranges and golds near Stoicism, Virtue Ethics and
+Utilitarianism. Among the sets that do pass, every school's possible
+colours were tried together. Each set is scored by its closest pair
+among all six schools, under the worst of the three views. The highest
+score is 12.8, a blue, violet and magenta set whose three new colours
+are only 12.8 apart and all within 90 degrees of hue of each other,
+which is the all-violet set again in other words; this set scores 12.7,
+a difference no one can see. So the score is rounded to the nearest
+whole unit, and ties go to the set whose new colours are furthest from
+each other: 21.5 for this one. Confucianism
+has to be the brown, since the Ubuntu and Buddhist exclusions both cover
+it; Ubuntu and Buddhist Ethics could swap blue and violet at the same
+score, and this way round was the search's first.
+
+**What to know.**
+- The weakest pair is Confucianism's brown and Virtue Ethics' oxblood
+  under simulated deuteranopia, 12.7, and the two are neighbours on the
+  map (50 and 110 degrees). Under protanopia the brown is nearest
+  Stoicism and Virtue Ethics (17.0 each); in normal vision it is nearest
+  Utilitarianism's ochre (20.1, the limit being 20). Names always sit
+  beside colours, which is what the relaxed rule rests on.
+- The brown's hue is 21 degrees from the ochre's. The ruling's families
+  constrain the three new schools among themselves, so this is no
+  breach, and a reading that applied families across all six would rule
+  the brown out and leave only blue, violet and magenta sets, the kind
+  rejected.
+- The relaxation to 8 turned out not to be needed: this set clears the
+  original 12 (its weakest pair is 12.7), and the search with 12 picks
+  the same set.
+- Ubuntu's blue is 15.1 from the judge's blue in normal vision, the
+  limit being 15.
+- With the other two held where they are, Confucianism and Ubuntu have
+  no alternative at least 10 from the chosen colour (they have near ones,
+  4.6 to 8.5 away); Buddhist Ethics has two, shown beside it.
+- Each card surface is the marker itself, except Buddhist Ethics',
+  darkened to `#724aab` so the card's text holds AA at its lowest
+  opacity. The live schools' surfaces are all darker than their markers;
+  whether the new ones should be too was an open question at Checkpoint
+  A that ruling 16 did not answer, and it goes on Checkpoint B's list.
+
+Nothing live changes: the colours reach the site with Phase 3, behind
+`SIX_SCHOOLS`.
+
+### Quiz v2, as ruled
+
+Arthur's ruling 15 of 2026-11-05 ("Arthur's rulings of 2026-11-05 on
+Checkpoint A"), carried into `docs/quiz-v2.json` and `docs/quiz-v2.md`:
+
+- The axes, their plain names and the six positions stand as drafted,
+  Ubuntu at 0 degrees and Buddhist Ethics at 310 included, and so do the
+  weighted options.
+- 2c, 5c, 7a, 7c and 6b take Arthur's wording, each keeping its school
+  and vector. The simulation, re-run, gives the same figures to the
+  digit, as it must: it never reads an option's wording. Every school lands as
+  primary for 16.2% to 17.7% of answer patterns.
+- 1a, 10b, 3d, 5b, 6d, 9a and 8c stay as written. No rule-based school;
+  a duty-based one is the obvious seventh, later (noted above).
+- The copy's AI framing is reworded now, on the live site: "ten
+  questions on how AI should decide things" was not true of v1 either
+  (three of its ten questions involve AI), and "ten questions about how
+  you decide what's right" is true of both. That covers the site
+  description, `SharePage`, `ChallengeInvite` and the opening of one
+  share line on each school page (`content/schools/*.md`, which the
+  ruling names). The time ("about eighty seconds", which v2's longer
+  options would make untrue) and three schools becoming six change at
+  launch, and the share lines that describe v1's questions go to Arthur
+  as content judgements (`docs/quiz-v2.md`, section 8).
+- PostHog's `share_clicked` records a share line by its index, and three
+  of those indices now hold new text (stoicism 1, utilitarianism 2,
+  virtue-ethics 0) from this PR's production deploy on 2026-11-05.
+  A comparison of share lines should split on that date.
+
+Quiz v2 ships at launch, after the sample teardown, and the fresh run
+follows it (`docs/sample-activity.md`, "At launch").
+
+### Sample activity: halts that hold, and console logs (2026-11-05)
+
+Arthur's ruling 19 of 2026-11-05 asked for one fresh review of #57's last
+fixes. It found nothing blocking, and four things to fix:
+
+- **A halt could be lifted without a validation passing.** `execute`
+  cleared `last_error` before writing, so a `full` run by hand that then
+  crashed left the run failed but not halted, and the next scheduled
+  `extend` wrote; and a validation that threw left the run `complete`.
+  Now every run that writes ends halted ("halted: validation not
+  finished") and only a passing validation lifts it
+  (`finishValidation`); a run by hand on a halted run keeps the halt
+  while it writes, and through a crash; and a refusal while writing (a
+  row it would not adopt or update, a user without its ban) halts the
+  run rather than leaving the schedule to try again every six hours,
+  which is what `docs/sample-activity.md`, "Stop conditions", already
+  said it did. `scripts/seed-production.ts` does the same, and a canary
+  cannot be run on a halted run or one that has had its full stage, so a
+  run by hand from the command line cannot lift a halt either. The run's
+  lock is kept from the end of the writes until the validation's result
+  is recorded, so no teardown or other writer can come in between; if it
+  is lost, nothing is recorded and the halt stays. An error from the
+  writes goes to `last_error`, and the public log gets a line of its
+  own, since the message can name a row.
+- **The 5% duplicate check ran after the writes.** The rate is the
+  plan's own, so it now runs with the dry-run checks: an extension that
+  would cross it is refused before anything is written.
+- **Console logs skipped `before_send`.** posthog-js sends console log
+  records by their own path, and console capture can be switched on from
+  the PostHog project. The `logs` setting's own `beforeSend` now drops
+  every one once the page load has shown a sample page: a record logged
+  before the logs script loads is filtered only when it is replayed,
+  without the address it was logged at.
+- **The sample users' email tag** comes from the generator's random
+  streams, which are not meant for secrets. Changing it would break the
+  live run's spot checks, so it becomes an HMAC for the fresh run at
+  launch (`docs/sample-activity.md`, "At launch").
+
+And from its nits: `return_visit` was lost for a visit that started on a
+sample page (the flag was set before `track()` dropped the event), and is
+now sent from the first genuine page; the docs say what web vitals and
+the heatmap's mouse-move timer can still carry; and the stop conditions
+say what each one does.
+
+### Node 24 actions and the in-range fixes
+
+Checkpoint A's housekeeping, "mine to do next" (`docs/checkpoint-a.md`):
+
+- **The sample workflow's actions.** `actions/checkout` and
+  `actions/setup-node` go from v4, which targets the Node 20 runtime that
+  GitHub now runs on Node 24 with a warning (the last run's log says so),
+  to v5, which targets Node 24, and are pinned to their commits
+  (checkout v5.1.0, setup-node v5.0.0) rather than to tags, since this
+  job holds the production service key and a tag can be moved without a
+  commit here. v5 is the smallest step to Node 24; v6 and v7 of both
+  exist, and their breaking changes touch nothing this job uses, so
+  moving to them is a later choice. The job's own Node
+  (`node-version: 22`) is unchanged.
+- **follow-redirects, vite, vitest.** Each moves within its parent's
+  range: follow-redirects 1.16.0 to 1.16.2, the only release with the
+  fix (published 2026-10-25); vitest 5.0.0 to 5.0.5 and vite 8.2.2 to
+  8.3.5, taken with `npm update --before=2026-10-22` so nothing is newer
+  than two weeks (vite 8.3.6 and vitest 5.1.0 came out this week). Their
+  dependencies moved with them, among them postcss 8.5.31 and
+  source-map-js 1.2.2, which clears that advisory too, and two majors
+  within vitest's own ranges (obug 3.0.0, why-is-node-running 3.2.1).
+  `package.json` is unchanged; no dependency is added, and two
+  (siginfo, stackback) drop out.
+
+`npm audit` now lists 10 packages, down from 15 on main before this
+(16 at the audit; zod went in #73): `dompurify` (not loaded, product
+tours are off), `js-yaml` (our own front matter), `next` and its pinned
+`postcss` 8.4.31 (build only, fixed in Next 16), `minimatch` and the
+`@typescript-eslint` packages (lint only, moderate).
+
+### Stage 5, step 1: the `SIX_SCHOOLS` flag (2026-11-05)
+
+The first step of `docs/stage5-plan.md`. A build made with `SIX_SCHOOLS=1`
+shows Confucianism, Ubuntu and Buddhist Ethics after the live three; a
+build without it is the production build it was, which
+`npm run check:bundle` confirms on every build.
+
+- **Read when the build starts.** `next.config.ts` reads the variable and
+  passes it through `env`, always `"0"` or `"1"`, so Next writes it into
+  server and client code as a constant. Each module that holds a new
+  school's strings tests `process.env.SIX_SCHOOLS === "1"` itself
+  (`school-registry.ts`, `school-colors.ts`, `card-tokens.ts`), and on a
+  flag-off build that test is false at compile time and the strings behind
+  it are dropped. Tested in each module rather than imported as a
+  constant, because a value carried across a module boundary is not one
+  the build can fold.
+- **Shown, not published.** `SHOWN_SCHOOLS` is the published three plus,
+  with the flag, the three drafts, which keep `status: "draft"`.
+  `PUBLISHED_SCHOOLS` is unchanged, because the judge reads it (the rival
+  schools in its prompt, the schools its reply may name), and
+  `tests/six-schools.test.ts` checks the judge's six request fixtures
+  byte for byte with the flag on. Every lookup keyed by school now answers
+  for the shown schools: `publishedLookup` is renamed `shownLookup`, and
+  `schoolName`, the adherent nouns, `schoolColourVar` and `schoolShadeVar`
+  read `shownEntry`. No page lists the three yet; step 2 moves the
+  surfaces over.
+- **Colours.** The markers and card surfaces are ruling 16's
+  (`colour-candidates.json`). Each live school's deep shade, under a
+  chunky control, is its marker at about three quarters of the lightness
+  and chroma in OKLCH; the new deep shades are the new markers at 0.75
+  and 0.73: Confucianism `#371a03`, Ubuntu `#112532`, Buddhist Ethics
+  `#53387b`. They are in `src/app/six-schools.css`, which the layout
+  imports through a name only `next.config.ts` resolves: the real file on
+  a flag-on build, the empty `six-schools.off.css` on any other. The
+  image routes' copies are in `card-tokens.ts`, behind the flag. The
+  stylesheet also writes `.text-confucian` and the other two by hand,
+  since Tailwind makes `text-*` classes only for `@theme` tokens, which
+  every build ships.
+- **Adherent nouns, for Checkpoint B (e).** Proposed, and shown on
+  flag-on builds only: "Confucian", "Ubuntu Ethicist" and "Buddhist
+  Ethicist", with plurals. Ubuntu has no settled English noun for one of
+  its arguers, and someone arguing from Buddhist Ethics is not thereby a
+  Buddhist, so those two follow "Virtue Ethicist". Six places write "a"
+  or "A" before the noun, which "Ubuntu Ethicist" would need as "an"
+  (`ChallengeInvite.tsx`, `ProfilePage.tsx`, twice in
+  `ArgumentEditor.tsx`, the class page, and the quiz result, whose
+  comment says every adherent name takes "a"). None can show one of the
+  three until a reader is placed in one, in step 4, which handles them.
+- **The bundle check** now looks for nineteen strings rather than six:
+  the ids and names, the proposed adherent nouns (added to
+  `DRAFT_SCHOOLS`, which does not depend on the flag), and every colour
+  in `six-schools.css`. It throws if a draft lacks an adherent noun or
+  any of its three colour tokens. It reads which kind of build it has
+  from the build itself (`config.env` in `required-server-files.json`),
+  and each script needs its own kind: `npm run check:bundle` fails on a
+  flag-on build, and `npm run check:bundle:six` makes one into
+  `.next-six` and fails unless all nineteen are in it whole, a name or
+  id as a quoted string of its own and not inside a longer one. Both
+  builds take about 35 seconds here.
+- **The build cache.** Webpack's cache is keyed on Next's own config,
+  which leaves out `env` and the stylesheet alias, and on the text of
+  `next.config.ts`, which does not change with the variable. The review
+  of #79 built with the flag and then without it into one directory, and
+  the flag-off build kept the flag-on stylesheet: all seven colours and
+  the three ids in its CSS. JavaScript was rebuilt correctly. Vercel
+  restores `.next/cache` between deploys and runs no bundle check, so the
+  flag is now part of the cache's version, and each kind of build reads
+  only a cache its own kind wrote. Rebuilt both ways over one cache, and
+  back, the checks pass each time.
+- **No flag in production before launch.** `next.config.ts` refuses to
+  build when the flag is on and `VERCEL_ENV` is `production`, or when a
+  Vercel build (`VERCEL=1`) does not say which environment it is for, so
+  a wrong tick in Vercel fails the deploy and the live one stays, rather
+  than publishing the three with every gate green. The launch merge
+  removes the refusal. It cannot see a promotion: promoting a flag-on
+  preview to Production does not rebuild, and the review charter (rule 4)
+  counts it as publishing.
+- **Tests pin the flag off.** `vitest.config.mts` sets `SIX_SCHOOLS` to
+  `"0"` for every test that does not stub it, so a flag left in the
+  shell cannot fail unrelated tests under misleading names.
+
+Vercel's Preview environment gets `SIX_SCHOOLS=1` once this is merged;
+Production does not until launch.
+
+### Stage 5, step 2a: the school pages, lessons and table for six (2026-11-05)
+
+The first half of step 2 of `docs/stage5-plan.md`. On a `SIX_SCHOOLS`
+build the three new schools have pages and appear wherever the product
+lists the schools a reader can read about; on any other build every page
+is as it was, and the landing page, a school page and the lessons index
+were compared with the step 1 build to show it: the same markup once
+scripts and build ids are set aside.
+
+- **Loaders.** `src/lib/drafts.ts` gains one rule: on a `SIX_SCHOOLS`
+  build, a draft that belongs to one of the three is shown with them, by
+  every loader, without `includeDrafts`. A school file belongs to its
+  `id`, a module to its `school`. On any other build there is no such
+  school, so nothing loads that did not before. A draft that belongs to
+  no school, such as an elsewhere passage, stays hidden; Today's view
+  from elsewhere is step 2b's, with the lesson page it opens.
+- **Pages moved to `SHOWN_SCHOOL_IDS`:** `/s/[school]` (with its static
+  params, so a flag-on build prerenders the three), the landing page's
+  schools section, the footer, the lessons index's order, chips and
+  empty state, Today's lessons card, and the school table, whose new rows
+  sit unranked with no average until someone argues for them. The
+  table's "ranked once it has N judged arguments" rule from
+  `/styleguide/phase3` is not used: N is Arthur's to set (Checkpoint B).
+- **Counted headings.** "The three schools" and "The other two" are now
+  counted from the list (`src/lib/count-word.ts`), so a flag-on build
+  says six and five, and each is one string, so the markup a flag-off
+  build serves is unchanged.
+- **Left on the published three:** the sitemap, which lists sophecs.com
+  URLs where the three do not exist; `/debate/rubric`, which is the
+  judge's; the sharing image, whose "Three schools." is step 4's copy;
+  and everything the judge reads.
+- **What else a flag-on build does differently**, from the loaders:
+  `/lessons/modules/[id]` prerenders the three's draft modules, one each;
+  `/quiz/result` sends all six schools' content to the page, though the
+  quiz still places a reader in one of three; and `getSchool` answers for
+  the three, so `/r/[id]`, `/c/[id]`, their images, the verdict page and
+  `/today` would render a row in one of them on a preview. On a flag-off
+  build it still throws, which is why step 3 comes before any v2 write.
+- **Today's lessons card** counts its modules too ("All six modules
+  read." on a flag-on build).
+- **The three's pages offer "Take the quiz" and "Argue a motion from
+  it"**, which cannot yet place a reader in them or judge them (steps 4
+  and 5). Previews only; for Checkpoint B.
+
+### Stage 5, step 2b: Today's view from elsewhere (2026-11-05)
+
+The second half of step 2 of `docs/stage5-plan.md`. On a `SIX_SCHOOLS`
+build Today offers the week's view from elsewhere, and the passage has a
+page; on any other build neither exists, and every passage page and the
+lessons index serve the markup they did.
+
+- **Which passages.** The six "elsewhere" passages in `content/micro`
+  are drafts that belong to no school: their traditions are not all the
+  three's (one is the Zhuangzi). They are Phase 3's, so the loader shows
+  them on a `SIX_SCHOOLS` build and on no other, keyed on the flag itself
+  and not on which schools are drafts, so that they stay at launch, when
+  the three are published and the flag is on for Production. A draft in
+  any other position stays hidden everywhere. When the flag is retired
+  after launch, their `status: draft` goes with it.
+- **Today.** The card from `/styleguide/phase3` sits in the path after
+  step 4, "Face an objection", which brings the after-reading. It is a
+  list item and not a seventh step: it has no check and nothing waits for
+  it (`docs/daily-path-copy.md`). It is always there on a flag-on build,
+  not only once step 4 is reached; the copy says it is optional, and
+  whether it should wait for the after-reading is Arthur's (Checkpoint B).
+  "Read it" opens the passage's page.
+- **The passage's page.** `/lessons/[slug]` labels it "A view from
+  elsewhere", leaves out the reading counter, and links to the passage
+  that frames the question. The before and after pages count only their
+  pair, so a flag-on build still numbers them 1 and 2 of 2
+  (`src/lib/passage-place.ts`, tested on every real passage).
+- **On Today**, the card is a list item in the path's `<ol>`, as the
+  paused note is; each step's button names itself "Step N", so the card
+  is not counted as one, and its title is an `<h2>` under the page's
+  `<h1>`.
+- **Kept out:** the lessons index (which pairs before and after, as it
+  always has) and the sitemap, whose sophecs.com addresses have no such
+  page.
+
+### One address (2026-11-05)
+
+Arthur saw the site move from sophecs.com to sophecs.vercel.app on his
+phone, signed in, on `/debate`. Every production deployment also answers
+at www.sophecs.com, sophecs.vercel.app and two vercel.app aliases Vercel
+assigns (`sophecs-arthurrzhang-1874s-projects`, `sophecs-git-main-...`),
+none of which redirected, and every link on the site is relative, so a
+reader who reached one of them stayed there.
+
+- **How readers reached it: signing in.** Supabase Auth sends a sign-in
+  whose return address is not on its allow-list to its Site URL, and the
+  Site URL was `https://sophecs.vercel.app`. Its logs show it: the
+  `referer` GoTrue logs for the sample engine's admin calls, which carry
+  no return address, is the Site URL, `https://sophecs.vercel.app`; and
+  at 05:42:07 UTC on 2026-11-05 a Google sign-in started three seconds
+  after a page view on sophecs.com (PostHog) was sent to that bare
+  address, not to `/auth/callback`. The reader landed on sophecs.vercel.app
+  signed out, signed in again from `/debate/opaque-benefit` there, and
+  every page after it was on vercel.app.
+- **Nothing in the code or the database pointed there.** No site-URL
+  variable exists in Vercel; the share sheet, challenge links, sitemap and
+  `metadataBase` all write `https://sophecs.com`; no stored row names
+  vercel.app except one quiz result's `referrer` (a reader who arrived
+  from a vercel.app page). PostHog counts 98 page views on
+  sophecs.vercel.app by 6 people since 10 September, against 281 by 28 on
+  sophecs.com, and 5 on a deployment's own URL in September.
+- **The fix in code (`next.config.ts`).** A production build sends every
+  page request on any host other than sophecs.com to the same path and
+  query there. It shipped as a 307 in #83 (a browser keeps a 308, so a
+  rule Vercel's router read differently from Next's could have left
+  readers in a loop no rollback reaches), and became a 308 in #85, after
+  the live check of 2026-11-05 21:41 UTC (`docs/progress.md`). Not moved:
+  `/api/` (Vercel's cron calls one and does not follow redirects, and a fetch from a tab left open on an old
+  host could not follow one: sophecs.com sees none of that host's cookies
+  and answers no cross-origin request), `/_next` and anything under it
+  (the same files on every host; Next adds the same exclusion to every
+  redirect it runs itself, so the rule tells Vercel's router, which runs
+  the rules in production), the deployment's own
+  URL (behind Vercel's login; it lets a past deployment be opened), and
+  previews and local builds. A sign-in that falls back to the Site URL
+  arrives at the root with `?code=`, which the home page would drop; it
+  is sent to `/auth/callback` with a 307, so it completes, at `/me`, or at
+  the quiz for a reader who has not taken it.
+- **Where a sign-in may land.** `/auth/callback` followed `next` from the
+  query string wherever it pointed: `/login?next=//evil.example` sent a
+  reader who had just signed in to evil.example. It now keeps a value only
+  if it resolves on the site and the path it normalises to still does, on
+  any origin (`src/lib/local-path.ts`): `/..//evil.example` normalises to
+  `//evil.example`, which a first version of the check let through. Any
+  other value lands where no `next` would. The quiz still carries its own
+  `next` unused; the redirect that one day consumes it must use the same
+  check.
+- **The fix outside the code, which is Arthur's to click**: Supabase
+  Auth's Site URL and redirect allow-list, and the Vercel domains' own
+  redirects. The steps are in the pull request. The code's redirect does
+  not depend on them, and they do not depend on it.
+- **Cookies and storage are per host.** A reader signed in on
+  sophecs.vercel.app is signed out on sophecs.com and signs in once more,
+  and an unsent argument the editor saved in that host's local storage
+  stays there, out of reach now that every page there redirects. A tab
+  left open there across the deploy fails its next server action (they
+  post to page paths, which redirect), and a quiz finished in it loses
+  its pending result, kept in that host's session storage; reloading
+  lands on sophecs.com. Submitting an argument goes through `/api/judge`
+  and is not affected.
+- **A loop to avoid.** A Vercel domain redirect from sophecs.com to
+  another host (www, say) would loop with these rules, which send that
+  host back. Today no domain redirects; the steps in the pull request
+  point www at sophecs.com, the way that agrees.
+
+### Sample scores that do not look generated (2026-11-05)
+
+Arthur: no sample score should look generated, and none should cluster on
+round numbers. Measured on the live run's rows before any change:
+
+- **Composites:** 8,111 scored sample verdicts, 23.3% on a multiple of 5
+  and 12.3% on a multiple of 10. The judge's own replies, 418 scored in
+  `tests/judge/golden-runs`, land on a multiple of 5 16.3% of the time.
+  The excess came from clamping each composite into its tier's range,
+  which piled scores on 50, 70 and 90.
+- **Criteria:** about half were half points (7.5). The judge has never
+  given one: all 418 replies score every criterion in whole numbers.
+- **Ratings:** 19.5% of `elo_after` on a multiple of 5 and 10.0% on a
+  multiple of 10, and 22.4% of rating changes on a multiple of 5. That is
+  the share any spread of whole numbers gives (20% and 10%), and the
+  ratings come from the product's own `soloElo` and `pairwiseElo`, as a
+  reader's do. Sample profiles with no rated argument hold 1200, the
+  rating every account starts on.
+- **Streaks:** 0 to 5, from the product's own `applyStreakDay`.
+- **Quiz percentages** on result pages: 21.8% on a multiple of 5 for
+  sample results and 21.4% for readers' own, both from `scoreQuiz`.
+
+So the verdict scores, the only numbers the generator draws itself, were
+the fix; ratings, streaks and quiz percentages are computed from them, or
+from generated answers, by the product's own functions.
+
+- **Not in place.** The engine inserts rows and refreshes a profile's
+  rating and streak; it has no way to rewrite a written verdict, and its
+  spot checks hold every written row to the plan, so a generator that
+  changed a written row would halt the schedule. A one-off rewrite of
+  8,111 production rows, with every later rating recomputed, would be a
+  new kind of production write and not one the engine validates.
+- **New rows, from 2026-11-06 06:00 UTC.** `scoreRuleFor` picks rule 2
+  for rows dated from then, and for every row of a run begun after then.
+  The live run had written to 2026-11-05 14:57 UTC; the six hours past
+  midnight are margin for a late merge. With a dummy seed, the window the
+  live run has written regenerates byte for byte the same on main and on
+  this branch (the same manifest hash to 05:59 UTC on 2026-11-06), and
+  with a window to 2026-11-08 every row dated before the cutover, in
+  every table, is identical (28,814 rows, by the second reviewer's count),
+  but for profiles' rating and streak, which the engine brings up to date
+  on every run as it always has; only rows after it change. Rule 2 makes
+  every draw rule 1 makes and takes its numbers from a stream of its own,
+  so a rule-2 verdict differs from rule 1's for the same row only in its
+  four numbers and its `prompt_version`, `sample-template-2`, which a
+  revision's and a rejection's row carry too.
+- **A late merge fails before it writes.** Old code running past the
+  cutover would write a few rule-1 scores the new plan calls rule 2. The
+  spot checks read 50 debates of about 8,600 and would almost never see
+  them, so every run now compares every stored sample debate's score and
+  `prompt_version` with the plan before it writes, and again in
+  validation (`storedScoreCheck`). Run end to end against the in-memory
+  adapter: on time, 0 of 9,853 stored debates differ and every check
+  passes through 2026-11-20; with old code writing at 07:41 after the
+  cutover, the next run is refused, "13 of 8576 stored sample debates
+  differ", and writes nothing.
+- **The existing rows** go at launch with the run, as planned; the fresh
+  run follows rule 2 throughout.
+- **Rule 2**, on six seeds of a full-size fresh run (three of mine, three
+  of the second reviewer's): composites 12.5% to 13.0% on a multiple of
+  5 and 5.8% to 6.3% on a multiple of 10; criteria on 0, 5 or 10 4.6% to
+  5.2% (fidelity), 9.6% to 11.1% (rigor) and 13.4% to 15.2%
+  (engagement); every criterion a whole number. Thinning harder would
+  leave visible gaps at 50, 55 and 60. Score bands 70-90 / 50-69 / 25-49:
+  about 26 / 47 / 25 (on my three seeds 25.8-26.3 / 46.4-47.8 /
+  24.9-26.0), against the plan's 25 / 50 / 25, with about 1-2% below 25
+  and 0.1-0.3% above 90, which rule 1's clamp never allowed. A first cut of the bands
+  gave 23 / 44 / 30, and the mid tier's lower edges were raised to bring
+  it back.
+- **On the verdict page, for the live run only:** a rule-2 revision of a
+  rule-1 original shows a half-point change ("6.5, now 7, +0.5"). Those
+  rows go at launch.
+- **The check.** `scripts/seed/round-scores.ts`: more than 20% of a run's
+  rule-2 scores on a multiple of 5, for the composite or any criterion,
+  refuses the run before it writes (with the duplicate-text check) and
+  fails validation after, on every path that validates. It judges once
+  there are 1,000 rule-2 verdicts, so that chance alone almost never
+  refuses a run (at a true share of 15.4%, above rule 2's highest
+  measured, about once in 24,000, by the exact binomial); the live run
+  reaches that about eleven days after the cutover, at about 86 a day,
+  and a fresh run starts with thousands. The schedule runs it, the
+  stored-score check and the duplicate check before it writes; a run by
+  hand (`seed-production`, `seed-local`) meets them in its validation,
+  after the write, which halts the run if one fails.
+- **If a merge comes after the cutover.** Every scheduled run is then
+  refused, and the job goes red, until `SCORE_RULE_2_FROM` is moved past
+  the run's `window_to`, which makes the rows old code wrote rule-1 rows
+  again. Do not revert this change to recover: old code has no stored
+  check, and its 50-row spot checks would rarely see the rule-2 rows
+  already written.
 
 ### The judge's caps and budget (migration 0026)
 

@@ -43,7 +43,7 @@ import {
   type Tier,
   type TopicSlug,
 } from "./banks";
-import { templateVerdict, templateRevisionVerdict, templateRejection, type Verdict, type Rejection } from "./verdicts";
+import { templateVerdict, templateRevisionVerdict, templateRejection, scoreRuleFor, type Verdict, type Rejection } from "./verdicts";
 import { Compositions } from "./compositions";
 import { replay } from "./replay";
 import { DAY, HOUR, MINUTE, TIMEZONES, activeTimeOn, dayWeight, iso, startOfUtcDay } from "./time";
@@ -52,6 +52,13 @@ import readingResponseBank from "./reading-responses.json";
 
 // Bumped whenever the same plan inputs would give different rows, so an
 // older plan is refused by name rather than by a hash mismatch.
+//
+// Score rule 2 (verdicts.ts) did not bump it. It changes only rows dated
+// from SCORE_RULE_2_FROM, which no run had written when it shipped, so the
+// live run's plan still regenerates every row it wrote, and a bump would
+// have refused that run by name for rows it never changed. A plan file
+// made before it with a window past the cutover is still refused, by its
+// manifest hash.
 export const GENERATOR_VERSION = "sample-activity-3";
 
 export interface GenConfig {
@@ -621,8 +628,8 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     const r = root.fork(`debate/${u.n}/${slot.k}`);
     const fr = banks.fragments[topic];
     const parts = compositions.next(topic, school, tier);
-    const verdict = slot.rejected ? null : templateVerdict(fr, { school, tier }, parts, u.skill, r);
-    const rejection = slot.rejected ? templateRejection(r) : null;
+    const verdict = slot.rejected ? null : templateVerdict(fr, { school, tier }, parts, u.skill, r, scoreRuleFor(slot.t, to));
+    const rejection = slot.rejected ? templateRejection(r, scoreRuleFor(slot.t, to)) : null;
     const rid = id(r);
     const row: DebateRow = {
       id: rid,
@@ -666,7 +673,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
       ...parent.parts,
       objections: [...parent.parts.objections, answeredIdx],
     });
-    const verdict = templateRevisionVerdict(fr, parent.row.school, parent.tier, parent.verdict, revisedParts, answeredIdx, slot.revise!.answered, r);
+    const verdict = templateRevisionVerdict(fr, parent.row.school, parent.tier, parent.verdict, revisedParts, answeredIdx, slot.revise!.answered, r, scoreRuleFor(rt, to));
     const rid = id(r);
     debates.push({
       row: {
@@ -678,6 +685,8 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         rejection_reason: null,
         verdict,
         score: verdict.score,
+        // Its own rule's, not the parent's: under rule 2 the two can differ.
+        prompt_version: verdict.prompt_version,
         argument_public: r.chance(0.8) ? parent.row.argument_public : !parent.row.argument_public,
         created_at: iso(rt),
         kind: "revision",

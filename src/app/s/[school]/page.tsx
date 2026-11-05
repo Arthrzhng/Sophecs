@@ -4,15 +4,18 @@ import { notFound } from "next/navigation";
 import { getSchool } from "@/lib/schools";
 import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
 import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
-import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "@/lib/types";
+import { SHOWN_SCHOOL_IDS, type SchoolId } from "@/lib/types";
+import { countWord } from "@/lib/count-word";
 
+// Every school this build shows: the published three, and on a
+// SIX_SCHOOLS build the three drafts as well (docs/stage5-plan.md, step 2).
 export function generateStaticParams() {
-  return PUBLISHED_SCHOOL_IDS.map((school) => ({ school }));
+  return SHOWN_SCHOOL_IDS.map((school) => ({ school }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ school: string }> }) {
   const { school } = await params;
-  if (!PUBLISHED_SCHOOL_IDS.includes(school as SchoolId)) return { title: "Sophecs" };
+  if (!SHOWN_SCHOOL_IDS.includes(school as SchoolId)) return { title: "Sophecs" };
   const content = getSchool(school as SchoolId);
   return { title: `${content.name} · Sophecs`, description: content.one_line };
 }
@@ -39,12 +42,12 @@ export async function generateMetadata({ params }: { params: Promise<{ school: s
  */
 export default async function SchoolPage({ params }: { params: Promise<{ school: string }> }) {
   const { school } = await params;
-  if (!PUBLISHED_SCHOOL_IDS.includes(school as SchoolId)) notFound();
+  if (!SHOWN_SCHOOL_IDS.includes(school as SchoolId)) notFound();
 
   const id = school as SchoolId;
   const content = getSchool(id);
   const tone = SCHOOL_CHUNKY[id];
-  const others = PUBLISHED_SCHOOL_IDS.filter((other) => other !== id);
+  const others = SHOWN_SCHOOL_IDS.filter((other) => other !== id);
 
   // Back on <Page> now the daily-path wrapper is gone: the wrapper had to
   // sit on <main>, which <Page> owns. `rhythm="path"` keeps the 40/40 this
@@ -107,7 +110,7 @@ export default async function SchoolPage({ params }: { params: Promise<{ school:
         </section>
 
         <section className="mt-12 border-t-2 border-rule pt-8">
-          <h2 className="text-base font-extrabold text-ink">The other two</h2>
+          <h2 className="text-base font-extrabold text-ink">{`The other ${countWord(others.length)}`}</h2>
           <ul className="mt-5 grid gap-5 sm:grid-cols-2">
             {others.map((other) => {
               const that = getSchool(other);

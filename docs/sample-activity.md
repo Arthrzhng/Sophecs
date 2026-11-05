@@ -76,8 +76,21 @@ challenges." `/method#samples` explains the rest.
   in batches, sometimes after the reader has left: `before_send` also
   drops any event carrying a sample page's address and any replay chunk
   recorded while one was open, and replay is paused for as long as a
-  sample page is open. A visit that starts on a sample page does not load
-  PostHog at all; the reader is identified on their first genuine page.
+  sample page is open. Console logs, which PostHog captures only if that
+  is switched on in the project, go out by another path that
+  `before_send` does not see, so the `logs` setting's own `beforeSend`
+  drops every one once the page load has shown a sample page (a record
+  logged before PostHog's logs script loads is filtered later, when it is
+  replayed, and by then carries no address to check). A visit that starts
+  on a sample page does not load PostHog at all; the reader is
+  identified on their first genuine page, which also sends
+  `return_visit` when their first visit was more than a day before
+  (`tests/seed/return-visit.test.ts`). Two things can
+  still carry a trace of a sample page, though no sample content: when a
+  visit starts on one, web vitals (if switched on) can report that page's
+  load timings and the element last touched under the first genuine
+  page's address; and the heatmap's mouse-move timer (500 ms) can file one
+  move made on a sample page just after the reader leaves it.
   `tests/seed/analytics-sample.test.ts`. The seed writes
   rows directly and emits no event. Sample quiz results carry no
   referrer. A page showing a sample passes no referrer on (`referrer:
@@ -124,8 +137,25 @@ challenges." `/method#samples` explains the rest.
   never to resolve. Supabase Auth refuses requests that relate to a banned
   user. No invitation, link or reset is ever requested.
 - **Spending.** No model is called. Every sample verdict is a template,
-  `prompt_version` `sample-template-1`, `verdict_is_template` true. No
-  `ai_calls`, `reports`, `blocks`, payment or analytics row is written.
+  `prompt_version` `sample-template-1` or `sample-template-2` (below),
+  `verdict_is_template` true. No `ai_calls`, `reports`, `blocks`, payment
+  or analytics row is written.
+- **Scores.** A template verdict's numbers follow a documented rule
+  (`scripts/seed/verdicts.ts`). Rule 2 (`sample-template-2`) gives
+  whole-number criteria, as the judge does, and lands on a multiple of 5
+  about 13% of the time for the composite and 5-15% for each criterion;
+  the judge's own replies land there 16.3% of the time. It applies to
+  rows dated from 2026-11-06 06:00 UTC, and to every row of a run begun
+  after then. Rows the run begun on 2026-11-05 wrote before then keep
+  rule 1 (half-point criteria; 23.3% of composites on a multiple of 5),
+  since the engine cannot rewrite a row it has written; they go at
+  launch. Every scheduled run compares every stored sample score with its
+  plan before it writes, and refuses on any difference; every validation,
+  a run by hand's included, does the same after the write. A scheduled
+  run whose rule-2 scores land on a multiple of 5 more than 20% of the
+  time, for the composite or any criterion, is refused before it writes,
+  and any run fails validation after (`scripts/seed/round-scores.ts`),
+  once it has a thousand rule-2 verdicts to judge.
 
 ## Real numbers
 
@@ -237,7 +267,7 @@ Measured on a plan with the defaults and a test seed, base window to
 | Debaters who revise | about 15% | 12.1% |
 | Arguments in the base window, revisions included | 9,000 to 12,000 at 4,000 accounts | 8,297 (442 revisions) |
 | Rejected | about 3% | 3% |
-| Score bands 70-90 / 50-69 / 25-49 | 25 / 50 / 25 | 26 / 51.2 / 22.8 |
+| Score bands 70-90 / 50-69 / 25-49 | 25 / 50 / 25 | 26 / 51.2 / 22.8 (rule 1); rule 2, a fresh run on three seeds: 25.8-26.3 / 46.4-47.8 / 24.9-26.0, with 1.2-1.7 below 25 and 0.1-0.3 above 90 |
 | Exchanges complete / lapsed / open | 70 / 20 / 10 | 339 / 104 / 49 of 492 |
 | Challenges complete / accepted / open | | 98 / 66 / 164 |
 | Arguments sharing their exact text with another | under 5% | 0% (0.1% after ten more days) |
@@ -247,8 +277,11 @@ Measured on a plan with the defaults and a test seed, base window to
 
 **Verdicts.** The judge's own response shape, validated in the tests
 against `VerdictSchema`. The score is `10 x (0.5 F + 0.25 R + 0.25 E)`
-plus at most 2 points of noise, held in the tier's range (strong 70-90,
-mid 50-70, weak 25-50). The strongest and weakest moves quote the
+plus noise. Under rule 1 that is at most 2 points, with half-point
+criteria, held in the tier's range (strong 70-90, mid 50-70, weak
+25-50). Under rule 2 (Scores, above) it is up to 4 points, with
+whole-number criteria and no range to hold it in, and some scores on a
+multiple of 5 move a point or two. The strongest and weakest moves quote the
 argument verbatim. The named objection is the rival whose objection the
 argument does not answer, and a revision adds that answer.
 
@@ -328,7 +361,13 @@ belongs to a process that died and can be cleared. In the workflow a run
 clears one itself (a job the runner killed, by the timeout, a cancel or a
 lost machine, leaves its lock behind), which is safe there because the
 concurrency group runs one job at a time; from a machine it takes
-`--break-stale-lock`.
+`--break-stale-lock`. One exception: a run keeps its lock, unrefreshed,
+from the end of its writes until its validation is recorded, which
+takes minutes. The schedule cannot break it then, since the run is
+halted ("validation not finished") and an `extend` stops at the halt
+before it touches the lock; a `full` or teardown started by hand could
+after 15 minutes, and the validation would then leave the run's status
+and halt as they were (its report still goes to `last_report`).
 
 ## Teardown
 
@@ -341,7 +380,9 @@ with the service key:
         # preview: what would go, and any genuine row that points at a sample row
     ... --execute --confirm-teardown <id>
 
-It works from the registry, so no plan is needed. It deletes the run's
+It works from the registry, so no plan is needed, and it takes the run's
+lock: while another process holds it, teardown is refused (if that
+process died, the lock can be cleared after 15 minutes). It deletes the run's
 registry items in dependency order, scoped again by the marker or the
 run's own users, clears a genuine row's nullable reference to a sample row
 first, and stops on anything it could only keep by deleting it. It keeps
@@ -413,28 +454,84 @@ sample teardown and a fresh run into the launch steps". In order:
 3. **A fresh run:** `canary`, then `full`, as in Rollout steps 4 and 5,
    each with Arthur's go-ahead. The new run has a new id (the canary's
    start time), and the schedule extends it once its full stage has
-   passed.
+   passed. Every verdict in it follows score rule 2, so the rule-1 rows
+   go with the old run. Before its canary, the sample users' email tag becomes
+   HMAC-SHA256 of the run and the user's number, keyed by the seed: the
+   current tag comes from the generator's own random streams, which are
+   not meant for secrets, so someone who reconstructed a stream from
+   public outputs could work out every address. Nothing is exposed by
+   that (the addresses are on `sophecs.test` and the users are banned),
+   and changing it for the live run would break its spot checks, so it
+   waits for the fresh run.
 
 ## Stop conditions
 
 Stop and report, without retrying past the engine's own retries, if:
 
-- any validation check fails, exact duplicate argument texts reaching 5%
-  among them;
-- the run refuses to adopt a row;
-- auth user creation is refused, or any created user comes back without
-  its ban;
+- any validation check fails (the run halts);
+- exact duplicate argument texts would reach 5% (refused with the
+  dry-run checks, before anything is written);
+- more than 20% of the run's rule-2 scores, of the composite or of any
+  criterion, would land on a multiple of 5 (the schedule refuses it with
+  its dry-run checks; any run fails validation after a write);
+- any stored sample debate's score or `prompt_version` differs from the
+  plan (the same two places). This is what code with another score rule
+  writing past the cutover leaves; the way on is to move
+  `SCORE_RULE_2_FROM` past the run's `window_to`, not to revert to code
+  without the check;
+- the run refuses to adopt or update a row, or a created user comes back
+  without its ban (the run halts);
+- auth user creation fails past the retries (the run fails; the next
+  scheduled run tries again);
 - the dry-run checks find the motions differ, another run holds a lock,
-  or the plan is not the run's;
-- the canary's rate puts the full run beyond an hour.
+  or the plan is not the run's (refused before anything is written; each
+  scheduled run is refused the same way until it is put right);
+- the canary's rate puts the full run beyond an hour (a judgement made by
+  hand at the canary).
 
-A failed validation halts the run: `seed_runs.status` becomes `failed`
-with `last_error` starting "halted: validation failed", and from then on
-each scheduled run writes nothing and fails, until a `full` stage run by
-hand passes validation again. Any other failure (a lost runner, the
-timeout, a database error) is retried by the next scheduled run, which
-resumes. A run that keeps failing shows as failed runs in the Actions
-tab, and GitHub emails the account that set the schedule.
+A halted run has `seed_runs.status` `failed` and a `last_error`
+starting "halted:", and from then on each scheduled run writes nothing
+and fails, until a `full` stage run by hand passes validation again.
+Three things halt it (`scripts/seed/engine.ts`, `HALT_PREFIX`):
+
+- "halted: validation failed", naming the checks that failed;
+- "halted: validation not finished": every run that writes ends halted
+  this way, and only a validation that passes lifts it, so a validation
+  that throws, or a job lost before validating, leaves the run halted;
+- "halted: stopped", with the refusal: a row the run would not adopt or
+  update, or a user without its ban.
+
+A run by hand on a halted run keeps the halt while it writes, and if it
+fails partway, the halt stays in front of the new error; only its
+passing validation lifts it, and a canary cannot be run on a halted run
+or one that has had its full stage, since it validates only its first
+cohorts. A run that writes keeps the run's lock from the end of its
+writes until its validation's result is recorded, so no teardown or
+other process can write to the run in between; if that lock is lost,
+nothing is recorded and the halt stays. The duplicate check runs with
+the dry-run checks, before anything is written, so an extension that
+would cross 5% is refused rather than written and halted.
+
+Everything else resumes. A database error during the writes, past the
+engine's retries, leaves the run `failed` but not halted, and the next
+scheduled run resumes it. A runner lost during the writes (the timeout,
+a cancel, a lost machine) leaves the run `running` with its lock, which
+the next scheduled run clears once it is 15 minutes old, then resumes. A
+runner lost after the writes leaves the run halted, "validation not
+finished", as above. The schedule resumes only an `extend`: a `canary`
+or `full` stage that fails or is lost leaves the run short of its full
+stage, and the schedule does nothing (a green job, unless the run was
+left halted, when every scheduled run fails) until `full` is run by hand
+again. An `extend` also refuses a run halted by another process in the
+minutes between its own check and taking the lock. `tests/seed/ci.test.ts` and
+`tests/seed/engine.test.ts` cover each case. A run that keeps failing
+shows as failed runs in the Actions tab, and GitHub emails the account
+that set the schedule.
+
+The workflow's log is public, so an error from the writes, which can
+name a row, is logged as a line of its own ("the run stopped on a
+refusal" or "the run failed while writing"), and the detail goes to
+`seed_runs.last_error`, or the line says it could not be recorded.
 
 ## Limits
 
@@ -447,7 +544,8 @@ tab, and GitHub emails the account that set the schedule.
 - Exact duplicates rise once a composition list runs out. Measured in
   review on 2026-11-04 at production volumes: 0.02% at the start, 0.28%
   after 90 days, 3.29% after a year and 9.85% after two, so the 5% check
-  halts the run after about 16 months unless the passages grow. Making
+  refuses every extension from about 16 months on, before writing
+  anything, unless the passages grow. Making
   the plan takes 14 s at the start and about 3 minutes after a year.
   Re-measured on 2026-11-05 with two other seeds and production's base
   window: 0.2% at the start, 0.5% and 0.7% after 90 days, 3% after a

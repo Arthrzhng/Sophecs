@@ -1,5 +1,5 @@
 {
-  "what": "Quiz v2 draft for docs/quiz-v2.md: the two axes, the six school positions and the ten questions with their weights. A draft for Arthur to decide, not built. scripts/simulate-quiz-v2.mjs reads this file. Each option's vector is its school's direction (angle) times that school's weight in radius_by_school.",
+  "what": "Quiz v2 for docs/quiz-v2.md: the two axes, the six school positions and the ten questions with their weights. Accepted by Arthur on 2026-11-05 (Checkpoint A, item 15), with five options reworded on the same vectors; not built yet. scripts/simulate-quiz-v2.mjs reads this file. Each option's vector is its school's direction (angle) times that school's weight in radius_by_school.",
   "axes": {
     "x": {
       "name": "Who it is about",
@@ -105,7 +105,7 @@
         },
         {
           "id": "2c",
-          "label": "Say whatever is most likely to get the essay improved before it is handed in, even if that is not quite what I think.",
+          "label": "Say whatever is most likely to get the essay improved before it is handed in.",
           "leans": "utilitarianism",
           "vector": {
             "x": -0.42,
@@ -231,7 +231,7 @@
         },
         {
           "id": "5c",
-          "label": "Keep my eyes on my own paper. Their choices are theirs to answer for.",
+          "label": "Tell them once, privately, what I saw. What they do next is theirs to answer for; what I say is mine.",
           "leans": "stoicism",
           "vector": {
             "x": -0.97,
@@ -264,7 +264,7 @@
         },
         {
           "id": "6b",
-          "label": "I am the older one, so I set how we treat each other's things and expect him to follow it.",
+          "label": "I am the older one, so it is on me to show him how we treat each other's things, and on him to learn to ask.",
           "leans": "confucian",
           "vector": {
             "x": 0.51,
@@ -297,7 +297,7 @@
       "options": [
         {
           "id": "7a",
-          "label": "Play as well as I can wherever I am put. Who gets picked is not up to me.",
+          "label": "Tell the captain once, calmly, what I think is fair, then play as well as I can wherever I am put. Whether they listen is not up to me.",
           "leans": "stoicism",
           "vector": {
             "x": -0.97,
@@ -315,7 +315,7 @@
         },
         {
           "id": "7c",
-          "label": "Tell the captain to their face that it is unfair. Keeping quiet would be cowardly.",
+          "label": "Tell the captain to their face that it is unfair. Going along with it would make me someone I don't want to be.",
           "leans": "virtue-ethics",
           "vector": {
             "x": -0.27,

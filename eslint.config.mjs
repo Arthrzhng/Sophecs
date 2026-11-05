@@ -11,7 +11,7 @@ const compat = new FlatCompat({ baseDirectory: dirname(fileURLToPath(import.meta
 // that would need a custom plugin to express them.
 const config = [
   {
-    ignores: [".next/**", "node_modules/**", ".claude/**", "next-env.d.ts", "tsconfig.tsbuildinfo"],
+    ignores: [".next/**", ".next-six/**", "node_modules/**", ".claude/**", "next-env.d.ts", "tsconfig.tsbuildinfo"],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {

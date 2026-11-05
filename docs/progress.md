@@ -518,3 +518,153 @@ are in each pull request.
   - Not checked live: the card image's pixels (the fetch returns a PNG as
     text); the mark rests on `tests/seed/challenge-preview.test.ts`, which
     runs the routes.
+
+## 2026-11-05: Arthur's rulings on Checkpoint A
+
+Each pull request had one to three fresh review passes; the findings and
+fixes are in each. Every production deploy below was read from Vercel
+as Ready.
+
+- #67 merged as `82fbffe`: the rulings recorded in `docs/decisions.md`.
+  Deploy `dpl_77cYToNKoHMQPNr9BgCUkDpSyzSD`.
+- #68 merged as `a5ee501`: judge v3's engagement cap tied to its own
+  reply, comments stripped before v3 is sent, Utilitarianism's
+  Virtue Ethics voice (rulings 2/11, 12, 14). v3 is not live. Deploy
+  `dpl_HcvfPv5KGmqQWTpc8UBUc8gLdL5J`.
+- #69 merged as `5f95ad2`: migration 0024 (rulings 4, 21, 22, 23),
+  applied through the Supabase tool at 14:53 UTC (migration version
+  `20261105145333`), before the merge, with the security advisor before
+  and after and a read-back (the
+  display_name check, the narrowed class policies, the class functions
+  and `exchanges_public` closed to clients, `elo_percentile`'s search
+  path). 0025, which drops the five unreachable insert policies (ruling
+  5), is with Arthur for the SQL Editor; not yet run (all five policies
+  still present, read at 16:44 UTC).
+  Deploy `dpl_x9X8rtfSy3pk3uZ2dvQGLjUYB8Eu`.
+- #70 merged as `9003c1b`: sample pages pass no referrer on (ruling 18).
+  Live, fetched from sophecs.com through Vercel at 16:45 UTC: a sample
+  account's result (`/r/HREvvktgxx`) carries `<meta name="referrer"
+  content="no-referrer">`, and the landing page (`/`)
+  `strict-origin-when-cross-origin`.
+  Deploy `dpl_APWR1Ybh5fTCTcd9ihQWkDq2eAvh`.
+- #73 merged as `bfadb6d`: zod 4.6.7 (ruling 13), the six request
+  fixtures unchanged, a 91-reply corpus parsing the same on zod 3 and 4;
+  `schema.ts` and `screen.ts` keep zod 3's UTF-16 count for their
+  200-character caps. Deploy `dpl_ECaMA5sGPQmGPRUu7DBSEBg8AJgP`.
+- #74 merged as `99744fe`: the new schools' colours, Confucianism
+  `#562b05`, Ubuntu `#1e3b4f`, Buddhist Ethics `#7d56b8` (ruling 16), on
+  a preview deployment's `/styleguide/phase3`; nothing live changes.
+  Deploy `dpl_HKH9Yj851bjdXvaDAUVRC7cRBtg9`.
+- #75 merged as `0dd59cf`: Quiz v2 as ruled (ruling 15), and the live
+  copy no longer calls the quiz "about AI". Deploy
+  `dpl_BsD2uG8bYyp4B3SiBpnyWkA3TuoA`.
+- #72 merged as `ac5ceec`: the fixes from the fresh review of #57's last
+  fixes (ruling 19): a sample run's halt now holds until a validation
+  passes, refusals halt, the duplicate check runs before writing, console
+  logs are dropped once a sample page has been shown, and `return_visit`
+  is sent from the first genuine page of a visit. The scheduled job uses
+  it from its next run. Deploy `dpl_3K6kxcR6EhKSgDdB2ZLt2fibb3tz`.
+- #76 merged as `099c3b1`: the sample workflow's actions on Node 24,
+  pinned by commit; follow-redirects, vite and vitest within range.
+  `npm audit` listed 10 packages at the merge. Deploy
+  `dpl_Ccd4XCRVK5o4WALuxPey627jxDgj`.
+- Open: #71, the judge's caps and budget (rulings 6, 7, 8), three passes
+  done, waiting on Arthur's yes to migration 0026 before it is applied
+  and merged.
+
+## 2026-11-05: Stage 5, the flag and the pages that only read
+
+Each pull request had one to three fresh review passes; the findings and
+fixes are in each. The fixes from the last pass of #78, #79, #80 and
+#81 were made after it, and each pull request says so. Every production
+deploy below was read from Vercel as Ready.
+
+- #77 merged as `d9ec035`: the entry above. Deploy
+  `dpl_4xL5QRpN7MNPnBuau38ctoPF6awi`.
+- #78 merged as `de35849`: `docs/stage5-plan.md`, the plan for building
+  the six schools behind a build-time `SIX_SCHOOLS` flag, in six steps
+  with four gates. Three passes. Deploy
+  `dpl_ATcouqnPoLLmdLvtSDovnWU9m6PA`.
+- #79 merged as `d733c59`: step 1, the flag. A flag-on build shows the
+  three after the live schools; a flag-off build is unchanged, which
+  `npm run check:bundle` now checks over nineteen strings, colours
+  included, and `npm run check:bundle:six` checks the other way. The
+  judge reads the published list, which does not move. Review found
+  webpack's cache carrying the flag-on stylesheet into a flag-off build;
+  the flag is now in the cache's version. `next.config.ts` refuses a
+  flag-on production build. Deploy `dpl_GzthwxDF9xovry1oWNFcyYsefBUV`,
+  and sophecs.com read at 17:48 UTC showed three schools and the same
+  stylesheet as before.
+- `SIX_SCHOOLS=1` set in Vercel for Preview only, at 19:11 UTC.
+- #80 merged as `979d9d8`: step 2a. On a flag-on build the three have
+  pages, modules on `/lessons`, rows on the table, and places on the
+  landing page and in the footer. Its preview, the first flag-on Vercel
+  build, served `/s/ubuntu` with "The other five". Deploy
+  `dpl_Ch8vXgMsrppWuKuLxALpafN7VUNb`.
+- #81 merged as `132a7bd`: step 2b. On a flag-on build Today offers the
+  week's view from elsewhere after step 4, and each of the six passages
+  has a page; the before and after pages still number their pair 1 and 2
+  of 2. Review found the passages keyed on the three being drafts, which
+  would have hidden them at launch; they are keyed on the flag. Deploy
+  `dpl_5uMbDJm478A2ZAtxYcBh9m4fGLVS`.
+- Not done: migration 0025 is still with Arthur (all five policies
+  present at 19:41 UTC), #71 waits on his yes to 0026, and the sample
+  workflow's 18:41 UTC run had not started by 19:41. Checkpoint B
+  (`docs/checkpoint-b.md`) lists everything open.
+
+## 2026-11-05: one address
+
+- #82 merged as `c2d9ac9`: Checkpoint B (`docs/checkpoint-b.md`) and the
+  entry above. Deploy `dpl_DvxqBK2MBNx1z4uSz2An6BSTuwEW`, Ready.
+- Migration 0025, run by Arthur in the SQL Editor, read back at 20:52
+  UTC: the five unreachable insert policies are gone, `own update` on
+  profiles is kept, and the other policies on the five tables are as
+  before. Security advisor after: the same findings as before, nothing
+  new.
+- #83 merged as `c682e82`: one address. Every host but sophecs.com and
+  the deployment's own URL sends a page to the same path and query on
+  sophecs.com; a sign-in that falls
+  back to Supabase's Site URL (`https://sophecs.vercel.app`, which is how
+  readers reached that host) completes on sophecs.com; `/auth/callback`
+  keeps `next` on the site, closing an open redirect. Three review
+  passes; the second found the first fix to the open redirect let dot
+  segments through. Deploy `dpl_Hf57AxRGc6MVg814fyrGMdJRDfD3`, Ready and
+  aliased to all five hosts.
+- The live check of #83, through Vercel's fetch at 21:41 UTC:
+
+  | Request | Result |
+  | --- | --- |
+  | `https://sophecs.com/robots.txt` | 200, no Location |
+  | `https://sophecs.vercel.app/debate?x=1` | 307 to `https://sophecs.com/debate?x=1` |
+  | `https://www.sophecs.com/lessons` | 307 to `https://sophecs.com/lessons` |
+  | `https://sophecs-arthurrzhang-1874s-projects.vercel.app/table` | 307 to `https://sophecs.com/table` |
+  | `https://sophecs.vercel.app/?code=x` | 307 to `https://sophecs.com/auth/callback?code=x` |
+  | `https://sophecs.com/auth/callback?next=/..//evil.example` (no code) | ends at `/login` on sophecs.com, 200 (with no code the route never reads `next`; `tests/auth-callback.test.ts` checks `next` itself) |
+  | `https://sophecs.com/api/cron/keepalive` | 401, the route's own, not redirected |
+
+  The fetch tool adds a `_vercel_share` parameter to the Locations it
+  reports; the site does not. sophecs.com is left alone, so #85 makes the
+  host rule a 308: Arthur's message of 2026-11-05 asked for
+  "sophecs.vercel.app permanently redirecting to it (www too)".
+- Still Arthur's (#83 lists the clicks): Supabase Auth's Site URL and
+  redirect allow-list, and Vercel's domain redirect for www. Until then
+  a sign-in returns to `/me`, or to the quiz for a reader who has not
+  taken it, rather than to the page it started from.
+
+## 2026-11-05: sample scores that do not look generated
+
+- #84 merged as `ebacb28`. Sample verdicts dated from 2026-11-06 06:00
+  UTC, and every verdict of a run begun after then, follow score rule 2:
+  whole-number criteria, as the judge gives, and composites on a multiple
+  of 5 about 13% of the time (23.3% of the live run's 8,111 before it;
+  the judge's own replies 16.3%). The live run's earlier rows keep rule
+  1, regenerate unchanged, and go at launch. Every run now checks every
+  stored sample score against its plan, and refuses a run whose rule-2
+  scores are more than 20% on a multiple of 5. Two review passes; the
+  first found that a late merge would not have failed safely, which the
+  stored check fixes. At merge (21:48 UTC) the live run's `window_to` was
+  2026-11-05 14:57 UTC, before the cutover. Deploy
+  `dpl_Dziy9W1qdng5Cu4czFodCyp4Bor1`, Ready (the engine runs from GitHub
+  Actions, not from the deploy).
+- Not yet seen: the first scheduled run on #84's code. The 18:41 UTC slot
+  had not run by 21:48; the schedule has fired once since #57 merged.

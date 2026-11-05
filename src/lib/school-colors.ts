@@ -1,6 +1,7 @@
 import { CARD_INK, CARD_SURFACE } from "./card-tokens";
 import {
-  publishedLookup,
+  SHOWN_SCHOOL_IDS,
+  shownLookup,
   schoolAdherent,
   schoolAdherentPlural,
   schoolName,
@@ -9,10 +10,13 @@ import {
 
 // Every map here is built from the registry rather than written out, so a
 // school cannot be in the product and missing from one of them, and each
-// goes through `publishedLookup`: it holds the published schools and
+// goes through `shownLookup`: it holds the schools this build shows and
 // answers for anything else with a neutral computed from the id. No draft
-// school's name or id appears in any of these, which is what keeps them
-// out of the client bundle.
+// school's name or id appears in any of these on a build without
+// SIX_SCHOOLS, which is what keeps them out of production's client bundle.
+// Each map enumerates SHOWN_SCHOOL_IDS rather than naming schools, so the
+// flag is tested in the registry, and again only where a module holds
+// literals of its own: TEXT_CLASS_BY_SCHOOL here, and card-tokens.ts.
 //
 // The saturated surfaces are read from card-tokens.ts, not restated here:
 // that file is the single place the globals.css literals are mirrored for
@@ -21,9 +25,9 @@ import {
 export const SCHOOL_COLORS: Record<
   SchoolId,
   { surface: string; ink: string; name: string }
-> = publishedLookup(
+> = shownLookup(
   Object.fromEntries(
-    (["stoicism", "utilitarianism", "virtue-ethics"] as const).map((id) => [
+    SHOWN_SCHOOL_IDS.map((id) => [
       id,
       { surface: CARD_SURFACE[id], ink: CARD_INK, name: schoolName(id) },
     ])
@@ -40,9 +44,9 @@ export const SCHOOL_COLORS: Record<
 // say" does not, and a naive lowercase of the name gets it wrong for all
 // three. The nouns are in the registry; a published school without one
 // fails `tests/school-registry.test.ts` rather than rendering a fallback.
-export const SCHOOL_ADHERENT: Record<SchoolId, string> = publishedLookup(
+export const SCHOOL_ADHERENT: Record<SchoolId, string> = shownLookup(
   Object.fromEntries(
-    (["stoicism", "utilitarianism", "virtue-ethics"] as const).map((id) => [
+    SHOWN_SCHOOL_IDS.map((id) => [
       id,
       schoolAdherent(id),
     ])
@@ -52,9 +56,9 @@ export const SCHOOL_ADHERENT: Record<SchoolId, string> = publishedLookup(
 
 // The same, in the plural, for talking about a school's side rather than
 // one of its arguers: "+1 for the Stoics on the table".
-export const SCHOOL_ADHERENT_PLURAL: Record<SchoolId, string> = publishedLookup(
+export const SCHOOL_ADHERENT_PLURAL: Record<SchoolId, string> = shownLookup(
   Object.fromEntries(
-    (["stoicism", "utilitarianism", "virtue-ethics"] as const).map((id) => [
+    SHOWN_SCHOOL_IDS.map((id) => [
       id,
       schoolAdherentPlural(id),
     ])
@@ -73,13 +77,21 @@ export const SCHOOL_ADHERENT_PLURAL: Record<SchoolId, string> = publishedLookup(
 // utilities it needs by scanning source for class strings, so a
 // `text-${token}` built at runtime would compile and then render with no
 // colour at all. A school with no class of its own gets `text-ink`.
+//
+// The three unpublished schools' classes are written by hand in
+// src/app/six-schools.css, which only a SIX_SCHOOLS build includes, and
+// are named here behind the same build-time constant as the registry's
+// entries (see SHOWN_DRAFTS there), so a build without the flag drops them.
 const TEXT_CLASS_BY_SCHOOL: Partial<Record<SchoolId, string>> = {
   stoicism: "text-stoic",
   utilitarianism: "text-utilitarian",
   "virtue-ethics": "text-virtue",
+  ...(process.env.SIX_SCHOOLS === "1"
+    ? { confucian: "text-confucian", ubuntu: "text-ubuntu", buddhist: "text-buddhist" }
+    : {}),
 };
 
-export const SCHOOL_TEXT_CLASS: Record<SchoolId, string> = publishedLookup(
+export const SCHOOL_TEXT_CLASS: Record<SchoolId, string> = shownLookup(
   TEXT_CLASS_BY_SCHOOL,
   () => "text-ink"
 );

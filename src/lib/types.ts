@@ -17,10 +17,14 @@ export {
   PUBLISHED_SCHOOLS,
   QUIZ_SCHOOLS,
   PUBLISHED_SCHOOL_IDS,
+  SHOWN_SCHOOLS,
+  SHOWN_SCHOOL_IDS,
   publishedEntry,
-  publishedLookup,
+  shownEntry,
+  shownLookup,
   schoolName,
   isPublished,
+  isShown,
   isQuizSchool,
 } from "./school-registry";
 

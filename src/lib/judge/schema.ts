@@ -13,6 +13,14 @@ function maxWords(max: number) {
   return (val: string) => val.trim().split(/\s+/).filter(Boolean).length <= max;
 }
 
+// A length cap in UTF-16 code units, as zod 3's .max() counted. zod 4.5 and
+// later count .max() in code points, which lets an emoji-heavy string run
+// to twice the cap; Arthur's ruling of 2026-11-05 moved to zod 4 on the
+// condition that v2 behaves as before (docs/decisions.md, "zod 4").
+function maxUnits(max: number) {
+  return (val: string) => val.length <= max;
+}
+
 // The schools a verdict may name. Published only: a verdict naming a
 // school still in draft would be a verdict about something no reader can
 // see. The cast is zod's tuple requirement, not a widening; the enum's
@@ -27,7 +35,7 @@ const JUDGEABLE_SCHOOLS = PUBLISHED_SCHOOL_IDS as unknown as [SchoolId, ...Schoo
 export const VerdictSchema = z.discriminatedUnion("rejected", [
   z.object({
     rejected: z.literal(true),
-    rejection_reason: z.string().min(1).max(200),
+    rejection_reason: z.string().min(1).refine(maxUnits(200), "rejection_reason exceeds 200 characters"),
   }),
   z.object({
     rejected: z.literal(false),

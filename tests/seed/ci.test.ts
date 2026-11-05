@@ -2,9 +2,9 @@
 // database: canary, full, then extensions, each one appending; nothing
 // before a full stage or after teardown; a wrong seed refused before a
 // write; and a log with nothing in it that is secret or a reader's.
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { MemoryAdapter } from "../../scripts/seed/adapter-memory";
-import { runCi, CANARY_ACCOUNTS, HALTED, type Mode } from "../../scripts/seed/ci";
+import { runCi, CANARY_ACCOUNTS, HALTED, REFUSED, VALIDATING, type Mode, type CiOptions } from "../../scripts/seed/ci";
 import { teardown } from "../../scripts/seed/teardown";
 import { contentTopics } from "../../scripts/seed/topics";
 
@@ -22,10 +22,35 @@ function freshDb() {
   return db;
 }
 
-async function step(db: MemoryAdapter, mode: Mode, hours: number, seed = SEED) {
+async function step(db: MemoryAdapter, mode: Mode, hours: number, seed = SEED, maxExactDuplicatePct?: number, extra: Partial<CiOptions> = {}) {
   const lines: string[] = [];
-  const out = await runCi({ mode, adapter: db, seed, projectRef: "tekifezydjlgxgndkxul", now: () => at(hours), log: (l) => lines.push(l), config: SMALL, batchSize: 100 });
+  const out = await runCi({ mode, adapter: db, seed, projectRef: "tekifezydjlgxgndkxul", now: () => at(hours), log: (l) => lines.push(l), config: SMALL, batchSize: 100, maxExactDuplicatePct, ...extra });
   return { out, lines };
+}
+
+// Stored texts no longer match the plan (as after an edit to the passages),
+// so the next validation fails. Returns a function that puts them back.
+function breakDebates(db: MemoryAdapter) {
+  const debates = db.table("debates");
+  const kept = new Map<string, unknown>();
+  for (const [id, r] of debates) {
+    if (!r.is_sample) continue;
+    kept.set(id, r.argument);
+    debates.set(id, { ...r, argument: "edited" });
+  }
+  return () => {
+    for (const [id, a] of kept) debates.set(id, { ...debates.get(id)!, argument: a });
+  };
+}
+
+async function haltedRun(db: MemoryAdapter) {
+  await step(db, "canary", 0);
+  await step(db, "full", 1);
+  const run = (await db.listRuns())[0];
+  const putBack = breakDebates(db);
+  expect((await step(db, "extend", 24)).out).toMatchObject({ ok: false, outcome: "written" });
+  expect((await db.getRun(run.id))!.last_error).toMatch(new RegExp(`^${HALTED}`));
+  return { run, putBack };
 }
 
 const samples = (db: MemoryAdapter, table: string) => [...db.table(table).values()].filter((r) => r.is_sample).length;
@@ -92,14 +117,7 @@ describe("the scheduled workflow's path", () => {
     await step(db, "canary", 0);
     await step(db, "full", 1);
     const run = (await db.listRuns())[0];
-    // Stored texts no longer match the plan (as after an edit to the passages).
-    const debates = db.table("debates");
-    const kept = new Map<string, unknown>();
-    for (const [id, r] of debates) {
-      if (!r.is_sample) continue;
-      kept.set(id, r.argument);
-      debates.set(id, { ...r, argument: "edited" });
-    }
+    const putBack = breakDebates(db);
     const bad = await step(db, "extend", 24);
     expect(bad.out).toMatchObject({ ok: false, outcome: "written" });
     expect(bad.lines.join("\n")).toMatch(/^FAIL {2}spot check: debates$/m);
@@ -112,10 +130,203 @@ describe("the scheduled workflow's path", () => {
     expect(samples(db, "debates")).toBe(before);
 
     // Put right, a full stage run by hand clears the halt, and the schedule resumes.
-    for (const [id, a] of kept) debates.set(id, { ...debates.get(id)!, argument: a });
+    putBack();
     expect((await step(db, "full", 31)).out).toMatchObject({ ok: true });
-    expect((await db.getRun(run.id))!.last_error).toBeNull();
+    expect((await db.getRun(run.id))!).toMatchObject({ status: "complete", last_error: null });
     expect((await step(db, "extend", 36)).out).toMatchObject({ ok: true, outcome: "written" });
+  });
+
+  it("keeps the halt when a full stage run by hand fails before it validates", async () => {
+    const db = freshDb();
+    const { run, putBack } = await haltedRun(db);
+    putBack();
+    // The database goes away mid-write, while the job holds the lock.
+    const items = db.items.bind(db);
+    const spy = vi.spyOn(db, "items").mockImplementation(async (...args: Parameters<MemoryAdapter["items"]>) => {
+      if ((await db.getRun(run.id))!.lock_token) throw new Error("connection lost");
+      return items(...args);
+    });
+    await expect(step(db, "full", 31)).rejects.toThrow(/^the run failed while writing; seed_runs.last_error has the detail$/);
+    spy.mockRestore();
+    const after = (await db.getRun(run.id))!;
+    expect(after.status).toBe("failed");
+    expect(after.last_error).toMatch(new RegExp(`^${HALTED}: .*; then: connection lost$`));
+    // So the schedule still writes nothing.
+    const before = samples(db, "debates");
+    expect((await step(db, "extend", 36)).out).toMatchObject({ ok: false, outcome: "halted" });
+    expect(samples(db, "debates")).toBe(before);
+    // A full stage that gets through validation lifts it.
+    expect((await step(db, "full", 37)).out).toMatchObject({ ok: true });
+    expect((await db.getRun(run.id))!).toMatchObject({ status: "complete", last_error: null });
+  });
+
+  it("halts the run when its validation does not finish", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    // A read error in the validation, once the rows are written (the run
+    // reaches its new end only when they are).
+    const scan = db.scan.bind(db);
+    const spy = vi.spyOn(db, "scan").mockImplementation(async (...args: Parameters<MemoryAdapter["scan"]>) => {
+      const written = Date.parse((await db.getRun(run.id))!.window_to) === Date.parse(at(24 * 7));
+      if (written && args[0] === "debates") throw new Error("read timed out");
+      return scan(...args);
+    });
+    const debatesBefore = samples(db, "debates");
+    await expect(step(db, "extend", 24 * 7)).rejects.toThrow(/read timed out/);
+    spy.mockRestore();
+    expect(samples(db, "debates")).toBeGreaterThan(debatesBefore);
+    expect((await db.getRun(run.id))!).toMatchObject({ status: "failed", last_error: VALIDATING, lock_token: null });
+    const before = samples(db, "debates");
+    expect((await step(db, "extend", 24 * 8)).out).toMatchObject({ ok: false, outcome: "halted" });
+    expect(samples(db, "debates")).toBe(before);
+  });
+
+  it("halts the run on a refusal while writing, rather than trying again every six hours", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    // The run's profiles are no longer marked as samples: it must not touch them.
+    const ids = [...db.table("profiles").values()].filter((r) => r.is_sample).map((r) => String(r.id));
+    for (const [id, r] of db.table("profiles")) if (r.is_sample) db.table("profiles").set(id, { ...r, is_sample: false });
+    const lines: string[] = [];
+    const err = await runCi({ mode: "extend", adapter: db, seed: SEED, projectRef: "tekifezydjlgxgndkxul", now: () => at(24 * 7), log: (l) => lines.push(l), config: SMALL, batchSize: 100 }).catch((e: Error) => e);
+    // The public log and the error main() prints carry no row id; the run
+    // keeps the detail.
+    expect((err as Error).message).toBe("the run stopped on a refusal; seed_runs.last_error has the detail");
+    for (const text of [...lines, (err as Error).message]) {
+      expect(text).not.toMatch(/refusing/);
+      for (const id of ids) expect(text).not.toContain(id);
+    }
+    const after = (await db.getRun(run.id))!;
+    expect(after.status).toBe("failed");
+    expect(after.last_error).toMatch(new RegExp(`^${REFUSED}: .*refusing`));
+    const held = await step(db, "extend", 24 * 8);
+    expect(held.out).toMatchObject({ ok: false, outcome: "halted" });
+    // The log names the halt, not the refused row.
+    expect(held.lines.join("\n")).toContain(`(${REFUSED})`);
+    expect(held.lines.join("\n")).not.toMatch(/refusing/);
+  });
+
+  it("writes nothing to a run halted after the schedule's own check", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    const acquire = db.acquireLock.bind(db);
+    const spy = vi.spyOn(db, "acquireLock").mockImplementation(async (...args: Parameters<MemoryAdapter["acquireLock"]>) => {
+      await db.updateRun(run.id, { status: "failed", last_error: `${HALTED}: spot check: debates` });
+      return acquire(...args);
+    });
+    const before = samples(db, "debates");
+    const out = await step(db, "extend", 24 * 7);
+    spy.mockRestore();
+    expect(out.out).toMatchObject({ ok: false, outcome: "halted" });
+    expect(samples(db, "debates")).toBe(before);
+    expect((await db.getRun(run.id))!).toMatchObject({ status: "failed", last_error: `${HALTED}: spot check: debates`, lock_token: null });
+  });
+
+  it("fails the schedule for a halted run at any stage, the canary's included", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    const run = (await db.listRuns())[0];
+    await db.updateRun(run.id, { status: "failed", last_error: `${HALTED}: spot check: debates` });
+    expect((await step(db, "extend", 6)).out).toMatchObject({ ok: false, outcome: "halted" });
+  });
+
+  it("refuses a teardown while the run is being validated, then records the validation", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    const scan = db.scan.bind(db);
+    let started = false;
+    let tried: unknown = null;
+    const spy = vi.spyOn(db, "scan").mockImplementation(async (...args: Parameters<MemoryAdapter["scan"]>) => {
+      const written = Date.parse((await db.getRun(run.id))!.window_to) === Date.parse(at(24 * 7));
+      if (written && !started && args[0] === "debates") {
+        started = true;
+        tried = await teardown(db, run.id).catch((e: Error) => e);
+      }
+      return scan(...args);
+    });
+    const out = await step(db, "extend", 24 * 7);
+    spy.mockRestore();
+    expect(String((tried as Error).message)).toMatch(/lock/);
+    expect(out.out).toMatchObject({ ok: true, outcome: "written" });
+    expect((await db.getRun(run.id))!).toMatchObject({ status: "complete", last_error: null, lock_token: null });
+  });
+
+  it("resumes, on the next schedule, a run a database error stopped mid-write", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    const items = db.items.bind(db);
+    const spy = vi.spyOn(db, "items").mockImplementation(async (...args: Parameters<MemoryAdapter["items"]>) => {
+      if ((await db.getRun(run.id))!.lock_token) throw new Error("connection reset");
+      return items(...args);
+    });
+    await expect(step(db, "extend", 24 * 7)).rejects.toThrow(/^the run failed while writing; seed_runs.last_error has the detail$/);
+    spy.mockRestore();
+    expect((await db.getRun(run.id))!).toMatchObject({ status: "failed", last_error: "connection reset", lock_token: null });
+    const before = samples(db, "debates");
+    expect((await step(db, "extend", 24 * 8)).out).toMatchObject({ ok: true, outcome: "written" });
+    expect(samples(db, "debates")).toBeGreaterThan(before);
+  });
+
+  it("refuses an extension that would cross the duplicate limit before writing anything", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    const before = samples(db, "debates");
+    const over = await step(db, "extend", 24 * 7, SEED, 0);
+    expect(over.out).toMatchObject({ ok: false, outcome: "dry-run-failed" });
+    expect(over.lines.join("\n")).toMatch(/exact duplicate argument texts under 0%: [\d.]+%\)/);
+    expect(samples(db, "debates")).toBe(before);
+    // Refused, not halted: the next extension under the limit goes through.
+    expect((await db.getRun(run.id))!.status).toBe("complete");
+    expect((await step(db, "extend", 24 * 8)).out).toMatchObject({ ok: true, outcome: "written" });
+  });
+
+  it("refuses an extension whose rule-2 scores land on multiples of 5 too often, before writing anything", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    const before = samples(db, "debates");
+    // A limit of 0% from the first rule-2 verdict: a week on, past the cutover, some land on one.
+    const over = await step(db, "extend", 24 * 7, SEED, undefined, { maxRoundScorePct: 0, minRoundScoreSample: 1 });
+    expect(over.out).toMatchObject({ ok: false, outcome: "dry-run-failed" });
+    expect(over.lines.join("\n")).toMatch(/sample scores on a multiple of 5 at most 0%: rule 2: \d+ verdicts.*over 0%/);
+    expect(samples(db, "debates")).toBe(before);
+    expect((await db.getRun(run.id))!.status).toBe("complete");
+    expect((await step(db, "extend", 24 * 7)).out).toMatchObject({ ok: true, outcome: "written" });
+  });
+
+  it("refuses a run whose stored scores differ from its plan, however few, before writing anything", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0);
+    await step(db, "full", 1);
+    const run = (await db.listRuns())[0];
+    // Both checks are on the full stage's record.
+    const names = ((await db.getRun(run.id))!.last_report as { checks: { name: string; ok: boolean }[] }).checks;
+    expect(names.filter((c) => /stored sample scores|multiple of 5/.test(c.name)).map((c) => c.ok)).toEqual([true, true]);
+    // One stored score moved, as a write by code with another score rule would leave it.
+    const debates = db.table("debates");
+    const [id, row] = [...debates].find(([, r]) => r.is_sample && typeof r.score === "number")!;
+    debates.set(id, { ...row, score: Number(row.score) + 1 });
+    const before = samples(db, "debates");
+    const refused = await step(db, "extend", 24 * 3);
+    expect(refused.out).toMatchObject({ ok: false, outcome: "dry-run-failed" });
+    expect(refused.lines.join("\n")).toMatch(/stored sample scores match the plan: 1 of \d+ stored sample debates differ/);
+    expect(refused.lines.join("\n")).not.toContain(id);
+    expect(samples(db, "debates")).toBe(before);
+    debates.set(id, row);
+    expect((await step(db, "extend", 24 * 3)).out).toMatchObject({ ok: true, outcome: "written" });
   });
 
   it("refuses another seed before writing anything", async () => {

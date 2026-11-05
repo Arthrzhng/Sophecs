@@ -6,7 +6,7 @@ import { getAllTopicFiles } from "@/lib/topics";
 import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
 import { authorList, moduleNumbers } from "@/lib/lesson-index";
-import { PUBLISHED_SCHOOL_IDS } from "@/lib/footnotes";
+import { SHOWN_SCHOOL_IDS } from "@/lib/school-registry";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
 
@@ -35,7 +35,7 @@ export default function LessonsPage() {
   // nothing behind it.
   const modules = getAllModules().sort(
     (a, b) =>
-      PUBLISHED_SCHOOL_IDS.indexOf(a.school) - PUBLISHED_SCHOOL_IDS.indexOf(b.school)
+      SHOWN_SCHOOL_IDS.indexOf(a.school) - SHOWN_SCHOOL_IDS.indexOf(b.school)
   );
   const numbers = moduleNumbers(modules);
 
@@ -54,9 +54,10 @@ export default function LessonsPage() {
   const byTopic = new Map<string, { before?: MicroLessonContent; after?: MicroLessonContent }>();
   for (const lesson of lessons) {
     // The index pairs a motion's two readings, and a third position has no
-    // slot in that pair. `getAllMicroLessons` already hides "elsewhere"
-    // lessons by hiding drafts; this keeps the index right even if one is
-    // ever published by mistake, rather than letting it widen the map.
+    // slot in that pair. On a SIX_SCHOOLS build `getAllMicroLessons`
+    // returns the "elsewhere" passages too (src/lib/micro-lessons.ts), so
+    // this is what keeps them out of the index; on any other build it
+    // hides them as drafts and this is a second guard.
     if (lesson.position !== "before" && lesson.position !== "after") continue;
     const entry = byTopic.get(lesson.topic) ?? {};
     entry[lesson.position] = lesson;
@@ -90,7 +91,7 @@ export default function LessonsPage() {
               body="Until they land, the case for each school is the thing worth reading — each one is a few hundred words with its own primary source."
               action={
                 <div className="flex flex-wrap items-center gap-6 text-sm">
-                  {PUBLISHED_SCHOOL_IDS.map((school) => (
+                  {SHOWN_SCHOOL_IDS.map((school) => (
                     <Link
                       key={school}
                       href={`/s/${school}`}

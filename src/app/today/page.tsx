@@ -3,7 +3,8 @@ import { createClient as createSupabaseServerClient } from "@/lib/supabase/serve
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getWeeklyMotion } from "@/lib/weekly-motion";
 import { getCaseStates } from "@/lib/cases";
-import { getMicroLesson } from "@/lib/micro-lessons";
+import { getAllMicroLessons, getMicroLesson } from "@/lib/micro-lessons";
+import { ElsewhereCard } from "@/components/phase3/ElsewhereCard";
 import { getSchool } from "@/lib/schools";
 import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
 import { TodayClient } from "@/components/today/TodayClient";
@@ -16,7 +17,7 @@ import { splitModule } from "@/lib/module-readings";
 import { isoWeekRange, rankSchools, type JudgedArgument } from "@/lib/school-table";
 import { todayUTC } from "@/lib/streak";
 import { readAll } from "@/lib/read-all";
-import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "@/lib/types";
+import { SHOWN_SCHOOL_IDS, type SchoolId } from "@/lib/types";
 
 export const metadata = {
   title: "Today · Sophecs",
@@ -59,7 +60,7 @@ export default async function TodayPage() {
   const modules: LessonsCardModule[] = getAllModules()
     .sort(
       (a, b) =>
-        PUBLISHED_SCHOOL_IDS.indexOf(a.school) - PUBLISHED_SCHOOL_IDS.indexOf(b.school)
+        SHOWN_SCHOOL_IDS.indexOf(a.school) - SHOWN_SCHOOL_IDS.indexOf(b.school)
     )
     .map((m) => ({
       id: m.id,
@@ -163,6 +164,9 @@ export default async function TodayPage() {
   const row = (topics ?? []).find((t) => t.slug === weekly.slug);
   const microBeforeSlug = (row?.micro_before as string | undefined) ?? null;
   const lesson = microBeforeSlug ? getMicroLesson(microBeforeSlug) : null;
+  // The week's view from elsewhere, which only a SIX_SCHOOLS build loads.
+  const elsewhere =
+    getAllMicroLessons().find((l) => l.topic === weekly.slug && l.position === "elsewhere") ?? null;
 
   const states = await getCaseStates(admin, user.id, [
     { slug: weekly.slug, microBefore: microBeforeSlug },
@@ -188,6 +192,7 @@ export default async function TodayPage() {
           ? `${lesson.source.author}, ${lesson.source.work}, ${lesson.source.section}`
           : ""
       }
+      elsewhere={elsewhere ? <ElsewhereCard lesson={elsewhere} /> : undefined}
     >
       {sidebar}
     </TodayClient>
