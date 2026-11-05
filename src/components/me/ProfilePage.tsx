@@ -9,7 +9,7 @@ import { EloBlock } from "./EloBlock";
 import { StreakBlock } from "./StreakBlock";
 import { RatingChart } from "./RatingChart";
 import { PendingChallenges } from "./PendingChallenges";
-import { SCHOOL_ADHERENT, SCHOOL_COLORS } from "@/lib/school-colors";
+import { SCHOOL_ADHERENT, SCHOOL_ARTICLE, SCHOOL_COLORS } from "@/lib/school-colors";
 import type { CaseState } from "@/lib/case-steps";
 import type { PendingChallenge } from "@/lib/challenge";
 import type { OpenObjection } from "@/lib/objections";
@@ -113,7 +113,7 @@ export function ProfilePage({
 
       {school && allClosed && (
         <p className="mt-6 max-w-[55ch] font-serif text-md leading-relaxed text-ink">
-          You&apos;ve closed every motion as a {SCHOOL_ADHERENT[school]}.{" "}
+          You&apos;ve closed every motion as {SCHOOL_ARTICLE[school]} {SCHOOL_ADHERENT[school]}.{" "}
           <Link href="/quiz" className="underline underline-offset-4">
             Retake the quiz
           </Link>{" "}

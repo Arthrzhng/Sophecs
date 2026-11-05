@@ -1,12 +1,16 @@
+import { RANK_MIN_ARGUMENTS, unrankedNote } from "@/lib/school-table";
+
 /**
  * The school table with six rows: Phase 3.0 preview only (Stage 4 of the
- * brief of 2026-11-03).
+ * brief of 2026-11-03), from fixture averages.
  *
- * A school is ranked once it has enough judged original arguments to make
- * its average mean something; until then its row says so instead of
- * showing a rank. How many is enough is Arthur's to set, so the threshold
- * is a prop and the preview passes a fixture. Copy:
- * docs/daily-path-copy.md, "School table, a school not yet ranked".
+ * A school is ranked once it has RANK_MIN_ARGUMENTS judged original
+ * arguments in the week (Arthur's ruling (e)5 of 2026-11-05), the live
+ * table's threshold; until then its row says so instead of showing a
+ * rank. Unlike the live table it does not share tied ranks or order the
+ * unranked rows: the live table on a SIX_SCHOOLS build
+ * (src/components/table/SchoolTable.tsx) is the one readers see.
+ * Copy: docs/daily-path-copy.md, "School table, a school not yet ranked".
  */
 
 export interface SixSchoolRow {
@@ -20,9 +24,9 @@ export interface SixSchoolRow {
   fidelity: number | null;
 }
 
-export function SixSchoolTable({ rows, threshold }: { rows: SixSchoolRow[]; threshold: number }) {
+export function SixSchoolTable({ rows }: { rows: SixSchoolRow[] }) {
   const ranked = rows
-    .filter((r) => r.arguments >= threshold && r.fidelity !== null)
+    .filter((r) => r.arguments >= RANK_MIN_ARGUMENTS && r.fidelity !== null)
     .sort((a, b) => (b.fidelity ?? 0) - (a.fidelity ?? 0));
   const unranked = rows.filter((r) => !ranked.includes(r));
 
@@ -36,7 +40,7 @@ export function SixSchoolTable({ rows, threshold }: { rows: SixSchoolRow[]; thre
           key={row.id}
           row={row}
           rank={null}
-          note={`Ranked once it has ${threshold} judged original arguments. ${row.arguments} so far.`}
+          note={unrankedNote(row.arguments)}
         />
       ))}
     </ol>

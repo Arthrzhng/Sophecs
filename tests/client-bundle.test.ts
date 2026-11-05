@@ -35,9 +35,10 @@ describe("the client bundle", () => {
       expect(needles, `the plural adherent noun of ${entry.id}`).toContain(entry.adherentPlural);
     }
     // Every colour the flag-only stylesheet defines: three markers, three
-    // deep shades, and the one card surface that is not its marker.
+    // deep shades and three card surfaces, each darker than its marker
+    // (Arthur's ruling (e)2 of 2026-11-05).
     const colours = colourNeedles();
-    expect(colours).toHaveLength(7);
+    expect(colours).toHaveLength(9);
     for (const hex of colours) expect(needles).toContain(hex);
   });
 

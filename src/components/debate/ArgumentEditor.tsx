@@ -17,7 +17,7 @@ import {
   wordCount,
 } from "@/lib/debate-limits";
 import { track } from "@/lib/analytics/client";
-import { SCHOOL_ADHERENT, SCHOOL_COLORS } from "@/lib/school-colors";
+import { SCHOOL_ADHERENT, SCHOOL_ARTICLE, SCHOOL_COLORS } from "@/lib/school-colors";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
 import type { SchoolId } from "@/lib/types";
 import {
@@ -369,7 +369,7 @@ export function ArgumentEditor({
             className="mt-4 border-l-4 pl-4 text-sm font-semibold leading-relaxed text-ink-mid"
             style={{ borderColor: SCHOOL_COLORS[school].surface }}
           >
-            Arguing as a {SCHOOL_ADHERENT[school]}
+            Arguing as {SCHOOL_ARTICLE[school]} {SCHOOL_ADHERENT[school]}
           </p>
         </>
       )}
@@ -387,7 +387,7 @@ export function ArgumentEditor({
           scaffolding, not a different exercise. */}
       {showScaffold && (
         <ol className="mt-8 max-w-[55ch] list-decimal space-y-2 pl-5 text-sm leading-relaxed text-ink-mid">
-          <li>State what a {SCHOOL_ADHERENT[school]} would say about this motion.</li>
+          <li>State what {SCHOOL_ARTICLE[school]} {SCHOOL_ADHERENT[school]} would say about this motion.</li>
           {/* The excerpt is keyed to the motion, not to the school: the
               Stoic and the Utilitarian arguing this motion read the same
               one. It sets up the question; the reason belongs to the

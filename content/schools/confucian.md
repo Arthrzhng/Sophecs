@@ -39,8 +39,8 @@ share_lines:
     it, not by what it scores. Sophecs says that is Confucian.
   - >-
     Ten questions about how I decide what's right, and I kept asking the
-    same one: who owes what to whom here, and does this system let them pay
-    it. Sophecs called that Confucian role ethics.
+    same one: who owes what to whom here, and can they still pay it.
+    Sophecs called that Confucian role ethics.
   - >-
     My whole ethics, per this quiz: get the names right, because a word
     that flatters a system is how a bad decision passes for a good one.

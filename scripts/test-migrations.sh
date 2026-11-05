@@ -60,9 +60,12 @@ psql -At -d "$DB" -c "
   where table_schema='public' and table_name='debates' and column_name='motion_text'"
 
 # 0020 puts debates.motion_text into debates_public, and Postgres will not
-# drop a column a view reads, so 0015's rollback needs 0020's first.
-say "rollback: 0023, 0020, then 0015, then 0014"
-for f in "$REPO/supabase/rollback/0023_sample_activity.down.sql" \
+# drop a column a view reads, so 0015's rollback needs 0020's first. 0027
+# adds columns to the public_results view 0023 last defined, so it goes
+# before 0023.
+say "rollback: 0027, 0023, 0020, then 0015, then 0014"
+for f in "$REPO/supabase/rollback/0027_quiz_results_versions.down.sql" \
+         "$REPO/supabase/rollback/0023_sample_activity.down.sql" \
          "$REPO/supabase/rollback/0020_debates_public_motion_text.down.sql" \
          "$REPO/supabase/rollback/0015_debates_motion_text.down.sql" \
          "$REPO/supabase/rollback/0014_more_schools.down.sql"; do
@@ -89,7 +92,8 @@ say "forward again, to prove the rollback left a re-appliable database"
 for f in "$REPO/supabase/migrations/0014_more_schools.sql" \
          "$REPO/supabase/migrations/0015_debates_motion_text.sql" \
          "$REPO/supabase/migrations/0020_debates_public_motion_text.sql" \
-         "$REPO/supabase/migrations/0023_sample_activity.sql"; do
+         "$REPO/supabase/migrations/0023_sample_activity.sql" \
+         "$REPO/supabase/migrations/0027_quiz_results_versions.sql"; do
   start=$(date +%s%N)
   psql_q -f "$f"
   printf '  %-40s %6.1f ms\n' "$(basename "$f")" "$(( $(date +%s%N) - start ))e-6"

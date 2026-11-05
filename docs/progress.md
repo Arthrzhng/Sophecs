@@ -668,3 +668,27 @@ deploy below was read from Vercel as Ready.
   Actions, not from the deploy).
 - Not yet seen: the first scheduled run on #84's code. The 18:41 UTC slot
   had not run by 21:48; the schedule has fired once since #57 merged.
+
+## 2026-11-05: Checkpoint B's rulings
+
+- #71 merged as `dcebda3`: the judge's caps and budget. Migration 0026
+  applied as version 20261105220626 and read back (Arthur's (a) 1).
+  Deploy `dpl_DujFSaUBCWZiCzHzJ4gY24Vy3Kph`, Ready and aliased to
+  sophecs.com (read from Vercel at 22:25 UTC).
+- 0025, which Arthur ran in the SQL Editor, read back: the five insert
+  policies are gone and nothing else changed.
+- A manual sample run on the Node 24 actions and #72's engine, as Arthur
+  asked: Actions run 42117727476, 22:00 to 22:03 UTC, success. 51
+  debates written, 38 of 38 checks passed, the stored-score check
+  compared 8,403 rows, and the round-score check read "rule 2: 0
+  verdicts; too few to judge", as expected before the 06:00 cutover.
+  The schedule itself has fired once (14:57 UTC, for the 12:41 slot);
+  the 18:41 slot had not run by 22:45 UTC.
+- The full v3 golden run after #68, (b) 2: 105 calls, $1.3586, on branch
+  `rulings-e` (#86). Eval key spend is now **$7.1520 of $8.00**. It does
+  not pass; `docs/decisions.md`, "Arthur's rulings of 2026-11-05 on
+  Checkpoint B", has the cases, and the fix goes back to Arthur under
+  (b). The new-schools run waits on it.
+- #86: the (e) rulings (a/an, darker surfaces for the three, the two
+  share lines, ranking at 20 arguments, the view from elsewhere at step
+  4, UNVERIFIED). Its merge commit and deploy go in the next entry.

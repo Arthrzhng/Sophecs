@@ -146,8 +146,14 @@ const FIXTURE_WEEK_START = new Date("2026-10-05T00:00:00Z");
 const FIXTURE_WEEK_END = new Date("2026-10-12T00:00:00Z");
 export const FIXTURE_WEEK = 41;
 
-function judged(school: SchoolId, marks: number[]): JudgedArgument[] {
-  return marks.map((fidelity) => ({ school, fidelity }));
+/**
+ * `marks` repeated `times` over, so a fixture school clears
+ * RANK_MIN_ARGUMENTS without changing its average.
+ */
+function judged(school: SchoolId, marks: number[], times = 1): JudgedArgument[] {
+  return Array.from({ length: times }, () => marks)
+    .flat()
+    .map((fidelity) => ({ school, fidelity }));
 }
 
 function at(day: number): string {
@@ -167,19 +173,22 @@ const NO_CHANGES = schoolChanges([], FIXTURE_WEEK_START, FIXTURE_WEEK_END);
 /** A week with a clear order and no ties. */
 export const FIXTURE_TABLE_ROWS = rankSchools(
   [
-    ...judged("stoicism", [7.5, 8.0, 6.5]),
-    ...judged("utilitarianism", [8.5, 9.0]),
-    ...judged("virtue-ethics", [6.0, 7.0, 6.5, 7.5]),
+    ...judged("stoicism", [7.5, 8.0, 6.5], 8),
+    ...judged("utilitarianism", [8.5, 9.0], 11),
+    ...judged("virtue-ethics", [6.0, 7.0, 6.5, 7.5], 9),
   ],
   CHANGES
 );
 
-/** Two schools level on both average and count, so they share a rank. */
+/**
+ * Two schools level on both average and count, so they share a rank, and
+ * a third short of RANK_MIN_ARGUMENTS, so it is not ranked yet.
+ */
 export const FIXTURE_TABLE_TIED = rankSchools(
   [
-    ...judged("stoicism", [7.0, 8.0]),
-    ...judged("utilitarianism", [8.0, 7.0]),
-    ...judged("virtue-ethics", [6.0]),
+    ...judged("stoicism", [7.0, 8.0], 10),
+    ...judged("utilitarianism", [8.0, 7.0], 10),
+    ...judged("virtue-ethics", [6.0], 4),
   ],
   CHANGES
 );

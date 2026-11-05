@@ -58,8 +58,8 @@ beforeEach(() => {
     { id: "c-genuine", challenger_result_id: "r-genuine", is_sample: false },
   ];
   tables.public_results = [
-    { id: "r-sample", school: "stoicism", is_sample: true },
-    { id: "r-genuine", school: "stoicism", is_sample: false },
+    { id: "r-sample", school: "stoicism", is_sample: true, quiz_version: 1 },
+    { id: "r-genuine", school: "stoicism", is_sample: false, quiz_version: 1 },
   ];
   tables.debates_public = [
     { id: "d-sample", school: "stoicism", score: 61, topic_slug: "t", motion_text: "A motion.", is_sample: true },

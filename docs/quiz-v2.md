@@ -494,3 +494,9 @@ By file, with each line's index in `share_lines`:
   "the data was only mine" (proposed: "the choice was only mine"); [2]
   "judge a system by the relationships it leaves behind".
 - The time wording above, "a few minutes".
+
+**Ruled at Checkpoint B, 2026-11-05 ((e) 3 and 4).** The two proposed
+rewordings are used: `confucian.md` [1] "can they still pay it" and
+`ubuntu.md` [1] "the choice was only mine". The other lines listed above
+are unchanged. "A few minutes" is accepted, and goes in where v2 runs: on
+flag-on builds with step 4, and everywhere at launch.

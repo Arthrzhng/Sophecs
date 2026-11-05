@@ -144,9 +144,9 @@
         "minDeltaEProtanopia": 17,
         "deuteranopia": "#423a05",
         "protanopia": "#383000",
-        "cardSurface": "#562b05",
-        "cardInkFull": 11.34,
-        "cardInkAtLowestOpacity": 7.84
+        "cardSurface": "#472100",
+        "cardInkFull": 13.31,
+        "cardInkAtLowestOpacity": 9
       }
     ],
     "ubuntu": [
@@ -166,9 +166,9 @@
         "minDeltaEProtanopia": 12.9,
         "deuteranopia": "#2b364f",
         "protanopia": "#323b50",
-        "cardSurface": "#1e3b4f",
-        "cardInkFull": 11.02,
-        "cardInkAtLowestOpacity": 7.69
+        "cardSurface": "#142f42",
+        "cardInkFull": 13.05,
+        "cardInkAtLowestOpacity": 8.89
       }
     ],
     "buddhist": [
@@ -188,9 +188,9 @@
         "minDeltaEProtanopia": 29.2,
         "deuteranopia": "#3d6ab6",
         "protanopia": "#316abb",
-        "cardSurface": "#724aab",
-        "cardInkFull": 6.02,
-        "cardInkAtLowestOpacity": 4.5
+        "cardSurface": "#6f4aa6",
+        "cardInkFull": 6.17,
+        "cardInkAtLowestOpacity": 4.6
       },
       {
         "hex": "#6a6996",
@@ -208,9 +208,9 @@
         "minDeltaEProtanopia": 24,
         "deuteranopia": "#5b6c95",
         "protanopia": "#5c6f98",
-        "cardSurface": "#5c5b87",
-        "cardInkFull": 5.99,
-        "cardInkAtLowestOpacity": 4.52
+        "cardSurface": "#5c5b85",
+        "cardInkFull": 6.01,
+        "cardInkAtLowestOpacity": 4.53
       },
       {
         "hex": "#865d8f",
@@ -228,9 +228,9 @@
         "minDeltaEProtanopia": 22.4,
         "deuteranopia": "#616d8d",
         "protanopia": "#576991",
-        "cardSurface": "#785082",
-        "cardInkFull": 6.05,
-        "cardInkAtLowestOpacity": 4.55
+        "cardSurface": "#785180",
+        "cardInkFull": 6.02,
+        "cardInkAtLowestOpacity": 4.52
       }
     ]
   },
