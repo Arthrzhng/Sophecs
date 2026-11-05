@@ -62,15 +62,15 @@ const SIX_SCHOOLS_TOKENS = path.join(
 // sophecs.vercel.app.
 //
 // So a production build sends every page request on any other host to the
-// same path and query on sophecs.com, permanently. Not redirected:
+// same path and query on sophecs.com. Not redirected:
 // - /api/, which no reader sees as an address. Vercel's cron calls one and
 //   does not follow redirects, and a fetch from a tab left open on an old
 //   host could not follow one either: sophecs.com would see none of that
 //   host's cookies, and answers no cross-origin request.
-// - /_next/, the scripts and styles a page already on an old host loads.
-//   They are the same files on every host, and Next's own router leaves
-//   them alone, so Vercel's router, which runs these rules in production,
-//   is told the same and both behave alike.
+// - /_next and anything under it, the scripts and styles a page already
+//   on an old host loads: the same files on every host. Next adds this
+//   exclusion to every redirect it runs itself, so it is written into the
+//   rule for Vercel's router, which runs these rules in production.
 // - the deployment's own URL (VERCEL_URL), so a past deployment can still
 //   be opened at its own address; Vercel asks for a login there.
 // - previews and local builds, whose VERCEL_ENV is not "production".
@@ -85,6 +85,11 @@ const SIX_SCHOOLS_TOKENS = path.join(
 //
 // Never point a Vercel domain redirect from sophecs.com to another host
 // (www, say): these rules send that host back, and the two would loop.
+//
+// The host rule is a 307 until a live check has shown sophecs.com is left
+// alone in production (docs/progress.md), and a 308 after. A browser keeps
+// a 308, so a rule Vercel read differently from Next could otherwise leave
+// readers in a loop that no rollback reaches.
 //
 // Host values are regular expressions. Next anchors them; the anchors here
 // say so for any reader or router that does not.
@@ -102,10 +107,10 @@ export function canonicalRedirects(env: NodeJS.ProcessEnv) {
       permanent: false,
     },
     {
-      source: "/:path((?!api/|_next/).*)",
+      source: "/:path((?!api/|_next).*)",
       missing: kept.map((host) => ({ type: "host" as const, value: exactly(host) })),
       destination: `https://${CANONICAL_HOST}/:path`,
-      permanent: true,
+      permanent: false,
     },
   ];
 }

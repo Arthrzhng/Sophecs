@@ -1,9 +1,10 @@
 // One address (docs/decisions.md): a production build sends every page on
 // another host to sophecs.com, and a sign-in that fell back to Supabase's
 // Site URL to /auth/callback. The rules are matched here with Next's own
-// matchers (path-to-regexp for the path, matchHas for the host and query);
-// in production Vercel's router runs them, after converting them, and the
-// pull request records a check against the live hosts.
+// matchers (path-to-regexp for the path, matchHas for the host and query).
+// In production Vercel's router runs them, after converting them, and no
+// check before a merge can reach production-only rules: the check made on
+// the live hosts after the merge is in docs/progress.md.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getPathMatch } from "next/dist/shared/lib/router/utils/path-match";
 import { matchHas } from "next/dist/shared/lib/router/utils/prepare-destination";
@@ -52,7 +53,7 @@ describe("on production", () => {
       for (const path of ["/", "/debate", "/debate/opaque-benefit", "/me"]) expect(route(rules, host, path), `${host}${path}`).toBeNull();
   });
 
-  it("sends every other host to the same path and query on sophecs.com, permanently", () => {
+  it("sends every other host to the same path and query on sophecs.com, for now with a 307", () => {
     for (const host of [
       "sophecs.vercel.app",
       "www.sophecs.com",
@@ -63,16 +64,16 @@ describe("on production", () => {
       "sophecs.com.evil.example",
       "xsophecs.com",
     ]) {
-      expect(route(rules, host, "/"), host).toEqual({ status: 308, location: "https://sophecs.com/" });
+      expect(route(rules, host, "/"), host).toEqual({ status: 307, location: "https://sophecs.com/" });
       expect(route(rules, host, "/debate/opaque-benefit", { x: "1" }), host).toEqual({
-        status: 308,
+        status: 307,
         location: "https://sophecs.com/debate/opaque-benefit?x=1",
       });
     }
   });
 
   it("leaves /api/ and /_next/ on every host, and the deployment's own URL", () => {
-    for (const path of ["/api/judge", "/api/cron/keepalive", "/_next/static/chunks/main.js"])
+    for (const path of ["/api/judge", "/api/cron/keepalive", "/_next/static/chunks/main.js", "/_next", "/_nextfoo"])
       expect(route(rules, "sophecs.vercel.app", path), path).toBeNull();
     expect(route(rules, "sophecs.vercel.app", "/apiary")?.location).toBe("https://sophecs.com/apiary");
     expect(route(rules, DEPLOYMENT, "/debate")).toBeNull();

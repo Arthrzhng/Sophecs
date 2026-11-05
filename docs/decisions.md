@@ -3349,12 +3349,16 @@ reader who reached one of them stayed there.
   sophecs.com, and 5 on a deployment's own URL in September.
 - **The fix in code (`next.config.ts`).** A production build sends every
   page request on any host other than sophecs.com to the same path and
-  query there, with a 308. Not moved: `/api/` (Vercel's cron calls one and
+  query there: a 307 until a live check has shown that production leaves
+  sophecs.com alone, then a 308 (a browser keeps a 308, so a rule Vercel's
+  router read differently from Next's could otherwise leave readers in a
+  loop no rollback reaches). Not moved: `/api/` (Vercel's cron calls one and
   does not follow redirects, and a fetch from a tab left open on an old
   host could not follow one: sophecs.com sees none of that host's cookies
-  and answers no cross-origin request), `/_next/` (the same files on every
-  host, and left alone by Next's own router, so Vercel's router, which
-  runs the rules in production, is told the same), the deployment's own
+  and answers no cross-origin request), `/_next` and anything under it
+  (the same files on every host; Next adds the same exclusion to every
+  redirect it runs itself, so the rule tells Vercel's router, which runs
+  the rules in production), the deployment's own
   URL (behind Vercel's login; it lets a past deployment be opened), and
   previews and local builds. A sign-in that falls back to the Site URL
   arrives at the root with `?code=`, which the home page would drop; it
@@ -3362,9 +3366,13 @@ reader who reached one of them stayed there.
   the quiz for a reader who has not taken it.
 - **Where a sign-in may land.** `/auth/callback` followed `next` from the
   query string wherever it pointed: `/login?next=//evil.example` sent a
-  reader who had just signed in to evil.example. It now keeps only a path
-  that resolves on the same site (`src/lib/local-path.ts`), and otherwise
-  lands where it would with no `next`.
+  reader who had just signed in to evil.example. It now keeps a value only
+  if it resolves on the site and the path it normalises to still does, on
+  any origin (`src/lib/local-path.ts`): `/..//evil.example` normalises to
+  `//evil.example`, which a first version of the check let through. Any
+  other value lands where no `next` would. The quiz still carries its own
+  `next` unused; the redirect that one day consumes it must use the same
+  check.
 - **The fix outside the code, which is Arthur's to click**: Supabase
   Auth's Site URL and redirect allow-list, and the Vercel domains' own
   redirects. The steps are in the pull request. The code's redirect does
