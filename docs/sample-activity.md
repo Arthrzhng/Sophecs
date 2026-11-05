@@ -76,8 +76,21 @@ challenges." `/method#samples` explains the rest.
   in batches, sometimes after the reader has left: `before_send` also
   drops any event carrying a sample page's address and any replay chunk
   recorded while one was open, and replay is paused for as long as a
-  sample page is open. A visit that starts on a sample page does not load
-  PostHog at all; the reader is identified on their first genuine page.
+  sample page is open. Console logs, which PostHog captures only if that
+  is switched on in the project, go out by another path that
+  `before_send` does not see, so the `logs` setting's own `beforeSend`
+  drops every one once the page load has shown a sample page (a record
+  logged before PostHog's logs script loads is filtered later, when it is
+  replayed, and by then carries no address to check). A visit that starts
+  on a sample page does not load PostHog at all; the reader is
+  identified on their first genuine page, which also sends
+  `return_visit` when their first visit was more than a day before
+  (`tests/seed/return-visit.test.ts`). Two things can
+  still carry a trace of a sample page, though no sample content: when a
+  visit starts on one, web vitals (if switched on) can report that page's
+  load timings and the element last touched under the first genuine
+  page's address; and the heatmap's mouse-move timer (500 ms) can file one
+  move made on a sample page just after the reader leaves it.
   `tests/seed/analytics-sample.test.ts`. The seed writes
   rows directly and emits no event. Sample quiz results carry no
   referrer. A page showing a sample passes no referrer on (`referrer:
@@ -328,7 +341,13 @@ belongs to a process that died and can be cleared. In the workflow a run
 clears one itself (a job the runner killed, by the timeout, a cancel or a
 lost machine, leaves its lock behind), which is safe there because the
 concurrency group runs one job at a time; from a machine it takes
-`--break-stale-lock`.
+`--break-stale-lock`. One exception: a run keeps its lock, unrefreshed,
+from the end of its writes until its validation is recorded, which
+takes minutes. The schedule cannot break it then, since the run is
+halted ("validation not finished") and an `extend` stops at the halt
+before it touches the lock; a `full` or teardown started by hand could
+after 15 minutes, and the validation would then leave the run's status
+and halt as they were (its report still goes to `last_report`).
 
 ## Teardown
 
@@ -341,7 +360,9 @@ with the service key:
         # preview: what would go, and any genuine row that points at a sample row
     ... --execute --confirm-teardown <id>
 
-It works from the registry, so no plan is needed. It deletes the run's
+It works from the registry, so no plan is needed, and it takes the run's
+lock: while another process holds it, teardown is refused (if that
+process died, the lock can be cleared after 15 minutes). It deletes the run's
 registry items in dependency order, scoped again by the marker or the
 run's own users, clears a genuine row's nullable reference to a sample row
 first, and stops on anything it could only keep by deleting it. It keeps
@@ -413,28 +434,75 @@ sample teardown and a fresh run into the launch steps". In order:
 3. **A fresh run:** `canary`, then `full`, as in Rollout steps 4 and 5,
    each with Arthur's go-ahead. The new run has a new id (the canary's
    start time), and the schedule extends it once its full stage has
-   passed.
+   passed. Before its canary, the sample users' email tag becomes
+   HMAC-SHA256 of the run and the user's number, keyed by the seed: the
+   current tag comes from the generator's own random streams, which are
+   not meant for secrets, so someone who reconstructed a stream from
+   public outputs could work out every address. Nothing is exposed by
+   that (the addresses are on `sophecs.test` and the users are banned),
+   and changing it for the live run would break its spot checks, so it
+   waits for the fresh run.
 
 ## Stop conditions
 
 Stop and report, without retrying past the engine's own retries, if:
 
-- any validation check fails, exact duplicate argument texts reaching 5%
-  among them;
-- the run refuses to adopt a row;
-- auth user creation is refused, or any created user comes back without
-  its ban;
+- any validation check fails (the run halts);
+- exact duplicate argument texts would reach 5% (refused with the
+  dry-run checks, before anything is written);
+- the run refuses to adopt or update a row, or a created user comes back
+  without its ban (the run halts);
+- auth user creation fails past the retries (the run fails; the next
+  scheduled run tries again);
 - the dry-run checks find the motions differ, another run holds a lock,
-  or the plan is not the run's;
-- the canary's rate puts the full run beyond an hour.
+  or the plan is not the run's (refused before anything is written; each
+  scheduled run is refused the same way until it is put right);
+- the canary's rate puts the full run beyond an hour (a judgement made by
+  hand at the canary).
 
-A failed validation halts the run: `seed_runs.status` becomes `failed`
-with `last_error` starting "halted: validation failed", and from then on
-each scheduled run writes nothing and fails, until a `full` stage run by
-hand passes validation again. Any other failure (a lost runner, the
-timeout, a database error) is retried by the next scheduled run, which
-resumes. A run that keeps failing shows as failed runs in the Actions
-tab, and GitHub emails the account that set the schedule.
+A halted run has `seed_runs.status` `failed` and a `last_error`
+starting "halted:", and from then on each scheduled run writes nothing
+and fails, until a `full` stage run by hand passes validation again.
+Three things halt it (`scripts/seed/engine.ts`, `HALT_PREFIX`):
+
+- "halted: validation failed", naming the checks that failed;
+- "halted: validation not finished": every run that writes ends halted
+  this way, and only a validation that passes lifts it, so a validation
+  that throws, or a job lost before validating, leaves the run halted;
+- "halted: stopped", with the refusal: a row the run would not adopt or
+  update, or a user without its ban.
+
+A run by hand on a halted run keeps the halt while it writes, and if it
+fails partway, the halt stays in front of the new error; only its
+passing validation lifts it, and a canary cannot be run on a halted run
+or one that has had its full stage, since it validates only its first
+cohorts. A run that writes keeps the run's lock from the end of its
+writes until its validation's result is recorded, so no teardown or
+other process can write to the run in between; if that lock is lost,
+nothing is recorded and the halt stays. The duplicate check runs with
+the dry-run checks, before anything is written, so an extension that
+would cross 5% is refused rather than written and halted.
+
+Everything else resumes. A database error during the writes, past the
+engine's retries, leaves the run `failed` but not halted, and the next
+scheduled run resumes it. A runner lost during the writes (the timeout,
+a cancel, a lost machine) leaves the run `running` with its lock, which
+the next scheduled run clears once it is 15 minutes old, then resumes. A
+runner lost after the writes leaves the run halted, "validation not
+finished", as above. The schedule resumes only an `extend`: a `canary`
+or `full` stage that fails or is lost leaves the run short of its full
+stage, and the schedule does nothing (a green job, unless the run was
+left halted, when every scheduled run fails) until `full` is run by hand
+again. An `extend` also refuses a run halted by another process in the
+minutes between its own check and taking the lock. `tests/seed/ci.test.ts` and
+`tests/seed/engine.test.ts` cover each case. A run that keeps failing
+shows as failed runs in the Actions tab, and GitHub emails the account
+that set the schedule.
+
+The workflow's log is public, so an error from the writes, which can
+name a row, is logged as a line of its own ("the run stopped on a
+refusal" or "the run failed while writing"), and the detail goes to
+`seed_runs.last_error`, or the line says it could not be recorded.
 
 ## Limits
 
@@ -447,7 +515,8 @@ tab, and GitHub emails the account that set the schedule.
 - Exact duplicates rise once a composition list runs out. Measured in
   review on 2026-11-04 at production volumes: 0.02% at the start, 0.28%
   after 90 days, 3.29% after a year and 9.85% after two, so the 5% check
-  halts the run after about 16 months unless the passages grow. Making
+  refuses every extension from about 16 months on, before writing
+  anything, unless the passages grow. Making
   the plan takes 14 s at the start and about 3 minutes after a year.
   Re-measured on 2026-11-05 with two other seeds and production's base
   window: 0.2% at the start, 0.5% and 0.7% after 90 days, 3% after a

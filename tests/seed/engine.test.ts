@@ -2,9 +2,9 @@
 // schema's ownership rules: retries, lost responses, crashes, resumes,
 // locks, refusal to adopt rows it did not write, and teardown that leaves
 // genuine rows and other runs alone.
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { MemoryAdapter } from "../../scripts/seed/adapter-memory";
-import { execute, StopError } from "../../scripts/seed/engine";
+import { execute, finishValidation, HALTED, HaltedError, releaseHeld, StopError, VALIDATING } from "../../scripts/seed/engine";
 import { validate } from "../../scripts/seed/validate";
 import { preview, teardown } from "../../scripts/seed/teardown";
 import { smallPlan } from "./fixture";
@@ -125,6 +125,114 @@ describe("execute", () => {
     expect(v.checks.filter((c) => !c.ok)).toEqual([]);
     await execute({ dataset, plan, adapter: db, ...quiet });
     expect(sampleRows(db)).toBe(total(dataset));
+  });
+
+  it("refuses a canary on a run that has had its full stage, or is halted, since it checks only its first cohorts", async () => {
+    const db = freshDb();
+    await execute({ dataset, plan, adapter: db, ...quiet, cohortLimit: 30 });
+    await db.updateRun(plan.runId, { status: "failed", last_error: `${HALTED}: spot check: debates` });
+    // A smaller canary on a halted canary-stage run.
+    await expect(execute({ dataset, plan, adapter: db, ...quiet, cohortLimit: 5, endHalted: VALIDATING })).rejects.toThrow(/is halted after a canary of 30; a smaller canary cannot be run on it/);
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: `${HALTED}: spot check: debates`, lock_token: null });
+    // The same canary again is a resume: it validates all it wrote, and
+    // keeps the halt until that passes.
+    const again = await execute({ dataset, plan, adapter: db, ...quiet, cohortLimit: 30, endHalted: VALIDATING });
+    expect(again.heldWith).toBe(`${HALTED}: spot check: debates`);
+    expect(await finishValidation(db, again, [])).toBe(true);
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "running", last_error: null, lock_token: null });
+    // Once the full stage has passed, no canary at all.
+    await db.updateRun(plan.runId, { status: "running", last_error: null });
+    await execute({ dataset, plan, adapter: db, ...quiet });
+    await expect(execute({ dataset, plan, adapter: db, ...quiet, cohortLimit: 25 })).rejects.toThrow(/has had its full stage; a canary cannot be run on it/);
+    expect((await db.getRun(plan.runId))!.lock_token).toBeNull();
+  });
+
+  it("keeps the run locked from the end of its writes until the validation is recorded", async () => {
+    const db = freshDb();
+    const r = await execute({ dataset, plan, adapter: db, ...quiet, endHalted: VALIDATING });
+    expect(r.heldWith).toBe(VALIDATING);
+    expect(r.lockToken).toBeTruthy();
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: VALIDATING, lock_token: r.lockToken });
+    // Another writer, or a teardown, is refused while it is validated.
+    await expect(execute({ dataset, plan, adapter: db, ...quiet, endHalted: VALIDATING })).rejects.toThrow(/locked by another process/);
+    await expect(teardown(db, plan.runId)).rejects.toThrow(/lock/);
+    // The result is recorded under that lock, which is then released.
+    expect(await finishValidation(db, r, ["spot check: debates"])).toBe(true);
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: `${HALTED}: spot check: debates`, lock_token: null });
+  });
+
+  it("decides from the run as it is once the lock is held, and releases the lock on a refusal", async () => {
+    const db = freshDb();
+    await execute({ dataset, plan, adapter: db, ...quiet });
+    // Halted by another process between this run's checks and its lock.
+    const acquire = db.acquireLock.bind(db);
+    const spy = vi.spyOn(db, "acquireLock").mockImplementation(async (...args: Parameters<MemoryAdapter["acquireLock"]>) => {
+      await db.updateRun(plan.runId, { status: "failed", last_error: `${HALTED}: spot check: debates` });
+      return acquire(...args);
+    });
+    await expect(execute({ dataset, plan, adapter: db, ...quiet, refuseHalted: true, endHalted: VALIDATING })).rejects.toBeInstanceOf(HaltedError);
+    spy.mockRestore();
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: `${HALTED}: spot check: debates`, lock_token: null });
+  });
+
+  it("releases the lock when a read fails between taking it and writing", async () => {
+    const db = freshDb();
+    await execute({ dataset, plan, adapter: db, ...quiet, cohortLimit: 25 });
+    const getRun = db.getRun.bind(db);
+    let armed = false;
+    const acquire = db.acquireLock.bind(db);
+    const a = vi.spyOn(db, "acquireLock").mockImplementation(async (...args: Parameters<MemoryAdapter["acquireLock"]>) => {
+      const ok = await acquire(...args);
+      armed = true;
+      return ok;
+    });
+    const g = vi.spyOn(db, "getRun").mockImplementation(async (...args: Parameters<MemoryAdapter["getRun"]>) => {
+      if (armed) {
+        armed = false;
+        throw new Error("read timed out");
+      }
+      return getRun(...args);
+    });
+    await expect(execute({ dataset, plan, adapter: db, ...quiet })).rejects.toThrow(/read timed out/);
+    a.mockRestore();
+    g.mockRestore();
+    expect((await db.getRun(plan.runId))!.lock_token).toBeNull();
+  });
+
+  it("keeps the halt, and releases the lock, when the end's refresh of the lock fails", async () => {
+    const db = freshDb();
+    const spy = vi.spyOn(db, "refreshLock");
+    let calls = 0;
+    const refresh = MemoryAdapter.prototype.refreshLock.bind(db);
+    spy.mockImplementation(async (...args: Parameters<MemoryAdapter["refreshLock"]>) => {
+      calls++;
+      // Every heartbeat succeeds; the refresh at the end does not.
+      if ((await db.getRun(plan.runId))!.last_error === VALIDATING) throw new Error("fetch failed");
+      return refresh(...args);
+    });
+    const r = await execute({ dataset, plan, adapter: db, ...quiet, endHalted: VALIDATING });
+    spy.mockRestore();
+    expect(calls).toBeGreaterThan(0);
+    expect(r.lockToken).toBeNull();
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: VALIDATING, lock_token: null });
+    expect(await finishValidation(db, r, [])).toBe(false);
+    await releaseHeld(db, r);
+  });
+
+  it("records nothing when the kept lock was taken, and leaves the halt", async () => {
+    const db = freshDb();
+    const r = await execute({ dataset, plan, adapter: db, ...quiet, endHalted: VALIDATING });
+    // Broken as stale and taken by another process.
+    await db.updateRun(plan.runId, { lock_token: "other", locked_at: new Date().toISOString() });
+    expect(await finishValidation(db, r, [])).toBe(false);
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "failed", last_error: VALIDATING, lock_token: "other" });
+  });
+
+  it("without endHalted, releases its lock and keeps none", async () => {
+    const db = freshDb();
+    const r = await execute({ dataset, plan, adapter: db, ...quiet });
+    expect(r.lockToken).toBeNull();
+    expect((await db.getRun(plan.runId))!).toMatchObject({ status: "complete", lock_token: null });
   });
 
   it("stops cleanly when cancelled and resumes", async () => {
