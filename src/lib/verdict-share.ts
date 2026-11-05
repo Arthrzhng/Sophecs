@@ -1,4 +1,5 @@
-// A school's verdict share line without its "The judge's note:" sentence.
+// The sentence a verdict page offers to share (verdictShareLine), and a
+// school's share template without its "The judge's note:" sentence.
 //
 // For a private argument seen by someone other than its author, the
 // verdict line is withheld (migration 0018: the judge quotes the
