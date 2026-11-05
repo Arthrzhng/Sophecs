@@ -89,11 +89,18 @@ challenges." `/method#samples` explains the rest.
   result, and not in the Referer header, which `/r/[id]` reads into
   `card_viewed` and `share_page_viewed`. The root layout states the
   browsers' default for every other page, which puts it back after a
-  client-side navigation away from a sample page
-  (`tests/seed/sample-referrer.test.ts`). One gap: Next.js streams
-  metadata to browsers after the page's content, so a click made before
-  that part arrives and before the page hydrates is a full load without
-  the policy yet.
+  client-side navigation away from a sample page. That relies on how
+  Next.js 15.5 handles metadata: each navigation's metadata is sent
+  afresh, React inserts a new `<meta name="referrer">` element for it,
+  and inserting one re-applies the policy.
+  `tests/seed/sample-referrer.test.ts` pins both values, not that
+  mechanism, so a Next.js upgrade should be checked by hand on a sample
+  page. Two gaps remain. First, Next.js streams metadata to browsers
+  after the page's content, so until that part arrives the page runs
+  under the browser's default: a link followed in that window, as a full
+  load or as a client-side navigation, still sends the sample page's
+  address. Second, the root layout's stated policy replaces a stricter
+  one a reader may have set in their own browser, on every page.
 - **Matching.** No sample argument has `seeking_counterpart_at` set, so
   `seekCounterpart` never offers one to a reader.
 - **Challenges.** A sample never answers. A reader who opens a sample
