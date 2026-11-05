@@ -575,15 +575,16 @@ as Ready.
 ## 2026-11-05: Stage 5, the flag and the pages that only read
 
 Each pull request had one to three fresh review passes; the findings and
-fixes are in each. Every production deploy below was read from Vercel
-as Ready.
+fixes are in each. The fixes from the last pass of #78, #79, #80 and
+#81 were made after it, and each pull request says so. Every production
+deploy below was read from Vercel as Ready.
 
 - #77 merged as `d9ec035`: the entry above. Deploy
   `dpl_4xL5QRpN7MNPnBuau38ctoPF6awi`.
 - #78 merged as `de35849`: `docs/stage5-plan.md`, the plan for building
   the six schools behind a build-time `SIX_SCHOOLS` flag, in six steps
-  with four gates. Three passes; the third pass's fixes were made after
-  it. Deploy `dpl_ATcouqnPoLLmdLvtSDovnWU9m6PA`.
+  with four gates. Three passes. Deploy
+  `dpl_ATcouqnPoLLmdLvtSDovnWU9m6PA`.
 - #79 merged as `d733c59`: step 1, the flag. A flag-on build shows the
   three after the live schools; a flag-off build is unchanged, which
   `npm run check:bundle` now checks over nineteen strings, colours

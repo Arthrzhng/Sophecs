@@ -23,16 +23,20 @@ plan for the six schools, in `docs/stage5-plan.md`.
   deployment shows six, because `SIX_SCHOOLS=1` is set in Vercel for
   Preview only. Steps 3 to 6 wait on the gates below.
 
-To see the six schools, open any preview deployment built after 19:11
-UTC on 2026-11-05: `/`, `/s/confucian`, `/s/ubuntu`, `/s/buddhist`,
-`/lessons`, `/table`, and Today when signed in.
+To see the six schools, open the preview deployment of a branch that
+contains `132a7bd` (#81), built after 19:11 UTC on 2026-11-05, such as
+this pull request's own: `/`, `/s/confucian`, `/s/ubuntu`,
+`/s/buddhist`, `/lessons`, `/table`, and Today when signed in. An older
+branch's preview, such as #71's, shows three.
 
 ## Production database writes: (a)
 
 1. **Migration 0026, for the judge's daily ceiling and budget (#71).**
-   Ready, reviewed three times, waiting on your yes. On it: advisor,
-   apply, advisor, read-back, merge. The pull request has the SQL, the
-   lock each statement takes, the rollback and the local test.
+   Reviewed three times, waiting on your yes. Its branch predates #72 to
+   #81 (zod 4 and the flag among them), so on your yes: merge main into
+   it and rerun the gates, then advisor, apply, advisor, read-back,
+   merge. The pull request has the SQL, the lock each statement takes,
+   the rollback and the local test.
    `supabase/migrations/0026_ai_spend_since.sql` on branch `judge-caps`.
 2. **Migration 0025, dropping the five unreachable insert policies.**
    Posted for you to run in the SQL Editor. Not run: all five were still
@@ -50,6 +54,7 @@ UTC on 2026-11-05: `/`, `/s/confucian`, `/s/ubuntu`, `/s/buddhist`,
    Three options: (i) accept marked rows, never move an account's school
    to a v2 result's until launch, and clear the rows at launch; (ii) a
    second, free Supabase project for previews; (iii) read-only previews.
+   Step 4 also edits the frozen `src/app/actions.ts`.
    **I recommend (i)**: it needs no new project or secrets, step 3's
    guards keep production safe from the rows, and the clearing is
    already planned into the launch. (ii) is cleaner, and would also stop
@@ -76,14 +81,16 @@ UTC on 2026-11-05: `/`, `/s/confucian`, `/s/ubuntu`, `/s/buddhist`,
 3. **For the record: `src/lib/judge/schema.ts`, which is frozen under
    (b), was edited under ruling 13.** zod 4 counts code points where zod
    3 counted UTF-16 units, so the 200-character caps now say so
-   explicitly (`maxUnits`), and the judge's replies parse exactly as
-   before: 91 replies checked on both versions. `docs/decisions.md`,
+   explicitly (`maxUnits`), and replies parse exactly as before: 91
+   checked on both versions, 74 of them the judge's and 17 the
+   screener's. `docs/decisions.md`,
    "zod 4".
 
 ## Publishing: (c)
 
 1. **Stage 5, Gate 4: the launch.** On your instruction only: the sample
-   teardown; clearing a preview's v2 rows (if Gate 2 is (i)); the flag on
+   teardown; clearing a preview's v2 rows if Gate 2 is (i), which is an
+   (a) write; the flag on
    for Production, with `next.config.ts`'s refusal of it removed; the
    three content files' status and colour tokens; the share lines and
    other front matter; `README.md`; then the fresh sample run.
@@ -98,11 +105,17 @@ UTC on 2026-11-05: `/`, `/s/confucian`, `/s/ubuntu`, `/s/buddhist`,
 1. **An atomic reservation for the judge's ceiling and cap (#71).** Two
    submissions sent at once can both pass on the same count. Each extra
    costs about $0.03 and the monthly budget bounds the total.
-   `src/app/api/judge/route.ts`.
+   `src/app/api/judge/route.ts` on branch `judge-caps`.
 2. **Whether allowlisted reviewers face the daily ceiling (#71).** Today
-   they have only the monthly budget. `src/lib/judge-allowlist.ts`.
-3. **Golden runs:** v3 after #68 (above), and the three new schools under
-   Gate 3.
+   they have only the monthly budget: the `if (!isAllowlisted)` block in
+   `src/app/api/judge/route.ts` on `judge-caps` skips the ceiling and the
+   cap; `src/lib/judge-allowlist.ts` holds the id check.
+3. **Golden runs.** v3 after #68: 24 cases at 3 samples, 72 calls, $0.97
+   estimated, billed to the eval key. The three new
+   schools' run under Gate 3 has no estimate yet; it comes with that
+   gate's proposal.
+4. **Re-screening pending arena replies** (see (e) 8): a job would spend
+   on the screener, and it touches the frozen `src/app/api/**`.
 
 ## Content and philosophy: (e)
 
@@ -112,12 +125,12 @@ UTC on 2026-11-05: `/`, `/s/confucian`, `/s/ubuntu`, `/s/buddhist`,
    and arguing from Buddhist Ethics does not make someone a Buddhist.
    "Ubuntu Ethicist" takes "an", and six places write "a" (step 4 handles
    them). `src/lib/school-registry.ts` (`SHOWN_DRAFTS`) and
-   `school-registry.drafts.ts`.
+   `src/lib/school-registry.drafts.ts`.
 2. **Darker card surfaces for the new schools?** The live three's result
    cards are darker than their markers; the new three's are the marker
    itself, except Buddhist Ethics', darkened only for contrast.
-   `src/app/six-schools.css`, `docs/decisions.md`, "The new schools'
-   colours".
+   `src/app/six-schools.css` and `src/lib/card-tokens.ts`,
+   `docs/decisions.md`, "The new schools' colours".
 3. **The share lines that describe the quiz as about AI or name v1's
    questions**, by file and index, with two proposed rewordings.
    `docs/quiz-v2.md`, section 8, "For Arthur".
@@ -136,11 +149,21 @@ UTC on 2026-11-05: `/`, `/s/confucian`, `/s/ubuntu`, `/s/buddhist`,
    then, or leave them as the pages will be at launch?
    `src/app/s/[school]/page.tsx`.
 8. **Pending arena replies are never re-screened (#71).** A reply held
-   because screening was paused, over budget or failed stays pending,
-   and its author is told it "will be delivered once it has been
-   checked", which nothing does. A re-screening job would spend (d); the
-   copy is (e). `src/app/api/counterpart/turn/route.ts`,
+   because screening was paused, over budget, over its daily cap, failed,
+   or (with #71) could not read the spend stays pending, and its author
+   is told it "will be delivered once it has been checked", which nothing
+   does. Every reply sent on a preview is held, since a preview's budget
+   fails closed. The copy is (e); a re-screening job is (d), above.
+   `src/app/api/counterpart/turn/route.ts`,
    `src/components/counterpart/TurnComposer.tsx`.
+9. **What `UNVERIFIED` bars in the research file.** The file says
+   UNVERIFIED items are not to be used; the narrower reading the content
+   implies (not as a citation or an attribution, but still usable
+   otherwise) was put to you at Phase 2 and is unruled. It matters at
+   Gate 4: `content/schools/ubuntu.md`'s `one_line` is the Nguni maxim's
+   English, whose translator and date are UNVERIFIED.
+   `content/research/non-western-sources.md`, `docs/review-charter.md`,
+   rule 5.
 
 ## Housekeeping
 
@@ -148,11 +171,14 @@ Mine to do, or for your information:
 
 - **`CLAUDE.md` says `check:bundle` looks for a draft's "id or name".** It
   now also looks for its adherent nouns and colours, and Stage 5 adds
-  `npm run check:bundle:six`. The file is yours, so I have not changed
-  it; `CONTRIBUTING.md` and `docs/review-charter.md` say it in full.
-- **GitHub's schedule has run one of the sample workflow's three slots
-  today.** The 06:41 UTC slot never ran, the 12:41 one started at 14:57,
-  and the 18:41 one had not started at 19:41. So the first run on the
+  `npm run check:bundle:six`. The line is still true as far as it goes,
+  and `CLAUDE.md` is the short version that points at
+  `CONTRIBUTING.md`, which says it in full, with
+  `docs/review-charter.md`; so I have left it. Say if you want it longer.
+- **GitHub's schedule has run one of the three slots since the sample
+  workflow was merged** (#57, 03:25 UTC; the cron is every six hours at
+  41 minutes past). The 06:41 UTC slot never ran, the 12:41 one started
+  at 14:57, and the 18:41 one had not started at 19:41. So the first run on the
   Node 24 actions and #72's engine is still to come. Scheduled runs on
   GitHub are best effort; if extending the run on time matters, a
   manual run from the Actions tab does the same thing.
@@ -161,5 +187,8 @@ Mine to do, or for your information:
 - **`actions/checkout` and `actions/setup-node` v6 and v7** exist; v5 was
   the smallest step to Node 24. `docs/decisions.md`, "Node 24 actions and
   the in-range fixes".
-- **`npm audit` listed 10 packages** at #76's merge, none reachable from a
-  request. Same entry.
+- **`npm audit` listed 10 packages** at #76's merge, none reachable by a
+  reader's input. `docs/decisions.md`, "Dependency audit (2026-11-05)",
+  has each, including the two not ruled out entirely (`js-yaml` reads
+  our own front matter at build and request time; DOMPurify loads only
+  through a tour preview).
