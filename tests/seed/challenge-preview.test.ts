@@ -10,14 +10,18 @@ type Row = Record<string, unknown>;
 const tables: Record<string, Row[]> = {};
 
 // The reads these routes make: .from(t).select(cols).eq(col, v), then
-// .single() or .maybeSingle().
+// .single() or .maybeSingle(). Only the selected columns come back, as
+// from PostgREST, so a marker a route forgets to select reads as missing.
+const pick = (row: Row, cols: string) =>
+  Object.fromEntries(cols.split(",").map((c) => c.trim()).map((c) => [c, row[c]]));
 vi.mock("@/lib/supabase/admin", () => ({
   isAdminConfigured: () => true,
   createAdminClient: () => ({
     from: (t: string) => ({
-      select: () => ({
+      select: (cols: string) => ({
         eq: (col: string, v: unknown) => {
-          const row = (tables[t] ?? []).find((r) => r[col] === v);
+          const found = (tables[t] ?? []).find((r) => r[col] === v);
+          const row = found && pick(found, cols);
           return {
             single: async () => (row ? { data: row, error: null } : { data: null, error: { code: "PGRST116" } }),
             maybeSingle: async () => ({ data: row ?? null, error: null }),
@@ -113,4 +117,12 @@ describe("the card routes", () => {
       expect(drawn).toEqual([]);
     });
   }
+
+  it("verdict preview: a debate whose topic row is missing still draws its marked card, with the default motion", async () => {
+    tables.debate_topics = [];
+    const res = await verdictOg(verdictParams("d-sample"));
+    await res.arrayBuffer();
+    expect(res.status).toBe(200);
+    expect(drawn).toEqual([{ card: "verdict", sample: true }]);
+  });
 });
