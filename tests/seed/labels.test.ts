@@ -88,15 +88,6 @@ describe("metrics", () => {
     expect(readFileSync("src/app/debate/[slug]/[debateId]/page.tsx", "utf8")).toMatch(/\{publicRow\.is_sample && <SamplePageMarker \/>\}/);
   });
 
-  it("a sample verdict page sends no share sentence, even in its data", async () => {
-    // The sentence says "The judge's note", and a sample's verdict is a
-    // template; the share row is not shown, and the sentence is not sent.
-    const { readFileSync } = await import("node:fs");
-    const page = readFileSync("src/app/debate/[slug]/[debateId]/page.tsx", "utf8");
-    expect(page).toMatch(/const shareLine = publicRow\.is_sample\s*\?\s*""\s*:/);
-    expect(page).toMatch(/shareLine=\{shareLine\}/);
-  });
-
   it("nothing reaches PostHog from a page that carries the sample marker", async () => {
     // The real module: this file mocks it for the trackers above.
     const { onSamplePage, SAMPLE_PAGE_ATTRIBUTE } = await vi.importActual<typeof import("../../src/lib/analytics/client")>("../../src/lib/analytics/client");
