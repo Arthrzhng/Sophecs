@@ -13,9 +13,11 @@ step's pull request gets a flag-on preview to review, and a preview of an
 unrelated branch shows six schools as well.
 
 **Read when the build starts, not at runtime.** `next.config.ts` reads it
-and passes it to the code through `env`, which writes the value into
-server and client code alike as a constant. A runtime read would not do:
-`school-registry.ts`, `school-colors.ts` and `card-tokens.ts` are imported
+and passes it to the code through `env`, always as `"0"` or `"1"` (Next
+skips an unset value, which would leave nothing to write in), and `env`
+writes the value into server and client code alike as a constant. A
+runtime read would not do: `school-registry.ts`, `school-colors.ts` and
+`card-tokens.ts` are imported
 by client components (the lessons filter, the quiz result, the verdict),
 which cannot read a server variable, so a page would render six schools on
 the server and hydrate with three. Every module that holds one of the
@@ -33,8 +35,12 @@ until launch because the judge reads it: the rival schools in its prompt
 (`anthropic.ts`) and the schools its reply may name (`judge/schema.ts`,
 `judge/rubric.ts`), all frozen under (b). So a flag-on build changes
 nothing the judge receives until Gate 3 says otherwise. `DRAFT_SCHOOLS`
-does not depend on the flag either, so `check:bundle` always has the
-three's strings to look for.
+(server-only) does not depend on the flag either, and carries the
+proposed adherent nouns as well as the ids and names, so `check:bundle`
+always has the three's strings to look for: those, and every colour in
+the flag-only stylesheet. It fails if a draft has no adherent noun or the
+stylesheet no colour, so neither direction of the check can pass on an
+empty list.
 
 **The three content files stay as they are.** They have no `colour_token`
 and `content/**` is frozen, so `tests/school-registry.test.ts` holds the
@@ -67,8 +73,11 @@ project key are set for Production only. So on a preview:
   `/api/counterpart/turn` inserts the turn as `pending` and only then
   checks the budget, which fails closed, so the turn stays pending and
   unseen by the counterpart.
-- **The quiz writes a result,** and for a signed-in reader moves their
-  account's school (`retakeQuizSchool`, `src/lib/claim.ts`).
+- **The quiz writes a result,** and moves a real account's school in two
+  ways (`src/lib/claim.ts`): a signed-in reader's quiz replaces their
+  school (`retakeQuizSchool`), and signing in after an anonymous quiz
+  claims the result and gives a new or schoolless account its school
+  (`claimAnonymousResults`).
 - **No analytics are sent:** with no project key the client and the
   server send nothing.
 
@@ -92,18 +101,19 @@ of the three; Gate 2 is about that.
    (`/s/[school]`, from `content/schools/*.md`), the lessons index and
    filter chips for six, the six-row school table, Today's "view from
    elsewhere" card, the result card and its image for six schools, and
-   the copy that counts three schools (`docs/quiz-v2.md`, section 8,
-   "Three schools become six": `ChallengeInvite.tsx`, the quiz page's
-   description, the landing page, the sharing image). From the Stage 4
-   previews on `/styleguide/phase3`, which stay as the review surface. No
-   database change.
+   the landing page's "The three schools" section, which lists schools to
+   read about. Copy that says what the quiz places you in waits for step
+   4, since only v2 can place you in six. From the Stage 4 previews on
+   `/styleguide/phase3`, which stay as the review surface. No database
+   change.
 3. **v1 and v2 side by side.** Before anything writes a v2 result,
    because a preview writes into production's tables and production's
-   own pages would then read the row: `/r/[id]`, its card and sharing
-   image, and `/c/[id]` would put a new school's raw id into server
-   HTML (which `check:bundle` never reads), and the share page's
-   comparison columns, which read `vector[school]` for each of the three,
-   would print NaN% or, with no vector, fail. Every reader of a quiz result
+   own pages would then read the row. `/r/[id]`, its card and sharing
+   image, and `/c/[id]` all call `getSchool`, which throws for a draft
+   (`src/lib/schools.ts`), so a v2 result in one of the three would be an
+   error page in production; and the share page's comparison columns,
+   which read `vector[school]` for each of the three, would print NaN% or,
+   with no vector, fail. Every reader of a quiz result
    learns its version: v1 results keep opening on the triangle, a v2
    result opens on the map on a flag-on build and as not found on a
    flag-off one, and the comparison columns and a challenge across
@@ -113,13 +123,26 @@ of the three; Gate 2 is about that.
 4. **Quiz v2.** On flag-on builds: the questions from
    `docs/quiz-v2.json`, the map (`SchoolMap`) in place of the triangle,
    the nearest-school result logic of `scripts/simulate-quiz-v2.mjs`,
-   storage of a point, and the copy that is true only of v2 ("a few
-   minutes"; the triangle line on the landing page). This is the first
-   step that writes something new, so it follows **Gate 2**.
+   storage of a point, and the copy that is true only of v2: "a few
+   minutes", the triangle line on the landing page, and everything in
+   `docs/quiz-v2.md`, section 8, "Three schools become six", that says
+   what the quiz places you in (`ChallengeInvite.tsx`, the quiz page's
+   description, the landing page's opening, the sharing image). v2 is
+   new files beside v1's: `content/quiz/questions` and v1's scoring in
+   `src/lib/scoring.ts` stay byte-identical until the launch teardown,
+   because the live sample run replays them and halts if they change
+   (`docs/sample-activity.md`, Limits). The result is written by
+   `submitQuizResult` in `src/app/actions.ts`, which is frozen and typed
+   to v1's three-weight vector, so this step edits a frozen file. It is
+   the first step that writes something new, so it follows **Gate 2**.
 5. **Debating as a new school.** The arena, the judge and the
    micro-lessons for a reader placed in one of the three. **Gate 3.**
-6. **Launch.** On Arthur's instruction only: the sample teardown, the
-   flag on for Production, the three content files' status and colour
+6. **Launch.** On Arthur's instruction only: the sample teardown; under
+   Gate 2's option (i), clearing the preview's v2 results, and the
+   challenges that point at them, before the launch merge, since once
+   production writes v2 results the version can no longer tell them
+   apart (an (a) write); the flag on for Production; the three content
+   files' status and colour
    tokens, the share lines and other front matter in
    `docs/quiz-v2.md`, section 8 (front matter is the same in every
    build, so it cannot be flagged and changes in the launch merge
@@ -141,17 +164,23 @@ of the three; Gate 2 is about that.
      advisor runs before and after.
 
    Written and tested locally with a rollback, then applied only on his
-   yes, as 0024 was. The schools themselves need nothing: 0014 already
+   yes, as 0024 was. The rollback can restore `vector`'s `not null` only
+   while no v2 row exists. The schools themselves need nothing: 0014 already
    lets every school column hold all six.
 2. **Preview writes**, before step 4. A flag-on preview writes v2 results
-   into production's `quiz_results` (marked, by `quiz_version`), and a
-   signed-in reader taking the v2 quiz there moves their real account's
-   `profiles.school` and `school_history` into one of the three. Nothing
-   marks that, production can show the school only as its raw id, and
-   the judge has no criteria for it. Options:
-   - (i) accept the result rows, marked and cleared at launch, with
-     flag-on builds never moving a profile's school until launch: a v2
-     result on a preview stays the anonymous reader's own;
+   into production's `quiz_results` (marked, by `quiz_version`), and moves
+   a real account into one of the three by either path above: a signed-in
+   reader's v2 quiz replaces their `profiles.school` and adds to
+   `school_history`, and signing in after an anonymous v2 quiz gives a
+   new or schoolless account the v2 result's school. Nothing marks that.
+   In production the account would then hit an error on `/today` and on
+   its verdict pages, which call `getSchool`, and the judge has no
+   criteria for its school. Step 4 also edits `src/app/actions.ts`, which
+   is frozen. Options:
+   - (i) accept the result rows, marked and cleared at launch (step 6),
+     with flag-on builds never moving a profile's school until launch,
+     on either path: the v2 quiz does not replace a school, and the claim
+     on sign-in gives no school from a v2 result;
    - (ii) give previews their own Supabase project: a second free
      project, no cost, but its own migrations, secrets and auth;
    - (iii) let a flag-on preview read but not write, which tests least.
