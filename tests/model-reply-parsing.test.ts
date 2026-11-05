@@ -3,7 +3,8 @@
 // field a refused one is refused for. Arthur's ruling 13 of 2026-11-05
 // moved zod from 3 to 4 on condition that v2's behaviour stays the same;
 // these outcomes were taken from zod 3.25.76 and hold unchanged on zod 4
-// (docs/decisions.md, "zod 4"). The wording of a refusal is zod's and is
+// (docs/decisions.md, "zod 4"), the astral-character cases included, which
+// zod 4's own .max() would have let through. The wording of a refusal is zod's and is
 // not pinned, except that it never repeats the model's text: the summary
 // is logged.
 import { describe, expect, it, vi } from "vitest";
@@ -59,6 +60,24 @@ const judgeCases: Record<string, unknown> = {
   rejected_empty_reason: { rejected: true, rejection_reason: "" },
   rejected_long_reason: { rejected: true, rejection_reason: "x".repeat(201) },
   rejected_reason_200: { rejected: true, rejection_reason: "x".repeat(200) },
+  // 200 code points but 201 UTF-16 units: refused, as zod 3 counted.
+  rejected_reason_astral_over: { rejected: true, rejection_reason: "x".repeat(199) + "\u{1F600}" },
+  rejected_reason_astral_200: { rejected: true, rejection_reason: "x".repeat(198) + "\u{1F600}" },
+  // The shapes judge.v2.md asks for: the field the other branch uses, null.
+  valid_null_reason: v({ rejection_reason: null }),
+  rejected_null_scores: {
+    rejected: true,
+    rejection_reason: "Off topic.",
+    score: null,
+    fidelity: null,
+    rigor: null,
+    engagement: null,
+    strongest_move: null,
+    weakest_move: null,
+    a_stronger_version_would: null,
+    verdict_line: null,
+    unanswered_objection: null,
+  },
   rejected_missing_reason: { rejected: true },
   rejected_string: { rejected: "false", score: 1 },
   rejected_missing: without("rejected"),
@@ -105,6 +124,8 @@ const screenCases: Record<string, unknown> = {
   harassment: { result: "harassment", reason: "Insults the reader." },
   reason_200: { result: "spam", reason: "x".repeat(200) },
   reason_201: { result: "spam", reason: "x".repeat(201) },
+  reason_astral_over: { result: "spam", reason: "x".repeat(199) + "\u{1F600}" },
+  reason_astral_200: { result: "spam", reason: "x".repeat(198) + "\u{1F600}" },
   reason_null: { result: "ok", reason: null },
   reason_number: { result: "ok", reason: 3 },
   result_unknown: { result: "rude, said the screener", reason: "" },
@@ -124,7 +145,9 @@ const JUDGE_ACCEPTED: Record<string, unknown> = {
   // Keys the schema does not name are dropped, as before.
   valid_extra_key: valid,
   objection_extra: valid,
+  valid_null_reason: valid,
   rejected_with_scores: { rejected: true, rejection_reason: "Off topic." },
+  rejected_null_scores: { rejected: true, rejection_reason: "Off topic." },
 };
 for (const k of [
   "valid_revision",
@@ -136,12 +159,14 @@ for (const k of [
   "valid_whitespace_words",
   "rejected_ok",
   "rejected_reason_200",
+  "rejected_reason_astral_200",
 ])
   JUDGE_ACCEPTED[k] = judgeCases[k];
 
 const JUDGE_REFUSED: Record<string, string[] | "not json"> = {
   rejected_empty_reason: ["rejection_reason"],
   rejected_long_reason: ["rejection_reason"],
+  rejected_reason_astral_over: ["rejection_reason"],
   rejected_missing_reason: ["rejection_reason"],
   rejected_string: ["rejected"],
   rejected_missing: ["rejected"],
@@ -186,10 +211,12 @@ const SCREEN_ACCEPTED: Record<string, { result: string; reason: string }> = {
   ok_extra: { result: "ok", reason: "" },
   harassment: { result: "harassment", reason: "Insults the reader." },
   reason_200: { result: "spam", reason: "x".repeat(200) },
+  reason_astral_200: { result: "spam", reason: "x".repeat(198) + "\u{1F600}" },
   fenced: { result: "off_topic", reason: "About football." },
 };
 const SCREEN_REFUSED: Record<string, string[] | "not json"> = {
   reason_201: ["reason"],
+  reason_astral_over: ["reason"],
   reason_null: ["reason"],
   reason_number: ["reason"],
   result_unknown: ["result"],
@@ -211,7 +238,7 @@ describe("the judge's reply", () => {
     it(`accepts ${name}`, async () => {
       next = raw(judgeCases[name]);
       const r = await callJudgeModel("Motion", "stoicism", "An argument.");
-      expect(r.verdict).toEqual(expected);
+      expect(r.verdict).toStrictEqual(expected);
     });
   }
 
@@ -249,7 +276,7 @@ describe("the screener's reply", () => {
     it(`accepts ${name}`, async () => {
       next = raw(screenCases[name]);
       const r = await screenTurn({ quotedClaim: "A claim.", body: "A reply." });
-      expect({ result: r.result, reason: r.reason }).toEqual(expected);
+      expect({ result: r.result, reason: r.reason }).toStrictEqual(expected);
     });
   }
 

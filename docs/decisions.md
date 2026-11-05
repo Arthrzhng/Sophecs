@@ -2925,30 +2925,54 @@ zod goes from 3.25.76 to 4.6.7, which fixes zod 3's high advisory
 (memory exhaustion validating oversized constrained collections;
 "Dependency audit (2026-11-05)"). zod parses only model replies, the
 judge's (`src/lib/judge/schema.ts`) and the turn screener's
-(`src/lib/screen.ts`), and the golden fixtures in `tests/judge/`. No
-code changed: the schemas compile and behave the same under 4.
+(`src/lib/screen.ts`), and the golden fixtures in `tests/judge/`.
+
+**One behaviour change in zod, undone here.** From 4.5, zod counts a
+string's `.max()` in Unicode code points; zod 3 counted UTF-16 code
+units, which is what JavaScript's `length` is. Under zod 4 a
+`rejection_reason`, or a screener's `reason`, of 199 letters and an
+emoji (201 units, 200 code points) would pass where zod 3 refused it,
+and any emoji-heavy string could run to twice the cap. No zod 4 release
+that fixes the advisory counts the old way. So both 200-character caps
+are now a check on `length` (`maxUnits` in `schema.ts`, a `refine` in
+`screen.ts`), which counts as before. `.min(1)` is unaffected. This is
+an edit to the frozen `schema.ts`, made under ruling 13 to keep its
+condition; it changes nothing the judge is sent. The only other edit
+to a frozen file is a comment in `src/lib/anthropic.ts`, on the clause
+its error summary cuts.
 
 **The request fixtures.** zod plays no part in what the judge is sent,
 and `tests/judge-request.test.ts` holds all six byte for byte; nothing
-under `tests/judge-request/`, `content/` or `src/lib/judge/` changed.
+under `tests/judge-request/` or `content/` changed.
 
-**v2's behaviour.** One corpus of 67 model replies, 52 to the judge and
-15 to the screener, run through the real parse paths (`callJudgeModel`
+**v2's behaviour.** One corpus of 73 model replies, 56 to the judge and
+17 to the screener, run through the real parse paths (`callJudgeModel`
 and `screenTurn`, the model replaced by a stub) under zod 3 and under
 zod 4: every reply is accepted or refused the same way, every accepted
 one parses to the same data, and every refusal names the same fields.
-The corpus covers both verdict shapes, every field's type, bounds and
-word caps at and past the limit, a draft school and a wrong-case one as
-the objection's school, keys the schema does not name (dropped, as
-before), and replies that are not objects or not JSON.
+The corpus covers both verdict shapes, including the nulls `judge.v2.md`
+asks for in the field the other shape uses; every field's type, bounds
+and word caps at and past the limit; the two 200-character caps with an
+astral character at and past the limit; a draft school and a wrong-case
+one as the objection's school; keys the schema does not name (dropped,
+as before); and replies that are not objects or not JSON.
 `tests/model-reply-parsing.test.ts` keeps it, with the outcomes taken
-from zod 3.
+from zod 3; without the caps' new check, its two astral cases fail on
+zod 4. The review's own 77 further cases, run the same way (numbers
+from `1e309` to `-0`, `__proto__` keys, lone surrogates, unknown keys
+nested deep and many more), differed only in those two cases. One
+difference outside production: the golden runner's fixture schema now
+refuses an Infinity in a band, which zod 3 let through; no fixture has
+one.
 
-**What does change** is zod's wording of a refusal, which is logged
-(`ai_calls.validation_error`, and the production log) and read by
-nobody: "Too big: expected number to be <=100" where it said "Number
-must be less than or equal to 100", and so on. One change is a fix: zod
-3 quoted the value it got for a wrong enum value, and the screener's
-summary logged it as it came, so a screener reply naming no known result
-put the model's text in the log. zod 4 names the options only, and the
-test holds both summaries to that.
+**What does change** is zod's wording of a refusal: "Too big: expected
+number to be <=100" where it said "Number must be less than or equal to
+100", and so on. The judge's summary is logged (`ai_calls`'
+`validation_error`, and the production log) and read by nobody. One
+change is a fix: zod 3 quoted the value it got for a wrong enum value,
+and the screener's summary kept it, so a screener reply naming no known
+result put the model's text in the message; that message is logged only
+outside production (`src/app/api/counterpart/turn/route.ts`), and zod 4
+names the options only. The test holds the zod refusals of both to
+that; the screener's not-JSON message still quotes the start of the
+reply, by design.
