@@ -3320,3 +3320,60 @@ lessons index serve the markup they did.
 - **Kept out:** the lessons index (which pairs before and after, as it
   always has) and the sitemap, whose sophecs.com addresses have no such
   page.
+
+### Sample scores that do not look generated (2026-11-05)
+
+Arthur: no sample score should look generated, and none should cluster on
+round numbers. Measured on the live run's rows before any change:
+
+- **Composites:** 8,111 scored sample verdicts, 23.3% on a multiple of 5
+  and 12.3% on a multiple of 10. The judge's own replies, 836 in
+  `tests/judge/golden-runs`, land on a multiple of 5 16.3% of the time.
+  The excess came from clamping each composite into its tier's range,
+  which piled scores on 50, 70 and 90.
+- **Criteria:** about half were half points (7.5). The judge has never
+  given one: all 836 replies score every criterion in whole numbers.
+- **Ratings:** 19.5% of `elo_after` on a multiple of 5 and 10.0% on a
+  multiple of 10, and 22.4% of rating changes on a multiple of 5. That is
+  the share any spread of whole numbers gives (20% and 10%), and the
+  ratings come from the product's own `soloElo` and `pairwiseElo`, as a
+  reader's do. Sample profiles with no rated argument hold 1200, the
+  rating every account starts on.
+- **Streaks:** 0 to 5, from the product's own `applyStreakDay`.
+- **Quiz percentages** on result pages: 21.8% on a multiple of 5 for
+  sample results and 21.4% for readers' own, both from `scoreQuiz`.
+
+So the verdict scores, the only numbers the generator draws itself, were
+the fix; ratings, streaks and quiz percentages are computed from them, or
+from generated answers, by the product's own functions.
+
+- **Not in place.** The engine inserts rows and refreshes a profile's
+  rating and streak; it has no way to rewrite a written verdict, and its
+  spot checks hold every written row to the plan, so a generator that
+  changed a written row would halt the schedule. A one-off rewrite of
+  8,111 production rows, with every later rating recomputed, would be a
+  new kind of production write and not one the engine validates.
+- **New rows, from 2026-11-06 00:00 UTC.** `scoreRuleFor` picks rule 2
+  for rows dated from then, and for every row of a run begun after then.
+  With a dummy seed, the window the live run has written regenerates
+  byte for byte the same on main and on this branch (the same manifest
+  hash to 21:00 and to 23:59 UTC on 2026-11-05), and with a window to
+  2026-11-08 the 8,507 debates dated before the cutover are identical;
+  only rows after it change. Rule 2 makes every draw rule 1 makes and
+  takes its numbers from a stream of its own, so a rule-2 verdict differs
+  from rule 1's for the same row only in its four numbers and its
+  `prompt_version`, `sample-template-2`.
+- **The existing rows** go at launch with the run, as planned; the fresh
+  run follows rule 2 throughout.
+- **Rule 2**, on three seeds of a full-size fresh run: composites 12.3%
+  to 12.6% on a multiple of 5 and 5.5% to 6.2% on a multiple of 10;
+  criteria on 0, 5 or 10 7.4% to 8.0% (fidelity), 14.4% to 15.4%
+  (rigor) and 10.0% to 10.2% (engagement); every criterion a whole
+  number. Thinning harder would leave visible gaps at 50, 55 and 60.
+- **The check.** `scripts/seed/round-scores.ts`: more than 20% of a run's
+  rule-2 scores on a multiple of 5, for the composite or any criterion,
+  refuses the run before it writes (with the duplicate-text check) and
+  fails validation after, on every path that validates. It judges once
+  there are 1,000 rule-2 verdicts, so that chance alone never refuses a
+  run; the live run reaches that about ten days after the cutover, and a
+  fresh run starts with thousands.

@@ -9,6 +9,7 @@ import { contentTopics } from "./topics";
 import { execute, finishValidation, HaltedError, isHalted, LockLostError, recordedOnRun, releaseHeld, StopError, thrownWhileWriting, VALIDATING } from "./engine";
 import { validate } from "./validate";
 import { dryRun } from "./dryrun";
+import { roundScoreCheck } from "./round-scores";
 import { GuardError } from "./env";
 import { preview, teardown } from "./teardown";
 
@@ -111,11 +112,18 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
   const maxDup = o.maxExactDuplicatePct ?? MAX_EXACT_DUPLICATE_PCT;
   const dupPct = Number((describe(dataset) as { exactDuplicateArgumentsPct: number }).exactDuplicateArgumentsPct);
   const dupCheck = { name: `exact duplicate argument texts under ${maxDup}%`, ok: dupPct < maxDup, detail: `${dupPct}%` };
+  // So is how often its scores land on a multiple of 5; validate repeats
+  // this check after the writes.
+  const roundCheck = roundScoreCheck(dataset, { cohortLimit });
   const dry = await dryRun(adapter, plan);
-  const dryLines = [...dry.lines, `${dupCheck.ok ? "ok" : "FAIL"}: ${dupCheck.name}: ${dupCheck.detail}`];
-  if (!dry.ok || !dupCheck.ok) {
+  const planChecks = [dupCheck, roundCheck];
+  const dryLines = [...dry.lines, ...planChecks.map((c) => `${c.ok ? "ok" : "FAIL"}: ${c.name}: ${c.detail}`)];
+  const failedPlanChecks = planChecks.filter((c) => !c.ok);
+  if (!dry.ok || failedPlanChecks.length) {
     await record({ dryRun: dryLines, ok: false });
-    log(`dry-run checks failed${dupCheck.ok ? "" : ` (${dupCheck.name}: ${dupCheck.detail})`}; nothing written (details in seed_runs.last_report)`);
+    log(
+      `dry-run checks failed${failedPlanChecks.length ? ` (${failedPlanChecks.map((c) => `${c.name}: ${c.detail}`).join("; ")})` : ""}; nothing written (details in seed_runs.last_report)`
+    );
     return { ok: false, outcome: "dry-run-failed", runId: plan.runId };
   }
   log("dry-run checks passed");

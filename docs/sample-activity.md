@@ -137,8 +137,23 @@ challenges." `/method#samples` explains the rest.
   never to resolve. Supabase Auth refuses requests that relate to a banned
   user. No invitation, link or reset is ever requested.
 - **Spending.** No model is called. Every sample verdict is a template,
-  `prompt_version` `sample-template-1`, `verdict_is_template` true. No
-  `ai_calls`, `reports`, `blocks`, payment or analytics row is written.
+  `prompt_version` `sample-template-1` or `sample-template-2` (below),
+  `verdict_is_template` true. No `ai_calls`, `reports`, `blocks`, payment
+  or analytics row is written.
+- **Scores.** A template verdict's numbers follow a documented rule
+  (`scripts/seed/verdicts.ts`). Rule 2 (`sample-template-2`) gives
+  whole-number criteria, as the judge does, and lands on a multiple of 5
+  about 12% of the time for the composite and 7-15% for each criterion;
+  the judge's own replies land there 16.3% of the time. It applies to
+  rows dated from 2026-11-06 00:00 UTC, and to every row of a run begun
+  after then. Rows the run begun on 2026-11-05 wrote before then keep
+  rule 1 (half-point criteria; 23.3% of composites on a multiple of 5),
+  since the engine cannot rewrite a row it has written and the schedule's
+  spot checks hold every written row to the plan; they go at launch. A run
+  whose rule-2 scores land on a multiple of 5 more than 20% of the time,
+  for the composite or any criterion, is refused before it writes and
+  fails validation after (`scripts/seed/round-scores.ts`), once it has a
+  thousand rule-2 verdicts to judge.
 
 ## Real numbers
 
@@ -434,7 +449,8 @@ sample teardown and a fresh run into the launch steps". In order:
 3. **A fresh run:** `canary`, then `full`, as in Rollout steps 4 and 5,
    each with Arthur's go-ahead. The new run has a new id (the canary's
    start time), and the schedule extends it once its full stage has
-   passed. Before its canary, the sample users' email tag becomes
+   passed. Every verdict in it follows score rule 2, so the rule-1 rows
+   go with the old run. Before its canary, the sample users' email tag becomes
    HMAC-SHA256 of the run and the user's number, keyed by the seed: the
    current tag comes from the generator's own random streams, which are
    not meant for secrets, so someone who reconstructed a stream from
@@ -450,6 +466,9 @@ Stop and report, without retrying past the engine's own retries, if:
 - any validation check fails (the run halts);
 - exact duplicate argument texts would reach 5% (refused with the
   dry-run checks, before anything is written);
+- more than 20% of the run's rule-2 scores, of the composite or of any
+  criterion, would land on a multiple of 5 (refused with the dry-run
+  checks, and a validation failure after a write);
 - the run refuses to adopt or update a row, or a created user comes back
   without its ban (the run halts);
 - auth user creation fails past the retries (the run fails; the next

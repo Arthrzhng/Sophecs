@@ -8,11 +8,35 @@
 // verdict; tests/seed/verdicts.test.ts parses every template through the
 // real schema.
 //
-// The scores follow one documented rule, because the judge's own prompt
+// The scores follow a documented rule, because the judge's own prompt
 // gives none: the composite is ten times a weighted mean of the three
-// criteria, fidelity counting double, 10 x (0.5 F + 0.25 R + 0.25 E),
-// moved by at most 2 points of noise and held inside the tier's range
-// (strong 70-90, mid 50-70, weak 25-50).
+// criteria, fidelity counting double, 10 x (0.5 F + 0.25 R + 0.25 E), plus
+// a little noise. There are two versions of it.
+//
+// Rule 1, the first, gives criteria in half points and holds the composite
+// inside the tier's range (strong 70-90, mid 50-70, weak 25-50) by
+// clamping. Both read as generated: the judge has never given a half point
+// (836 replies in tests/judge/golden-runs, every criterion a whole number),
+// and the clamp piles scores on the range's ends, so 23.3% of the first
+// run's composites were multiples of 5, against the judge's 16.3%.
+//
+// Rule 2 gives whole-number criteria, drawn as rule 1 draws them but from
+// bands that reach past it, lets the composite fall where the criteria put
+// it, with no tier range to pile against, and moves four in ten composites
+// that land on a multiple of 5 by one or two points, and three in ten of
+// the criteria that land on 0, 5 or 10 by one. scripts/seed/ci.ts refuses a run
+// whose rule-2 scores are more than MAX_ROUND_SCORE_PCT round.
+//
+// Which rule a verdict follows is decided by scoreRuleFor: rows dated from
+// SCORE_RULE_2_FROM, and every row of a run begun after it, follow rule 2.
+// The run begun on 2026-11-05 wrote its rows under rule 1 up to then, and
+// those rows regenerate exactly as written, which the schedule's spot
+// checks confirm on every run; they go at launch, with the run.
+//
+// Rule 2 makes every draw rule 1 makes, in the same order, and takes its
+// numbers from a stream of its own, so a rule-2 verdict differs from the
+// rule-1 verdict for the same row in its four numbers and its
+// prompt_version and in nothing else.
 
 import type { Rng } from "./rng";
 import { schoolAdherent, schoolName } from "../../src/lib/school-registry";
@@ -28,6 +52,19 @@ import {
 } from "./banks";
 
 export const TEMPLATE_PROMPT_VERSION = "sample-template-1";
+export const TEMPLATE_PROMPT_VERSION_2 = "sample-template-2";
+
+export type ScoreRule = 1 | 2;
+
+/** Rows dated from here, and every row of a run begun from here, follow rule 2. */
+export const SCORE_RULE_2_FROM = "2026-11-06T00:00:00.000Z";
+
+export function scoreRuleFor(rowTime: number, runBaseTo: number): ScoreRule {
+  const from = Date.parse(SCORE_RULE_2_FROM);
+  return rowTime >= from || runBaseTo >= from ? 2 : 1;
+}
+
+export const promptVersionFor = (rule: ScoreRule) => (rule === 2 ? TEMPLATE_PROMPT_VERSION_2 : TEMPLATE_PROMPT_VERSION);
 
 export const SCORE_RANGE: Record<Tier, [number, number]> = {
   strong: [70, 90],
@@ -113,6 +150,64 @@ function scoreFor(tier: Tier, f: number, r: number, e: number, rng: Rng): number
   return clamp(Math.round(compositeScore(f, r, e) + rng.int(-2, 2)), lo, hi);
 }
 
+// ---- rule 2 ----
+
+// Wider than rule 1's bands by about half a point at each end, so that,
+// rounded to whole numbers, every value in a band is drawn about as often
+// as its neighbours rather than the end values half as often; and the
+// tiers overlap, so that no whole number is rare because it sits where one
+// tier's band stops and the next begins.
+const AXIS_BANDS_2: Record<Tier, { f: [number, number]; r: [number, number]; e: [number, number] }> = {
+  strong: { f: [6.5, 9.4], r: [5.6, 9.2], e: [4.2, 8.4] },
+  mid: { f: [4.2, 8.2], r: [3.6, 7.6], e: [1.6, 6.2] },
+  weak: { f: [1.6, 5.8], r: [1.6, 5.4], e: [0.6, 3.6] },
+};
+
+/** A whole-number criterion: three in ten that land on 0, 5 or 10 move one point, inside 0-10. */
+function criterion(x: number, rng: Rng): number {
+  let v = clamp(Math.round(x), 0, 10);
+  if (v % 5 === 0 && rng.chance(0.3)) v = v === 0 ? 1 : v === 10 ? 9 : v + (rng.chance(0.5) ? 1 : -1);
+  return v;
+}
+
+/**
+ * The composite from whole-number criteria. The noise is the sum of two
+ * draws, so it is likelier small than large and smooths over the 2.5-point
+ * steps whole-number criteria leave in the weighted mean. Four in ten that
+ * land on a multiple of 5 move one or two points.
+ */
+function composite2(f: number, r: number, e: number, noise: number, rng: Rng): number {
+  let s = clamp(Math.round(compositeScore(f, r, e) + noise), 1, 99);
+  if (s % 5 === 0 && rng.chance(0.4)) s += rng.pick([-2, -1, 1, 2]);
+  return s;
+}
+
+function scoresRule2(tier: Tier, skill: number, rng: Rng) {
+  const b = AXIS_BANDS_2[tier];
+  const draw = ([lo, hi]: [number, number]) => criterion(lo + (hi - lo) * (0.5 * skill + 0.5 * rng.next()), rng);
+  const f = draw(b.f);
+  const r = draw(b.r);
+  const e = draw(b.e);
+  return { f, r, e, score: composite2(f, r, e, rng.float(-2, 2) + rng.float(-2, 2), rng) };
+}
+
+/**
+ * A revision's numbers under rule 2. As under rule 1, no criterion falls
+ * below the original's, and engagement rises when the objection is
+ * answered: here by at least a point, and to no more than 9, as rule 1
+ * keeps it below 10. The original may be a rule-1 verdict in half points.
+ */
+function revisionScoresRule2(parent: Pick<Verdict, "fidelity" | "rigor" | "engagement">, answered: boolean, rng: Rng) {
+  const f = Math.max(Math.round(parent.fidelity), criterion(parent.fidelity + rng.float(0, 0.8), rng));
+  const r = Math.max(Math.round(parent.rigor), criterion(parent.rigor + rng.float(0, 0.8), rng));
+  const raised = criterion(parent.engagement + (answered ? rng.float(2, 3.5) : rng.float(0, 1)), rng);
+  const e = Math.min(9, Math.max(Math.round(parent.engagement) + (answered ? 1 : 0), raised));
+  return { f, r, e, score: composite2(f, r, e, rng.float(-1, 1.5) + rng.float(-1, 1.5), rng) };
+}
+
+/** Rule 2's numbers come from a stream of their own (see the header). */
+const RULE_2_STREAM = "score-rule-2";
+
 /** The rival whose objection the argument does not answer. */
 export function unansweredRival(fr: TopicFragments, school: SchoolId, parts: Parts, rng: Rng): number {
   const all = fr.schools[school].objections.map((_, i) => i);
@@ -129,11 +224,15 @@ export function templateVerdict(
   arg: Pick<BankArgument, "school" | "tier">,
   parts: Parts,
   skill: number,
-  rng: Rng
+  rng: Rng,
+  rule: ScoreRule = 1
 ): Verdict {
   const s = fr.schools[arg.school];
-  const { f, r, e } = axes(arg.tier, skill, rng);
-  const score = scoreFor(arg.tier, f, r, e, rng);
+  // Rule 1's draws are made under either rule, so the rest of the verdict
+  // draws exactly as it did; rule 2 then takes its numbers from its own stream.
+  const one = axes(arg.tier, skill, rng);
+  const oneScore = scoreFor(arg.tier, one.f, one.r, one.e, rng);
+  const { f, r, e, score } = rule === 2 ? scoresRule2(arg.tier, skill, rng.fork(RULE_2_STREAM)) : { ...one, score: oneScore };
   const openIdx = unansweredRival(fr, arg.school, parts, rng);
   const open = s.objections[openIdx];
   const rivalName = NAME(open.rival);
@@ -188,7 +287,7 @@ export function templateVerdict(
     a_stronger_version_would: stronger,
     verdict_line: line,
     unanswered_objection: objectionBlock(open),
-    prompt_version: TEMPLATE_PROMPT_VERSION,
+    prompt_version: promptVersionFor(rule),
   };
 }
 
@@ -205,13 +304,17 @@ export function templateRevisionVerdict(
   revisedParts: Parts,
   answeredIdx: number,
   answered: boolean,
-  rng: Rng
+  rng: Rng,
+  rule: ScoreRule = 1
 ): Verdict {
   const s = fr.schools[school];
-  const f = half(clamp(parentVerdict.fidelity + rng.float(0, 0.5), 0, 10));
-  const r = half(clamp(parentVerdict.rigor + rng.float(0, 0.5), 0, 10));
-  const e = half(clamp(parentVerdict.engagement + (answered ? rng.float(2, 3.5) : rng.float(0, 1)), 0, 9.5));
-  const score = clamp(Math.round(compositeScore(f, r, e) + rng.int(-1, 2)), 25, 90);
+  // As in templateVerdict: rule 1's draws first, under either rule.
+  const f1 = half(clamp(parentVerdict.fidelity + rng.float(0, 0.5), 0, 10));
+  const r1 = half(clamp(parentVerdict.rigor + rng.float(0, 0.5), 0, 10));
+  const e1 = half(clamp(parentVerdict.engagement + (answered ? rng.float(2, 3.5) : rng.float(0, 1)), 0, 9.5));
+  const score1 = clamp(Math.round(compositeScore(f1, r1, e1) + rng.int(-1, 2)), 25, 90);
+  const { f, r, e, score } =
+    rule === 2 ? revisionScoresRule2(parentVerdict, answered, rng.fork(RULE_2_STREAM)) : { f: f1, r: r1, e: e1, score: score1 };
   const added = s.objections[answeredIdx];
   const q = quoteFrom(added.answer, rng);
   const remaining = s.objections.map((_, i) => i).filter((i) => !revisedParts.objections.includes(i));
@@ -238,7 +341,7 @@ export function templateRevisionVerdict(
     improvement_note: answered
       ? `"${q}" meets the ${NAME(added.rival)} objection directly, which the first attempt did not.`
       : `The new paragraph names the ${NAME(added.rival)} objection, but "${q}" restates the position more than it answers it.`,
-    prompt_version: TEMPLATE_PROMPT_VERSION,
+    prompt_version: promptVersionFor(rule),
   };
 }
 
