@@ -2698,7 +2698,7 @@ lists 16 packages (1 critical, 6 high, 9 moderate):
 | Package | Severity | Reaches | Why it matters or not |
 | --- | --- | --- | --- |
 | `dompurify` | critical | `posthog-js` product tours | Above: not loaded. |
-| `zod` 3.x | high (memory exhaustion validating oversized constrained collections) | direct; it parses only the model's replies, the judge's (`src/lib/judge/schema.ts`) and the turn screener's (`src/lib/screen.ts`), never a reader's input | Those replies are capped by `max_tokens` (850 for the judge, 60 for the screener), which bounds the collections. Fixed from zod 4.6.6, a major upgrade that touches the frozen judge schema: worth doing deliberately. |
+| `zod` 3.x | high (memory exhaustion validating oversized constrained collections) | direct; it parses only the model's replies, the judge's (`src/lib/judge/schema.ts`) and the turn screener's (`src/lib/screen.ts`), never a reader's input | Those replies are capped by `max_tokens` (850 for the judge, 60 for the screener), which bounds the collections. Fixed from zod 4.6.6, a major upgrade that touches the frozen judge schema: worth doing deliberately. Done on 2026-11-05 ("zod 4", below). |
 | `follow-redirects` 1.16.0 | high (credential headers can follow cross-origin redirects) | `posthog-node` (`src/lib/analytics/server.ts`) through `axios` | Shipped in the server bundle, never called: posthog-node 4.18 uses `axios` only when there is no global `fetch`, and the Vercel project runs Node 24.x (its own setting; nothing in the repository overrides it, and the sample workflow's Node 22 is for CI), which has one. An `npm update` moves it to a fixed release within range. |
 | `next` and its pinned `postcss` 8.4.31 | moderate and high (source-map path traversal, `</style>` escaping) | build only | Reads CSS we write; nothing attacker-controlled. Next 15 pins its own copy; fixed in Next 16. The site's own `postcss` 8.5.26 is outside the range. |
 | `js-yaml` 3.15.1 | high (CPU with empty merge keys) | `gray-matter`, reading our own content frontmatter at build and request time | Only reads files in `content/`, which we write. |
@@ -2916,6 +2916,70 @@ five exactly. `scripts/test-migrations.sh` passes.
 
 **Snapshot:** `docs/seed-snapshots/2026-11-05-before-0024.json`, read from
 production at 06:00 UTC on 2026-11-05.
+
+### zod 4
+
+Arthur's ruling 13 of 2026-11-05: "zod 4: yes, own PR; the six judge
+request fixtures must stay byte-identical and v2 behaviour unchanged".
+zod goes from 3.25.76 to 4.6.7, which fixes zod 3's high advisory
+(memory exhaustion validating oversized constrained collections;
+"Dependency audit (2026-11-05)"). zod parses only model replies, the
+judge's (`src/lib/judge/schema.ts`) and the turn screener's
+(`src/lib/screen.ts`), and the golden fixtures in `tests/judge/`.
+
+**One behaviour change in zod, undone here.** From 4.5, zod counts a
+string's `.max()` in Unicode code points; zod 3 counted UTF-16 code
+units, which is what JavaScript's `length` is. Under zod 4 a
+`rejection_reason`, or a screener's `reason`, of 199 letters and an
+emoji (201 units, 200 code points) would pass where zod 3 refused it,
+and any emoji-heavy string could run to twice the cap. No zod 4 release
+that fixes the advisory counts the old way. So both 200-character caps
+are now a check on `length` (`maxUnits` in `schema.ts`, a `refine` in
+`screen.ts`), which counts as before. `.min(1)` is unaffected. This is
+an edit to the frozen `schema.ts`, made under ruling 13 to keep its
+condition; it changes nothing the judge is sent. The only other edit
+to a frozen file is a comment in `src/lib/anthropic.ts`, on the clause
+its error summary cuts.
+
+**The request fixtures.** zod plays no part in what the judge is sent,
+and `tests/judge-request.test.ts` holds all six byte for byte; nothing
+under `tests/judge-request/` or `content/` changed.
+
+**v2's behaviour.** One corpus of 91 model replies, 74 to the judge and
+17 to the screener, run through the real parse paths (`callJudgeModel`
+and `screenTurn`, the model replaced by a stub) under zod 3 and under
+zod 4: every reply is accepted or refused the same way, every accepted
+one parses to the same data, and every refusal names the same fields.
+The corpus covers both verdict shapes, including the nulls `judge.v2.md`
+asks for in the field the other shape uses; every field's type, bounds
+and word caps at and past the limit; the two 200-character caps with an
+astral character at and past the limit; a draft school and a wrong-case
+one as the objection's school; keys the schema does not name (dropped,
+as before); and replies that are not objects or not JSON.
+`tests/model-reply-parsing.test.ts` keeps it, with the outcomes taken
+from zod 3; without the caps' new check, its two astral cases fail on
+zod 4. The reviews' own 179 further cases, run the same way (numbers
+from `1e309` to `-0`, `__proto__` keys, lone and split surrogates,
+combining marks, unknown keys nested deep and many more), differed only
+in those two cases before the check and in none after it. One
+difference outside production: the golden runner's fixture schema now
+refuses an Infinity in a band, which zod 3 let through; no fixture has
+one.
+
+**What does change** is zod's wording of a refusal: "Too big: expected
+number to be <=100" where it said "Number must be less than or equal to
+100", and so on, and a refusal can name a field twice (an array in a
+string field is refused for its type and again for its length). The
+judge's summary is logged (`ai_calls`' `validation_error`, and the
+production log) and printed by the golden runner, and no code parses
+it. One
+change is a fix: zod 3 quoted the value it got for a wrong enum value,
+and the screener's summary kept it, so a screener reply naming no known
+result put the model's text in the message; that message is logged only
+outside production (`src/app/api/counterpart/turn/route.ts`), and zod 4
+names the options only. The test holds the zod refusals of both to
+that; the screener's not-JSON message still quotes the start of the
+reply, by design.
 
 ### The new schools' colours
 

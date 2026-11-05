@@ -17,9 +17,14 @@ const OUTPUT_COST_PER_TOKEN = 5 / 1_000_000;
 export const SCREEN_RESULTS = ["ok", "harassment", "personal_info", "off_topic", "spam"] as const;
 export type ScreenResult = (typeof SCREEN_RESULTS)[number];
 
+// The reason's 200 is in UTF-16 code units, as zod 3's .max() counted;
+// zod 4.5 and later count .max() in code points (docs/decisions.md, "zod 4").
 const ScreenSchema = z.object({
   result: z.enum(SCREEN_RESULTS),
-  reason: z.string().max(200).default(""),
+  reason: z
+    .string()
+    .refine((val) => val.length <= 200, "reason exceeds 200 characters")
+    .default(""),
 });
 
 let client: Anthropic | null = null;
