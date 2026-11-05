@@ -48,19 +48,34 @@ export type RunnablePromptVersion = PromptVersion | "v3";
 const promptTemplates = new Map<string, string>([
   [
     PROMPT_VERSION,
-    readFileSync(join(process.cwd(), `content/prompts/judge.${PROMPT_VERSION}.md`), "utf-8"),
+    asSent(PROMPT_VERSION, readFileSync(join(process.cwd(), `content/prompts/judge.${PROMPT_VERSION}.md`), "utf-8")),
   ],
 ]);
 
 function promptTemplateFor(version: RunnablePromptVersion): string {
   const cached = promptTemplates.get(version);
   if (cached !== undefined) return cached;
-  const template = readFileSync(
+  const raw = readFileSync(
     join(process.cwd(), `content/prompts/judge.${version}.md`),
     "utf-8"
   );
+  const template = asSent(version, raw);
   promptTemplates.set(version, template);
   return template;
+}
+
+// Arthur, 2026-11-05: "Strip comments from judge.v3.md before it is sent
+// (v3 only)." v3's head comment is the file's own history, written for
+// whoever edits it, and until now it reached the model with the rest. v1
+// and v2 come back exactly as read, and v2's request is pinned by the six
+// fixtures in tests/judge-request. Both reads above go through here, the
+// module-scope default included, so v3 is stripped whichever way it is
+// reached.
+export function asSent(version: RunnablePromptVersion, raw: string): string {
+  if (version !== "v3") return raw;
+  // The head comment and the blank lines after it; any other comment
+  // without the lines around it, so paragraphs either side stay apart.
+  return raw.replace(/^\s*<!--[\s\S]*?-->\s*/, "").replace(/<!--[\s\S]*?-->/g, "");
 }
 
 // The schools an `unanswered_objection` may name, for v3's
@@ -141,7 +156,7 @@ export async function callJudgeModel(
 
   // {{RUBRIC}} is in every version. {{RIVAL_SCHOOLS}} is v3 and later, so
   // it is optional, and its absence leaves v2 byte for byte what it was.
-  // Both are filled in one pass over the raw template: see
+  // Both are filled in one pass over the template as sent: see
   // src/lib/judge/fill-placeholder.ts for the three defects that shape.
   const system = fillPlaceholders(promptTemplateFor(promptVersion), {
     "{{RUBRIC}}": { value: criteria, required: true },

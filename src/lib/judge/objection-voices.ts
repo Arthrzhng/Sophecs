@@ -8,9 +8,10 @@ import type { SchoolId } from "@/lib/school-registry";
  * never returned the power objection on the Confucian hierarchy cases: it
  * has to put the objection in a rival school's mouth, and nothing told it
  * which. He set Confucianism's voices himself and asked for the same
- * exercise for all six, symmetrically. The other five are drafted from
- * each school's page in content/schools, and are his to confirm at
- * Checkpoint A.
+ * exercise for all six, symmetrically. The other five were drafted from
+ * each school's page in content/schools. At Checkpoint A, on 2026-11-05,
+ * he replaced Utilitarianism's Virtue Ethics voice with his own wording
+ * and kept the Buddhist Ethics voices.
  *
  * A voice is named to the judge only when its school is one of the rivals
  * the prompt lists. A rival outside that list could not be returned
@@ -38,7 +39,7 @@ export const OBJECTION_VOICES: Record<SchoolId, ReadonlyArray<{ rival: SchoolId;
   utilitarianism: [
     {
       rival: "virtue-ethics",
-      why: "justice gives each person what is owed to them, and a total owes nobody anything",
+      why: "what is done to one person must be justifiable to that person, not only to the total",
     },
     {
       rival: "ubuntu",

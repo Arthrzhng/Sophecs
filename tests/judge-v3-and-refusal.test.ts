@@ -253,10 +253,12 @@ describe("judge.v3.md", () => {
     expect(header).toContain("not the production default");
     expect(header).toContain("rival-schools substitution");
 
-    // And it must NOT write either placeholder out in full. The whole file
-    // is sent to the model, comment included, and anthropic.ts fills a
-    // placeholder by name: a header that named one would have the mention
-    // filled and the real placeholder left standing in the prompt. That is
+    // And it must NOT write either placeholder out in full. The whole file,
+    // comment included, used to be sent to the model, and anthropic.ts
+    // fills a placeholder by name: a header that named one had the mention
+    // filled and the real placeholder left standing in the prompt. The
+    // comment is stripped before filling since 2026-11-05, and this still
+    // holds the raw file to the rule. That is
     // exactly what happened when the substitution was first added. See
     // tests/judge-request.test.ts, which checks every version.
     expect(header).not.toContain("{{RUBRIC}}");

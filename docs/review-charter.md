@@ -289,7 +289,7 @@ because it reports success.
 - A substitution in `src/lib/anthropic.ts` filled the first occurrence of
   a placeholder with `String.prototype.replace`. `content/prompts/judge.v3.md`
   named `{{RUBRIC}}` twice, once in its own header comment and once as the
-  real placeholder, and the whole file is sent to the model, so pointing
+  real placeholder, and the whole file was then sent to the model, so pointing
   the judge at v3 would have asked it to score against a template, with
   nothing to say so. For a while this was an open hazard on `main` while
   the fix sat on a branch. It is closed: `fillPlaceholders` in

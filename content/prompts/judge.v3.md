@@ -42,15 +42,28 @@ Changed again on 2026-11-03, under the brief's rule for a judge blind spot
 ("fix it in v3 for all six schools symmetrically"): the engagement
 criterion now says to check that objection first, and that leaving it
 unmet holds engagement to 4 at most. The runs behind it are in
-docs/decisions.md, not here, because this comment is sent to the model.
+docs/decisions.md.
 
-Neither placeholder is written out in full anywhere in this comment, and
-that is not a style choice. The whole file is sent to the model, comment
-included, and src/lib/anthropic.ts fills a placeholder by name. A version
-that named one here and used it below would have the mention filled and the
-real placeholder left standing. `fillOnce` now refuses a prompt that names
-one twice, so this would fail loudly rather than quietly; the comment still
-avoids it so there is nothing to fail on.
+Changed on 2026-11-05, by Arthur's ruling on Checkpoint A ("strengthen the
+v3 engagement-cap instruction"): in the 2F runs the judge returned the
+school's best-known objection as unanswered and still scored engagement
+5. The criterion now ties the cap to the judge's own reply: decide the
+objection first, and if it is that one, engagement is 4 or lower, without
+changing the objection to escape the cap. The response format now puts
+`unanswered_objection` before the scores, because the judge writes its
+reply in order with no thinking step, and its note on the scores says the
+same. The cap is still 4.
+
+Also from 2026-11-05 (Arthur: "strip comments from judge.v3.md before it
+is sent (v3 only)"): src/lib/anthropic.ts removes HTML comments from this
+file before the request is built, so this comment no longer reaches the
+model. v1 and v2 are sent as they are.
+
+Neither placeholder is written out in full anywhere in this comment. The
+comment is removed before the placeholders are filled, so naming one here
+would no longer reach the model, but "every judge prompt file" in
+tests/judge-request.test.ts checks the raw file and would fail on it, and
+it would be a trap the day the stripping changed.
 
 v3 is not the production default. `PROMPT_VERSION` in
 src/lib/judge/schema.ts is still "v2", and switching it needs fidelity
@@ -79,7 +92,11 @@ Score in this order of priority:
    Check first the objection the school's criteria below name as the one
    it is best known for having to answer. An argument that leaves that
    objection unmet scores no more than 4 on engagement, however well it
-   answers any other.
+   answers any other. The cap binds your own reply. Decide
+   `unanswered_objection` first, as the response format below orders it,
+   and if it is that best-known objection, your `engagement` score must be
+   4 or lower. Do not change which objection you return to stay under the
+   cap.
 
 The school's specific fidelity criteria for this debate:
 
@@ -237,6 +254,11 @@ fence. Match this shape exactly:
 {
   "rejected": false,
   "rejection_reason": null,
+  "unanswered_objection": {
+    "school": "RIVAL_SCHOOL",
+    "claim": "",
+    "why_it_stands": ""
+  },
   "score": 0,
   "fidelity": 0,
   "rigor": 0,
@@ -244,12 +266,7 @@ fence. Match this shape exactly:
   "strongest_move": "",
   "weakest_move": "",
   "a_stronger_version_would": "",
-  "verdict_line": "",
-  "unanswered_objection": {
-    "school": "RIVAL_SCHOOL",
-    "claim": "",
-    "why_it_stands": ""
-  }
+  "verdict_line": ""
 }
 ```
 
@@ -259,7 +276,10 @@ the school the argument was assigned. Do not return the word
 `RIVAL_SCHOOL`.
 
 `score` is 0-100 (null if rejected). `fidelity`, `rigor`, and `engagement`
-are each 0-10. `strongest_move` and `weakest_move` should quote or closely
+are each 0-10, and `engagement` is at most 4 when `unanswered_objection`
+is the assigned school's best-known objection, as its criteria name it.
+`unanswered_objection` comes first so that it is decided before the
+scores. `strongest_move` and `weakest_move` should quote or closely
 paraphrase the argument. `verdict_line` is the one sentence a user might
 actually want to share, in at most 20 words.
 

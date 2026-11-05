@@ -1127,8 +1127,9 @@ judging is live.
 
 **The substitution had a bug, and it is worth recording because the shape
 of it will recur.** `String.prototype.replace` with a string pattern fills
-the first occurrence and says nothing about the rest. A prompt file is sent
-to the model whole, header comment included, and `judge.v3.md` named both
+the first occurrence and says nothing about the rest. A prompt file was
+then sent to the model whole, header comment included (v3's comment is
+stripped since 2026-11-05), and `judge.v3.md` named both
 of its placeholders in that comment before using them. So the first naive
 `.replace("{{RUBRIC}}", criteria)` filled the mention in the comment and
 left the real placeholder standing: the model would have been asked to
@@ -2010,7 +2011,9 @@ of 2026-10-26, still tells the model that "5 of 72 v3 samples returned a
 verdict_line over its cap". It predates #51 and is left for
 Checkpoint A, with the wider question of whether the comment should reach
 the model at all: removing it from what is sent means changing how
-`src/lib/anthropic.ts` reads the file.
+`src/lib/anthropic.ts` reads the file. **Ruled on 2026-11-05:** "Strip
+comments from judge.v3.md before it is sent (v3 only)". Since then v3's
+comment does not reach the model.
 
 **Run 2, `2026-11-03T21-35-58-347Z-v3.json`**, at `e0e75ae`, 78 calls,
 $1.1559:
@@ -2091,12 +2094,14 @@ therefore reaches the judge the day Ubuntu is published, without an edit.
 v1, v2 and the six request fixtures are unchanged.
 
 The five Arthur did not set are drafted from the school pages, and are his
-to confirm at Checkpoint A:
+to confirm at Checkpoint A. **Ruled on 2026-11-05:** Utilitarianism's
+voice became his wording (in the table below), and "Buddhist voices
+stay"; the other three stand as drafted.
 
 | School | Objection (in short) | Voiced by | Why, as the judge receives it | Once published | Source on the page |
 | --- | --- | --- | --- | --- | --- |
 | Stoicism | gives up on the world too easily | `utilitarianism` | the harm an unfair system does is a sum someone could reduce, and declining to try is itself a choice about that harm | `ubuntu`: a person is a person through other persons, so standing apart from an unfair system leaves the people inside it on their own | Stoicism's gets_wrong: "Utilitarians would say this gives up on the world too easily" |
-| Utilitarianism | no total makes the trade fair to the person who pays | `virtue-ethics` | justice gives each person what is owed to them, and a total owes nobody anything | `ubuntu`: each person's capacity for relationship is to be honoured, not netted against other people's gains | Utilitarianism's gets_wrong gives it to Rawls, who is no school here; Ubuntu's page: "Metz argues against building systems to maximise expected utility" |
+| Utilitarianism | no total makes the trade fair to the person who pays | `virtue-ethics` | what is done to one person must be justifiable to that person, not only to the total (Arthur's wording, 2026-11-05; first drafted as "justice gives each person what is owed to them, and a total owes nobody anything") | `ubuntu`: each person's capacity for relationship is to be honoured, not netted against other people's gains | Utilitarianism's gets_wrong gives it to Rawls, who is no school here; Ubuntu's page: "Metz argues against building systems to maximise expected utility" |
 | Virtue Ethics | no answer for scale | `utilitarianism` | a policy that touches thousands of people needs its outcomes compared, and asking what a good person would do does not compare them | none | Virtue Ethics' gets_wrong: "Utilitarians would say this has no answer for scale" |
 | Confucianism | too ready to authorise hierarchy | `utilitarianism` | the subordinate party's interests go uncounted when the stronger party sets the terms | `ubuntu`: solidarity requires the weaker party can be heard | Arthur's ruling, in his words |
 | Ubuntu | a community is not one voice | `stoicism` | a dissenter's own judgment is the one thing the community cannot decide for them | none | Ubuntu's gets_wrong: "Stoics would add that a self defined through others has handed away the one thing that was its own" |
