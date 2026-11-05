@@ -97,6 +97,38 @@ describe("with SIX_SCHOOLS=1", () => {
   });
 });
 
+describe("the loader rule itself", () => {
+  // Asserted directly, because the content alone cannot test it: no draft
+  // file today belongs to a published school, so a rule that showed one
+  // would pass every test that only reads the content.
+  it("shows a draft only when it is one of the three's, and only with the flag", async () => {
+    const draft = { status: "draft" };
+    const on = (await load("1")).drafts;
+    for (const id of NEW) expect(on.excluded(draft, {}, id), id).toBe(false);
+    for (const id of LIVE) expect(on.excluded(draft, {}, id), id).toBe(true);
+    expect(on.excluded(draft, {}, undefined)).toBe(true);
+    expect(on.excluded(draft, {}, "mohism")).toBe(true);
+    expect(on.SHOWN_DRAFT_SCHOOL_IDS).toEqual(NEW);
+
+    const off = (await load("0")).drafts;
+    for (const id of [...NEW, ...LIVE]) expect(off.excluded(draft, {}, id), id).toBe(true);
+    // includeDrafts is unchanged by any of it, and a published file loads.
+    expect(off.excluded(draft, { includeDrafts: true }, "stoicism")).toBe(false);
+    expect(on.excluded({}, {}, "stoicism")).toBe(false);
+  });
+});
+
+describe("the school pages", () => {
+  it("are generated for the schools each build shows", async () => {
+    await load("0");
+    const off = (await import("../src/app/s/[school]/page")).generateStaticParams();
+    expect(off.map((p) => p.school)).toEqual(LIVE);
+    await load("1");
+    const on = (await import("../src/app/s/[school]/page")).generateStaticParams();
+    expect(on.map((p) => p.school)).toEqual([...LIVE, ...NEW]);
+  });
+});
+
 describe("countWord", () => {
   it("writes the counts the pages use as words, and larger ones as digits", async () => {
     const { countWord } = await import("../src/lib/count-word");

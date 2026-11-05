@@ -3273,3 +3273,15 @@ scripts and build ids are set aside.
   URLs where the three do not exist; `/debate/rubric`, which is the
   judge's; the sharing image, whose "Three schools." is step 4's copy;
   and everything the judge reads.
+- **What else a flag-on build does differently**, from the loaders:
+  `/lessons/modules/[id]` prerenders the three's draft modules, one each;
+  `/quiz/result` sends all six schools' content to the page, though the
+  quiz still places a reader in one of three; and `getSchool` answers for
+  the three, so `/r/[id]`, `/c/[id]`, their images, the verdict page and
+  `/today` would render a row in one of them on a preview. On a flag-off
+  build it still throws, which is why step 3 comes before any v2 write.
+- **Today's lessons card** counts its modules too ("All six modules
+  read." on a flag-on build).
+- **The three's pages offer "Take the quiz" and "Argue a motion from
+  it"**, which cannot yet place a reader in them or judge them (steps 4
+  and 5). Previews only; for Checkpoint B.

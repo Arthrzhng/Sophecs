@@ -19,7 +19,8 @@ export interface ModuleContent {
   // Where each reading starts; absent means the module is one reading.
   // See module-readings.ts.
   readings?: ModuleReadingMark[];
-  /** See lib/drafts.ts. Draft files load only on /styleguide/drafts. */
+  /** See lib/drafts.ts. Draft files load on /styleguide/drafts, and on a
+      SIX_SCHOOLS build when they are the three's. */
   status?: "draft";
 }
 
