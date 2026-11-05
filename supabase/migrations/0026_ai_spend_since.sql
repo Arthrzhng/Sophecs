@@ -6,8 +6,10 @@
 -- the server, which has two faults: a select with no range returns at
 -- most one response's rows (Supabase's default is 1,000), so past that
 -- the total undercounts; and it read a query error as zero spend. This
--- function returns the sum itself; budget.ts calls it and treats an error
--- as over budget (docs/decisions.md, "The judge's caps and budget").
+-- function returns the sum itself; budget.ts calls it, and when the call
+-- fails the judge route sends nothing to the judge and answers that the
+-- spending limit could not be checked, and the counterpart route holds the
+-- reply unscreened (docs/decisions.md, "The judge's caps and budget").
 --
 -- The same rows as before: every ai_calls row since `since`, whatever its
 -- kind. Security invoker, so it reads ai_calls with the caller's rights;

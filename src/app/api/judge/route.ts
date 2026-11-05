@@ -86,7 +86,7 @@ export async function POST(request: Request) {
   }
 
   // Allowlisted reviewers (JUDGE_ALLOWLIST_USER_IDS) bypass the kill switch,
-  // the daily cap and, with it, the daily call ceiling only — budget,
+  // the daily cap and, with it, the daily call ceiling only; budget,
   // length, and the topic lock still apply. Checked here, right after the session check and before the
   // kill switch, per how this was asked for.
   const isAllowlisted = isJudgeAllowlisted(user.id);

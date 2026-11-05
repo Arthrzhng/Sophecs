@@ -2896,10 +2896,11 @@ list. A count that fails stops the submission (503),
 as the cap's does.
 
 **7. "Budget check totals spend in the database and fails closed."**
-Totalling in the database needs something there to do it, so the ruling
-carries the function that does: Supabase's PostgREST has aggregates
-switched off, and the alternative, reading every row, is what this
-replaces. `ai_spend_since(since)` (migration 0026) returns the sum of `cost_usd`
+Totalling in the database needs something there to do it: Supabase's
+PostgREST has aggregates switched off, and the alternative, reading every
+row, is what this replaces. The ruling did not say a migration was
+approved, as item 8's did, so Arthur was asked for a yes to 0026 itself
+before it is applied. `ai_spend_since(since)` (migration 0026) returns the sum of `cost_usd`
 over every `ai_calls` row since `since`, the same rows `budget.ts` read
 before. Only the server role may call it. `getMonthlySpend` calls it for
 the first of the month and returns null on an error, a missing value or a
@@ -2912,12 +2913,15 @@ read now holds the turn as pending, as the kill switch, the budget and a
 failed screening call already do. Nothing re-screens a pending turn
 today, so the exchange waits until someone acts; that predates this and
 is on Checkpoint B's list. Before, a month past 1,000 rows was
-undercounted (one response's rows) and an error read as zero spend. A ceiling that is not a positive
-number now blocks too; before, a non-numeric `AI_MONTHLY_BUDGET_USD` was
-read as no limit.
+undercounted (one response's rows) and an error read as zero spend. A ceiling that is unset or not a positive
+number now blocks too, as "unread", so the reader is told the limit could
+not be checked rather than that it was reached and resets next month,
+which a bad setting never does; before, a non-numeric
+`AI_MONTHLY_BUDGET_USD` was read as no limit.
 
 **Order.** 0026 is applied before this merges: without the function, every
-budget check is an error, so judging and counterpart turns pause. The
+budget check is an error, so nothing is sent to the judge and counterpart
+turns are held. The
 rollback is the reverse: revert `budget.ts`, then drop the function.
 
 **Tests.** `tests/budget.test.ts`; `tests/judge-retry.test.ts` (a judged

@@ -43,15 +43,20 @@ export async function getMonthlySpend(): Promise<number | null> {
 }
 
 /**
- * The month's budget: "ok", "over", or "unread" when the spend could not
- * be read. An unset ceiling, or one that is not a positive number, is
- * "over": it blocks rather than allowing unlimited spend.
+ * The month's budget: "ok", "over", or "unread" when it could not be
+ * checked. An unset ceiling, or one that is not a positive number, is
+ * "unread" too: it blocks rather than allowing unlimited spend, and it is
+ * not "over", because the reader would then be told the monthly limit was
+ * reached and resets next month, which a bad setting never does.
  * AI_MONTHLY_BUDGET_USD=50 is the current value; see docs/decisions.md for
  * the math behind that number.
  */
 export async function budgetState(): Promise<"ok" | "over" | "unread"> {
   const ceiling = Number(process.env.AI_MONTHLY_BUDGET_USD ?? "0");
-  if (!(ceiling > 0)) return "over";
+  if (!(ceiling > 0)) {
+    console.error("[budget] AI_MONTHLY_BUDGET_USD is unset or not a positive number");
+    return "unread";
+  }
   const spent = await getMonthlySpend();
   if (spent === null) return "unread";
   return spent >= ceiling ? "over" : "ok";

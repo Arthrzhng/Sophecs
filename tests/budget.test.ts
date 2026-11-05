@@ -82,8 +82,14 @@ describe("the monthly budget", () => {
     resetBudgetCacheForTests();
     reply = { data: 1, error: null };
     expect(await budgetState()).toBe("ok");
-    vi.stubEnv("AI_MONTHLY_BUDGET_USD", "");
-    expect(await budgetState()).toBe("over");
+  });
+
+  it("calls a missing or unusable ceiling unread, not over: it never resets next month", async () => {
+    reply = { data: 1, error: null };
+    for (const v of ["", "0", "-5", "abc"]) {
+      vi.stubEnv("AI_MONTHLY_BUDGET_USD", v);
+      expect(await budgetState(), v).toBe("unread");
+    }
   });
 
   it("caches a good total for a minute", async () => {

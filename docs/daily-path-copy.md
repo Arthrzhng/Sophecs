@@ -284,7 +284,7 @@ Argue screen panel heading: `What the judge looks for`. Link under it:
 
 ### The daily call ceiling
 
-Shown on the argue screen when a submission would take a reader past 20
+Shown on the argue screen when a submission could take a reader past 20
 judge calls in 24 hours, retries and failed submissions included (Arthur's
 ruling of 2026-11-05 on Checkpoint A, item 6). It can only be reached by
 submissions the judge struggled to mark: five arguments at three attempts

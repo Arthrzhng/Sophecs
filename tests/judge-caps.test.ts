@@ -61,4 +61,14 @@ describe("/api/judge's daily call ceiling", () => {
     expect(editor).toContain('title: "That is all the judging for today."');
     expect(read("src/lib/analytics/events.ts")).toContain('| "call_ceiling"');
   });
+
+  it("says the spending limit is monthly, since it is (src/lib/budget.ts)", () => {
+    const editor = read("src/components/debate/ArgumentEditor.tsx");
+    const start = editor.indexOf("  budget: {");
+    const budget = editor.slice(start, editor.indexOf("},", start));
+    expect(budget).toContain('title: "Judging is paused for the month."');
+    expect(budget).toContain("The judge has a monthly spending limit and it has been reached.");
+    expect(budget).toContain("once the limit resets at the start of next month");
+    expect(budget).not.toMatch(/today|daily/i);
+  });
 });
