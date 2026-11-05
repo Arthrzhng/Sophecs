@@ -434,9 +434,9 @@ of v2 (e.g. ten questions about how you decide what's right)."
 **Done now, on the live site.** "Ten questions on how AI should decide
 things" is not true of v1 either: three of v1's ten questions involve AI
 (an algorithm and a loan, an AI tool, a self-driving car) and seven do
-not, the same three in ten as v2. "Ten questions about how you decide
-what's right" is true of both, so the AI framing goes now rather than
-waiting for launch:
+not. v2 has one (8), and two more about apps (4 and 10). "Ten questions
+about how you decide what's right" is true of both, so the AI framing
+goes now rather than waiting for launch:
 
 | Where | Was | Now |
 | --- | --- | --- |
@@ -463,23 +463,34 @@ the launch merge itself):
   schools"); the quiz page's description (`src/app/quiz/page.tsx`,
   "Stoicism, Utilitarianism or Virtue Ethics"); the landing page
   (`src/app/page.tsx`, "the Stoics, the Utilitarians or the Virtue
-  Ethicists", and the heading "The three schools"); and the site's
-  sharing image (`src/app/opengraph-image.tsx`, "Ten scenarios. Three
-  schools.").
+  Ethicists", the heading "The three schools", and "Every answer moves
+  you across the triangle", which v2's two-axis map replaces); the
+  site's sharing image (`src/app/opengraph-image.tsx`, "Ten scenarios.
+  Three schools."); and, outside the site, `README.md` ("one of three
+  schools").
 
-**For Arthur, on the phase's decision list (e).** Share lines are shown
-beside a quiz result, so they describe the quiz, and some describe v1's
-questions in particular. None is changed here:
+**For Arthur, on the phase's decision list (e).** Share lines are the
+text a reader posts when they share a result (to X, WhatsApp, the
+clipboard), so they describe the quiz, and many describe it as about AI
+or name v1's questions. None is changed here beyond its opening words.
+By file, with each line's index in `share_lines`:
 
-- `content/schools/utilitarianism.md`, "My verdict on the self-driving
-  car problem...": v1's question 8, which v2 does not ask.
-- `content/schools/ubuntu.md`, "my answer to every AI question...", and
-  its first line's "the data was only mine" (proposed: "the choice was
-  only mine").
-- `content/schools/confucian.md`, "does this system let them pay it"
-  (proposed: "can they still pay it"), and its "Apparently I ... an AI"
-  line.
-- `content/schools/stoicism.md`, its "Apparently I ... an AI" line.
-- `content/schools/buddhist.md`, "are we still checking", which means
-  watching an AI after release.
+- `stoicism.md`: [0] "the only thing an AI can't take from me"; [2]
+  "including the algorithm's verdict".
+- `utilitarianism.md`: [1] "My verdict on the self-driving car problem",
+  v1's question 8, which v2 does not ask; [2], edited here, "count
+  everyone it touches", where "it" meant the AI the line no longer
+  names.
+- `virtue-ethics.md`: [1] "I judge an algorithm the same way I judge a
+  person".
+- `confucian.md`: [0] "I judge an AI by what it does to the relationships
+  around it"; [1], edited here, "does this system let them pay it"
+  (proposed: "can they still pay it"); [2] "a word that flatters a
+  system".
+- `buddhist.md`: [0] "what a system was built to do, not just what it
+  scored"; [1], edited here, "are we still checking", which means
+  watching an AI after release; [2] "keep looking after it ships".
+- `ubuntu.md`: [0] "my answer to every AI question"; [1], edited here,
+  "the data was only mine" (proposed: "the choice was only mine"); [2]
+  "judge a system by the relationships it leaves behind".
 - The time wording above, "a few minutes".

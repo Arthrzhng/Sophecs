@@ -2941,6 +2941,10 @@ Checkpoint A"), carried into `docs/quiz-v2.json` and `docs/quiz-v2.md`:
   options would make untrue) and three schools becoming six change at
   launch, and the share lines that describe v1's questions go to Arthur
   as content judgements (`docs/quiz-v2.md`, section 8).
+- PostHog's `share_clicked` records a share line by its index, and three
+  of those indices now hold new text (stoicism 1, utilitarianism 2,
+  virtue-ethics 0) from this PR's production deploy on 2026-11-05.
+  A comparison of share lines should split on that date.
 
 Quiz v2 ships at launch, after the sample teardown, and the fresh run
 follows it (`docs/sample-activity.md`, "At launch").

@@ -41,8 +41,9 @@ share_lines:
     Apparently I care what a system was built to do, not just what it
     scored. Sophecs says that is Buddhist ethics.
   - >-
-    Ten questions about how I decide what's right, and my answer kept being: who is this hurting,
-    and are we still checking. Sophecs called that Buddhist.
+    Ten questions about how I decide what's right, and my answer kept being:
+    who is this hurting, and are we still checking. Sophecs called that
+    Buddhist.
   - >-
     My whole ethics, per this quiz: treat the thing on the other end of
     the decision as you would be treated, and keep looking after it

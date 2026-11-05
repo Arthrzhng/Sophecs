@@ -35,8 +35,8 @@ share_lines:
     Apparently I think the only thing an AI can't take from me is my
     judgement. Sophecs says Stoic. Prove me wrong.
   - >-
-    Ten questions about how I decide what's right, and my answer kept coming back to: that part
-    was never up to me anyway. Sophecs called it Stoic.
+    Ten questions about how I decide what's right, and my answer kept coming
+    back to: that part was never up to me anyway. Sophecs called it Stoic.
   - >-
     My whole ethics, per this quiz: control what's mine, let the rest go,
     including the algorithm's verdict. Sophecs says that's Stoicism.

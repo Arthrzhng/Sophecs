@@ -41,8 +41,8 @@ share_lines:
     Apparently my answer to every AI question is: who else is in this,
     and who did nobody ask. Sophecs says that is Ubuntu.
   - >-
-    Ten questions about how I decide what's right, and I never once thought the data was only
-    mine. Sophecs called that Ubuntu.
+    Ten questions about how I decide what's right, and I never once thought
+    the data was only mine. Sophecs called that Ubuntu.
   - >-
     My whole ethics, per this quiz: a person is a person through other
     persons, so judge a system by the relationships it leaves behind.

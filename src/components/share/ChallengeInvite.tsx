@@ -48,9 +48,9 @@ export function ChallengeInvite({
 
       <p className="mt-5 max-w-[54ch] text-base leading-relaxed text-ink-mid">
         Sophecs asks ten questions about how you decide what&apos;s right and
-        places you in one of three schools of ethics, then asks you to argue for yours
-        against a motion. No account needed for the questions, and about eighty
-        seconds.
+        places you in one of three schools of ethics, then asks you to argue
+        for yours against a motion. No account needed for the questions, and
+        about eighty seconds.
       </p>
 
       <div className="mt-8">
