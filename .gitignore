@@ -1,5 +1,7 @@
 node_modules
 .next/
+# npm run check:bundle:six's flag-on build (next.config.ts, SOPHECS_DIST_DIR).
+.next-six/
 out/
 build/
 .env

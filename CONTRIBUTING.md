@@ -107,11 +107,20 @@ notably Satori rendering in the image routes, and the `server-only`
 boundary.
 
 `npm run check:bundle` runs last because it reads the build. It greps
-`.next/static` for any draft school's id or name and fails if one is
-there, which is the Phase 1B guarantee that no draft reaches a page or a
-bundle. It was added after a registry that enumerated every school put
-three unreleased school names into thirteen production client chunks; the
-other four gates were all green at the time.
+`.next/static` for any draft school's id, name, adherent noun or colour
+and fails if one is there, which is the Phase 1B guarantee that no draft
+reaches a page or a production bundle. It was added after a registry that
+enumerated every school put three unreleased school names into thirteen
+production client chunks; the other four gates were all green at the
+time.
+
+While Stage 5 builds the new schools behind `SIX_SCHOOLS`
+(`docs/stage5-plan.md`), a change to the registry, a school map,
+`next.config.ts`, `src/app/six-schools.css` or anything a client component
+imports also runs `npm run check:bundle:six`. It builds with the flag into
+`.next-six`, which leaves `.next` alone, and fails unless every one of
+those strings is in that build's client bundle: the flag-on build has to
+show what the flag-off build must not.
 
 ## Things that are frozen
 

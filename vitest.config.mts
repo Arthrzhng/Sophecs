@@ -34,6 +34,13 @@ export default defineConfig({
     alias: {
       "server-only": fileURLToPath(new URL("./scripts/server-only-shim.cjs", import.meta.url)),
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      // The root layout imports the new schools' tokens by a name only
+      // next.config.ts resolves (docs/stage5-plan.md). A test that imports
+      // the layout reads its metadata, never its styles, so the name points
+      // at the empty stylesheet whatever SIX_SCHOOLS says.
+      "@six-schools/tokens.css": fileURLToPath(
+        new URL("./src/app/six-schools.off.css", import.meta.url)
+      ),
     },
   },
 });

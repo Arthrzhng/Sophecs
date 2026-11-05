@@ -101,15 +101,26 @@ neither must a reviewer in a hurry.
 ## 3. No draft string reaches a client bundle
 
 Phase 1B's guarantee is that no draft school reaches any page or any
-bundle. `npm run check:bundle` greps `.next/static` for every draft
-school's id, name and adherent noun, taking the strings from the registry
-rather than from a list in the script.
+production bundle. `npm run check:bundle` greps `.next/static` for every
+draft school's id, name and adherent noun, taking the strings from the
+drafts module rather than from a list in the script, and for every colour
+in `src/app/six-schools.css`, the new schools' tokens.
 
-Today that is six strings, and the script prints the count: the draft
-entries in `src/lib/school-registry.drafts.ts` carry an id and a name but no
-adherent nouns, so the adherent needles `draftNeedles()` would add are
-empty until a draft entry gains them. Read the printed count rather than
-assuming the coverage.
+Today that is nineteen strings, and the script prints the count: three
+ids, three names, six adherent nouns (proposals, Checkpoint B (e)) and
+seven colours. It throws rather than run on fewer, if a draft loses its
+adherent nouns or the stylesheet its colours. Read the printed count
+rather than assuming the coverage.
+
+Stage 5 builds the new schools behind a build-time `SIX_SCHOOLS` flag
+(`docs/stage5-plan.md`). The check reads which kind of build it has from
+the build (`config.env` in `required-server-files.json`), and on a
+flag-on build fails unless every one of the strings is there, so a flag
+that did not take is not passed as a production build.
+`npm run check:bundle:six` makes that build, into `.next-six`, and checks
+it. A change to the registry, a school map, `next.config.ts`, the flag's
+stylesheet, or anything a client component imports runs it as well as
+the five gates, and its output is read like the first's.
 
 This rule exists because a single registry that enumerated all six schools
 put three unreleased school names into **thirteen** production client
@@ -134,7 +145,11 @@ most needs Arthur's yes.
 
 The check is the diff, not the gate: `git diff origin/main...HEAD --
 src/lib/school-registry.drafts.ts src/lib/school-registry.ts
-content/schools/` plus the `status:` front matter in the school files. Note the shape of that
+content/schools/` plus the `status:` front matter in the school files.
+In `school-registry.ts`, an entry in `SHOWN_DRAFTS` is shown on flag-on
+builds only, behind `process.env.SIX_SCHOOLS === "1"`; an entry added to
+`PUBLISHED_SCHOOLS`, or a `SHOWN_DRAFTS` entry moved out from behind that
+test, is publishing, and so is setting `SIX_SCHOOLS` for Production. Note the shape of that
 front-matter diff: only the drafts carry a `status:` field at all, so
 publishing shows up as a **removed** line rather than a changed value.
 

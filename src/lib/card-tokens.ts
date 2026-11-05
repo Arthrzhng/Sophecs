@@ -1,4 +1,4 @@
-import { publishedLookup, type SchoolId } from "./school-registry";
+import { shownLookup, type SchoolId } from "./school-registry";
 
 /**
  * Design tokens as literals, for every surface that renders through Satori.
@@ -45,6 +45,12 @@ import { publishedLookup, type SchoolId } from "./school-registry";
  *   --color-stoic                #3e5c4b
  *   --color-utilitarian          #8a6320
  *   --color-virtue               #7a3540
+ *
+ * And, on a SIX_SCHOOLS build only, the three unpublished schools' tokens
+ * from src/app/six-schools.css: each surface and marker below is behind
+ * the same build-time constant as the registry's entries for them
+ * (SHOWN_DRAFTS in school-registry.ts), so a build without the flag drops
+ * the literals and `npm run check:bundle` finds none of them.
  */
 
 /** --color-on-saturated. Near-white, very slightly warm. */
@@ -59,6 +65,12 @@ const CARD_SURFACE_BY_SCHOOL: Partial<Record<SchoolId, string>> = {
   stoicism: "#33503f",
   utilitarianism: "#7a5518",
   "virtue-ethics": "#6b2c37",
+  // --color-confucian-surface, --color-ubuntu-surface,
+  // --color-buddhist-surface: the card text's lowest opacity clears AA on
+  // each (colour-candidates.json, cardInkAtLowestOpacity).
+  ...(process.env.SIX_SCHOOLS === "1"
+    ? { confucian: "#562b05", ubuntu: "#1e3b4f", buddhist: "#724aab" }
+    : {}),
 };
 
 /**
@@ -69,7 +81,7 @@ const CARD_SURFACE_BY_SCHOOL: Partial<Record<SchoolId, string>> = {
  */
 export const CARD_SURFACE_NEUTRAL = "#1c1b18";
 
-export const CARD_SURFACE: Record<SchoolId, string> = publishedLookup(
+export const CARD_SURFACE: Record<SchoolId, string> = shownLookup(
   CARD_SURFACE_BY_SCHOOL,
   () => CARD_SURFACE_NEUTRAL
 );
@@ -238,12 +250,16 @@ const SCHOOL_MARKER_BY_SCHOOL: Partial<Record<SchoolId, string>> = {
   stoicism: "#3e5c4b",
   utilitarianism: "#8a6320",
   "virtue-ethics": "#7a3540",
+  // --color-confucian, --color-ubuntu, --color-buddhist.
+  ...(process.env.SIX_SCHOOLS === "1"
+    ? { confucian: "#562b05", ubuntu: "#1e3b4f", buddhist: "#7d56b8" }
+    : {}),
 };
 
 /** --color-ink-mid: the existing neutral for marks sitting on paper. */
 export const SCHOOL_MARKER_NEUTRAL = "#5e5950";
 
-export const SCHOOL_MARKER: Record<SchoolId, string> = publishedLookup(
+export const SCHOOL_MARKER: Record<SchoolId, string> = shownLookup(
   SCHOOL_MARKER_BY_SCHOOL,
   () => SCHOOL_MARKER_NEUTRAL
 );
