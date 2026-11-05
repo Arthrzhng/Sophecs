@@ -215,6 +215,11 @@ Candidates, figures and screenshots are in `docs/phase3-styleguide/`.
 
 The choice is Arthur's: one of these, or loosen a constraint.
 
+**Ruled on 2026-11-05 (item 16):** the all-violet set is rejected; the
+three come from different hue families, held to 8 rather than 12 from
+the live three under the simulations. The chosen set is in
+`docs/decisions.md`, "The new schools' colours".
+
 ## Sample activity (New)
 
 `docs/sample-activity.md` has the design. None of these is one of the

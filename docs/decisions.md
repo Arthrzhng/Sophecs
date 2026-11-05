@@ -2698,7 +2698,7 @@ lists 16 packages (1 critical, 6 high, 9 moderate):
 | Package | Severity | Reaches | Why it matters or not |
 | --- | --- | --- | --- |
 | `dompurify` | critical | `posthog-js` product tours | Above: not loaded. |
-| `zod` 3.x | high (memory exhaustion validating oversized constrained collections) | direct; it parses only the model's replies, the judge's (`src/lib/judge/schema.ts`) and the turn screener's (`src/lib/screen.ts`), never a reader's input | Those replies are capped by `max_tokens` (850 for the judge, 60 for the screener), which bounds the collections. Fixed from zod 4.6.6, a major upgrade that touches the frozen judge schema: worth doing deliberately. |
+| `zod` 3.x | high (memory exhaustion validating oversized constrained collections) | direct; it parses only the model's replies, the judge's (`src/lib/judge/schema.ts`) and the turn screener's (`src/lib/screen.ts`), never a reader's input | Those replies are capped by `max_tokens` (850 for the judge, 60 for the screener), which bounds the collections. Fixed from zod 4.6.6, a major upgrade that touches the frozen judge schema: worth doing deliberately. Done on 2026-11-05 ("zod 4", below). |
 | `follow-redirects` 1.16.0 | high (credential headers can follow cross-origin redirects) | `posthog-node` (`src/lib/analytics/server.ts`) through `axios` | Shipped in the server bundle, never called: posthog-node 4.18 uses `axios` only when there is no global `fetch`, and the Vercel project runs Node 24.x (its own setting; nothing in the repository overrides it, and the sample workflow's Node 22 is for CI), which has one. An `npm update` moves it to a fixed release within range. |
 | `next` and its pinned `postcss` 8.4.31 | moderate and high (source-map path traversal, `</style>` escaping) | build only | Reads CSS we write; nothing attacker-controlled. Next 15 pins its own copy; fixed in Next 16. The site's own `postcss` 8.5.26 is outside the range. |
 | `js-yaml` 3.15.1 | high (CPU with empty merge keys) | `gray-matter`, reading our own content frontmatter at build and request time | Only reads files in `content/`, which we write. |
@@ -2916,6 +2916,140 @@ five exactly. `scripts/test-migrations.sh` passes.
 
 **Snapshot:** `docs/seed-snapshots/2026-11-05-before-0024.json`, read from
 production at 06:00 UTC on 2026-11-05.
+
+### zod 4
+
+Arthur's ruling 13 of 2026-11-05: "zod 4: yes, own PR; the six judge
+request fixtures must stay byte-identical and v2 behaviour unchanged".
+zod goes from 3.25.76 to 4.6.7, which fixes zod 3's high advisory
+(memory exhaustion validating oversized constrained collections;
+"Dependency audit (2026-11-05)"). zod parses only model replies, the
+judge's (`src/lib/judge/schema.ts`) and the turn screener's
+(`src/lib/screen.ts`), and the golden fixtures in `tests/judge/`.
+
+**One behaviour change in zod, undone here.** From 4.5, zod counts a
+string's `.max()` in Unicode code points; zod 3 counted UTF-16 code
+units, which is what JavaScript's `length` is. Under zod 4 a
+`rejection_reason`, or a screener's `reason`, of 199 letters and an
+emoji (201 units, 200 code points) would pass where zod 3 refused it,
+and any emoji-heavy string could run to twice the cap. No zod 4 release
+that fixes the advisory counts the old way. So both 200-character caps
+are now a check on `length` (`maxUnits` in `schema.ts`, a `refine` in
+`screen.ts`), which counts as before. `.min(1)` is unaffected. This is
+an edit to the frozen `schema.ts`, made under ruling 13 to keep its
+condition; it changes nothing the judge is sent. The only other edit
+to a frozen file is a comment in `src/lib/anthropic.ts`, on the clause
+its error summary cuts.
+
+**The request fixtures.** zod plays no part in what the judge is sent,
+and `tests/judge-request.test.ts` holds all six byte for byte; nothing
+under `tests/judge-request/` or `content/` changed.
+
+**v2's behaviour.** One corpus of 91 model replies, 74 to the judge and
+17 to the screener, run through the real parse paths (`callJudgeModel`
+and `screenTurn`, the model replaced by a stub) under zod 3 and under
+zod 4: every reply is accepted or refused the same way, every accepted
+one parses to the same data, and every refusal names the same fields.
+The corpus covers both verdict shapes, including the nulls `judge.v2.md`
+asks for in the field the other shape uses; every field's type, bounds
+and word caps at and past the limit; the two 200-character caps with an
+astral character at and past the limit; a draft school and a wrong-case
+one as the objection's school; keys the schema does not name (dropped,
+as before); and replies that are not objects or not JSON.
+`tests/model-reply-parsing.test.ts` keeps it, with the outcomes taken
+from zod 3; without the caps' new check, its two astral cases fail on
+zod 4. The reviews' own 179 further cases, run the same way (numbers
+from `1e309` to `-0`, `__proto__` keys, lone and split surrogates,
+combining marks, unknown keys nested deep and many more), differed only
+in those two cases before the check and in none after it. One
+difference outside production: the golden runner's fixture schema now
+refuses an Infinity in a band, which zod 3 let through; no fixture has
+one.
+
+**What does change** is zod's wording of a refusal: "Too big: expected
+number to be <=100" where it said "Number must be less than or equal to
+100", and so on, and a refusal can name a field twice (an array in a
+string field is refused for its type and again for its length). The
+judge's summary is logged (`ai_calls`' `validation_error`, and the
+production log) and printed by the golden runner, and no code parses
+it. One
+change is a fix: zod 3 quoted the value it got for a wrong enum value,
+and the screener's summary kept it, so a screener reply naming no known
+result put the model's text in the message; that message is logged only
+outside production (`src/app/api/counterpart/turn/route.ts`), and zod 4
+names the options only. The test holds the zod refusals of both to
+that; the screener's not-JSON message still quotes the start of the
+reply, by design.
+
+### The new schools' colours
+
+Arthur's ruling 16 of 2026-11-05: "reject the all-violet set. The three
+new schools must come from different hue families; relax the colour-blind
+distance vs the live three from 12 to 8 (names always sit beside colours).
+Pick the best set under those rules, show it in the styleguide, and
+proceed; don't wait for me unless nothing passes."
+
+**Chosen:** Confucianism `#562b05`, a deep brown; Ubuntu `#1e3b4f`, a dark
+blue; Buddhist Ethics `#7d56b8`, a violet. On `/styleguide/phase3`, "The
+new schools' colours" (a preview deployment), with screenshots in
+`docs/phase3-styleguide/`.
+
+**The rules, as `scripts/colour-candidates.mjs` now applies them.** Every
+constraint from Checkpoint A stands (white hero text at AA, a dot that
+shows on paper, CIEDE2000 20 from the live schools and 15 from the judge's
+blue and the step-done orange in normal vision, each school's stereotyped
+hues excluded), with the distance to the live three under simulated
+deuteranopia and protanopia lowered from 12 to 8. "Different hue
+families" is eight named families of OKLCH hue (red, orange and brown,
+yellow and gold, green, cyan and teal, blue, violet, magenta; red takes
+two sectors, since it wraps through 0), one school to a family, and the three also at least 40 degrees of hue apart, so a
+violet at 300 and a magenta at 320 do not count as different.
+
+**Why this set.** The relaxed 8 hardly widens what passes: 1,059 colours
+against 1,056, nearly all blue to magenta, because the binding limit is
+the 20 from the live three in normal vision, which shuts out the greens,
+teals, reds, oranges and golds near Stoicism, Virtue Ethics and
+Utilitarianism. Among the sets that do pass, every school's possible
+colours were tried together. Each set is scored by its closest pair
+among all six schools, under the worst of the three views. The highest
+score is 12.8, a blue, violet and magenta set whose three new colours
+are only 12.8 apart and all within 90 degrees of hue of each other,
+which is the all-violet set again in other words; this set scores 12.7,
+a difference no one can see. So the score is rounded to the nearest
+whole unit, and ties go to the set whose new colours are furthest from
+each other: 21.5 for this one. Confucianism
+has to be the brown, since the Ubuntu and Buddhist exclusions both cover
+it; Ubuntu and Buddhist Ethics could swap blue and violet at the same
+score, and this way round was the search's first.
+
+**What to know.**
+- The weakest pair is Confucianism's brown and Virtue Ethics' oxblood
+  under simulated deuteranopia, 12.7, and the two are neighbours on the
+  map (50 and 110 degrees). Under protanopia the brown is nearest
+  Stoicism and Virtue Ethics (17.0 each); in normal vision it is nearest
+  Utilitarianism's ochre (20.1, the limit being 20). Names always sit
+  beside colours, which is what the relaxed rule rests on.
+- The brown's hue is 21 degrees from the ochre's. The ruling's families
+  constrain the three new schools among themselves, so this is no
+  breach, and a reading that applied families across all six would rule
+  the brown out and leave only blue, violet and magenta sets, the kind
+  rejected.
+- The relaxation to 8 turned out not to be needed: this set clears the
+  original 12 (its weakest pair is 12.7), and the search with 12 picks
+  the same set.
+- Ubuntu's blue is 15.1 from the judge's blue in normal vision, the
+  limit being 15.
+- With the other two held where they are, Confucianism and Ubuntu have
+  no alternative at least 10 from the chosen colour (they have near ones,
+  4.6 to 8.5 away); Buddhist Ethics has two, shown beside it.
+- Each card surface is the marker itself, except Buddhist Ethics',
+  darkened to `#724aab` so the card's text holds AA at its lowest
+  opacity. The live schools' surfaces are all darker than their markers;
+  whether the new ones should be too was an open question at Checkpoint
+  A that ruling 16 did not answer, and it goes on Checkpoint B's list.
+
+Nothing live changes: the colours reach the site with Phase 3, behind
+`SIX_SCHOOLS`.
 
 ### Quiz v2, as ruled
 
