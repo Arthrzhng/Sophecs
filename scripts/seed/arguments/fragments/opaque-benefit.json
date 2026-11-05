@@ -1,0 +1,121 @@
+{
+  "topic": "opaque-benefit",
+  "weak": [
+    "Honestly most people do not read explanations anyway. If a computer says no to your loan you just want it fixed, not a lecture about how the model works, so explaining it is mostly for show.",
+    "Doctors already use tools nobody fully understands, and nobody stops them. If it works it works. Asking for reasons every time would slow everything down and people would suffer while we argued about it.",
+    "People should always be told why. It is basic respect and it is unfair otherwise. If I was the person it decided about I would want to know, and I think most people would say the same.",
+    "AI is going to be everywhere soon whether we like it or not, so this debate is a bit late. The companies will deploy it either way, and it is better to have it helping than not.",
+    "The real problem is trust. If people cannot see why something happened they will not trust it, and without trust the whole system falls apart, so we need explanations before anything is deployed."
+  ],
+  "weak_direction": [
+    "for",
+    "for",
+    "against",
+    "for",
+    "against"
+  ],
+  "schools": {
+    "stoicism": {
+      "direction": "for",
+      "positions": [
+        "The system should be deployed if the people responsible judged the evidence soundly, because the soundness of a judgement does not depend on whether its reasons can be passed on.",
+        "I hold that deploying it is right, provided the deciders assented only to what the evidence warranted; the opacity of the mechanism is not theirs to answer for.",
+        "A Stoic can accept this motion. What matters is whether the people deploying it judged well, not whether the machine's workings can be laid out for everyone.",
+        "Deploy it. The mechanism is an external, and the only thing anyone here is answerable for is how carefully they judged the evidence that it reduces suffering."
+      ],
+      "reasons": [
+        "Epictetus divides the world into what is up to us and what is not. The inner workings of a trained model are not up to the people who deploy it. Their judgement about whether the evidence is good enough is up to them, and that is where their responsibility sits.",
+        "A judgement is sound when it assents only to what the impression warrants. If trials show the system reliably reduces suffering, assenting to that is sound, and it does not become unsound because the reasons inside the model cannot be written down for a patient.",
+        "The person decided about is not wronged by lacking an explanation, because their good never depended on it. What they owe themselves is a right response to what happens to them, and that response is fully in their power whether or not anyone explains the machine.",
+        "Demanding an explanation before acting treats a feeling of understanding as if it were part of virtue. It is not. The deployers act well if they judged the evidence carefully and would withdraw the system the moment that evidence changed."
+      ],
+      "examples": [
+        "Think of a triage tool that flags sepsis hours earlier than nurses do. The ward cannot say why it fires, but the trial data were checked carefully.",
+        "A clinic adopts a screening model after reading three independent audits. The model cannot explain a single case, but the clinic's judgement can be explained in full.",
+        "A sailor trusts a compass without knowing why it points north. What he is answerable for is whether he checked it against the stars."
+      ],
+      "objections": [
+        {
+          "rival": "virtue-ethics",
+          "claim": "justice is owed to the person a decision lands on, and a practice of withholding reasons trains deployers into people who stop thinking they owe anyone an answer.",
+          "answer": "But the answer the deployers owe is an account of their own judgement, which they can always give: what evidence they saw and why they assented to it. That is owed and can be paid. An account of the weights inside the model was never theirs to give.",
+          "why": "The argument treats explanation as a convenience, and never says what the deployers owe the person who is refused."
+        },
+        {
+          "rival": "utilitarianism",
+          "claim": "the Stoic has the right verdict for the wrong reason, since what justifies deployment is the suffering prevented and not the inner state of the people who chose it.",
+          "answer": "Suffering prevented is a fine outcome, but outcomes are not up to anyone. A deployer who got lucky with poor evidence has not acted well, and one who judged soundly has, whatever the counts turn out to be.",
+          "why": "It never says why a lucky deployment on thin evidence would be worse than a careful one with the same outcome."
+        }
+      ]
+    },
+    "utilitarianism": {
+      "direction": "for",
+      "positions": [
+        "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm.",
+        "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance.",
+        "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better.",
+        "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did."
+      ],
+      "reasons": [
+        "Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.",
+        "Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.",
+        "Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.",
+        "Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy."
+      ],
+      "examples": [
+        "If a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses.",
+        "A fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted.",
+        "Nobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough."
+      ],
+      "objections": [
+        {
+          "rival": "virtue-ethics",
+          "claim": "an opaque optimiser is cleverness without practical wisdom, and deploying it hands the judgement about the target to something that cannot judge targets.",
+          "answer": "The target here is not hidden: it is fewer people suffering, and that is checked from outside by counting outcomes. Monitoring the results is how we notice if the mark drifts, and that does not need the system to explain itself.",
+          "why": "The argument assumes counting outcomes keeps the goal in view, but never says who notices when the system starts hitting the wrong target."
+        },
+        {
+          "rival": "stoicism",
+          "claim": "what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action.",
+          "answer": "Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides.",
+          "why": "It never explains why the deployers' judgement matters at all, beyond the outcomes it happens to produce."
+        }
+      ]
+    },
+    "virtue-ethics": {
+      "direction": "against",
+      "positions": [
+        "The system should not be deployed on these terms, because justice to the person a decision lands on includes owing them an answer.",
+        "I oppose the motion. A practice of deciding about people without being able to tell them why forms the wrong character in the people who run it.",
+        "Do not deploy it. Reducing suffering is good, but a just person does not make decisions about others that they cannot account for to those others.",
+        "The motion asks us to accept being unanswerable to the people we act on, and a person of practical wisdom would refuse that even for a good outcome."
+      ],
+      "reasons": [
+        "Aristotle distinguishes practical wisdom from mere cleverness. Cleverness hits whatever target is set; practical wisdom also sees what the target should be and can say why. An opaque system is cleverness alone, and deploying it hands over the part of the decision that needed wisdom.",
+        "Justice is a virtue of relationships: it concerns what we owe to particular people. Someone refused treatment by a system nobody can explain has been treated as a case in a distribution rather than as a person to whom an account is owed.",
+        "Character is formed by what we repeatedly do. An institution that grows used to deciding about people without explaining itself trains its staff to stop asking whether they could justify a decision, and that habit will outlast this particular system.",
+        "A practically wise doctor weighs the numbers, but also notices when a case is unusual and the rule does not fit. A system nobody can question removes the moment where that noticing happens, and so removes the very perception good judgement depends on."
+      ],
+      "examples": [
+        "Imagine telling a patient that a model denied her surgery and nobody, not even the consultant, can say what it saw in her case.",
+        "A nurse who stops asking why the system flagged a patient has lost something that made her good at her job, even if the flags are usually right.",
+        "A judge who sentenced by an oracle's number could not tell the defendant why, and we would rightly say the court had stopped doing justice."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "insisting on explanations means accepting more suffering for the sake of the deployers' moral self-image, which is a vain thing to trade lives for.",
+          "answer": "The point is not self-image. The habit of accounting for decisions is what lets an institution notice when it is harming people, so giving it up is not a trade between virtue and outcomes but a gamble with the outcomes too.",
+          "why": "It never faces the patients the less accurate system would miss, or says what is owed to them."
+        },
+        {
+          "rival": "stoicism",
+          "claim": "the deployers are responsible only for judging the evidence well, and the mechanism's opacity is an external they could not have controlled.",
+          "answer": "But choosing to deploy something unexplainable is not an external; it is a choice, and it is exactly the kind of choice that shapes who the deployers become. The Stoic moves the decision out of view and then says nobody is answerable for it.",
+          "why": "It does not say why judging the evidence soundly is not already enough to discharge the deployers' responsibility."
+        }
+      ]
+    }
+  }
+}

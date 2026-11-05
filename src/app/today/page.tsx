@@ -15,6 +15,7 @@ import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
 import { isoWeekRange, rankSchools, type JudgedArgument } from "@/lib/school-table";
 import { todayUTC } from "@/lib/streak";
+import { readAll } from "@/lib/read-all";
 import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "@/lib/types";
 
 export const metadata = {
@@ -89,23 +90,28 @@ export default async function TodayPage() {
       .eq("active", true),
     // The same rows the school table counts: originals, not rejected,
     // judged, inside this ISO week. Kept in step by reading the same
-    // columns through the same rankSchools, not by a second tally.
-    admin
-      .from("debates")
-      .select("school, verdict")
-      .eq("kind", "original")
-      .eq("rejected", false)
-      .not("verdict", "is", null)
-      .gte("created_at", start.toISOString())
-      .lt("created_at", end.toISOString()),
+    // columns through the same rankSchools, not by a second tally, and
+    // through readAll, as the table does, so a week of more than 1,000
+    // arguments is counted whole (src/lib/read-all.ts).
+    readAll<{ school: SchoolId; fidelity: unknown; is_sample: boolean }>((from, to) =>
+      admin
+        .from("debates")
+        .select("school, fidelity:verdict->fidelity, is_sample", { count: "exact" })
+        .eq("kind", "original")
+        .eq("rejected", false)
+        .not("verdict", "is", null)
+        .gte("created_at", start.toISOString())
+        .lt("created_at", end.toISOString())
+        .order("id")
+        .range(from, to)
+    ),
   ]);
   const topics = topicRows.data;
+  if (judgedRows.error) console.error("[today] week of debates:", judgedRows.error);
 
-  const judged: JudgedArgument[] = (
-    (judgedRows.data ?? []) as { school: SchoolId; verdict: { fidelity?: number | null } | null }[]
-  ).map((row) => ({
+  const judged: JudgedArgument[] = (judgedRows.rows ?? []).map((row) => ({
     school: row.school,
-    fidelity: typeof row.verdict?.fidelity === "number" ? row.verdict.fidelity : null,
+    fidelity: typeof row.fidelity === "number" ? row.fidelity : null,
   }));
 
   // Joined and left are the table's own columns and play no part in the
@@ -127,6 +133,9 @@ export default async function TodayPage() {
         oneLine={getSchool(school).one_line}
         elo={Number(profile?.elo ?? 1200)}
         rank={ranks.find((r) => r.school === school)?.rank ?? null}
+        // The same disclosure as the table's, when this week's rank counts
+        // a sample account's argument (migration 0023).
+        includesSamples={(judgedRows.rows ?? []).some((row) => row.is_sample)}
       />
       <LessonsCard modules={modules} />
     </>

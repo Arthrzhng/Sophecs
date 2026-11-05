@@ -30,6 +30,8 @@ export interface CardLayoutProps {
   // name from content. Unset, the card is what it always was.
   surface?: string;
   schoolName?: string;
+  /** A sample account's result (docs/sample-activity.md): the card says so. */
+  sample?: boolean;
 }
 
 // Pure — no hooks, inline styles only, every size derived from `width` — so
@@ -65,6 +67,7 @@ export function CardLayout({
   unit = "px",
   surface,
   schoolName,
+  sample,
 }: CardLayoutProps) {
   // Sizes are authored against `width` and converted once, here. Scaling the
   // whole tree with a transform is not an option in pure CSS: scale() needs a
@@ -110,6 +113,31 @@ export function CardLayout({
           flexGrow: 1,
         }}
       >
+        {/* A sample account's card says so before anything else, in the
+            card's own ink and rule, so a shared image cannot pass for a
+            reader's result. */}
+        {sample && (
+          <div
+            style={{
+              display: "flex",
+              alignSelf: "flex-start",
+              fontFamily: fonts.sans,
+              fontSize: u(width * s.source),
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              paddingTop: u(width * 0.004),
+              paddingBottom: u(width * 0.004),
+              paddingLeft: u(width * 0.012),
+              paddingRight: u(width * 0.012),
+              borderWidth: u(2),
+              borderStyle: "solid",
+              borderColor: CARD_RULE,
+              marginBottom: u(width * s.gapSource * 2),
+            }}
+          >
+            Sample
+          </div>
+        )}
         {/* The quotation. Spectral italic, set to a measure rather than to
             the card edge, with typographic quotes. Satori has no ::before,
             so the marks are in the string. */}

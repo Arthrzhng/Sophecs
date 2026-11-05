@@ -131,9 +131,14 @@ const READERS = [
 describe("motion_text comes from debates_public", () => {
   it.each(READERS)("%s selects motion_text from the view", (file) => {
     const source = fs.readFileSync(path.join(process.cwd(), file), "utf-8").replace(/\s+/g, " ");
-    const viewRead = /\.from\("debates_public"\) ?\.select\( ?"([^"]*)" ?\)/.exec(source);
-    expect(viewRead, `${file} should read debates_public`).not.toBeNull();
-    expect(viewRead?.[1].split(",").map((c) => c.trim())).toContain("motion_text");
+    // Every read of the view that loads a debate's content takes its
+    // wording from there too. A read of the sample marker alone (the
+    // verdict page's title) loads no content and is left out.
+    const contentReads = [...source.matchAll(/\.from\("debates_public"\) ?\.select\( ?"([^"]*)" ?\)/g)]
+      .map((m) => m[1].split(",").map((c) => c.trim()))
+      .filter((cols) => !(cols.length === 1 && cols[0] === "is_sample"));
+    expect(contentReads.length, `${file} should read debates_public`).toBeGreaterThan(0);
+    for (const cols of contentReads) expect(cols).toContain("motion_text");
   });
 
   it.each(READERS)("%s no longer reads motion_text from debates", (file) => {

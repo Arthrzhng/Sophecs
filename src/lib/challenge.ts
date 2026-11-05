@@ -159,16 +159,22 @@ export async function recordChallengeDebate(
   const [{ data: challengerDebate }, { data: challengeeDebate }] = await Promise.all([
     admin
       .from("debates")
-      .select("id, user_id, school, score, elo_before")
+      .select("id, user_id, school, score, elo_before, is_sample")
       .eq("id", challenge.challenger_debate_id)
       .maybeSingle(),
     admin
       .from("debates")
-      .select("id, user_id, school, score, elo_before")
+      .select("id, user_id, school, score, elo_before, is_sample")
       .eq("id", challenge.challengee_debate_id)
       .maybeSingle(),
   ]);
   if (!challengerDebate || !challengeeDebate) return { completed: false };
+
+  // A sample account's debate never moves a genuine rating, and a sample
+  // account does not take part in competition (docs/sample-activity.md).
+  // Each side keeps the rating its own judged debate gave it, and the
+  // challenge is left as it is rather than completed against a sample.
+  if (challengerDebate.is_sample || challengeeDebate.is_sample) return { completed: false };
 
   const now = new Date().toISOString();
   const challengerResult = pairwiseElo(

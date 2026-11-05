@@ -1,0 +1,121 @@
+{
+  "topic": "borrowed-judgement",
+  "weak": [
+    "I already let my phone choose my music and my routes, and my life is fine. People worried about calculators too, and now nobody cares, so this is the same kind of panic.",
+    "If the AI makes better choices then I would be stupid not to use it. Why would I want to make worse decisions just to prove I made them myself? That is just pride.",
+    "Using AI for everything makes people lazy. Soon nobody will be able to think for themselves, and then society will fall apart because nobody knows how to do anything without a machine.",
+    "It depends on the person. Some people are good at making choices and some are not, so some people should use the assistant and others should not. There is no single answer for everyone.",
+    "Big tech companies want us to depend on their assistants so they can make money from our data. That is the real cost, and it has nothing to do with philosophy, it is about privacy."
+  ],
+  "weak_direction": [
+    "against",
+    "against",
+    "for",
+    "neutral",
+    "for"
+  ],
+  "schools": {
+    "stoicism": {
+      "direction": "for",
+      "positions": [
+        "The only thing that is truly yours is the faculty that judges impressions, and handing that over is the one loss no better outcome can repay.",
+        "I support the motion. What an assistant takes over is opinion, impulse and desire, which are exactly the things Epictetus says are up to us.",
+        "Handing daily choices to an assistant costs something that matters, because the choices are the exercise of the one faculty a person actually owns.",
+        "The motion is right. Better meals and better replies are externals; the judging that produced them was yours, and giving it away is giving away yourself."
+      ],
+      "reasons": [
+        "The Enchiridion opens by sorting what is up to us from what is not: opinion, impulse, desire and aversion on one side, body, property and reputation on the other. An assistant that chooses your meals and replies takes over items on the first list, the only list that was ever yours.",
+        "Better outcomes are not the point. Health, money and a smoother day are indifferents on the Stoic view; they can be preferred but they are not good. The good is the right use of impressions, and a person who no longer uses their impressions has given up the good for the preferred.",
+        "One might say that trusting the assistant is itself a judgement. But it is a single judgement used to retire all the rest. Epictetus would say the faculty grows strong only by being exercised daily, and a faculty used once a year is one that has been allowed to waste.",
+        "Freedom, for Epictetus, is being unhindered in what is up to you. A person whose every choice is made by a service is free only as long as the service runs and agrees with them, which is to say they have made their freedom depend on something external."
+      ],
+      "examples": [
+        "Someone whose assistant picks the reply to a grieving friend has sent a better message and has not been a friend.",
+        "A traveller who lets the app choose every turn arrives sooner and has never once looked at the road.",
+        "If an assistant decides which job you apply for, the job may be better, but the choice of how to spend your life was not yours."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "nothing that matters is lost unless your life goes worse, and if the choices are better and you are happier then the worry about whose judgement it was is sentiment.",
+          "answer": "This assumes happiness is the good, and that is the very point in dispute. A person can be comfortable and well fed while their ruling faculty withers, and the Stoic says that person has lost the only thing that was theirs.",
+          "why": "The argument never says what is lost if the person is happier by every measure they themselves care about."
+        },
+        {
+          "rival": "virtue-ethics",
+          "claim": "the loss is better described as a failure to develop practical wisdom over a life, not as the surrender of a faculty in any single act.",
+          "answer": "The two accounts agree about the danger, but the Stoic one says why each handover matters now: every choice given away is an act of the ruling faculty not performed, whether or not a whole life ends up shaped by it.",
+          "why": "It does not say why a single delegated choice costs anything, if the faculty can still be exercised elsewhere."
+        }
+      ]
+    },
+    "utilitarianism": {
+      "direction": "against",
+      "positions": [
+        "Nothing that matters is lost unless your life goes worse, and if the choices are better and you are happier then the worry about whose judgement it was is sentiment.",
+        "I reject the motion. If an assistant's choices make people's lives go better, handing them over costs nothing that matters morally.",
+        "A utilitarian should oppose this motion. Better choices mean more welfare, and the satisfaction of having chosen yourself is only one preference to weigh among many.",
+        "The motion overstates the cost. Where an assistant chooses better, people are better off, and being better off is what matters."
+      ],
+      "reasons": [
+        "What makes a life go well is the happiness and satisfaction in it. If an assistant chooses meals that keep you healthier and replies that keep friendships warmer, your life is going better by the measure that counts, and the source of the choice adds nothing to the total.",
+        "Some people do enjoy deciding, and that enjoyment counts. But many find daily choices draining, and for them delegation removes a burden. A blanket claim that delegation always costs something ignores the people for whom choosing was the cost.",
+        "Mill valued individuality, but he valued it because it tends to make people happier and societies more inventive. Where delegation leaves people with more time and energy for what they care about, it serves the same ends individuality was meant to serve.",
+        "If delegation did weaken people's ability to choose in ways that later made them worse off, that would be a real cost, and it should be measured. But that is a claim about consequences, to be tested, not a cost that exists however well things go."
+      ],
+      "examples": [
+        "A carer who lets an assistant handle shopping and bills has an extra hour each day with the person she looks after.",
+        "Someone who uses an assistant to plan healthier meals and loses the weight their doctor worried about is plainly better off.",
+        "A person with severe anxiety for whom each small choice is distressing gains a calmer life from delegation, and nothing in that is a loss."
+      ],
+      "objections": [
+        {
+          "rival": "stoicism",
+          "claim": "the faculty that judges impressions is the only thing truly yours, and no better outcome can repay handing it over.",
+          "answer": "That treats one faculty as valuable in itself, whatever difference it makes to anyone. If exercising it made people no happier and no better off, it would be hard to say what its value consisted in.",
+          "why": "It never engages with the claim that some goods are not measured by how well a life goes."
+        },
+        {
+          "rival": "virtue-ethics",
+          "claim": "practical wisdom exists only in the person who exercises it, so a life of delegated choices is one in which you never become anyone in particular.",
+          "answer": "If people became less capable and that left them worse off, the utilitarian would count it. But that is an empirical risk to be watched, and many people delegate small choices precisely so they can put their judgement into larger ones.",
+          "why": "The argument does not say what is lost by never developing practical wisdom, if the person never feels its absence."
+        }
+      ]
+    },
+    "virtue-ethics": {
+      "direction": "for",
+      "positions": [
+        "Practical wisdom exists only in the person who exercises it, so a life of delegated choices is one in which you never become anyone in particular.",
+        "I support the motion. Even when an assistant chooses better, delegating daily choices denies a person the practice through which character is formed.",
+        "The motion is right, because the good life is not a sequence of good outcomes but the activity of a person exercising practical wisdom.",
+        "Handing over daily choices costs something that matters: the slow formation of the judgement that makes a person good at living."
+      ],
+      "reasons": [
+        "Aristotle says we become builders by building and just by doing just acts. Practical wisdom is formed the same way, by deliberating about real choices and living with the results. An assistant that makes the choices for you removes the practice through which the virtue would have grown.",
+        "Eudaimonia, the good life, is an activity of the soul in accordance with virtue. It is not a state of having things go well but of doing the living well yourself. A life of excellent delegated choices may contain good outcomes and still not be the activity Aristotle meant.",
+        "Practical wisdom is perception of the particular case: this friend, this evening, this decision. An assistant decides from general patterns. A person who stops attending to particulars loses the sensitivity that would have let them see what a situation needed.",
+        "Character is visible in choices. The meals someone cooks, the replies they send, the work they seek are where their character shows. A person whose choices are all made by a service has no character on display, because there is nothing of theirs left to display it."
+      ],
+      "examples": [
+        "A teenager whose assistant chooses every reply never learns how to apologise well, because she never once had to find the words.",
+        "A cook who only follows the app's plan never develops the taste that would tell her when the plan is wrong.",
+        "Someone who lets the assistant choose their gifts may please everyone and never come to know the people they love."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "if the choices are better and the person is happier then the worry about who made them is sentiment, and nothing that matters has been lost.",
+          "answer": "Happiness in Aristotle's sense is the activity of living well, not the feeling of satisfaction. A person who is comfortable but has never deliberated is missing the activity itself, and that is not sentiment but the substance of the good life.",
+          "why": "It never says why a person who is content with delegated choices is worse off by anything they would recognise."
+        },
+        {
+          "rival": "stoicism",
+          "claim": "the cost is simpler than lost development: any choice handed over is an act of the ruling faculty given away, whatever happens to one's character later.",
+          "answer": "Single acts matter, but the Stoic picture misses why. A choice matters because it is part of a life through which a character is formed, and that is why delegation over years is worse than any single handover.",
+          "why": "The argument does not explain why a single delegated choice is not already a loss in its own right."
+        }
+      ]
+    }
+  }
+}

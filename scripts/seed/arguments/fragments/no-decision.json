@@ -1,0 +1,121 @@
+{
+  "topic": "no-decision",
+  "weak": [
+    "A language model is just predicting the next word. It is maths, not a mind, so of course it does not decide anything, and anyone who says it does has been fooled by the marketing.",
+    "We say a thermostat decides to turn the heating on and nobody minds. Words like decide are just shortcuts, so it is not a mistake, it is how language works, and the debate is about nothing.",
+    "If a model can choose between options and give an answer, then it decides. I do not see what else deciding could mean. Humans are also just neurons firing, so the difference is not that big.",
+    "Whether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything.",
+    "This matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not."
+  ],
+  "weak_direction": [
+    "for",
+    "against",
+    "against",
+    "neutral",
+    "neutral"
+  ],
+  "schools": {
+    "stoicism": {
+      "direction": "for",
+      "positions": [
+        "The motion is right: a decision is assent given to an impression by a ruling faculty, and a language model has neither, so the word is misapplied.",
+        "I agree that it is a mistake to say a model decides. Deciding is an act of a mind's governing part, and a model's output is not an act of anything's governing part.",
+        "A Stoic must accept the motion. However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none.",
+        "It is a mistake to say a model decides, because deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents."
+      ],
+      "reasons": [
+        "Chrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.",
+        "The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.",
+        "Determinism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it.",
+        "Calling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing."
+      ],
+      "examples": [
+        "When a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope.",
+        "A weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point.",
+        "A person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "whether there is a decision inside the box changes nothing about what the output does to people, so the mistake does not matter.",
+          "answer": "It matters to us, because we are the ones assenting to the model's outputs. If we call them decisions we stop noticing that the only decision in the chain was ours, made when we chose to act on what the model produced.",
+          "why": "The argument never says what practical difference the correct description makes to anyone affected by the output."
+        },
+        {
+          "rival": "virtue-ethics",
+          "claim": "the Stoic account is too thin: choice is deliberate desire formed by character, and assent alone does not capture what is missing in the model.",
+          "answer": "Assent is the core of deliberate desire, not a rival to it. Whatever else a choice involves, it involves a mind accepting how things seem and acting on it, and the model lacks that before the question of character even arises.",
+          "why": "It does not explain why character and deliberation add nothing to assent when we ask what deciding requires."
+        }
+      ]
+    },
+    "utilitarianism": {
+      "direction": "against",
+      "positions": [
+        "Whether there is a decision inside the box changes nothing about what the output does to people, so the motion's mistake, if it is one, does not matter.",
+        "I reject the motion's importance. Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them.",
+        "A utilitarian should not care much about this motion. If the word decide helps people predict and control what the system does, using it is no mistake.",
+        "It is not a mistake worth correcting. A word is good if it helps people act well, and talking about model decisions often does exactly that."
+      ],
+      "reasons": [
+        "What matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was.",
+        "Words are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry.",
+        "The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.",
+        "Mill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it."
+      ],
+      "examples": [
+        "A tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did.",
+        "Pilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness.",
+        "If a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses."
+      ],
+      "objections": [
+        {
+          "rival": "virtue-ethics",
+          "claim": "calling the output a decision quietly moves responsibility off the people who trained and deployed the system, and that shift has consequences of its own.",
+          "answer": "If the word really shifts responsibility, that is a consequence, and a utilitarian takes it seriously. The fix is to assign accountability explicitly in law and practice, which works far better than policing a verb.",
+          "why": "It never answers the claim that the word itself changes who gets held responsible, which is a consequence the argument says it cares about."
+        },
+        {
+          "rival": "stoicism",
+          "claim": "deciding is assent by a ruling faculty, so to call the output a decision is simply false, and false beliefs about what happens to us are the root of misjudgement.",
+          "answer": "False beliefs matter when they lead to worse outcomes. Where the word helps people predict and correct the system, its looseness costs nothing, and where it misleads, the remedy is better oversight, not better metaphysics.",
+          "why": "The argument does not say whether it matters that the description is false when the falseness has no visible cost."
+        }
+      ]
+    },
+    "virtue-ethics": {
+      "direction": "for",
+      "positions": [
+        "The motion is right: choice is deliberate desire formed by character, and a system with no character cannot choose.",
+        "I agree with the motion. Calling a model's output a decision quietly moves responsibility off the people who trained and deployed it.",
+        "It is a mistake to say a language model decides, because deciding belongs to agents with settled characters who deliberate about what to do.",
+        "A model does not decide. Aristotle's choice, prohairesis, needs a character that wants ends and deliberates about means, and the model has neither."
+      ],
+      "reasons": [
+        "Aristotle defines choice as deliberate desire: we wish for an end, deliberate about the means, and choose the act. A model has no ends of its own and does not deliberate; it continues text. Calling that a choice borrows the dignity of an agent without any of the agency.",
+        "The word matters because responsibility follows it. If the model decided, the engineers merely built a thing that decides, and the blame drifts away from the people whose character and choices actually shaped what it does.",
+        "Choices express character; they reveal what kind of person someone is. Nothing about a model's output reveals a character, because it has none to reveal. The people who trained it do have characters, and their choices are visible in its behaviour.",
+        "A practically wise person sees the particular case and deliberates about it. A model produces what its training makes probable. When we say it decided, we invite people to stop looking for the human deliberation that really happened, or failed to happen."
+      ],
+      "examples": [
+        "When a company says the algorithm decided to cut someone's benefits, the sentence has no human subject, and that is precisely its function.",
+        "A child who shares because she has been praised for sharing has not yet chosen generosity. A model that outputs kindness is further from choosing still.",
+        "We would not say a vending machine decided to keep your coin, and we would be right to look for whoever set it up badly."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "the vocabulary changes nothing about outcomes, so policing the word decide is a distraction from reducing the harm these systems do.",
+          "answer": "Vocabulary shapes who is held to account, and accountability shapes outcomes. But beyond that, how we describe agency shapes how we understand ourselves, and a culture that lets machines decide is training people out of the habit of deciding.",
+          "why": "It never says what difference it makes to the person harmed whether the output is called a decision."
+        },
+        {
+          "rival": "stoicism",
+          "claim": "character is beside the point: the model fails to decide because it has no faculty of assent, and that is true before any question of character arises.",
+          "answer": "Assent without character would be a strange kind of choosing, an isolated yes with no one behind it. The Stoic point is part of the truth, but choice is the work of a whole character, and that is what is plainly missing here.",
+          "why": "The argument does not say why the absence of assent alone would not settle the question."
+        }
+      ]
+    }
+  }
+}

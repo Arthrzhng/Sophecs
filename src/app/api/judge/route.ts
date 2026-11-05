@@ -448,12 +448,16 @@ export async function POST(request: Request) {
   // one indexed query, exact, no drift. Revisions are excluded from both the
   // write trigger and the window: a revision's elo_before is a copy of its
   // parent's elo_after, so counting it would weight one participant twice.
+  // Sample accounts' debates (migration 0023) are excluded too: they are
+  // generated, and a genuine reader's rating is never measured against
+  // them. docs/sample-activity.md, "Ratings".
   if (!isRevision) {
     const { data: recentElos } = await admin
       .from("debates")
       .select("elo_before")
       .eq("topic_slug", topic.slug)
       .eq("kind", "original")
+      .eq("is_sample", false)
       .not("elo_before", "is", null)
       .order("created_at", { ascending: false })
       .limit(PAR_ELO_WINDOW);

@@ -13,6 +13,8 @@ import { track } from "@/lib/analytics/client";
 import { SCHOOL_ADHERENT_PLURAL, SCHOOL_COLORS } from "@/lib/school-colors";
 import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
 import { JUDGE_AXES, AXIS_MAX } from "@/lib/judge-axes";
+import { SampleLabel } from "@/components/sample/SampleLabel";
+import { SAMPLE_ASSESSMENT, SAMPLE_ASSESSMENT_NOTE } from "@/lib/sample";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
 import type { SchoolId } from "@/lib/types";
 
@@ -51,6 +53,11 @@ const WITHHELD_NOTE =
   "The judge's note can quote the argument, so only the person who wrote it can read it while the argument is private.";
 const WITHHELD_REJECTED =
   "The judge set this argument aside without a score. Its reason can quote the argument, so only the person who wrote it can read it.";
+// The same two, for a sample assessment, which no judge wrote.
+const WITHHELD_NOTE_TEMPLATE =
+  "These notes can quote the argument, so they are shown only while the argument is public.";
+const WITHHELD_REJECTED_TEMPLATE =
+  "This argument was set aside without a score. The reason can quote the argument, so it is shown only while the argument is public.";
 function withheldObjection(schoolName: string): string {
   return `The argument left a ${schoolName} objection standing. Its wording can quote the argument, so only the person who wrote it can read it.`;
 }
@@ -135,6 +142,7 @@ export function Verdict({
   comparison,
   counterpart,
   textWithheld = false,
+  sample = null,
 }: {
   debateId: string;
   topicSlug: string;
@@ -172,14 +180,25 @@ export function Verdict({
    * words rather than leaving the spaces empty.
    */
   textWithheld?: boolean;
+  /**
+   * Set on an argument a sample account made (migration 0023). It gets the
+   * Sample label, no share row, and no view events. `template` is a
+   * verdict written from a template rather than by the judge: it says so,
+   * and nothing on the page claims the judge read it.
+   */
+  sample?: { template: boolean } | null;
 }) {
   const [showAfter, setShowAfter] = useState(showAfterLessonInitially);
   const objection = verdict.rejected ? null : verdict.unanswered_objection ?? null;
+  const template = Boolean(sample?.template);
 
   // elo_changed fires once, from ArgumentEditor right after judging — not
   // here, since this component also renders on every later revisit of the
   // same verdict page and would otherwise re-fire it on each view.
+  // A view of a sample account's argument is not engagement with anyone's
+  // work, so it is not counted (docs/sample-activity.md, "Metrics").
   useEffect(() => {
+    if (sample) return;
     track({
       name: "verdict_viewed",
       props: { debate_id: debateId, score: verdict.score ?? 0, is_owner: isOwner, rejected: verdict.rejected },
@@ -188,7 +207,7 @@ export function Verdict({
   }, []);
 
   useEffect(() => {
-    if (objection) {
+    if (objection && !sample) {
       track({
         name: "objection_viewed",
         props: { debate_id: debateId, rival_school: objection.school, is_owner: isOwner },
@@ -207,7 +226,8 @@ export function Verdict({
   if (verdict.rejected) {
     return (
       <div>
-        <p className="text-sm text-ink-soft">Verdict</p>
+        {sample && <SampleLabel />}
+        <p className="text-sm text-ink-soft">{template ? SAMPLE_ASSESSMENT : "Verdict"}</p>
         <h1 className="mt-1 max-w-[60ch] font-serif text-lg font-medium leading-snug text-ink">
           {motion}
         </h1>
@@ -216,8 +236,11 @@ export function Verdict({
             title="This was not judged."
             body={
               textWithheld
-                ? WITHHELD_REJECTED
-                : (verdict.rejection_reason ?? "The judge returned no verdict for this argument.")
+                ? template
+                  ? WITHHELD_REJECTED_TEMPLATE
+                  : WITHHELD_REJECTED
+                : (verdict.rejection_reason ??
+                  (template ? "No reason was recorded." : "The judge returned no verdict for this argument."))
             }
             action={
               <div className="flex flex-wrap items-center gap-6 text-sm">
@@ -233,6 +256,7 @@ export function Verdict({
 
   return (
     <div>
+      {sample && <SampleLabel className="mb-4" />}
       <div className="flex flex-wrap items-center gap-6">
         {/* The composite out of 100. It is not one of the three criteria,
             which is why it sits apart from them rather than as a fourth
@@ -251,7 +275,9 @@ export function Verdict({
 
         <div className="min-w-0 flex-1">
           {weekNumber != null && (
-            <p className="text-sm text-ink-mid">Week {weekNumber} &middot; verdict is in</p>
+            <p className="text-sm text-ink-mid">
+              Week {weekNumber} &middot; {template ? SAMPLE_ASSESSMENT.toLowerCase() : "verdict is in"}
+            </p>
           )}
           <h1 className="mt-1 max-w-[34ch] text-xl font-extrabold leading-tight tracking-tight text-ink">
             {textWithheld ? WITHHELD_HEADING : verdict.verdict_line}
@@ -295,8 +321,11 @@ export function Verdict({
           composite, and the composite is the circle above. */}
       <section className="mt-10 border-t-2 border-rule pt-8">
         <h2 className="text-lg font-extrabold tracking-tight text-ink">
-          How the judge scored you
+          {template ? SAMPLE_ASSESSMENT : "How the judge scored you"}
         </h2>
+        {template && (
+          <p className="mt-2 max-w-[60ch] text-sm text-ink-mid">{SAMPLE_ASSESSMENT_NOTE}</p>
+        )}
         <ul className="mt-5 max-w-[40rem] space-y-4">
           {JUDGE_AXES.map((axis) => {
             const value = verdict[axis.key];
@@ -318,7 +347,9 @@ export function Verdict({
         </ul>
       </section>
       <p className="mt-3 text-sm">
-        <TextLink href="/debate/rubric">How this was judged</TextLink>
+        <TextLink href="/debate/rubric">
+          {template ? "What the judge looks for" : "How this was judged"}
+        </TextLink>
       </p>
 
       {/* The judge's reading of the argument. The one-line summary is a
@@ -331,10 +362,10 @@ export function Verdict({
             repeated here; what follows is the judge's reading of the
             argument, which is what this section was always for. */}
         <h2 className="text-lg font-extrabold tracking-tight text-ink">
-          The judge&apos;s note
+          {template ? "Notes on the argument" : <>The judge&apos;s note</>}
         </h2>
         {textWithheld ? (
-          <p className="prose-reading mt-6">{WITHHELD_NOTE}</p>
+          <p className="prose-reading mt-6">{template ? WITHHELD_NOTE_TEMPLATE : WITHHELD_NOTE}</p>
         ) : (
           <div className="mt-6 space-y-6">
             <Reading label="Strongest move" body={verdict.strongest_move} />
@@ -512,7 +543,11 @@ export function Verdict({
       )}
 
       <div className="mt-10 border-t-2 border-rule pt-8">
-        <ShareRow debateId={debateId} topicSlug={topicSlug} score={verdict.score ?? 0} shareLine={shareLine} />
+        {/* Nothing to share: a sample account's argument is nobody's to
+            pass on as their own. */}
+        {!sample && (
+          <ShareRow debateId={debateId} topicSlug={topicSlug} score={verdict.score ?? 0} shareLine={shareLine} />
+        )}
         {isOwner && (
           <p className="mt-6">
             <TextLink href="/today">Back to today</TextLink>

@@ -42,6 +42,9 @@ async function main() {
     .from("debates")
     .select("id, school, argument, verdict, created_at, debate_topics(motion)")
     .not("verdict", "is", null)
+    // Sample accounts' verdicts are templates (docs/sample-activity.md);
+    // this review is of what the judge wrote.
+    .eq("is_sample", false)
     .order("created_at", { ascending: false })
     .limit(n);
 

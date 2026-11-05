@@ -22,17 +22,19 @@ export default async function VerdictOGImage({
   let school: SchoolId = "stoicism";
   let motion = "Sophecs";
   let score = 0;
+  let sample = false;
 
   if (isAdminConfigured()) {
     const admin = createAdminClient();
     const { data } = await admin
       .from("debates_public")
-      .select("school, score, topic_slug, motion_text")
+      .select("school, score, topic_slug, motion_text, is_sample")
       .eq("id", debateId)
       .maybeSingle();
     if (data) {
       school = data.school as SchoolId;
       score = Number(data.score ?? 0);
+      sample = Boolean(data.is_sample);
       // The stored wording comes from the view with the rest (migration
       // 0020), as on the verdict page; the topic's current motion is the
       // fallback for a debate stored before motion_text existed.
@@ -53,6 +55,7 @@ export default async function VerdictOGImage({
         school={school}
         motion={motion}
         score={score}
+        sample={sample}
         width={1200}
         height={630}
         fonts={{ serif: "Spectral", sans: "IBM Plex Sans", mono: "IBM Plex Mono" }}

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { SamplePageMarker } from "@/components/sample/SamplePageMarker";
 import { cookies, headers } from "next/headers";
 import { CardViewTracker } from "@/components/card/CardViewTracker";
 import { SharePage } from "@/components/share/SharePage";
@@ -15,7 +16,7 @@ async function getResult(id: string): Promise<QuizResultRow | null> {
   const admin = createAdminClient();
   const { data } = await admin
     .from("public_results")
-    .select("id, school, secondary, vector, challenge_from, created_at")
+    .select("id, school, secondary, vector, challenge_from, created_at, is_sample")
     .eq("id", id)
     .single();
   return (data as QuizResultRow) ?? null;
@@ -74,15 +75,17 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const result = await getResult(id);
   if (!result) return { title: "Sophecs" };
   const school = getSchool(result.school);
+  // A sample account's result says so in the title and the link preview.
+  const title = result.is_sample ? `${school.name} · Sample · Sophecs` : `${school.name} · Sophecs`;
   return {
-    title: `${school.name} · Sophecs`,
+    title,
     description: school.one_line,
     openGraph: {
-      title: `${school.name} · Sophecs`,
+      title,
       description: school.one_line,
       images: [`/r/${id}/opengraph-image`],
     },
-    twitter: { card: "summary_large_image" },
+    twitter: { card: "summary_large_image", title },
   };
 }
 
@@ -135,7 +138,13 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
 
   return (
     <>
-      <CardViewTracker resultId={id} school={result.school} isOwner={isOwner} referrer={referrer} />
+      {/* A view of a sample result is not a share converting, so it is
+          not counted (docs/sample-activity.md, "Metrics"). */}
+      {result.is_sample ? (
+        <SamplePageMarker />
+      ) : (
+        <CardViewTracker resultId={id} school={result.school} isOwner={isOwner} referrer={referrer} />
+      )}
       <SharePage
         resultId={id}
         school={result.school}
@@ -150,6 +159,7 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
         isSignedIn={Boolean(user)}
         shareLine={shareLine}
         shareLineIndex={shareLineIndex}
+        isSample={Boolean(result.is_sample)}
       />
     </>
   );

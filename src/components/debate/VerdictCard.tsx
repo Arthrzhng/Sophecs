@@ -1,5 +1,5 @@
 import { SCHOOL_COLORS } from "@/lib/school-colors";
-import { OG_INK, OG_INK_SOFT, OG_PAPER } from "@/lib/card-tokens";
+import { OG_INK, OG_INK_MID, OG_INK_SOFT, OG_PAPER } from "@/lib/card-tokens";
 import type { SchoolId } from "@/lib/types";
 
 // The share surface for a verdict — paper, not saturated, per the brief:
@@ -14,6 +14,7 @@ export function VerdictCard({
   width,
   height,
   fonts,
+  sample,
 }: {
   school: SchoolId;
   motion: string;
@@ -21,6 +22,8 @@ export function VerdictCard({
   width: number;
   height: number;
   fonts: { serif: string; sans: string; mono: string };
+  /** A sample account's verdict, scored from a template (docs/sample-activity.md). */
+  sample?: boolean;
 }) {
   const color = SCHOOL_COLORS[school];
   const scale = width / 1200;
@@ -40,7 +43,25 @@ export function VerdictCard({
         fontFamily: fonts.sans,
       }}
     >
-      <div style={{ display: "flex", width: px(64), height: 3, backgroundColor: color.surface }} />
+      <div style={{ display: "flex", alignItems: "center", gap: px(24) }}>
+        <div style={{ display: "flex", width: px(64), height: 3, backgroundColor: color.surface }} />
+        {sample && (
+          <div
+            style={{
+              display: "flex",
+              fontFamily: fonts.sans,
+              fontSize: px(20),
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: OG_INK_MID,
+              padding: `${px(4)}px ${px(12)}px`,
+              border: `2px solid ${OG_INK_SOFT}`,
+            }}
+          >
+            Sample assessment
+          </div>
+        )}
+      </div>
       <div style={{ display: "flex", alignItems: "baseline", gap: px(20), marginTop: px(28) }}>
         <span style={{ fontFamily: fonts.mono, fontSize: px(72), fontWeight: 500 }}>{score}</span>
         <span style={{ fontFamily: fonts.mono, fontSize: px(20), color: OG_INK_SOFT }}>/ 100</span>

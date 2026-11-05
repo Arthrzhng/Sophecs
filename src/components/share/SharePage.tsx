@@ -4,6 +4,7 @@ import { ShareSheet } from "@/components/share/ShareSheet";
 import { ChallengeButton } from "@/components/share/ChallengeButton";
 import { DebateThemButton } from "@/components/share/DebateThemButton";
 import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
+import { SampleLabel } from "@/components/sample/SampleLabel";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import { QUIZ_SCHOOLS } from "@/lib/school-registry";
 import type { QuizResultRow, SchoolId } from "@/lib/types";
@@ -23,6 +24,11 @@ export interface SharePageProps {
   isSignedIn: boolean;
   shareLine: string;
   shareLineIndex: number;
+  /**
+   * A sample account's result (migration 0023). Labelled, and shown as to
+   * a stranger: a sample account takes up no challenge and debates no one.
+   */
+  isSample?: boolean;
 }
 
 /**
@@ -52,6 +58,7 @@ export function SharePage({
   isSignedIn,
   shareLine,
   shareLineIndex,
+  isSample = false,
 }: SharePageProps) {
   const name = SCHOOL_COLORS[school].name;
 
@@ -59,14 +66,19 @@ export function SharePage({
   // and one action. Everything else on this page is for someone who already
   // has a result of their own; showing a stranger four competing next steps
   // is how a shared link stops converting.
-  const coldRecipient = !isOwner && !isSavedToProfile && !showDebateThem && !otherVector;
+  const coldRecipient = isSample || (!isOwner && !isSavedToProfile && !showDebateThem && !otherVector);
 
   return (
     <main className="flex-1">
       <div className="mx-auto max-w-read px-6 py-10">
+        {isSample && <SampleLabel />}
         <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
-          {isOwner ? "Your school" : "Someone shared their result"}
-          {isSavedToProfile && " · saved to your profile"}
+          {isSample
+            ? "A sample account's result"
+            : isOwner
+              ? "Your school"
+              : "Someone shared their result"}
+          {!isSample && isSavedToProfile && " · saved to your profile"}
         </p>
 
         <div className="mt-4">

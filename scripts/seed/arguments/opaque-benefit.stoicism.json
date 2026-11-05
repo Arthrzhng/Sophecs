@@ -1,0 +1,755 @@
+[
+  {
+    "id": "opaque-benefit.stoicism.01",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1,
+        2
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I hold that deploying it is right, provided the deciders assented only to what the evidence warranted; the opacity of the mechanism is not theirs to answer for. A judgement is sound when it assents only to what the impression warrants. If trials show the system reliably reduces suffering, assenting to that is sound, and it does not become unsound because the reasons inside the model cannot be written down for a patient.\n\nThe person decided about is not wronged by lacking an explanation, because their good never depended on it. What they owe themselves is a right response to what happens to them, and that response is fully in their power whether or not anyone explains the machine. Think of a triage tool that flags sepsis hours earlier than nurses do. The ward cannot say why it fires, but the trial data were checked carefully.\n\nA Virtue Ethicist will object that justice is owed to the person a decision lands on, and a practice of withholding reasons trains deployers into people who stop thinking they owe anyone an answer. But the answer the deployers owe is an account of their own judgement, which they can always give: what evidence they saw and why they assented to it. That is owed and can be paid. An account of the weights inside the model was never theirs to give. So the question is not how things turn out, which is never ours, but how well the judging was done.",
+    "words": 248
+  },
+  {
+    "id": "opaque-benefit.stoicism.02",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2,
+        0
+      ],
+      "example": null,
+      "objections": [
+        0
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Deploy it. The mechanism is an external, and the only thing anyone here is answerable for is how carefully they judged the evidence that it reduces suffering. The person decided about is not wronged by lacking an explanation, because their good never depended on it. What they owe themselves is a right response to what happens to them, and that response is fully in their power whether or not anyone explains the machine.\n\nEpictetus divides the world into what is up to us and what is not. The inner workings of a trained model are not up to the people who deploy it. Their judgement about whether the evidence is good enough is up to them, and that is where their responsibility sits.\n\nA Virtue Ethicist will object that justice is owed to the person a decision lands on, and a practice of withholding reasons trains deployers into people who stop thinking they owe anyone an answer. But the answer the deployers owe is an account of their own judgement, which they can always give: what evidence they saw and why they assented to it. That is owed and can be paid. An account of the weights inside the model was never theirs to give. Everything else here is external. What remains to be judged is the use each person made of their own reason.",
+    "words": 225
+  },
+  {
+    "id": "opaque-benefit.stoicism.03",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        3,
+        2
+      ],
+      "example": 1,
+      "objections": [
+        1
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A Stoic can accept this motion. What matters is whether the people deploying it judged well, not whether the machine's workings can be laid out for everyone. Demanding an explanation before acting treats a feeling of understanding as if it were part of virtue. It is not. The deployers act well if they judged the evidence carefully and would withdraw the system the moment that evidence changed.\n\nThe person decided about is not wronged by lacking an explanation, because their good never depended on it. What they owe themselves is a right response to what happens to them, and that response is fully in their power whether or not anyone explains the machine. A clinic adopts a screening model after reading three independent audits. The model cannot explain a single case, but the clinic's judgement can be explained in full.\n\nA Utilitarian will object that the Stoic has the right verdict for the wrong reason, since what justifies deployment is the suffering prevented and not the inner state of the people who chose it. Suffering prevented is a fine outcome, but outcomes are not up to anyone. A deployer who got lucky with poor evidence has not acted well, and one who judged soundly has, whatever the counts turn out to be. Keep the line between what is up to us and what is not, and the motion answers itself.",
+    "words": 230
+  },
+  {
+    "id": "opaque-benefit.stoicism.04",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0,
+        1
+      ],
+      "example": 2,
+      "objections": [
+        1
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "The system should be deployed if the people responsible judged the evidence soundly, because the soundness of a judgement does not depend on whether its reasons can be passed on. Epictetus divides the world into what is up to us and what is not. The inner workings of a trained model are not up to the people who deploy it. Their judgement about whether the evidence is good enough is up to them, and that is where their responsibility sits.\n\nA judgement is sound when it assents only to what the impression warrants. If trials show the system reliably reduces suffering, assenting to that is sound, and it does not become unsound because the reasons inside the model cannot be written down for a patient. A sailor trusts a compass without knowing why it points north. What he is answerable for is whether he checked it against the stars.\n\nA Utilitarian will object that the Stoic has the right verdict for the wrong reason, since what justifies deployment is the suffering prevented and not the inner state of the people who chose it. Suffering prevented is a fine outcome, but outcomes are not up to anyone. A deployer who got lucky with poor evidence has not acted well, and one who judged soundly has, whatever the counts turn out to be. So the question is not how things turn out, which is never ours, but how well the judging was done.",
+    "words": 241
+  },
+  {
+    "id": "opaque-benefit.stoicism.05",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2,
+        3
+      ],
+      "example": 0,
+      "objections": [
+        1
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Deploy it. The mechanism is an external, and the only thing anyone here is answerable for is how carefully they judged the evidence that it reduces suffering. The person decided about is not wronged by lacking an explanation, because their good never depended on it. What they owe themselves is a right response to what happens to them, and that response is fully in their power whether or not anyone explains the machine.\n\nDemanding an explanation before acting treats a feeling of understanding as if it were part of virtue. It is not. The deployers act well if they judged the evidence carefully and would withdraw the system the moment that evidence changed. Think of a triage tool that flags sepsis hours earlier than nurses do. The ward cannot say why it fires, but the trial data were checked carefully.\n\nA Utilitarian will object that the Stoic has the right verdict for the wrong reason, since what justifies deployment is the suffering prevented and not the inner state of the people who chose it. Suffering prevented is a fine outcome, but outcomes are not up to anyone. A deployer who got lucky with poor evidence has not acted well, and one who judged soundly has, whatever the counts turn out to be. Keep the line between what is up to us and what is not, and the motion answers itself.",
+    "words": 230
+  },
+  {
+    "id": "opaque-benefit.stoicism.06",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3,
+        1
+      ],
+      "example": 1,
+      "objections": [
+        0
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I hold that deploying it is right, provided the deciders assented only to what the evidence warranted; the opacity of the mechanism is not theirs to answer for. Demanding an explanation before acting treats a feeling of understanding as if it were part of virtue. It is not. The deployers act well if they judged the evidence carefully and would withdraw the system the moment that evidence changed.\n\nA judgement is sound when it assents only to what the impression warrants. If trials show the system reliably reduces suffering, assenting to that is sound, and it does not become unsound because the reasons inside the model cannot be written down for a patient. A clinic adopts a screening model after reading three independent audits. The model cannot explain a single case, but the clinic's judgement can be explained in full.\n\nA Virtue Ethicist will object that justice is owed to the person a decision lands on, and a practice of withholding reasons trains deployers into people who stop thinking they owe anyone an answer. But the answer the deployers owe is an account of their own judgement, which they can always give: what evidence they saw and why they assented to it. That is owed and can be paid. An account of the weights inside the model was never theirs to give. So the question is not how things turn out, which is never ours, but how well the judging was done.",
+    "words": 242
+  },
+  {
+    "id": "opaque-benefit.stoicism.07",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0,
+        2
+      ],
+      "example": 2,
+      "objections": [
+        0
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "A Stoic can accept this motion. What matters is whether the people deploying it judged well, not whether the machine's workings can be laid out for everyone. Epictetus divides the world into what is up to us and what is not. The inner workings of a trained model are not up to the people who deploy it. Their judgement about whether the evidence is good enough is up to them, and that is where their responsibility sits.\n\nThe person decided about is not wronged by lacking an explanation, because their good never depended on it. What they owe themselves is a right response to what happens to them, and that response is fully in their power whether or not anyone explains the machine. A sailor trusts a compass without knowing why it points north. What he is answerable for is whether he checked it against the stars.\n\nA Virtue Ethicist will object that justice is owed to the person a decision lands on, and a practice of withholding reasons trains deployers into people who stop thinking they owe anyone an answer. But the answer the deployers owe is an account of their own judgement, which they can always give: what evidence they saw and why they assented to it. That is owed and can be paid. An account of the weights inside the model was never theirs to give. Everything else here is external. What remains to be judged is the use each person made of their own reason.",
+    "words": 249
+  },
+  {
+    "id": "opaque-benefit.stoicism.08",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        1,
+        0
+      ],
+      "example": null,
+      "objections": [
+        0
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "The system should be deployed if the people responsible judged the evidence soundly, because the soundness of a judgement does not depend on whether its reasons can be passed on. A judgement is sound when it assents only to what the impression warrants. If trials show the system reliably reduces suffering, assenting to that is sound, and it does not become unsound because the reasons inside the model cannot be written down for a patient.\n\nEpictetus divides the world into what is up to us and what is not. The inner workings of a trained model are not up to the people who deploy it. Their judgement about whether the evidence is good enough is up to them, and that is where their responsibility sits.\n\nA Virtue Ethicist will object that justice is owed to the person a decision lands on, and a practice of withholding reasons trains deployers into people who stop thinking they owe anyone an answer. But the answer the deployers owe is an account of their own judgement, which they can always give: what evidence they saw and why they assented to it. That is owed and can be paid. An account of the weights inside the model was never theirs to give. That is the Stoic answer: look to the judgement, not the outcome, because only the judgement was ever in anyone's power.",
+    "words": 228
+  },
+  {
+    "id": "opaque-benefit.stoicism.09",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2,
+        1
+      ],
+      "example": 1,
+      "objections": [
+        1
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A Stoic can accept this motion. What matters is whether the people deploying it judged well, not whether the machine's workings can be laid out for everyone. The person decided about is not wronged by lacking an explanation, because their good never depended on it. What they owe themselves is a right response to what happens to them, and that response is fully in their power whether or not anyone explains the machine.\n\nA judgement is sound when it assents only to what the impression warrants. If trials show the system reliably reduces suffering, assenting to that is sound, and it does not become unsound because the reasons inside the model cannot be written down for a patient. A clinic adopts a screening model after reading three independent audits. The model cannot explain a single case, but the clinic's judgement can be explained in full.\n\nA Utilitarian will object that the Stoic has the right verdict for the wrong reason, since what justifies deployment is the suffering prevented and not the inner state of the people who chose it. Suffering prevented is a fine outcome, but outcomes are not up to anyone. A deployer who got lucky with poor evidence has not acted well, and one who judged soundly has, whatever the counts turn out to be. Keep the line between what is up to us and what is not, and the motion answers itself.",
+    "words": 235
+  },
+  {
+    "id": "opaque-benefit.stoicism.10",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3,
+        0
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Deploy it. The mechanism is an external, and the only thing anyone here is answerable for is how carefully they judged the evidence that it reduces suffering. Demanding an explanation before acting treats a feeling of understanding as if it were part of virtue. It is not. The deployers act well if they judged the evidence carefully and would withdraw the system the moment that evidence changed.\n\nEpictetus divides the world into what is up to us and what is not. The inner workings of a trained model are not up to the people who deploy it. Their judgement about whether the evidence is good enough is up to them, and that is where their responsibility sits. Think of a triage tool that flags sepsis hours earlier than nurses do. The ward cannot say why it fires, but the trial data were checked carefully.\n\nA Virtue Ethicist will object that justice is owed to the person a decision lands on, and a practice of withholding reasons trains deployers into people who stop thinking they owe anyone an answer. But the answer the deployers owe is an account of their own judgement, which they can always give: what evidence they saw and why they assented to it. That is owed and can be paid. An account of the weights inside the model was never theirs to give. Everything else here is external. What remains to be judged is the use each person made of their own reason.",
+    "words": 246
+  },
+  {
+    "id": "opaque-benefit.stoicism.11",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Deploy it. The mechanism is an external, and the only thing anyone here is answerable for is how carefully they judged the evidence that it reduces suffering. Demanding an explanation before acting treats a feeling of understanding as if it were part of virtue. It is not. The deployers act well if they judged the evidence carefully and would withdraw the system the moment that evidence changed.\n\nA sailor trusts a compass without knowing why it points north. What he is answerable for is whether he checked it against the stars. So the question is not how things turn out, which is never ours, but how well the judging was done.",
+    "words": 111
+  },
+  {
+    "id": "opaque-benefit.stoicism.12",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "A Stoic can accept this motion. What matters is whether the people deploying it judged well, not whether the machine's workings can be laid out for everyone. Epictetus divides the world into what is up to us and what is not. The inner workings of a trained model are not up to the people who deploy it. Their judgement about whether the evidence is good enough is up to them, and that is where their responsibility sits.\n\nA clinic adopts a screening model after reading three independent audits. The model cannot explain a single case, but the clinic's judgement can be explained in full. Everything else here is external. What remains to be judged is the use each person made of their own reason.",
+    "words": 124
+  },
+  {
+    "id": "opaque-benefit.stoicism.13",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        2
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I hold that deploying it is right, provided the deciders assented only to what the evidence warranted; the opacity of the mechanism is not theirs to answer for. The person decided about is not wronged by lacking an explanation, because their good never depended on it. What they owe themselves is a right response to what happens to them, and that response is fully in their power whether or not anyone explains the machine.\n\nThink of a triage tool that flags sepsis hours earlier than nurses do. The ward cannot say why it fires, but the trial data were checked carefully. So the question is not how things turn out, which is never ours, but how well the judging was done.",
+    "words": 121
+  },
+  {
+    "id": "opaque-benefit.stoicism.14",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        1
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "The system should be deployed if the people responsible judged the evidence soundly, because the soundness of a judgement does not depend on whether its reasons can be passed on. A judgement is sound when it assents only to what the impression warrants. If trials show the system reliably reduces suffering, assenting to that is sound, and it does not become unsound because the reasons inside the model cannot be written down for a patient.\n\nA clinic adopts a screening model after reading three independent audits. The model cannot explain a single case, but the clinic's judgement can be explained in full. Keep the line between what is up to us and what is not, and the motion answers itself.",
+    "words": 120
+  },
+  {
+    "id": "opaque-benefit.stoicism.15",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        0
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "I hold that deploying it is right, provided the deciders assented only to what the evidence warranted; the opacity of the mechanism is not theirs to answer for. Epictetus divides the world into what is up to us and what is not. The inner workings of a trained model are not up to the people who deploy it. Their judgement about whether the evidence is good enough is up to them, and that is where their responsibility sits.\n\nA sailor trusts a compass without knowing why it points north. What he is answerable for is whether he checked it against the stars. Keep the line between what is up to us and what is not, and the motion answers itself.",
+    "words": 120
+  },
+  {
+    "id": "opaque-benefit.stoicism.16",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "The system should be deployed if the people responsible judged the evidence soundly, because the soundness of a judgement does not depend on whether its reasons can be passed on. Demanding an explanation before acting treats a feeling of understanding as if it were part of virtue. It is not. The deployers act well if they judged the evidence carefully and would withdraw the system the moment that evidence changed.\n\nThink of a triage tool that flags sepsis hours earlier than nurses do. The ward cannot say why it fires, but the trial data were checked carefully. Everything else here is external. What remains to be judged is the use each person made of their own reason.",
+    "words": 117
+  },
+  {
+    "id": "opaque-benefit.stoicism.17",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Deploy it. The mechanism is an external, and the only thing anyone here is answerable for is how carefully they judged the evidence that it reduces suffering. The person decided about is not wronged by lacking an explanation, because their good never depended on it. What they owe themselves is a right response to what happens to them, and that response is fully in their power whether or not anyone explains the machine.\n\nA clinic adopts a screening model after reading three independent audits. The model cannot explain a single case, but the clinic's judgement can be explained in full. Keep the line between what is up to us and what is not, and the motion answers itself.",
+    "words": 118
+  },
+  {
+    "id": "opaque-benefit.stoicism.18",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        1
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "A Stoic can accept this motion. What matters is whether the people deploying it judged well, not whether the machine's workings can be laid out for everyone. A judgement is sound when it assents only to what the impression warrants. If trials show the system reliably reduces suffering, assenting to that is sound, and it does not become unsound because the reasons inside the model cannot be written down for a patient.\n\nA sailor trusts a compass without knowing why it points north. What he is answerable for is whether he checked it against the stars. Everything else here is external. What remains to be judged is the use each person made of their own reason.",
+    "words": 116
+  },
+  {
+    "id": "opaque-benefit.stoicism.19",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "A Stoic can accept this motion. What matters is whether the people deploying it judged well, not whether the machine's workings can be laid out for everyone. Demanding an explanation before acting treats a feeling of understanding as if it were part of virtue. It is not. The deployers act well if they judged the evidence carefully and would withdraw the system the moment that evidence changed.\n\nThink of a triage tool that flags sepsis hours earlier than nurses do. The ward cannot say why it fires, but the trial data were checked carefully. Everything else here is external. What remains to be judged is the use each person made of their own reason.",
+    "words": 114
+  },
+  {
+    "id": "opaque-benefit.stoicism.20",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Deploy it. The mechanism is an external, and the only thing anyone here is answerable for is how carefully they judged the evidence that it reduces suffering. The person decided about is not wronged by lacking an explanation, because their good never depended on it. What they owe themselves is a right response to what happens to them, and that response is fully in their power whether or not anyone explains the machine.\n\nA sailor trusts a compass without knowing why it points north. What he is answerable for is whether he checked it against the stars. Keep the line between what is up to us and what is not, and the motion answers itself.",
+    "words": 115
+  },
+  {
+    "id": "opaque-benefit.stoicism.21",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "The system should be deployed if the people responsible judged the evidence soundly, because the soundness of a judgement does not depend on whether its reasons can be passed on. Epictetus divides the world into what is up to us and what is not. The inner workings of a trained model are not up to the people who deploy it. Their judgement about whether the evidence is good enough is up to them, and that is where their responsibility sits.\n\nA clinic adopts a screening model after reading three independent audits. The model cannot explain a single case, but the clinic's judgement can be explained in full. So the question is not how things turn out, which is never ours, but how well the judging was done.",
+    "words": 127
+  },
+  {
+    "id": "opaque-benefit.stoicism.22",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I hold that deploying it is right, provided the deciders assented only to what the evidence warranted; the opacity of the mechanism is not theirs to answer for. A judgement is sound when it assents only to what the impression warrants. If trials show the system reliably reduces suffering, assenting to that is sound, and it does not become unsound because the reasons inside the model cannot be written down for a patient.\n\nThink of a triage tool that flags sepsis hours earlier than nurses do. The ward cannot say why it fires, but the trial data were checked carefully. So the question is not how things turn out, which is never ours, but how well the judging was done.",
+    "words": 120
+  },
+  {
+    "id": "opaque-benefit.stoicism.23",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Deploy it. The mechanism is an external, and the only thing anyone here is answerable for is how carefully they judged the evidence that it reduces suffering. A judgement is sound when it assents only to what the impression warrants. If trials show the system reliably reduces suffering, assenting to that is sound, and it does not become unsound because the reasons inside the model cannot be written down for a patient.\n\nA sailor trusts a compass without knowing why it points north. What he is answerable for is whether he checked it against the stars. Keep the line between what is up to us and what is not, and the motion answers itself.",
+    "words": 114
+  },
+  {
+    "id": "opaque-benefit.stoicism.24",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        3
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A Stoic can accept this motion. What matters is whether the people deploying it judged well, not whether the machine's workings can be laid out for everyone. Demanding an explanation before acting treats a feeling of understanding as if it were part of virtue. It is not. The deployers act well if they judged the evidence carefully and would withdraw the system the moment that evidence changed.\n\nA clinic adopts a screening model after reading three independent audits. The model cannot explain a single case, but the clinic's judgement can be explained in full. Keep the line between what is up to us and what is not, and the motion answers itself.",
+    "words": 112
+  },
+  {
+    "id": "opaque-benefit.stoicism.25",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I hold that deploying it is right, provided the deciders assented only to what the evidence warranted; the opacity of the mechanism is not theirs to answer for. Epictetus divides the world into what is up to us and what is not. The inner workings of a trained model are not up to the people who deploy it. Their judgement about whether the evidence is good enough is up to them, and that is where their responsibility sits.\n\nThink of a triage tool that flags sepsis hours earlier than nurses do. The ward cannot say why it fires, but the trial data were checked carefully. So the question is not how things turn out, which is never ours, but how well the judging was done.",
+    "words": 125
+  },
+  {
+    "id": "opaque-benefit.stoicism.26",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        2
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "The system should be deployed if the people responsible judged the evidence soundly, because the soundness of a judgement does not depend on whether its reasons can be passed on. The person decided about is not wronged by lacking an explanation, because their good never depended on it. What they owe themselves is a right response to what happens to them, and that response is fully in their power whether or not anyone explains the machine.\n\nThink of a triage tool that flags sepsis hours earlier than nurses do. The ward cannot say why it fires, but the trial data were checked carefully. Keep the line between what is up to us and what is not, and the motion answers itself.",
+    "words": 121
+  },
+  {
+    "id": "opaque-benefit.stoicism.27",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Deploy it. The mechanism is an external, and the only thing anyone here is answerable for is how carefully they judged the evidence that it reduces suffering. A judgement is sound when it assents only to what the impression warrants. If trials show the system reliably reduces suffering, assenting to that is sound, and it does not become unsound because the reasons inside the model cannot be written down for a patient.\n\nA clinic adopts a screening model after reading three independent audits. The model cannot explain a single case, but the clinic's judgement can be explained in full. Keep the line between what is up to us and what is not, and the motion answers itself.",
+    "words": 117
+  },
+  {
+    "id": "opaque-benefit.stoicism.28",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A Stoic can accept this motion. What matters is whether the people deploying it judged well, not whether the machine's workings can be laid out for everyone. The person decided about is not wronged by lacking an explanation, because their good never depended on it. What they owe themselves is a right response to what happens to them, and that response is fully in their power whether or not anyone explains the machine.\n\nA sailor trusts a compass without knowing why it points north. What he is answerable for is whether he checked it against the stars. That is the Stoic answer: look to the judgement, not the outcome, because only the judgement was ever in anyone's power.",
+    "words": 118
+  },
+  {
+    "id": "opaque-benefit.stoicism.29",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I hold that deploying it is right, provided the deciders assented only to what the evidence warranted; the opacity of the mechanism is not theirs to answer for. Demanding an explanation before acting treats a feeling of understanding as if it were part of virtue. It is not. The deployers act well if they judged the evidence carefully and would withdraw the system the moment that evidence changed.\n\nThink of a triage tool that flags sepsis hours earlier than nurses do. The ward cannot say why it fires, but the trial data were checked carefully. So the question is not how things turn out, which is never ours, but how well the judging was done.",
+    "words": 115
+  },
+  {
+    "id": "opaque-benefit.stoicism.30",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "The system should be deployed if the people responsible judged the evidence soundly, because the soundness of a judgement does not depend on whether its reasons can be passed on. Epictetus divides the world into what is up to us and what is not. The inner workings of a trained model are not up to the people who deploy it. Their judgement about whether the evidence is good enough is up to them, and that is where their responsibility sits.\n\nA clinic adopts a screening model after reading three independent audits. The model cannot explain a single case, but the clinic's judgement can be explained in full. Everything else here is external. What remains to be judged is the use each person made of their own reason.",
+    "words": 127
+  },
+  {
+    "id": "opaque-benefit.stoicism.31",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0
+      ]
+    },
+    "text": "A Stoic can accept this motion. What matters is whether the people deploying it judged well, not whether the machine's workings can be laid out for everyone.\n\nHonestly most people do not read explanations anyway. If a computer says no to your loan you just want it fixed, not a lecture about how the model works, so explaining it is mostly for show. Think of a triage tool that flags sepsis hours earlier than nurses do. The ward cannot say why it fires, but the trial data were checked carefully.",
+    "words": 90
+  },
+  {
+    "id": "opaque-benefit.stoicism.32",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        1,
+        0
+      ]
+    },
+    "text": "Deploy it. The mechanism is an external, and the only thing anyone here is answerable for is how carefully they judged the evidence that it reduces suffering.\n\nDoctors already use tools nobody fully understands, and nobody stops them. If it works it works. Asking for reasons every time would slow everything down and people would suffer while we argued about it. Honestly most people do not read explanations anyway. If a computer says no to your loan you just want it fixed, not a lecture about how the model works, so explaining it is mostly for show.",
+    "words": 97
+  },
+  {
+    "id": "opaque-benefit.stoicism.33",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3
+      ]
+    },
+    "text": "The system should be deployed if the people responsible judged the evidence soundly, because the soundness of a judgement does not depend on whether its reasons can be passed on.\n\nAI is going to be everywhere soon whether we like it or not, so this debate is a bit late. The companies will deploy it either way, and it is better to have it helping than not. A sailor trusts a compass without knowing why it points north. What he is answerable for is whether he checked it against the stars.",
+    "words": 91
+  },
+  {
+    "id": "opaque-benefit.stoicism.34",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3
+      ]
+    },
+    "text": "I hold that deploying it is right, provided the deciders assented only to what the evidence warranted; the opacity of the mechanism is not theirs to answer for.\n\nAI is going to be everywhere soon whether we like it or not, so this debate is a bit late. The companies will deploy it either way, and it is better to have it helping than not. A clinic adopts a screening model after reading three independent audits. The model cannot explain a single case, but the clinic's judgement can be explained in full.",
+    "words": 92
+  },
+  {
+    "id": "opaque-benefit.stoicism.35",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0
+      ]
+    },
+    "text": "A Stoic can accept this motion. What matters is whether the people deploying it judged well, not whether the machine's workings can be laid out for everyone.\n\nHonestly most people do not read explanations anyway. If a computer says no to your loan you just want it fixed, not a lecture about how the model works, so explaining it is mostly for show. A clinic adopts a screening model after reading three independent audits. The model cannot explain a single case, but the clinic's judgement can be explained in full.",
+    "words": 90
+  },
+  {
+    "id": "opaque-benefit.stoicism.36",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        1
+      ]
+    },
+    "text": "I hold that deploying it is right, provided the deciders assented only to what the evidence warranted; the opacity of the mechanism is not theirs to answer for.\n\nDoctors already use tools nobody fully understands, and nobody stops them. If it works it works. Asking for reasons every time would slow everything down and people would suffer while we argued about it. A sailor trusts a compass without knowing why it points north. What he is answerable for is whether he checked it against the stars.",
+    "words": 86
+  },
+  {
+    "id": "opaque-benefit.stoicism.37",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3,
+        0
+      ]
+    },
+    "text": "The system should be deployed if the people responsible judged the evidence soundly, because the soundness of a judgement does not depend on whether its reasons can be passed on.\n\nAI is going to be everywhere soon whether we like it or not, so this debate is a bit late. The companies will deploy it either way, and it is better to have it helping than not. Honestly most people do not read explanations anyway. If a computer says no to your loan you just want it fixed, not a lecture about how the model works, so explaining it is mostly for show.",
+    "words": 103
+  },
+  {
+    "id": "opaque-benefit.stoicism.38",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        1
+      ]
+    },
+    "text": "Deploy it. The mechanism is an external, and the only thing anyone here is answerable for is how carefully they judged the evidence that it reduces suffering.\n\nDoctors already use tools nobody fully understands, and nobody stops them. If it works it works. Asking for reasons every time would slow everything down and people would suffer while we argued about it. Think of a triage tool that flags sepsis hours earlier than nurses do. The ward cannot say why it fires, but the trial data were checked carefully.",
+    "words": 88
+  },
+  {
+    "id": "opaque-benefit.stoicism.39",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0
+      ]
+    },
+    "text": "A Stoic can accept this motion. What matters is whether the people deploying it judged well, not whether the machine's workings can be laid out for everyone.\n\nHonestly most people do not read explanations anyway. If a computer says no to your loan you just want it fixed, not a lecture about how the model works, so explaining it is mostly for show. A sailor trusts a compass without knowing why it points north. What he is answerable for is whether he checked it against the stars.",
+    "words": 87
+  },
+  {
+    "id": "opaque-benefit.stoicism.40",
+    "topic": "opaque-benefit",
+    "school": "stoicism",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3,
+        1
+      ]
+    },
+    "text": "I hold that deploying it is right, provided the deciders assented only to what the evidence warranted; the opacity of the mechanism is not theirs to answer for.\n\nAI is going to be everywhere soon whether we like it or not, so this debate is a bit late. The companies will deploy it either way, and it is better to have it helping than not. Doctors already use tools nobody fully understands, and nobody stops them. If it works it works. Asking for reasons every time would slow everything down and people would suffer while we argued about it.",
+    "words": 99
+  }
+]

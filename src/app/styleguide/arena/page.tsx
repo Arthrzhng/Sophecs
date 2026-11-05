@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { TABLE_SAMPLE_NOTE } from "@/lib/sample";
 import { Page } from "@/components/layout/Page";
 import { TopicList } from "@/components/debate/TopicList";
 import { JudgingPausedNotice } from "@/components/debate/JudgingPausedNotice";
@@ -824,6 +825,71 @@ export default function ArenaPreviewPage() {
           />
         </div>
       </Section>
+
+      {/* Sample accounts (docs/sample-activity.md): the same components,
+          with the Sample label and, on a template verdict, the sample
+          assessment wording. Nothing else about them changes. */}
+      <Section title="37. Sample: a template verdict, seen by a visitor">
+        <Verdict
+          debateId="preview-sample"
+          topicSlug="opaque-benefit"
+          motion={FIXTURE_MOTION}
+          school="stoicism"
+          verdict={FIXTURE_VERDICT}
+          eloDelta={6}
+          eloAfter={1206}
+          weekNumber={41}
+          tableContribution={1}
+          argument={FIXTURE_ARGUMENT}
+          isOwner={false}
+          argumentPublic
+          afterLesson={null}
+          showAfterLessonInitially={false}
+          shareLine=""
+          sample={{ template: true }}
+        />
+      </Section>
+
+      <Section title="38. Sample: a shared result" narrow>
+        <SharePage
+          resultId={FIXTURE_RESULT_ID}
+          school="stoicism"
+          oneLine={getSchool("stoicism").one_line}
+          oneLineAttribution={getSchool("stoicism").one_line_attribution}
+          vector={FIXTURE_VECTOR}
+          otherVector={null}
+          isOwner={false}
+          isSavedToProfile={false}
+          showDebateThem={false}
+          challengeId={null}
+          isSignedIn={false}
+          shareLine=""
+          shareLineIndex={0}
+          isSample
+        />
+      </Section>
+
+      <Section title="39. Sample: a challenge" narrow>
+        <ChallengeInvite
+          challengeId="preview-sample"
+          school="utilitarianism"
+          content={getSchool("utilitarianism")}
+          isSample
+        />
+      </Section>
+
+      <Section title="40. Sample: the school table in a week with sample accounts">
+        <SchoolTable
+          week={FIXTURE_WEEK}
+          rows={FIXTURE_TABLE_ROWS}
+          yourSchool="stoicism"
+          yourLine={yourTableLine(3, "Stoicism")}
+          emptyWeek={false}
+          paused={false}
+          sampleNote={TABLE_SAMPLE_NOTE}
+        />
+      </Section>
+
     </Page>
   );
 }

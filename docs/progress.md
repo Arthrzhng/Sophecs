@@ -191,6 +191,13 @@ entry names.
   `/styleguide/phase3/card/confucian` answered 404, as it should in
   production, and `/robots.txt` 200.
 
+## 2026-11-04: Checkpoint A
+
+- #56 merged as `7f0406e`: the Stage 1 rerun, the merge log for #51, #53,
+  #54 and #55, and `docs/checkpoint-a.md`. Production deploy
+  `dpl_12RLEjQrBzewYW9gw79ZRUsAmFZY`, Ready (read from Vercel on
+  2026-11-04).
+
 ## 2026-11-04: a counterpart exchange can take its first turn
 
 - `seekCounterpart` opened exchanges whose first turn the turn route
@@ -313,3 +320,84 @@ entry names.
     SELECT kept on the tables and views; `reading_responses` unchanged.
     13 policies and every row count unchanged.
   - Security advisor after: the same findings as before.
+
+## 2026-11-04: sample activity, revised to Arthur's ruling
+
+- Arthur approved the run on 2026-11-04 in a revised form: 3,278 accounts;
+  permanent, with new activity on a schedule; a GitHub Actions workflow
+  holding the service key and the seed as secrets; "Sample" on
+  every surface, share and link-preview images included; no synthetic
+  referrers and nothing in PostHog; real numbers kept real; a reader's
+  own rating, percentile and streak against real readers only; class
+  pages that never show a sample; exact duplicate arguments under 5%; no
+  genuine-row export. `docs/sample-activity.md` has the design.
+- Branch `sample-activity`:
+  - migration 0023 (0021 went to the challenges fix, 0022 to the client
+    grants fix): the marker, the
+    registry (no seed stored; `base_to`, `last_report`), eleven triggers,
+    the marker on the two views, `elo_percentile` over genuine profiles,
+    an index on `debates(created_at)`;
+  - a generator whose base window is fixed and whose arguments run on
+    without changing anything already made, texts given out without
+    repeats (0% exact duplicates at full size), and an engine that
+    extends a run and brings profiles up to date;
+  - `.github/workflows/sample-activity.yml` and `scripts/seed-ci.ts`:
+    canary, full, extend every six hours, and teardown by hand with the
+    run's id typed in; a public log with counts and check names only;
+  - the Sample mark on the verdict, result and card images and in the
+    three pages' titles; a sample-page marker that stops every analytics
+    event; samples left out of class pages; a sample challenge never
+    accepted; a query in the doc for real and sample counts.
+- Tested on local Postgres 16: the sample migration's test and the round trip
+  pass; 600 accounts end to end, canary, full, an extension three days on
+  that wrote only the 59 new arguments and the 24 profiles they moved, the
+  earlier plan then refused, validation passing, and teardown leaving the
+  genuine reader as it was.
+- A fifth review (Arthur waived the three-pass cap for this PR) found nine
+  things, all fixed:
+  - PostHog still loaded on sample pages, and autocapture, `$identify`,
+    and the project's session replay and heatmaps (on, read from PostHog)
+    sent from them. Now `before_send` drops anything from a sample page or
+    recorded on one, replay pauses while one is open, and a visit that
+    starts on one loads nothing.
+  - A killed job's lock stopped every later scheduled run; the workflow now
+    clears a lock older than 15 minutes.
+  - A failed validation did not stop the schedule; it now halts the run
+    until a full stage run by hand passes.
+  - The secrets move to a GitHub environment limited to main, since any
+    branch's workflow can read a repository secret.
+  - The checks read every genuine profile, debate and result into the
+    runner; they now read counts and each topic's par window only.
+  - Exact duplicates are now a validation check (5%), and the docs give
+    the measured timescale (about 16 months).
+  - Link previews of sample verdicts and challenges now say Sample.
+  - Sample addresses carry a seed-derived tag, so they cannot be worked
+    out from the public run id.
+  - The docs say the motions and passages are fixed for a run's life.
+- Retested after the fixes: the five gates, the migration's test, and the 600
+  account end-to-end run with the extension and teardown. That run caught
+  the local adapter still reading the old address format at teardown,
+  which refused rather than deleted; fixed.
+- Renumbered to 0023 once #61 and #62 were on `main`, and its database
+  test rebuilt to run under production's grants as 0022 left them: each
+  client write 0022 took is checked as denied, and again with the
+  privilege granted back for one transaction to show the guard still
+  refuses it. Gates, the 0023 test, the migration round trip and the 600
+  account end-to-end run pass on `ada1ac0`.
+- **0023 applied in production at 03:23:59 UTC on 2026-11-05**, migration
+  version `20261105032359`, through the Supabase tool (no DROP, no
+  prompt), with Arthur's go-ahead of the same morning.
+  - Before: no active session, no `ai_calls` row and no unjudged debate in
+    the previous 10 minutes; security advisor as after 0021; snapshot,
+    `docs/seed-snapshots/2026-11-05-before-0023.json`.
+  - Read back at 03:24 UTC: the six columns, `not null default false`, no
+    row marked; `seed_runs` and `seed_run_items` with row level security
+    on, no privilege for anon or authenticated, empty; the eleven
+    triggers; the guard not executable by clients; both views with their
+    columns appended, owner, options and ACL unchanged, every row's
+    digest as before (`95f4c9b1...`, `38d85702...`);
+    `elo_percentile(1200)` unchanged; `debates_created_at_idx`; 0022's
+    grants intact.
+  - Security advisor after: no new ERROR or WARN. One INFO added, as
+    expected: `seed_runs` and `seed_run_items` have row level security and
+    no policy, which is the design (server role only).
