@@ -2804,8 +2804,8 @@ The numbers map onto `docs/checkpoint-a.md` as follows:
   as 0023 last defined it, keeps the private verdict fields out (0018,
   0020). Making them `security_invoker` would move every one of those
   choices into policies on the base tables: a redesign with its own risk.
-  `exchanges_public` is the exception in use: nothing reads it, so 23
-  takes its read access away from clients.
+  `exchanges_public` differs: if nothing reads it, 23 takes its read
+  access away from clients.
 - **24, the 0018 shape.** For a private argument, the withheld verdict
   fields are left out of the public verdict rather than set to null. The
   reason is the one 0018 records: the shape is a list of fields to keep,
@@ -2838,9 +2838,12 @@ and no Point-in-Time Recovery ("Open pre-pilot item: there is no
 restorable backup"). Arthur's decision of 2026-11-05: no backups and no
 Pro. A destructive mistake, ours or Supabase's, is unrecoverable beyond
 whatever a migration's own snapshot holds. What limits that: every
-production write goes through the usual process (a snapshot of what it
-touches, a tested rollback, a read-back), and statements with DROP are
+change applied by hand goes through the usual process (a snapshot of what
+it touches, a tested rollback, a read-back), and statements with DROP are
 run by Arthur himself in the SQL Editor (his instruction quoted under 5).
+The sample workflow writes on its own schedule with neither; its rows are
+recovered from its registry, not from a backup (`docs/sample-activity.md`,
+"Backup and recovery").
 
 Leaked-password protection, which also needs Pro, is dropped. The site
 asks for no password; whether password sign-up is reachable through the
