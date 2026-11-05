@@ -207,8 +207,13 @@ export default async function VerdictPage({
   // sentence for every school, and one more field to write for each.
   // Anything else (objection still standing, or a v1 parent with no
   // objection at all) falls back to the ordinary verdict line.
-  const shareLine =
-    comparison && parentObjectionSchool && verdict.objection_answered
+  //
+  // A sample account's page has no share row, so it gets no share sentence
+  // either: not even in the page's data, since the sentence says "The
+  // judge's note" and a sample's verdict is a template the judge never read.
+  const shareLine = publicRow.is_sample
+    ? ""
+    : comparison && parentObjectionSchool && verdict.objection_answered
       ? `Answered the ${SCHOOL_COLORS[parentObjectionSchool].name} objection to my ` +
         `${SCHOOL_COLORS[school].name} case on ${shortMotion}: ` +
         `${comparison.first.score} → ${verdict.score}. sophecs.com/debate/${slug}/${debateId}`
