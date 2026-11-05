@@ -30,6 +30,12 @@ describe("without SIX_SCHOOLS", () => {
     for (const id of NEW) expect(drafts.shownDraftSchool(id)).toBe(false);
   });
 
+  it("loads no view from elsewhere", async () => {
+    const { micro } = await load("0");
+    expect(micro.getAllMicroLessons().filter((l) => l.position === "elsewhere")).toEqual([]);
+    expect(micro.getMicroLesson("opaque-benefit-elsewhere")).toBeNull();
+  });
+
   it("ranks the three published schools, as before", async () => {
     const { table } = await load("0");
     expect(table.rankSchools([], {}).map((r) => r.school).sort()).toEqual([...LIVE].sort());
@@ -63,9 +69,28 @@ describe("with SIX_SCHOOLS=1", () => {
     );
   });
 
-  it("does not show a draft that belongs to no school, such as an elsewhere passage", async () => {
+  it("shows the views from elsewhere, one per motion, and no other draft passage", async () => {
     const { micro } = await load("1");
-    expect(micro.getAllMicroLessons().filter((l) => l.position === "elsewhere")).toEqual([]);
+    const all = micro.getAllMicroLessons();
+    const elsewhere = all.filter((l) => l.position === "elsewhere");
+    expect(elsewhere.length).toBeGreaterThan(0);
+    expect(new Set(elsewhere.map((l) => l.topic)).size).toBe(elsewhere.length);
+    for (const l of elsewhere) expect(micro.getMicroLesson(l.slug)?.slug).toBe(l.slug);
+    // Every draft that loads is an elsewhere passage.
+    for (const l of all.filter((x) => x.status === "draft")) expect(l.position).toBe("elsewhere");
+    // Each sits on a motion that has its before passage, which its page
+    // links to as the passage that frames the question.
+    for (const l of elsewhere) {
+      expect(all.some((x) => x.topic === l.topic && x.position === "before"), l.slug).toBe(true);
+    }
+  });
+
+  it("keeps the sitemap to sophecs.com's own pages: no elsewhere passage, no new school", async () => {
+    await load("1");
+    const { default: sitemap } = await import("../src/app/sitemap");
+    const urls = sitemap().map((e) => e.url);
+    expect(urls.filter((u) => u.includes("elsewhere"))).toEqual([]);
+    for (const id of NEW) expect(urls).not.toContain(`https://sophecs.com/s/${id}`);
   });
 
   it("gives the school table six rows, the three new ones unranked with no average", async () => {

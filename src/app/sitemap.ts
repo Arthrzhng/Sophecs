@@ -15,10 +15,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .sort((a, b) => a.sort - b.sort)
     .map((topic) => ({ url: `${BASE}/debate/${topic.slug}`, priority: 0.7 }));
 
-  const lessons = getAllMicroLessons().map((lesson) => ({
-    url: `${BASE}/lessons/${lesson.slug}`,
-    priority: 0.5,
-  }));
+  // The before and after passages only: an "elsewhere" passage loads on a
+  // SIX_SCHOOLS build, and has no page at the sophecs.com address below.
+  const lessons = getAllMicroLessons()
+    .filter((lesson) => lesson.position !== "elsewhere")
+    .map((lesson) => ({
+      url: `${BASE}/lessons/${lesson.slug}`,
+      priority: 0.5,
+    }));
 
   return [
     { url: BASE, priority: 1 },

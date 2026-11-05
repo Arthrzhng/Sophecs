@@ -3267,3 +3267,30 @@ scripts and build ids are set aside.
   URLs where the three do not exist; `/debate/rubric`, which is the
   judge's; the sharing image, whose "Three schools." is step 4's copy;
   and everything the judge reads.
+
+### Stage 5, step 2b: Today's view from elsewhere (2026-11-05)
+
+The second half of step 2 of `docs/stage5-plan.md`. On a `SIX_SCHOOLS`
+build Today offers the week's view from elsewhere, and the passage has a
+page; on any other build neither exists, and every passage page and the
+lessons index serve the markup they did.
+
+- **Which passages.** The six "elsewhere" passages in `content/micro`
+  are drafts that belong to no school: their traditions are not all the
+  three's (one is the Zhuangzi). They are Phase 3's, so the loader shows
+  them on a `SIX_SCHOOLS` build and on no other. A draft in any other
+  position stays hidden everywhere.
+- **Today.** The card from `/styleguide/phase3` sits in the path after
+  step 4, "Face an objection", which brings the after-reading. It is a
+  list item and not a seventh step: it has no check and nothing waits for
+  it (`docs/daily-path-copy.md`). It is always there on a flag-on build,
+  not only once step 4 is reached; the copy says it is optional, and
+  whether it should wait for the after-reading is Arthur's (Checkpoint B).
+  "Read it" opens the passage's page.
+- **The passage's page.** `/lessons/[slug]` labels it "A view from
+  elsewhere", leaves out the reading counter, and links to the passage
+  that frames the question. The before and after pages count only their
+  pair, so a flag-on build still numbers them 1 and 2 of 2.
+- **Kept out:** the lessons index (which pairs before and after, as it
+  always has) and the sitemap, whose sophecs.com addresses have no such
+  page.

@@ -2,7 +2,7 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { excluded, type LoadOptions } from "./drafts";
+import { SHOWN_DRAFT_SCHOOL_IDS, excluded, type LoadOptions } from "./drafts";
 import {
   MAX_RETRIEVAL_PROMPTS,
   POSITION_ORDER,
@@ -94,9 +94,21 @@ function loadAll(): Record<string, MicroLessonContent> {
   return result;
 }
 
+/**
+ * An "elsewhere" passage belongs to no school: it is Phase 3's view from
+ * elsewhere, which Today offers after the after-reading. A SIX_SCHOOLS
+ * build shows Phase 3, so it shows these drafts too (docs/stage5-plan.md,
+ * step 2); any other build shows none, as before. A draft in any other
+ * position stays a draft everywhere.
+ */
+function hidden(lesson: MicroLessonContent, options: LoadOptions): boolean {
+  const phase3 = lesson.position === "elsewhere" && SHOWN_DRAFT_SCHOOL_IDS.length > 0;
+  return excluded(lesson, { includeDrafts: options.includeDrafts || phase3 });
+}
+
 export function getMicroLesson(slug: string, options: LoadOptions = {}): MicroLessonContent | null {
   const lesson = loadAll()[slug];
-  if (!lesson || excluded(lesson, options)) return null;
+  if (!lesson || hidden(lesson, options)) return null;
   return lesson;
 }
 
@@ -105,7 +117,7 @@ export function getMicroLesson(slug: string, options: LoadOptions = {}): MicroLe
 // is the order they're encountered in.
 export function getAllMicroLessons(options: LoadOptions = {}): MicroLessonContent[] {
   return Object.values(loadAll())
-    .filter((lesson) => !excluded(lesson, options))
+    .filter((lesson) => !hidden(lesson, options))
     .sort(
       (a, b) =>
         a.topic.localeCompare(b.topic) || POSITION_ORDER[a.position] - POSITION_ORDER[b.position]
