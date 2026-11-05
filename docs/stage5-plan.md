@@ -179,7 +179,9 @@ of the three; Gate 2 is about that.
    three content files' status and colour tokens, the share lines and
    other front matter in `docs/quiz-v2.md`, section 8 (front matter is
    the same in every build, so it cannot be flagged and changes in the
-   launch merge itself), `README.md`, then the fresh sample run.
+   launch merge itself), `README.md`, then the fresh sample run. The
+   six "elsewhere" passages stay `status: draft`: the flag, not their
+   status, shows them, and their status goes when the flag is retired.
    **Gate 4.**
 
 ## Gates for Arthur
