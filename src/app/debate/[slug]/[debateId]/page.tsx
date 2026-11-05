@@ -10,10 +10,9 @@ import { countsOnTable } from "@/lib/school-table";
 import { getRevisionId } from "@/lib/objections";
 import { getSchool } from "@/lib/schools";
 import { Page } from "@/components/layout/Page";
-import { SCHOOL_COLORS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate, shortMotionForShare } from "@/lib/motion-text";
-import { shareTemplateFor } from "@/lib/verdict-share";
+import { verdictShareLine } from "@/lib/verdict-share";
 import { verdictForViewer } from "@/lib/verdict-privacy";
 
 // A sample account's verdict says so in the title too, which is what a
@@ -193,26 +192,23 @@ export default async function VerdictPage({
   // a reword, and this page is the one that used to say the wrong thing.
   const motion = motionForDebate(publicRow.motion_text as string | null, topic.motion);
   const shortMotion = shortMotionForShare(motion);
-  const shareTemplate = shareTemplateFor(schoolContent.verdict_share_line, textWithheld);
-  const baseShareLine = shareTemplate
-    .replaceAll("{score}", String(verdict.score ?? ""))
-    .replaceAll("{topic}", shortMotion)
-    .replaceAll("{verdict_line}", verdict.verdict_line ?? "")
-    .replaceAll("{slug}", slug)
-    .replaceAll("{id}", debateId);
-
-  // A revision that actually answered its objection gets its own line: the
-  // movement is the interesting part, not the absolute score. Built in code
-  // rather than as a fourth per-school frontmatter field — it is the same
-  // sentence for every school, and one more field to write for each.
-  // Anything else (objection still standing, or a v1 parent with no
-  // objection at all) falls back to the ordinary verdict line.
-  const shareLine =
-    comparison && parentObjectionSchool && verdict.objection_answered
-      ? `Answered the ${SCHOOL_COLORS[parentObjectionSchool].name} objection to my ` +
-        `${SCHOOL_COLORS[school].name} case on ${shortMotion}: ` +
-        `${comparison.first.score} → ${verdict.score}. sophecs.com/debate/${slug}/${debateId}`
-      : baseShareLine;
+  // src/lib/verdict-share.ts: none for a sample account, the movement for
+  // a revision that answered its objection, otherwise the school's line.
+  const shareLine = verdictShareLine({
+    sample: Boolean(publicRow.is_sample),
+    template: schoolContent.verdict_share_line,
+    textWithheld,
+    school,
+    shortMotion,
+    score: verdict.score,
+    verdictLine: verdict.verdict_line,
+    slug,
+    debateId,
+    answeredObjection:
+      comparison && parentObjectionSchool && verdict.objection_answered
+        ? { school: parentObjectionSchool, firstScore: comparison.first.score }
+        : null,
+  });
 
   return (
     <Page width="ui">

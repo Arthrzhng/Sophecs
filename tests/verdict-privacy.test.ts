@@ -449,6 +449,8 @@ describe("the verdict page's wiring", () => {
     expect(page).toContain('.select("id, verdict, argument_public")');
     expect(page).toContain("parentPublic = Boolean(parentRow?.argument_public);");
     expect(page).toContain("textWithheld={textWithheld}");
-    expect(page).toContain("shareTemplateFor(schoolContent.verdict_share_line, textWithheld)");
+    // The share sentence is built by verdictShareLine, which passes
+    // textWithheld to shareTemplateFor (tests/seed/share-sentence.test.ts).
+    expect(page).toContain("verdictShareLine({ sample: Boolean(publicRow.is_sample), template: schoolContent.verdict_share_line, textWithheld,");
   });
 });
