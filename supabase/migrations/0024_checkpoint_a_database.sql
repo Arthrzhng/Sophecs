@@ -41,9 +41,13 @@
 -- on profiles while it checks the rows (3,280, milliseconds), and every
 -- lock is held to the end of the transaction. lock_timeout keeps any of
 -- them from queueing behind a long reader and holding every read behind
--- it. CREATE OR REPLACE FUNCTION takes ACCESS SHARE on profiles while it
--- checks the body, which conflicts only with ACCESS EXCLUSIVE. REVOKE
--- takes no table lock. No
+-- it. It bounds each wait separately, so in the worst case reads of the
+-- class tables wait about 15s, 5s for each of the three tables, before
+-- the file fails and rolls back whole. CREATE OR REPLACE FUNCTION takes
+-- ACCESS SHARE on profiles while it checks the body, which conflicts
+-- only with ACCESS EXCLUSIVE; the constraint then upgrades that lock, so
+-- a deadlock is possible in principle, and Postgres would end it by
+-- rolling one side back. REVOKE takes no table lock. No
 -- transaction of its own: the Supabase runner wraps the file, and by hand
 -- it is `psql --single-transaction`. The rollback is
 -- supabase/rollback/0024_checkpoint_a_database.down.sql, and
