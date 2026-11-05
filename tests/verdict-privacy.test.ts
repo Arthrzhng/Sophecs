@@ -108,21 +108,6 @@ function codeOnly(source: string): string {
   return source.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/(^|[^:])\/\/[^\n]*/g, "$1");
 }
 
-/** The body of the block that opens at `opener`, up to its matching brace. */
-function blockAfter(source: string, opener: string): string {
-  const start = source.indexOf(opener);
-  if (start === -1) return "";
-  let depth = 0;
-  for (let i = start + opener.length - 1; i < source.length; i += 1) {
-    if (source[i] === "{") depth += 1;
-    else if (source[i] === "}") {
-      depth -= 1;
-      if (depth === 0) return source.slice(start, i + 1);
-    }
-  }
-  return "";
-}
-
 const READERS = [
   "src/app/debate/[slug]/[debateId]/page.tsx",
   "src/app/debate/[slug]/[debateId]/opengraph-image.tsx",
@@ -178,11 +163,15 @@ describe("motion_text comes from debates_public", () => {
     expect(og).toContain("motion = motionForDebate(data.motion_text as string | null, topic.motion)");
   });
 
-  it("reads the topic on the OG image only inside the block for a debate it found", () => {
+  it("reads the topic on the OG image only for a debate it found", () => {
+    // A debate the view does not return is a 404 before anything else is
+    // read (tests/seed/challenge-preview.test.ts runs the route).
     const og = codeOnly(fs.readFileSync(path.join(process.cwd(), READERS[1]), "utf-8"));
-    const block = blockAfter(og, "if (data) {");
-    expect(block, "the if (data) block").not.toBe("");
-    expect(block).toContain('.from("debate_topics")');
+    const guard = og.indexOf('if (!data) return new Response(null, { status: 404');
+    const topic = og.indexOf('.from("debate_topics")');
+    expect(guard, "the 404 guard").toBeGreaterThan(-1);
+    expect(topic, "the topic read").toBeGreaterThan(-1);
+    expect(guard, "the 404 guard must come before the topic read").toBeLessThan(topic);
     expect(og.split('.from("debate_topics")').length - 1, "one topic read").toBe(1);
   });
 });

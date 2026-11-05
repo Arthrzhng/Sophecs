@@ -1,37 +1,53 @@
-// A sample challenge's link preview (src/app/c/[id]/page.tsx): the
-// challenger's result card, which draws the Sample mark, only when that
-// result is itself a sample; and the result card routes give no image at
-// all, uncached, for a result they cannot read, rather than a default
-// card that would carry no mark.
+// A sample challenge's link preview (src/app/c/[id]/page.tsx) is the
+// challenger's result card, which draws the Sample mark, and only when
+// that result is itself a sample. The card routes draw the mark from the
+// row's own marker, and give no image at all, uncached, for a row they
+// cannot read, rather than a default card that would carry no mark.
+import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 type Row = Record<string, unknown>;
 const tables: Record<string, Row[]> = {};
 
-// The two reads these routes make: .from(t).select(cols).eq(col, v).single().
+// The reads these routes make: .from(t).select(cols).eq(col, v), then
+// .single() or .maybeSingle().
 vi.mock("@/lib/supabase/admin", () => ({
   isAdminConfigured: () => true,
   createAdminClient: () => ({
     from: (t: string) => ({
       select: () => ({
-        eq: (col: string, v: unknown) => ({
-          single: async () => {
-            const row = (tables[t] ?? []).find((r) => r[col] === v);
-            return row ? { data: row, error: null } : { data: null, error: { code: "PGRST116" } };
-          },
-        }),
+        eq: (col: string, v: unknown) => {
+          const row = (tables[t] ?? []).find((r) => r[col] === v);
+          return {
+            single: async () => (row ? { data: row, error: null } : { data: null, error: { code: "PGRST116" } }),
+            maybeSingle: async () => ({ data: row ?? null, error: null }),
+          };
+        },
       }),
     }),
   }),
 }));
 
+// What each card would draw, without depending on Satori's pixels.
+const drawn: { card: string; sample: unknown }[] = [];
+const stub = (card: string) =>
+  function StubCard(props: { sample?: boolean }) {
+    drawn.push({ card, sample: props.sample });
+    return createElement("div", { style: { display: "flex" } }, card);
+  };
+vi.mock("@/components/card/CardLayout", () => ({ CardLayout: stub("result") }));
+vi.mock("@/components/debate/VerdictCard", () => ({ VerdictCard: stub("verdict") }));
+
 const { generateMetadata } = await import("../../src/app/c/[id]/page");
-const ogImage = (await import("../../src/app/r/[id]/opengraph-image")).default;
-const { GET: cardPng } = await import("../../src/app/r/[id]/card.png/route");
+const resultOg = (await import("../../src/app/r/[id]/opengraph-image")).default;
+const { GET: resultPng } = await import("../../src/app/r/[id]/card.png/route");
+const verdictOg = (await import("../../src/app/debate/[slug]/[debateId]/opengraph-image")).default;
 
 const params = (id: string) => ({ params: Promise.resolve({ id }) });
+const verdictParams = (debateId: string) => ({ params: Promise.resolve({ slug: "t", debateId }) });
 
 beforeEach(() => {
+  drawn.length = 0;
   tables.challenges = [
     { id: "c-sample", challenger_result_id: "r-sample", is_sample: true },
     { id: "c-sample-genuine-challenger", challenger_result_id: "r-genuine", is_sample: true },
@@ -41,6 +57,11 @@ beforeEach(() => {
     { id: "r-sample", school: "stoicism", is_sample: true },
     { id: "r-genuine", school: "stoicism", is_sample: false },
   ];
+  tables.debates_public = [
+    { id: "d-sample", school: "stoicism", score: 61, topic_slug: "t", motion_text: "A motion.", is_sample: true },
+    { id: "d-genuine", school: "stoicism", score: 61, topic_slug: "t", motion_text: "A motion.", is_sample: false },
+  ];
+  tables.debate_topics = [{ slug: "t", motion: "A motion." }];
 });
 
 describe("a challenge's link preview", () => {
@@ -54,14 +75,10 @@ describe("a challenge's link preview", () => {
   });
 
   it("has no image for a sample challenge whose challenger's result is not a sample", async () => {
-    const m = (await generateMetadata(params("c-sample-genuine-challenger"))) as {
-      title: string;
-      openGraph?: { images?: unknown };
-      twitter?: { images?: unknown };
-    };
+    const m = (await generateMetadata(params("c-sample-genuine-challenger"))) as { title: string; openGraph?: object; twitter?: object };
     expect(m.title).toBe("A sample account's challenge · Sophecs");
-    expect(m.openGraph?.images).toBeUndefined();
-    expect(m.twitter?.images).toBeUndefined();
+    expect(m.openGraph).not.toHaveProperty("images");
+    expect(m.twitter).not.toHaveProperty("images");
   });
 
   it("is unchanged for a genuine challenge", async () => {
@@ -69,12 +86,31 @@ describe("a challenge's link preview", () => {
   });
 });
 
-describe("the result card routes, for a result they cannot read", () => {
-  it("give a 404 that is not cached, not a default card", async () => {
-    for (const res of [await ogImage(params("r-missing")), await cardPng(new Request("http://x/"), params("r-missing"))]) {
+describe("the card routes", () => {
+  const routes = [
+    { name: "result preview", card: "result", run: (id: string) => resultOg(params(`r-${id}`)) },
+    { name: "result download", card: "result", run: (id: string) => resultPng(new Request("http://x/"), params(`r-${id}`)) },
+    { name: "verdict preview", card: "verdict", run: (id: string) => verdictOg(verdictParams(`d-${id}`)) },
+  ];
+
+  for (const r of routes) {
+    it(`${r.name}: marks a sample's card and not a genuine one, cached as before`, async () => {
+      for (const [id, sample] of [["sample", true], ["genuine", false]] as const) {
+        drawn.length = 0;
+        const res = await r.run(id);
+        await res.arrayBuffer();
+        expect(res.status).toBe(200);
+        expect(res.headers.get("Content-Type")).toBe("image/png");
+        expect(res.headers.get("Cache-Control")).toBe("public, max-age=31536000, immutable");
+        expect(drawn).toEqual([{ card: r.card, sample }]);
+      }
+    });
+
+    it(`${r.name}: a row it cannot read is a 404 that is not cached, and nothing is drawn`, async () => {
+      const res = await r.run("missing");
       expect(res.status).toBe(404);
       expect(res.headers.get("Cache-Control")).toBe("no-store");
-      expect(res.headers.get("Content-Type")).not.toBe("image/png");
-    }
-  });
+      expect(drawn).toEqual([]);
+    });
+  }
 });

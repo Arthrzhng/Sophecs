@@ -49,8 +49,11 @@ describe("link previews of sample pages", () => {
     const m = sampleMetadata("A sample account's challenge · Sophecs", { url: "/r/R1/opengraph-image", alt: "A sample account's result card" });
     expect(m.openGraph.images?.[0]).toMatchObject({ url: "/r/R1/opengraph-image", alt: "A sample account's result card", width: 1200, height: 630 });
     expect(m.twitter.images?.[0].url).toBe("/r/R1/opengraph-image");
-    // Without one, no image at all rather than an unmarked one.
-    expect(sampleMetadata("x").openGraph.images).toBeUndefined();
+    // Without one, no images key at all: Next.js skips a segment's own
+    // opengraph-image whenever the key is present, even as undefined, which
+    // would take the sample verdict page's marked card away.
+    expect(sampleMetadata("x").openGraph).not.toHaveProperty("images");
+    expect(sampleMetadata("x").twitter).not.toHaveProperty("images");
     const { readFileSync } = await import("node:fs");
     const page = readFileSync("src/app/c/[id]/page.tsx", "utf8");
     // The challenger's result card, only when that result is a sample
