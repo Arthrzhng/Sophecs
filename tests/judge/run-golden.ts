@@ -89,7 +89,7 @@ const VERSION = resolveVersion();
 // single-sample runs against a band of 8-10. Three samples and a median
 // measure the distribution instead of pretending it's a point value, at
 // three times the cost. That was about 18p a run when the set was six
-// cases; it is about $0.42 for the v2 run and $0.93 for v3 now, and the dry
+// cases; it is about $0.42 for the v2 run and $0.97 for v3 now, and the dry
 // run prints the current figure. See docs/decisions.md.
 const SAMPLES = parseSamples(process.env.GOLDEN_SAMPLES);
 
@@ -337,10 +337,10 @@ async function sampleCase(
 // its COST comment and its two per-token rates. Two corrections to the
 // obvious approach, both found in review:
 //
-// - est_in=1700 was measured for v2. The whole prompt file is sent, header
-//   comment included, and v3 is more than twice v2's size, so a v3 run
-//   priced at v2's figure understated it by about a quarter. The difference
-//   in file size is added at roughly four bytes a token. That is a rule of
+// - est_in=1700 was measured for v2. v3's prompt as sent (its head comment
+//   stripped since 2026-11-05) is still larger than v2's, so a v3 run
+//   priced at v2's figure would understate it. The difference in the size
+//   of what is sent is added at roughly four bytes a token. That is a rule of
 //   thumb rather than a count, which would need an API call.
 // - The COST comment's own est_usd_per_call=0.0098 does not follow from
 //   its est_in and est_out at those rates, which give 0.0099. The frozen

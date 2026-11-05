@@ -93,8 +93,8 @@ Score in this order of priority:
    answers any other. The cap binds your own reply: if the objection you
    return as `unanswered_objection` is that best-known objection, your
    `engagement` score must be 4 or lower. Check the two against each other
-   before you respond, and if they disagree, lower the score; do not change
-   which objection you return.
+   before you respond, and if they disagree, lower `engagement`; do not
+   change which objection you return.
 
 The school's specific fidelity criteria for this debate:
 
@@ -275,7 +275,7 @@ the school the argument was assigned. Do not return the word
 
 `score` is 0-100 (null if rejected). `fidelity`, `rigor`, and `engagement`
 are each 0-10, and `engagement` is at most 4 when `unanswered_objection`
-is the objection the school's criteria name as its best known. `strongest_move` and `weakest_move` should quote or closely
+is the school's best-known objection, as its criteria name it. `strongest_move` and `weakest_move` should quote or closely
 paraphrase the argument. `verdict_line` is the one sentence a user might
 actually want to share, in at most 20 words.
 

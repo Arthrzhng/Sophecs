@@ -332,10 +332,10 @@ describe("v3 as sent (Arthur's rulings of 2026-11-05)", () => {
       "scores no more than 4 on engagement, however well it answers any other. The cap binds your own reply: " +
         "if the objection you return as `unanswered_objection` is that best-known objection, your `engagement` " +
         "score must be 4 or lower. Check the two against each other before you respond, and if they disagree, " +
-        "lower the score; do not change which objection you return."
+        "lower `engagement`; do not change which objection you return."
     );
     expect(flat).toContain(
-      "`engagement` is at most 4 when `unanswered_objection` is the objection the school's criteria name as its best known."
+      "`engagement` is at most 4 when `unanswered_objection` is the school's best-known objection, as its criteria name it."
     );
   });
 

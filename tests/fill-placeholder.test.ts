@@ -31,8 +31,9 @@ describe("fillPlaceholders", () => {
 
   it("throws when a placeholder appears twice", () => {
     // The real regression: judge.v3.md named {{RUBRIC}} in its own header
-    // comment and again as the placeholder. The whole file is sent to the
-    // model, so the naive fill filled the comment and left the placeholder.
+    // comment and again as the placeholder. The whole file was then sent to
+    // the model, so the naive fill filled the comment and left the
+    // placeholder.
     const template = "<!-- interpolated at {{RUBRIC}} -->\n\n{{RUBRIC}}";
     expect(() => fillPlaceholders(template, { "{{RUBRIC}}": RUBRIC })).toThrow(
       "judge prompt names {{RUBRIC}} 2 times; it must appear at most once"
