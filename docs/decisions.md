@@ -3380,7 +3380,12 @@ reader who reached one of them stayed there.
 - **Cookies and storage are per host.** A reader signed in on
   sophecs.vercel.app is signed out on sophecs.com and signs in once more,
   and an unsent argument the editor saved in that host's local storage
-  stays there, out of reach now that every page there redirects.
+  stays there, out of reach now that every page there redirects. A tab
+  left open there across the deploy fails its next server action (they
+  post to page paths, which redirect), and a quiz finished in it loses
+  its pending result, kept in that host's session storage; reloading
+  lands on sophecs.com. Submitting an argument goes through `/api/judge`
+  and is not affected.
 - **A loop to avoid.** A Vercel domain redirect from sophecs.com to
   another host (www, say) would loop with these rules, which send that
   host back. Today no domain redirects; the steps in the pull request

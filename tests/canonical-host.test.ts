@@ -1,13 +1,17 @@
 // One address (docs/decisions.md): a production build sends every page on
 // another host to sophecs.com, and a sign-in that fell back to Supabase's
 // Site URL to /auth/callback. The rules are matched here with Next's own
-// matchers (path-to-regexp for the path, matchHas for the host and query).
-// In production Vercel's router runs them, after converting them, and no
-// check before a merge can reach production-only rules: the check made on
-// the live hosts after the merge is in docs/progress.md.
+// matchers (path-to-regexp for the path, matchHas for the host and query),
+// their status read as Next reads it, and Next's own validation run on
+// them. In production Vercel's router runs them, after converting them; no
+// check before a merge can reach production-only rules, so the check made
+// on the live hosts after the merge will be recorded in docs/progress.md.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getPathMatch } from "next/dist/shared/lib/router/utils/path-match";
 import { matchHas } from "next/dist/shared/lib/router/utils/prepare-destination";
+import loadCustomRoutes from "next/dist/lib/load-custom-routes";
+import { buildCustomRoute } from "next/dist/lib/build-custom-route";
+import { getRedirectStatus } from "next/dist/lib/redirect-status";
 import nextConfig, { canonicalRedirects, CANONICAL_HOST } from "../next.config";
 
 const DEPLOYMENT = "sophecs-abc123def-arthurrzhang-1874s-projects.vercel.app";
@@ -22,7 +26,7 @@ function route(rules: Rule[], host: string, path: string, query: Record<string, 
     if (!matchHas(req, query, rule.has ?? [], rule.missing ?? [])) continue;
     const search = new URLSearchParams(query).toString();
     const to = rule.destination.replace(":path", String((params as Record<string, string>).path ?? ""));
-    return { status: rule.permanent ? 308 : 307, location: `${to}${search ? `?${search}` : ""}` };
+    return { status: getRedirectStatus(rule as never), location: `${to}${search ? `?${search}` : ""}` };
   }
   return null;
 }
@@ -79,7 +83,7 @@ describe("on production", () => {
     expect(route(rules, DEPLOYMENT, "/debate")).toBeNull();
   });
 
-  it("sends a sign-in code at the root to the callback, on any host, for the moment", () => {
+  it("sends a sign-in code at the root to the callback, on any host", () => {
     for (const host of ["sophecs.vercel.app", "sophecs.com"])
       expect(route(rules, host, "/", { code: "abc123" }), host).toEqual({
         status: 307,
@@ -87,6 +91,16 @@ describe("on production", () => {
       });
     // Only at the root.
     expect(route(rules, "sophecs.com", "/debate", { code: "abc123" })).toBeNull();
+  });
+
+  it("passes Next's own validation, and Next builds both as 307s", async () => {
+    // What next build does with them: an invalid rule throws here, and the
+    // status comes from whichever of permanent or statusCode a rule sets.
+    const custom = await loadCustomRoutes({ redirects: async () => rules } as never);
+    const ours = custom.redirects.filter((r) => !(r as { internal?: boolean }).internal);
+    expect(ours).toHaveLength(2);
+    for (const r of ours) expect(buildCustomRoute("redirect", r, ["/_next"]).statusCode).toBe(307);
+    for (const r of rules) expect("statusCode" in r).toBe(false);
   });
 
   it("keeps only sophecs.com when the build does not say its own URL", () => {

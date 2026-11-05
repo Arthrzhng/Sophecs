@@ -87,7 +87,7 @@ const SIX_SCHOOLS_TOKENS = path.join(
 // (www, say): these rules send that host back, and the two would loop.
 //
 // The host rule is a 307 until a live check has shown sophecs.com is left
-// alone in production (docs/progress.md), and a 308 after. A browser keeps
+// alone in production (to be recorded in docs/progress.md), and a 308 after. A browser keeps
 // a 308, so a rule Vercel read differently from Next could otherwise leave
 // readers in a loop that no rollback reaches.
 //
