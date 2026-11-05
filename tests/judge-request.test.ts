@@ -306,6 +306,46 @@ describe("the prompt version override", () => {
   });
 });
 
+describe("v3 as sent (Arthur's rulings of 2026-11-05)", () => {
+  function sentV3(): Promise<string> {
+    created.length = 0;
+    return callJudgeModel(MOTION, "stoicism", ARGUMENT, undefined, "v3").then(() => String(created[0].system));
+  }
+
+  it("leaves out the file's HTML comments, and v2 keeps its own text", async () => {
+    // "Strip comments from judge.v3.md before it is sent (v3 only)."
+    const system = await sentV3();
+    expect(system).not.toContain("<!--");
+    expect(system).not.toContain("-->");
+    expect(system).not.toContain("v3 differs from v2");
+    expect(system.startsWith("You are a philosophy tutor")).toBe(true);
+    // The file still has its comment; only the request loses it.
+    expect(fs.readFileSync(path.join(process.cwd(), "content/prompts/judge.v3.md"), "utf-8").startsWith("<!--")).toBe(true);
+  });
+
+  it("ties the engagement cap to the objection the judge returns", async () => {
+    // "Strengthen the v3 engagement-cap instruction." Pinned whole, inside
+    // the engagement criterion and in the note on the scores.
+    const flat = (await sentV3()).replace(/\s+/g, " ");
+    const criterion = flat.slice(flat.indexOf("3. **Engagement**"), flat.indexOf("The school's specific fidelity criteria"));
+    expect(criterion).toContain(
+      "scores no more than 4 on engagement, however well it answers any other. The cap binds your own reply: " +
+        "if the objection you return as `unanswered_objection` is that best-known objection, your `engagement` " +
+        "score must be 4 or lower. Check the two against each other before you respond."
+    );
+    expect(flat).toContain(
+      "`engagement` is at most 4 when `unanswered_objection` is the objection the school's criteria name as its best known."
+    );
+  });
+
+  it("gives Utilitarianism's Virtue Ethics voice Arthur's wording, under v3 only", () => {
+    const words = "what is done to one person must be justifiable to that person, not only to the total";
+    expect(fidelityCriteriaFor("utilitarianism", "v3")).toContain(words);
+    expect(fidelityCriteriaFor("utilitarianism", "v3")).not.toContain("a total owes nobody anything");
+    expect(fidelityCriteriaFor("utilitarianism", "v2")).not.toContain(words);
+  });
+});
+
 describe("every judge prompt file", () => {
   // The invariant `fillPlaceholders` enforces at call time, checked here at the
   // file level so it fails on the prompt rather than on a run.

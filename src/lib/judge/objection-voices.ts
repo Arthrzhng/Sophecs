@@ -38,7 +38,7 @@ export const OBJECTION_VOICES: Record<SchoolId, ReadonlyArray<{ rival: SchoolId;
   utilitarianism: [
     {
       rival: "virtue-ethics",
-      why: "justice gives each person what is owed to them, and a total owes nobody anything",
+      why: "what is done to one person must be justifiable to that person, not only to the total",
     },
     {
       rival: "ubuntu",
