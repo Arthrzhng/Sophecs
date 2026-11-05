@@ -91,6 +91,11 @@ q "insert into auth.users (id) values ('$OWNER'), ('$MEMBER')" >/dev/null
 q "insert into profiles (id, handle, display_name, elo) values ('$OWNER', 'owner', 'Owner', 1250), ('$MEMBER', 'member', 'Member', 1150)" >/dev/null
 q "insert into classes (id, code, owner_id, name) values ('c1', 'CODE1', '$OWNER', 'A class')" >/dev/null
 q "insert into class_members (class_id, user_id) values ('c1', '$MEMBER')" >/dev/null
+# A sample profile rated below everyone, so elo_percentile's "not
+# is_sample" is exercised: counted, it would move every percentile.
+SAMPLE=33333333-3333-4333-8333-333333333333
+q "insert into auth.users (id) values ('$SAMPLE')" >/dev/null
+q "insert into profiles (id, handle, display_name, elo, is_sample) values ('$SAMPLE', 'sample', 'Sample', 900, true)" >/dev/null
 
 say "before 0024"
 expect "a member reads the class" 1 "$(as_role authenticated "select count(*) from classes where id = 'c1'" "$MEMBER")"
@@ -119,6 +124,7 @@ expect "signed in, is_class_owner refused" denied "$(as_role authenticated "sele
 expect "anon, is_class_member refused" denied "$(as_role anon "select public.is_class_member('c1', '$MEMBER')")"
 expect "the server role still reads every class" 1 "$(as_role service_role "select count(*) from classes")"
 expect "elo_percentile's search_path" 'search_path=""' "$(q "select array_to_string(proconfig, ',') from pg_proc where proname = 'elo_percentile'")"
+expect "elo_percentile still counts genuine profiles only" "0.00000000000000000000 0.50000000000000000000 1.00000000000000000000" "$PCT_BEFORE"
 expect "elo_percentile's results unchanged" "$PCT_BEFORE" "$(q "select elo_percentile(1100) || ' ' || elo_percentile(1200) || ' ' || elo_percentile(1300)")"
 # Called with no search_path at all, so the body must name its table in
 # full. (As anon it would return 0 either way: it runs with the caller's

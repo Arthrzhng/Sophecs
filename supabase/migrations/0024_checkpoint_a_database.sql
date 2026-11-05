@@ -11,7 +11,7 @@
 --    setDisplayName's trim and 60-character limit. The check holds the
 --    limit in the database. Rows checked in production on 2026-11-05
 --    before writing this: 3,280 profiles, none over 60 characters (the
---    longest is 12), none blank or untrimmed. char_length counts code
+--    longest is 12; docs/seed-snapshots/2026-11-05-before-0024.json). char_length counts code
 --    points; setDisplayName's limit counts UTF-16 units, which are never
 --    fewer, so nothing the site writes can fail it.
 --
@@ -28,7 +28,7 @@
 --
 -- 22. "fix elo_percentile's search_path". It ran with the caller's
 --    search_path. It now runs with an empty one and names its table in
---    full. Same signature, body and result; CREATE OR REPLACE keeps its
+--    full. Same signature, logic and results; CREATE OR REPLACE keeps its
 --    owner and grants.
 --
 -- 23. "If nothing reads exchanges_public, revoke its read access."
@@ -36,11 +36,12 @@
 --    the database depends on it (pg_depend, read on 2026-11-05). Clients
 --    lose SELECT; the server role keeps it.
 --
--- Locks: ADD CONSTRAINT takes ACCESS EXCLUSIVE on profiles while it checks
--- the rows (3,280, milliseconds); ALTER POLICY takes ACCESS EXCLUSIVE on
--- classes and on class_members for the catalogue change. lock_timeout
--- keeps either from queueing behind a long reader and holding every read
--- behind it. REVOKE and CREATE OR REPLACE FUNCTION take no table lock. No
+-- Locks: ALTER POLICY takes ACCESS EXCLUSIVE on classes and on
+-- class_members for the catalogue change; ADD CONSTRAINT, last, takes it
+-- on profiles while it checks the rows (3,280, milliseconds), and every
+-- lock is held to the end of the transaction. lock_timeout keeps any of
+-- them from queueing behind a long reader and holding every read behind
+-- it. REVOKE and CREATE OR REPLACE FUNCTION take no table lock. No
 -- transaction of its own: the Supabase runner wraps the file, and by hand
 -- it is `psql --single-transaction`. The rollback is
 -- supabase/rollback/0024_checkpoint_a_database.down.sql, and
@@ -48,11 +49,6 @@
 -- local database.
 
 set local lock_timeout = '5s';
-
--- 4.
-alter table public.profiles
-  add constraint profiles_display_name_length
-  check (display_name is null or char_length(display_name) <= 60);
 
 -- 21.
 alter policy "class read owner or member" on public.classes
@@ -85,9 +81,17 @@ $$;
 -- 23.
 revoke select on public.exchanges_public from anon, authenticated;
 
+-- 4. Last, so ACCESS EXCLUSIVE on profiles, which most pages read, is held
+-- only from here to the end of the file.
+alter table public.profiles
+  add constraint profiles_display_name_length
+  check (display_name is null or char_length(display_name) <= 60);
+
 -- What clients hold afterwards, checked rather than assumed: a REVOKE that
 -- finds nothing it may revoke (a privilege another role granted) still
--- succeeds.
+-- succeeds. And no policy anywhere may still call either class function,
+-- since a signed-in read of its table would then fail with "permission
+-- denied for function".
 do $$
 declare
   left_over text[] := '{}';
@@ -107,6 +111,14 @@ begin
   end loop;
   if cardinality(left_over) > 0 then
     raise exception '0024: still held after the revokes: %', array_to_string(left_over, ', ');
+  end if;
+  select array_agg(pol.polrelid::regclass || ' "' || pol.polname || '"') into left_over
+    from pg_depend d join pg_policy pol on pol.oid = d.objid
+    where d.classid = 'pg_policy'::regclass
+      and d.refobjid in ('public.is_class_member(text, uuid)'::regprocedure,
+                         'public.is_class_owner(text, uuid)'::regprocedure);
+  if cardinality(left_over) > 0 then
+    raise exception '0024: policies still call the class functions: %', array_to_string(left_over, ', ');
   end if;
 end
 $$;

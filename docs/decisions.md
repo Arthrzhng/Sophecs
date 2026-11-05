@@ -2870,7 +2870,8 @@ because one of them drops:
 - **0024, through the Supabase tool** (no DROP):
   - **4.** `profiles_display_name_length`: `display_name` is null or at
     most 60 characters. Production's rows were checked first: 3,280, none
-    over 60, the longest 12.
+    over 60, the longest 12. Added last, so `profiles` is locked for the
+    shortest time.
   - **21.** No signed-in path needs `is_class_member` or `is_class_owner`.
     Every class read in `src/` uses the server role; the one signed-in
     class write, `leaveClass`, deletes the reader's own `class_members`
@@ -2878,9 +2879,13 @@ because one of them drops:
     policies narrow to the reader's own rows (ALTER POLICY, renamed "class
     read owner" and "member read own"), and clients can no longer execute
     either function. The functions stay, unused; dropping them is a DROP
-    for later.
+    for later. The closing check also fails if any policy still calls
+    either. Checkpoint A and "For Checkpoint A, from the security work"
+    said a revoke "would break class pages": it would not have, since
+    class pages read with the server role; it would only have broken the
+    two policies for a direct signed-in read through the API.
   - **22.** `elo_percentile` runs with `search_path = ''` and names
-    `public.profiles` in full. Same signature, body and results.
+    `public.profiles` in full. Same signature, logic and results.
   - **23.** Nothing in `src/` or `scripts/` reads `exchanges_public`, and
     in production no database object depends on it (`pg_depend`, read on
     2026-11-05), so anon and authenticated lose SELECT on it. The server
@@ -2894,13 +2899,13 @@ because one of them drops:
   update", which `/me`'s two signed-in updates go through.
 
 **Tests.** `scripts/test-0024-checkpoint-a-database.sh` applies every
-migration before 0024 under Supabase's default privileges, then checks 38
+migration before 0024 under Supabase's default privileges, then checks 39
 things: the constraint at 60 and 61 characters, from the server role and
 signed in; a member no longer reading the class and an owner no longer
 reading others' memberships, while each still reads their own and
 `leaveClass` still deletes; both functions refused to anon and
-authenticated; `elo_percentile`'s results unchanged and its body running
-under an empty caller search path; `exchanges_public` refused to clients
+authenticated; `elo_percentile` counting genuine profiles only, its results unchanged
+and its body running under an empty caller search path; `exchanges_public` refused to clients
 and read by the server role; the rollback restoring every policy, grant,
 function and constraint exactly (compared as text); 0024 refused, naming
 the privilege, when another role has granted one of the functions; 0025
