@@ -26,12 +26,14 @@ export const metadata = {
 // draft schools on the server only, so no draft name reaches a client
 // bundle (npm run check:bundle).
 //
-// Nothing here is decided. The colours are candidates
-// (scripts/colour-candidates.mjs), the map's positions are
-// docs/quiz-v2.md's draft, and the copy is docs/daily-path-copy.md §12.
+// The new schools' colours are chosen, under Arthur's ruling 16 of
+// 2026-11-05 (scripts/colour-candidates.mjs); the map's positions are
+// docs/quiz-v2.md's, accepted in ruling 15, and the copy is
+// docs/daily-path-copy.md §12.
 
 interface Candidate {
   hex: string;
+  family: string;
   textOnHero: number;
   dotOnPaper: number;
   minDeltaE: number;
@@ -47,7 +49,8 @@ interface Candidate {
 interface Candidates {
   existing: Record<string, { hex: string; deuteranopia: string; protanopia: string; textOnHero: number }>;
   candidates: Record<string, Candidate[]>;
-  recommended: Record<string, string> & { minPairwiseDeltaE: number };
+  chosen: Record<string, string> & { worstPairAllSix: number; worstPairAmongNew: number };
+  thresholds: Record<string, number>;
 }
 
 // The colour script keys the live schools by their token names.
@@ -82,9 +85,11 @@ export default function Phase3Page() {
   const elsewhere = getAllMicroLessons({ includeDrafts: true }).filter((l) => l.position === "elsewhere");
   const ALL: SchoolId[] = [...PUBLISHED_SCHOOL_IDS, ...DRAFT_SCHOOL_IDS];
   const nameOf = (id: SchoolId) => schoolDisplayName(id);
-  // A live school's own token; a draft school's recommended candidate.
+  // A live school's own token; a draft school's chosen colour.
   const colourOf = (id: SchoolId) =>
-    (PUBLISHED_SCHOOL_IDS as readonly SchoolId[]).includes(id) ? schoolColourVar(id) : colours.recommended[id];
+    (PUBLISHED_SCHOOL_IDS as readonly SchoolId[]).includes(id) ? schoolColourVar(id) : colours.chosen[id];
+  const chosenOf = (id: SchoolId) => colours.candidates[id].find((c) => c.hex === colours.chosen[id])!;
+  const withoutAlternatives = DRAFT_SCHOOL_IDS.filter((id) => colours.candidates[id].length === 1).map(nameOf);
   const mapSchools: MapSchool[] = ALL.map((id) => ({
     id,
     name: nameOf(id),
@@ -97,22 +102,25 @@ export default function Phase3Page() {
       <h1 className="text-xl font-extrabold tracking-tight text-ink">Phase 3.0</h1>
       <p className="mt-1 max-w-[60ch] text-base text-ink-mid">
         Stage 4 of the brief of 3 November: the six-school pieces, on fixtures. Nothing on this
-        page is live, and nothing on it is decided.
+        page is live.
       </p>
 
-      <Section title="Colour candidates for the new schools">
+      <Section title="The new schools' colours">
         <p className="max-w-[62ch] text-sm leading-relaxed text-ink-mid">
-          Three per school, from <Mono>scripts/colour-candidates.mjs</Mono>. Each carries white
-          hero text at AA, shows as a dot on paper, keeps its distance from the three live schools
-          in normal vision and under simulated deuteranopia and protanopia, and avoids its
-          school&apos;s stereotyped hues. All but four of the colours that pass those constraints are
-          indigo to plum (hue 250 to 335); the four others, three dark teals and a brown, are not
-          among those offered. The
-          recommended set is the three that stay furthest apart from each other: a smallest
-          difference of {colours.recommended.minPairwiseDeltaE} (CIEDE2000) under any of the three
-          views.
+          Chosen by <Mono>scripts/colour-candidates.mjs</Mono> under Arthur&apos;s ruling of 5
+          November: the three come from different hue families, at least{" "}
+          {colours.thresholds.MIN_HUE_GAP} degrees of hue apart, and each stays at least{" "}
+          {colours.thresholds.MIN_DE_CVD} (CIEDE2000) from every live school under simulated
+          deuteranopia and protanopia. The other constraints are as before: white hero text at AA, a
+          dot that shows on paper, {colours.thresholds.MIN_DE} from the live schools and{" "}
+          {colours.thresholds.MIN_DE_OTHERS} from the judge&apos;s blue and the step-done orange in
+          normal vision, and none of a school&apos;s stereotyped hues. Each set that passes is scored
+          by its closest pair among all six schools under the worst of the three views, rounded to a
+          whole unit; of the sets with the best score, this is the one whose three new colours are
+          furthest from each other ({colours.chosen.worstPairAmongNew}). Its closest pair is{" "}
+          {colours.chosen.worstPairAllSix}. Names always sit beside the colours.
         </p>
-        <h3 className="mt-6 text-base font-extrabold text-ink">Recommended set, beside the live three</h3>
+        <h3 className="mt-6 text-base font-extrabold text-ink">The six, side by side</h3>
         <ViewRow
           label="Normal vision"
           swatches={ALL.map((id) => ({ name: nameOf(id), colour: colourOf(id) }))}
@@ -125,10 +133,17 @@ export default function Phase3Page() {
               name: nameOf(id),
               colour: (PUBLISHED_SCHOOL_IDS as readonly SchoolId[]).includes(id)
                 ? colours.existing[TOKEN_KEY[id]!][view]
-                : colours.candidates[id].find((c) => c.hex === colours.recommended[id])![view],
+                : chosenOf(id)[view],
             }))}
           />
         ))}
+        <p className="mt-8 max-w-[62ch] text-sm leading-relaxed text-ink-mid">
+          Beside each chosen colour, the best alternatives for that school with the other two held
+          where they are, under the same rules, each at least {colours.thresholds.MIN_DE_BETWEEN} from
+          the chosen one.
+          {withoutAlternatives.length > 0 &&
+            ` ${withoutAlternatives.join(" and ")} ${withoutAlternatives.length === 1 ? "has" : "have"} none that far away.`}
+        </p>
         {DRAFT_SCHOOL_IDS.map((id) => (
           <div key={id} className="mt-8">
             <h3 className="text-base font-extrabold text-ink">{nameOf(id)}</h3>
@@ -138,7 +153,7 @@ export default function Phase3Page() {
                   key={c.hex}
                   school={nameOf(id)}
                   candidate={c}
-                  recommended={c.hex === colours.recommended[id]}
+                  chosen={c.hex === colours.chosen[id]}
                 />
               ))}
             </div>
@@ -207,10 +222,10 @@ export default function Phase3Page() {
       <Section title="Result cards, six schools">
         <p className="mb-4 max-w-[62ch] text-sm text-ink-mid">
           Each school&apos;s own one_line at the card&apos;s 1200 by 630. The new schools use a card
-          surface derived from the recommended candidate: the same hue, darkened only where the
-          card&apos;s text would otherwise fall below AA at its lowest opacity. Of the three, only
-          Confucianism&apos;s needed it. The live schools&apos; surfaces are all darker than their
-          markers; whether the new ones should be too is Arthur&apos;s to decide.
+          surface derived from its chosen colour: the same hue, darkened only where the card&apos;s
+          text would otherwise fall below AA at its lowest opacity. The live schools&apos; surfaces
+          are all darker than their markers; whether the new ones should be too is Arthur&apos;s to
+          decide.
         </p>
         <div className="grid gap-6">
           {ALL.map((id) => {
@@ -229,7 +244,7 @@ export default function Phase3Page() {
                     sans: "var(--font-plex-sans), system-ui, sans-serif",
                   }}
                   unit="cqw"
-                  surface={colours.candidates[id].find((c) => c.hex === colours.recommended[id])!.cardSurface}
+                  surface={chosenOf(id).cardSurface}
                   schoolName={nameOf(id)}
                 />
               </div>
@@ -334,11 +349,11 @@ function ViewRow({ label, swatches }: { label: string; swatches: { name: string;
 function CandidateCard({
   school,
   candidate: c,
-  recommended,
+  chosen,
 }: {
   school: string;
   candidate: Candidate;
-  recommended: boolean;
+  chosen: boolean;
 }) {
   return (
     <div className="overflow-hidden rounded-card border-2 border-rule bg-surface">
@@ -350,7 +365,8 @@ function CandidateCard({
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-bold">
           <span aria-hidden="true" className="size-3 shrink-0 rounded-full" style={{ background: c.hex }} />
           {school} <span className="font-mono text-xs text-ink-mid">{c.hex}</span>
-          {recommended && <span className="text-xs font-extrabold uppercase text-ink-mid">recommended</span>}
+          <span className="text-xs text-ink-mid">{c.family}</span>
+          {chosen && <span className="text-xs font-extrabold uppercase text-ink-mid">chosen</span>}
         </p>
         <p className="font-mono text-xs text-ink-mid">
           White text {c.textOnHero}:1 &middot; dot {c.dotOnPaper}:1
