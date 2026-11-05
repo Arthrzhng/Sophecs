@@ -122,9 +122,10 @@ flag that did not take is not passed as a production build. Each script
 needs its own kind of build: `npm run check:bundle` fails on a flag-on
 `.next` rather than checking it, so a `SIX_SCHOOLS=1` left in a shell or
 in `.env.local` cannot turn the gate green. `npm run check:bundle:six`
-makes the flag-on build, into `.next-six`, and checks it. A change to the registry, a school map, `next.config.ts`, the flag's
-stylesheet, or anything a client component imports runs it as well as
-the five gates, and its output is read like the first's.
+makes the flag-on build, into `.next-six`, and checks it. A change to the
+registry, a school map, `next.config.ts`, the flag's stylesheet, or
+anything a client component imports runs it as well as the five gates,
+and its output is read like the first's.
 
 This rule exists because a single registry that enumerated all six schools
 put three unreleased school names into **thirteen** production client
@@ -153,7 +154,10 @@ content/schools/` plus the `status:` front matter in the school files.
 In `school-registry.ts`, an entry in `SHOWN_DRAFTS` is shown on flag-on
 builds only, behind `process.env.SIX_SCHOOLS === "1"`; an entry added to
 `PUBLISHED_SCHOOLS`, or a `SHOWN_DRAFTS` entry moved out from behind that
-test, is publishing, and so is setting `SIX_SCHOOLS` for Production. Note the shape of that
+test, is publishing, and so is setting `SIX_SCHOOLS` for Production, and
+so is promoting a flag-on preview deployment to Production, which does
+not rebuild and so passes no check at all. `next.config.ts` refuses a
+flag-on production build; it cannot see a promotion. Note the shape of that
 front-matter diff: only the drafts carry a `status:` field at all, so
 publishing shows up as a **removed** line rather than a changed value.
 

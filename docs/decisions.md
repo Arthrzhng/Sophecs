@@ -3228,10 +3228,16 @@ build without it is the production build it was, which
   only a cache its own kind wrote. Rebuilt both ways over one cache, and
   back, the checks pass each time.
 - **No flag in production before launch.** `next.config.ts` refuses to
-  build when the flag is on and `VERCEL_ENV` is `production`, so a wrong
-  tick in Vercel fails the deploy and the live one stays, rather than
-  publishing the three with every gate green. The launch merge removes
-  the refusal.
+  build when the flag is on and `VERCEL_ENV` is `production`, or when a
+  Vercel build (`VERCEL=1`) does not say which environment it is for, so
+  a wrong tick in Vercel fails the deploy and the live one stays, rather
+  than publishing the three with every gate green. The launch merge
+  removes the refusal. It cannot see a promotion: promoting a flag-on
+  preview to Production does not rebuild, and the review charter (rule 4)
+  counts it as publishing.
+- **Tests pin the flag off.** `vitest.config.mts` sets `SIX_SCHOOLS` to
+  `"0"` for every test that does not stub it, so a flag left in the
+  shell cannot fail unrelated tests under misleading names.
 
 Vercel's Preview environment gets `SIX_SCHOOLS=1` once this is merged;
 Production does not until launch.
@@ -3267,6 +3273,18 @@ scripts and build ids are set aside.
   URLs where the three do not exist; `/debate/rubric`, which is the
   judge's; the sharing image, whose "Three schools." is step 4's copy;
   and everything the judge reads.
+- **What else a flag-on build does differently**, from the loaders:
+  `/lessons/modules/[id]` prerenders the three's draft modules, one each;
+  `/quiz/result` sends all six schools' content to the page, though the
+  quiz still places a reader in one of three; and `getSchool` answers for
+  the three, so `/r/[id]`, `/c/[id]`, their images, the verdict page and
+  `/today` would render a row in one of them on a preview. On a flag-off
+  build it still throws, which is why step 3 comes before any v2 write.
+- **Today's lessons card** counts its modules too ("All six modules
+  read." on a flag-on build).
+- **The three's pages offer "Take the quiz" and "Argue a motion from
+  it"**, which cannot yet place a reader in them or judge them (steps 4
+  and 5). Previews only; for Checkpoint B.
 
 ### Stage 5, step 2b: Today's view from elsewhere (2026-11-05)
 
