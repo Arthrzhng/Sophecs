@@ -10,6 +10,7 @@ import {
   draftNeedles,
   findDraftLeaks,
   findMissing,
+  wrongKindOfBuild,
 } from "../scripts/check-client-bundle";
 import { DRAFT_SCHOOLS } from "../src/lib/school-registry.drafts";
 
@@ -98,6 +99,25 @@ describe("the client bundle", () => {
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
+  });
+
+  it("refuses to check a build of the other kind, in both directions", () => {
+    // The production gate on a flag-on build, as a SIX_SCHOOLS=1 left in
+    // a shell or .env.local would make one: refused, not passed.
+    expect(wrongKindOfBuild(true, false, ".next")).toMatch(/this is the production check/);
+    // --six on a production build: refused, not passed as a missing flag.
+    expect(wrongKindOfBuild(false, true, ".next")).toMatch(/--six checks a build with it/);
+    expect(wrongKindOfBuild(false, false, ".next")).toBeNull();
+    expect(wrongKindOfBuild(true, true, ".next-six")).toBeNull();
+  });
+
+  it("refuses to run when a draft has no adherent noun to look for", () => {
+    const [first, ...rest] = DRAFT_SCHOOLS;
+    const withoutNoun = { ...first, adherent: undefined };
+    expect(() => draftNeedles(SIX_SCHOOLS_CSS, [withoutNoun, ...rest])).toThrowError(
+      new RegExp(`${first.id} has no adherent noun`)
+    );
+    expect(() => draftNeedles(SIX_SCHOOLS_CSS, [...DRAFT_SCHOOLS])).not.toThrow();
   });
 
   it("refuses to run when the stylesheet lacks one of a draft's colour tokens", () => {

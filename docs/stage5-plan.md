@@ -17,9 +17,12 @@ pushed before the gate is answered.
 Vercel runs a plain `next build`, which runs no bundle check, so a wrong
 tick that set the flag for Production would publish the three with every
 gate green. `next.config.ts` therefore refuses to build when the flag is
-on and `VERCEL_ENV` is `production`; the launch merge removes that
-refusal. `npm run check:bundle:six` is the other direction: it catches
-code that ignores the flag, not a wrong setting in Vercel.
+on and `VERCEL_ENV` is `production`, or when a Vercel build does not say
+which environment it is for; the launch merge removes that refusal. It
+covers builds only: promoting a flag-on preview to Production does not
+rebuild, so it would publish the three past every check, and is never
+done before launch. `npm run check:bundle:six` is the other direction:
+it catches code that ignores the flag, not a wrong setting in Vercel.
 
 **Read when the build starts, not at runtime.** `next.config.ts` reads it
 and passes it to the code through `env`, always as `"0"` or `"1"` (Next

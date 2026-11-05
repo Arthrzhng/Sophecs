@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { DRAFT_SCHOOLS } from "../src/lib/school-registry.drafts";
+import type { SchoolEntry } from "../src/lib/school-registry";
 
 /**
  * Fails if a draft school's id, name, adherent noun or colour is in the
@@ -100,9 +101,12 @@ export function colourNeedles(cssFile: string = SIX_SCHOOLS_CSS): string[] {
  * shade) from the flag-only stylesheet, would let both directions of the
  * check pass without looking for what a flag-on build actually holds.
  */
-export function draftNeedles(cssFile: string = SIX_SCHOOLS_CSS): string[] {
+export function draftNeedles(
+  cssFile: string = SIX_SCHOOLS_CSS,
+  drafts: readonly SchoolEntry[] = DRAFT_SCHOOLS
+): string[] {
   const out = new Set<string>();
-  for (const entry of DRAFT_SCHOOLS) {
+  for (const entry of drafts) {
     if (!entry.adherent || !entry.adherentPlural) {
       throw new Error(
         `${entry.id} has no adherent noun in school-registry.drafts.ts, ` +
@@ -115,7 +119,7 @@ export function draftNeedles(cssFile: string = SIX_SCHOOLS_CSS): string[] {
     out.add(entry.adherentPlural);
   }
   const tokens = colourTokens(cssFile);
-  for (const entry of DRAFT_SCHOOLS) {
+  for (const entry of drafts) {
     for (const name of [entry.id, `${entry.id}-surface`, `${entry.id}-deep`]) {
       if (!tokens[name]) {
         throw new Error(
@@ -165,6 +169,22 @@ export function findDraftLeaks(clientDir: string = CLIENT_DIR): BundleLeak[] {
 }
 
 /**
+ * Why this build is the wrong kind for the check asked for, or null if it
+ * is the right one. `npm run check:bundle` needs a build without the flag
+ * and refuses one with it, rather than checking it; `--six` the reverse.
+ */
+export function wrongKindOfBuild(builtSix: boolean, expectSix: boolean, dir: string): string | null {
+  if (builtSix === expectSix) return null;
+  const where = path.relative(process.cwd(), dir) || dir;
+  return builtSix
+    ? `The build in ${where} was made with SIX_SCHOOLS=1, and this is the production check, ` +
+        `which needs a build without it. Unset SIX_SCHOOLS (in the shell and in .env.local) and ` +
+        `run \`npm run build\` again; the flag-on build is \`npm run check:bundle:six\`'s.`
+    : `The build in ${where} was made without SIX_SCHOOLS, and --six checks a build with it. ` +
+        `Run \`npm run check:bundle:six\`, which makes one.`;
+}
+
+/**
  * The needles a SIX_SCHOOLS build should hold and does not. Stricter than
  * a leak: a colour in either case, and anything else only as a whole
  * quoted string, so that "Confucian" is not found by way of
@@ -194,16 +214,9 @@ function main() {
   const files = filesUnder(CLIENT_DIR).length;
 
   const builtSix = builtWithSixSchools(dir);
-  if (builtSix !== expectSix) {
-    console.error(
-      builtSix
-        ? `The build in ${path.relative(process.cwd(), dir)} was made with SIX_SCHOOLS=1, and ` +
-            `this is the production check, which needs a build without it. Unset SIX_SCHOOLS ` +
-            `(in the shell and in .env.local) and run \`npm run build\` again; the flag-on ` +
-            `build is \`npm run check:bundle:six\`'s.`
-        : `The build in ${path.relative(process.cwd(), dir)} was made without SIX_SCHOOLS, and ` +
-            `--six checks a build with it. Run \`npm run check:bundle:six\`, which makes one.`
-    );
+  const wrongKind = wrongKindOfBuild(builtSix, expectSix, dir);
+  if (wrongKind) {
+    console.error(wrongKind);
     process.exit(1);
   }
 

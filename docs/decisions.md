@@ -3228,10 +3228,16 @@ build without it is the production build it was, which
   only a cache its own kind wrote. Rebuilt both ways over one cache, and
   back, the checks pass each time.
 - **No flag in production before launch.** `next.config.ts` refuses to
-  build when the flag is on and `VERCEL_ENV` is `production`, so a wrong
-  tick in Vercel fails the deploy and the live one stays, rather than
-  publishing the three with every gate green. The launch merge removes
-  the refusal.
+  build when the flag is on and `VERCEL_ENV` is `production`, or when a
+  Vercel build (`VERCEL=1`) does not say which environment it is for, so
+  a wrong tick in Vercel fails the deploy and the live one stays, rather
+  than publishing the three with every gate green. The launch merge
+  removes the refusal. It cannot see a promotion: promoting a flag-on
+  preview to Production does not rebuild, and the review charter (rule 4)
+  counts it as publishing.
+- **Tests pin the flag off.** `vitest.config.mts` sets `SIX_SCHOOLS` to
+  `"0"` for every test that does not stub it, so a flag left in the
+  shell cannot fail unrelated tests under misleading names.
 
 Vercel's Preview environment gets `SIX_SCHOOLS=1` once this is merged;
 Production does not until launch.
