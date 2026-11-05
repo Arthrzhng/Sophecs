@@ -53,8 +53,58 @@ const SIX_SCHOOLS_TOKENS = path.join(
   SIX_SCHOOLS === "1" ? "six-schools.css" : "six-schools.off.css"
 );
 
+// One address: readers see sophecs.com and no other (docs/decisions.md,
+// "One address"). A production deployment also answers at www.sophecs.com,
+// sophecs.vercel.app and two vercel.app aliases Vercel assigns, and a
+// reader who arrived at one stayed there, because every link on the site is
+// relative. Signing in is how they arrived: Supabase Auth sends a sign-in
+// whose return address it does not recognise to its Site URL, which was
+// sophecs.vercel.app.
+//
+// So a production build sends every page request on any other host to the
+// same path and query on sophecs.com, permanently. Not redirected:
+// - /api/, which no reader sees as an address. Vercel's cron calls one, and
+//   a POST from a tab left open on an old host would not survive the hop.
+// - the deployment's own URL (VERCEL_URL), so a past deployment can still
+//   be opened at its own address; Vercel asks for a login there.
+// - previews and local builds, whose VERCEL_ENV is not "production".
+//
+// A sign-in that fell back to the Site URL arrives at the root with ?code=,
+// which only /auth/callback can exchange, and the root would drop it. It is
+// sent there on sophecs.com, wherever it landed, so the sign-in completes
+// (at /me, since the page the reader started from is not in the fallback).
+// The exchange needs the cookie the sign-in set when it started, which is
+// on sophecs.com once readers can no longer start one anywhere else.
+//
+// Host values are regular expressions. Next anchors them; the anchors here
+// say so for any reader or router that does not.
+export const CANONICAL_HOST = "sophecs.com";
+
+export function canonicalRedirects(env: NodeJS.ProcessEnv) {
+  if (env.VERCEL_ENV !== "production") return [];
+  const exactly = (host: string) => `^${host.replace(/\./g, "\\.")}$`;
+  const kept = [CANONICAL_HOST, env.VERCEL_URL].filter((h): h is string => Boolean(h));
+  return [
+    {
+      source: "/",
+      has: [{ type: "query" as const, key: "code" }],
+      destination: `https://${CANONICAL_HOST}/auth/callback`,
+      permanent: false,
+    },
+    {
+      source: "/:path((?!api/).*)",
+      missing: kept.map((host) => ({ type: "host" as const, value: exactly(host) })),
+      destination: `https://${CANONICAL_HOST}/:path`,
+      permanent: true,
+    },
+  ];
+}
+
 const nextConfig: NextConfig = {
   env: { SIX_SCHOOLS },
+  async redirects() {
+    return canonicalRedirects(process.env);
+  },
   // `npm run check:bundle:six` builds with the flag into a directory of its
   // own, so the flag-on build never overwrites the .next that
   // `npm run check:bundle` reads. Unset everywhere else, Vercel included,

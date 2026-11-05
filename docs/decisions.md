@@ -3320,3 +3320,44 @@ lessons index serve the markup they did.
 - **Kept out:** the lessons index (which pairs before and after, as it
   always has) and the sitemap, whose sophecs.com addresses have no such
   page.
+
+### One address (2026-11-05)
+
+Arthur saw the site move from sophecs.com to sophecs.vercel.app on his
+phone, signed in, on `/debate`. Every production deployment also answers
+at www.sophecs.com, sophecs.vercel.app and two vercel.app aliases Vercel
+assigns (`sophecs-arthurrzhang-1874s-projects`, `sophecs-git-main-...`),
+none of which redirected, and every link on the site is relative, so a
+reader who reached one of them stayed there.
+
+- **How readers reached it: signing in.** Supabase Auth sends a sign-in
+  whose return address is not on its allow-list to its Site URL, and the
+  Site URL was `https://sophecs.vercel.app`. Its logs show it: the
+  `referer` GoTrue logs for the sample engine's admin calls, which carry
+  no return address, is the Site URL, `https://sophecs.vercel.app`; and
+  at 05:42:07 UTC on 2026-11-05 a Google sign-in started three seconds
+  after a page view on sophecs.com (PostHog) was sent to that bare
+  address, not to `/auth/callback`. The reader landed on sophecs.vercel.app
+  signed out, signed in again from `/debate/opaque-benefit` there, and
+  every page after it was on vercel.app.
+- **Nothing in the code or the database pointed there.** No site-URL
+  variable exists in Vercel; the share sheet, challenge links, sitemap and
+  `metadataBase` all write `https://sophecs.com`; no stored row names
+  vercel.app except one quiz result's `referrer` (a reader who arrived
+  from a vercel.app page). PostHog counts 98 page views on
+  sophecs.vercel.app by 6 people since 10 September, against 281 by 28 on
+  sophecs.com, and 5 on a deployment's own URL in September.
+- **The fix in code (`next.config.ts`).** A production build sends every
+  page request on any host other than sophecs.com to the same path and
+  query there, with a 308. Not moved: `/api/` (Vercel's cron calls one,
+  and a POST does not survive the hop), the deployment's own URL (behind
+  Vercel's login; it lets a past deployment be opened), and previews and
+  local builds. A sign-in that falls back to the Site URL arrives at the
+  root with `?code=`, which the home page would drop; it is sent to
+  `/auth/callback` with a 307, so it completes, at `/me`.
+- **The fix outside the code, which is Arthur's to click**: Supabase
+  Auth's Site URL and redirect allow-list, and the Vercel domains' own
+  redirects. The steps are in the pull request. The code's redirect does
+  not depend on them, and they do not depend on it.
+- **Cookies are per host.** A reader signed in on sophecs.vercel.app is
+  signed out on sophecs.com and signs in once more.
