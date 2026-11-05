@@ -363,14 +363,16 @@ export async function logAiCall(params: {
 }
 
 /**
- * Takes a failed submission's calls out of the daily cap.
+ * Takes calls out of the daily cap: all of a failed submission's, and a
+ * judged submission's retries (every call but the one that validated).
  *
- * Arthur's ruling of 2026-11-03: a submission that ends without a verdict
- * does not use one of the reader's arguments for the day. Its calls stay
- * in ai_calls, and in the monthly budget, because they were billed; only
- * the cap stops counting them. Errors are reported, not thrown: the reader
- * is already being told judging failed, and a failure here costs them a
- * cap slot rather than the message.
+ * Arthur's rulings of 2026-11-03 and 2026-11-05 (item 8): a submission that
+ * ends without a verdict does not use one of the reader's arguments for the
+ * day, and retries never do. The calls stay in ai_calls, and in the monthly
+ * budget and the daily call ceiling, because they were billed; only the
+ * cap stops counting them. Errors are reported, not thrown: on a failure
+ * the reader is already being told judging failed, and on a verdict they
+ * get it; either way a failure here costs them a cap slot, not the result.
  *
  * Returns whether the calls are out of the cap, true when there were none
  * to take out, so the reader is only told the attempt did not use one of

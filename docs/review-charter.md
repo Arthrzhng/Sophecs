@@ -405,7 +405,7 @@ Where the numbers live, so the arithmetic is checkable: the COST comment at
 the top of `src/lib/anthropic.ts` carries the model, the per-call estimate,
 the token estimates and the daily cap, and `INPUT_COST_PER_TOKEN` and
 `OUTPUT_COST_PER_TOKEN` are just below it. The monthly budget is
-`AI_MONTHLY_BUDGET_USD`, enforced by `isBudgetExceeded()`. Multiply cases by
+`AI_MONTHLY_BUDGET_USD`, enforced by `budgetState()` (`src/lib/budget.ts`). Multiply cases by
 samples for the call count, and calls by the per-call estimate for the
 figure; both appear in a proposal or it is not one.
 

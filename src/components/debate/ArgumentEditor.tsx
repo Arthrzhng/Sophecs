@@ -59,7 +59,8 @@ interface JudgeResponse {
 // it. "Judging is paused" on its own tells the reader nothing about whether
 // their four hundred words survived.
 //
-// These three reasons all return from /api/judge before it writes anything,
+// These reasons (the kill switch, the budget, the daily cap and the call
+// ceiling) all return from /api/judge before it writes anything,
 // so there is no saved row and nothing queued: the only copy of the text is
 // the localStorage draft this component autosaves. Saying "saved and will be
 // judged when judging resumes" promised a queue that does not exist, and

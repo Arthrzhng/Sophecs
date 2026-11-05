@@ -36,8 +36,11 @@ describe("the monthly budget", () => {
     expect(calls).toHaveLength(1);
     expect(calls[0].fn).toBe("ai_spend_since");
     const since = new Date(String(calls[0].args.since));
+    const now = new Date();
+    expect(since.getUTCFullYear()).toBe(now.getUTCFullYear());
+    expect(since.getUTCMonth()).toBe(now.getUTCMonth());
     expect(since.getUTCDate()).toBe(1);
-    expect(since.getUTCHours() + since.getUTCMinutes() + since.getUTCSeconds()).toBe(0);
+    expect(since.getUTCHours() + since.getUTCMinutes() + since.getUTCSeconds() + since.getUTCMilliseconds()).toBe(0);
   });
 
   it("reads a numeric that comes back as text", async () => {

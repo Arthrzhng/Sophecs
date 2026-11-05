@@ -1,9 +1,10 @@
 // The daily call ceiling in /api/judge (Arthur's ruling of 2026-11-05 on
 // Checkpoint A, item 6): every judge call a reader made in the last 24
 // hours, retries and failed submissions included, held to 20, checked so
-// that a submission starts only if all its attempts fit. The route needs a
-// live session and database, so it is read rather than run, with comments
-// blanked so a commented-out check cannot pass.
+// that a submission starts only if all its attempts fit. This file reads
+// the source for the constants, the query's filters and the copy, with
+// comments blanked so a commented-out check cannot pass; what the route
+// does with them is run in tests/judge-ceiling-route.test.ts.
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";

@@ -58,6 +58,7 @@ expect "nothing since is zero, not null" 0 "$(as_role service_role "select publi
 expect "anon refused" denied "$(as_role anon "select public.ai_spend_since('2026-11-01T00:00:00Z')")"
 expect "authenticated refused" denied "$(as_role authenticated "select public.ai_spend_since('2026-11-01T00:00:00Z')")"
 expect "its own search_path is empty" 'search_path=""' "$(q "select array_to_string(proconfig, ',') from pg_proc where proname = 'ai_spend_since'")"
+expect "it runs with the caller's rights (security invoker)" 'f' "$(q "select prosecdef from pg_proc where proname = 'ai_spend_since'")"
 
 say "rollback, and 0026 again"
 apply "$REPO/supabase/rollback/0026_ai_spend_since.down.sql"

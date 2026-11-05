@@ -34,8 +34,8 @@ const DAILY_CAP = 5;
 // Arthur's ruling of 2026-11-05 on Checkpoint A, item 6: "a hard daily
 // ceiling on judge calls per reader, retries included, above the
 // 5-argument cap. Pick a sensible number and state it." 20 judge calls in
-// any 24 hours, every call counted, the ones taken off the argument cap
-// included. A submission starts only if all of its possible attempts fit
+// any 24 hours, every logged call counted, the ones taken off the argument
+// cap included. A submission starts only if all of its possible attempts fit
 // under it, so one submission at a time never passes it (two sent at once
 // can both read the same count): five judged arguments at three attempts
 // each are 15 calls and always fit, with room for at least one failed
@@ -64,8 +64,9 @@ function paused(reason: PauseReason) {
   return NextResponse.json({ ok: false, paused: true, reason });
 }
 
-// Order follows the brief exactly: session, kill switch, budget, daily cap,
-// topic lock, length, insert, call the model, validate, elo, return. The
+// Order follows the brief exactly: session, kill switch, budget, daily cap
+// (and after it the daily call ceiling), topic lock, length, insert, call
+// the model, validate, elo, return. The
 // only two deviations are unavoidable data lookups (profile/topic) needed
 // to perform the checks after them, interleaved rather than done upfront.
 export async function POST(request: Request) {
