@@ -3349,10 +3349,10 @@ reader who reached one of them stayed there.
   sophecs.com, and 5 on a deployment's own URL in September.
 - **The fix in code (`next.config.ts`).** A production build sends every
   page request on any host other than sophecs.com to the same path and
-  query there: a 307 until a live check has shown that production leaves
-  sophecs.com alone, then a 308 (a browser keeps a 308, so a rule Vercel's
-  router read differently from Next's could otherwise leave readers in a
-  loop no rollback reaches). Not moved: `/api/` (Vercel's cron calls one and
+  query there. It shipped as a 307 (a browser keeps a 308, so a rule
+  Vercel's router read differently from Next's could have left readers in
+  a loop no rollback reaches), and is a 308 since the live check of
+  2026-11-05 21:41 UTC (`docs/progress.md`). Not moved: `/api/` (Vercel's cron calls one and
   does not follow redirects, and a fetch from a tab left open on an old
   host could not follow one: sophecs.com sees none of that host's cookies
   and answers no cross-origin request), `/_next` and anything under it

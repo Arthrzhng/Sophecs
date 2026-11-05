@@ -611,3 +611,39 @@ deploy below was read from Vercel as Ready.
   present at 19:41 UTC), #71 waits on his yes to 0026, and the sample
   workflow's 18:41 UTC run had not started by 19:41. Checkpoint B
   (`docs/checkpoint-b.md`) lists everything open.
+
+## 2026-11-05: one address
+
+- #82 merged as `c2d9ac9`: Checkpoint B (`docs/checkpoint-b.md`) and the
+  entry above. Deploy `dpl_DvxqBK2MBNx1z4uSz2An6BSTuwEW`, Ready.
+- Migration 0025, run by Arthur in the SQL Editor, read back at 20:52
+  UTC: the five unreachable insert policies are gone, `own update` on
+  profiles is kept, and the other policies on the five tables are as
+  before. Security advisor after: the same findings as before, nothing
+  new.
+- #83 merged as `c682e82`: one address. Every host but sophecs.com sends
+  a page to the same path and query on sophecs.com; a sign-in that falls
+  back to Supabase's Site URL (`https://sophecs.vercel.app`, which is how
+  readers reached that host) completes on sophecs.com; `/auth/callback`
+  keeps `next` on the site, closing an open redirect. Three review
+  passes; the second found the first fix to the open redirect let dot
+  segments through. Deploy `dpl_Hf57AxRGc6MVg814fyrGMdJRDfD3`, Ready and
+  aliased to all five hosts.
+- The live check of #83, through Vercel's fetch at 21:41 UTC:
+
+  | Request | Result |
+  | --- | --- |
+  | `https://sophecs.com/robots.txt` | 200, no Location |
+  | `https://sophecs.vercel.app/debate?x=1` | 307 to `https://sophecs.com/debate?x=1` |
+  | `https://www.sophecs.com/lessons` | 307 to `https://sophecs.com/lessons` |
+  | `https://sophecs-arthurrzhang-1874s-projects.vercel.app/table` | 307 to `https://sophecs.com/table` |
+  | `https://sophecs.vercel.app/?code=x` | 307 to `https://sophecs.com/auth/callback?code=x` |
+  | `https://sophecs.com/auth/callback?next=/..//evil.example` (no code) | ends at `/login` on sophecs.com, 200 |
+  | `https://sophecs.com/api/cron/keepalive` | 401, the route's own, not redirected |
+
+  The fetch tool adds a `_vercel_share` parameter to the Locations it
+  reports; the site does not. sophecs.com is left alone, so this pull
+  request makes the host rule a 308, as Arthur asked.
+- Still Arthur's (#83 lists the clicks): Supabase Auth's Site URL and
+  redirect allow-list, and Vercel's domain redirect for www. Until then
+  a sign-in returns to `/me` rather than to the page it started from.
