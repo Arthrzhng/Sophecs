@@ -242,6 +242,32 @@ entry names.
   `score`, `fidelity`, `rigor`, `engagement` and `prompt_version`, with
   `argument: null` and `textWithheld: true`: no field that can quote the
   argument reaches a stranger, as 0018 and 0020's keep-list intend.
+- **0021 applied by hand.** The Supabase tool's confirmation prompt for
+  a DROP timed out unanswered four times, so on 2026-11-05 Arthur ran the
+  file himself in the Supabase SQL Editor, the whole of it as reviewed
+  (`supabase/migrations/0021_challenges_no_client_update.sql`, sha256
+  `16ac74c0...6358d0a`), and reported "Success. No rows returned". **It
+  is not in Supabase's migration list** (`supabase_migrations`), which
+  goes from 0020 to 0022: the SQL Editor runs a statement without
+  recording a migration. Anyone comparing that list with the repository
+  should expect the gap. 0022 had gone in first, at 03:00:50 UTC; the two
+  are independent.
+  - Before: the snapshot is
+    `docs/seed-snapshots/2026-11-04-challenges-policies-before-0021.json`,
+    re-checked at 02:59 UTC on 2026-11-05 (the same three policies). The
+    security advisor before is the one run for 0022 that morning.
+  - Read back at 03:10 UTC: the policies on `challenges` are
+    "anon insert own" and "challenges read party", none for UPDATE; row
+    level security on; grants as 0022 left them (`anon=r`,
+    `authenticated=r`); 3 rows, none past open.
+  - Security advisor after: the same findings as before.
+- **`backup_20261022` dropped by hand.** For the same reason Arthur ran
+  `drop schema backup_20261022 cascade;` in the SQL Editor on
+  2026-11-05. Before, a read found only its four tables, their TOAST
+  tables and array types, with nothing outside the schema depending on
+  them. Read back at 03:05 UTC: no schema named `backup%`; the live
+  tables keep their rows (1 debate, 1 profile, 28 quiz results, 3
+  challenges). The open item in `docs/decisions.md` is closed.
 
 ## 2026-11-04: clients keep only the writes the site makes (migration 0022)
 
@@ -266,7 +292,7 @@ entry names.
   2026-11-05 ("Yes, with the extras").
 - **Applied in production at 03:00:50 UTC on 2026-11-05**, migration
   version `20261105030050`, through the Supabase tool, with no prompt
-  (it has no DROP). Applied before 0021, which Arthur applies by hand; the
+  (it has no DROP). Applied before 0021, which Arthur then ran by hand (above); the
   two are independent, and 0022 alone already takes UPDATE on
   `challenges` from both roles.
   - Before: security advisor run (3 `security_definer_view` errors, the

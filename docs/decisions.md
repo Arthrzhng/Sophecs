@@ -987,6 +987,9 @@ Nothing in the repository holds any of it: the committed snapshot,
 `docs/seed-snapshots/2026-10-21-phase2c-pre-migration.json`, is schema and
 shape only, because this repository is public.
 
+**Closed 2026-11-05.** Arthur dropped it in the SQL Editor; read back at
+03:05 UTC, gone, with the live tables unchanged (`docs/progress.md`).
+
 ### Open pre-pilot item: there is no restorable backup
 
 The project is on Supabase's free plan, which has no daily backups and no
@@ -2507,8 +2510,10 @@ it; they get what the page offers without it ("Challenge a friend" to
 the result's owner, "Take the quiz" to anyone else, since #60). A party whose result is not saved to their
 account is refused, as `/api/judge` would not record their debate either.
 
-**Snapshot, read-back and advisor:** recorded in `docs/progress.md` when
-0021 is applied.
+**Applied by hand on 2026-11-05**, in the Supabase SQL Editor, after the
+tool's confirmation prompt timed out four times: so it is not in
+Supabase's migration list. Snapshot, read-back and advisor are in
+`docs/progress.md`.
 
 ### Clients keep only the writes the site makes (migration 0022)
 
