@@ -998,6 +998,9 @@ taking its own copy into `backup_20261022` before applying, by hand, once.
 That is adequate for one migration Arthur is watching. It is not adequate
 for a term's worth of student work.
 
+**Closed on 2026-11-05:** Arthur decided no backups and no Pro, an
+accepted risk ("Arthur's rulings of 2026-11-05 on Checkpoint A").
+
 **Decide before the Winchester pilot puts student data in**, because the
 choice changes what a bad afternoon costs:
 
@@ -2697,3 +2700,158 @@ lists 16 packages (1 critical, 6 high, 9 moderate):
 | `source-map-js` 1.2.1 | high (DoS with crafted source maps) | build only | Our own source maps. |
 | `vite` 8.2.2, `vitest` 5.0.0, `@vitest/mocker` | high and moderate (dev server and editor launch; three of the eight are Windows-only) | tests only | Never served. `npm update vite vitest` clears them: vite is a peer of vitest and has to move itself, to 8.2.4 or later. |
 | `minimatch`, `@typescript-eslint/*` (five packages) | moderate (glob DoS) | lint only | Our own globs. |
+
+### Arthur's rulings of 2026-11-05 on Checkpoint A
+
+Arthur ruled on every item of `docs/checkpoint-a.md` on 2026-11-05, by the
+numbers of the list sent with it. His words are quoted where they set a
+rule. Items carried out in code or in the database get their own entries
+when they ship.
+
+The numbers map onto `docs/checkpoint-a.md` as follows:
+
+| Numbers | Section of `docs/checkpoint-a.md` |
+| --- | --- |
+| 1 to 3 | Stage 1 (2F), items 1 to 3 |
+| 4, 5 | Production database writes: (a), items 1 and 2 |
+| 6 to 10 | Spending, rate limits and budget: (d), items 1 to 5 |
+| 11 to 13 | What the judge receives: (b), items 1 to 3 |
+| 14 to 16 | Content and philosophy: (e): the objection voices, Quiz v2, the colours |
+| 17 to 19 | Sample activity, items 1 to 3 |
+| 20 to 25 | Security design, items 1 to 6 |
+| 26 | Housekeeping: the nav icon |
+
+**The rulings**
+
+- **1.** `confucian-hierarchy-school`: "keep the band. It's a judge
+  weakness." The band in `tests/judge/golden/confucian-hierarchy-school.json`
+  is not widened.
+- **2 and 11.** "Yes, strengthen the v3 engagement-cap instruction (v3
+  isn't live)."
+- **3.** "Accept your reading." The readings in "2F, the rerun after the
+  objection voices" stand.
+- **4.** "Yes: display_name 60-char check constraint (verify existing rows
+  first)."
+- **5.** "Yes: drop the five unused policies, NOT 'own update'. Usual
+  process." The DROP statements go to Arthur, by his instruction in the
+  same message: "Database statements with DROP: post them for me to run
+  in the SQL Editor rather than waiting on the Supabase prompt."
+- **6.** "Yes: a hard daily ceiling on judge calls per reader, retries
+  included, above the 5-argument cap. Pick a sensible number and state
+  it."
+- **7.** "Yes: budget check totals spend in the database and fails
+  closed."
+- **8.** "Retries must not use a reader's arguments. Additive schema
+  change approved if needed."
+- **9 and 10.** "No backups and no Supabase Pro: Arthur's decision. Record
+  it in decisions.md as an accepted risk, and drop leaked-password
+  protection." Recorded below.
+- **12.** "Strip comments from judge.v3.md before it is sent (v3 only)."
+- **13.** zod 4: "yes, own PR; the six judge request fixtures must stay
+  byte-identical and v2 behaviour unchanged."
+- **14.** "Utilitarianism's virtue-ethics voice becomes: 'what is done to
+  one person must be justifiable to that person, not only to the total'.
+  Buddhist voices stay."
+- **15.** Quiz v2:
+  - "Axes, plain names and the six positions: accepted as drafted,
+    including Ubuntu at 0 degrees and Buddhist Ethics at 310."
+  - "Weighted options (16.2-17.7%)."
+  - "Reword the share lines, site description, SharePage and
+    ChallengeInvite away from 'ten questions about AI', to something true
+    of v2 (e.g. ten questions about how you decide what's right)."
+  - Option edits, "same schools and vectors; re-run the simulation", in
+    his words:
+    - 2c: "Say whatever is most likely to get the essay improved before
+      it is handed in."
+    - 5c: "Tell them once, privately, what I saw. What they do next is
+      theirs to answer for; what I say is mine."
+    - 7a: "Tell the captain once, calmly, what I think is fair, then play
+      as well as I can wherever I am put. Whether they listen is not up
+      to me."
+    - 7c: "Tell the captain to their face that it is unfair. Going along
+      with it would make me someone I don't want to be."
+    - 6b: "I am the older one, so it is on me to show him how we treat
+      each other's things, and on him to learn to ask."
+    - "Keep 1a, 10b, 3d, 5b, 6d, 9a, and 8c as written."
+  - "No rule-based school: accept the reading and note in decisions.md
+    that a duty-based school is the obvious seventh later." Noted below.
+- **16.** "Colours: reject the all-violet set. The three new schools must
+  come from different hue families; relax the colour-blind distance vs
+  the live three from 12 to 8 (names always sit beside colours). Pick the
+  best set under those rules, show it in the styleguide, and proceed;
+  don't wait for me unless nothing passes."
+- **17.** "Understood: plan the sample teardown and a fresh run into the
+  launch steps (Quiz v2 ships at launch)." `docs/sample-activity.md`, "At
+  launch".
+- **18.** "Yes: no-referrer policy on sample pages."
+- **19.** "Yes: one fresh review of #57's last fixes."
+- **20, 24 and 25.** "accept as is; document why in decisions.md."
+  Below.
+- **21.** "Restrict is_class_member/is_class_owner if any signed-in path
+  doesn't need them."
+- **22.** "Yes: fix elo_percentile's search_path."
+- **23.** "If nothing reads exchanges_public, revoke its read access."
+- **26.** "No header icons: drop the item."
+
+**Accepted as is (20, 24, 25), and why**
+
+- **20, the three `security_definer_view` errors** (`debates_public`,
+  `exchanges_public`, `public_results`). Each view is the public surface
+  of its table and is meant to show rows the table's own policies hide
+  from a stranger, which is what definer rights are for here. Each lists
+  its columns by name ("What each public view exposes on SELECT"),
+  clients can only SELECT from them (0016, 0022), and `debates_public`,
+  as 0023 last defined it, keeps the private verdict fields out (0018,
+  0020). Making them `security_invoker` would move every one of those
+  choices into policies on the base tables: a redesign with its own risk.
+  `exchanges_public` differs: if nothing reads it, 23 takes its read
+  access away from clients.
+- **24, the 0018 shape.** For a private argument, the withheld verdict
+  fields are left out of the public verdict rather than set to null. The
+  reason is the one 0018 records: the shape is a list of fields to keep,
+  so a field the verdict gains later is withheld until someone decides it
+  is safe, rather than shown until someone notices. `withheldVerdict` in
+  `src/lib/verdict-privacy.ts` builds the same shape for the page, and
+  `tests/verdict-privacy.test.ts` holds it.
+- **25, the client write policies on `blocks`, `reports` and
+  `classes`.** Each lets a signed-in reader write only rows that are
+  their own:
+  - "reports insert own" and "class insert own" allow an insert, the same
+    write the site makes through the server, without its checks (a class
+    past the limit, for one);
+  - "blocks own" is `for all` (`0012_counterpart.sql`), so a reader can
+    also update or delete their own block rows. The site only adds a
+    block and offers no way to remove one, and deleting a block makes the
+    pair matchable again (`seekCounterpart` in `src/app/debate/actions.ts`
+    reads blocks in both directions). Checkpoint A said "the site makes
+    those writes through the server, with its own checks", and the earlier
+    message to Arthur that they let a user do "what the site already
+    allows on their own rows, minus its limits"; both understated this,
+    and it was put to Arthur after the ruling.
+
+  No other reader's data is reachable through any of them.
+
+**Accepted risk: no backups (9, 10)**
+
+The project stays on Supabase's free plan, so there are no daily backups
+and no Point-in-Time Recovery ("Open pre-pilot item: there is no
+restorable backup"). Arthur's decision of 2026-11-05: no backups and no
+Pro. A destructive mistake, ours or Supabase's, is unrecoverable beyond
+whatever a migration's own snapshot holds. What limits that: every
+change applied by hand goes through the usual process (a snapshot of what
+it touches, a tested rollback, a read-back), and statements with DROP are
+run by Arthur himself in the SQL Editor (his instruction quoted under 5).
+The sample workflow writes on its own schedule with neither; its rows are
+recovered from its registry, not from a backup (`docs/sample-activity.md`,
+"Backup and recovery").
+
+Leaked-password protection, which also needs Pro, is dropped. The site
+asks for no password; whether password sign-up is reachable through the
+Auth API has not been checked ("For Checkpoint A, from the security
+work"), so this risk is accepted unmeasured.
+
+**No rule-based school (15)**
+
+The quiz's axes were drawn on the reading that none of the six schools is
+a rule-based ethics (`docs/quiz-v2.md`, section 1). Arthur accepted that
+reading. A duty-based school is the obvious seventh, later.
