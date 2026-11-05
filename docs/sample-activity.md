@@ -143,18 +143,19 @@ challenges." `/method#samples` explains the rest.
 - **Scores.** A template verdict's numbers follow a documented rule
   (`scripts/seed/verdicts.ts`). Rule 2 (`sample-template-2`) gives
   whole-number criteria, as the judge does, and lands on a multiple of 5
-  about 13% of the time for the composite and 5-14% for each criterion;
+  about 13% of the time for the composite and 5-15% for each criterion;
   the judge's own replies land there 16.3% of the time. It applies to
   rows dated from 2026-11-06 06:00 UTC, and to every row of a run begun
   after then. Rows the run begun on 2026-11-05 wrote before then keep
   rule 1 (half-point criteria; 23.3% of composites on a multiple of 5),
   since the engine cannot rewrite a row it has written; they go at
-  launch. Every run compares every stored sample score with its plan
-  before it writes, and refuses on any difference. A run whose rule-2
-  scores land on a multiple of 5 more than 20% of the time, for the
-  composite or any criterion, is refused before it writes and fails
-  validation after (`scripts/seed/round-scores.ts`), once it has a
-  thousand rule-2 verdicts to judge.
+  launch. Every scheduled run compares every stored sample score with its
+  plan before it writes, and refuses on any difference; every validation,
+  a run by hand's included, does the same after the write. A scheduled
+  run whose rule-2 scores land on a multiple of 5 more than 20% of the
+  time, for the composite or any criterion, is refused before it writes,
+  and any run fails validation after (`scripts/seed/round-scores.ts`),
+  once it has a thousand rule-2 verdicts to judge.
 
 ## Real numbers
 
@@ -471,11 +472,13 @@ Stop and report, without retrying past the engine's own retries, if:
 - exact duplicate argument texts would reach 5% (refused with the
   dry-run checks, before anything is written);
 - more than 20% of the run's rule-2 scores, of the composite or of any
-  criterion, would land on a multiple of 5 (refused with the dry-run
-  checks, and a validation failure after a write);
+  criterion, would land on a multiple of 5 (the schedule refuses it with
+  its dry-run checks; any run fails validation after a write);
 - any stored sample debate's score or `prompt_version` differs from the
-  plan (refused with the dry-run checks; what code with another score
-  rule writing past the cutover would leave);
+  plan (the same two places). This is what code with another score rule
+  writing past the cutover leaves; the way on is to move
+  `SCORE_RULE_2_FROM` past the run's `window_to`, not to revert to code
+  without the check;
 - the run refuses to adopt or update a row, or a created user comes back
   without its ban (the run halts);
 - auth user creation fails past the retries (the run fails; the next

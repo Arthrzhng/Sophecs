@@ -3358,9 +3358,11 @@ from generated answers, by the product's own functions.
   The live run had written to 2026-11-05 14:57 UTC; the six hours past
   midnight are margin for a late merge. With a dummy seed, the window the
   live run has written regenerates byte for byte the same on main and on
-  this branch (the same manifest hash to 23:59 UTC on 2026-11-05), and
+  this branch (the same manifest hash to 05:59 UTC on 2026-11-06), and
   with a window to 2026-11-08 every row dated before the cutover, in
-  every table, is identical; only rows after it change. Rule 2 makes
+  every table, is identical (28,814 rows, by the second reviewer's count),
+  but for profiles' rating and streak, which the engine brings up to date
+  on every run as it always has; only rows after it change. Rule 2 makes
   every draw rule 1 makes and takes its numbers from a stream of its own,
   so a rule-2 verdict differs from rule 1's for the same row only in its
   four numbers and its `prompt_version`, `sample-template-2`, which a
@@ -3377,14 +3379,15 @@ from generated answers, by the product's own functions.
   differ", and writes nothing.
 - **The existing rows** go at launch with the run, as planned; the fresh
   run follows rule 2 throughout.
-- **Rule 2**, on three seeds of a full-size fresh run: composites 12.7%
-  to 12.8% on a multiple of 5 and 5.8% to 6.3% on a multiple of 10;
-  criteria on 0, 5 or 10 4.8% to 5.2% (fidelity), 10.0% to 11.1%
-  (rigor) and 13.4% to 14.4% (engagement); every criterion a whole
-  number. Thinning harder would leave visible gaps at 50, 55 and 60.
-  Score bands 70-90 / 50-69 / 25-49: 25.8-26.3 / 46.4-47.8 / 24.9-26.0,
-  against the plan's 25 / 50 / 25, with 1.2-1.7% below 25 and 0.1-0.3%
-  above 90, which rule 1's clamp never allowed. A first cut of the bands
+- **Rule 2**, on six seeds of a full-size fresh run (three of mine, three
+  of the second reviewer's): composites 12.5% to 13.0% on a multiple of
+  5 and 5.8% to 6.3% on a multiple of 10; criteria on 0, 5 or 10 4.6% to
+  5.2% (fidelity), 9.6% to 11.1% (rigor) and 13.4% to 15.2%
+  (engagement); every criterion a whole number. Thinning harder would
+  leave visible gaps at 50, 55 and 60. Score bands 70-90 / 50-69 / 25-49:
+  about 26 / 47 / 25 (on my three seeds 25.8-26.3 / 46.4-47.8 /
+  24.9-26.0), against the plan's 25 / 50 / 25, with about 1-2% below 25
+  and 0.1-0.3% above 90, which rule 1's clamp never allowed. A first cut of the bands
   gave 23 / 44 / 30, and the mid tier's lower edges were raised to bring
   it back.
 - **On the verdict page, for the live run only:** a rule-2 revision of a
@@ -3395,7 +3398,16 @@ from generated answers, by the product's own functions.
   refuses the run before it writes (with the duplicate-text check) and
   fails validation after, on every path that validates. It judges once
   there are 1,000 rule-2 verdicts, so that chance alone almost never
-  refuses a run (at rule 2's highest share, 15.4%, about once in 24,000,
-  by the exact binomial); the live run reaches that about ten days after
-  the cutover, at about ninety a day, and a fresh run starts with
-  thousands.
+  refuses a run (at a true share of 15.4%, above rule 2's highest
+  measured, about once in 24,000, by the exact binomial); the live run
+  reaches that about eleven days after the cutover, at about 86 a day,
+  and a fresh run starts with thousands. The schedule runs it, the
+  stored-score check and the duplicate check before it writes; a run by
+  hand (`seed-production`, `seed-local`) meets them in its validation,
+  after the write, which halts the run if one fails.
+- **If a merge comes after the cutover.** Every scheduled run is then
+  refused, and the job goes red, until `SCORE_RULE_2_FROM` is moved past
+  the run's `window_to`, which makes the rows old code wrote rule-1 rows
+  again. Do not revert this change to recover: old code has no stored
+  check, and its 50-row spot checks would rarely see the rule-2 rows
+  already written.

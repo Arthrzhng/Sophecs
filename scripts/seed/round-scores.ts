@@ -4,12 +4,13 @@
 // A score of 70, 75 or 80 is no less likely from the judge than 71, but a
 // page of sample verdicts where one in four is a multiple of 5 reads as
 // generated; the judge's own replies land there 16.3% of the time (418
-// scored replies in tests/judge/golden-runs). Rule 2 of scripts/seed/verdicts.ts lands there
-// about 12% of the time for the composite and 7-15% for each criterion.
+// scored replies in tests/judge/golden-runs). Rule 2 of
+// scripts/seed/verdicts.ts lands there about 13% of the time for the
+// composite and 5-15% for each criterion (six seeds of a fresh run).
 //
 // Counted over a run's rule-2 verdicts only. The rule-1 verdicts the run
 // begun on 2026-11-05 wrote before the cutover stay as written (they
-// regenerate exactly, which the spot checks confirm) and are reported but
+// regenerate exactly, which storedScoreCheck confirms) and are reported but
 // not held to the limit: 23.3% of their composites are multiples of 5, and
 // they go at launch, with the run.
 
@@ -23,11 +24,12 @@ export const MAX_ROUND_SCORE_PCT = 20;
 
 /**
  * Below this many rule-2 verdicts the share is reported but not judged, so
- * that chance alone does not refuse a run. At 1000, a share of 15.4%, the
- * highest rule 2 gives (rigor, on one seed of three), comes out over 20%
- * by chance about once in twenty-four thousand (the exact binomial). The
- * run begun on 2026-11-05 adds about ninety rule-2 verdicts a day; a fresh
- * run has thousands.
+ * that chance alone does not refuse a run. At 1000, a true share of 15.4%,
+ * above the highest rule 2 gave on six seeds (engagement, 15.2%), comes
+ * out over 20% by chance about once in twenty-four thousand (the exact
+ * binomial). The run begun on 2026-11-05 adds about 86 rule-2 verdicts a
+ * day and reaches 1000 about eleven days after the cutover; a fresh run
+ * has thousands.
  */
 export const MIN_ROUND_SCORE_SAMPLE = 1000;
 
@@ -114,11 +116,16 @@ export async function storedScoreCheck(
       if (!earliest || at < earliest) earliest = at;
     }
   }
+  // Stored sample debates of which the plan holds none means the plan is
+  // not this run's (another seed, say): that is no pass.
+  const unmatched = compared === 0 && stored.length > 0 && planned.size > 0;
   return {
     name: "stored sample scores match the plan",
-    ok: differ === 0,
+    ok: differ === 0 && !unmatched,
     detail: differ
       ? `${differ} of ${compared} stored sample debates differ from the plan in score or prompt_version, the earliest dated ${earliest}`
-      : `${compared} stored sample debates compared`,
+      : unmatched
+        ? `none of ${stored.length} stored sample debates is in the plan`
+        : `${compared} stored sample debates compared`,
   };
 }

@@ -160,11 +160,12 @@ function scoreFor(tier: Tier, f: number, r: number, e: number, rng: Rng): number
 
 // ---- rule 2 ----
 
-// Wider than rule 1's bands by about half a point at each end, so that,
-// rounded to whole numbers, every value in a band is drawn about as often
-// as its neighbours rather than the end values half as often; and the
-// tiers overlap, so that no whole number is rare because it sits where one
-// tier's band stops and the next begins.
+// Drawn from continuous bands and rounded, so a whole number at a band's
+// edge is not drawn half as often as its neighbours; the tiers' bands
+// overlap, so that no whole number is rare because it sits where one
+// tier's band stops and the next begins; and the edges were set by
+// measurement, so that a fresh run's composites fall in the plan's score
+// bands (70-90 / 50-69 / 25-49) close to 25 / 50 / 25.
 const AXIS_BANDS_2: Record<Tier, { f: [number, number]; r: [number, number]; e: [number, number] }> = {
   strong: { f: [6.8, 9.4], r: [5.8, 9.2], e: [4.4, 8.4] },
   mid: { f: [4.6, 8.2], r: [4.2, 7.6], e: [2.4, 6.2] },

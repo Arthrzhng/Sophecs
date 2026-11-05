@@ -46,10 +46,21 @@ describe("a run begun before the cutover", () => {
     const past = small({ to: "2026-11-08T00:00:00.000Z" });
     const before = (ds: ReturnType<typeof small>) => ds.debates.filter((d) => Date.parse(d.row.created_at) < cut).map((d) => d.row);
     expect(before(past)).toEqual(before(until));
+    // Every row, rejections and revisions of rule-1 originals included, in
+    // its verdict and in its own column.
+    let rejectedAfter = 0;
+    let revisionsAcross = 0;
+    const byId = new Map(past.debates.map((d) => [d.row.id, d.row]));
     for (const d of past.debates) {
-      if (d.row.verdict.rejected) continue;
-      expect(d.row.verdict.prompt_version).toBe(Date.parse(d.row.created_at) < cut ? "sample-template-1" : "sample-template-2");
+      const want = Date.parse(d.row.created_at) < cut ? "sample-template-1" : "sample-template-2";
+      expect(d.row.verdict.prompt_version, d.row.id).toBe(want);
+      expect(d.row.prompt_version, d.row.id).toBe(want);
+      if (want === "sample-template-2" && d.row.verdict.rejected) rejectedAfter++;
+      if (want === "sample-template-2" && d.row.kind === "revision" && byId.get(d.row.parent_debate_id!)!.prompt_version === "sample-template-1") revisionsAcross++;
     }
+    // The fixture holds both cases, so the assertions above reach them.
+    expect(rejectedAfter).toBeGreaterThan(0);
+    expect(revisionsAcross).toBeGreaterThan(0);
   });
 
   it("reports rule 1's share without judging it, and judges nothing while rule 2 has few verdicts", () => {

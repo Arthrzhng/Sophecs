@@ -266,6 +266,8 @@ export function buildPlan(input: PlanInput, banks: Banks = loadBanks()): { plan:
       "Every registry item for the run is created, and every row reads back marked and owned.",
       "Sample rows per table equal the registry's created items across runs.",
       "Spot checks: 50 rows per kind read back equal to the plan's rows.",
+      "Every stored sample debate's score and prompt_version equal the plan's.",
+      "Rule-2 scores land on a multiple of 5 no more than 20% of the time, for the composite and each criterion, once there are 1,000.",
       "No sample debate is waiting for a counterpart (seeking_counterpart_at is null).",
       "Genuine rows not removed; genuine profiles' ratings, streaks and schools unchanged; debate_topics par unchanged; elo_percentile(1200) unchanged.",
       prod ? "Auth spot check: 20 sample users are banned, carry this run's id, and have the planned email." : "",
