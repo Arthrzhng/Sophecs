@@ -55,6 +55,21 @@ export function authorForSeq(seq: number, userA: string, userB: string): string 
   return seq % 2 === 1 ? userA : userB;
 }
 
+/**
+ * Whether the reader's own latest reply is saved and not yet screened. Then
+ * the turn is still theirs, and the route would refuse a further reply
+ * until this one is decided. Only the latest reply counts: an older
+ * pending reply of theirs that the exchange has moved past must not lock
+ * them out. `turns` in sequence order.
+ */
+export function latestReplyPending(
+  turns: readonly { author_id: string | null; screen_result: string }[],
+  userId: string
+): boolean {
+  const last = turns[turns.length - 1];
+  return Boolean(last && last.author_id === userId && last.screen_result === "pending");
+}
+
 export function isLapsed(lastTurnAt: string | Date, now: Date = new Date()): boolean {
   const last = typeof lastTurnAt === "string" ? new Date(lastTurnAt) : lastTurnAt;
   return now.getTime() - last.getTime() > LAPSE_DAYS * 24 * 60 * 60 * 1000;

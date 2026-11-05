@@ -3659,8 +3659,8 @@ runs pass." Agreed that nothing promotes a flag-on preview to Production.
 - **1.** Yes: an atomic reservation for the ceiling and the cap.
 - **2.** "Allowlisted reviewers skip the daily ceiling; the budget still
   applies." That is how #71 shipped.
-- **4.** Yes: a small scheduled job that re-screens pending arena replies,
-  inside the monthly budget.
+- **4.** "Yes: a small scheduled re-screening job for pending replies,
+  inside the monthly budget."
 
 **(e) Content and philosophy**
 
@@ -3826,12 +3826,24 @@ own rules:
   `next_turn`. Filtering in the query keeps replies that can never be
   delivered from filling every run;
 - every write is conditional on what was read, and a reply whose
-  exchange will not take the hand-over goes back to pending, which the
-  route reports as a non-2xx.
+  exchange will not take the hand-over goes back to pending; if even that
+  fails it is counted as stuck, visible in an exchange still waiting on
+  its author, for a hand to fix. Either makes the route answer non-2xx.
 
 A run screens at most 20 replies, oldest first, each at least ten
 minutes old so the route's own screen is never doubled, and starts none
-after 40 seconds, inside the route's 60. At $0.0006 a call that is at
+after 40 seconds. Each of its calls has a 15-second limit and no retries
+(`screenAndLog` takes them as options; the turn route passes none), so a
+call started at 40 seconds ends inside the route's 60 and is logged.
+
+Two things are left as they are and go on the list for Arthur, (e) 8:
+the lapse clock runs from the exchange's last delivered reply, so a reply
+saved on day 13 that cannot be screened lapses with the exchange and is
+never delivered; and `/me` still lists an exchange whose latest reply is
+the reader's own pending one under "Reply", where the exchange page now
+says it is waiting to be checked. The sentence "A check that could not
+run is tried again once a day." and the label "waiting to be checked"
+are new copy, on the same list. At $0.0006 a call that is at
 most about a cent a day. The report it returns holds counts only.
 
 The route is a new file under the frozen `src/app/api/**`. The ruling's

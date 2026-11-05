@@ -8,6 +8,8 @@ vi.mock("server-only", () => ({}));
 
 type Row = Record<string, unknown>;
 const tables: Record<string, Row[]> = {};
+// Updates to these tables fail, as a lost connection would.
+const failingUpdates = new Set<string>();
 
 // Enough of supabase-js and PostgREST for this module: an inner-joined
 // `exchanges!inner(...)` embed on turns, filters on the turn's own
@@ -48,6 +50,7 @@ function query(table: string) {
   b.limit = (n: number) => ((limit = n), b);
   b.update = (p: Row) => ((patch = p), b);
   b.then = (resolve: (v: unknown) => unknown) => {
+    if (patch && failingUpdates.has(table)) return resolve({ data: null, error: { message: "connection lost" } });
     if (patch) {
       const hit = rows();
       for (const r of hit) Object.assign(r, patch);
@@ -85,6 +88,7 @@ const exchange = (id: string, extra: Row = {}) => ({
 });
 
 beforeEach(() => {
+  failingUpdates.clear();
   tables.turns = [turn("t1")];
   tables.exchanges = [exchange("x1")];
   tables.ai_calls = [];
@@ -205,6 +209,68 @@ describe("rescreenPending", () => {
     expect(tables.exchanges[0]).toMatchObject({ status: "lapsed", next_turn: null });
   });
 
+  it("reports a reply it could not put back as stuck, apart from one it could", async () => {
+    let call = 0;
+    // The hand-over fails; then the revert fails too.
+    const r = await rescreenPending(admin, deps({
+      screen: async () => {
+        Object.assign(tables.exchanges[0], { next_turn: "a" });
+        return ok();
+      },
+    }));
+    expect(r).toMatchObject({ failed: 1, stuck: 0 });
+    expect(tables.turns[0].screen_result).toBe("pending");
+    Object.assign(tables.exchanges[0], { next_turn: "b" });
+    const r2 = await rescreenPending(admin, deps({
+      screen: async () => {
+        call++;
+        failingUpdates.add("exchanges");
+        return ok();
+      },
+    }));
+    // The turn was set ok before the exchange update failed; the revert
+    // then succeeded, so this one is failed, not stuck.
+    expect(call).toBe(1);
+    expect(r2).toMatchObject({ failed: 1, stuck: 0 });
+    expect(tables.turns[0].screen_result).toBe("pending");
+  });
+
+  it("counts a reply left visible when neither the hand-over nor the revert would take", async () => {
+    let turnUpdates = 0;
+    const r = await rescreenPending(admin, deps({
+      screen: async () => {
+        failingUpdates.add("exchanges");
+        return ok();
+      },
+    }));
+    expect(r.failed).toBe(1);
+    // Now fail the turns table after its first update (the ok), so the revert fails.
+    tables.turns[0].screen_result = "pending";
+    failingUpdates.clear();
+    const origFrom = (admin as unknown as { from: (t: string) => unknown }).from;
+    const wrapped = {
+      from: (t: string) => {
+        const q = origFrom(t) as Record<string, unknown>;
+        if (t !== "turns") return q;
+        const update = q.update as (p: Row) => unknown;
+        q.update = (p: Row) => {
+          turnUpdates++;
+          if (turnUpdates === 2) failingUpdates.add("turns");
+          return update(p);
+        };
+        return q;
+      },
+    } as never;
+    const r2 = await rescreenPending(wrapped, deps({
+      screen: async () => {
+        failingUpdates.add("exchanges");
+        return ok();
+      },
+    }));
+    expect(r2).toMatchObject({ stuck: 1, failed: 0 });
+    expect(tables.turns[0].screen_result).toBe("ok");
+  });
+
   it("takes the oldest first, and screens at most a batch a run", async () => {
     tables.exchanges = Array.from({ length: RESCREEN_BATCH + 5 }, (_, i) => exchange(`x${i}`));
     tables.turns = [
@@ -261,6 +327,18 @@ describe("what the author of a pending reply is told", () => {
     expect(fs.readFileSync("src/components/counterpart/ExchangeView.tsx", "utf8")).toContain("{REPLY_SAVED_COPY}");
   });
 
+  it("locks the composer only on the reader's own latest reply, while it is pending", async () => {
+    const { latestReplyPending } = await import("../src/lib/counterpart");
+    const t = (author_id: string | null, screen_result: string) => ({ author_id, screen_result });
+    expect(latestReplyPending([t("a", "ok"), t("b", "pending")], "b")).toBe(true);
+    expect(latestReplyPending([t("a", "ok"), t("b", "ok")], "b")).toBe(false);
+    // An older pending reply the exchange moved past does not lock the reader out.
+    expect(latestReplyPending([t("a", "ok"), t("b", "pending"), t("a", "ok")], "b")).toBe(false);
+    // Nor does the other reader's pending reply.
+    expect(latestReplyPending([t("a", "pending")], "b")).toBe(false);
+    expect(latestReplyPending([], "b")).toBe(false);
+  });
+
   it("shows a pending reply as waiting, not held, and offers no second reply while it waits", async () => {
     const { renderToStaticMarkup } = await import("react-dom/server");
     const { createElement } = await import("react");
@@ -279,5 +357,6 @@ describe("what the author of a pending reply is told", () => {
     const { readFileSync } = await import("node:fs");
     const page = readFileSync("src/app/counterpart/[id]/page.tsx", "utf8");
     expect(page).toContain("nextSeq <= MAX_SEQ && !myPending;");
+    expect(page).toContain("const myPending = latestReplyPending(turns, user.id);");
   });
 });

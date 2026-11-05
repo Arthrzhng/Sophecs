@@ -27,8 +27,10 @@ export async function GET(request: Request) {
   try {
     const report = await rescreenPending(admin);
     // A reply screened ok whose exchange would not take the hand-over is
-    // put back to pending; a non-2xx makes that show in the cron log.
-    return NextResponse.json({ ok: report.failed === 0, ...report }, { status: report.failed ? 500 : 200 });
+    // put back to pending, or, if that failed too, left stuck; either
+    // makes a non-2xx, which is what shows in the cron log.
+    const bad = report.failed + report.stuck;
+    return NextResponse.json({ ok: bad === 0, ...report }, { status: bad ? 500 : 200 });
   } catch (err) {
     // A non-2xx is what shows in Vercel's cron log.
     return NextResponse.json(

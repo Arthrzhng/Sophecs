@@ -47,6 +47,12 @@ import { screenAndLog, SCREEN_DAILY_CAP, type ScreenCallResult } from "@/lib/scr
 export const RESCREEN_BATCH = 20;
 export const RESCREEN_MIN_AGE_MS = 10 * 60 * 1000;
 export const RESCREEN_TIME_BUDGET_MS = 40 * 1000;
+/**
+ * Each screen call's own limit, with no retries, so a call started just
+ * inside RESCREEN_TIME_BUDGET_MS still ends inside the route's 60 seconds
+ * and is logged; one cut off by the platform would be billed and unlogged.
+ */
+export const RESCREEN_CALL_TIMEOUT_MS = 15 * 1000;
 /** How many candidate replies one run reads, of which at most RESCREEN_BATCH are screened. */
 export const RESCREEN_READ_LIMIT = 100;
 
@@ -60,7 +66,7 @@ export interface RescreenDeps {
 }
 
 const DEFAULT_DEPS: RescreenDeps = {
-  screen: screenAndLog,
+  screen: (params) => screenAndLog(params, { timeout: RESCREEN_CALL_TIMEOUT_MS, maxRetries: 0 }),
   budget: budgetState,
   killed: () => process.env.KILL_SWITCH_SCREEN === "true",
   now: () => new Date(),
@@ -80,6 +86,11 @@ export interface RescreenReport {
   stranded: number;
   /** Screened ok, but the exchange would not take the hand-over; the reply went back to pending. */
   failed: number;
+  /**
+   * As `failed`, but the reply could not be put back either: it is visible
+   * in an exchange still waiting on its author. Needs a hand to fix.
+   */
+  stuck: number;
 }
 
 type Candidate = {
@@ -97,7 +108,7 @@ export async function rescreenPending(
 ): Promise<RescreenReport> {
   const d = { ...DEFAULT_DEPS, ...deps };
   const started = d.clock();
-  const report: RescreenReport = { stoppedBy: null, read: 0, delivered: 0, held: 0, waiting: 0, stranded: 0, failed: 0 };
+  const report: RescreenReport = { stoppedBy: null, read: 0, delivered: 0, held: 0, waiting: 0, stranded: 0, failed: 0, stuck: 0 };
 
   if (d.killed()) return { ...report, stoppedBy: "kill_switch" };
   if ((await d.budget()) !== "ok") return { ...report, stoppedBy: "budget" };
@@ -127,7 +138,7 @@ export async function rescreenPending(
     const turn = rows[i];
     const exchange = turn.exchanges;
     const turnOf = exchange.user_a && exchange.user_b ? authorForSeq(turn.seq, exchange.user_a, exchange.user_b) : null;
-    if (turnOf !== turn.author_id || exchange.next_turn !== turn.author_id) {
+    if (!turn.author_id || turnOf !== turn.author_id || exchange.next_turn !== turn.author_id) {
       report.stranded++;
       continue;
     }
@@ -193,8 +204,14 @@ export async function rescreenPending(
       .eq("next_turn", turn.author_id)
       .select("id");
     if (moveError || !moved?.length) {
-      await admin.from("turns").update({ screen_result: "pending" }).eq("id", turn.id).eq("screen_result", "ok");
-      report.failed++;
+      const { data: back, error: backError } = await admin
+        .from("turns")
+        .update({ screen_result: "pending" })
+        .eq("id", turn.id)
+        .eq("screen_result", "ok")
+        .select("id");
+      if (backError || !back?.length) report.stuck++;
+      else report.failed++;
       continue;
     }
     report.delivered++;

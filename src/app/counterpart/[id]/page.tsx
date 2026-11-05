@@ -5,7 +5,7 @@ import {
   ExchangeView,
   type ExchangeStatus,
 } from "@/components/counterpart/ExchangeView";
-import { isLapsed, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
+import { isLapsed, latestReplyPending, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate } from "@/lib/motion-text";
 
@@ -98,9 +98,8 @@ export default async function CounterpartPage({
   // visible to both, an unscreened one only to its author.
   const visible = turns.filter((t) => t.screen_result === "ok" || t.author_id === user.id);
   const myHeld = turns.find((t) => t.author_id === user.id && t.screen_result === "flagged");
-  // Saved and not yet screened: the turn is still this reader's, and the
-  // route would refuse another reply until this one is decided.
-  const myPending = turns.some((t) => t.author_id === user.id && t.screen_result === "pending");
+  // src/lib/counterpart.ts: the reader's own latest reply, not yet screened.
+  const myPending = latestReplyPending(turns, user.id);
   const anyRemoved = turns.some((t) => t.screen_result === "removed");
 
   const nextSeq = turns.length + 1;
