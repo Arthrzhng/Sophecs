@@ -22,7 +22,7 @@ import { SupabaseAdapter } from "./seed/adapter-supabase";
 import { buildPlan, readPlan, writePlan, datasetForPlan } from "./seed/plan";
 import { DEFAULTS } from "./seed/generate";
 import { contentTopics } from "./seed/topics";
-import { execute } from "./seed/engine";
+import { execute, finishValidation, releaseHeld, VALIDATING } from "./seed/engine";
 import { validate } from "./seed/validate";
 import { dryRun } from "./seed/dryrun";
 import { cancelSignal, int, isoFlag, log, main, nowFloored, parseFlags, refuseUnsupported, str, writeReport } from "./seed/cli";
@@ -125,15 +125,33 @@ main(async () => {
     log,
     signal: cancelSignal(log),
     breakStaleLock: Boolean(f["break-stale-lock"]),
+    // Halted until the validation below passes, as the scheduled job does
+    // (scripts/seed/ci.ts), so a run by hand cannot lift a halt unvalidated.
+    endHalted: VALIDATING,
   });
   log(`wrote ${JSON.stringify(result.written)} in ${result.seconds.toFixed(1)} s (${result.rowsPerSecond.toFixed(0)} rows/s${result.authUsersPerSecond ? `, ${result.authUsersPerSecond.toFixed(1)} auth users/s` : ""})`);
   if (result.cancelled) {
-    log("cancelled. Run the same command to resume.");
+    await releaseHeld(adapter, result);
+    log("cancelled. Run the same command to resume; the run stays halted until a run of it passes validation.");
+    process.exitCode = 1;
     return;
   }
-  const report = await validate(adapter, dataset, result.before, { cohortLimit });
-  for (const c of report.checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}: ${c.detail}`);
-  log(`report: ${writeReport(`seed-${plan.runId}`, { result, validation: report })}`);
+  // Under the lock execute kept, released by finishValidation, or here if
+  // the validation throws (the run then stays halted).
+  let report: Awaited<ReturnType<typeof validate>>;
+  let recorded: boolean;
+  try {
+    report = await validate(adapter, dataset, result.before, { cohortLimit });
+    for (const c of report.checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}: ${c.detail}`);
+    log(`report: ${writeReport(`seed-${plan.runId}`, { result, validation: report })}`);
+    recorded = await finishValidation(adapter, result, report.checks.filter((c) => !c.ok).map((c) => c.name));
+  } finally {
+    await releaseHeld(adapter, result);
+  }
+  if (!recorded) {
+    log("the validation's result could not be recorded (the run's lock was lost); the run stays halted");
+    process.exitCode = 1;
+  }
   if (!report.ok) {
     log("validation failed: stop here. See docs/sample-activity.md, \"Stop conditions\".");
     process.exitCode = 1;

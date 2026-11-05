@@ -2981,6 +2981,152 @@ names the options only. The test holds the zod refusals of both to
 that; the screener's not-JSON message still quotes the start of the
 reply, by design.
 
+### The new schools' colours
+
+Arthur's ruling 16 of 2026-11-05: "reject the all-violet set. The three
+new schools must come from different hue families; relax the colour-blind
+distance vs the live three from 12 to 8 (names always sit beside colours).
+Pick the best set under those rules, show it in the styleguide, and
+proceed; don't wait for me unless nothing passes."
+
+**Chosen:** Confucianism `#562b05`, a deep brown; Ubuntu `#1e3b4f`, a dark
+blue; Buddhist Ethics `#7d56b8`, a violet. On `/styleguide/phase3`, "The
+new schools' colours" (a preview deployment), with screenshots in
+`docs/phase3-styleguide/`.
+
+**The rules, as `scripts/colour-candidates.mjs` now applies them.** Every
+constraint from Checkpoint A stands (white hero text at AA, a dot that
+shows on paper, CIEDE2000 20 from the live schools and 15 from the judge's
+blue and the step-done orange in normal vision, each school's stereotyped
+hues excluded), with the distance to the live three under simulated
+deuteranopia and protanopia lowered from 12 to 8. "Different hue
+families" is eight named families of OKLCH hue (red, orange and brown,
+yellow and gold, green, cyan and teal, blue, violet, magenta; red takes
+two sectors, since it wraps through 0), one school to a family, and the three also at least 40 degrees of hue apart, so a
+violet at 300 and a magenta at 320 do not count as different.
+
+**Why this set.** The relaxed 8 hardly widens what passes: 1,059 colours
+against 1,056, nearly all blue to magenta, because the binding limit is
+the 20 from the live three in normal vision, which shuts out the greens,
+teals, reds, oranges and golds near Stoicism, Virtue Ethics and
+Utilitarianism. Among the sets that do pass, every school's possible
+colours were tried together. Each set is scored by its closest pair
+among all six schools, under the worst of the three views. The highest
+score is 12.8, a blue, violet and magenta set whose three new colours
+are only 12.8 apart and all within 90 degrees of hue of each other,
+which is the all-violet set again in other words; this set scores 12.7,
+a difference no one can see. So the score is rounded to the nearest
+whole unit, and ties go to the set whose new colours are furthest from
+each other: 21.5 for this one. Confucianism
+has to be the brown, since the Ubuntu and Buddhist exclusions both cover
+it; Ubuntu and Buddhist Ethics could swap blue and violet at the same
+score, and this way round was the search's first.
+
+**What to know.**
+- The weakest pair is Confucianism's brown and Virtue Ethics' oxblood
+  under simulated deuteranopia, 12.7, and the two are neighbours on the
+  map (50 and 110 degrees). Under protanopia the brown is nearest
+  Stoicism and Virtue Ethics (17.0 each); in normal vision it is nearest
+  Utilitarianism's ochre (20.1, the limit being 20). Names always sit
+  beside colours, which is what the relaxed rule rests on.
+- The brown's hue is 21 degrees from the ochre's. The ruling's families
+  constrain the three new schools among themselves, so this is no
+  breach, and a reading that applied families across all six would rule
+  the brown out and leave only blue, violet and magenta sets, the kind
+  rejected.
+- The relaxation to 8 turned out not to be needed: this set clears the
+  original 12 (its weakest pair is 12.7), and the search with 12 picks
+  the same set.
+- Ubuntu's blue is 15.1 from the judge's blue in normal vision, the
+  limit being 15.
+- With the other two held where they are, Confucianism and Ubuntu have
+  no alternative at least 10 from the chosen colour (they have near ones,
+  4.6 to 8.5 away); Buddhist Ethics has two, shown beside it.
+- Each card surface is the marker itself, except Buddhist Ethics',
+  darkened to `#724aab` so the card's text holds AA at its lowest
+  opacity. The live schools' surfaces are all darker than their markers;
+  whether the new ones should be too was an open question at Checkpoint
+  A that ruling 16 did not answer, and it goes on Checkpoint B's list.
+
+Nothing live changes: the colours reach the site with Phase 3, behind
+`SIX_SCHOOLS`.
+
+### Quiz v2, as ruled
+
+Arthur's ruling 15 of 2026-11-05 ("Arthur's rulings of 2026-11-05 on
+Checkpoint A"), carried into `docs/quiz-v2.json` and `docs/quiz-v2.md`:
+
+- The axes, their plain names and the six positions stand as drafted,
+  Ubuntu at 0 degrees and Buddhist Ethics at 310 included, and so do the
+  weighted options.
+- 2c, 5c, 7a, 7c and 6b take Arthur's wording, each keeping its school
+  and vector. The simulation, re-run, gives the same figures to the
+  digit, as it must: it never reads an option's wording. Every school lands as
+  primary for 16.2% to 17.7% of answer patterns.
+- 1a, 10b, 3d, 5b, 6d, 9a and 8c stay as written. No rule-based school;
+  a duty-based one is the obvious seventh, later (noted above).
+- The copy's AI framing is reworded now, on the live site: "ten
+  questions on how AI should decide things" was not true of v1 either
+  (three of its ten questions involve AI), and "ten questions about how
+  you decide what's right" is true of both. That covers the site
+  description, `SharePage`, `ChallengeInvite` and the opening of one
+  share line on each school page (`content/schools/*.md`, which the
+  ruling names). The time ("about eighty seconds", which v2's longer
+  options would make untrue) and three schools becoming six change at
+  launch, and the share lines that describe v1's questions go to Arthur
+  as content judgements (`docs/quiz-v2.md`, section 8).
+- PostHog's `share_clicked` records a share line by its index, and three
+  of those indices now hold new text (stoicism 1, utilitarianism 2,
+  virtue-ethics 0) from this PR's production deploy on 2026-11-05.
+  A comparison of share lines should split on that date.
+
+Quiz v2 ships at launch, after the sample teardown, and the fresh run
+follows it (`docs/sample-activity.md`, "At launch").
+
+### Sample activity: halts that hold, and console logs (2026-11-05)
+
+Arthur's ruling 19 of 2026-11-05 asked for one fresh review of #57's last
+fixes. It found nothing blocking, and four things to fix:
+
+- **A halt could be lifted without a validation passing.** `execute`
+  cleared `last_error` before writing, so a `full` run by hand that then
+  crashed left the run failed but not halted, and the next scheduled
+  `extend` wrote; and a validation that threw left the run `complete`.
+  Now every run that writes ends halted ("halted: validation not
+  finished") and only a passing validation lifts it
+  (`finishValidation`); a run by hand on a halted run keeps the halt
+  while it writes, and through a crash; and a refusal while writing (a
+  row it would not adopt or update, a user without its ban) halts the
+  run rather than leaving the schedule to try again every six hours,
+  which is what `docs/sample-activity.md`, "Stop conditions", already
+  said it did. `scripts/seed-production.ts` does the same, and a canary
+  cannot be run on a halted run or one that has had its full stage, so a
+  run by hand from the command line cannot lift a halt either. The run's
+  lock is kept from the end of the writes until the validation's result
+  is recorded, so no teardown or other writer can come in between; if it
+  is lost, nothing is recorded and the halt stays. An error from the
+  writes goes to `last_error`, and the public log gets a line of its
+  own, since the message can name a row.
+- **The 5% duplicate check ran after the writes.** The rate is the
+  plan's own, so it now runs with the dry-run checks: an extension that
+  would cross it is refused before anything is written.
+- **Console logs skipped `before_send`.** posthog-js sends console log
+  records by their own path, and console capture can be switched on from
+  the PostHog project. The `logs` setting's own `beforeSend` now drops
+  every one once the page load has shown a sample page: a record logged
+  before the logs script loads is filtered only when it is replayed,
+  without the address it was logged at.
+- **The sample users' email tag** comes from the generator's random
+  streams, which are not meant for secrets. Changing it would break the
+  live run's spot checks, so it becomes an HMAC for the fresh run at
+  launch (`docs/sample-activity.md`, "At launch").
+
+And from its nits: `return_visit` was lost for a visit that started on a
+sample page (the flag was set before `track()` dropped the event), and is
+now sent from the first genuine page; the docs say what web vitals and
+the heatmap's mouse-move timer can still carry; and the stop conditions
+say what each one does.
+
 ### Node 24 actions and the in-range fixes
 
 Checkpoint A's housekeeping, "mine to do next" (`docs/checkpoint-a.md`):
