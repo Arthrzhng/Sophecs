@@ -321,7 +321,7 @@ entry names.
     13 policies and every row count unchanged.
   - Security advisor after: the same findings as before.
 
-## 2026-11-04: sample activity, revised to Arthur's ruling, not yet run
+## 2026-11-04: sample activity, revised to Arthur's ruling
 
 - Arthur approved the run on 2026-11-04 in a revised form: 3,278 accounts;
   permanent, with new activity on a schedule; a GitHub Actions workflow
@@ -378,3 +378,26 @@ entry names.
   account end-to-end run with the extension and teardown. That run caught
   the local adapter still reading the old address format at teardown,
   which refused rather than deleted; fixed.
+- Renumbered to 0023 once #61 and #62 were on `main`, and its database
+  test rebuilt to run under production's grants as 0022 left them: each
+  client write 0022 took is checked as denied, and again with the
+  privilege granted back for one transaction to show the guard still
+  refuses it. Gates, the 0023 test, the migration round trip and the 600
+  account end-to-end run pass on `ada1ac0`.
+- **0023 applied in production at 03:23:59 UTC on 2026-11-05**, migration
+  version `20261105032359`, through the Supabase tool (no DROP, no
+  prompt), with Arthur's go-ahead of the same morning.
+  - Before: no active session, no `ai_calls` row and no unjudged debate in
+    the previous 10 minutes; security advisor as after 0021; snapshot,
+    `docs/seed-snapshots/2026-11-05-before-0023.json`.
+  - Read back at 03:24 UTC: the six columns, `not null default false`, no
+    row marked; `seed_runs` and `seed_run_items` with row level security
+    on, no privilege for anon or authenticated, empty; the eleven
+    triggers; the guard not executable by clients; both views with their
+    columns appended, owner, options and ACL unchanged, every row's
+    digest as before (`95f4c9b1...`, `38d85702...`);
+    `elo_percentile(1200)` unchanged; `debates_created_at_idx`; 0022's
+    grants intact.
+  - Security advisor after: no new ERROR or WARN. One INFO added, as
+    expected: `seed_runs` and `seed_run_items` have row level security and
+    no policy, which is the design (server role only).

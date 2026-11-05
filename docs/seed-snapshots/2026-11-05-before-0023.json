@@ -1,0 +1,17 @@
+{
+  "what": "The objects migration 0023 (sample activity) changes, production (tekifezydjlgxgndkxul), before 0023.",
+  "taken_at": "2026-11-05T03:22:54Z",
+  "how": "One read-only query through the Supabase tool: the two views' definitions (md5 of pg_get_viewdef), columns, owner, options and ACL; a digest of every row of each view; elo_percentile(1200) and its definition's md5; whether any marker column, registry table or user trigger existed; row counts.",
+  "session": { "active_sessions": 0, "ai_calls_last_10_min": 0, "unjudged_debates_last_10_min": 0 },
+  "views": [
+    { "view": "debates_public", "def_md5": "558625def7c1a0cd72f4e2acd62de285", "cols": "id,topic_slug,school,score,verdict,elo_before,elo_after,created_at,kind,parent_debate_id,argument,motion_text", "owner": "postgres", "options": null, "acl": "anon=r/postgres,authenticated=r/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres", "rows_digest": "95f4c9b11556a724fccd7ebb498fb544" },
+    { "view": "public_results", "def_md5": "689be61b46b07304da2cb9df8dc88681", "cols": "id,school,secondary,vector,challenge_from,created_at", "owner": "postgres", "options": null, "acl": "anon=r/postgres,authenticated=r/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres", "rows_digest": "38d8570208f7c3aa878a35361fb07248" }
+  ],
+  "elo_percentile_1200": 0,
+  "elo_percentile_def_md5": "649ac31325e3c185e38e30b5d84c80cb",
+  "marker_columns": 0,
+  "registry_tables": 0,
+  "user_triggers_in_public": 0,
+  "rows": { "profiles": 1, "quiz_results": 28, "debates": 1, "challenges": 3, "exchanges": 0, "turns": 0, "reading_responses": 2, "classes": 0, "class_members": 0, "auth_users": 3 },
+  "db_size": "12 MB"
+}
