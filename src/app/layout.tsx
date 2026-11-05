@@ -13,6 +13,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://sophecs.com"),
   title: "Sophecs",
   description: DESCRIPTION,
+  // Browsers' own default, stated so that every page carries it. A sample's
+  // page sets "no-referrer" (src/lib/sample.ts), and a policy set by a meta
+  // tag stays with the tab after a client-side navigation removes the tag;
+  // the next page's own tag is what puts the default back.
+  referrer: "strict-origin-when-cross-origin",
   // opengraph-image.tsx supplies the image itself; these carry the rest of
   // the card so sophecs.com previews properly when the bare domain is shared.
   openGraph: {
