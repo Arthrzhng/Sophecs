@@ -5,7 +5,7 @@ import { ClassViewTracker } from "@/components/me/ClassViewTracker";
 import { ClassView } from "@/components/class/ClassView";
 import { getCaseStates, type CaseState } from "@/lib/cases";
 import { normaliseClassCode } from "@/lib/classes";
-import { SCHOOL_ADHERENT } from "@/lib/school-colors";
+import { SCHOOL_ADHERENT, SCHOOL_ARTICLE } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
 
 export const metadata = { title: "Class · Sophecs" };
@@ -113,7 +113,7 @@ export default async function ClassPage({ params }: { params: Promise<{ code: st
             id,
             name:
               profile?.displayName ??
-              (school ? `A ${SCHOOL_ADHERENT[school]}` : "A student"),
+              (school ? `${SCHOOL_ARTICLE[school] === "an" ? "An" : "A"} ${SCHOOL_ADHERENT[school]}` : "A student"),
             school,
             states: statesByUser.get(id) ?? {},
           };

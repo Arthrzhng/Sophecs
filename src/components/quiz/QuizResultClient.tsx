@@ -9,7 +9,7 @@ import { TextLink } from "@/components/ui/TextLink";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { ShareSheet } from "@/components/share/ShareSheet";
 import { ChunkyButton, ChunkyLink } from "@/components/daily-path/ChunkyButton";
-import { SCHOOL_ADHERENT } from "@/lib/school-colors";
+import { SCHOOL_ADHERENT, SCHOOL_ARTICLE } from "@/lib/school-colors";
 import { ChallengeButton } from "@/components/share/ChallengeButton";
 import { PENDING_RESULT_KEY } from "@/components/quiz/QuizShell";
 import { submitQuizResult } from "@/app/actions";
@@ -123,8 +123,8 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
       <div>
       {/* "You argue like a ..." rather than "Your school": the quiz reports
           how someone argues, which is the claim the product can actually
-          support. Every adherent name takes "a". */}
-      <p className="text-sm text-ink-mid">You argue like a</p>
+          support. The article is the noun's own: "an Ubuntu Ethicist". */}
+      <p className="text-sm text-ink-mid">You argue like {SCHOOL_ARTICLE[pending.primary]}</p>
       <h1 className="mt-1 text-xl font-extrabold tracking-tight text-ink">
         {SCHOOL_ADHERENT[pending.primary]}
       </h1>

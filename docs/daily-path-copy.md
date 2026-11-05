@@ -238,13 +238,14 @@ is given in full to a screen reader rather than the letter.
 
 | State | Copy |
 |---|---|
-| ranked | `{First\|Second\|Third} on the table this week` |
-| the school has nothing judged this week | `Not ranked yet this week` |
+| ranked | `{First\|Second\|...\|Sixth} on the table this week` |
+| the school is not ranked: none of its arguments has a fidelity mark this week, or, on a SIX_SCHOOLS build, fewer than 20 judged original arguments | `Not ranked yet this week` |
 
 The place is a word, not `1st`: the rating on the line above is a numeral
 set in mono, and two numerals one under the other saying different kinds of
 thing read as a table of figures. Ties share a rank and no school can place
-below third, so three words cover it.
+below the number of schools shown, three or, on a SIX_SCHOOLS build, six,
+so six words cover it.
 
 - Link: `See the school table` → school table
 
@@ -338,7 +339,7 @@ verdict page is unchanged.
 |---|---|
 | Page heading, in place of the verdict line | `The verdict on a private argument` |
 | "The judge's note", in place of its three paragraphs | `The judge's note can quote the argument, so only the person who wrote it can read it while the argument is private.` |
-| The objection left standing, in place of its wording | `The argument left a {School} objection standing. Its wording can quote the argument, so only the person who wrote it can read it.` |
+| The objection left standing, in place of its wording | `The argument left {a/an} {School} objection standing. Its wording can quote the argument, so only the person who wrote it can read it.` ("an" for Ubuntu) |
 | Share line | The school's share line without its `The judge's note: {verdict_line}.` sentence |
 | A rejected argument, in place of the judge's reason | `The judge set this argument aside without a score. Its reason can quote the argument, so only the person who wrote it can read it.` |
 | A revision's note on what changed | Not shown: the note can quote the argument too |
@@ -370,8 +371,11 @@ verdict page is unchanged.
 | Judging paused | the empty-week line, then `Judging is paused while we check the quality of the verdicts.` |
 
 Ties share a rank. Rank is by average fidelity, then by number of arguments.
-A school with no average has no rank. Week is the ISO week, the same one
-the weekly motion uses.
+A school with no average has no rank. On a SIX_SCHOOLS build, neither has
+one with fewer than 20 judged original arguments in the week, and its row
+says how many it has, except in an empty week, whose own line says it
+(`School table, a school not yet ranked`, below). Week is the ISO week,
+the same one the weekly motion uses.
 
 Originals only. A revision is a second attempt at the same motion after
 feedback and does not move the reader's rating, so it does not move their
@@ -479,12 +483,17 @@ The axis names are `docs/quiz-v2.md`'s, and change if that draft does.
 | In place of the rank, read aloud | `Not ranked yet` (the live table's words) |
 | Under the name | `Ranked once it has {N} judged original arguments. {n} so far.` |
 
-{N} is a threshold Arthur has not set; the preview shows a fixture value
-and says so.
+{N} is 20, Arthur's ruling (e)5 of 2026-11-05: a school is ranked once it
+has 20 judged original arguments in the week. It is `RANK_MIN_ARGUMENTS`
+in `src/lib/school-table.ts`, and holds on SIX_SCHOOLS builds, the
+question Checkpoint B asked. Whether the live table takes it is Arthur's
+to say.
 
 ### Today, the view from elsewhere
 
-An optional card after the after-reading, not a seventh step.
+An optional card after the after-reading, not a seventh step. Shown only
+once the reader reaches step 4 (Arthur's ruling (e)6 of 2026-11-05), which
+is once they have argued the week's motion.
 
 | Element | Copy |
 |---|---|

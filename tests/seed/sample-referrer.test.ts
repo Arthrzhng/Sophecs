@@ -44,7 +44,7 @@ const p = (id: string) => ({ params: Promise.resolve({ id }) });
 const pv = (debateId: string) => ({ params: Promise.resolve({ debateId }) });
 
 beforeEach(() => {
-  const res = { school: "stoicism", secondary: "utilitarianism", vector: {}, challenge_from: null, created_at: "2026-11-05T00:00:00Z" };
+  const res = { school: "stoicism", secondary: "utilitarianism", vector: {}, challenge_from: null, created_at: "2026-11-05T00:00:00Z", quiz_version: 1 };
   tables.public_results = [
     { id: "r-sample", ...res, is_sample: true },
     { id: "r-genuine", ...res, is_sample: false },

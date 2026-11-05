@@ -117,12 +117,12 @@ export function StreakCard({
   );
 }
 
-// Three schools, so three places. Written out rather than "1st": the
-// rating beside it is a number and is set in mono, and two numerals in
-// adjacent lines saying different kinds of thing read as a table of
-// figures. Ties share a rank, so the third place can be vacant, but no
-// school can ever rank below third.
-const PLACES = ["First", "Second", "Third"];
+// A place for every school a build can show, six on a SIX_SCHOOLS build.
+// Written out rather than "1st": the rating beside it is a number and is
+// set in mono, and two numerals in adjacent lines saying different kinds
+// of thing read as a table of figures. Ties share a rank, so a place can
+// be vacant, but no school ranks below the number of schools.
+const PLACES = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth"];
 
 /** The reader's school, its rating, where it stands, and the way to the table. */
 export function SchoolCard({
@@ -136,7 +136,12 @@ export function SchoolCard({
   oneLine: string;
   /** profiles.elo, the reader's own rating, not the school's. */
   elo: number;
-  /** The school's place on this week's table, or null with nothing judged. */
+  /**
+   * The school's place on this week's table, or null while it is not
+   * ranked: none of its arguments has a fidelity mark this week, or, on a
+   * SIX_SCHOOLS build, it has fewer than RANK_MIN_ARGUMENTS
+   * (src/lib/school-table.ts).
+   */
   rank: number | null;
   /** This week's ranks count a sample account's argument (migration 0023). */
   includesSamples?: boolean;

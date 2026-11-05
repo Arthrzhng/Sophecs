@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { SCHOOL_CHUNKY } from "@/components/daily-path/chunky";
-import { SCHOOL_ADHERENT } from "@/lib/school-colors";
+import { SCHOOL_ADHERENT, SCHOOL_ARTICLE } from "@/lib/school-colors";
 import { SampleLabel } from "@/components/sample/SampleLabel";
 import type { SchoolContent } from "@/lib/schools";
 import type { SchoolId } from "@/lib/types";
@@ -43,7 +43,7 @@ export function ChallengeInvite({
         {isSample ? "A sample account's challenge" : "Someone challenged you"}
       </p>
       <h1 className="mt-2 max-w-[24ch] text-xl font-extrabold leading-tight tracking-tight text-ink">
-        They came out a {adherent}. Find out what you are.
+        They came out {SCHOOL_ARTICLE[school]} {adherent}. Find out what you are.
       </h1>
 
       <p className="mt-5 max-w-[54ch] text-base leading-relaxed text-ink-mid">

@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { pairwiseElo } from "@/lib/elo";
+import { schoolFromResult } from "@/lib/quiz-result";
 import type { SchoolId } from "@/lib/types";
 
 // The active topic with the lowest sort that neither known participant has
@@ -117,10 +118,12 @@ export async function getPendingChallenges(
     if (otherResultId) {
       const { data: otherResult } = await admin
         .from("quiz_results")
-        .select("school")
+        .select("school, quiz_version")
         .eq("id", otherResultId)
         .maybeSingle();
-      otherSchool = (otherResult?.school as SchoolId | undefined) ?? null;
+      // Named only from a v1 result (src/lib/quiz-result.ts); a v2 one
+      // reads as a side whose school is not shown.
+      otherSchool = otherResult ? schoolFromResult(otherResult) : null;
     }
     pending.push({ challengeId: c.id, topicSlug: c.topic_slug, otherSchool });
   }

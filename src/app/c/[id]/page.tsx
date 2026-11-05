@@ -6,6 +6,7 @@ import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { ChallengeInvite } from "@/components/share/ChallengeInvite";
 import { ChallengeViewTracker } from "@/components/share/ChallengeViewTracker";
 import { getSchool } from "@/lib/schools";
+import { shownOnThisBuild } from "@/lib/quiz-result";
 import type { SchoolId } from "@/lib/types";
 
 // A sample account's challenge says so in the title too, which is what a
@@ -38,10 +39,12 @@ async function getChallenge(id: string) {
 
   const { data: result } = await admin
     .from("public_results")
-    .select("school, is_sample")
+    .select("school, is_sample, quiz_version")
     .eq("id", challenge.challenger_result_id)
     .single();
-  if (!result) return null;
+  // A challenger's result this build does not show (a v2 one without
+  // SIX_SCHOOLS, src/lib/quiz-result.ts) makes the challenge not found.
+  if (!result || !shownOnThisBuild(result)) return null;
 
   return {
     school: result.school as SchoolId,

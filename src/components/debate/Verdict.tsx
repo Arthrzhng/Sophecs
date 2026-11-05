@@ -10,7 +10,7 @@ import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { TextLink } from "@/components/ui/TextLink";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { track } from "@/lib/analytics/client";
-import { SCHOOL_ADHERENT_PLURAL, SCHOOL_COLORS } from "@/lib/school-colors";
+import { SCHOOL_ADHERENT_PLURAL, SCHOOL_ARTICLE, SCHOOL_COLORS } from "@/lib/school-colors";
 import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
 import { JUDGE_AXES, AXIS_MAX } from "@/lib/judge-axes";
 import { SampleLabel } from "@/components/sample/SampleLabel";
@@ -58,8 +58,11 @@ const WITHHELD_NOTE_TEMPLATE =
   "These notes can quote the argument, so they are shown only while the argument is public.";
 const WITHHELD_REJECTED_TEMPLATE =
   "This argument was set aside without a score. The reason can quote the argument, so it is shown only while the argument is public.";
-function withheldObjection(schoolName: string): string {
-  return `The argument left a ${schoolName} objection standing. Its wording can quote the argument, so only the person who wrote it can read it.`;
+// The article is the adherent noun's: every school's name begins with the
+// same sound as its noun ("an Ubuntu objection", "an Ubuntu Ethicist"),
+// which tests/six-schools.test.ts checks for all six.
+function withheldObjection(school: SchoolId): string {
+  return `The argument left ${SCHOOL_ARTICLE[school]} ${SCHOOL_COLORS[school].name} objection standing. Its wording can quote the argument, so only the person who wrote it can read it.`;
 }
 
 // The parent's four marks, so a revision can be read against its original.
@@ -387,7 +390,7 @@ export function Verdict({
             <p className="text-sm text-ink-mid">{SCHOOL_COLORS[objection.school].name}</p>
             {textWithheld ? (
               <p className="mt-2 text-sm leading-relaxed text-ink-mid">
-                {withheldObjection(SCHOOL_COLORS[objection.school].name)}
+                {withheldObjection(objection.school)}
               </p>
             ) : (
               <>

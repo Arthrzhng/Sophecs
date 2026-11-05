@@ -11,6 +11,8 @@ import {
   TODAY_SHIFTS,
   todayPathStates,
   todayDoneFlags,
+  showsElsewhere,
+  ELSEWHERE_FROM_STEP,
   hasActionableStep,
 } from "@/lib/today-path";
 import type { SchoolId } from "@/lib/types";
@@ -185,8 +187,11 @@ export function TodayClient({
                     )}
                     {/* After the after-reading, which step 4 brings, and
                         not a seventh step: it has no check, and nothing on
-                        the path waits for it (docs/daily-path-copy.md). */}
-                    {i === 3 && elsewhere && <li className="w-full max-w-[52ch]">{elsewhere}</li>}
+                        the path waits for it (docs/daily-path-copy.md).
+                        Shown only once the reader has reached step 4. */}
+                    {i === ELSEWHERE_FROM_STEP && elsewhere && showsElsewhere(statuses) && (
+                      <li className="w-full max-w-[52ch]">{elsewhere}</li>
+                    )}
                   </Fragment>
                 );
               })}

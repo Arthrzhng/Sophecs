@@ -3,6 +3,8 @@ import {
   todayPathStates,
   todayDoneFlags,
   hasActionableStep,
+  showsElsewhere,
+  ELSEWHERE_FROM_STEP,
   TODAY_STEPS,
 } from "../src/lib/today-path";
 
@@ -101,5 +103,32 @@ describe("todayPathStates while judging is paused", () => {
     expect(s[3].state).toBe("done");
     expect(s[4].state).toBe("locked");
     expect(s[4].lockReason).toBe("judging");
+  });
+});
+
+describe("showsElsewhere", () => {
+  it("is keyed to step 4, Face an objection", () => {
+    expect(TODAY_STEPS[ELSEWHERE_FROM_STEP].title).toBe("Face an objection");
+  });
+
+  it("hides the view from elsewhere until the reader reaches step 4", () => {
+    expect(showsElsewhere(states({}, false, false))).toBe(false);
+    expect(showsElsewhere(states({ read: true }, false, false))).toBe(false);
+    // Read and checked: step 3 is current, step 4 still locked.
+    expect(showsElsewhere(states({ read: true }, true, false))).toBe(false);
+  });
+
+  it("shows it once the reader has argued, which reaches step 4, and after", () => {
+    expect(showsElsewhere(states({ read: true, argued: true }, true, false))).toBe(true);
+    expect(showsElsewhere(states({ read: true, argued: true, answered: true, closed: true }, true, false))).toBe(true);
+  });
+
+  it("keeps it shown for a reader who argued before judging was paused, and hidden for one who had not", () => {
+    expect(showsElsewhere(states({ read: true, argued: true }, true, true))).toBe(true);
+    expect(showsElsewhere(states({ read: true }, true, true))).toBe(false);
+  });
+
+  it("shows nothing for a path with no step 4", () => {
+    expect(showsElsewhere([])).toBe(false);
   });
 });

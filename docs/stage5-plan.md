@@ -150,7 +150,9 @@ of the three; Gate 2 is about that.
    `submitQuizResult` is in `src/app/actions.ts`, which is frozen, so
    this step edits a frozen file too. It reads the version column, so it
    follows **Gate 1**, and it is deployed to production before step 4's
-   branch is pushed.
+   branch is pushed. Done as migration 0027 and `src/lib/quiz-result.ts`
+   (`docs/decisions.md`, "Stage 5, step 3"); the map on a v2 result page
+   comes with step 4, which brings the v2 quiz's data it draws from.
 4. **Quiz v2.** On flag-on builds: the questions from
    `docs/quiz-v2.json`, the map (`SchoolMap`) in place of the triangle,
    the nearest-school result logic of `scripts/simulate-quiz-v2.mjs`,
@@ -236,3 +238,12 @@ of the three; Gate 2 is about that.
    `docs/decisions.md`), and the adherent nouns from step 1.
 
 Steps 1 and 2 need no gate and start now.
+
+**Ruled at Checkpoint B, 2026-11-05.** Gate 1: yes, the migration and the
+edit to `src/app/actions.ts`. Gate 2: option (i). Gate 3: yes, the new
+schools' criteria on flag-on builds only, and the three in the rival list
+on flag-on builds; the new-schools golden run follows the full v3 run,
+within an $8.00 cumulative cap on the eval key. Gate 4: not yet; it is
+brought to Arthur once the golden runs pass. Nothing promotes a flag-on
+preview to Production (`docs/decisions.md`, `### Arthur's rulings of
+2026-11-05 on Checkpoint B`).

@@ -3,6 +3,7 @@ import { CardLayout } from "@/components/card/CardLayout";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { loadCardFonts } from "@/lib/og-fonts";
 import { getSchool } from "@/lib/schools";
+import { shownOnThisBuild } from "@/lib/quiz-result";
 import type { SchoolId } from "@/lib/types";
 
 // Node.js runtime, not edge: see docs/decisions.md and card.png/route.tsx —
@@ -27,10 +28,12 @@ export default async function OGImage({ params }: { params: Promise<{ id: string
     const admin = createAdminClient();
     const { data } = await admin
       .from("public_results")
-      .select("school, is_sample")
+      .select("school, is_sample, quiz_version")
       .eq("id", id)
       .single();
-    if (!data) return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+    // A result this build does not show (src/lib/quiz-result.ts) gets no
+    // image, as a wrong id does.
+    if (!data || !shownOnThisBuild(data)) return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
     school = data.school as SchoolId;
     sample = Boolean(data.is_sample);
   }
