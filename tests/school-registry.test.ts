@@ -8,7 +8,7 @@ import {
   QUIZ_SCHOOLS,
   isPublished,
   publishedEntry,
-  publishedLookup,
+  shownLookup,
   schoolAdherent,
   schoolAdherentPlural,
   schoolColourVar,
@@ -220,24 +220,31 @@ describe("a school the client registry does not hold", () => {
   });
 });
 
-describe("publishedLookup", () => {
-  it("holds only the published schools, which is what keeps drafts out of the bundle", () => {
-    const lookup = publishedLookup({ stoicism: "kept" }, () => "neutral");
+describe("shownLookup", () => {
+  it("holds only the schools this build shows, which is what keeps drafts out of the bundle", () => {
+    // Every draft is offered an entry; a build without SIX_SCHOOLS, which
+    // the suite runs as, must drop each of them.
+    const offered = Object.fromEntries([
+      ["stoicism", "kept"],
+      ...DRAFT_SCHOOL_IDS.map((id) => [id, `entry for ${id}`]),
+    ]) as Partial<Record<SchoolId, string>>;
+    const lookup = shownLookup(offered, () => "neutral");
     expect(Object.keys(lookup)).toEqual(["stoicism"]);
     for (const id of DRAFT_SCHOOL_IDS) {
       expect(Object.keys(lookup), `${id} must not be a key`).not.toContain(id);
+      expect(lookup[id], `${id} gets the neutral, not the entry offered`).toBe("neutral");
     }
   });
 
   it("still answers for every school", () => {
-    const lookup = publishedLookup({ stoicism: "kept" }, () => "neutral");
+    const lookup = shownLookup({ stoicism: "kept" }, () => "neutral");
     expect(lookup.stoicism).toBe("kept");
     expect(lookup.utilitarianism).toBe("neutral");
     for (const id of ALL_SCHOOL_IDS) expect(typeof lookup[id]).toBe("string");
   });
 
   it("computes the neutral from the id, so a name can fall back to the id", () => {
-    const lookup = publishedLookup<string>({}, (id) => `fallback:${id}`);
+    const lookup = shownLookup<string>({}, (id) => `fallback:${id}`);
     expect(lookup.confucian).toBe("fallback:confucian");
   });
 });

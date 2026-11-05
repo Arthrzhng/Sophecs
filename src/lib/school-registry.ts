@@ -1,5 +1,5 @@
 /**
- * The one place the product's published schools are listed.
+ * The one place the product's schools are listed for the client.
  *
  * Before this file there were twenty-six: three separate `SCHOOL_IDS`
  * constants, eleven `Record<SchoolId, …>` maps, five hand-written arrays
@@ -11,21 +11,29 @@
  * - `QUIZ_SCHOOLS` is what the quiz can sort somebody into. It stays the
  *   original three until there is a quiz v2, so the result triangle has
  *   three corners and the question bank's vectors keep their three keys.
- * - `PUBLISHED_SCHOOLS` is what a reader can see. Every public surface
- *   iterates it.
+ * - `PUBLISHED_SCHOOLS` is what production publishes. The judge reads it
+ *   (the rival schools in its prompt, the schools its reply may name), so
+ *   it moves only when a school is published, under Arthur's (b) and (c).
  *
- * **Draft schools are not here.** They are in
+ * And a third, `SHOWN_SCHOOLS`, which is what this build shows a reader:
+ * the published schools, and on a build made with `SIX_SCHOOLS=1` the
+ * three that are not yet published as well (docs/stage5-plan.md). Every
+ * public surface moves to it in Stage 5; every lookup keyed by school
+ * already answers for it. Without the flag it is `PUBLISHED_SCHOOLS`.
+ *
+ * **Draft schools are not here**, except on a `SIX_SCHOOLS` build, behind
+ * a constant a build without the flag drops. They are in
  * `school-registry.drafts.ts`, which is `server-only`, because a draft
  * school's id and name are unreleased product decisions and the Phase 1B
- * guarantee is that no draft reaches a page or a bundle. This file ships
- * to the browser; that one cannot. The first attempt at this registry
+ * guarantee is that no draft reaches a production page or bundle. This
+ * file ships to the browser; that one cannot. The first attempt at this registry
  * held all six entries and put "confucian", "Confucianism", "ubuntu" and
  * "buddhist" into thirteen production client chunks, which is the thing
  * the draft gate exists to prevent.
  *
  * The split is also what makes the fallback rule true by construction
  * rather than by diligence. Everything keyed by school goes through
- * `publishedLookup`, which answers for a published school and gives a
+ * `shownLookup`, which answers for a school this build shows and gives a
  * neutral for anything else. A draft renders in neutral ink because the
  * client does not know it, not because somebody remembered to write an
  * `?? ink`.
@@ -105,12 +113,89 @@ export const QUIZ_SCHOOLS: readonly QuizSchoolId[] = [
   "virtue-ethics",
 ];
 
-/** The schools a production reader can see. Every public surface iterates this. */
+/** The schools production publishes, and the judge reads. */
 export const PUBLISHED_SCHOOL_IDS: readonly SchoolId[] = PUBLISHED_SCHOOLS.map((s) => s.id);
 
 const PUBLISHED_BY_ID = new Map<SchoolId, SchoolEntry>(
   PUBLISHED_SCHOOLS.map((s) => [s.id, s])
 );
+
+/**
+ * The three schools that are not yet published, on a `SIX_SCHOOLS` build
+ * and an empty list on any other.
+ *
+ * `process.env.SIX_SCHOOLS` is written into the code as a constant when the
+ * build starts (next.config.ts), so on a build without the flag the test
+ * below is `"0" === "1"`, and the entries behind it are dead code the build
+ * drops. That is what keeps these ids and names out of production's client
+ * bundle, which `npm run check:bundle` confirms on every build. Written out
+ * here rather than imported, because an import would carry them across a
+ * module boundary the build cannot see through. For the same reason the
+ * two other modules with literals of their own test the flag again:
+ * `card-tokens.ts` for its colours and `school-colors.ts` for its text
+ * classes. Everything else reads these entries through the lists below.
+ *
+ * Still `status: "draft"`: they are drafts that this build shows, and
+ * `content/schools/*.md`, which is frozen, says so. Their names match the
+ * drafts module and their content files (`tests/six-schools.test.ts`).
+ *
+ * The adherent nouns are proposals, shown on flag-on builds only, and are
+ * Arthur's to rule on at Checkpoint B (e). "Ubuntu" has no settled English
+ * noun for one of its arguers, and an arguer from Buddhist Ethics is not
+ * thereby a Buddhist, so those two follow "Virtue Ethicist".
+ */
+const SHOWN_DRAFTS: readonly SchoolEntry[] =
+  process.env.SIX_SCHOOLS === "1"
+    ? [
+        {
+          id: "confucian",
+          status: "draft",
+          name: "Confucianism",
+          adherent: "Confucian",
+          adherentPlural: "Confucians",
+          colourToken: "--color-confucian",
+        },
+        {
+          id: "ubuntu",
+          status: "draft",
+          name: "Ubuntu",
+          adherent: "Ubuntu Ethicist",
+          adherentPlural: "Ubuntu Ethicists",
+          colourToken: "--color-ubuntu",
+        },
+        {
+          id: "buddhist",
+          status: "draft",
+          name: "Buddhist Ethics",
+          adherent: "Buddhist Ethicist",
+          adherentPlural: "Buddhist Ethicists",
+          colourToken: "--color-buddhist",
+        },
+      ]
+    : [];
+
+/**
+ * What this build shows a reader, in the order the product shows them:
+ * the published schools, then on a `SIX_SCHOOLS` build the three.
+ */
+export const SHOWN_SCHOOLS: readonly SchoolEntry[] = [...PUBLISHED_SCHOOLS, ...SHOWN_DRAFTS];
+
+export const SHOWN_SCHOOL_IDS: readonly SchoolId[] = SHOWN_SCHOOLS.map((s) => s.id);
+
+const SHOWN_BY_ID = new Map<SchoolId, SchoolEntry>(SHOWN_SCHOOLS.map((s) => [s.id, s]));
+
+/**
+ * The entry for a school this build shows, or null: a draft on a build
+ * without the flag, or a string from a database row written by a later
+ * version of the app.
+ */
+export function shownEntry(id: SchoolId): SchoolEntry | null {
+  return SHOWN_BY_ID.get(id) ?? null;
+}
+
+export function isShown(id: SchoolId): boolean {
+  return SHOWN_BY_ID.has(id);
+}
 
 /**
  * A published school's entry, or null for one this module does not hold:
@@ -131,8 +216,8 @@ export function isQuizSchool(id: SchoolId): id is QuizSchoolId {
 }
 
 /**
- * The display name of a published school, or the raw id for anything
- * else.
+ * The display name of a school this build shows, or the raw id for
+ * anything else.
  *
  * The id is the right fallback: it is true, it is not another school's
  * name, and it is not the string "undefined". A draft school's real name
@@ -140,18 +225,18 @@ export function isQuizSchool(id: SchoolId): id is QuizSchoolId {
  * code can reach.
  */
 export function schoolName(id: SchoolId): string {
-  return publishedEntry(id)?.name ?? id;
+  return shownEntry(id)?.name ?? id;
 }
 
 /** "Stoic". The display name where nobody has written one. */
 export function schoolAdherent(id: SchoolId): string {
-  const entry = publishedEntry(id);
+  const entry = shownEntry(id);
   return entry?.adherent ?? schoolName(id);
 }
 
 /** "Stoics". The display name where nobody has written one. */
 export function schoolAdherentPlural(id: SchoolId): string {
-  const entry = publishedEntry(id);
+  const entry = shownEntry(id);
   return entry?.adherentPlural ?? schoolName(id);
 }
 
@@ -160,22 +245,23 @@ export function schoolAdherentPlural(id: SchoolId): string {
  * school this module has no colour for. Never another school's colour.
  */
 export function schoolColourVar(id: SchoolId): string {
-  const token = publishedEntry(id)?.colourToken;
+  const token = shownEntry(id)?.colourToken;
   return token ? `var(${token})` : "var(--color-ink)";
 }
 
 /** The same, for the deeper shade a chunky control's bottom edge uses. */
 export function schoolShadeVar(id: SchoolId): string {
-  const token = publishedEntry(id)?.colourToken;
+  const token = shownEntry(id)?.colourToken;
   return token ? `var(${token}-deep)` : "var(--color-ink)";
 }
 
 /**
- * A map over every school, built from the published ones alone.
+ * A map over every school, built from the ones this build shows alone.
  *
  * Reads as an ordinary `Record<SchoolId, T>`, which is what the sixty-odd
- * call sites and the judge path expect, but holds only the published
- * entries. A school it does not hold gets `neutral`, computed from the id
+ * call sites and the judge path expect, but holds only the entries for
+ * the schools this build shows. A school it does not hold gets `neutral`,
+ * computed from the id
  * so a name can fall back to the id while a colour falls back to ink.
  *
  * A plain object cannot do this job. To answer for every `SchoolId` it
@@ -184,15 +270,15 @@ export function schoolShadeVar(id: SchoolId): string {
  * exactly the regression this replaced:
  * `scripts/check-client-bundle.ts` is the test that it stays replaced.
  *
- * `Object.keys` and spread see the published entries, which is what every
+ * `Object.keys` and spread see the shown entries, which is what every
  * caller that enumerates wants.
  */
-export function publishedLookup<T>(
+export function shownLookup<T>(
   entries: Partial<Record<SchoolId, T>>,
   neutral: (id: SchoolId) => T
 ): Record<SchoolId, T> {
   const held = Object.fromEntries(
-    PUBLISHED_SCHOOL_IDS.filter((id) => entries[id] !== undefined).map((id) => [
+    SHOWN_SCHOOL_IDS.filter((id) => entries[id] !== undefined).map((id) => [
       id,
       entries[id] as T,
     ])

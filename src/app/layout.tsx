@@ -5,6 +5,9 @@ import { AnalyticsProvider } from "@/components/analytics-provider";
 import { SiteHeader } from "@/components/nav/SiteHeader";
 import { SiteFooter } from "@/components/nav/SiteFooter";
 import "./globals.css";
+// The three unpublished schools' colour tokens on a SIX_SCHOOLS build, and
+// an empty stylesheet on any other (next.config.ts resolves the name).
+import "@six-schools/tokens.css";
 
 const DESCRIPTION =
   "Ten questions about how you decide what's right. Find out which school of ethics you actually argue from.";

@@ -1,0 +1,47 @@
+/* The three schools that are not yet published, on a SIX_SCHOOLS build
+   only (docs/stage5-plan.md). A build without the flag imports
+   six-schools.off.css in this file's place (next.config.ts), so none of
+   these names or hexes reaches a stylesheet production serves, and
+   `npm run check:bundle` fails if one does.
+
+   The same three kinds of token as each live school's in globals.css, and
+   the same rules for where each may be used.
+
+   Markers: chosen under Arthur's ruling 16 of 2026-11-05
+   (scripts/colour-candidates.mjs, docs/phase3-styleguide/
+   colour-candidates.json). White text on each: 12.1 / 11.7 / 5.4 : 1. */
+:root {
+  --color-confucian: #562b05;
+  --color-ubuntu: #1e3b4f;
+  --color-buddhist: #7d56b8;
+
+  /* The result card's surface: the marker, darkened only where the card's
+     text would otherwise fall below AA at its lowest opacity, which of the
+     three is Buddhist Ethics alone (colour-candidates.json, cardSurface).
+     Mirrored for Satori in src/lib/card-tokens.ts. */
+  --color-confucian-surface: #562b05;
+  --color-ubuntu-surface: #1e3b4f;
+  --color-buddhist-surface: #724aab;
+
+  /* The pressed-shadow shade under a chunky control. The live three's are
+     their markers at about three quarters of the lightness (0.73 to 0.77)
+     and of the chroma (0.69 to 0.75) in OKLCH, at the same hue; these are
+     the new markers at 0.75 and 0.73. */
+  --color-confucian-deep: #371a03;
+  --color-ubuntu-deep: #112532;
+  --color-buddhist-deep: #53387b;
+}
+
+/* SCHOOL_TEXT_CLASS's classes for the three (src/lib/school-colors.ts).
+   The live schools' come from Tailwind, which makes `text-stoic` from the
+   @theme token; these tokens are not in @theme, because @theme is in
+   globals.css and every build ships it, so the classes are written here. */
+.text-confucian {
+  color: var(--color-confucian);
+}
+.text-ubuntu {
+  color: var(--color-ubuntu);
+}
+.text-buddhist {
+  color: var(--color-buddhist);
+}

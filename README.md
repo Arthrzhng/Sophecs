@@ -36,9 +36,10 @@ Checks, all five of which must pass before a push:
 npx tsc --noEmit && npm run lint && npm run test && npm run build && npm run check:bundle
 ```
 
-`npm run check:bundle` reads the build and fails if a draft school's id or
-name is in any client chunk. `CONTRIBUTING.md` says why, and
-`docs/review-charter.md` is the standard a step is reviewed against.
+`npm run check:bundle` reads the build and fails if a draft school's id,
+name, adherent noun or colour is in any client chunk. `CONTRIBUTING.md`
+says why, and `docs/review-charter.md` is the standard a step is reviewed
+against.
 
 ## Judging is live, deliberately
 

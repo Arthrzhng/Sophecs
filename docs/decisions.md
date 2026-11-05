@@ -3157,3 +3157,87 @@ Checkpoint A's housekeeping, "mine to do next" (`docs/checkpoint-a.md`):
 tours are off), `js-yaml` (our own front matter), `next` and its pinned
 `postcss` 8.4.31 (build only, fixed in Next 16), `minimatch` and the
 `@typescript-eslint` packages (lint only, moderate).
+
+### Stage 5, step 1: the `SIX_SCHOOLS` flag (2026-11-05)
+
+The first step of `docs/stage5-plan.md`. A build made with `SIX_SCHOOLS=1`
+shows Confucianism, Ubuntu and Buddhist Ethics after the live three; a
+build without it is the production build it was, which
+`npm run check:bundle` confirms on every build.
+
+- **Read when the build starts.** `next.config.ts` reads the variable and
+  passes it through `env`, always `"0"` or `"1"`, so Next writes it into
+  server and client code as a constant. Each module that holds a new
+  school's strings tests `process.env.SIX_SCHOOLS === "1"` itself
+  (`school-registry.ts`, `school-colors.ts`, `card-tokens.ts`), and on a
+  flag-off build that test is false at compile time and the strings behind
+  it are dropped. Tested in each module rather than imported as a
+  constant, because a value carried across a module boundary is not one
+  the build can fold.
+- **Shown, not published.** `SHOWN_SCHOOLS` is the published three plus,
+  with the flag, the three drafts, which keep `status: "draft"`.
+  `PUBLISHED_SCHOOLS` is unchanged, because the judge reads it (the rival
+  schools in its prompt, the schools its reply may name), and
+  `tests/six-schools.test.ts` checks the judge's six request fixtures
+  byte for byte with the flag on. Every lookup keyed by school now answers
+  for the shown schools: `publishedLookup` is renamed `shownLookup`, and
+  `schoolName`, the adherent nouns, `schoolColourVar` and `schoolShadeVar`
+  read `shownEntry`. No page lists the three yet; step 2 moves the
+  surfaces over.
+- **Colours.** The markers and card surfaces are ruling 16's
+  (`colour-candidates.json`). Each live school's deep shade, under a
+  chunky control, is its marker at about three quarters of the lightness
+  and chroma in OKLCH; the new deep shades are the new markers at 0.75
+  and 0.73: Confucianism `#371a03`, Ubuntu `#112532`, Buddhist Ethics
+  `#53387b`. They are in `src/app/six-schools.css`, which the layout
+  imports through a name only `next.config.ts` resolves: the real file on
+  a flag-on build, the empty `six-schools.off.css` on any other. The
+  image routes' copies are in `card-tokens.ts`, behind the flag. The
+  stylesheet also writes `.text-confucian` and the other two by hand,
+  since Tailwind makes `text-*` classes only for `@theme` tokens, which
+  every build ships.
+- **Adherent nouns, for Checkpoint B (e).** Proposed, and shown on
+  flag-on builds only: "Confucian", "Ubuntu Ethicist" and "Buddhist
+  Ethicist", with plurals. Ubuntu has no settled English noun for one of
+  its arguers, and someone arguing from Buddhist Ethics is not thereby a
+  Buddhist, so those two follow "Virtue Ethicist". Six places write "a"
+  or "A" before the noun, which "Ubuntu Ethicist" would need as "an"
+  (`ChallengeInvite.tsx`, `ProfilePage.tsx`, twice in
+  `ArgumentEditor.tsx`, the class page, and the quiz result, whose
+  comment says every adherent name takes "a"). None can show one of the
+  three until a reader is placed in one, in step 4, which handles them.
+- **The bundle check** now looks for nineteen strings rather than six:
+  the ids and names, the proposed adherent nouns (added to
+  `DRAFT_SCHOOLS`, which does not depend on the flag), and every colour
+  in `six-schools.css`. It throws if a draft lacks an adherent noun or
+  any of its three colour tokens. It reads which kind of build it has
+  from the build itself (`config.env` in `required-server-files.json`),
+  and each script needs its own kind: `npm run check:bundle` fails on a
+  flag-on build, and `npm run check:bundle:six` makes one into
+  `.next-six` and fails unless all nineteen are in it whole, a name or
+  id as a quoted string of its own and not inside a longer one. Both
+  builds take about 35 seconds here.
+- **The build cache.** Webpack's cache is keyed on Next's own config,
+  which leaves out `env` and the stylesheet alias, and on the text of
+  `next.config.ts`, which does not change with the variable. The review
+  of #79 built with the flag and then without it into one directory, and
+  the flag-off build kept the flag-on stylesheet: all seven colours and
+  the three ids in its CSS. JavaScript was rebuilt correctly. Vercel
+  restores `.next/cache` between deploys and runs no bundle check, so the
+  flag is now part of the cache's version, and each kind of build reads
+  only a cache its own kind wrote. Rebuilt both ways over one cache, and
+  back, the checks pass each time.
+- **No flag in production before launch.** `next.config.ts` refuses to
+  build when the flag is on and `VERCEL_ENV` is `production`, or when a
+  Vercel build (`VERCEL=1`) does not say which environment it is for, so
+  a wrong tick in Vercel fails the deploy and the live one stays, rather
+  than publishing the three with every gate green. The launch merge
+  removes the refusal. It cannot see a promotion: promoting a flag-on
+  preview to Production does not rebuild, and the review charter (rule 4)
+  counts it as publishing.
+- **Tests pin the flag off.** `vitest.config.mts` sets `SIX_SCHOOLS` to
+  `"0"` for every test that does not stub it, so a flag left in the
+  shell cannot fail unrelated tests under misleading names.
+
+Vercel's Preview environment gets `SIX_SCHOOLS=1` once this is merged;
+Production does not until launch.

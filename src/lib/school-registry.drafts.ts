@@ -21,15 +21,45 @@ import {
  * check this file and `school-registry.ts` against `content/schools/*.md`
  * between them.
  *
+ * The same list whether or not the build has `SIX_SCHOOLS`: a draft that
+ * a flag-on build shows is still a draft, and `npm run check:bundle` takes
+ * its strings from here, so the check never runs on an empty list. The
+ * adherent nouns are proposals for Arthur (Checkpoint B, (e)), the same as
+ * the registry's `SHOWN_DRAFTS`, which shows them on flag-on builds; here
+ * they are what the bundle check looks for. The colour tokens stay null,
+ * as the content files have none; a flag-on build's tokens are the
+ * registry's.
+ *
  * Every entry here carries `status: "draft"`, and nothing published
  * belongs in it. `tests/school-registry.test.ts` fails if the two files
  * overlap, if either disagrees with the content files, or if a draft here
  * has a colour token.
  */
 export const DRAFT_SCHOOLS: readonly SchoolEntry[] = [
-  { id: "confucian", status: "draft", name: "Confucianism", colourToken: null },
-  { id: "ubuntu", status: "draft", name: "Ubuntu", colourToken: null },
-  { id: "buddhist", status: "draft", name: "Buddhist Ethics", colourToken: null },
+  {
+    id: "confucian",
+    status: "draft",
+    name: "Confucianism",
+    adherent: "Confucian",
+    adherentPlural: "Confucians",
+    colourToken: null,
+  },
+  {
+    id: "ubuntu",
+    status: "draft",
+    name: "Ubuntu",
+    adherent: "Ubuntu Ethicist",
+    adherentPlural: "Ubuntu Ethicists",
+    colourToken: null,
+  },
+  {
+    id: "buddhist",
+    status: "draft",
+    name: "Buddhist Ethics",
+    adherent: "Buddhist Ethicist",
+    adherentPlural: "Buddhist Ethicists",
+    colourToken: null,
+  },
 ];
 
 /** Every school the product knows about, published first, then drafts. */
