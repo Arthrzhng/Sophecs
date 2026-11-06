@@ -551,9 +551,10 @@ The menu under `Me`:
 | `Retake the quiz` | `/quiz` |
 | `Sign out` | signs out, then `/` |
 
-Whether a reader is signed in is read from the session cookie before the
-page is drawn, as the header's `Me` and `Sign in` label is today, so
-neither set of links flashes into the other.
+Whether a reader is signed in is read from the session cookie by a
+script that runs before the page is drawn, so neither set of links
+flashes into the other. (Today's header settles its `Me` or `Sign in`
+label only once the page's script has run.)
 
 ### Mobile
 

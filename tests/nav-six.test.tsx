@@ -59,6 +59,11 @@ describe("a build without SIX_SCHOOLS", () => {
     const { header, six } = await load(flag);
     expect(header.SiteHeader).not.toBe(six.SiteHeaderSix);
     const html = renderToStaticMarkup(createElement(header.SiteHeader));
+    // Byte for byte as main's header renders on the same page (main at
+    // 901e3a4, the same pathname mocked).
+    expect(`${html}\n`).toBe(
+      fs.readFileSync(path.join(process.cwd(), "tests", "nav-six-flag-off", "header.html"), "utf8")
+    );
     expect(links(html).map(([href, text]) => [href, text])).toEqual([
       ["/", "Sophecs"],
       ["/quiz", "Quiz"],
@@ -71,6 +76,22 @@ describe("a build without SIX_SCHOOLS", () => {
       ["/table", "School table"],
       ["/me", "Me"],
     ]);
+  });
+
+  it.each(["0", ""])("sends /schools and /how-it-works to the site's own not-found page (SIX_SCHOOLS=%j)", async (flag) => {
+    const { config } = await load(flag);
+    // Rewritten before any page is looked up, to a path no route answers,
+    // so the reader gets the not-found page main serves there, header and
+    // all, rather than the bare shell a page's own notFound() returns.
+    expect(await config.default.rewrites!()).toEqual({
+      beforeFiles: [
+        { source: "/schools", destination: "/_flag-off/schools" },
+        { source: "/how-it-works", destination: "/_flag-off/how-it-works" },
+      ],
+      afterFiles: [],
+      fallback: [],
+    });
+    expect(fs.existsSync(path.join(process.cwd(), "src", "app", "_flag-off"))).toBe(false);
   });
 
   it("adds no redirects, and has no /schools or /how-it-works, not even their titles", async () => {
@@ -102,6 +123,51 @@ describe("a build without SIX_SCHOOLS", () => {
     // (901e3a4), less React's empty text separators, which a static render
     // does not write.
     expect(`${renderToStaticMarkup(createElement(cards.SchoolCards))}\n`).toBe(fixture("school-cards"));
+  });
+
+  it("keeps /table's own heading, and the landing page's cards at theirs", async () => {
+    vi.resetModules();
+    vi.stubEnv("SIX_SCHOOLS", "0");
+    vi.doMock("@/lib/school-table-page", () => ({ loadSchoolTable: async () => FIXTURE_PROPS.table }));
+    try {
+      const page = await import("../src/app/table/page");
+      const html = renderToStaticMarkup(await page.default());
+      const table = fs.readFileSync(path.join(process.cwd(), "tests", "nav-six-flag-off", "school-table.html"), "utf8");
+      expect(html).toContain(table.trimEnd());
+      expect(page.dynamic).toBe("force-dynamic");
+    } finally {
+      vi.doUnmock("@/lib/school-table-page");
+    }
+    // The landing page draws the cards as main did (the fixture above
+    // pins what that renders).
+    const landing = fs.readFileSync(path.join(process.cwd(), "src", "app", "page.tsx"), "utf8");
+    expect(landing.match(/<SchoolCards[^>]*\/>/g)).toEqual(["<SchoolCards />"]);
+  });
+
+  // A link written out to an old address would, on a flag-on build, lose
+  // its anchor on the redirect when clicked; every one goes through
+  // src/lib/nav-routes.ts. These are the only places an old address may
+  // stay written out: the constants themselves, the three-school header,
+  // the footer's flag-off links, and /method's own link to the rubric.
+  it("writes the old addresses out nowhere but where a build without the flag needs them", () => {
+    const found: Record<string, number> = {};
+    const walk = (dir: string) => {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const f = path.join(dir, e.name);
+        if (e.isDirectory()) walk(f);
+        else if (/\.tsx?$/.test(e.name)) {
+          const n = (fs.readFileSync(f, "utf8").match(/["'](?:\/debate\/rubric|\/method|\/table)["'#]/g) ?? []).length;
+          if (n) found[path.relative(process.cwd(), f)] = n;
+        }
+      }
+    };
+    walk(path.join(process.cwd(), "src"));
+    expect(found).toEqual({
+      "src/lib/nav-routes.ts": 5,
+      "src/components/nav/SiteHeader.tsx": 1,
+      "src/components/nav/SiteFooter.tsx": 2,
+      "src/app/method/page.tsx": 1,
+    });
   });
 
   it("links where it always has, and lists the old pages in the sitemap", async () => {
@@ -202,7 +268,30 @@ describe("a build with SIX_SCHOOLS=1", () => {
     // Set when a sign-in starts, kept whether or not it finishes.
     expect(run("sb-tekifezydjlgxgndkxul-auth-token-code-verifier=abc")).toBeUndefined();
     expect(run("sb-x-auth-tokens=1")).toBeUndefined();
+    expect(run("notsb-x-auth-token=1")).toBeUndefined();
     expect(run("")).toBeUndefined();
+  });
+
+  it("keeps the mark up to date as the reader moves, and takes it away on signing out", async () => {
+    const { syncAuthHint } = await import("../src/components/nav/auth-hint");
+    const attrs: Record<string, string> = {};
+    const document = {
+      cookie: "a=1; sb-x-auth-token=abc",
+      documentElement: {
+        setAttribute: (k: string, v: string) => (attrs[k] = v),
+        removeAttribute: (k: string) => delete attrs[k],
+      },
+    };
+    vi.stubGlobal("document", document);
+    try {
+      syncAuthHint();
+      expect(attrs["data-auth"]).toBe("in");
+      document.cookie = "a=1; sb-x-auth-token-code-verifier=abc";
+      syncAuthHint();
+      expect(attrs["data-auth"]).toBeUndefined();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it("redirects the old addresses, keeping every one working", async () => {
@@ -212,8 +301,9 @@ describe("a build with SIX_SCHOOLS=1", () => {
       { source: "/method", destination: "/how-it-works", permanent: false },
       { source: "/debate/rubric", destination: "/how-it-works#rubric", permanent: false },
     ]);
-    // And the config the build reads carries them.
+    // And the config the build reads carries them, and rewrites nothing.
     expect(await config.default.redirects!()).toEqual(config.sixSchoolsRedirects("1"));
+    expect(await config.default.rewrites!()).toEqual({ beforeFiles: [], afterFiles: [], fallback: [] });
   });
 
   it("links straight to the new pages, anchors and all, rather than through a redirect", async () => {
@@ -252,6 +342,19 @@ describe("a build with SIX_SCHOOLS=1", () => {
     expect(html).toContain("Questions or corrections: arthur.rzhang@gmail.com");
     // One h1; the merged pages' headings sit under their sections.
     expect(html.match(/<h1/g)).toHaveLength(1);
+    const levels = [...html.matchAll(/<h([1-6])[^>]*>(.*?)<\/h\1>/g)].map(
+      (m) => `h${m[1]} ${m[2].replace(/<[^>]*>/g, "")}`
+    );
+    const at = (title: string) => levels.findIndex((h) => h.slice(3) === title);
+    for (const title of ["How the judge works", "How this was judged", "Counterpart rules", "Sample accounts"])
+      expect(levels[at(title)]).toBe(`h2 ${title}`);
+    expect(levels[at("Known limitations")]).toBe("h3 Known limitations");
+    expect(levels[at("What counts as faithful")]).toBe("h3 What counts as faithful");
+    // The contents line links each section, by the id each has.
+    const contents = /<nav aria-label="On this page"[^>]*>(.*?)<\/nav>/.exec(html)![1];
+    const targets = [...contents.matchAll(/href="#([^"]+)"/g)].map((m) => m[1]);
+    expect(targets).toEqual(["judge", "rubric", "counterpart", "samples"]);
+    for (const id of targets) expect(html).toContain(`id="${id}"`);
     expect((await howItWorks.generateMetadata()).title).toBe("How it works · Sophecs");
   });
 
@@ -311,10 +414,11 @@ describe("a build with SIX_SCHOOLS=1", () => {
     try {
       const page = await import("../src/app/schools/page");
       const html = renderToStaticMarkup(await page.default());
-      const outline = [...html.matchAll(/<h([1-6])[^>]*>(.*?)<\/h\1>/g)].map(
+      expect(page.dynamic).toBe("force-dynamic");
+      const headings = [...html.matchAll(/<h([1-6])[^>]*>(.*?)<\/h\1>/g)].map(
         (m) => `h${m[1]} ${m[2].replace(/<[^>]*>/g, "")}`
       );
-      expect(outline.slice(0, 7)).toEqual([
+      expect(headings.slice(0, 7)).toEqual([
         "h1 Schools",
         "h2 Stoicism",
         "h2 Utilitarianism",
@@ -323,9 +427,9 @@ describe("a build with SIX_SCHOOLS=1", () => {
         "h2 Ubuntu",
         "h2 Buddhist Ethics",
       ]);
-      expect(outline[7]).toMatch(/^h2 /);
-      expect(outline.slice(8).every((h) => h.startsWith("h3 "))).toBe(true);
-      expect(outline.length).toBeGreaterThan(8);
+      expect(headings[7]).toMatch(/^h2 /);
+      expect(headings.slice(8).every((h) => h.startsWith("h3 "))).toBe(true);
+      expect(headings.length).toBeGreaterThan(8);
     } finally {
       vi.doUnmock("@/lib/school-table-page");
     }

@@ -221,10 +221,10 @@ the new-schools run 16 or 23 of 25, depending on item 3.
     Samples for the new three need new argument banks, which are content.
     Rule whether the run should cover them.
 14. **The navigation's copy and screenshots** (#99). The copy is
-    `docs/daily-path-copy.md`, section 13, with what is new marked: the
-    two pages' titles, descriptions and headings, the contents line on
-    `/how-it-works` and its spoken name "On this page", and the Exemplars
-    link. The choices made where your instruction left room are in
+    `docs/daily-path-copy.md`, section 13, with what is new marked:
+    `/schools`' description; `/how-it-works`' title, description and
+    heading, its contents line and that line's spoken name "On this
+    page"; and the Exemplars link. The choices made where your instruction left room are in
     `docs/decisions.md`, "Navigation for six schools, behind
     SIX_SCHOOLS": no sign-in link in the signed-out header; where each
     item under Me goes; the method page's closing sentence ("The criteria

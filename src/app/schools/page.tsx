@@ -5,9 +5,11 @@ import { SchoolCards } from "@/components/schools/SchoolCards";
 import { SchoolTable } from "@/components/table/SchoolTable";
 import { loadSchoolTable } from "@/lib/school-table-page";
 
-// Metadata rather than a static export, so that a build without the flag
-// says nothing of this page: its 404 has the site's own title and
-// description, as before the page existed.
+// A build without the flag never reaches this page: next.config.ts
+// rewrites its address to one no route answers, so the reader gets the
+// site's own not-found page, as before the page existed. The metadata is
+// generated, and refuses as the page does, so that even reached some
+// other way it says nothing of the page.
 export async function generateMetadata(): Promise<Metadata> {
   if (process.env.SIX_SCHOOLS !== "1") notFound();
   return {

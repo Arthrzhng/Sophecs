@@ -4667,9 +4667,13 @@ signed in, at 390px and 1280px, in the Gate 4 pack for my review."
 Built after Gate 3 and the new-schools run, as asked. The copy is in
 `docs/daily-path-copy.md`, section 13, with what is new marked for his
 ruling. A build without the flag, production included, renders every
-touched page and component byte for byte as before; that was checked by
-rendering the old and new versions of `/method`, `/debate/rubric`, the
-footer, the motion list and the school table side by side.
+touched page and component byte for byte as before. Tests pin it against
+fixtures rendered from main (`tests/nav-six-flag-off/`), and two reviews
+served main and the branch, both built without the flag, side by side.
+On such a build `/schools` and `/how-it-works` are rewritten
+(`flagOffRewrites` in `next.config.ts`) to a path no route answers, so
+they get the site's own not-found page, as on main; a page that refuses
+by itself answers with Next's bare error shell instead.
 
 Choices made where the instruction left room, each his to change:
 - **Signed-in or not, before the page is drawn.** Both link sets are in
@@ -4723,11 +4727,14 @@ Choices made where the instruction left room, each his to change:
   `-code-verifier` cookie a half-finished sign-in leaves, so a reader who
   abandoned a sign-in is not shown the signed-in header.
 - **The flag-off bundle.** The flag-off build's markup is pinned by
-  fixtures rendered from main's components (`tests/nav-six-flag-off/`).
+  fixtures taken from main (`tests/nav-six-flag-off/`).
   Its JavaScript is not byte for byte main's. The root layout's script,
   which every page loads, grows by 1,743 bytes (563 compressed): the
   header picks its version at build time, but what the six-school
   header imports still comes along unused, namely the published three's
   names and colours and the session-cookie test. No draft school is
-  among it (`check:bundle` passes). Measured on flag-off builds of main
-  at 901e3a4 and of this branch.
+  among it (`check:bundle` passes). The stylesheet grows too, by
+  387 bytes (62 compressed), seven rules for classes no flag-off page
+  uses, since Tailwind writes a rule for every class it finds in the
+  source, whichever build uses it. Measured on flag-off builds of
+  main at 901e3a4 and of this branch.

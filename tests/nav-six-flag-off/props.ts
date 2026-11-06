@@ -1,5 +1,5 @@
 // Fixed inputs for the flag-off markup fixtures beside this file, which
-// were rendered from main's components (at cd49c49) before the navigation
+// were rendered from main (at cd49c49 and 901e3a4) before the navigation
 // change. tests/nav-six.test.tsx renders today's components with the same
 // inputs, without the flag, and requires the same bytes: production's
 // pages may not change.

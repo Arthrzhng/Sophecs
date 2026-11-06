@@ -136,10 +136,31 @@ export function sixSchoolsRedirects(sixSchools: string) {
   ];
 }
 
+// The navigation's two new pages, on a build without SIX_SCHOOLS, production
+// included: their addresses are sent, before any page is looked up, to a
+// private path no route answers, so they get the site's own not-found page
+// exactly as on main. Left to the pages themselves, a notFound() thrown
+// while their metadata is read answers with Next's bare error shell, with
+// no header, footer or "Nothing here." until the page's script runs.
+export function flagOffRewrites(sixSchools: string) {
+  if (sixSchools === "1") return { beforeFiles: [], afterFiles: [], fallback: [] };
+  return {
+    beforeFiles: [
+      { source: "/schools", destination: "/_flag-off/schools" },
+      { source: "/how-it-works", destination: "/_flag-off/how-it-works" },
+    ],
+    afterFiles: [],
+    fallback: [],
+  };
+}
+
 const nextConfig: NextConfig = {
   env: { SIX_SCHOOLS },
   async redirects() {
     return [...canonicalRedirects(process.env), ...sixSchoolsRedirects(SIX_SCHOOLS)];
+  },
+  async rewrites() {
+    return flagOffRewrites(SIX_SCHOOLS);
   },
   // `npm run check:bundle:six` builds with the flag into a directory of its
   // own, so the flag-on build never overwrites the .next that
