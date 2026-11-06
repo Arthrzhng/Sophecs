@@ -59,7 +59,14 @@ create index judge_reservations_user_expires_idx on public.judge_reservations (u
 
 alter table public.judge_reservations enable row level security;
 revoke all on public.judge_reservations from public, anon, authenticated;
-revoke all on sequence public.judge_reservations_id_seq from public, anon, authenticated;
+-- The identity sequence by the name Postgres gave it, which is
+-- judge_reservations_id_seq unless that name was taken.
+do $$
+begin
+  execute format('revoke all on sequence %s from public, anon, authenticated',
+    pg_get_serial_sequence('public.judge_reservations', 'id'));
+end
+$$;
 
 -- Returns the reservation's id as text, or the reason it was refused:
 -- 'daily_cap' or 'call_ceiling', the route's own words for its two
@@ -68,7 +75,8 @@ revoke all on sequence public.judge_reservations_id_seq from public, anon, authe
 -- It must stay VOLATILE and run under READ COMMITTED (PostgREST's
 -- default): each statement then takes a fresh snapshot after the lock
 -- wait, so the second of two racing calls counts the first one's
--- reservation. Marked STABLE, or run under REPEATABLE READ, it would
+-- reservation. Marked STABLE it would not run at all (a non-volatile
+-- function may not DELETE or INSERT); run under REPEATABLE READ it would
 -- count from a snapshot taken before the wait and let both through.
 create function public.reserve_judge_submission(
   p_user uuid,
@@ -131,16 +139,22 @@ grant execute on function public.release_judge_reservation(bigint) to service_ro
 -- role already holds all of them, and more; this states the minimum.
 grant select, insert, delete on public.judge_reservations to service_role;
 
+-- Every table privilege there is: Postgres 17, which production runs,
+-- adds MAINTAIN to the seven of 16 (as 0022 found).
 do $$
+declare
+  v_table_privs text := 'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER'
+    || case when current_setting('server_version_num')::int >= 170000 then ',MAINTAIN' else '' end;
+  v_seq text := pg_get_serial_sequence('public.judge_reservations', 'id');
 begin
   if has_function_privilege('anon', 'public.reserve_judge_submission(uuid, integer, integer, integer, integer)', 'EXECUTE')
      or has_function_privilege('authenticated', 'public.reserve_judge_submission(uuid, integer, integer, integer, integer)', 'EXECUTE')
      or has_function_privilege('anon', 'public.release_judge_reservation(bigint)', 'EXECUTE')
      or has_function_privilege('authenticated', 'public.release_judge_reservation(bigint)', 'EXECUTE')
-     or has_table_privilege('anon', 'public.judge_reservations', 'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
-     or has_table_privilege('authenticated', 'public.judge_reservations', 'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
-     or has_sequence_privilege('anon', 'public.judge_reservations_id_seq', 'USAGE,SELECT,UPDATE')
-     or has_sequence_privilege('authenticated', 'public.judge_reservations_id_seq', 'USAGE,SELECT,UPDATE') then
+     or has_table_privilege('anon', 'public.judge_reservations', v_table_privs)
+     or has_table_privilege('authenticated', 'public.judge_reservations', v_table_privs)
+     or has_sequence_privilege('anon', v_seq, 'USAGE,SELECT,UPDATE')
+     or has_sequence_privilege('authenticated', v_seq, 'USAGE,SELECT,UPDATE') then
     raise exception '0028: a client role can still reach judge_reservations, its sequence or its functions';
   end if;
 end

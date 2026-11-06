@@ -9,8 +9,12 @@
 -- agent (docs/decisions.md). By hand outside the editor, it is
 -- `psql --single-transaction`.
 --
--- Dropping the table drops its foreign key, which takes SHARE ROW
--- EXCLUSIVE on auth.users as creating it did; hence the lock timeout.
+-- Dropping the table drops its foreign key's triggers on auth.users, which
+-- takes ACCESS EXCLUSIVE on auth.users until it commits: it holds up reads
+-- there too (every sign-in, and `getUser` on every signed-in request) for
+-- the milliseconds of the drop, or for up to the five-second
+-- `lock_timeout` if a transaction is already reading auth.users, after
+-- which it gives up with nothing dropped. Run it at a quiet moment.
 
 set local lock_timeout = '5s';
 

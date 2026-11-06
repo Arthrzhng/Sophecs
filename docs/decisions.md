@@ -3895,7 +3895,8 @@ a second reader who is not held up.
 
 The client roles are refused the table, both functions and the table's
 identity sequence, which Supabase's default privileges would otherwise
-grant them; the migration checks all three before it commits. Its one
+grant them; the migration checks all three before it commits, every
+table privilege included (MAINTAIN too on Postgres 17). Its one
 lock on an existing table is the foreign key's SHARE ROW EXCLUSIVE on
 `auth.users`, which holds up sign-ups and account deletions, not reads,
 until it commits; a five-second `lock_timeout` makes it give up rather
@@ -3919,5 +3920,6 @@ Nothing changes now. `rankThresholdApplies()` in `src/lib/school-table.ts`
 reads the flag, so a build without it ranks every school with an average,
 as before, and the launch, which turns the flag on for Production, applies
 the rule to the live table in the same step. `docs/stage5-plan.md`, step 6,
-lists it, so the launch brief says so: from that Monday each school is
-unranked until it has 20 judged original arguments in the week.
+and Gate 4 list it, so the launch brief says so: from the launch deploy,
+over the week in progress, each school is unranked until it has 20 judged
+original arguments in the week.
