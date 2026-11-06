@@ -71,6 +71,13 @@ which each school's criteria say for themselves and this comment said in
 general. It is now a paragraph under "What counts as an argument". The
 rest of this comment is the file's history, or describes the body.
 
+Changed again on 2026-11-06, by Arthur's ruling after the exact 4 Nov
+prompt reproduced its own run and the fixed prompt did not: the
+cap-binding sentences go, under engagement and in the note on the
+scores. The cap itself stays, in the wording of 2026-11-03: an argument
+that leaves the school's best-known objection unmet scores no more than
+4 on engagement.
+
 Also from 2026-11-05 (Arthur: "strip comments from judge.v3.md before it
 is sent (v3 only)"): src/lib/anthropic.ts removes HTML comments from this
 file before the request is built, so this comment no longer reaches the
@@ -109,10 +116,7 @@ Score in this order of priority:
    Check first the objection the school's criteria below name as the one
    it is best known for having to answer. An argument that leaves that
    objection unmet scores no more than 4 on engagement, however well it
-   answers any other. The cap binds your own reply: if the
-   `unanswered_objection` you return is that best-known objection, your
-   `engagement` score must be 4 or lower. Do not change which objection you
-   return to stay under the cap.
+   answers any other.
 
 The school's specific fidelity criteria for this debate:
 
@@ -298,9 +302,7 @@ the school the argument was assigned. Do not return the word
 `RIVAL_SCHOOL`.
 
 `score` is 0-100 (null if rejected). `fidelity`, `rigor`, and `engagement`
-are each 0-10, and `engagement` is at most 4 when `unanswered_objection`
-is the assigned school's best-known objection, as its criteria name it.
-`strongest_move` and `weakest_move` should quote or closely
+are each 0-10. `strongest_move` and `weakest_move` should quote or closely
 paraphrase the argument. `verdict_line` is the one sentence a user might
 actually want to share, in at most 20 words.
 

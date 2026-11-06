@@ -323,19 +323,17 @@ describe("v3 as sent (Arthur's rulings of 2026-11-05)", () => {
     expect(fs.readFileSync(path.join(process.cwd(), "content/prompts/judge.v3.md"), "utf-8").startsWith("<!--")).toBe(true);
   });
 
-  it("ties the engagement cap to the objection the judge returns", async () => {
-    // "Strengthen the v3 engagement-cap instruction." Pinned whole, inside
-    // the engagement criterion and in the note on the scores.
+  it("keeps the engagement cap, without the sentences that bound it to the reply", async () => {
+    // Arthur's ruling of 2026-11-06: the cap-binding sentences of
+    // 2026-11-05 go; the cap stays in its wording of 2026-11-03.
     const flat = (await sentV3()).replace(/\s+/g, " ");
     const criterion = flat.slice(flat.indexOf("3. **Engagement**"), flat.indexOf("The school's specific fidelity criteria"));
     expect(criterion).toContain(
-      "scores no more than 4 on engagement, however well it answers any other. The cap binds your own reply: " +
-        "if the `unanswered_objection` you return is that best-known objection, your `engagement` " +
-        "score must be 4 or lower. Do not change which objection you return to stay under the cap."
+      "An argument that leaves that objection unmet scores no more than 4 on engagement, however well it answers any other."
     );
-    expect(flat).toContain(
-      "`engagement` is at most 4 when `unanswered_objection` is the assigned school's best-known objection, as its criteria name it."
-    );
+    expect(flat).not.toContain("The cap binds your own reply");
+    expect(flat).not.toContain("Do not change which objection you return");
+    expect(flat).not.toContain("`engagement` is at most 4 when");
   });
 
   it("keeps the response format's field order from before #68 (Arthur's ruling of 2026-11-05)", async () => {
