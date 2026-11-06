@@ -3923,3 +3923,44 @@ the rule to the live table in the same step. `docs/stage5-plan.md`, step 6,
 and Gate 4 list it, so the launch brief says so: from the launch deploy,
 over the week in progress, each school is unranked until it has 20 judged
 original arguments in the week.
+
+### Judge v3 after #68: two single-sample checks, and a stop (2026-11-06)
+
+Arthur's ruling of 2026-11-06: move the still-correct guidance from v3's
+stripped head comment into the body, keep stripping comments, the
+restored response order, the engagement cap and the objection voices;
+run one single-sample check; if it misses, run one single-sample check of
+the exact 4 Nov prompt, then stop and report. Eval key cap $12.00
+cumulative.
+
+The comment, sent to the model until 2026-11-05, carried one piece of
+guidance the body did not: crediting the concept over the vocabulary,
+which each school's criteria also say. It moved (fe03e1f). Everything
+else it said to the judge was already in the body; the rest was the
+file's history.
+
+| Run | Prompt | Out of band | Validation failures | Billed |
+| --- | --- | --- | --- | --- |
+| 2026-11-06T01-06-11-994Z | v3 at fe03e1f, comment stripped | 6 of 25 | 0 | $0.3230 |
+| 2026-11-06T01-08-52-100Z | the exact 4 Nov prompt (e83e0a8, sha256 61a178ca..., comment sent, the earlier Utilitarianism voice) | 2 of 25 | 0 | $0.3745 |
+
+The fixed prompt missed buddhist-intention-excuse (48, band 5-40),
+buddhist-strong (62, fidelity 7), confucian-ren-disposition (61, fidelity
+6), stoic-strong (fidelity 7), ubuntu-strong (68) and virtue-exemplar
+(68, fidelity 7). The 4 Nov prompt missed confucian-hierarchy-school (80,
+engagement 5) and stoic-analogy (fidelity 7), the first of which was out
+of band in the 4 Nov run itself; its other 23 cases sit where that run
+put them. So the model has not drifted: what moved the scores is in the
+prompt since e83e0a8. The visible symptom is engagement, which on the
+strong cases fell from 5 to 7 on 4 Nov to 3 or 4, taking the composite
+down with it. What is left between the two prompts: the cap-binding
+sentences under engagement and on the scores, the head comment no
+longer sent, and Utilitarianism's Virtue Ethics voice.
+
+The 4 Nov check ran the code at e83e0a8 in a scratch checkout, so the
+request was built exactly as then; only the local validator was zod 4
+rather than zod 3, which changes nothing that is sent. Both run files
+are in tests/judge/golden-runs. Cumulative on the eval key: $8.1681 of
+$12.00. Stopped as ruled; the full v3 run and the new-schools run were
+not started.
+
