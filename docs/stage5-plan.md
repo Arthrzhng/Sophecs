@@ -168,6 +168,10 @@ of the three; Gate 2 is about that.
    `submitQuizResult` in `src/app/actions.ts`, which is frozen and typed
    to v1's three-weight vector, so this step edits a frozen file. It is
    the first step that writes something new, so it follows **Gate 2**.
+   Done on SIX_SCHOOLS builds (`docs/decisions.md`, "Stage 5, step 4"):
+   `src/lib/quiz-v2.ts`, `src/lib/quiz-v2-score.ts`, `QuizShellV2`, and
+   `submitQuizResultV2` in `src/app/actions.ts`, which never moves a
+   profile's school and takes up only a v2 challenger's challenge.
 5. **Debating as a new school.** The arena, the judge and the
    micro-lessons for a reader placed in one of the three. **Gate 3.**
 6. **Launch.** On Arthur's instruction only: the sample teardown; under

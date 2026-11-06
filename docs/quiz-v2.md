@@ -1,8 +1,9 @@
 # Quiz v2
 
-Stage 3 of the brief of 2026-11-03. **Nothing here is built yet.** Every
-choice below is a philosophy or content judgement and is Arthur's (CLAUDE.md
-item (e)).
+Stage 3 of the brief of 2026-11-03. **Built on SIX_SCHOOLS builds only**,
+in Stage 5, step 4 (`docs/decisions.md`, "Stage 5, step 4"); production
+still runs v1. Every choice below is a philosophy or content judgement and
+is Arthur's (CLAUDE.md item (e)).
 
 **Ruled on 2026-11-05** (Checkpoint A, item 15; `docs/decisions.md`,
 "Arthur's rulings of 2026-11-05 on Checkpoint A"): the axes, their plain

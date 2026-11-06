@@ -5,7 +5,9 @@ import { newId } from "@/lib/ids";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { retakeQuizSchool } from "@/lib/claim";
-import { schoolFromResult } from "@/lib/quiz-result";
+import { quizVersionOf, schoolFromResult } from "@/lib/quiz-result";
+import { quizV2, QUIZ_V2_ON } from "@/lib/quiz-v2";
+import { scoreQuizV2, type MapPoint, type QuizV2Option } from "@/lib/quiz-v2-score";
 import type { SchoolId, SchoolVector } from "@/lib/types";
 
 export interface SubmitQuizResultInput {
@@ -138,6 +140,128 @@ export async function submitQuizResult(
   }
 
   return { ok: true, id, challengerSchool, schoolChanged };
+}
+
+export interface SubmitQuizResultV2Input {
+  answers: { q: number; opt: string }[];
+  challengeId?: string | null;
+  referrer?: string;
+}
+
+export type SubmitQuizResultV2Output =
+  | {
+      ok: true;
+      id: string;
+      primary: SchoolId;
+      secondary: SchoolId;
+      point: MapPoint;
+      challengerSchool?: SchoolId;
+    }
+  | { ok: false; error: string };
+
+// Quiz v2's result, on a SIX_SCHOOLS build only (docs/stage5-plan.md,
+// step 4; Arthur's Gate 2, option (i)). Called from /quiz/result on that
+// build. Any build answers a server action, so this one refuses on a build
+// without the flag rather than relying on no page calling it.
+//
+// The result is computed here from the answers, with the same scorer the
+// quiz shows the reader (src/lib/quiz-v2-score.ts): the browser sends which
+// option it chose for each question, never a school or a point. The row is
+// v2 in shape, as 0027's check requires: a point, no vector.
+//
+// Two things v1 does are not done, until launch:
+// - the result never moves a profile's school. A preview writes into
+//   production's tables, and production would then place the account in a
+//   school it does not publish;
+// - it takes up a challenge only from a v2 challenger. A v1 challenger is
+//   a production reader, and a preview's result would close their
+//   challenge with a side production cannot show. The rule mirrors v1's,
+//   which takes up a v1 challenger's only (src/lib/quiz-result.ts).
+export async function submitQuizResultV2(
+  input: SubmitQuizResultV2Input
+): Promise<SubmitQuizResultV2Output> {
+  if (!QUIZ_V2_ON) return { ok: false, error: "This quiz is not available here." };
+  if (!isAdminConfigured()) {
+    return { ok: false, error: "Supabase is not configured in this environment." };
+  }
+
+  const anonId = (await cookies()).get("anon_id")?.value;
+  if (!anonId) return { ok: false, error: "Missing anonymous identity." };
+
+  const quiz = quizV2();
+  const given = Array.isArray(input?.answers) ? input.answers : [];
+  if (given.length !== quiz.questions.length) return { ok: false, error: "Every question needs an answer." };
+  const chosen: QuizV2Option[] = [];
+  for (const [i, question] of quiz.questions.entries()) {
+    const answer = given[i];
+    const option =
+      answer && answer.q === question.id ? question.options.find((o) => o.id === answer.opt) : undefined;
+    if (!option) return { ok: false, error: "Every question needs an answer." };
+    chosen.push(option);
+  }
+  const scored = scoreQuizV2(chosen, quiz.schools);
+  const primary = scored.primary as SchoolId;
+  const secondary = scored.secondary as SchoolId;
+
+  const id = newId();
+  const admin = createAdminClient();
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let challenge: { challengerResultId: string; challengerSchool: SchoolId } | null = null;
+  if (input.challengeId) {
+    const { data: c } = await admin
+      .from("challenges")
+      .select("challenger_result_id, is_sample")
+      .eq("id", input.challengeId)
+      .maybeSingle();
+    if (c && !c.is_sample) {
+      const { data: challenger } = await admin
+        .from("quiz_results")
+        .select("school, anon_id, user_id, quiz_version")
+        .eq("id", c.challenger_result_id)
+        .maybeSingle();
+      const own = Boolean(challenger && (challenger.anon_id === anonId || (user && challenger.user_id === user.id)));
+      if (challenger && !own && quizVersionOf(challenger) === 2 && typeof challenger.school === "string")
+        challenge = {
+          challengerResultId: c.challenger_result_id as string,
+          challengerSchool: challenger.school as SchoolId,
+        };
+    }
+  }
+
+  const { error } = await admin.from("quiz_results").insert({
+    id,
+    anon_id: anonId,
+    user_id: user?.id ?? null,
+    school: primary,
+    secondary,
+    vector: null,
+    quiz_version: 2,
+    map_x: scored.point.x,
+    map_y: scored.point.y,
+    answers: chosen.map((o, i) => ({ q: quiz.questions[i].id, opt: o.id })),
+    challenge_from: challenge?.challengerResultId ?? null,
+    referrer: input.referrer ?? null,
+  });
+  if (error) return { ok: false, error: error.message };
+
+  let challengerSchool: SchoolId | undefined;
+  if (input.challengeId && challenge) {
+    // Accepted once, by the first reader to finish, as v1's is.
+    const { data: accepted } = await admin
+      .from("challenges")
+      .update({ challengee_result_id: id, status: "accepted" })
+      .eq("id", input.challengeId)
+      .eq("status", "open")
+      .is("challengee_result_id", null)
+      .select("id");
+    if (accepted?.length) challengerSchool = challenge.challengerSchool;
+  }
+
+  return { ok: true, id, primary, secondary, point: scored.point, challengerSchool };
 }
 
 export interface CreateChallengeOutput {

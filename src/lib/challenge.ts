@@ -92,7 +92,14 @@ export async function getPendingChallenges(
   admin: SupabaseClient,
   userId: string
 ): Promise<PendingChallenge[]> {
-  const { data: ownResults } = await admin.from("quiz_results").select("id").eq("user_id", userId);
+  // The reader's own v1 results only, on every build, until launch: a
+  // challenge on a v2 result has no debate to offer (src/app/r/[id]/page.tsx
+  // offers "Debate them" between two v1 results only; Gate 2, option (i)).
+  const { data: ownResults } = await admin
+    .from("quiz_results")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("quiz_version", 1);
   const ownResultIds = (ownResults ?? []).map((r) => r.id as string);
   if (ownResultIds.length === 0) return [];
 

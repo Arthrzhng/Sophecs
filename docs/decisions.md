@@ -3951,3 +3951,73 @@ has them, and the Nguni maxim's English gloss keeps its UNVERIFIED
 translator and date: Metz calls it a maxim and does not say he translated
 it. Nothing in the content changes. Ticked in the Gate 4 checklist,
 `docs/stage5-plan.md`.
+
+### Stage 5, step 4: quiz v2 on SIX_SCHOOLS builds
+
+`docs/stage5-plan.md`, step 4, under Gate 2, option (i) (Arthur, Checkpoint
+B, 2026-11-05). Gate 2 names step 4's edit to the frozen
+`src/app/actions.ts` among what it decides.
+Everything here is on a build with `SIX_SCHOOLS=1`; a build without it is
+unchanged, apart from the two step-3 leftovers at the end.
+
+**The quiz.** `/quiz` and the landing page's first question run quiz v2:
+the ten questions of `docs/quiz-v2.json`, the two-axis map (`SchoolMap`)
+where v1 draws its triangle, and the result logic of
+`scripts/simulate-quiz-v2.mjs`.
+- The data is read on the server only, by `src/lib/quiz-v2.ts`, which
+  checks its shape as the simulator does and hands the client the
+  questions, options and vectors as props. The file names the three
+  unpublished schools, so no client module imports it; each option's
+  school (`leans`) is not sent at all.
+- The scorer, `src/lib/quiz-v2-score.ts`, names no school: positions arrive
+  as data. `tests/quiz-v2-score.test.ts` runs all 1,048,576 answer
+  patterns through it and requires the simulator's shares, its zero ties
+  and its six personas exactly.
+- v2 keeps its own storage keys, so a v1 quiz in progress from before a
+  deploy is not read as v2 answers.
+
+**The result.** `submitQuizResultV2` in `src/app/actions.ts` refuses on a
+build without the flag, takes the reader's option for each question,
+scores them itself and writes a v2 row: `quiz_version` 2, the point in
+`map_x` and `map_y`, no vector, as 0027's check requires. Under option (i):
+- it never moves a profile's school, signed in or not (no
+  `retakeQuizSchool`);
+- it takes up a challenge only from a v2 challenger, mirroring v1, which
+  takes up a v1 challenger's only. A v1 challenger is a production reader,
+  and a preview's result would close their challenge with a side
+  production cannot show.
+
+`/quiz/result` and `/r/[id]` show the reader's point on the map beside the
+card. Because the profile's school does not move, "Start my path" on a
+preview leads to the school the account already has, if any; that is
+option (i)'s cost, accepted with it.
+
+**The copy that is true only of v2** (`docs/quiz-v2.md`, section 8), on
+flag-on builds only:
+- "a few minutes" for "about eighty seconds" (`SharePage`,
+  `ChallengeInvite`) and "About 80 seconds" (the landing page), as ruled
+  at Checkpoint B (e) 4;
+- "one of six schools of ethics" for "one of three" (`ChallengeInvite`),
+  the quiz page's description, and the landing page's opening, which
+  named the three schools' adherents;
+- "across the map" for "across the triangle" (the landing page's first
+  step);
+- "Six schools." for "Three schools." in the site's sharing image.
+
+These are counts and nouns that follow from v2, not new judgements; they
+are on the (e) list for the phase all the same. New text the reader sees
+on a flag-on build: the map's captions "Where this answer moves you" (as
+on the approved Stage 4 preview), "Where your answers put you" and "Where
+these answers landed", and its accessible title.
+
+**Step 3's leftovers, on every build.** "Debate them" on `/r/[id]` is now
+offered only between two v1 results (`comparable`), and `/me` lists
+challenges on a reader's own v1 results only. Until launch a debate puts
+each side's school against the other's, and a v2 result's school is one
+production does not publish.
+
+`tests/quiz-v2-submit.test.ts` drives the action on both builds against a
+fake database that applies 0027's shape check; `tests/quiz-result-versions.test.ts`
+gains the two leftovers, and its fake now applies `.or()` filters, without
+which the `/me` case could not fail.
+

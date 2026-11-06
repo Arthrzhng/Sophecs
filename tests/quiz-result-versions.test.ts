@@ -27,7 +27,16 @@ function query(table: string) {
   b.select = () => b;
   b.eq = (c: string, v: unknown) => (filters.push((r) => r[c] === v), b);
   b.is = (c: string, v: unknown) => (filters.push((r) => (r[c] ?? null) === v), b);
-  b.or = () => b;
+  // "col.eq.value,col.eq.value": any of them, as PostgREST reads it.
+  b.or = (expr: string) => {
+    const parts = expr.split(",").map((p) => {
+      const [col, op, ...rest] = p.split(".");
+      if (op !== "eq") throw new Error(`fake or(): only eq, got ${op}`);
+      return { col, value: rest.join(".") };
+    });
+    filters.push((r) => parts.some((p) => r[p.col] === p.value));
+    return b;
+  };
   b.neq = () => b;
   b.in = (c: string, vs: unknown[]) => (filters.push((r) => vs.includes(r[c])), b);
   b.order = (col: string, o?: { ascending?: boolean }) => ((order = { col, asc: o?.ascending ?? true }), b);
@@ -183,6 +192,20 @@ describe("pending challenges on /me", () => {
       { challengeId: "c2", topicSlug: null, otherSchool: null },
     ]);
   });
+
+  it("lists no challenge on the reader's own v2 result (step 4)", async () => {
+    tables.quiz_results = [
+      v1("mine-v1", "stoicism", "2026-11-01", { user_id: "u1" }),
+      v2("mine-v2", "buddhist", "2026-11-02", { user_id: "u1" }),
+      v1("theirs", "virtue-ethics", "2026-11-01"),
+    ];
+    tables.challenges = [
+      { id: "c-v1", topic_slug: null, status: "accepted", challenger_result_id: "mine-v1", challengee_result_id: "theirs" },
+      { id: "c-v2", topic_slug: null, status: "open", challenger_result_id: "mine-v2", challengee_result_id: null },
+    ];
+    const pending = await getPendingChallenges({ from: query } as never, "u1");
+    expect(pending.map((p) => p.challengeId)).toEqual(["c-v1"]);
+  });
 });
 
 describe("the share page's comparison", () => {
@@ -234,6 +257,14 @@ describe("the wiring the render tests cannot see", () => {
     expect(page).toContain("vector={compareWith ? result.vector : null}");
     expect(page).toContain("otherVector={compareWith?.vector ?? null}");
     expect(page).toContain("hasOtherResult={otherResult !== null}");
+  });
+
+  it("/r/[id] offers Debate them between two v1 results only (step 4)", async () => {
+    const { readFileSync } = await import("node:fs");
+    const page = readFileSync("src/app/r/[id]/page.tsx", "utf8").replace(/\s+/g, " ");
+    expect(page).toContain(
+      "const showDebateThem = Boolean( challengeInfo && challengeInfo.status !== \"complete\" && viewerIsParty && challengeOther && comparable(result, challengeOther) );"
+    );
   });
 
   it("/me's result_claimed event takes the newest v1 result, the one the profile's school came from", async () => {

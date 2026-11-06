@@ -8,7 +8,9 @@ import { getSchool, pickShareLine } from "@/lib/schools";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { viewerIsChallengeParty } from "@/lib/challenge";
-import { PUBLIC_RESULT_COLUMNS, comparable, shownOnThisBuild } from "@/lib/quiz-result";
+import { PUBLIC_RESULT_COLUMNS, comparable, quizVersionOf, shownOnThisBuild } from "@/lib/quiz-result";
+import { SchoolMap } from "@/components/phase3/SchoolMap";
+import { QUIZ_V2_ON, quizV2, quizV2MapSchools } from "@/lib/quiz-v2";
 import type { QuizResultRow } from "@/lib/types";
 
 export const revalidate = 86400; // s-maxage=86400 — result rows never change
@@ -129,8 +131,8 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
 
   const school = getSchool(result.school);
   const challengerFromLink = result.challenge_from ? await getResult(result.challenge_from) : null;
-  const otherResult =
-    challengerFromLink ?? (challengeInfo ? await getResult(challengeInfo.otherResultId) : null);
+  const challengeOther = challengeInfo ? await getResult(challengeInfo.otherResultId) : null;
+  const otherResult = challengerFromLink ?? challengeOther;
   // The weights side by side only for two v1 results: a v2 result has none,
   // and the two quizzes asked different questions.
   const compareWith = otherResult && comparable(result, otherResult) ? otherResult : null;
@@ -144,7 +146,30 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
       { anon_id: ownerAnonId, user_id: ownerUserId },
       await getResultOwners(challengeInfo.otherResultId),
     ]);
-  const showDebateThem = Boolean(challengeInfo && challengeInfo.status !== "complete" && viewerIsParty);
+  // Only between two v1 results, on every build, until launch: a debate
+  // between the sides puts each reader's school against the other's, and a
+  // v2 result's school is one production does not publish (Gate 2, option
+  // (i)). A side this build does not show reads as null here, so on a
+  // build without SIX_SCHOOLS a v2 other side is never offered either.
+  const showDebateThem = Boolean(
+    challengeInfo &&
+      challengeInfo.status !== "complete" &&
+      viewerIsParty &&
+      challengeOther &&
+      comparable(result, challengeOther)
+  );
+
+  // A v2 result's point on the map, which only a SIX_SCHOOLS build shows.
+  const figure =
+    QUIZ_V2_ON && quizVersionOf(result) === 2 && typeof result.map_x === "number" && typeof result.map_y === "number" ? (
+      <SchoolMap
+        title="Where these answers put them, on the map of the schools"
+        schools={quizV2MapSchools()}
+        axes={quizV2().axes}
+        reader={{ x: result.map_x, y: result.map_y }}
+        caption="Where these answers landed"
+      />
+    ) : null;
 
 
   return (
@@ -172,6 +197,7 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
         shareLine={shareLine}
         shareLineIndex={shareLineIndex}
         isSample={Boolean(result.is_sample)}
+        figure={figure}
       />
     </>
   );
