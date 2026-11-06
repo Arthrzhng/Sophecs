@@ -34,6 +34,7 @@ async function load(flag: string) {
     method: await import("../src/app/method/page"),
     rubric: await import("../src/app/debate/rubric/page"),
     table: await import("../src/components/table/SchoolTable"),
+    cards: await import("../src/components/schools/SchoolCards"),
   };
 }
 afterEach(() => vi.unstubAllEnvs());
@@ -85,7 +86,7 @@ describe("a build without SIX_SCHOOLS", () => {
 
   // Rendered from main's components before the change (tests/nav-six-flag-off).
   it("renders the pages and components it touches byte for byte as main did", async () => {
-    const { method, rubric, footer, topics, table } = await load("0");
+    const { method, rubric, footer, topics, table, cards } = await load("0");
     const fixture = (n: string) =>
       fs.readFileSync(path.join(process.cwd(), "tests", "nav-six-flag-off", `${n}.html`), "utf8");
     expect(`${renderToStaticMarkup(method.default())}\n`).toBe(fixture("method"));
@@ -97,6 +98,10 @@ describe("a build without SIX_SCHOOLS", () => {
     expect(`${renderToStaticMarkup(createElement(table.SchoolTable, FIXTURE_PROPS.table as never))}\n`).toBe(
       fixture("school-table")
     );
+    // The landing page's cards: taken from main's prerendered landing page
+    // (901e3a4), less React's empty text separators, which a static render
+    // does not write.
+    expect(`${renderToStaticMarkup(createElement(cards.SchoolCards))}\n`).toBe(fixture("school-cards"));
   });
 
   it("links where it always has, and lists the old pages in the sitemap", async () => {
@@ -292,9 +297,127 @@ describe("a build with SIX_SCHOOLS=1", () => {
     }
   });
 
-  it("gives the Me menu's anchors their targets", () => {
-    const read = (f: string) => fs.readFileSync(path.join(process.cwd(), f), "utf8");
-    expect(read("src/components/me/ProfilePage.tsx")).toContain('<Section title="Pending challenges" id="challenges">');
-    expect(read("src/components/me/SettingsPage.tsx")).toContain('<Section title="Classes" id="classes">');
+  it("gives the Me menu's anchors their targets", async () => {
+    const html = await meAndSettings("1");
+    expect(html).toContain('<section id="challenges" class="mt-12 border-t-2 border-rule pt-10 scroll-mt-8">');
+    expect(html).toContain('<section id="debates" class="mt-12 border-t-2 border-rule pt-10 scroll-mt-8">');
+    expect(html).toContain('<section id="classes" class="mt-12 border-t-2 border-rule pt-10 scroll-mt-8">');
+  });
+
+  it("sets /schools' headings in order: the page, then the cards and the table, then the table's notes", async () => {
+    vi.resetModules();
+    vi.stubEnv("SIX_SCHOOLS", "1");
+    vi.doMock("@/lib/school-table-page", () => ({ loadSchoolTable: async () => FIXTURE_PROPS.table }));
+    try {
+      const page = await import("../src/app/schools/page");
+      const html = renderToStaticMarkup(await page.default());
+      const outline = [...html.matchAll(/<h([1-6])[^>]*>(.*?)<\/h\1>/g)].map(
+        (m) => `h${m[1]} ${m[2].replace(/<[^>]*>/g, "")}`
+      );
+      expect(outline.slice(0, 7)).toEqual([
+        "h1 Schools",
+        "h2 Stoicism",
+        "h2 Utilitarianism",
+        "h2 Virtue Ethics",
+        "h2 Confucianism",
+        "h2 Ubuntu",
+        "h2 Buddhist Ethics",
+      ]);
+      expect(outline[7]).toMatch(/^h2 /);
+      expect(outline.slice(8).every((h) => h.startsWith("h3 "))).toBe(true);
+      expect(outline.length).toBeGreaterThan(8);
+    } finally {
+      vi.doUnmock("@/lib/school-table-page");
+    }
+  });
+
+  it("marks the reader before the page is drawn, from the root layout", async () => {
+    const { html, script } = await rootLayout("1");
+    expect(html).toContain(`<html lang="en" class="f f f f"><head><script>${script}</script></head><body`);
+  });
+});
+
+// The profile and the settings page, with a debate so that the history
+// section is drawn, as a build with the flag given renders them.
+async function meAndSettings(flag: string) {
+  vi.resetModules();
+  vi.stubEnv("SIX_SCHOOLS", flag);
+  const { ProfilePage } = await import("../src/components/me/ProfilePage");
+  const { SettingsPage } = await import("../src/components/me/SettingsPage");
+  return (
+    renderToStaticMarkup(
+      createElement(ProfilePage, {
+        school: null,
+        displayName: null,
+        elo: 1200,
+        percentile: 50,
+        streak: 0,
+        streakUpdatedOn: null,
+        today: "2026-11-06",
+        ratingPoints: [],
+        objections: [],
+        weeklyMotion: null,
+        hasAnyDebate: true,
+        exchanges: [],
+        pendingChallenges: [],
+        debates: [{ id: "d1", topicSlug: "opaque-benefit", topicTitle: "The opaque benefit", score: 70, rejected: false }],
+        caseStates: {},
+        allClosed: false,
+      })
+    ) +
+    renderToStaticMarkup(
+      createElement(SettingsPage, { displayName: null, argumentDefaultPublic: false, owned: [], joined: [] })
+    )
+  );
+}
+
+// The root layout, its fonts, stylesheets and analytics stood in for, as a
+// build with the flag given renders it.
+async function rootLayout(flag: string) {
+  vi.resetModules();
+  vi.stubEnv("SIX_SCHOOLS", flag);
+  vi.doMock("@/lib/fonts", () => ({
+    spectral: { variable: "f" },
+    plexSans: { variable: "f" },
+    plexMono: { variable: "f" },
+    bricolage: { variable: "f" },
+  }));
+  vi.doMock("@/components/analytics-provider", () => ({ AnalyticsProvider: () => null }));
+  vi.doMock("@/components/nav/SiteHeader", () => ({ SiteHeader: () => null }));
+  vi.doMock("@/components/nav/SiteFooter", () => ({ SiteFooter: () => null }));
+  vi.doMock("@six-schools/tokens.css", () => ({}));
+  try {
+    const layout = await import("../src/app/layout");
+    const { AUTH_HINT_SCRIPT } = await import("../src/components/nav/auth-hint");
+    return {
+      html: renderToStaticMarkup(layout.default({ children: createElement("main") })),
+      script: AUTH_HINT_SCRIPT,
+    };
+  } finally {
+    for (const m of [
+      "@/lib/fonts",
+      "@/components/analytics-provider",
+      "@/components/nav/SiteHeader",
+      "@/components/nav/SiteFooter",
+      "@six-schools/tokens.css",
+    ])
+      vi.doUnmock(m);
+  }
+}
+
+describe("a build without SIX_SCHOOLS, on the pages the header's menus reach", () => {
+  it("gives the profile's and the settings page's sections no anchors", async () => {
+    const html = await meAndSettings("0");
+    expect(html).toContain('<section class="mt-12 border-t-2 border-rule pt-10"><h2');
+    expect(html).not.toMatch(/<section id=/);
+    expect(html).not.toContain("scroll-mt-8");
+  });
+
+  it("adds nothing to the root layout's head", async () => {
+    const { html } = await rootLayout("0");
+    // React draws an empty <head> for an <html> that has none.
+    expect(html).toBe(
+      '<html lang="en" class="f f f f"><head></head><body class="min-h-screen flex flex-col bg-paper text-ink"><main></main></body></html>'
+    );
   });
 });
