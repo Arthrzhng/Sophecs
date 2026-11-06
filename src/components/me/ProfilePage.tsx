@@ -26,9 +26,17 @@ export interface ProfileDebate {
   revision?: { id: string; topicSlug: string; score: number | null; rejected: boolean };
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+// The anchors the header's Me menu links to, on a SIX_SCHOOLS build only
+// (docs/daily-path-copy.md, section 13); every other build's markup is as
+// it was.
+const ANCHORS = process.env.SIX_SCHOOLS === "1";
+
+function Section({ title, children, id }: { title: string; children: React.ReactNode; id?: string }) {
   return (
-    <section className="mt-12 border-t-2 border-rule pt-10">
+    <section
+      id={ANCHORS ? id : undefined}
+      className={`mt-12 border-t-2 border-rule pt-10${ANCHORS && id ? " scroll-mt-8" : ""}`}
+    >
       <h2 className="text-lg font-extrabold tracking-tight text-ink">{title}</h2>
       <div className="mt-5">{children}</div>
     </section>
@@ -158,12 +166,12 @@ export function ProfilePage({
         </Section>
       )}
 
-      <Section title="Pending challenges">
+      <Section title="Pending challenges" id="challenges">
         <PendingChallenges challenges={pendingChallenges} />
       </Section>
 
       {debates.length > 0 && (
-        <Section title="Debate history">
+        <Section title="Debate history" id="debates">
           <ul className="flex flex-col gap-3">
             {debates.map((d) => (
               <li key={d.id} className="rounded-card border-2 border-rule bg-surface p-4">

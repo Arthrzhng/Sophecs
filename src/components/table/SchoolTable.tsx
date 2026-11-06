@@ -64,12 +64,25 @@ export function SchoolTable({
   emptyWeek,
   paused,
   sampleNote = null,
-}: SchoolTableProps) {
+  headingAs = "h1",
+}: SchoolTableProps & {
+  /**
+   * `h1` on `/table`, the page's own heading. `h2` on `/schools` (a
+   * SIX_SCHOOLS build), where the table sits under the page's heading and
+   * the schools' cards.
+   */
+  headingAs?: "h1" | "h2";
+}) {
+  const Heading = headingAs;
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="text-xl font-extrabold tracking-tight text-ink">School table</h1>
+          <Heading
+            className={`${headingAs === "h1" ? "text-xl" : "text-lg"} font-extrabold tracking-tight text-ink`}
+          >
+            School table
+          </Heading>
           <p className="mt-2 max-w-[60ch] text-base leading-relaxed text-ink-mid">
             How each school argued this week. Fidelity is the judge&apos;s 0&ndash;10 mark
             for arguing the way the school reasons, averaged across every judged

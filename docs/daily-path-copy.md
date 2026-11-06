@@ -512,3 +512,106 @@ The School table link keeps its label, `School table`. The brief of
 "a neutral nav icon for School table (the triangle no longer means
 anything)"; the header's links carry no icons today, so this would add
 one beside the label, and the preview shows candidates for it.
+
+## 13. Navigation, Stage 5 (SIX_SCHOOLS builds)
+
+Arthur's instruction of 2026-11-06: the navigation restructure, behind
+`SIX_SCHOOLS`, launching with the six schools. A build without the flag,
+production included, keeps the header, footer and pages above unchanged.
+Words in `code` are his where he gave them; the rest is marked new, for
+his ruling with the screenshots in `docs/gate4.md`.
+
+### Header, signed out
+
+| Element | Copy | Goes to |
+|---|---|---|
+| Wordmark | `Sophecs` | `/` |
+| Links, in order | `Lessons` · `Motions` · `Schools` · `How it works` | `/lessons`, `/debate`, `/schools`, `/how-it-works` |
+| Primary button | `Take the quiz` | `/quiz` |
+
+There is no sign-in link in this header, as given. A returning reader
+signs in from the landing page, which keeps its own link to `/login`.
+
+### Header, signed in
+
+| Element | Copy | Goes to |
+|---|---|---|
+| Wordmark | `Sophecs` | `/today` |
+| Links, in order | `Today` · `Motions` · `Lessons` · `Schools` | `/today`, `/debate`, `/lessons`, `/schools` |
+| Button | `Me` (set in capitals, as now) | opens the menu below |
+
+The menu under `Me`:
+
+| Item | Goes to |
+|---|---|
+| `Profile` | `/me` |
+| `My debates and challenges` | `/me#challenges`, the profile's pending challenges, with its debate history after them |
+| `Classes` | `/me/settings#classes` |
+| `Settings` | `/me/settings` |
+| `Retake the quiz` | `/quiz` |
+| `Sign out` | signs out, then `/` |
+
+Whether a reader is signed in is read from the session cookie before the
+page is drawn, as the header's `Me` and `Sign in` label is today, so
+neither set of links flashes into the other.
+
+### Mobile
+
+Below 640 pixels the four links collapse into the existing `Menu`
+disclosure, in the same order. The wordmark and the button (`Take the
+quiz`, or `Me` and its menu) stay beside it.
+
+### Schools (`/schools`)
+
+| Element | Copy |
+|---|---|
+| Page title | `Schools · Sophecs` |
+| Description (new) | `Each school's page, and how each argued this week.` |
+| Heading | `Schools` |
+| Cards | one per school shown on the build, as the landing page draws them: the school's name, linking to `/s/{school}`, its `one_line` and attribution |
+| Below the cards | this week's school table, with its own copy (section 8), its heading set as a second-level heading |
+
+`/table` redirects here.
+
+### How it works (`/how-it-works`)
+
+The judge's method page (`/method`) and the rubric (`/debate/rubric`)
+merged, their text unchanged. New: the page title, the heading and the
+contents line.
+
+| Element | Copy |
+|---|---|
+| Page title (new) | `How it works · Sophecs` |
+| Description (new) | `What the judge scores, the criteria it is given, and what a score does and does not mean.` |
+| Heading (new) | `How it works` |
+| Contents (new), linking to each section | `How the judge works` · `How this was judged` · `Counterpart rules` · `Sample accounts` |
+| Sections, with their anchors | `How the judge works` (`#judge`), with `Known limitations`; `How this was judged` (`#rubric`), with its three axes and `What counts as faithful`; `Counterpart rules` (`#counterpart`); `Sample accounts` (`#samples`) |
+| Foot | `Questions or corrections: arthur.rzhang@gmail.com` and `Back to the motions`, as on the two pages now |
+
+The method page's `Read the rubric` link, which pointed at the other page,
+is left out: the rubric is on the same page. `/method` redirects here, and
+keeps its anchor, so `/method#samples` lands on `#samples`;
+`/debate/rubric` redirects to `#rubric`.
+
+### Motions
+
+`Debate` becomes `Motions` in the header, the footer and the two debate
+pages' titles (`Motions · Sophecs`). The URLs stay `/debate`. The list's
+heading already reads `Motions`.
+
+Each motion card in the list gains a link under it:
+
+| Element | Copy | Goes to |
+|---|---|---|
+| Link (new) | `Exemplars`; read aloud, `Exemplars: {motion title}` | `/debate/{slug}/exemplars` |
+
+It sits under the card, not inside it, because the whole card is already
+a link and a link cannot hold another.
+
+### Footer
+
+| Element | Now | With the flag |
+|---|---|---|
+| The site | `Debate` | `Motions` |
+| About | `How the judge works` (`/method`), `The rubric` (`/debate/rubric`) | `How it works` (`/how-it-works`), `The rubric` (`/how-it-works#rubric`) |
+| The disclosure's `Read the rubric` | `/debate/rubric` | `/how-it-works#rubric` |

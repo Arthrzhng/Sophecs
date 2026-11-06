@@ -1,0 +1,36 @@
+import { notFound } from "next/navigation";
+import { Page } from "@/components/layout/Page";
+import { SchoolCards } from "@/components/schools/SchoolCards";
+import { SchoolTable } from "@/components/table/SchoolTable";
+import { loadSchoolTable } from "@/lib/school-table-page";
+
+export const metadata = {
+  title: "Schools · Sophecs",
+  description: "Each school's page, and how each argued this week.",
+};
+
+// The schools, a card each linking to its page, with this week's table
+// under them, on a SIX_SCHOOLS build (Arthur, 2026-11-06;
+// docs/daily-path-copy.md, section 13). The cards are the schools the
+// build shows, the list every public surface moved to in Stage 5's step 2,
+// which at launch is the six published. A SIX_SCHOOLS build redirects
+// /table here (next.config.ts).
+//
+// A build without the flag, production included, has no such page.
+//
+// Dynamic for the reason /table is: the table reads the session.
+export const dynamic = "force-dynamic";
+
+export default async function SchoolsPage() {
+  if (process.env.SIX_SCHOOLS !== "1") notFound();
+  const table = await loadSchoolTable();
+  return (
+    <Page width="ui" rhythm="path">
+      <h1 className="text-xl font-extrabold tracking-tight text-ink">Schools</h1>
+      <SchoolCards />
+      <section className="mt-12 border-t-2 border-rule pt-10">
+        <SchoolTable {...table} headingAs="h2" />
+      </section>
+    </Page>
+  );
+}

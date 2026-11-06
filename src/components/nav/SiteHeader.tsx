@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AuthSlot } from "./AuthSlot";
+import { SiteHeaderSix } from "./SiteHeaderSix";
 
 const LINKS = [
   { href: "/quiz", label: "Quiz" },
@@ -29,7 +30,7 @@ function useActive(pathname: string) {
 // Stage 8 put it on the Daily path palette and Bricolage: the active route
 // is the mockups' white pill rather than an underline, and every link is a
 // 44px target, which the underlined text links were not.
-export function SiteHeader() {
+function SiteHeaderThree() {
   const pathname = usePathname();
   const isActive = useActive(pathname);
 
@@ -103,3 +104,9 @@ export function SiteHeader() {
     </header>
   );
 }
+
+// A SIX_SCHOOLS build has the navigation of 2026-11-06 (SiteHeaderSix,
+// docs/daily-path-copy.md, section 13); every other build, production
+// included, the header above, unchanged. The flag is a build-time constant
+// (next.config.ts), so each build has one header.
+export const SiteHeader = process.env.SIX_SCHOOLS === "1" ? SiteHeaderSix : SiteHeaderThree;

@@ -3,7 +3,7 @@ import { LandingQuestion } from "@/components/quiz/LandingQuestion";
 import { LandingQuestionV2 } from "@/components/quiz/LandingQuestionV2";
 import { QUIZ_V2_ON, quizV2, quizV2MapSchools } from "@/lib/quiz-v2";
 import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
-import { getSchool } from "@/lib/schools";
+import { SchoolCards } from "@/components/schools/SchoolCards";
 import { getAllTopicFiles } from "@/lib/topics";
 import { SHOWN_SCHOOL_IDS } from "@/lib/types";
 import { countWord } from "@/lib/count-word";
@@ -123,27 +123,7 @@ export default function LandingPage() {
           </h2>
           {/* Real quotation with real citation, which is the only thing on
               this page that shows what the schools actually say. */}
-          <ul className="mt-6 grid gap-6 sm:grid-cols-3">
-            {SHOWN_SCHOOL_IDS.map((id) => {
-              const school = getSchool(id);
-              return (
-                <li key={id} className="rounded-card border-2 border-rule bg-surface p-5">
-                  <h3 className="text-base font-extrabold text-ink">
-                    <Link
-                      href={`/s/${id}`}
-                      className="inline-flex min-h-11 items-center underline-offset-4 hover:underline"
-                    >
-                      {school.name}
-                    </Link>
-                  </h3>
-                  <p className="mt-3 font-serif text-base leading-relaxed text-ink-mid">
-                    &ldquo;{school.one_line}&rdquo;
-                  </p>
-                  <p className="mt-2 text-sm text-ink-soft">{school.one_line_attribution}</p>
-                </li>
-              );
-            })}
-          </ul>
+          <SchoolCards />
         </section>
 
         {motion && (

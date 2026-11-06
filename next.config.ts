@@ -118,10 +118,28 @@ export function canonicalRedirects(env: NodeJS.ProcessEnv) {
   ];
 }
 
+// The navigation restructure's old addresses, on a SIX_SCHOOLS build only
+// (Arthur, 2026-11-06: "Keep every existing URL working (redirect, never
+// 404)"; docs/daily-path-copy.md, section 13). /table is shown under the
+// schools' cards at /schools; /method and /debate/rubric are one page,
+// /how-it-works. A browser keeps a URL's anchor across a redirect whose
+// destination has none, so /method#samples lands on /how-it-works#samples;
+// /debate/rubric is sent to the rubric's own section. Not permanent until
+// the launch makes them so: a browser keeps a permanent redirect, and a
+// preview's addresses may still change.
+export function sixSchoolsRedirects(sixSchools: string) {
+  if (sixSchools !== "1") return [];
+  return [
+    { source: "/table", destination: "/schools", permanent: false },
+    { source: "/method", destination: "/how-it-works", permanent: false },
+    { source: "/debate/rubric", destination: "/how-it-works#rubric", permanent: false },
+  ];
+}
+
 const nextConfig: NextConfig = {
   env: { SIX_SCHOOLS },
   async redirects() {
-    return canonicalRedirects(process.env);
+    return [...canonicalRedirects(process.env), ...sixSchoolsRedirects(SIX_SCHOOLS)];
   },
   // `npm run check:bundle:six` builds with the flag into a directory of its
   // own, so the flag-on build never overwrites the .next that

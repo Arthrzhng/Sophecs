@@ -12,7 +12,8 @@ import { TOPIC_LOCK_DAYS } from "@/lib/debate-limits";
 import type { SchoolId } from "@/lib/types";
 
 export const metadata = {
-  title: "Debate · Sophecs",
+  // "Motions" on a SIX_SCHOOLS build (docs/daily-path-copy.md, section 13).
+  title: process.env.SIX_SCHOOLS === "1" ? "Motions · Sophecs" : "Debate · Sophecs",
   description:
     "Six motions on AI and ethics. Pick one and argue it from your school; the judge scores how faithfully you argued from it.",
 };
