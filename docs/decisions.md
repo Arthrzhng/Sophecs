@@ -4640,3 +4640,66 @@ key: $12.2431 of $15.00, over the 18 run files.
   78 against 75; its objection was `utilitarianism` three times in both
   runs, so the added Ubuntu voice does not show in it) and stoic-analogy's
   fidelity.
+
+### Navigation for six schools, behind SIX_SCHOOLS (2026-11-06)
+
+Arthur, 2026-11-06: "Queue this after Gate 3 and the new-schools run;
+don't let it delay them. Navigation restructure, as part of Stage 5
+behind SIX_SCHOOLS (launches with the six schools; production unchanged
+until then). Signed out: Header: Lessons · Motions · Schools · How it
+works, plus a primary "Take the quiz" button. Logo -> /. Signed in:
+Header: Today · Motions · Lessons · Schools. Logo -> /today. The ME
+button opens a menu: Profile, My debates and challenges, Classes,
+Settings, Retake the quiz, Sign out. Pages: "Schools" (/schools): a card
+per published school linking to its /s/[school] page, with this week's
+table below. /table redirects to it. "How it works": merge /method and
+/debate/rubric into one page with anchors; old URLs redirect, including
+/method#samples. Rename "Debate" to "Motions" in the nav and headings
+(keep /debate URLs). Add an "Exemplars" link on each motion card in the
+list. Mobile: the same items in the existing Menu dropdown. Keep every
+existing URL working (redirect, never 404). Copy goes into
+docs/daily-path-copy.md first. Screenshots of both menus, signed out and
+signed in, at 390px and 1280px, in the Gate 4 pack for my review."
+
+Built after Gate 3 and the new-schools run, as asked. The copy is in
+`docs/daily-path-copy.md`, section 13, with what is new marked for his
+ruling. A build without the flag, production included, renders every
+touched page and component byte for byte as before; that was checked by
+rendering the old and new versions of `/method`, `/debate/rubric`, the
+footer, the motion list and the school table side by side.
+
+Choices made where the instruction left room, each his to change:
+- **Signed-in or not, before the page is drawn.** Both link sets are in
+  the page; a one-line script in the root layout marks `<html
+  data-auth="in">` from the session cookie, and CSS shows one set. No
+  page reads cookies on the server for it, so static pages stay static,
+  and neither set flashes into the other. The header re-reads the cookie
+  on each page change; Sign out loads the Supabase client only when
+  pressed.
+- **No sign-in link in the signed-out header,** as given. The landing
+  page keeps its own link to `/login`.
+- **The Me menu's targets:** Profile `/me`; My debates and challenges
+  `/me#challenges` (the pending challenges, with the debate history after
+  them); Classes `/me/settings#classes`; Settings `/me/settings`; Retake
+  the quiz `/quiz`. The anchors exist on flag-on builds only.
+- **"A card per published school":** the cards are the schools the
+  build shows, the list every public surface moved to in Stage 5's step
+  2, which is the six on a flag-on build and the six published at launch.
+- **How it works** keeps both pages' text unchanged, shared with them
+  (`src/components/how-it-works/`), under a new heading and a contents
+  line, with anchors `#judge`, `#rubric`, `#counterpart` and `#samples`.
+  The method page's "Read the rubric" link is left out, since the rubric
+  is on the same page. Its claim to show the judge's criteria in full is
+  unchanged and is Gate 4's item 10.
+- **Redirects** (`sixSchoolsRedirects` in `next.config.ts`, flag-on
+  builds only): `/table` to `/schools`, `/method` to `/how-it-works`
+  (a browser keeps the anchor, so `/method#samples` lands on
+  `#samples`), `/debate/rubric` to `/how-it-works#rubric`. Temporary
+  until the launch makes them permanent. Checked on a served flag-on
+  build: each answers 307 to its destination.
+- **Exemplars** sits under each motion card, not inside it: the card is
+  itself a link, and a link cannot hold another. Read aloud as
+  "Exemplars: {motion title}".
+- **"Debate" to "Motions"** in the header, the footer and the two debate
+  pages' titles; the footer's About column and its disclosure link point
+  at the merged page on a flag-on build.
