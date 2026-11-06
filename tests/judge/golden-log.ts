@@ -42,8 +42,9 @@ export interface GoldenCallRecord {
   /**
    * Where the fidelity criteria came from: `live` is src/lib/judge/rubric.ts,
    * exactly what production sends; `draft` is
-   * content/prompts/fidelity-criteria.draft.md, which only a golden run
-   * reads. Recorded so a result can never be mistaken for the other kind.
+   * content/prompts/fidelity-criteria.draft.md, which a golden run reads,
+   * and since Gate 3 a SIX_SCHOOLS build. Recorded so a result can never be
+   * mistaken for the other kind.
    */
   criteria_source: "live" | "draft";
   /** See `requestFingerprint`. Not a hash of the literal request bytes. */
@@ -70,6 +71,11 @@ export interface GoldenRun {
   prompt_sha256: string;
   model: string;
   samples_per_case: number;
+  // Present, and true, only on a run made with SIX_SCHOOLS=1, whose
+  // requests are a flag-on build's: six rivals, and the three new schools
+  // judged through the build's own criteria (Gate 3). Absent otherwise, so
+  // a run without the flag is written exactly as before.
+  six_schools?: true;
   calls: number;
   total_cost_usd: number;
   records: GoldenCallRecord[];
@@ -91,9 +97,15 @@ export function sha256(text: string): string {
  *
  * What it covers instead is every input the assembly is a function of: the
  * prompt version, the prompt file itself, the school's fidelity criteria,
- * and the motion, school and argument. The assembly is pure and is pinned
- * byte for byte by the committed fixtures, so equal inputs mean an equal
- * request. Two runs with the same fingerprint sent the same thing.
+ * the motion, school and argument, and, since Gate 3, whether the build
+ * is a SIX_SCHOOLS one: there, the rival list a v3 prompt is filled with,
+ * in its order. The assembly is pure and is pinned byte for byte by the
+ * committed fixtures, so equal inputs mean an equal request. Two runs with
+ * the same fingerprint sent the same thing.
+ *
+ * The list is added only on a SIX_SCHOOLS run, so every fingerprint a run
+ * without the flag has written, before Gate 3 or since, is computed
+ * exactly as before.
  */
 export function requestFingerprint(input: {
   promptVersion: string;
@@ -103,6 +115,8 @@ export function requestFingerprint(input: {
   school: string;
   argument: string;
   revisionOf?: { originalArgument: string; objectionClaim: string } | null;
+  /** The rival list a SIX_SCHOOLS build sends; only on such a run. */
+  rivalSchools?: readonly string[];
 }): string {
   return sha(
     JSON.stringify([
@@ -113,6 +127,7 @@ export function requestFingerprint(input: {
       input.school,
       input.argument,
       input.revisionOf ?? null,
+      ...(input.rivalSchools ? [{ rival_schools: [...input.rivalSchools] }] : []),
     ])
   );
 }
@@ -134,21 +149,43 @@ export function logTarget(value: string | undefined): "file" | "ai_calls" {
   return value === "ai_calls" ? "ai_calls" : "file";
 }
 
+/**
+ * Which build's requests a golden run sends (Gate 3), from SIX_SCHOOLS:
+ * true for "1", a flag-on build's; false for "0", empty or unset. The
+ * modules read the flag as next.config.ts writes it, "1" or not, so a value
+ * that only looks like yes (`true`, `yes`, ` 1`) would quietly run flag-off
+ * and bill for it. Anything else refuses, before any call. Here rather than
+ * in the runner for the reason `logTarget` is: so it can be tested by what
+ * it returns.
+ */
+export function parseSixSchools(value: string | undefined): boolean {
+  if (value === undefined || value === "" || value === "0") return false;
+  if (value === "1") return true;
+  throw new Error(`SIX_SCHOOLS="${value}" is neither "1" nor "0"; refusing to guess which build's requests to send`);
+}
+
 export function startRun(meta: {
   promptVersion: string;
   promptText: string;
   model: string;
   samplesPerCase: number;
+  /**
+   * A SIX_SCHOOLS run: the file says so twice, in `six_schools` and in a
+   * run id ending `-six`, so it cannot be taken for a flag-off run of the
+   * same version. Absent otherwise, so a flag-off file is written as before.
+   */
+  sixSchools?: boolean;
 }): GoldenRun {
   const started = new Date().toISOString();
   return {
-    run_id: `${started.replace(/[:.]/g, "-")}-${meta.promptVersion}`,
+    run_id: `${started.replace(/[:.]/g, "-")}-${meta.promptVersion}${meta.sixSchools ? "-six" : ""}`,
     started_at: started,
     finished_at: null,
     prompt_version: meta.promptVersion,
     prompt_sha256: sha(meta.promptText),
     model: meta.model,
     samples_per_case: meta.samplesPerCase,
+    ...(meta.sixSchools ? { six_schools: true as const } : {}),
     calls: 0,
     total_cost_usd: 0,
     records: [],

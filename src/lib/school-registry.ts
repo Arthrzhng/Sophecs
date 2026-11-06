@@ -11,9 +11,10 @@
  * - `QUIZ_SCHOOLS` is what the quiz can sort somebody into. It stays the
  *   original three until there is a quiz v2, so the result triangle has
  *   three corners and the question bank's vectors keep their three keys.
- * - `PUBLISHED_SCHOOLS` is what production publishes. The judge reads it
- *   (the rival schools in its prompt, the schools its reply may name), so
- *   it moves only when a school is published, under Arthur's (b) and (c).
+ * - `PUBLISHED_SCHOOLS` is what production publishes. It moves only when a
+ *   school is published, under Arthur's (c). The judge read it until Gate
+ *   3; it now reads `SHOWN_SCHOOLS` (the rival schools in its prompt, the
+ *   schools its reply may name), which is this list without the flag.
  *
  * And a third, `SHOWN_SCHOOLS`, which is what this build shows a reader:
  * the published schools, and on a build made with `SIX_SCHOOLS=1` the
@@ -118,7 +119,7 @@ export const QUIZ_SCHOOLS: readonly QuizSchoolId[] = [
   "virtue-ethics",
 ];
 
-/** The schools production publishes, and the judge reads. */
+/** The schools production publishes. */
 export const PUBLISHED_SCHOOL_IDS: readonly SchoolId[] = PUBLISHED_SCHOOLS.map((s) => s.id);
 
 const PUBLISHED_BY_ID = new Map<SchoolId, SchoolEntry>(

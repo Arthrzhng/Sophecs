@@ -2,26 +2,35 @@ import fs from "node:fs";
 import path from "node:path";
 import { fidelityCriteriaFor, hasFidelityCriteria, rivalsOf } from "../../src/lib/judge/rubric";
 import { objectionVoiceFor } from "../../src/lib/judge/objection-voices";
+import { DRAFT_CRITERIA_ON_THIS_BUILD, parseDraftCriteria } from "../../src/lib/judge/draft-criteria";
 import type { PromptVersion } from "../../src/lib/judge/schema";
 import type { SchoolId } from "../../src/lib/types";
 
 /**
- * Criteria for draft schools, for golden runs only.
+ * Criteria for draft schools, for golden runs.
  *
  * Arthur's ruling of 2026-10-24: the approved criteria for the three draft
  * schools stay out of `src/lib/judge/rubric.ts` until he publishes those
- * schools in Phase 3, so `/api/judge` keeps refusing them. A golden run
- * still has to score Tier B against them, so this module reads them from
- * `content/prompts/fidelity-criteria.draft.md` and hands them to the
- * runner, and nothing else.
+ * schools, so on a build without SIX_SCHOOLS `/api/judge` keeps refusing
+ * them. A golden run still has to score Tier B against them, so this module
+ * reads them from `content/prompts/fidelity-criteria.draft.md` and hands
+ * them to the runner.
  *
- * **Nothing in `src/` may import this or read that file.**
- * `tests/draft-criteria.test.ts` walks `src/` for both and drives
- * `/api/judge` itself to show it still refuses all three.
+ * Gate 3 (Arthur, Checkpoint B, 2026-11-05) puts the same criteria into
+ * what the judge receives on a SIX_SCHOOLS build, through
+ * `src/lib/judge/draft-criteria.ts`, which reads the same file with the
+ * same parser. A golden run with SIX_SCHOOLS=1 therefore judges the three
+ * through that path, as a flag-on build would, and `planCase` checks the
+ * text it sends is the text measured here.
+ *
+ * **Without the flag, nothing in `src/` reads that file.**
+ * `tests/draft-criteria.test.ts` walks `src/` for its name, which only
+ * `src/lib/judge/draft-criteria.ts` may carry, and drives `/api/judge`
+ * itself to show it still refuses all three.
  * `tests/draft-criteria-reads.test.ts` records every path the filesystem is
  * asked for while the route runs, because a path assembled at runtime has
- * no name for the walk to find. If either ever failed, the eval's
- * exception would have reached production.
+ * no name for the walk to find. If either ever failed, a flag-on exception
+ * would have reached production.
  */
 
 export const DRAFT_CRITERIA_FILE = path.join(
@@ -32,31 +41,25 @@ export const DRAFT_CRITERIA_FILE = path.join(
 );
 
 /**
- * The criteria sections of the draft file, keyed by school id.
- *
- * A section is a `## \`id\`` heading and everything up to the next `## `.
- * The body is trimmed and otherwise untouched: line breaks are kept,
+ * The criteria sections of the draft file, keyed by school id, parsed by
+ * the same function a SIX_SCHOOLS build uses (`parseDraftCriteria`), so
+ * what a golden run measures and what that build sends cannot drift apart.
+ * Each body is trimmed and otherwise untouched: line breaks are kept,
  * because the live criteria in `rubric.ts` keep theirs, and the length band
- * the criteria were written to is measured on the raw string. Normalising
- * whitespace here would send the judge something other than what was
- * approved and measured.
+ * the criteria were written to is measured on the raw string.
  */
 export function readDraftCriteria(
   text: string = fs.readFileSync(DRAFT_CRITERIA_FILE, "utf-8")
 ): Partial<Record<SchoolId, string>> {
-  const out: Partial<Record<SchoolId, string>> = {};
-  for (const section of text.split(/^## /m).slice(1)) {
-    const newline = section.indexOf("\n");
-    const heading = /^`([a-z-]+)`/.exec(section.slice(0, newline).trim());
-    if (!heading) continue;
-    out[heading[1] as SchoolId] = section.slice(newline).trim();
-  }
-  return out;
+  return parseDraftCriteria(text);
 }
 
 export type CasePlan =
   | { run: true; source: "live"; criteria: string; draftCriteria: undefined }
-  | { run: true; source: "draft"; criteria: string; draftCriteria: string }
+  // draftCriteria is the text callJudgeModel is handed in place of
+  // rubric.ts, or undefined on a SIX_SCHOOLS build, where the judge's own
+  // path already sends the same text (Gate 3).
+  | { run: true; source: "draft"; criteria: string; draftCriteria: string | undefined }
   | { run: false; reason: string };
 
 /**
@@ -83,7 +86,8 @@ export function planCase(
   draft: Partial<Record<SchoolId, string>>,
   version: PromptVersion | "v3"
 ): CasePlan {
-  if (hasFidelityCriteria(school)) {
+  const onThisBuild = DRAFT_CRITERIA_ON_THIS_BUILD[school] !== undefined;
+  if (hasFidelityCriteria(school) && !onThisBuild) {
     return {
       run: true,
       source: "live",
@@ -117,5 +121,17 @@ export function planCase(
   // under v3, so the two kinds of school are told the same thing. Draft
   // schools only ever run under a prompt that lists rivals, which is v3.
   const withVoice = `${criteria.trimEnd()}\n\n${objectionVoiceFor(school, rivalsOf(school))}`;
+  if (onThisBuild) {
+    // A SIX_SCHOOLS build judges the three against this file already
+    // (Gate 3), and callJudgeModel refuses an override for a school with
+    // criteria. So the run goes through the build's own path, which is
+    // what it should measure, after checking that path sends exactly the
+    // text planned here.
+    const sent = fidelityCriteriaFor(school, version);
+    if (sent !== withVoice) {
+      throw new Error(`the criteria a SIX_SCHOOLS build sends for "${school}" differ from the draft file's`);
+    }
+    return { run: true, source: "draft", criteria: withVoice, draftCriteria: undefined };
+  }
   return { run: true, source: "draft", criteria: withVoice, draftCriteria: withVoice };
 }

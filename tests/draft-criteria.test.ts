@@ -3,17 +3,23 @@ import path from "node:path";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 /**
- * The draft criteria reach a golden run and nothing else.
+ * Without SIX_SCHOOLS, the draft criteria reach a golden run and nothing
+ * else.
  *
  * Arthur's ruling of 2026-10-24: the approved criteria for the three draft
  * schools stay in content/prompts/fidelity-criteria.draft.md, out of
- * src/lib/judge/rubric.ts, until he publishes those schools in Phase 3.
- * Meanwhile /api/judge keeps refusing them. A golden run reads them from
- * the draft file so Tier B can be scored.
+ * src/lib/judge/rubric.ts, until he publishes those schools. A golden run
+ * reads them from the draft file so Tier B can be scored. Gate 3 (Arthur,
+ * Checkpoint B, 2026-11-05) lets a SIX_SCHOOLS build read them too, through
+ * src/lib/judge/draft-criteria.ts and nothing else; on every other build,
+ * production's included, /api/judge keeps refusing the three.
  *
  * Built like tests/golden-log.test.ts, and for the same reason: an
  * exception made for the eval is only worth having while it stays inside
- * the eval. This is the test that it does.
+ * the eval, and the flag-on one only while it stays behind the flag. This
+ * runs as a build without the flag (vitest.config.mts sets SIX_SCHOOLS=0);
+ * tests/six-schools.test.ts and the flag-on case in
+ * tests/draft-criteria-reads.test.ts are the flag-on side.
  */
 
 // ---- the route, driven for real, with its boundaries stubbed ------------
@@ -134,7 +140,7 @@ describe("/api/judge still refuses every draft school", () => {
 
 // ---- nothing in production knows the draft file exists ------------------
 
-describe("nothing in src/ reads the draft criteria", () => {
+describe("nothing in src/ but the flag-on loader reads the draft criteria", () => {
   const walk = (dir: string): string[] =>
     fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
       const full = path.join(dir, e.name);
@@ -144,20 +150,36 @@ describe("nothing in src/ reads the draft criteria", () => {
     file: path.relative(process.cwd(), f),
     text: fs.readFileSync(f, "utf-8"),
   }));
+  // The one file in src/ allowed to name the draft file: it reads it on a
+  // SIX_SCHOOLS build only (Gate 3), and is server-only.
+  const LOADER = path.join("src", "lib", "judge", "draft-criteria.ts");
 
   // Strict on purpose: a plain substring match, comments included. A
   // smarter check that stripped comments would be one more thing a read
   // could hide from. The cost is that src/ cannot name the file even in a
   // comment, which the first run of this test enforced on anthropic.ts.
-  it("names the draft file nowhere in src/", () => {
+  it("names the draft file nowhere in src/ but the flag-on loader", () => {
     const offenders = sources
       .filter((s) => s.text.includes("fidelity-criteria.draft"))
       .map((s) => s.file);
-    expect(offenders, "nothing in src/ may read the draft criteria file").toEqual([]);
+    expect(offenders, "only the flag-on loader may name the draft criteria file").toEqual([LOADER]);
+  });
+
+  it("has the loader read the draft file only when SIX_SCHOOLS is 1", () => {
+    const loader = sources.find((s) => s.file === LOADER)!.text;
+    // One read, in one function, called from one place, behind the flag.
+    expect(loader.match(/readFileSync\(/g)).toHaveLength(1);
+    expect(loader.match(/flagOnDraftCriteria\(\)/g)).toHaveLength(2);
+    expect(loader).toMatch(
+      /DRAFT_CRITERIA_ON_THIS_BUILD[^=]*=\s*process\.env\.SIX_SCHOOLS === "1" \? flagOnDraftCriteria\(\) : \{\};/
+    );
+    expect(loader.startsWith('import "server-only";')).toBe(true);
   });
 
   it("imports the golden run's loader nowhere in src/", () => {
-    const offenders = sources.filter((s) => s.text.includes("draft-criteria")).map((s) => s.file);
+    const offenders = sources
+      .filter((s) => s.text.includes("tests/judge/draft-criteria") || /from\s+["'](?:\.\.\/)+tests\//.test(s.text))
+      .map((s) => s.file);
     expect(offenders, "nothing in src/ may import tests/judge/draft-criteria").toEqual([]);
   });
 

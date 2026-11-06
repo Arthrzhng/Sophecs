@@ -4483,3 +4483,160 @@ ruled.
 
 Cumulative on the eval key: $11.0704 of $15.00, over the 17 run files on
 this branch.
+
+### Gate 3: the three judged on SIX_SCHOOLS builds (2026-11-06)
+
+Arthur at Checkpoint B, 2026-11-05, (b) 1: "Gate 3: yes. The new schools'
+fidelity criteria go into what the judge receives on flag-on builds only,
+and the three join the rival list on flag-on builds." Carried out after
+the full v3 run, as his ruling of 2026-11-06 ordered.
+
+**What a flag-on build now sends.**
+- **The prompt is v3.** `PROMPT_VERSION` in `src/lib/judge/schema.ts` is
+  `"v3"` on a SIX_SCHOOLS build and `"v2"` on every other. This is how the
+  ruling is read, and Arthur may rule otherwise at Gate 4: v2 names the
+  three published schools in its prose and asks for an objection from
+  "the two schools the argument was not assigned", so it cannot name six
+  rivals or judge a new school (the golden runner has refused to run the
+  three under v2 since Tier B began). Only v3 takes its rival list from
+  the registry. A flag-on build stores `prompt_version` `"v3"`; the
+  column is plain text.
+- **The rival list is the six.** `RIVAL_SCHOOLS_BLOCK`, `rivalsOf`, and
+  the schools a reply's objection may name (`VerdictSchema`) follow
+  `SHOWN_SCHOOL_IDS`: the published three without the flag, all six with
+  it.
+- **The three's criteria come from the draft file.** Arthur's ruling of
+  2026-10-24 keeps them out of `rubric.ts` until he publishes the
+  schools. `src/lib/judge/draft-criteria.ts` (server-only) reads
+  `content/prompts/fidelity-criteria.draft.md` once, as the module loads,
+  and only when `SIX_SCHOOLS` is `"1"`; otherwise its map is empty and
+  nothing is read. `fidelityCriteriaFor` gives each of the three its
+  section, verbatim, the text every golden run since 3 Nov 18:15 has
+  judged them against (the file last changed in 8e76d62, at 17:50 that
+  day), then the voice paragraph a published school gets. That paragraph names
+  only the voices whose school is among the rivals listed, so with six
+  listed Confucianism's also names its Ubuntu voice and Buddhist Ethics'
+  its Confucian one, which earlier runs, listing three rivals, did not
+  send; Ubuntu's is as before. (Corrected on review: this first said the
+  whole text was exactly what earlier runs sent.) Under v1 or v2 it
+  throws for them.
+- **`rubric.ts`'s criteria for a published school are unchanged.** What
+  fills the prompt's criteria for one is not quite: its voice paragraph
+  names only the voices whose school is among the rivals listed, so on a
+  flag-on build Stoicism's and Utilitarianism's also name their Ubuntu
+  voice, which `src/lib/judge/objection-voices.ts` already held for when
+  Ubuntu joined the list; Virtue Ethics' is unchanged. With the rival
+  list, that is all that differs from a flag-off v3 request.
+
+**What does not change.** A build without the flag, production
+included, sends byte for byte what it sent: v2, three rivals, the
+published criteria (the six fixtures in `tests/judge-request/`), and
+`/api/judge` refuses the three after reading the budget and the profile,
+before the topic lookup, the cap, and any write or call. The
+draft file is not read (`tests/draft-criteria-reads.test.ts` records
+every path the route asks for, and now also shows the recorder catching
+the flag-on read). `next.config.ts` still refuses SIX_SCHOOLS for a
+production build. Previews have no judge key and their budget fails
+closed, so no preview judges anything either.
+
+**Pinned.** Every request a flag-on build can send, for all six schools,
+original and revision, is a committed fixture in
+`tests/judge-request/six-schools/` (`tests/six-schools.test.ts`), so a
+change to what the judge receives on that build moves a fixture. The
+draft file is read once, at load: a test judges one of the three on a
+flag-on build and records no further read.
+
+**The golden runner.** With SIX_SCHOOLS=1 it judges the three through
+the build's own path (no draft override), after checking that path sends
+exactly the draft file's text; both read the file with the same parser,
+`parseDraftCriteria`. The new-schools run is that run. The flag sets the
+rival list, so on a SIX_SCHOOLS run the list itself, in its order, is
+part of a record's request fingerprint: every fingerprint of a run
+without the flag is computed as before (all 77 of the 16:58 full run
+still reproduce), and none of a flag-on run's can match one. A flag-on
+run file carries `"six_schools": true` and a run id ending `-six`. The
+runner prints which build's requests it sends; refuses a SIX_SCHOOLS
+value other than "1", "0" or none, since the modules treat anything but
+"1" as off and an operator meaning a flag-on run would otherwise pay for
+a flag-off one; and runs SIX_SCHOOLS=1 under v3 only, the one version a
+flag-on build sends.
+
+**The new-schools run (18:14 UTC).** Run
+`2026-11-06T18-14-06-111Z-v3-six.json`: SIX_SCHOOLS=1, v3 (the prompt of
+the 16:58 full run, sha256 `5c0bbece85a94d6f...`), three samples a case,
+all 25 cases, the live three's included since their requests change too.
+77 calls (two replies failed validation and passed on their retries),
+$1.1727, under a watchdog set to stop at $1.80 (armed from outside the
+repository: it reads the run file's total every two seconds and stops the
+runner at the limit; its log ended "runner finished; last total
+$1.17267"). Cumulative on the eval
+key: $12.2431 of $15.00, over the 18 run files.
+- **Bands, median of three:** 23 of 25 cases in every band, and the two
+  that miss are the two the flag-off run of 16:58 missed.
+  `confucian-hierarchy-school` scores 78/80/78 against 40-75, with
+  engagement 4/5/4, now inside its 0-4 (at 16:58: 82/83/83, engagement
+  5/6/6). `stoic-analogy` has fidelity 7/8/7 against 8-10, its score in
+  band (71/78/72).
+- **Objections:** under each fixture's expected schools, written for
+  three rivals, 8 cases fail the objection check, 7 of them passing every
+  band, so 16 of 25 pass. In each of the 8 the majority objection is a
+  voice the flag-on prompt names for that school: `ubuntu` for
+  `stoic-analogy`, `stoic-strong`, `stoic-wrong-school` and
+  `fabricated-source` (Stoicism), and for `confucian-hierarchy`,
+  `confucian-ren-disposition` and `confucian-wrong-school` (Confucianism);
+  `confucian` for `buddhist-wrong-school`. Counting the voices the prompt
+  names, 23 of 25 pass, the same two as above. (The objection check on
+  its own passes 17 of 25 on the fixtures' sets and 25 with the named
+  voices; 16 and 23 are whole-case passes.) Two wrong-school cases also
+  drew one objection in three from a school neither reading expects
+  (`confucian` for Utilitarianism and for Virtue Ethics), a minority that
+  fails neither. 72 of the 75 objections were a voice the prompt names.
+- **Scores:** the mean of the 25 medians is 54.76, against 55.00 at
+  16:58. Every strong case's score is in band; against 16:58 four are
+  higher, four the same and three lower (buddhist-strong 83 to 80,
+  confucian-strong 86 to 80, util-strong 83 to 80). The eleven cases of
+  the three new schools have a mean of medians of 58.09, against 58.45
+  with three rivals listed.
+- **The records:** all 77 fingerprints reproduce with the flag on and
+  none with it off; `criteria_source` is `draft` for the three's cases
+  and `live` for the rest.
+
+**For Gate 4.** Each is Arthur's; none is decided by being written here.
+- That a flag-on build, and so production at launch, judges with v3.
+- What v3 at launch does to verdicts already stored under v2. A revision
+  of a v2 original would be judged under v3. `/api/judge` computes the
+  revision's `scoreDelta` and `fidelityDelta` against the original's
+  scores for the `revision_judged` analytics event, and the verdict page
+  computes its own from the two stored verdicts and shows it, so both
+  would cross two prompt versions; Elo and a topic's par would take v3
+  scores beside v2 ones. The 3 Nov comparison found v3 scoring the strong cases 3 to 13
+  higher, and this file's rule is that scores across versions are not
+  compared as equivalent ("2F: the 3 Nov v3 re-run").
+- `/debate/rubric` says "These are the criteria the judge is given for
+  each school, in full — the same text". On a flag-on build it still
+  shows rubric.ts's v2 text for the published three only, while the
+  judge gets v3's text for six. At launch that would be untrue in
+  production: copy and publishing, (e) and (c).
+- Statements in frozen files that this makes untrue on a flag-on build,
+  and so at launch, and are his to change: v3's head comment says it "is
+  not the production default"; the draft criteria file says it is "NOT
+  LOADED BY ANYTHING IN PRODUCTION" and that `hasFidelityCriteria`
+  returns false for the three, and "One thing reads this file: the golden
+  runner". (`src/lib/anthropic.ts` said, of `draftCriteria`, that
+  "/api/judge keeps refusing them meanwhile"; that comment is corrected
+  here, under the Gate 3 ruling this PR already edits the file by.)
+- What counts as a fitting objection on a flag-on run. Each golden
+  fixture's expected objection schools were written for three rivals.
+  On a flag-on build the prompt names, from the approved voices,
+  `ubuntu` for Stoicism, Utilitarianism and Confucianism, and
+  `confucian` for Buddhist Ethics, and the judge follows the named voice
+  closely. The runner's pass test keeps the fixtures' sets; its notes now
+  say when an objection came from a school the fixture does not expect,
+  and whether the prompt named it, apart from one from the argued school.
+  Whether the named voices count is Arthur's: the new-schools run passes
+  16 of 25 if they do not, and 23 of 25 if they do.
+- The new-schools run's two misses, the same as the flag-off run's: the
+  hierarchy case (closer in this run, its engagement in band, its score
+  78 against 75; its objection was `utilitarianism` three times in both
+  runs, so the added Ubuntu voice does not show in it) and stoic-analogy's
+  fidelity.

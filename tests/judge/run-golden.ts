@@ -40,13 +40,15 @@ import { describeEndpoint, describeEvalKey, endpointProblem, resolveEvalKey } fr
 import {
   flush,
   logTarget,
+  parseSixSchools,
   requestFingerprint,
   startRun,
   type GoldenRun,
 } from "./golden-log";
 import type { SchoolId } from "../../src/lib/types";
-import { FIDELITY_CRITERIA } from "../../src/lib/judge/rubric";
-import { PUBLISHED_SCHOOL_IDS } from "../../src/lib/school-registry";
+import { FIDELITY_CRITERIA, rivalsOf } from "../../src/lib/judge/rubric";
+import { OBJECTION_VOICES } from "../../src/lib/judge/objection-voices";
+import { PUBLISHED_SCHOOL_IDS, SHOWN_SCHOOL_IDS } from "../../src/lib/school-registry";
 
 // Where a run logs. `file` writes tests/judge/golden-runs/<run>.json and
 // touches nothing else; `ai_calls` is the old behaviour, kept for anyone
@@ -126,6 +128,30 @@ function parseDryRun(value: string | undefined): boolean {
 }
 
 const DRY_RUN = parseDryRun(process.env.GOLDEN_DRY_RUN);
+
+// Which build's requests the run sends (Gate 3); see parseSixSchools.
+const SIX_SCHOOLS_RUN = parseSixSchools(process.env.SIX_SCHOOLS);
+// A flag-on build only ever sends v3, the one prompt that lists its rivals
+// from the registry; a SIX_SCHOOLS run of another version would measure a
+// request no build sends.
+if (SIX_SCHOOLS_RUN && VERSION !== "v3") {
+  throw new Error(`SIX_SCHOOLS=1 runs v3 only, as a flag-on build sends; JUDGE_PROMPT_VERSION is ${VERSION}`);
+}
+const BUILD = SIX_SCHOOLS_RUN
+  ? "SIX_SCHOOLS on: a flag-on build's requests (six rivals; the three new schools through the build's own criteria)"
+  : VERSION === PROMPT_VERSION
+    ? "SIX_SCHOOLS off: production's requests"
+    : `SIX_SCHOOLS off: ${VERSION} as a build without the flag would send it (three rivals), which production does not send`;
+
+// The rivals each school's voice paragraph names on this build: the
+// approved voices whose school is among the rivals listed. With six listed
+// that can be a school a fixture's expected objection schools, written for
+// three, do not include, so the table names it rather than calling it a
+// failure of a different kind.
+function voicedRivals(school: SchoolId): SchoolId[] {
+  const rivals = rivalsOf(school);
+  return OBJECTION_VOICES[school].map((v) => v.rival).filter((r) => rivals.includes(r));
+}
 
 interface GoldenCase {
   name: string;
@@ -273,6 +299,7 @@ function caseContext(c: GoldenCase, plan: RunnablePlan): RecordContext {
       motion: c.motion,
       school: c.school,
       argument: c.argument,
+      rivalSchools: SIX_SCHOOLS_RUN ? SHOWN_SCHOOL_IDS : undefined,
     }),
     model: MODEL,
   };
@@ -317,7 +344,8 @@ async function sampleCase(
           // undefined for a live school, so it is judged against rubric.ts
           // exactly as production would; the draft file's text for a draft
           // school, which callJudgeModel accepts only for a school with no
-          // live criteria.
+          // live criteria. Undefined for a draft school too on a
+          // SIX_SCHOOLS run, whose build already sends that text (Gate 3).
           plan.draftCriteria
         ),
       (attempt) => logCall(run, c, plan, i + 1, attempt)
@@ -445,7 +473,7 @@ function planSummary(cases: GoldenCase[], plans: Map<string, CasePlan>): string 
 }
 
 function printPlan(cases: GoldenCase[], plans: Map<string, CasePlan>): void {
-  console.log(`\nPrompt ${VERSION}, ${SAMPLES} sample(s) per case. ${planSummary(cases, plans)}\n`);
+  console.log(`\nPrompt ${VERSION}, ${SAMPLES} sample(s) per case. ${BUILD}. ${planSummary(cases, plans)}\n`);
 }
 
 function dryRun(cases: GoldenCase[], plans: Map<string, CasePlan>): void {
@@ -458,7 +486,7 @@ function dryRun(cases: GoldenCase[], plans: Map<string, CasePlan>): void {
       runs: plan.run ? "yes" : `no: ${plan.reason}`,
     };
   });
-  console.log(`\nDry run, prompt ${VERSION}, ${SAMPLES} sample(s) per case. Nothing was sent.\n`);
+  console.log(`\nDry run, prompt ${VERSION}, ${SAMPLES} sample(s) per case. ${BUILD}. Nothing was sent.\n`);
   console.table(rows);
   console.log(`\n${planSummary(cases, plans)}`);
 }
@@ -509,6 +537,7 @@ async function main() {
           promptText: promptText(),
           model: MODEL,
           samplesPerCase: SAMPLES,
+          sixSchools: SIX_SCHOOLS_RUN,
         })
       : null;
   const rows: {
@@ -630,7 +659,24 @@ async function main() {
     const notes: string[] = [];
     if (failures.length) notes.push(`${failures.length}/${SAMPLES} samples failed`, ...new Set(failures));
     notes.push(...retryNote(retries, retriesFailed));
-    if (!objectionPass) notes.push(`objection from argued school in ${samples.length - rivals.length} sample(s)`);
+    // What happened, by kind: the argued school's own objection, or a rival
+    // the fixture did not expect (on a SIX_SCHOOLS run, possibly one the
+    // prompt itself names as a voice for this school). Before Gate 3 the
+    // schema allowed only the expected kinds, so one count covered both.
+    const fromArgued = samples.filter((s) => s.objectionSchool === c.school).length;
+    const unexpected = samples.filter(
+      (s) => s.objectionSchool !== c.school && !c.expected_objection_school.includes(s.objectionSchool)
+    );
+    if (fromArgued) notes.push(`objection from the argued school in ${fromArgued} sample(s)`);
+    if (unexpected.length) {
+      const voiced = voicedRivals(c.school);
+      const named = unexpected.filter((s) => voiced.includes(s.objectionSchool as SchoolId)).length;
+      notes.push(
+        `objection from a school the fixture does not expect in ${unexpected.length} sample(s): ` +
+          `${[...new Set(unexpected.map((s) => s.objectionSchool))].join(", ")}` +
+          (named ? `; ${named} of them a voice this build's prompt names for ${c.school}` : "")
+      );
+    }
     if (terms && !weakestMovePass) {
       notes.push(
         `weakest_move named the invention in ${naming} of ${samples.length} sample(s); ` +
