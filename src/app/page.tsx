@@ -162,6 +162,15 @@ export default function LandingPage() {
                 Read the motion
               </Link>
             </p>
+            {/* The motion's exemplars: src/app/debate/[slug]/exemplars/page.tsx. */}
+            <p>
+              <Link
+                href={`/debate/${motion.slug}/exemplars`}
+                className="inline-flex min-h-11 items-center text-sm font-semibold text-ink underline underline-offset-4"
+              >
+                Exemplar ways to argue this motion
+              </Link>
+            </p>
           </section>
         )}
 

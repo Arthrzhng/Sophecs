@@ -4102,3 +4102,84 @@ scorer with the simulator's exact output (`node scripts/simulate-quiz-v2.mjs
 --json`): every school's primary count, every primary and secondary pair,
 the ties, and a hash of every pattern's result in order.
 
+### Exemplar ways to argue this motion (2026-11-06)
+
+Arthur, 2026-11-06, on sample accounts' activity: "Can we make this
+visible in some way without having an obvious sample label since
+visitors cannot interact with them anyways but just see what they're
+doing". Choosing among headings put to him for it: "Please could you do
+exemplar", then "Do exemplar and do like 50 exemplars". Then, asked
+whether to show one per different opening line instead of 50 that
+repeat, and whether to put a line under the heading saying where they
+come from, with "Written as examples for Sophecs." offered: "Do what you
+need to", taken as yes to both. So these are his: a page without a
+"Sample" label on each item, its heading, one per opening, and the line.
+Where it is linked from is mine, and his to move.
+
+`/debate/<slug>/exemplars` shows, under the heading "Exemplar ways to
+argue this motion" and the line "Written as examples for Sophecs.", the
+strongest sample argument under each opening line in each school,
+grouped by school, each opening from that line to its full text. The
+sample run writes four positions per school on a motion, so 50 would
+have repeated them: the first build's 50 on `opaque-benefit` had 12
+different first sentences, "Deploy it." and "Do not deploy it." ten
+times each. The opening line is the first sentence after any of the six
+frames the run puts in front of some arguments ("Here is my answer.",
+"My position is simple." and the rest; `SAMPLE_FRAMES`, tested against
+the generator's own list), since a frame says nothing a reader can choose
+by. One per opening came to 12 a motion, four a school (read-only count,
+2026-11-06). Highest template mark first; 50 stays as a ceiling, shared
+evenly across the schools. Every published row is read (up to 1000 a
+school; at most 241 today), though each opening first appeared within a
+school's top 15.
+
+What keeps it honest:
+- **Sample accounts' published arguments only.** `src/lib/exemplars.ts`
+  reads `is_sample` rows whose sample author published the argument
+  (`argument_public`), as a sample's own verdict page shows only those,
+  and refuses any row that is not a sample's. A real reader's argument is
+  theirs and public only if they publish it.
+- **On the motion as it reads now.** Only rows whose `motion_text` is
+  the topic's current motion, so an argument written to an earlier
+  wording is never shown under a later one.
+- **No deliberate misspellings.** The sample run writes one or two into
+  about 8% of its arguments to look like real writing; none is chosen
+  (`SAMPLE_TYPO`, tested against the generator's own list). Of its
+  misspellings only "its" for "it's" cannot be told from a correct word,
+  and the passages contain no "it's" for it to replace.
+- **No scores.** The samples' marks were written from templates, not by
+  the judge, so showing them would present a template as the judge's
+  verdict.
+- **No link to a sample's own pages**, which keep their labels. Items are
+  keyed by position, so no sample debate's id is in the page.
+- **Nothing in PostHog.** The page shows samples, so it renders
+  `SamplePageMarker` and passes no referrer on, as every other page
+  showing a sample does: no event and no session replay of the text
+  reaches PostHog from it. Its views are not counted.
+
+The arguments were composed by the sample run from passages written for
+it, so "Written as examples" is the truth of them; the page does not say
+they came from sample accounts, which is what the ruling above leaves
+off.
+
+The page is public, built on first request and then at most hourly. A
+failed database read is thrown, so a built page keeps serving rather than
+being replaced by an empty one; a motion with no sample arguments, as
+after the launch teardown until a fresh run, is not found, and so is a
+slug no motion could have, without a database read. It is linked from the
+landing page's "A motion you could argue" and from a reader's own
+verdict. The motion's own page, where a reader writes theirs, is left as
+it was.
+
+New copy: the heading and the line under it, as above; the link "Argue
+this motion"; the page title "Exemplar ways to argue this motion ·
+Sophecs" and its description "Exemplar ways to argue this motion, from
+each school.", which its link preview uses too. The arguments are the
+sample run's, accepted with it on 2026-11-04.
+
+For Arthur's list at the end of the phase: whether exemplars need a floor
+on the template mark. On the full dataset none of the 72 chosen is one
+the run wrote to be weak, but with only the canary's rows (the first 40
+accounts, after the launch teardown and before `full`) a review probe of
+the generator found 4 of 70 and 6 of 40 were, marked 28 to 36. A floor
+would leave a position out rather than show a weak argument for it.
