@@ -12,10 +12,13 @@ merge commit and deploy state of the one before.
 Eval key spend is kept as a running total against Arthur's cumulative
 cap: $4.80 in the brief of 2026-11-03, raised to $8.00 by his ruling of
 the same evening (recorded in `docs/decisions.md`, "Arthur's rulings of
-2026-11-03 on the Stage 1 miss"), and to $12.00 by his ruling of
-2026-11-06 on the v3 checks, "Cap $12.00 cumulative." (recorded on
-branch `judge-v3-order` in `docs/decisions.md`, "Judge v3 after #68:
-two single-sample checks, and a stop"). The total is the sum of
+2026-11-03 on the Stage 1 miss"), to $12.00 by his ruling of
+2026-11-06 after #68 (`docs/decisions.md`, "Judge v3 after #68: two
+single-sample checks, and a stop"), restated in his ruling on steps A and
+B as "Cap $12.00 cumulative.", and to
+$15.00 by his reversal of ruling 12 the same day, "Eval cap raised to
+$15.00 cumulative" (`docs/decisions.md`, "Judge v3: the head comment sent
+again, by Arthur's reversal of ruling 12"). The total is the sum of
 `total_cost_usd` over every golden run file, including any on a branch
 not yet merged, which each entry names.
 
@@ -773,3 +776,36 @@ deploy below was read from Vercel as Ready.
 - Waiting on Arthur: the v3 prompt under (b), with the two ways forward
   set out in #90; Supabase Auth's Site URL and redirect list, and the Vercel
   redirect from www to sophecs.com.
+
+## 2026-11-06: judge v3 merged, Gate 3, the new-schools run
+
+- #94 merged as `20e7e76`: the previous entry. Deploy
+  `dpl_2fDgRTespR2N1GtL9C5pfcpPtQBn`, Ready.
+- #95 merged as `8dcea34`: quiz v1 scored on the server, from the
+  answers alone (frozen `src/app/actions.ts`, Arthur's yes of
+  2026-11-06). One review pass. Deploy
+  `dpl_CBAofJaCHRy5W4nVWbwMNj6nSXsQ`, Ready. Every one of the 28 genuine
+  v1 results in production, rescored read-only, matches its stored
+  school.
+- #96 merged as `d263a82`: the v2 copy list for the Gate 4 pack, in
+  `docs/stage5-plan.md`. One review pass. Deploy
+  `dpl_51pMekq4rAXacb9rWdtF9xDU7SUu`, Ready.
+- #90 merged as `7e3a746`: judge v3 sends the 4 Nov head comment again
+  (ruling 12 reversed); the full run of 16:58 UTC passes 23 of 25; a null
+  `objection_answered` or `improvement_note` is accepted on an original
+  only. Three review passes. Deploy `dpl_DZnq3f1Ds97NGCgLDKoQPY3ELbHQ`,
+  Ready.
+- #97 merged as `cd49c49`: Gate 3. A SIX_SCHOOLS build judges all six
+  with v3; production is unchanged. The new-schools run of 18:14 UTC: 23
+  of 25 in every band; counting the objection, 16 or 23 of 25 pass in
+  full, depending on whether the voices the flag-on prompt names count.
+  Three review passes.
+  Deploy `dpl_CC7xqkvxjH3nsmsUC9sr4GKLZvvR`, Ready.
+- Eval key spend is now **$12.2431 of $15.00**, over the 18 run files.
+- Sample activity: the first run after the 06:00 cutover, Actions run
+  42180458429, ran from 07:22 to 07:25 UTC: success, 40 debates, 38
+  checks passed. Its 11 rows dated from 06:00 are rule 2 (whole criteria);
+  2 of the 11 composites fall on a multiple of 5.
+- Gate 4 is brought to Arthur in `docs/gate4.md`.
+- Waiting on Arthur: the Gate 4 pack; Supabase Auth's Site URL and
+  redirect list, and the Vercel redirect from www to sophecs.com.
