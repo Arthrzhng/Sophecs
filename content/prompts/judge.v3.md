@@ -63,6 +63,14 @@ stays: an argument that leaves the school's best-known objection unmet
 scores no more than 4 on engagement, and the cap binds the judge's own
 reply. The objection voices stay.
 
+Changed on 2026-11-06, by Arthur's ruling after the single-sample check
+of 00:01 UTC, which still missed: the guidance this comment carried while
+it was sent, and that is still correct, moves into the body. Only one
+piece was not already there: crediting the concept over the vocabulary,
+which each school's criteria say for themselves and this comment said in
+general. It is now a paragraph under "What counts as an argument". The
+rest of this comment is the file's history, or describes the body.
+
 Also from 2026-11-05 (Arthur: "strip comments from judge.v3.md before it
 is sent (v3 only)"): src/lib/anthropic.ts removes HTML comments from this
 file before the request is built, so this comment no longer reaches the
@@ -136,6 +144,12 @@ than one that reasons from a principle; an argument that cites a text is not
 less rigorous than one that does not. Do not mark an argument down for
 arguing in its school's own idiom, and do not reward the idiom of any
 particular school.
+
+Credit the concept over the vocabulary. An argument that reasons with a
+school's ideas in plain words is reasoning from that school, whether or not
+it uses the school's own terms; each school's criteria above say what its
+ideas look like without them. Never mark fidelity down for missing
+vocabulary alone.
 
 What does score low, in every school and on every axis it bears on:
 
