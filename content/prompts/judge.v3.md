@@ -90,6 +90,16 @@ the body, as "Before you score", right after the opening paragraph, where
 the comment used to sit. Its history and its notes for editors were
 dropped. Comments are still stripped before sending.
 
+Changed on 2026-11-06, step B of Arthur's ruling, after the step A check
+(the old comment's scoring instructions as a "Before you score" section)
+missed: the body is the 4 Nov body again, with no engagement cap. The two
+sentences the cap brought into the engagement criterion on 2026-11-03 are
+gone, so engagement reads as it did before. The objection section still
+says to return the school's best-known objection when the argument leaves
+it unmet, and the objection voices (src/lib/judge/objection-voices.ts)
+stay. The paragraph on the concept over the vocabulary is not in the body;
+each school's criteria say it. Comments are still stripped before sending.
+
 Neither placeholder is written out in full anywhere in this comment. The
 comment is removed before the placeholders are filled, so naming one here
 would no longer reach the model, but "every judge prompt file" in
@@ -111,30 +121,6 @@ an ethics debate. A student has been assigned a school of thought and a
 motion, and has written an argument defending the motion from that school's
 perspective. Score their argument.
 
-## Before you score
-
-These hold throughout what follows.
-
-- There are three criteria, in this order of priority: fidelity, rigor and
-  engagement. Each is scored on a ten-point scale, and the composite is out
-  of a hundred.
-- Arguments come in different forms, set out under "What counts as an
-  argument" below. Form alone never lowers a score. The same section says
-  what does score low in every school.
-- Call a source fabricated only when you are confident it is. Where you are
-  not, treat it as unverified.
-- Credit the concept over the vocabulary. Each school's criteria include a
-  paragraph on what its ideas look like in plain words.
-- Each school's criteria end by naming the objection it is best known for
-  having to answer. When the argument leaves that objection unmet, it
-  should normally be the one you return as left standing.
-- When you score engagement, check that objection first. Leaving it unmet
-  holds engagement to 4 at most.
-- The rejection rule, the word caps and the revision rules below apply as
-  written, and the shape of the response format is fixed. A response that
-  breaks a word cap is discarded: watch `verdict_line` most closely, and
-  keep `improvement_note` within 40 words.
-
 Score in this order of priority:
 
 1. **Fidelity** — does the argument actually reason the way this school
@@ -144,10 +130,6 @@ Score in this order of priority:
    no unearned leaps?
 3. **Engagement** — does it anticipate and respond to the strongest
    objection a rival school would raise?
-   Check first the objection the school's criteria below name as the one
-   it is best known for having to answer. An argument that leaves that
-   objection unmet scores no more than 4 on engagement, however well it
-   answers any other.
 
 The school's specific fidelity criteria for this debate:
 
@@ -179,12 +161,6 @@ than one that reasons from a principle; an argument that cites a text is not
 less rigorous than one that does not. Do not mark an argument down for
 arguing in its school's own idiom, and do not reward the idiom of any
 particular school.
-
-Credit the concept over the vocabulary. An argument that reasons with a
-school's ideas in plain words is reasoning from that school, whether or not
-it uses the school's own terms; each school's criteria above say what its
-ideas look like without them. Never mark fidelity down for missing
-vocabulary alone.
 
 What does score low, in every school and on every axis it bears on:
 

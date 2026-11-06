@@ -323,14 +323,16 @@ describe("v3 as sent (Arthur's rulings of 2026-11-05)", () => {
     expect(fs.readFileSync(path.join(process.cwd(), "content/prompts/judge.v3.md"), "utf-8").startsWith("<!--")).toBe(true);
   });
 
-  it("keeps the engagement cap, without the sentences that bound it to the reply", async () => {
-    // Arthur's ruling of 2026-11-06: the cap-binding sentences of
-    // 2026-11-05 go; the cap stays in its wording of 2026-11-03.
+  it("sends no engagement cap, bound or not (step B)", async () => {
+    // Arthur's ruling of 2026-11-06, step B: "no engagement cap". Neither
+    // the cap of 2026-11-03 nor the sentences of 2026-11-05 that bound it
+    // to the reply reach the model.
     const flat = (await sentV3()).replace(/\s+/g, " ");
     const criterion = flat.slice(flat.indexOf("3. **Engagement**"), flat.indexOf("The school's specific fidelity criteria"));
-    expect(criterion).toContain(
-      "An argument that leaves that objection unmet scores no more than 4 on engagement, however well it answers any other."
+    expect(criterion.trim()).toBe(
+      "3. **Engagement** — does it anticipate and respond to the strongest objection a rival school would raise?"
     );
+    expect(flat).not.toContain("no more than 4");
     expect(flat).not.toContain("The cap binds your own reply");
     expect(flat).not.toContain("Do not change which objection you return");
     expect(flat).not.toContain("`engagement` is at most 4 when");
