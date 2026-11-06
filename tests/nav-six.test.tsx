@@ -240,36 +240,6 @@ describe("a build without SIX_SCHOOLS", () => {
     expect(merged).toMatch(/<section id="rubric"[^>]*><i data-tracker="section rubric"><\/i>/);
   });
 
-  it("sends rubric_viewed once, when the section first reaches the window's upper half", async () => {
-    const { watchSection } = await import("../src/components/how-it-works/RubricSectionViewTracker");
-    let fire: (entries: { isIntersecting: boolean }[]) => void = () => {};
-    const seen = { options: undefined as unknown, observed: [] as unknown[], disconnected: 0 };
-    class FakeObserver {
-      constructor(cb: typeof fire, options: unknown) {
-        fire = cb;
-        seen.options = options;
-      }
-      observe(el: unknown) {
-        seen.observed.push(el);
-      }
-      disconnect() {
-        seen.disconnected++;
-      }
-    }
-    const el = { id: "rubric" };
-    const onSeen = vi.fn();
-    const stop = watchSection(el as never, onSeen, FakeObserver as never);
-    expect(seen.observed).toEqual([el]);
-    expect(seen.options).toEqual({ rootMargin: "0px 0px -50% 0px" });
-    fire([{ isIntersecting: false }]);
-    expect(onSeen).not.toHaveBeenCalled();
-    fire([{ isIntersecting: true }]);
-    expect(onSeen).toHaveBeenCalledTimes(1);
-    expect(seen.disconnected).toBe(1);
-    stop();
-    expect(seen.disconnected).toBe(2);
-  });
-
   it("links where it always has, and lists the old pages in the sitemap", async () => {
     const { routes, sitemap } = await load("0");
     expect({ ...routes }).toEqual({
@@ -457,7 +427,26 @@ describe("a build with SIX_SCHOOLS=1", () => {
     expect(bar[2]).toContain(`${SIGNED_IN_ONLY}hidden`);
     expect(bar[2]).toContain("text-ink-mid");
     expect(bar[2].split(/\s+/).filter((c) => c === "chunky" || c === "border-2" || c.startsWith("bg-"))).toEqual([]);
+    expect(bar[2].split(/\s+/).filter((c) => /extrabold|uppercase|tracking-wide/.test(c))).toEqual([]);
     expect(html).toMatch(/>Sign in<\/a><a [^>]*href="\/quiz"[^>]*>Take the quiz<\/a>/);
+  });
+
+  // "Sign in" is in the Menu exactly where the bar's is not: the Menu, the
+  // bar and the bar's "Sign in" change at one breakpoint, or a width would
+  // have none, or two.
+  it("switches the Menu, the bar and the bar's Sign in at one breakpoint", async () => {
+    const { header } = await load("1");
+    const html = renderToStaticMarkup(createElement(header.SiteHeader)).replace(/&amp;/g, "&");
+    const menu = /<details class="([^"]*)"><summary[^>]*>Menu<\/summary>/.exec(html)![1];
+    const bar = /<nav aria-label="Main" class="([^"]*)"><a /g;
+    const navs = [...html.matchAll(bar)].map((m) => m[1]);
+    const signIn = links(html).find(([href, , cls]) => href === "/login" && cls.startsWith("hidden"))![2];
+    const at = (cls: string, what: string) => /(?:^|\s)(sm|md|lg|xl):/.exec(cls.split(/\s+/).find((c) => c.endsWith(`:${what}`)) ?? "")?.[1];
+    expect(at(menu, "hidden")).toBe("md");
+    expect(navs.map((c) => at(c, "flex")).filter(Boolean)).toEqual(["md"]);
+    expect(at(signIn, "inline-flex")).toBe("md");
+    // And the row keeps its narrow gaps up to lg, so the bar fits at md.
+    expect(html).toContain('<div class="mx-auto flex min-h-16 max-w-ui items-center gap-3 px-6 py-2 lg:gap-5">');
   });
 
   it("shows Take the quiz only signed out, and the Me menu only signed in", async () => {
@@ -478,10 +467,12 @@ describe("a build with SIX_SCHOOLS=1", () => {
     expect(html).toContain("Known limitations");
     expect(html).toContain("What counts as faithful");
     expect(html).toContain("Questions or corrections: arthur.rzhang@gmail.com");
-    // /method's closing sentence, its link now to the section here.
-    expect(html).toContain(
-      'The criteria the judge is given are published in full, including the fidelity criteria for each school. <a href="#rubric" class="font-semibold text-ink underline underline-offset-4">Read the rubric</a>.'
-    );
+    // /method's closing sentence, its link now to the section here, before
+    // "Questions or corrections", as on /method.
+    const sentence =
+      'The criteria the judge is given are published in full, including the fidelity criteria for each school. <a href="#rubric" class="font-semibold text-ink underline underline-offset-4">Read the rubric</a>.';
+    expect(html).toContain(sentence);
+    expect(html.indexOf(sentence)).toBeLessThan(html.indexOf("Questions or corrections"));
     // One h1; the merged pages' headings sit under their sections.
     expect(html.match(/<h1/g)).toHaveLength(1);
     const levels = [...html.matchAll(/<h([1-6])[^>]*>(.*?)<\/h\1>/g)].map(
@@ -677,5 +668,76 @@ describe("a build without SIX_SCHOOLS, on the pages the header's menus reach", (
     expect(html).toBe(
       '<html lang="en" class="f f f f"><head></head><body class="min-h-screen flex flex-col bg-paper text-ink"><main></main></body></html>'
     );
+  });
+});
+
+describe("rubric_viewed on /how-it-works", () => {
+  it("sends rubric_viewed once, when the section first reaches the window's upper half", async () => {
+    const { watchSection } = await import("../src/components/how-it-works/RubricSectionViewTracker");
+    let fire: (entries: { isIntersecting: boolean }[]) => void = () => {};
+    const seen = { options: undefined as unknown, observed: [] as unknown[], disconnected: 0 };
+    class FakeObserver {
+      constructor(cb: typeof fire, options: unknown) {
+        fire = cb;
+        seen.options = options;
+      }
+      observe(el: unknown) {
+        seen.observed.push(el);
+      }
+      disconnect() {
+        seen.disconnected++;
+      }
+    }
+    const el = { id: "rubric" };
+    const onSeen = vi.fn();
+    const stop = watchSection(el as never, onSeen, FakeObserver as never);
+    expect(seen.observed).toEqual([el]);
+    expect(seen.options).toEqual({ rootMargin: "0px 0px -50% 0px" });
+    fire([{ isIntersecting: false }]);
+    expect(onSeen).not.toHaveBeenCalled();
+    fire([{ isIntersecting: true }]);
+    expect(onSeen).toHaveBeenCalledTimes(1);
+    expect(seen.disconnected).toBe(1);
+    stop();
+    expect(seen.disconnected).toBe(2);
+  });
+
+  it("watches the section it is given, by id, and sends nothing before it is seen", async () => {
+    const { trackSection } = await import("../src/components/how-it-works/RubricSectionViewTracker");
+    let fire: (entries: { isIntersecting: boolean }[]) => void = () => {};
+    const observed: unknown[] = [];
+    class FakeObserver {
+      constructor(cb: typeof fire) {
+        fire = cb;
+      }
+      observe(el: unknown) {
+        observed.push(el);
+      }
+      disconnect() {}
+    }
+    const rubric = { id: "rubric" };
+    const doc = { getElementById: (id: string) => (id === "rubric" ? rubric : null) };
+    const send = vi.fn();
+    trackSection("rubric", send, doc as never, FakeObserver as never);
+    expect(observed).toEqual([rubric]);
+    expect(send).not.toHaveBeenCalled();
+    fire([{ isIntersecting: true }]);
+    expect(send).toHaveBeenCalledTimes(1);
+    // No such section, or no IntersectionObserver: nothing is watched or sent.
+    expect(trackSection("missing", send, doc as never, FakeObserver as never)).toBeUndefined();
+    expect(trackSection("rubric", send, doc as never, undefined)).toBeUndefined();
+    expect(observed).toHaveLength(1);
+    expect(send).toHaveBeenCalledTimes(1);
+  });
+
+  it("sends rubric_viewed from the component, through trackSection, for the id it is given", () => {
+    const src = fs.readFileSync(
+      path.join(process.cwd(), "src", "components", "how-it-works", "RubricSectionViewTracker.tsx"),
+      "utf8"
+    );
+    expect(src).toContain(
+      'useEffect(() => trackSection(id, () => track({ name: "rubric_viewed", props: {} })), [id]);'
+    );
+    expect(src.match(/[^.\w]track\(/g)).toHaveLength(1);
   });
 });

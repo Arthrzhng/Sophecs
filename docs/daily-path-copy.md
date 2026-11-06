@@ -530,8 +530,9 @@ his ruling with the screenshots in `docs/gate4.md`.
 | Quiet text link, beside the button | `Sign in` | `/login` |
 | Primary button | `Take the quiz` | `/quiz` |
 
-`Sign in` is Arthur's ruling of 2026-11-06 ("returning students need it,
-styled as a quiet text link beside 'Take the quiz'"). It sits beside the
+`Sign in` is Arthur's ruling of 2026-11-06: "Add a "Sign in" link to the
+signed-out header (returning students need it), styled as a quiet text
+link beside "Take the quiz". It sits beside the
 button where the four links are in the bar; where they are in the
 `Menu`, it is the `Menu`'s last item instead (below).
 

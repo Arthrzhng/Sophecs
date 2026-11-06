@@ -4722,9 +4722,9 @@ Choices made where the instruction left room, each his to change:
 - **Widths.** The header keeps to one line from 360 pixels, the
   design's phone width (`design/layout.md`), up, with nothing pushed
   sideways; below 360 the quiz button wraps. Between 640 and 768 the
-  bar's links and gaps are a little narrower, so "How it works" stays on
-  one line. Only one of Menu and Me is open at a time. (With "Sign in",
-  the bar starts at 768; below.)
+  bar's links and gaps were a little narrower, so "How it works" stayed
+  on one line; with "Sign in" the bar starts at 768 and that narrower
+  step is gone (below). Only one of Menu and Me is open at a time.
 - **Links go to the new addresses directly.** On a flag-on build every
   link inside the site that led to `/method`, `/debate/rubric` or
   `/table` leads to `/how-it-works`, its anchors, or `/schools`
@@ -4784,35 +4784,49 @@ Carried out:
 - **`.rsc`.** On a build without the flag, `/schools.rsc` and
   `/how-it-works.rsc` are rewritten with the two pages, before any file
   is looked up (`flagOffRewrites` in `next.config.ts`). After #99 they
-  answered 200 on production with a not-found payload: Vercel serves a
-  page's `.rsc` file from the build, and widens only afterFiles
-  rewrites to cover it.
+  answered 200 on production with a not-found payload: fetched from the
+  production deployment of 80b8d5b (dpl_4nX8uRi1CKXr4XxoSomo7Lg6AHpJ)
+  at 21:26 UTC, both gave status 200, `x-matched-path` their own `.rsc`
+  address, and a payload whose page segment carries the digest
+  `NEXT_HTTP_ERROR_FALLBACK;404`. Vercel serves a page's `.rsc` file
+  from the build, and widens only afterFiles rewrites to cover it
+  (`@vercel/next` 29.0.0, read by the review). `next start` serves no
+  `.rsc` address at all, so only a production deploy can show the fix.
 - **The kill-switch read** stays in `src/lib/school-table-page.ts`.
 - **"Sign in"** (`/login`), a quiet text link (the bar links' grey, no
   fill or border) just before "Take the quiz", shown only signed out.
-  Beside the button it does not fit on a phone: at 360 pixels the page
-  would scroll 36 pixels sideways, and between 640 and 719 up to 62. So
+  Beside the button it does not fit on most phones: the page would scroll
+  sideways from 320 to 413 pixels (6 at 320, 36 at 360, 21 at 375, 6 at
+  390; none from 414 to 639) and between 640 and 719 (up to 62). So
   it is beside the button wherever the four links are in the bar, and
   the Menu's last item, below a rule, wherever they are in the Menu; and
   the bar now starts at 768 (`md`) rather than 640, the Menu below it,
-  for both readers. The row's gaps stay at 12 pixels up to 1024, so the
-  signed-out bar has 18 pixels to spare at 768. Measured on a served
+  for both readers: signed in, the Menu is used from 640 to 767 too,
+  which "Sign in" does not itself need, and is kept so the two headers
+  change at one width. The row's gaps stay at 12 pixels up to 1024, so
+  the signed-out bar has 18 pixels to spare at 768. Measured on a served
   flag-on build from 320 to 1280 pixels, signed out and in: one line
   from 360 up (below it the quiz button wraps), nothing pushed sideways.
-  Where it sits on a phone is his to change.
+  Where it sits on a phone, and the bar's new width for both readers,
+  are his to change (Gate 4 item 14).
 - **The Me items** as built.
 - **The method page's closing sentence** is back at the foot of
   `/how-it-works`, before "Questions or corrections", its "Read the
   rubric" now a link to the page's own `#rubric`. Like the rubric's own
   claim, it says the judge's criteria are published in full; on a
   flag-on build the page shows v2's criteria for three schools, which is
-  Gate 4's item 10.
+  Gate 4's item 10, now naming this file. The link to `#rubric` is a
+  choice his ruling left open.
 - **`rubric_viewed`** is sent from `/how-it-works` once a page view, when
   the rubric's section first reaches the upper half of the window
   (`src/components/how-it-works/RubricSectionViewTracker.tsx`); a link
   to `#rubric` lands it there at once. Same event and properties as
   `/debate/rubric`, which counts on load; PostHog's own path tells the
-  two apart.
+  two apart. What counts as "viewed" is a choice his ruling left open.
+  Checked in a browser by the review: no event on load at the top of
+  the page (390 to 2560 pixels wide), one when the section's top passes
+  the window's middle, none after, one on landing at `#rubric`, none on
+  landing at another section.
 - **Redirects:** temporary until the launch; making them permanent (308)
   in the launch merge is on Gate 4's item 15 and the checklist in
   `docs/stage5-plan.md`.

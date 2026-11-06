@@ -194,7 +194,11 @@ the new-schools run 16 or 23 of 25, depending on item 3.
     given v3's text, for six. Change the page's claim, or the page.
     `src/app/debate/rubric/page.tsx`; with #99, the text moves to
     `src/components/how-it-works/Rubric.tsx`, shared with `/how-it-works`,
-    to which a flag-on build redirects `/debate/rubric`.
+    to which a flag-on build redirects `/debate/rubric`. The method page's
+    closing sentence, kept on `/how-it-works` by your ruling of 2026-11-06,
+    makes the same claim there ("published in full, including the
+    fidelity criteria for each school"): `src/app/how-it-works/page.tsx`
+    and `src/app/method/page.tsx`.
 11. **A floor for exemplars.** On the full dataset none of the 72 chosen
     is one the sample run wrote to be weak; on the canary's rows alone, 4
     of 70 and 6 of 40 were, marked 28 to 36. A floor on the template mark
@@ -231,8 +235,24 @@ the new-schools run 16 or 23 of 25, depending on item 3.
     Arthur's rulings on #99". The copy is `docs/daily-path-copy.md`,
     section 13, with what is new marked: the two pages' descriptions;
     `/how-it-works`' contents line and that line's spoken name "On this
-    page"; and the Exemplars link. Taken from a served SIX_SCHOOLS
-    build, with "Sign in":
+    page"; and the Exemplars link. Where the rulings left room, these
+    were chosen, each yours to change (`docs/decisions.md`, the same
+    entry):
+    - **"Sign in" on a phone** is the Menu's last item, below a rule:
+      beside the button it pushes the page sideways from 320 to 413
+      pixels (36 at 360) and from 640 to 719 (up to 62).
+    - **The bar starts at 768 rather than 640, for both readers,** so
+      that "Sign in" sits beside the button wherever the bar is shown.
+      Signed in, that means the Menu, not the bar, from 640 to 767, and
+      the row's gaps are 12 pixels rather than 20 from 768 to 1023.
+      `src/components/nav/SiteHeaderSix.tsx`.
+    - **"Viewed"** is the rubric's section first reaching the upper half
+      of the window, once a page view; a link to `#rubric` counts at once.
+      `src/components/how-it-works/RubricSectionViewTracker.tsx`.
+    - **The restored sentence's "Read the rubric"** links to the rubric's
+      section on the same page. `src/app/how-it-works/page.tsx`.
+
+    Taken from a served SIX_SCHOOLS build, with "Sign in":
 
     | | 1280 pixels | 390 pixels |
     | --- | --- | --- |

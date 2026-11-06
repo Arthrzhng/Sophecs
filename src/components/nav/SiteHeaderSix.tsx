@@ -214,6 +214,7 @@ export function SiteHeaderSix() {
         <div className="ml-auto flex items-center gap-1">
           <Link
             href={SIGN_IN.href}
+            aria-current={isActive(SIGN_IN.href) ? "page" : undefined}
             className={`${SIGN_IN_BAR} min-h-11 items-center whitespace-nowrap rounded-chunky px-2 text-sm font-semibold text-ink-mid hover:text-ink`}
           >
             {SIGN_IN.label}

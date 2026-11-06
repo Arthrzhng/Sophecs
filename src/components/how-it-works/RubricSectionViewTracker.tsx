@@ -27,11 +27,24 @@ export function watchSection(
   return () => observer.disconnect();
 }
 
+/**
+ * Watches the element with this id and calls `send` once it is seen; does
+ * nothing where there is no such element or no IntersectionObserver.
+ */
+export function trackSection(
+  id: string,
+  send: () => void,
+  doc: Pick<Document, "getElementById"> = document,
+  Observer: typeof IntersectionObserver | undefined = typeof IntersectionObserver === "undefined"
+    ? undefined
+    : IntersectionObserver
+): (() => void) | undefined {
+  const el = doc.getElementById(id);
+  if (!el || !Observer) return undefined;
+  return watchSection(el, send, Observer);
+}
+
 export function RubricSectionViewTracker({ id }: { id: string }) {
-  useEffect(() => {
-    const el = document.getElementById(id);
-    if (!el || typeof IntersectionObserver === "undefined") return;
-    return watchSection(el, () => track({ name: "rubric_viewed", props: {} }));
-  }, [id]);
+  useEffect(() => trackSection(id, () => track({ name: "rubric_viewed", props: {} })), [id]);
   return null;
 }
