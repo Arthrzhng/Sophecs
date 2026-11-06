@@ -65,18 +65,17 @@ function promptTemplateFor(version: RunnablePromptVersion): string {
   return template;
 }
 
+// Every prompt is sent exactly as read, its head comment included.
 // Arthur, 2026-11-05: "Strip comments from judge.v3.md before it is sent
-// (v3 only)." v3's head comment is the file's own history, written for
-// whoever edits it, and until now it reached the model with the rest. v1
-// and v2 come back exactly as read, and v2's request is pinned by the six
-// fixtures in tests/judge-request. Both reads above go through here, the
-// module-scope default included, so v3 is stripped whichever way it is
-// reached.
-export function asSent(version: RunnablePromptVersion, raw: string): string {
-  if (version !== "v3") return raw;
-  // The head comment and the blank lines after it; any other comment
-  // without the lines around it, so paragraphs either side stay apart.
-  return raw.replace(/^\s*<!--[\s\S]*?-->\s*/, "").replace(/<!--[\s\S]*?-->/g, "");
+// (v3 only)"; reversed on 2026-11-06: "send the old head comment again,
+// exactly as the 4 Nov prompt sent it. This reverses my ruling 12; the
+// judge evidently relies on it." Without the comment v3's strong cases
+// scored ten points lower in every check of 2026-11-06
+// (docs/decisions.md, "Judge v3: the head comment sent again, by
+// Arthur's reversal of ruling 12"). The function stays so both reads
+// above keep one place that decides what is sent.
+export function asSent(_version: RunnablePromptVersion, raw: string): string {
+  return raw;
 }
 
 // The schools an `unanswered_objection` may name, for v3's
@@ -216,8 +215,23 @@ export async function callJudgeModel(
     );
   }
 
+  // Arthur's ruling of 2026-11-05 accepts null for these two fields on an
+  // original (schema.ts), where a v3 reply sometimes carries them. The
+  // schema cannot tell an original from a revision, so on a revision (a
+  // request carrying revision context) a null is refused here, as it was
+  // before the ruling: there both fields are the verdict's answer, and
+  // production's v2 revisions stay as they were
+  // (tests/judge-null-revision-fields.test.ts). It is reported alongside
+  // whatever else the schema refused, so a log still names every failure.
+  const revisionNulls =
+    revisionOf && typeof parsed === "object" && parsed !== null && (parsed as { rejected?: unknown }).rejected === false
+      ? (["objection_answered", "improvement_note"] as const).filter(
+          (field) => (parsed as Record<string, unknown>)[field] === null
+        )
+      : [];
+
   const result = VerdictSchema.safeParse(parsed);
-  if (!result.success) {
+  if (!result.success || revisionNulls.length > 0) {
     // Name the offending field rather than dumping the whole zod issue
     // array. Word-cap breaches are the common failure here, and the raw
     // message is a multi-line JSON blob that tells neither the golden-set
@@ -228,12 +242,13 @@ export async function callJudgeModel(
     // options only; the clause is still cut, should a wording quote it
     // again: the summary is logged, and it names a field and a rule, never
     // what the judge wrote (tests/model-reply-parsing.test.ts).
-    const summary = result.error.issues
-      .map(
+    const summary = [
+      ...(result.success ? [] : result.error.issues).map(
         (issue) =>
           `${issue.path.join(".") || "(root)"}: ${issue.message.replace(/,? received '[^]*$/, "")}`
-      )
-      .join("; ");
+      ),
+      ...revisionNulls.map((field) => `${field}: null on a revision`),
+    ].join("; ");
     throw new JudgeValidationError(summary, costUsd, latencyMs);
   }
 

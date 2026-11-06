@@ -89,7 +89,7 @@ const VERSION = resolveVersion();
 // single-sample runs against a band of 8-10. Three samples and a median
 // measure the distribution instead of pretending it's a point value, at
 // three times the cost. That was about 18p a run when the set was six
-// cases; it is about $0.42 for the v2 run and $0.97 for v3 now, and the dry
+// cases; it is about $0.42 for the v2 run and $1.10 for v3 now, and the dry
 // run prints the current figure. See docs/decisions.md.
 const SAMPLES = parseSamples(process.env.GOLDEN_SAMPLES);
 
@@ -338,7 +338,7 @@ async function sampleCase(
 // obvious approach, both found in review:
 //
 // - est_in=1700 was measured for v2. v3's prompt as sent (its head comment
-//   stripped since 2026-11-05) is still larger than v2's, so a v3 run
+//   included again since 2026-11-06) is larger than v2's, so a v3 run
 //   priced at v2's figure would understate it. The difference in the size
 //   of what is sent is added at roughly four bytes a token. That is a rule of
 //   thumb rather than a count, which would need an API call.
@@ -380,8 +380,9 @@ function estimatedUsdPerCall(): {
   const outRate = one(/^const OUTPUT_COST_PER_TOKEN = ([\d_]+) \/ ([\d_]+);/, "OUTPUT_COST_PER_TOKEN");
   const rate = (m: RegExpExecArray) => int(m[1]) / int(m[2]);
 
-  // What is sent, not the file: since 2026-11-05 v3's head comment is
-  // stripped before the request is built (asSent in src/lib/anthropic.ts).
+  // What is sent, through asSent in src/lib/anthropic.ts: today the file
+  // as read for every version (v3's head comment was stripped from
+  // 2026-11-05 until ruling 12 was reversed on 2026-11-06).
   const bytes = (v: string) =>
     Buffer.byteLength(
       asSent(v as RunnablePromptVersion, fs.readFileSync(path.join(process.cwd(), "content", "prompts", `judge.${v}.md`), "utf-8"))
@@ -404,9 +405,9 @@ function estimatedUsdPerCall(): {
 // counts bytes; the criteria are almost all ASCII, so the two agree to
 // within a few tokens. Checked against the 3 Nov v3 run, which billed $0.9934:
 // without this the estimate was $0.9657, with it $0.9791, so the rest of
-// the gap is the rule of thumb itself. That run still sent v3's head
-// comment; the file-size term now counts only what is sent, so a v3
-// estimate is about 1,000 input tokens a call lower than it was then.
+// the gap is the rule of thumb itself. That run sent v3's head comment, as
+// every v3 request does again since 2026-11-06 (ruling 12 reversed); the
+// file-size term counts what is sent, so it counts the comment.
 const V2_CRITERIA_MEAN_LENGTH =
   PUBLISHED_SCHOOL_IDS.reduce((sum, id) => sum + FIDELITY_CRITERIA[id].length, 0) /
   PUBLISHED_SCHOOL_IDS.length;

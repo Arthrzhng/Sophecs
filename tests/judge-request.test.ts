@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { describe, it, expect, vi } from "vitest";
@@ -312,37 +313,70 @@ describe("v3 as sent (Arthur's rulings of 2026-11-05)", () => {
     return callJudgeModel(MOTION, "stoicism", ARGUMENT, undefined, "v3").then(() => String(created[0].system));
   }
 
-  it("leaves out the file's HTML comments", async () => {
-    // "Strip comments from judge.v3.md before it is sent (v3 only)."
+  it("sends the 4 Nov head comment, exactly as the 4 Nov prompt sent it", async () => {
+    // Arthur, 2026-11-06, reversing ruling 12 ("Strip comments from
+    // judge.v3.md before it is sent"): "send the old head comment again,
+    // exactly as the 4 Nov prompt sent it ... the judge evidently relies on
+    // it." Pinned by hash, so an edit to the comment fails here: it is part
+    // of what the judge receives again, and the golden runs scored it.
     const system = await sentV3();
-    expect(system).not.toContain("<!--");
-    expect(system).not.toContain("-->");
-    expect(system).not.toContain("v3 differs from v2");
-    expect(system.startsWith("You are a philosophy tutor")).toBe(true);
-    // The file still has its comment; only the request loses it.
-    expect(fs.readFileSync(path.join(process.cwd(), "content/prompts/judge.v3.md"), "utf-8").startsWith("<!--")).toBe(true);
+    const head = system.match(/^\s*<!--[\s\S]*?-->/)?.[0] ?? "";
+    expect(crypto.createHash("sha256").update(head, "utf-8").digest("hex")).toBe(
+      "8bb0104030af594accb291e22f146bb04ba9007772a8fec9ac1c76fdfff0ace4"
+    );
+    expect(head).toContain("v3 differs from v2 in one respect");
+    // The file is sent as read: the request's text is the file's, its
+    // placeholders filled.
+    const file = fs.readFileSync(path.join(process.cwd(), "content/prompts/judge.v3.md"), "utf-8");
+    expect(system.startsWith(head)).toBe(true);
+    expect(file.startsWith(head)).toBe(true);
   });
 
-  it("ties the engagement cap to the objection the judge returns", async () => {
-    // "Strengthen the v3 engagement-cap instruction." Pinned whole, inside
-    // the engagement criterion and in the note on the scores.
+  it("is the prompt the full run of 2026-11-06 16:58 UTC scored, byte for byte", () => {
+    // The head comment is pinned above; this pins the body too. A run
+    // file's prompt_sha256 is the hash of the raw file, and this is the one
+    // recorded by tests/judge/golden-runs/2026-11-06T16-58-30-986Z-v3.json.
+    // An edit anywhere in the file, the vocabulary paragraph included, is a
+    // change to what the judge receives and needs a new run.
+    const file = fs.readFileSync(path.join(process.cwd(), "content/prompts/judge.v3.md"), "utf-8");
+    expect(crypto.createHash("sha256").update(file, "utf-8").digest("hex")).toBe(
+      "5c0bbece85a94d6f924c8a8cf70a37db30a72c6de2777bf4cfdeb00719223856"
+    );
+  });
+
+  it("keeps the engagement cap, without the sentences that bound it to the reply", async () => {
+    // Arthur's ruling of 2026-11-06: the cap-binding sentences of
+    // 2026-11-05 go; the cap stays in its wording of 2026-11-03.
     const flat = (await sentV3()).replace(/\s+/g, " ");
     const criterion = flat.slice(flat.indexOf("3. **Engagement**"), flat.indexOf("The school's specific fidelity criteria"));
     expect(criterion).toContain(
-      "scores no more than 4 on engagement, however well it answers any other. The cap binds your own reply. " +
-        "Decide `unanswered_objection` first, as the response format below orders it, and if it is that " +
-        "best-known objection, your `engagement` " +
-        "score must be 4 or lower. Do not change which objection you return to stay under the cap."
+      "An argument that leaves that objection unmet scores no more than 4 on engagement, however well it answers any other."
     );
-    expect(flat).toContain(
-      "`engagement` is at most 4 when `unanswered_objection` is the assigned school's best-known objection, as its criteria name it."
-    );
-    // The judge writes its reply in order with no thinking step, so the
-    // objection has to come before the scores it caps.
+    expect(flat).not.toContain("The cap binds your own reply");
+    expect(flat).not.toContain("Do not change which objection you return");
+    expect(flat).not.toContain("`engagement` is at most 4 when");
+  });
+
+  it("keeps the response format's field order from before #68 (Arthur's ruling of 2026-11-05)", async () => {
+    // "#68's reordering caused it": the scores where they were, the
+    // objection last, and nothing pointing at an order.
+    const flat = (await sentV3()).replace(/\s+/g, " ");
     const shape = JSON.parse(flat.slice(flat.indexOf("```json") + 7, flat.indexOf("```", flat.indexOf("```json") + 7)));
-    const keys = Object.keys(shape);
-    expect(keys.indexOf("unanswered_objection")).toBeLessThan(keys.indexOf("score"));
-    expect(keys.indexOf("unanswered_objection")).toBeLessThan(keys.indexOf("engagement"));
+    expect(Object.keys(shape)).toEqual([
+      "rejected",
+      "rejection_reason",
+      "score",
+      "fidelity",
+      "rigor",
+      "engagement",
+      "strongest_move",
+      "weakest_move",
+      "a_stronger_version_would",
+      "verdict_line",
+      "unanswered_objection",
+    ]);
+    expect(flat).not.toContain("as the response format below orders it");
+    expect(flat).not.toContain("comes first so that it is decided before the scores");
   });
 
   it("gives Utilitarianism's Virtue Ethics voice Arthur's wording, under v3 only", () => {
@@ -374,8 +408,9 @@ describe("every judge prompt file", () => {
   // This is the test that would have caught judge.v3.md naming both of its
   // placeholders in its own header comment: the comment was then sent to
   // the model with the rest of the file, and filling a placeholder by name
-  // filled the mention instead of the placeholder. v3's comment is now
-  // stripped before filling, and this still checks the raw file.
+  // filled the mention instead of the placeholder. v3's comment is sent
+  // again since 2026-11-06 (ruling 12 reversed), so this check on the raw
+  // file is again the one that matters.
   const dir = path.join(process.cwd(), "content", "prompts");
   const versions = fs
     .readdirSync(dir)

@@ -1128,8 +1128,9 @@ judging is live.
 **The substitution had a bug, and it is worth recording because the shape
 of it will recur.** `String.prototype.replace` with a string pattern fills
 the first occurrence and says nothing about the rest. A prompt file was
-then sent to the model whole, header comment included (v3's comment is
-stripped since 2026-11-05), and `judge.v3.md` named both
+then sent to the model whole, header comment included (v3's comment was
+stripped from 2026-11-05 until ruling 12 was reversed on 2026-11-06), and
+`judge.v3.md` named both
 of its placeholders in that comment before using them. So the first naive
 `.replace("{{RUBRIC}}", criteria)` filled the mention in the comment and
 left the real placeholder standing: the model would have been asked to
@@ -4183,3 +4184,302 @@ the run wrote to be weak, but with only the canary's rows (the first 40
 accounts, after the launch teardown and before `full`) a review probe of
 the generator found 4 of 70 and 6 of 40 were, marked 28 to 36. A floor
 would leave a position out rather than show a weak argument for it.
+
+### Judge v3 after #68: two single-sample checks, and a stop (2026-11-06)
+
+Arthur's ruling of 2026-11-06: move the still-correct guidance from v3's
+stripped head comment into the body, keep stripping comments, the
+restored response order, the engagement cap and the objection voices;
+run one single-sample check; if it misses, run one single-sample check of
+the exact 4 Nov prompt, then stop and report. Eval key cap $12.00
+cumulative.
+
+The comment, sent to the model until 2026-11-05, carried one piece of
+guidance the body did not: crediting the concept over the vocabulary,
+which each school's criteria also say. It moved (fe03e1f). Everything
+else it said to the judge was already in the body; the rest was the
+file's history.
+
+| Run | Prompt | Out of band | Validation failures | Billed |
+| --- | --- | --- | --- | --- |
+| 2026-11-06T01-06-11-994Z | v3 at fe03e1f, comment stripped | 6 of 25 | 0 | $0.3230 |
+| 2026-11-06T01-08-52-100Z | the exact 4 Nov prompt (e83e0a8, sha256 61a178ca..., comment sent, the earlier Utilitarianism voice) | 2 of 25 | 0 | $0.3745 |
+
+The fixed prompt missed buddhist-intention-excuse (48, band 5-40),
+buddhist-strong (62, fidelity 7), confucian-ren-disposition (61, fidelity
+6), stoic-strong (fidelity 7), ubuntu-strong (68) and virtue-exemplar
+(68, fidelity 7). The 4 Nov prompt missed confucian-hierarchy-school (80,
+engagement 5) and stoic-analogy (fidelity 7), the first of which was out
+of band in the 4 Nov run itself; its other 23 cases sit where that run
+put them. So the model has not drifted: what moved the scores is in the
+prompt since e83e0a8. The visible symptom is engagement, whose medians on
+the strong cases ran from 4 to 7 on 4 Nov (three at 4, the other eight 5
+to 7), and which in the fixed prompt's single sample was 3 or 4 on nine
+of the eleven and 5 on the other two, taking the composite down with it.
+(Corrected on review: this first said engagement fell "from 5 to 7 on 4
+Nov to 3 or 4".) What is left between the two prompts: the cap-binding
+sentences under engagement and on the scores, the head comment no
+longer sent, and Utilitarianism's Virtue Ethics voice.
+
+The 4 Nov check ran the code at e83e0a8 in a scratch checkout, so the
+request was built exactly as then; only the local validator was zod 4
+rather than zod 3, which changes nothing that is sent. Both run files
+are in tests/judge/golden-runs. Cumulative on the eval key: $8.1681 of
+$12.00. Stopped as ruled; the full v3 run and the new-schools run were
+not started.
+
+### Judge v3: the cap-binding sentences removed, and a second stop (2026-11-06)
+
+Arthur's ruling of 2026-11-06: one single-sample check with only the
+cap-binding sentences removed, the cap kept. If the strong cases return
+to band and the hierarchy cases stay in band, the full v3 run, then Gate
+3 and the new-schools run; if the strong cases return but the hierarchy
+cases fall out, a softened cap and one more check; if the strong cases
+still miss, stop and report.
+
+The prompt (a1d2d0c on this branch) is the 4 Nov body plus the paragraph
+on crediting the concept over the vocabulary; comments stripped; the
+Utilitarianism voice of 2026-11-05.
+
+Run `2026-11-06T01-38-01-934Z-v3.json`: 25 calls, $0.3139, no validation
+failures, 7 cases out of band.
+- **Strong cases** (those whose score band starts at 60 or above): five
+  still miss. buddhist-strong 68 (70-95), confucian-ren-disposition 61
+  (65-95) with fidelity 6, stoic-strong fidelity 7, ubuntu-strong 62,
+  util-obscure-source 68. The other six are in band.
+- **Hierarchy cases:** confucian-hierarchy-school 76 (40-75), out again;
+  confucian-hierarchy 68, in.
+- Also out: buddhist-intention-excuse 44 (5-40).
+
+Engagement on the strong cases came back part of the way (util-strong 6,
+stoic-analogy 5) but the composites did not. So the cap-binding
+sentences were not the main cause. What still separates this prompt from
+the 4 Nov one that reproduces its own run is the head comment, no longer
+sent; the vocabulary paragraph, now in the body; and Utilitarianism's
+Virtue Ethics voice. The strong cases that miss are in four schools, not
+only Utilitarianism.
+
+Stopped as ruled. Cumulative on the eval key: $8.4820 of $12.00. The full
+v3 run, Gate 3 and the new-schools run were not started.
+
+
+### Judge v3: the 4 Nov head comment sent again, one check (2026-11-06)
+
+Arthur, 2026-11-06, asked whether to spend about $0.37 on one check with
+the head comment sent again: "Do what you need to".
+
+The check sent the head comment exactly as it stood on 4 Nov (e83e0a8),
+then the body exactly as it stands at ae82585 on this branch: the 4 Nov
+body plus the paragraph on crediting the concept over the vocabulary, the
+cap-binding sentences removed, the cap kept, the Utilitarianism voice of
+2026-11-05. Only the comment differs from the check of 01:38 UTC. It ran
+from a scratch copy whose `asSent` returned v3 unstripped; nothing of
+that copy is committed, and this branch still strips comments.
+
+Run `2026-11-06T06-05-12-649Z-v3.json`: 26 calls (one reply failed
+validation and passed on its retry), $0.3960, 2 of 25 cases out of band,
+the same two the exact 4 Nov prompt missed: confucian-hierarchy-school
+(80, engagement 5), out of band in the 4 Nov run itself, and
+stoic-analogy (fidelity 7, score 70 in band). Every strong case is back
+in band, and 17 of the 25 cases score exactly what the exact 4 Nov
+prompt gave them. Against the check with the comment stripped:
+buddhist-strong 80 (was 68), confucian-strong 86 (72), util-obscure-source
+83 (68), virtue-exemplar 80 (70), ubuntu-strong 72 (62).
+
+So the head comment is what separates the two prompts. The vocabulary
+paragraph and the Utilitarianism voice are not the cause. The comment
+says nothing addressed to the judge, but sending it moves the strong
+cases' engagement up by one or two and their composites by about ten.
+Which of its paragraphs does this is not known: it describes the body
+(form alone never lowers a score; the criteria, scale and composite
+unchanged from v2), restates the engagement cap's history, and calls the
+file a draft to run the golden set against.
+
+Sending it again would reverse Arthur's ruling of 2026-11-05 ("strip
+comments from judge.v3.md before it is sent"), and finding which part
+carries the effect costs more checks than the cap leaves room for beside
+the full v3 run and the new-schools run. Both are his: stopped here and
+put to him. Cumulative on the eval key: $8.8780 of $12.00. The full v3
+run, Gate 3 and the new-schools run were not started.
+
+### Judge v3: steps A and B, both missed, and a stop (2026-11-06)
+
+Arthur, 2026-11-06, after the check of 06:05 UTC: "The old head comment
+is what matters. Proceed under A without stopping: Move every scoring
+instruction in that comment into the prompt body as explicit text (no
+hidden comment), keeping comments stripped. Drop only history and
+anything contradicting current criteria. ... Single-sample check of that
+prompt. If strong cases are in band: full v3 run, then Gate 3 and the
+new-schools run, then Gate 4. If it misses: go to step B (4 Nov prompt +
+objection voices + report-the-known-objection, no engagement cap) ... If
+B misses: stop. Cap $12.00 cumulative." The earlier message it refers to
+never reached this session; both steps were carried out from this one.
+
+**Step A (7687392).** A "Before you score" section after the opening
+paragraph, where the comment used to sit, carrying every scoring
+instruction the 4 Nov comment held, as instructions:
+- three criteria in order of priority, each out of ten, the composite
+  out of a hundred;
+- arguments come in different forms; form alone never lowers a score;
+  the same section says what scores low in every school;
+- call a source fabricated only when confident, unverified otherwise;
+- credit the concept over the vocabulary;
+- the school's best-known objection, named at the end of its criteria,
+  is normally the one returned when the argument leaves it unmet;
+- check that objection first when scoring engagement; leaving it unmet
+  holds engagement to 4 at most;
+- the rejection rule, word caps and revision rules as written, the
+  response format's shape fixed, a response breaking a word cap
+  discarded, `verdict_line` watched most closely, `improvement_note`
+  within 40 words.
+
+Dropped as history or notes for editors: that v3 differs from v2 in
+interpolating the rival schools, and why; that the JSON example no
+longer names a school; the dated change notes; that the criteria are
+Arthur's to write; the placeholder note; and "v3 is not the production
+default ... a draft to run the golden set against", which becomes false
+at launch. Nothing in the comment contradicted the criteria.
+
+Run `2026-11-06T15-51-54-644Z-v3.json`: 25 calls, $0.3367, 9 of 25 out
+of band. The strong cases fell further than without the section:
+buddhist-strong 61, confucian-ren-disposition 58, util-named-text 68,
+util-obscure-source 69, virtue-exemplar 68, ubuntu-strong 68, and
+engagement 3 on most of them.
+
+**Step B (02d01a0).** The 4 Nov body exactly, comments stripped, less the
+two sentences the cap of 2026-11-03 brought into the engagement
+criterion, so engagement reads as it did before the cap. The objection
+section's instruction to return the known objection stays; the voices
+are the code's (`src/lib/judge/objection-voices.ts`). Comments were kept
+stripped, as in step A: the 4 Nov comment restates the cap, which step B
+removes.
+
+Run `2026-11-06T15-55-59-122Z-v3.json`: 25 calls, $0.3086, 7 of 25 out
+of band: buddhist-intention-excuse 44 (5-40), buddhist-strong 61,
+confucian-hierarchy-school 78, confucian-ren-disposition 58, stoic-analogy
+fidelity 7, stoic-strong fidelity 7, util-obscure-source 68.
+
+Stopped as ruled. The full v3 run, Gate 3, the new-schools run and Gate 4
+were not started.
+
+What the six checks of the day show, taken together: with the 4 Nov head
+comment sent, the strong cases score as on 4 Nov (06:05 UTC, 2 out);
+without it they miss, whether its instructions are in the body (step A,
+9 out), the body is exactly 4 Nov's with no cap (step B, 7 out), or
+anything between (00:01, 01:06 and 01:38 UTC, 6 or 7 out). The first of
+those, at 00:01 UTC (`2026-11-06T00-01-04-700Z-v3.json`, $0.3185, the
+order of before #68 restored, f983066), missed buddhist-intention-excuse
+48, buddhist-strong 62, confucian-hierarchy fidelity 6,
+confucian-ren-disposition 61, stoic-strong fidelity 7, util-named-text
+64 and util-obscure-source 68. What lifts the scores is the comment
+itself, its history and framing included, and not any instruction in it.
+
+Cumulative on the eval key: $9.5233 of $12.00, over the 15 run files on
+this branch.
+
+### Judge v3: the head comment sent again, by Arthur's reversal of ruling 12 (2026-11-06)
+
+Arthur, 2026-11-06: "Judge prompt (b): send the old head comment again,
+exactly as the 4 Nov prompt sent it. This reverses my ruling 12; the
+judge evidently relies on it. Keep everything else in current v3 (field
+order, engagement cap, objection voices, the moved section if it doesn't
+conflict; if in doubt, drop the moved section, since the comment covers
+it). Record the reversal in docs/decisions.md. Then: single-sample check.
+If strong cases are in band: full v3 run, then Gate 3 and the
+new-schools run, then Gate 4. If it misses, stop and report. Eval cap
+raised to $15.00 cumulative; keep the watchdog armed."
+
+And, for the record of the step A/B plan that never reached this
+session: "A = move the comment's scoring guidance into the body (done,
+missed); B = 4 Nov prompt + objection voices + reporting the known
+objection, no engagement cap. Use B only if the check above misses
+because of the cap."
+
+**Ruling 12 reversed.** Ruling 12 (2026-11-05, "Strip comments from
+judge.v3.md before it is sent (v3 only)") is reversed. `asSent` in
+`src/lib/anthropic.ts` (frozen; this ruling is the authority) sends every
+prompt exactly as read, as it did before 2026-11-05.
+
+**The prompt.** `content/prompts/judge.v3.md` is the 4 Nov head comment,
+byte for byte as e83e0a8 has it, then the body as it stood at a1d2d0c:
+the field order from before #68, the engagement cap in its wording of
+2026-11-03 without the cap-binding sentences, and the paragraph on the
+concept over the vocabulary. The objection voices are the code's. The
+file's sha256 begins `5c0bbece85a94d6f`, the same as the check of 06:05
+UTC, so this is the prompt that check scored.
+
+**Dropped:** the "Before you score" section of step A. It restates the
+comment's instructions, and with it the strong cases scored lower (step
+A, 9 of 25 out), so it is in doubt in the ruling's sense and the comment
+covers it. **Kept, though moved:** the vocabulary paragraph, which was
+in the body in the 06:05 check that passed.
+
+**What the file no longer carries.** The head comment is the 4 Nov text,
+so the notes written into it since (the changes of 2026-11-05 and
+2026-11-06) are not in the file. They are in this file's entries:
+"Judge v3 after #68: two single-sample checks, and a stop", "Judge v3:
+the cap-binding sentences removed, and a second stop", "Judge v3: the
+4 Nov head comment sent again, one check" and "Judge v3: steps A and B,
+both missed, and a stop". The comment itself says v3 "is not the
+production default" and is "a draft to run the golden set against",
+which become false at launch; that is part of what the judge is sent,
+and is listed for Gate 4. Two more of its statements are already out of
+date, found on review: it says the paragraph crediting the concept over
+the vocabulary "lives with the criteria, not in this file", while this
+file's body now carries one, and it names `fillOnce`, which `src/` no
+longer has. Both are sent exactly as written, by the ruling, and are
+listed for Gate 4 with the others.
+
+**The check's rule.** "Strong cases in band" is read as: every one of
+the eleven strong cases (score band from 60 up) has its score in band,
+and none has fidelity more than a point under its band. A single sample
+of a case whose accepted median is in band can fall a point short:
+stoic-analogy's three samples in the accepted 4 Nov run had fidelity 8,
+7 and 8. The full run, on the median of three, is the test.
+
+**The check (16:55 UTC).** Run `2026-11-06T16-55-51-296Z-v3.json`, prompt
+sha256 `5c0bbece85a94d6f...`: 25 calls, $0.3794, 2 of 25 out of band, the
+same two as the 06:05 check and the exact 4 Nov prompt:
+confucian-hierarchy-school (83, engagement 6) and stoic-analogy
+(fidelity 7, score 71 in band). Every strong case's score is in band, and
+the one fidelity a point under its band is stoic-analogy's: under the
+rule above, the strong cases are in band, so the full run followed.
+
+**The full v3 run (16:58 UTC).** Run `2026-11-06T16-58-30-986Z-v3.json`,
+three samples a case: 77 calls (two replies failed validation and passed
+on their retries), $1.1677. On the pass test, the median of three on
+every axis with a band:
+- 23 of 25 cases pass.
+- `confucian-hierarchy-school` fails: 82/83/83 against 40-75, engagement
+  5/6/6 against 0-4. It has failed in every run that sent the 4 Nov
+  comment (the 4 Nov run itself, 80, and the checks of 01:08, 06:05 and
+  16:55, at 80 to 83 with engagement 5 or 6), and it was in band in three
+  runs that sent none: 22:08 on 5 Nov (72, engagement 3), and the checks
+  of 00:01 (74, engagement 4) and 01:06 (71, engagement 3) on 6 Nov. So
+  sending the comment again brings the strong cases back and takes this
+  case out of band again, the case #68's cap was written to hold. (On
+  review this line first said it fails "as in every run that has had it",
+  which those three runs contradict.)
+- `stoic-analogy` fails on fidelity: 7/7/7 against 8-10, with its score
+  in band (69/71/71). On 4 Nov it was 8/7/8, a pass.
+- The mean of the 25 medians is 55.0, against 54.7 on 4 Nov. Of the
+  eleven strong cases' median scores, nine are as on 4 Nov or higher
+  (buddhist-strong 78 to 83, stoic-strong 70 to 78,
+  confucian-ren-disposition 78 both times) and two lower:
+  stoic-analogy 78 to 71 and util-obscure-source 83 to 80, both still in
+  band. (Corrected on review: this first said the strong
+  cases all scored as on 4 Nov or higher.)
+
+So the full run passes but for those two, one known since 3 Nov and one
+a fidelity point short on a case that passed on 4 Nov. The prompt's one
+difference in body from the 4 Nov prompt is the paragraph on the concept
+over the vocabulary, kept because the 06:05 check that passed had it;
+the ruling's "if in doubt, drop the moved section" would also cover
+dropping it, at the cost of another full run (about $1.17). Both go to
+Arthur with the Gate 4 pack, with the trade-off above: no prompt tried so
+far has had the strong cases and `confucian-hierarchy-school` in band
+together. Gate 3 and the new-schools run go ahead as
+ruled.
+
+Cumulative on the eval key: $11.0704 of $15.00, over the 17 run files on
+this branch.

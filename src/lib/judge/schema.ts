@@ -66,10 +66,26 @@ export const VerdictSchema = z.discriminatedUnion("rejected", [
     }),
     // Present only on a revision (Task 2). Optional so an original's
     // verdict validates without them.
-    objection_answered: z.boolean().optional(),
+    //
+    // null is accepted on an original and treated as absent (Arthur's
+    // ruling of 2026-11-05, under (b)): in the v3 run of 22:08 UTC, 31
+    // replies to originals carried both fields as null and were refused,
+    // losing two samples. The schema cannot tell an original from a
+    // revision, so callJudgeModel (src/lib/anthropic.ts) refuses a
+    // revision's null after this runs, with whatever else this refused, as
+    // it was refused before the ruling. The transform leaves the key in the parsed verdict with the
+    // value undefined, which JSON.stringify drops, so what is stored is the
+    // same as for a reply that omitted it.
+    objection_answered: z
+      .boolean()
+      .nullable()
+      .transform((v) => v ?? undefined)
+      .optional(),
     improvement_note: z
       .string()
       .refine(maxWords(40), "improvement_note exceeds 40 words")
+      .nullable()
+      .transform((v) => v ?? undefined)
       .optional(),
   }),
 ]);
