@@ -13,8 +13,8 @@ Eval key spend is kept as a running total against Arthur's cumulative
 cap: $4.80 in the brief of 2026-11-03, raised to $8.00 by his ruling of
 the same evening (recorded in `docs/decisions.md`, "Arthur's rulings of
 2026-11-03 on the Stage 1 miss"), to $12.00 by his ruling of
-2026-11-06 on the v3 checks, "Cap $12.00 cumulative." (`docs/decisions.md`,
-"Judge v3 after #68: two single-sample checks, and a stop"), and to
+2026-11-06 on steps A and B, "Cap $12.00 cumulative." (`docs/decisions.md`,
+"Judge v3: steps A and B, both missed, and a stop"), and to
 $15.00 by his reversal of ruling 12 the same day, "Eval cap raised to
 $15.00 cumulative" (`docs/decisions.md`, "Judge v3: the head comment sent
 again, by Arthur's reversal of ruling 12"). The total is the sum of
@@ -796,8 +796,9 @@ deploy below was read from Vercel as Ready.
   Ready.
 - #97 merged as `cd49c49`: Gate 3. A SIX_SCHOOLS build judges all six
   with v3; production is unchanged. The new-schools run of 18:14 UTC: 23
-  of 25 in every band; 16 or 23 of 25 on the objection, depending on
-  whether the voices the flag-on prompt names count. Three review passes.
+  of 25 in every band; counting the objection, 16 or 23 of 25 pass in
+  full, depending on whether the voices the flag-on prompt names count.
+  Three review passes.
   Deploy `dpl_CC7xqkvxjH3nsmsUC9sr4GKLZvvR`, Ready.
 - Eval key spend is now **$12.2431 of $15.00**, over the 18 run files.
 - Sample activity: the first run after the 06:00 cutover, Actions run
