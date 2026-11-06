@@ -4566,7 +4566,10 @@ flag-on build sends.
 the 16:58 full run, sha256 `5c0bbece85a94d6f...`), three samples a case,
 all 25 cases, the live three's included since their requests change too.
 77 calls (two replies failed validation and passed on their retries),
-$1.1727, under a watchdog set to stop at $1.80. Cumulative on the eval
+$1.1727, under a watchdog set to stop at $1.80 (armed from outside the
+repository: it reads the run file's total every two seconds and stops the
+runner at the limit; its log ended "runner finished; last total
+$1.17267"). Cumulative on the eval
 key: $12.2431 of $15.00, over the 18 run files.
 - **Bands, median of three:** 23 of 25 cases in every band, and the two
   that miss are the two the flag-off run of 16:58 missed.
@@ -4582,10 +4585,12 @@ key: $12.2431 of $15.00, over the 18 run files.
   `fabricated-source` (Stoicism), and for `confucian-hierarchy`,
   `confucian-ren-disposition` and `confucian-wrong-school` (Confucianism);
   `confucian` for `buddhist-wrong-school`. Counting the voices the prompt
-  names, 23 of 25 pass, the same two as above. Three wrong-school cases
-  also drew one objection in three from a school neither reading expects
-  (`confucian` for Utilitarianism and for Virtue Ethics, `virtue-ethics`
-  for Confucianism), a minority that fails neither.
+  names, 23 of 25 pass, the same two as above. (The objection check on
+  its own passes 17 of 25 on the fixtures' sets and 25 with the named
+  voices; 16 and 23 are whole-case passes.) Two wrong-school cases also
+  drew one objection in three from a school neither reading expects
+  (`confucian` for Utilitarianism and for Virtue Ethics), a minority that
+  fails neither. 72 of the 75 objections were a voice the prompt names.
 - **Scores:** the mean of the 25 medians is 54.76, against 55.00 at
   16:58. Every strong case's score is in band; against 16:58 four are
   higher, four the same and three lower (buddhist-strong 83 to 80,
@@ -4631,5 +4636,7 @@ key: $12.2431 of $15.00, over the 18 run files.
   Whether the named voices count is Arthur's: the new-schools run passes
   16 of 25 if they do not, and 23 of 25 if they do.
 - The new-schools run's two misses, the same as the flag-off run's: the
-  hierarchy case (closer with six rivals, its engagement now in band, its
-  score 78 against 75) and stoic-analogy's fidelity.
+  hierarchy case (closer in this run, its engagement in band, its score
+  78 against 75; its objection was `utilitarianism` three times in both
+  runs, so the added Ubuntu voice does not show in it) and stoic-analogy's
+  fidelity.

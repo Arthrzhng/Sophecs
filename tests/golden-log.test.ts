@@ -254,6 +254,9 @@ describe("requestFingerprint", () => {
     expect(runner).toContain("rivalSchools: SIX_SCHOOLS_RUN ? SHOWN_SCHOOL_IDS : undefined,");
     expect(runner).toContain("const SIX_SCHOOLS_RUN = parseSixSchools(process.env.SIX_SCHOOLS);");
     expect(runner).toContain("sixSchools: SIX_SCHOOLS_RUN,");
+    // And a flag-on run of any other version refuses: it would bill a run
+    // marked -six whose requests are a flag-off build's.
+    expect(runner).toContain('if (SIX_SCHOOLS_RUN && VERSION !== "v3") {');
   });
 
   it("hashes the prompt rather than storing it", () => {

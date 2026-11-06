@@ -136,8 +136,9 @@ export async function callJudgeModel(
   // flag-on build (Gate 3) they have criteria through rubric.ts, so this is
   // refused for them as for a published school. Neither the file nor the
   // runner's loader is named here: a confinement test fails on any mention
-  // of either anywhere in src/ but the flag-on loader, comments included,
-  // so that a read cannot hide inside something that looks like a comment.
+  // of the file anywhere in src/ but the flag-on loader, and of the
+  // runner's loader anywhere in src/, comments included, so that a read
+  // cannot hide inside something that looks like a comment.
   //
   // It can only fill a gap, never replace live criteria. A school that has
   // criteria in rubric.ts is always judged against them, and passing this
