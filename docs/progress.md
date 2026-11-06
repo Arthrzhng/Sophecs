@@ -13,9 +13,9 @@ Eval key spend is kept as a running total against Arthur's cumulative
 cap: $4.80 in the brief of 2026-11-03, raised to $8.00 by his ruling of
 the same evening (recorded in `docs/decisions.md`, "Arthur's rulings of
 2026-11-03 on the Stage 1 miss"), to $12.00 by his ruling of
-2026-11-06 after #68 ("Eval key cap $12.00 cumulative.", recorded in
-`docs/decisions.md`, "Judge v3 after #68: two single-sample checks, and a
-stop", and restated in his ruling on steps A and B), and to
+2026-11-06 after #68 (`docs/decisions.md`, "Judge v3 after #68: two
+single-sample checks, and a stop"), restated in his ruling on steps A and
+B as "Cap $12.00 cumulative.", and to
 $15.00 by his reversal of ruling 12 the same day, "Eval cap raised to
 $15.00 cumulative" (`docs/decisions.md`, "Judge v3: the head comment sent
 again, by Arthur's reversal of ruling 12"). The total is the sum of

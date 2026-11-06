@@ -1,10 +1,10 @@
 # Gate 4
 
 Written on 2026-11-06, after the full v3 run, Gate 3 and the new-schools
-run, as Arthur's ruling of that day ordered: "full v3 run, then Gate 3
-and the new-schools run, then Gate 4." Gate 4 is the launch of the six
-schools; at Checkpoint B he said "not yet. Bring me Gate 4 once the golden
-runs pass." Every open item below is yours to decide, Arthur, except the list
+run, as your ruling of that day ordered: "full v3 run, then Gate 3 and
+the new-schools run, then Gate 4." Gate 4 is the launch of the six
+schools; at Checkpoint B you said "not yet. Bring me Gate 4 once the
+golden runs pass." Every open item below is yours to decide, Arthur, except the list
 under Housekeeping, which is mine. Each names the file it lives in.
 Nothing here is decided by being written down.
 
@@ -62,14 +62,19 @@ the new-schools run 16 or 23 of 25, depending on item 3.
    `tests/judge/golden/confucian-hierarchy-school.json`,
    `content/prompts/judge.v3.md`.
 2. **`stoic-analogy`'s fidelity.** 7/7/7 at 16:58 and 7/8/7 at 18:14,
-   against 8-10; its score in band both times. It passed on 4 Nov (8/7/8).
-   The one difference in body from the 4 Nov prompt is the paragraph
-   crediting the concept over the vocabulary, kept because the 06:05
-   check that passed had it; your ruling's "if in doubt, drop the moved
-   section" would also cover dropping it, at the cost of another full run:
-   25 cases, three samples, 75 calls (77 with retries at 16:58), about
-   $1.17, against $2.76 left under the $15.00 cap. Accept, or drop it and
-   rerun (d). `content/prompts/judge.v3.md`.
+   against 8-10; its score in band both times. It passed on 4 Nov (8/7/8,
+   a median of exactly 8). The one difference in body from the 4 Nov
+   prompt is the paragraph crediting the concept over the vocabulary,
+   kept because the 06:05 check that passed had it; your ruling's "if in
+   doubt, drop the moved section" would also cover dropping it, at the
+   cost of another full run: 25 cases, three samples, 75 calls (77 with
+   retries at 16:58), about $1.17, against $2.76 left under the $15.00
+   cap. But the exact 4 Nov prompt, without that paragraph, was run again
+   at 01:08 on 6 Nov and gave this case fidelity 7 as well
+   (`2026-11-06T01-08-52-100Z-v3.json`), and the same guidance stays in
+   the head comment and in each school's criteria. So a rerun without the
+   paragraph is not likely to move it. **I would accept it as a known
+   miss.** `content/prompts/judge.v3.md`.
 3. **Which objections count on a flag-on run.** Each golden fixture's
    expected objection schools were written for three rivals. On a
    flag-on build the prompt names, from the approved voices in
@@ -97,7 +102,10 @@ the new-schools run 16 or 23 of 25, depending on item 3.
    (26 Oct) and v3 $0.01519 (16:58; $0.01533 in the flag-on run). So the
    20-call daily ceiling, about $0.20 a reader a day under v2, becomes
    about $0.30, and the $50 monthly budget, which pauses judging when
-   spent, covers about 40% fewer calls: some 3,300 rather than 5,600.
+   spent, covers about 40% fewer calls: some 3,300 rather than 5,600, a
+   little fewer still since screening calls are paid from the same budget.
+   (On the measured v2 figure the ceiling is about $0.18 now; the $0.20
+   is the COST comment's estimate.)
    Spending (d), alongside the yes to v3.
 5. **Verdicts already stored under v2.** After launch a revision of a v2
    original is judged under v3. The verdict page shows the revision's
@@ -107,10 +115,14 @@ the new-schools run 16 or 23 of 25, depending on item 3.
    the change, so all of them would compare across versions; Elo and a
    topic's par would take v3 scores beside v2 ones. The rule in
    `docs/decisions.md` is that scores across versions are not compared as
-   equivalent. The only measure of the gap is from 26 Oct, when v3 scored
-   the strong and exemplar cases 3 to 13 points above v2 ("2F: Arthur's rulings of
-   2026-10-26, on the golden runs"), and that was a v3 prompt since
-   replaced: no run has compared v2 with the prompt that would launch.
+   equivalent. How big the gap is can be read from the run files already
+   committed: the v2 run of 26 Oct used today's `judge.v2.md`, and the
+   16:58 run today's `judge.v3.md`. On the 13 live cases whose arguments
+   have not changed since (all but `stoic-analogy`), v3's median score is
+   0 to 12 points above v2's, and the same 0 to 12 on the six strong
+   cases among them (`util-obscure-source` +12, `virtue-exemplar` +10,
+   `stoic-strong` +8). The two runs are eleven days apart on the same
+   model id.
    Options: (i) accept it; (ii) show no score change, in any of those
    places, when the two verdicts' versions differ, and leave Elo and par
    as they are; (iii) something else you rule. **I would take (ii).**
@@ -137,14 +149,18 @@ the new-schools run 16 or 23 of 25, depending on item 3.
      "is not the production default" and "a draft to run the golden set
      against"; that the vocabulary paragraph "lives with the criteria,
      not in this file" (the body carries one); and it names `fillOnce`,
-     which `src/` no longer has.
+     which `src/` no longer has. Rewording it changes what the judge
+     receives, (b), and so needs a full run, (d): the comment is what
+     moved the strong cases by about ten points (the 06:05 check), and a
+     run costs about $1.17 of the $2.76 left.
    - `content/prompts/fidelity-criteria.draft.md`, its header: "NOT
      LOADED BY ANYTHING IN PRODUCTION" and that `hasFidelityCriteria`
      returns false for the three (untrue at launch), and "One thing reads
      this file: the golden runner" (untrue on a flag-on build since
      Gate 3).
-   - `src/lib/anthropic.ts`, the judge's COST comment: `est_in=1700` and
-     `est_usd_per_call=0.0098` were measured for v2 (item 4).
+   - `src/lib/anthropic.ts`, the judge's COST comment, which describes
+     what a call costs rather than what is sent: `est_in=1700` and
+     `est_usd_per_call=0.0098` were written for v2 (item 4).
 
 ## Content and philosophy: (e)
 
@@ -177,7 +193,8 @@ the new-schools run 16 or 23 of 25, depending on item 3.
     published three. On a flag-on build, and so at launch, the judge is
     given v3's text, for six. Change the page's claim, or the page.
     `src/app/debate/rubric/page.tsx`; with #99, the text moves to
-    `src/components/how-it-works/Rubric.tsx`, shared with `/how-it-works`.
+    `src/components/how-it-works/Rubric.tsx`, shared with `/how-it-works`,
+    to which a flag-on build redirects `/debate/rubric`.
 11. **A floor for exemplars.** On the full dataset none of the 72 chosen
     is one the sample run wrote to be weak; on the canary's rows alone, 4
     of 70 and 6 of 40 were, marked 28 to 36. A floor on the template mark
@@ -199,7 +216,7 @@ the new-schools run 16 or 23 of 25, depending on item 3.
     The generator's schools are the quiz's (`scripts/seed/banks.ts`,
     `SCHOOLS = QUIZ_SCHOOLS`), and it replays v1's quiz
     (`docs/sample-activity.md`). So the launch week's table would rank the
-    three on sample activity and show the new three unranked under the
+    original three on sample activity and show the new three unranked under the
     20-argument rule, and the exemplars pages would show three schools.
     Samples for the new three need new argument banks, which are content.
     Rule whether the run should cover them.

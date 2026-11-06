@@ -4610,7 +4610,7 @@ key: $12.2431 of $15.00, over the 18 run files.
   computes its own from the two stored verdicts and shows it, so both
   would cross two prompt versions; Elo and a topic's par would take v3
   scores beside v2 ones. The 26 Oct comparison found v3 scoring the
-  strong cases 3 to 13 higher, with a v3 prompt since replaced ("2F:
+  strong and exemplar cases 3 to 13 higher, with a v3 prompt since replaced ("2F:
   Arthur's rulings of 2026-10-26, on the golden runs"), and this file's
   rule is that scores across versions are not compared as equivalent.
   (Corrected on review of the Gate 4 pack: this first cited the 3 Nov
