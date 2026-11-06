@@ -551,9 +551,8 @@ export function Verdict({
         {!sample && (
           <ShareRow debateId={debateId} topicSlug={topicSlug} score={verdict.score ?? 0} shareLine={shareLine} />
         )}
-        {/* After the reader's own argument, not before it, so the
-            exemplars are something to compare against rather than copy
-            (Arthur, 2026-11-06; src/app/debate/[slug]/exemplars/page.tsx). */}
+        {/* The motion's exemplars (src/app/debate/[slug]/exemplars/page.tsx),
+            offered on a reader's own verdict, to compare against. */}
         {isOwner && !sample && (
           <p className="mt-6">
             <TextLink href={`/debate/${topicSlug}/exemplars`}>Exemplar ways to argue this motion</TextLink>

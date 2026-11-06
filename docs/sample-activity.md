@@ -37,7 +37,7 @@ messaging, so a sample account is seen in fewer places than the word
 | its card (`opengraph-image`, `card.png`) | anyone shown the link | A "Sample" mark above the quotation. |
 | `/c/<id>` (challenge) | anyone with the link | The Sample label, "A sample account's challenge"; "Take the quiz" goes to `/quiz` without accepting it. Page title "A sample account's challenge". |
 | its link preview | anyone shown the link | The challenger's result card (`/r/<id>/opengraph-image`) with its "Sample" mark; no image if the challenger's result is not a sample, or if the card's lookup fails. |
-| `/debate/<slug>/exemplars` | anyone; linked from the landing page's motion and from a reader's own verdict | Up to 50 sample arguments on the motion under the heading "Exemplar ways to argue this motion", which says what they are in place of a label on each (Arthur, 2026-11-06). Sample accounts' arguments only, no scores, no link to a sample's verdict. |
+| `/debate/<slug>/exemplars` | anyone; linked from the landing page's motion and from a reader's own verdict | Up to 50 sample arguments on the motion under the heading "Exemplar ways to argue this motion", which says what they are in place of a label on each (Arthur, 2026-11-06). Published sample arguments only, no scores, no link to a sample's verdict. A genuine page: no `SamplePageMarker`, so its views reach PostHog. |
 | `/class/<code>` | the class owner only | Never a sample: a reader's class cannot hold one, and the page leaves out any sample member whatever the data says. |
 | `/counterpart/<id>` | the two participants only | Sample exchanges are between sample accounts only. |
 | `/me` | the reader only | Nothing of a sample's. |
@@ -464,6 +464,11 @@ sample teardown and a fresh run into the launch steps". In order:
    that (the addresses are on `sophecs.test` and the users are banned),
    and changing it for the live run would break its spot checks, so it
    waits for the fresh run.
+
+Between steps 1 and 3, `/debate/<slug>/exemplars` has no sample
+arguments to show and is not found; the landing page's and verdicts'
+links to it lead there. It fills again, within the hour, once the fresh
+run's `full` stage has written.
 
 ## Stop conditions
 

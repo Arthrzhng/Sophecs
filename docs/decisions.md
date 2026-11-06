@@ -4106,31 +4106,45 @@ the ties, and a hash of every pattern's result in order.
 
 Arthur, 2026-11-06, choosing among headings put to him for showing sample
 accounts' arguments to visitors: "Please could you do exemplar", then "Do
-exemplar and do like 50 exemplars".
+exemplar and do like 50 exemplars". The heading and the count are his;
+where the page is linked from is mine, and his to move.
 
 `/debate/<slug>/exemplars` shows, under the heading "Exemplar ways to
 argue this motion", up to 50 of the strongest sample arguments on that
-motion, shared evenly across the schools (17, 17 and 16 with three),
-grouped by school, each opening from its first sentence to its full text.
-The heading says what they are, in place of the "Sample" label on each
-item that the ruling of 2026-11-04 put on every other surface a sample
-appears: these are examples, and the heading does not claim anyone wrote
-them. Three things keep it that way:
-- **Sample accounts' arguments only.** `src/lib/exemplars.ts` reads
-  `is_sample` rows and refuses any other; a real reader's argument is
+motion (highest template mark first), shared evenly across the schools
+(17, 17 and 16 with three), grouped by school, each opening from its
+first sentence to its full text. The heading says what they are, in
+place of the "Sample" label on each item that the ruling of 2026-11-04
+put on every other surface a sample appears: these are examples, and the
+heading does not claim anyone wrote them. Three things keep it that way:
+- **Sample accounts' published arguments only.** `src/lib/exemplars.ts`
+  reads `is_sample` rows whose sample author published the argument
+  (`argument_public`), as a sample's own verdict page shows only those,
+  and refuses any row that is not a sample's. A real reader's argument is
   theirs and public only if they publish it.
 - **No scores.** The samples' marks were written from templates, not by
   the judge, so showing them would present a template as the judge's
   verdict.
-- **No link to a sample's own pages**, which keep their labels.
+- **No link to a sample's own pages**, which keep their labels. Items are
+  keyed by position, so no sample debate's id is in the page.
 
-The page is public and rebuilt at most hourly. It is linked from the
-landing page's "A motion you could argue" and from a reader's own
-verdict, after they have argued. Not from the motion's own page, where a
-reader writes theirs: 50 finished arguments there would invite copying
-one in to be judged.
+The page is public, built on first request and then at most hourly. A
+failed database read is thrown, so a built page keeps serving rather than
+being replaced by an empty one; a motion with no sample arguments, as
+after the launch teardown until a fresh run, is not found. It is linked
+from the landing page's "A motion you could argue" and from a reader's
+own verdict. The motion's own page, where a reader writes theirs, is left
+as it was. It is a genuine page, not a sample's: it renders no
+`SamplePageMarker`, so its page views reach PostHog like any other page's.
+
+Open, put to Arthur with the pull request: the sample run writes about
+six distinct opening sentences per school per motion, so 50 arguments
+repeat their openings heavily (four distinct ones among a school's top
+17 on `opaque-benefit`); and about 8% of sample originals carry
+deliberate typos (`withTypos`), which an "exemplar" heading makes look
+like the site's own mistakes.
 
 New copy: the heading, as Arthur chose it; the link "Argue this motion";
-the page title "Exemplar ways to argue this motion · Sophecs". The
+the page title "Exemplar ways to argue this motion · Sophecs" and its
+description "Exemplar ways to argue this motion, from each school." The
 arguments are the sample run's, accepted with it on 2026-11-04.
-

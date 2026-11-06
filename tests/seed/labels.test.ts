@@ -56,6 +56,13 @@ describe("labels", () => {
     expect(out).not.toContain(SAMPLE_EXPLANATION);
   });
 
+  it("offers the motion's exemplars on a reader's own genuine verdict only", () => {
+    const link = 'href="/debate/opaque-benefit/exemplars"';
+    expect(html(createElement(Verdict, { ...props, isOwner: true }))).toContain(link);
+    expect(html(createElement(Verdict, { ...props, isOwner: true, sample: { template: true } }))).not.toContain(link);
+    expect(html(createElement(Verdict, props))).not.toContain(link);
+  });
+
   it("a sample challenge is labelled and does not accept on the reader's behalf", () => {
     const content = { one_line: "x", name: "Stoicism" } as never;
     const out = html(createElement(ChallengeInvite, { challengeId: "c1", school: "stoicism", content, isSample: true }));

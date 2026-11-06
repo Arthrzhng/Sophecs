@@ -1,7 +1,7 @@
 // "Exemplar ways to argue this motion" (Arthur, 2026-11-06): the strongest
 // sample arguments on a motion, never a real reader's, shared evenly
 // across the schools, up to 50.
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { EXEMPLARS_PER_MOTION, getExemplars, openingOf, selectExemplars, type ExemplarCandidate } from "../src/lib/exemplars";
 import type { SchoolId } from "../src/lib/types";
 
@@ -52,22 +52,29 @@ describe("selectExemplars", () => {
 });
 
 describe("getExemplars", () => {
-  it("asks the database for sample accounts' judged originals on the motion only", async () => {
-    const calls: { table: string; filters: [string, string, unknown][]; order: string[] }[] = [];
+  // A stand-in for the admin client that records each query's filters and
+  // ordering, and answers each school's read with `answer(school)`.
+  const fakeAdmin = (answer: (school: unknown) => { data: unknown; error: unknown }) => {
+    const calls: { table: string; filters: [string, string, unknown][]; order: [string, unknown][] }[] = [];
     const admin = {
       from(table: string) {
-        const call = { table, filters: [] as [string, string, unknown][], order: [] as string[] };
+        const call = { table, filters: [] as [string, string, unknown][], order: [] as [string, unknown][] };
         calls.push(call);
         const b: Record<string, unknown> = {};
         b.select = () => b;
         b.eq = (c: string, v: unknown) => (call.filters.push(["eq", c, v]), b);
         b.not = (c: string, op: string, v: unknown) => (call.filters.push([`not.${op}`, c, v]), b);
-        b.order = (c: string) => (call.order.push(c), b);
-        b.limit = () => Promise.resolve({ data: [], error: null });
+        b.order = (c: string, o: unknown) => (call.order.push([c, o]), b);
+        b.limit = () => Promise.resolve(answer(call.filters.find(([, c]) => c === "school")?.[2]));
         return b;
       },
     };
-    await getExemplars(admin as never, "no-decision", SCHOOLS);
+    return { admin: admin as never, calls };
+  };
+
+  it("asks the database for sample accounts' published, judged originals on the motion only, strongest first", async () => {
+    const { admin, calls } = fakeAdmin(() => ({ data: [], error: null }));
+    await getExemplars(admin, "no-decision", SCHOOLS);
     expect(calls).toHaveLength(3);
     for (const [i, call] of calls.entries()) {
       expect(call.table).toBe("debates");
@@ -76,14 +83,24 @@ describe("getExemplars", () => {
           ["eq", "topic_slug", "no-decision"],
           ["eq", "school", SCHOOLS[i]],
           ["eq", "is_sample", true],
+          ["eq", "argument_public", true],
           ["eq", "kind", "original"],
           ["eq", "rejected", false],
           ["not.is", "verdict", null],
           ["not.is", "argument", null],
         ])
       );
-      expect(call.order[0]).toBe("score");
+      expect(call.order[0]).toEqual(["score", { ascending: false, nullsFirst: false }]);
     }
+  });
+
+  it("throws when a school cannot be read, rather than giving its places to the others", async () => {
+    const { admin } = fakeAdmin((school) =>
+      school === "utilitarianism" ? { data: null, error: { message: "timeout" } } : { data: made(school as SchoolId, 5), error: null }
+    );
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
+    await expect(getExemplars(admin, "no-decision", SCHOOLS)).rejects.toThrow("no-decision/utilitarianism");
+    quiet.mockRestore();
   });
 });
 

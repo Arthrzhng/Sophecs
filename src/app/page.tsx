@@ -162,7 +162,7 @@ export default function LandingPage() {
                 Read the motion
               </Link>
             </p>
-            {/* Arthur, 2026-11-06: src/app/debate/[slug]/exemplars/page.tsx. */}
+            {/* The motion's exemplars: src/app/debate/[slug]/exemplars/page.tsx. */}
             <p>
               <Link
                 href={`/debate/${motion.slug}/exemplars`}

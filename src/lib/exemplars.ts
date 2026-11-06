@@ -12,12 +12,14 @@ import type { SchoolId } from "@/lib/types";
  * Sample accounts' arguments only (docs/sample-activity.md), never a real
  * reader's: a reader's argument is theirs, and is public only if they
  * publish it. The query filters on `is_sample`, and the selection below
- * refuses any row that is not one.
+ * refuses any row that is not one. Of those, only the ones their sample
+ * author published (`argument_public`), as a sample's own verdict page
+ * shows only those.
  *
- * Shared out evenly across the schools, strongest first within each, with
- * exact repeats of the same text dropped (the sample run allows a few).
- * No score is returned: the samples' marks were written from templates,
- * not by the judge.
+ * Shared out evenly across the schools, highest template mark first within
+ * each, with exact repeats of the same text dropped (the sample run allows
+ * a few). No mark is returned: the samples' marks were written from
+ * templates, not by the judge.
  */
 
 export const EXEMPLARS_PER_MOTION = 50;
@@ -92,11 +94,12 @@ export async function getExemplars(
         .eq("topic_slug", topicSlug)
         .eq("school", school)
         .eq("is_sample", true)
+        .eq("argument_public", true)
         .eq("kind", "original")
         .eq("rejected", false)
         .not("verdict", "is", null)
         .not("argument", "is", null)
-        .order("score", { ascending: false })
+        .order("score", { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false })
         // Enough to fill every place even if this school must cover for
         // others and some texts repeat.
@@ -106,7 +109,14 @@ export async function getExemplars(
   const bySchool = new Map<SchoolId, ExemplarCandidate[]>();
   schools.forEach((school, i) => {
     const { data, error } = reads[i];
-    bySchool.set(school, error ? [] : ((data ?? []) as ExemplarCandidate[]));
+    // A failed read is an error, not an empty school: the others would
+    // quietly take its places. Thrown, so a cached page keeps serving
+    // until a rebuild succeeds.
+    if (error) {
+      console.error(`[exemplars] ${topicSlug}/${school} could not be read:`, error.message);
+      throw new Error(`exemplars: ${topicSlug}/${school} could not be read`);
+    }
+    bySchool.set(school, (data ?? []) as ExemplarCandidate[]);
   });
   return selectExemplars(bySchool, schools);
 }
