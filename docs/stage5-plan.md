@@ -285,6 +285,35 @@ of the three; Gate 2 is about that.
      every file `docs/decisions.md`, "Stage 5, step 4", lists, with the
      tests that pin them.
    - [ ] The fresh sample run.
+   - [ ] The v2 copy below, read and ruled by Arthur in the Gate 4 pack
+     (asked for on 2026-11-06).
+
+   **The v2 copy, for the Gate 4 pack.** Every piece of text a reader
+   sees only because quiz v2 and the six schools are on, as a flag-on
+   build shows it today, with what a reader sees now. Already ruled are
+   marked so; the rest is new text for his (e) judgement. The questions,
+   options and axis names themselves were ruled at Checkpoint A
+   (`docs/decisions.md`, "Quiz v2, as ruled"; `docs/quiz-v2.json`) and
+   are not repeated here.
+
+   | Where | Now | With v2 | Status |
+   | --- | --- | --- | --- |
+   | Landing page, under the heading (`src/app/page.tsx`) | A short quiz places you with the Stoics, the Utilitarians or the Virtue Ethicists. Then a few minutes a day: ... | A short quiz places you in one of six schools of ethics. Then a few minutes a day: ... | New |
+   | Landing page, under the first question | About 80 seconds. No sign-up, and no name attached to your answers. | A few minutes. No sign-up, and no name attached to your answers. | "A few minutes" ruled, (e) 4 |
+   | Landing page, first step | A short quiz. Every answer moves you across the triangle. | A short quiz. Every answer moves you across the map. | New |
+   | Landing page, the schools' heading | The three schools | Counted from the list: The six schools | New |
+   | The quiz page's description (`src/app/quiz/page.tsx`) | Ten questions that place you in Stoicism, Utilitarianism or Virtue Ethics, by what you already think rather than what you have read. | Ten questions that place you in one of six schools of ethics, by what you already think rather than what you have read. | New |
+   | The site's sharing image (`src/app/opengraph-image.tsx`) | Ten scenarios. Three schools. One result you'll want to argue about. | Ten scenarios. Six schools. One result you'll want to argue about. | New |
+   | A challenge's invitation (`src/components/share/ChallengeInvite.tsx`) | ... places you in one of three schools of ethics, ... and about eighty seconds. | ... places you in one of six schools of ethics, ... and a few minutes. | "A few minutes" ruled, (e) 4; "six" new |
+   | A result's share page (`src/components/share/SharePage.tsx`) | ... No account needed, about eighty seconds. | ... No account needed, a few minutes. | Ruled, (e) 4 |
+   | The map beside each question, at the start | (none: v1 shows a triangle) | You start here | New |
+   | The map beside each question, once answered | (none) | Where this answer moves you | As on the Stage 4 preview |
+   | The map on the reader's result | (none) | Where your answers put you; accessible title "Where your answers put you, on the map of the schools" | New |
+   | The map on a shared result (`/r/<id>`) | (none) | Where these answers landed; accessible title "Where these answers put them, on the map of the schools" | New |
+   | The quiz's last button | See your school | See your school | Unchanged |
+   | If the server scores a school the page cannot show | (none) | Couldn't show this result. Your result was saved, but this page could not show its school. Open the link again in a moment. | New |
+   | The six school pages' share lines (`content/schools/*.md`) | As listed in `docs/quiz-v2.md`, section 8 | The two rewordings ruled at Checkpoint B, (e) 3; the rest unchanged | Ruled, except the AI references that section lists, which stay as they are |
+   | `README.md` | one of three schools | To be written in the launch merge | Not written yet |
 
 Steps 1 and 2 need no gate and start now.
 
