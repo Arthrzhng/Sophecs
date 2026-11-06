@@ -66,10 +66,25 @@ export const VerdictSchema = z.discriminatedUnion("rejected", [
     }),
     // Present only on a revision (Task 2). Optional so an original's
     // verdict validates without them.
-    objection_answered: z.boolean().optional(),
+    //
+    // null is accepted and treated as absent (Arthur's ruling of
+    // 2026-11-05, under (b)): in the v3 run of 22:08 UTC, 31 replies to
+    // originals carried both fields as null and were refused, losing two
+    // samples. The schema cannot tell an original from a revision, so a
+    // revision's null reads as an omitted field does, which the route
+    // already treats as an objection not answered (objection_answered ===
+    // true is what counts). The parsed verdict has no such key, so nothing
+    // stored changes shape.
+    objection_answered: z
+      .boolean()
+      .nullable()
+      .transform((v) => v ?? undefined)
+      .optional(),
     improvement_note: z
       .string()
       .refine(maxWords(40), "improvement_note exceeds 40 words")
+      .nullable()
+      .transform((v) => v ?? undefined)
       .optional(),
   }),
 ]);

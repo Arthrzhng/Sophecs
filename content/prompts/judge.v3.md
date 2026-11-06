@@ -54,6 +54,15 @@ changing the objection to escape the cap. The response format now puts
 reply in order with no thinking step, and its note on the scores says the
 same. The cap is still 4.
 
+Changed back in part on 2026-11-05, by Arthur's ruling after the v3 run
+of 22:08 UTC, in which composites fell about 7 points and seven cases
+left their bands: "#68's reordering caused it." The response format's
+fields are in their order from before #68, `unanswered_objection` last,
+and the two sentences that pointed at that order are gone. The cap rule
+stays: an argument that leaves the school's best-known objection unmet
+scores no more than 4 on engagement, and the cap binds the judge's own
+reply. The objection voices stay.
+
 Also from 2026-11-05 (Arthur: "strip comments from judge.v3.md before it
 is sent (v3 only)"): src/lib/anthropic.ts removes HTML comments from this
 file before the request is built, so this comment no longer reaches the
@@ -92,11 +101,10 @@ Score in this order of priority:
    Check first the objection the school's criteria below name as the one
    it is best known for having to answer. An argument that leaves that
    objection unmet scores no more than 4 on engagement, however well it
-   answers any other. The cap binds your own reply. Decide
-   `unanswered_objection` first, as the response format below orders it,
-   and if it is that best-known objection, your `engagement` score must be
-   4 or lower. Do not change which objection you return to stay under the
-   cap.
+   answers any other. The cap binds your own reply: if the
+   `unanswered_objection` you return is that best-known objection, your
+   `engagement` score must be 4 or lower. Do not change which objection you
+   return to stay under the cap.
 
 The school's specific fidelity criteria for this debate:
 
@@ -254,11 +262,6 @@ fence. Match this shape exactly:
 {
   "rejected": false,
   "rejection_reason": null,
-  "unanswered_objection": {
-    "school": "RIVAL_SCHOOL",
-    "claim": "",
-    "why_it_stands": ""
-  },
   "score": 0,
   "fidelity": 0,
   "rigor": 0,
@@ -266,7 +269,12 @@ fence. Match this shape exactly:
   "strongest_move": "",
   "weakest_move": "",
   "a_stronger_version_would": "",
-  "verdict_line": ""
+  "verdict_line": "",
+  "unanswered_objection": {
+    "school": "RIVAL_SCHOOL",
+    "claim": "",
+    "why_it_stands": ""
+  }
 }
 ```
 
@@ -278,8 +286,7 @@ the school the argument was assigned. Do not return the word
 `score` is 0-100 (null if rejected). `fidelity`, `rigor`, and `engagement`
 are each 0-10, and `engagement` is at most 4 when `unanswered_objection`
 is the assigned school's best-known objection, as its criteria name it.
-`unanswered_objection` comes first so that it is decided before the
-scores. `strongest_move` and `weakest_move` should quote or closely
+`strongest_move` and `weakest_move` should quote or closely
 paraphrase the argument. `verdict_line` is the one sentence a user might
 actually want to share, in at most 20 words.
 

@@ -329,20 +329,35 @@ describe("v3 as sent (Arthur's rulings of 2026-11-05)", () => {
     const flat = (await sentV3()).replace(/\s+/g, " ");
     const criterion = flat.slice(flat.indexOf("3. **Engagement**"), flat.indexOf("The school's specific fidelity criteria"));
     expect(criterion).toContain(
-      "scores no more than 4 on engagement, however well it answers any other. The cap binds your own reply. " +
-        "Decide `unanswered_objection` first, as the response format below orders it, and if it is that " +
-        "best-known objection, your `engagement` " +
+      "scores no more than 4 on engagement, however well it answers any other. The cap binds your own reply: " +
+        "if the `unanswered_objection` you return is that best-known objection, your `engagement` " +
         "score must be 4 or lower. Do not change which objection you return to stay under the cap."
     );
     expect(flat).toContain(
       "`engagement` is at most 4 when `unanswered_objection` is the assigned school's best-known objection, as its criteria name it."
     );
-    // The judge writes its reply in order with no thinking step, so the
-    // objection has to come before the scores it caps.
+  });
+
+  it("keeps the response format's field order from before #68 (Arthur's ruling of 2026-11-05)", async () => {
+    // "#68's reordering caused it": the scores where they were, the
+    // objection last, and nothing pointing at an order.
+    const flat = (await sentV3()).replace(/\s+/g, " ");
     const shape = JSON.parse(flat.slice(flat.indexOf("```json") + 7, flat.indexOf("```", flat.indexOf("```json") + 7)));
-    const keys = Object.keys(shape);
-    expect(keys.indexOf("unanswered_objection")).toBeLessThan(keys.indexOf("score"));
-    expect(keys.indexOf("unanswered_objection")).toBeLessThan(keys.indexOf("engagement"));
+    expect(Object.keys(shape)).toEqual([
+      "rejected",
+      "rejection_reason",
+      "score",
+      "fidelity",
+      "rigor",
+      "engagement",
+      "strongest_move",
+      "weakest_move",
+      "a_stronger_version_would",
+      "verdict_line",
+      "unanswered_objection",
+    ]);
+    expect(flat).not.toContain("as the response format below orders it");
+    expect(flat).not.toContain("comes first so that it is decided before the scores");
   });
 
   it("gives Utilitarianism's Virtue Ethics voice Arthur's wording, under v3 only", () => {
