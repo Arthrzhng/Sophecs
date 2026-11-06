@@ -243,6 +243,28 @@ of the three; Gate 2 is about that.
    also holds the live table to the 20-argument rule, which the flag
    brings with it (ruled 2026-11-06; step 6).
 
+   **Gate 4 checklist.** What step 6 and this gate already name, ticked
+   as each is done; the launch itself waits for Arthur's instruction.
+   - [ ] The golden runs pass (the condition for bringing Gate 4).
+   - [x] The primary sources behind the Ubuntu quotations opened by
+     Arthur and checked against the research file word for word: Metz,
+     "Toward an African Moral Theory" (2007), pp. 322 and 332; Mhlambi,
+     "From Rationality to Relationality" (Carr Center, 2020), pp. 3 and 6.
+     2026-11-06 (`docs/decisions.md`, "Primary sources opened by Arthur").
+   - [ ] The content judgements listed for Checkpoint B and the adherent
+     nouns, as ruled.
+   - [ ] The sample teardown.
+   - [ ] The preview's v2 results cleared before the launch merge, an (a)
+     write: `challenge_from` set to null where a genuine row points at
+     one, and a real reader's challenge with a v2 challengee reopened.
+   - [ ] The flag on for Production, with `next.config.ts`'s refusal
+     removed; the live table's 20-argument rule comes with it.
+   - [ ] The three content files' status and colour tokens.
+   - [ ] The share lines and other front matter (`docs/quiz-v2.md`,
+     section 8), in the launch merge itself.
+   - [ ] `README.md`.
+   - [ ] The fresh sample run.
+
 Steps 1 and 2 need no gate and start now.
 
 **Ruled at Checkpoint B, 2026-11-05.** Gate 1: yes, the migration and the

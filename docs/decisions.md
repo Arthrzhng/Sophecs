@@ -3923,3 +3923,28 @@ the rule to the live table in the same step. `docs/stage5-plan.md`, step 6,
 and Gate 4 list it, so the launch brief says so: from the launch deploy,
 over the week in progress, each school is unranked until it has 20 judged
 original arguments in the week.
+
+### Primary sources opened by Arthur (2026-11-06)
+
+Arthur, 2026-11-06: "Source check done: I've opened Metz, 'Toward an
+African Moral Theory' (2007), pp. 322 and 332, and Mhlambi, 'From
+Rationality to Relationality' (Carr Center, 2020), pp. 3 and 6, and the
+quoted lines match the research file word for word."
+
+The four passages, as `content/research/non-western-sources.md` (round 2)
+gives them:
+
+| Source | Page | Passage | Used in |
+| --- | --- | --- | --- |
+| Metz, "Toward an African Moral Theory", *The Journal of Political Philosophy* 15(3), 2007 | 322 | "a person is a person through other persons." | `content/schools/ubuntu.md`, the `one_line` and its attribution; an objection voice in `src/lib/judge/objection-voices.ts` |
+| Same article | 332 | "moral value fundamentally lies not in the individual, but rather in a relationship between individuals." | `content/modules/relational-data.md` |
+| Mhlambi, "From Rationality to Relationality", Carr Center Discussion Paper 2020-009 | 3 | "Personhood is fundamentally relational." | `content/modules/relational-data.md` |
+| Same paper | 6 | "the notion that truths, and perhaps all truths, about an individual can be rationally computed destroys the core idea of privacy." | `content/modules/relational-data.md`; also cited by the golden case `util-obscure-source` |
+
+Until now these rested on the research file's own report that each was
+"directly visible" in the PDF it linked. They are now checked against the
+sources by a person, which settles the Ubuntu `one_line` that ruling (e)9
+of 2026-11-05 kept on Metz's authority (`docs/review-charter.md`, rule 5).
+Nothing in the content changes. Ticked in the Gate 4 checklist,
+`docs/stage5-plan.md`.
+
