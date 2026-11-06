@@ -4427,3 +4427,37 @@ and none has fidelity more than a point under its band. A single sample
 of a case whose accepted median is in band can fall a point short:
 stoic-analogy's three samples in the accepted 4 Nov run had fidelity 8,
 7 and 8. The full run, on the median of three, is the test.
+
+**The check (16:55 UTC).** Run `2026-11-06T16-55-51-296Z-v3.json`, prompt
+sha256 `5c0bbece85a94d6f...`: 25 calls, $0.3794, 2 of 25 out of band, the
+same two as the 06:05 check and the exact 4 Nov prompt:
+confucian-hierarchy-school (83, engagement 6) and stoic-analogy
+(fidelity 7, score 71 in band). Every strong case's score is in band, and
+the one fidelity a point under its band is stoic-analogy's: under the
+rule above, the strong cases are in band, so the full run followed.
+
+**The full v3 run (16:58 UTC).** Run `2026-11-06T16-58-30-986Z-v3.json`,
+three samples a case: 77 calls (two replies failed validation and passed
+on their retries), $1.1677. On the pass test, the median of three on
+every axis with a band:
+- 23 of 25 cases pass.
+- `confucian-hierarchy-school` fails, as in every run that has had it,
+  the accepted 4 Nov run included: 82/83/83 against 40-75, engagement
+  5/6/6 against 0-4.
+- `stoic-analogy` fails on fidelity: 7/7/7 against 8-10, with its score
+  in band (69/71/71). On 4 Nov it was 8/7/8, a pass.
+- The mean of the 25 medians is 55.0, against 54.7 on 4 Nov. Strong
+  cases score as on 4 Nov or higher (buddhist-strong 83/80/83,
+  stoic-strong 78, confucian-ren-disposition 78/72/78).
+
+So the full run passes but for those two, one known since 3 Nov and one
+a fidelity point short on a case that passed on 4 Nov. The prompt's one
+difference in body from the 4 Nov prompt is the paragraph on the concept
+over the vocabulary, kept because the 06:05 check that passed had it;
+the ruling's "if in doubt, drop the moved section" would also cover
+dropping it, at the cost of another full run (about $1.17). Both go to
+Arthur with the Gate 4 pack. Gate 3 and the new-schools run go ahead as
+ruled.
+
+Cumulative on the eval key: $11.0704 of $15.00, over the 17 run files on
+this branch.
