@@ -225,24 +225,26 @@ describe("judge.v3.md", () => {
     expect(flat(v2)).not.toContain("should normally be the one you return here");
   });
 
-  it("has no engagement cap, and still returns the school's known objection when it is left unmet (step B)", () => {
-    // Arthur's ruling of 2026-11-06, step B: "4 Nov prompt + objection
-    // voices + report-the-known-objection, no engagement cap". The cap of
-    // 2026-11-03 sat in the engagement criterion; both of its sentences go,
-    // and the criterion reads as it did before. The instruction to return
-    // the known objection stays, in the section on the objection left
-    // standing, where it is not a limit on any score.
+  it("holds engagement to 4 when the school's known objection is left unmet, under v3 only", () => {
+    // The 18:15 run of 2026-11-03: with the paragraph above in place, neither
+    // hierarchy case raised the power objection, and their engagement came
+    // back 5 and 7 against a band of 0-4. A judge blind spot, so under the
+    // brief the fix is in v3 and the same for all six schools: it sits in the
+    // engagement criterion, which every school's request carries.
+    // Pinned whole and inside the engagement criterion, before the rubric:
+    // a phrase check would pass with the cap removed or the condition
+    // inverted, and the same words anywhere else would not be read as part
+    // of how engagement is scored.
+    const rule =
+      "Check first the objection the school's criteria below name as the one " +
+      "it is best known for having to answer. An argument that leaves that " +
+      "objection unmet scores no more than 4 on engagement, however well it " +
+      "answers any other.";
     const flat = (s: string) => s.replace(/\s+/g, " ");
     const criterion = flat(v3body.slice(v3body.indexOf("3. **Engagement**"), v3body.indexOf("{{RUBRIC}}")));
-    expect(criterion.trim()).toBe(
-      "3. **Engagement** — does it anticipate and respond to the strongest objection a rival school would raise? The school's specific fidelity criteria for this debate:"
-    );
-    expect(flat(v3body)).not.toContain("no more than 4");
-    expect(flat(v3body)).not.toContain("Check first the objection");
-    const section = flat(v3body.slice(v3body.indexOf("## The objection left standing"), v3body.indexOf("## Revisions")));
-    expect(section).toContain(
-      "Each school's fidelity criteria end by naming the objection that school is best known for having to answer. When the argument leaves that objection unmet, it should normally be the one you return here"
-    );
+    expect(criterion).toContain(rule);
+    expect(flat(v3body).split(rule)).toHaveLength(2);
+    expect(flat(v2)).not.toContain("scores no more than 4 on engagement");
     expect(flat(v2)).not.toContain("best known for having to answer");
   });
 

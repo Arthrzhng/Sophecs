@@ -4372,3 +4372,58 @@ itself, its history and framing included, and not any instruction in it.
 
 Cumulative on the eval key: $9.5233 of $12.00, over the 15 run files on
 this branch.
+
+### Judge v3: the head comment sent again, by Arthur's reversal of ruling 12 (2026-11-06)
+
+Arthur, 2026-11-06: "Judge prompt (b): send the old head comment again,
+exactly as the 4 Nov prompt sent it. This reverses my ruling 12; the
+judge evidently relies on it. Keep everything else in current v3 (field
+order, engagement cap, objection voices, the moved section if it doesn't
+conflict; if in doubt, drop the moved section, since the comment covers
+it). Record the reversal in docs/decisions.md. Then: single-sample check.
+If strong cases are in band: full v3 run, then Gate 3 and the
+new-schools run, then Gate 4. If it misses, stop and report. Eval cap
+raised to $15.00 cumulative; keep the watchdog armed."
+
+And, for the record of the step A/B plan that never reached this
+session: "A = move the comment's scoring guidance into the body (done,
+missed); B = 4 Nov prompt + objection voices + reporting the known
+objection, no engagement cap. Use B only if the check above misses
+because of the cap."
+
+**Ruling 12 reversed.** Ruling 12 (2026-11-05, "Strip comments from
+judge.v3.md before it is sent (v3 only)") is reversed. `asSent` in
+`src/lib/anthropic.ts` (frozen; this ruling is the authority) sends every
+prompt exactly as read, as it did before 2026-11-05.
+
+**The prompt.** `content/prompts/judge.v3.md` is the 4 Nov head comment,
+byte for byte as e83e0a8 has it, then the body as it stood at a1d2d0c:
+the field order from before #68, the engagement cap in its wording of
+2026-11-03 without the cap-binding sentences, and the paragraph on the
+concept over the vocabulary. The objection voices are the code's. The
+file's sha256 begins `5c0bbece85a94d6f`, the same as the check of 06:05
+UTC, so this is the prompt that check scored.
+
+**Dropped:** the "Before you score" section of step A. It restates the
+comment's instructions, and with it the strong cases scored lower (step
+A, 9 of 25 out), so it is in doubt in the ruling's sense and the comment
+covers it. **Kept, though moved:** the vocabulary paragraph, which was
+in the body in the 06:05 check that passed.
+
+**What the file no longer carries.** The head comment is the 4 Nov text,
+so the notes written into it since (the changes of 2026-11-05 and
+2026-11-06) are not in the file. They are in this file's entries:
+"Judge v3 after #68: two single-sample checks, and a stop", "Judge v3:
+the cap-binding sentences removed, and a second stop", "Judge v3: the
+4 Nov head comment sent again, one check" and "Judge v3: steps A and B,
+both missed, and a stop". The comment itself says v3 "is not the
+production default" and is "a draft to run the golden set against",
+which become false at launch; that is part of what the judge is sent,
+and is listed for Gate 4.
+
+**The check's rule.** "Strong cases in band" is read as: every one of
+the eleven strong cases (score band from 60 up) has its score in band,
+and none has fidelity more than a point under its band. A single sample
+of a case whose accepted median is in band can fall a point short:
+stoic-analogy's three samples in the accepted 4 Nov run had fidelity 8,
+7 and 8. The full run, on the median of three, is the test.

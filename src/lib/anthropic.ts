@@ -65,18 +65,17 @@ function promptTemplateFor(version: RunnablePromptVersion): string {
   return template;
 }
 
+// Every prompt is sent exactly as read, its head comment included.
 // Arthur, 2026-11-05: "Strip comments from judge.v3.md before it is sent
-// (v3 only)." v3's head comment is the file's own history, written for
-// whoever edits it, and until now it reached the model with the rest. v1
-// and v2 come back exactly as read, and v2's request is pinned by the six
-// fixtures in tests/judge-request. Both reads above go through here, the
-// module-scope default included, so v3 is stripped whichever way it is
-// reached.
-export function asSent(version: RunnablePromptVersion, raw: string): string {
-  if (version !== "v3") return raw;
-  // The head comment and the blank lines after it; any other comment
-  // without the lines around it, so paragraphs either side stay apart.
-  return raw.replace(/^\s*<!--[\s\S]*?-->\s*/, "").replace(/<!--[\s\S]*?-->/g, "");
+// (v3 only)"; reversed on 2026-11-06: "send the old head comment again,
+// exactly as the 4 Nov prompt sent it. This reverses my ruling 12; the
+// judge evidently relies on it." Without the comment v3's strong cases
+// scored ten points lower in every check of 2026-11-06
+// (docs/decisions.md, "Judge v3: the head comment sent again, by
+// Arthur's reversal of ruling 12"). The function stays so both reads
+// above keep one place that decides what is sent.
+export function asSent(_version: RunnablePromptVersion, raw: string): string {
+  return raw;
 }
 
 // The schools an `unanswered_objection` may name, for v3's

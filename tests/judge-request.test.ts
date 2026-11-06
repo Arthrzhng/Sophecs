@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { describe, it, expect, vi } from "vitest";
@@ -312,27 +313,33 @@ describe("v3 as sent (Arthur's rulings of 2026-11-05)", () => {
     return callJudgeModel(MOTION, "stoicism", ARGUMENT, undefined, "v3").then(() => String(created[0].system));
   }
 
-  it("leaves out the file's HTML comments", async () => {
-    // "Strip comments from judge.v3.md before it is sent (v3 only)."
+  it("sends the 4 Nov head comment, exactly as the 4 Nov prompt sent it", async () => {
+    // Arthur, 2026-11-06, reversing ruling 12 ("Strip comments from
+    // judge.v3.md before it is sent"): "send the old head comment again,
+    // exactly as the 4 Nov prompt sent it ... the judge evidently relies on
+    // it." Pinned by hash, so an edit to the comment fails here: it is part
+    // of what the judge receives again, and the golden runs scored it.
     const system = await sentV3();
-    expect(system).not.toContain("<!--");
-    expect(system).not.toContain("-->");
-    expect(system).not.toContain("v3 differs from v2");
-    expect(system.startsWith("You are a philosophy tutor")).toBe(true);
-    // The file still has its comment; only the request loses it.
-    expect(fs.readFileSync(path.join(process.cwd(), "content/prompts/judge.v3.md"), "utf-8").startsWith("<!--")).toBe(true);
+    const head = system.match(/^\s*<!--[\s\S]*?-->/)?.[0] ?? "";
+    expect(crypto.createHash("sha256").update(head, "utf-8").digest("hex")).toBe(
+      "8bb0104030af594accb291e22f146bb04ba9007772a8fec9ac1c76fdfff0ace4"
+    );
+    expect(head).toContain("v3 differs from v2 in one respect");
+    // The file is sent as read: the request's text is the file's, its
+    // placeholders filled.
+    const file = fs.readFileSync(path.join(process.cwd(), "content/prompts/judge.v3.md"), "utf-8");
+    expect(system.startsWith(head)).toBe(true);
+    expect(file.startsWith(head)).toBe(true);
   });
 
-  it("sends no engagement cap, bound or not (step B)", async () => {
-    // Arthur's ruling of 2026-11-06, step B: "no engagement cap". Neither
-    // the cap of 2026-11-03 nor the sentences of 2026-11-05 that bound it
-    // to the reply reach the model.
+  it("keeps the engagement cap, without the sentences that bound it to the reply", async () => {
+    // Arthur's ruling of 2026-11-06: the cap-binding sentences of
+    // 2026-11-05 go; the cap stays in its wording of 2026-11-03.
     const flat = (await sentV3()).replace(/\s+/g, " ");
     const criterion = flat.slice(flat.indexOf("3. **Engagement**"), flat.indexOf("The school's specific fidelity criteria"));
-    expect(criterion.trim()).toBe(
-      "3. **Engagement** — does it anticipate and respond to the strongest objection a rival school would raise?"
+    expect(criterion).toContain(
+      "An argument that leaves that objection unmet scores no more than 4 on engagement, however well it answers any other."
     );
-    expect(flat).not.toContain("no more than 4");
     expect(flat).not.toContain("The cap binds your own reply");
     expect(flat).not.toContain("Do not change which objection you return");
     expect(flat).not.toContain("`engagement` is at most 4 when");
