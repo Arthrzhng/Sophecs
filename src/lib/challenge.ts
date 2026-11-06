@@ -93,8 +93,8 @@ export async function getPendingChallenges(
   userId: string
 ): Promise<PendingChallenge[]> {
   // The reader's own v1 results only, on every build, until launch: a
-  // challenge on a v2 result has no debate to offer (src/app/r/[id]/page.tsx
-  // offers "Debate them" between two v1 results only; Gate 2, option (i)).
+  // challenge on a v2 result has no debate to offer ("Debate them" and
+  // assignChallengeTopic take two v1 results only; Gate 2, option (i)).
   const { data: ownResults } = await admin
     .from("quiz_results")
     .select("id")

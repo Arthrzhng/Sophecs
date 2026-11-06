@@ -145,10 +145,20 @@ export function QuizShellV2({ questions, schools, mapSchools, axes }: QuizV2Prop
       const raw = sessionStorage.getItem(SESSION_KEY_V2);
       if (raw) {
         const saved = JSON.parse(raw) as State;
+        // Only a state this shell could have written: a whole-number index
+        // inside the quiz, every question before it answered, and every
+        // answer one of its question's options.
         const valid =
-          saved.chosenIds?.length === total &&
+          Array.isArray(saved.chosenIds) &&
+          saved.chosenIds.length === total &&
+          Number.isInteger(saved.index) &&
+          saved.index >= 0 &&
           saved.index < total &&
-          saved.chosenIds.every((id, i) => id === null || questions[i].options.some((o) => o.id === id));
+          saved.chosenIds.every(
+            (id, i) =>
+              (id === null && i >= saved.index) ||
+              (typeof id === "string" && questions[i].options.some((o) => o.id === id))
+          );
         if (valid) {
           dispatch({ type: "restore", state: saved });
           restored = true;

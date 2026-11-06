@@ -146,11 +146,11 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
       { anon_id: ownerAnonId, user_id: ownerUserId },
       await getResultOwners(challengeInfo.otherResultId),
     ]);
-  // Only between two v1 results, on every build, until launch: a debate
-  // between the sides puts each reader's school against the other's, and a
-  // v2 result's school is one production does not publish (Gate 2, option
-  // (i)). A side this build does not show reads as null here, so on a
-  // build without SIX_SCHOOLS a v2 other side is never offered either.
+  // Only between two v1 results, on every build, until launch, so that a
+  // challenge made on a SIX_SCHOOLS preview does not lead to debates and
+  // rating changes in production (Gate 2, option (i)). assignChallengeTopic
+  // refuses the same. A side this build does not show reads as null here,
+  // so without SIX_SCHOOLS a v2 other side is never offered either.
   const showDebateThem = Boolean(
     challengeInfo &&
       challengeInfo.status !== "complete" &&

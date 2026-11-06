@@ -372,10 +372,13 @@ inside the brief's range.
 **Retaking uses v2.** A reader who takes the quiz again gets the six-school
 quiz and a new result. Retaking while signed in already replaces the
 profile's school and records the change in `school_history`
-(`retakeQuizSchool` in `src/lib/claim.ts`), and a v2 retake would do the
-same. A reader who never retakes keeps their v1 school.
+(`retakeQuizSchool` in `src/lib/claim.ts`), and a v2 retake will do the
+same from launch. Until then a v2 result on a SIX_SCHOOLS preview moves no
+school (Gate 2, option (i); `docs/decisions.md`, "Stage 5, step 4"). A
+reader who never retakes keeps their v1 school.
 
-**What the build will need** (Stage 5, not now):
+**What the build needed** (Stage 5; built in steps 3 and 4, see
+`docs/decisions.md`):
 - **A version on each result.** v1 stores three school weights in
   `quiz_results.vector`; v2 would store a point. On a result page the
   stored vector is read only by the share page's comparison columns

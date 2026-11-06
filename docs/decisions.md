@@ -3971,8 +3971,8 @@ where v1 draws its triangle, and the result logic of
   school (`leans`) is not sent at all.
 - The scorer, `src/lib/quiz-v2-score.ts`, names no school: positions arrive
   as data. `tests/quiz-v2-score.test.ts` runs all 1,048,576 answer
-  patterns through it and requires the simulator's shares, its zero ties
-  and its six personas exactly.
+  patterns through it and requires the simulator's counts integer for
+  integer, and its six personas.
 - v2 keeps its own storage keys, so a v1 quiz in progress from before a
   deploy is not read as v2 answers.
 
@@ -3987,8 +3987,8 @@ scores them itself and writes a v2 row: `quiz_version` 2, the point in
   and a preview's result would close their challenge with a side
   production cannot show.
 
-`/quiz/result` and `/r/[id]` show the reader's point on the map beside the
-card. Because the profile's school does not move, "Start my path" on a
+`/quiz/result` and `/r/[id]` show the reader's point on the map below the
+card; `/quiz/result` draws the point the server scored. Because the profile's school does not move, "Start my path" on a
 preview leads to the school the account already has, if any; that is
 option (i)'s cost, accepted with it.
 
@@ -4008,16 +4008,49 @@ These are counts and nouns that follow from v2, not new judgements; they
 are on the (e) list for the phase all the same. New text the reader sees
 on a flag-on build: the map's captions "Where this answer moves you" (as
 on the approved Stage 4 preview), "Where your answers put you" and "Where
-these answers landed", and its accessible title.
+these answers landed"; the map's accessible titles "Where your answers
+put you, on the map of the schools" and "Where these answers put them, on
+the map of the schools"; and, if the server ever scored a school the page
+cannot show, "Couldn't show this result." with "Your result was saved,
+but this page could not show its school. Open the link again in a
+moment."
 
 **Step 3's leftovers, on every build.** "Debate them" on `/r/[id]` is now
-offered only between two v1 results (`comparable`), and `/me` lists
-challenges on a reader's own v1 results only. Until launch a debate puts
-each side's school against the other's, and a v2 result's school is one
-production does not publish.
+offered only between two v1 results (`comparable`), `assignChallengeTopic`
+refuses a challenge with a v2 side when called directly, and `/me` lists
+challenges on a reader's own v1 results only. A debate takes each
+reader's school from their profile, which option (i) never sets from a
+v2 result; what the limit prevents is a challenge made on a preview
+leading to debates and rating changes in production.
+
+**What production carries.** The v2 client code ships in every build,
+though only a SIX_SCHOOLS build renders it: `QuizShellV2`,
+`LandingQuestionV2`, `SchoolMap` and the scorer sit in a shared chunk
+that `/`, `/quiz` and `/quiz/result` load, and `QuizResultClientV2` in
+`/quiz/result`'s own. First-load JS rises by about 2 kB on each of the
+three (114 to 116 kB on `/` and `/quiz`, 118 to 120 kB on `/quiz/result`,
+as the review measured). It names no unpublished school (`check:bundle`).
+Switching the import with a build alias, as `@six-schools/tokens.css`
+does, would remove it; it was left as it is for this step and can be done
+at any time. The source of `src/app/opengraph-image.tsx` changed, so every
+page's `og:image` address carries a new hash; the image's bytes on a
+build without the flag are the same.
+
+**To undo at launch** (`docs/stage5-plan.md`, step 6 and its Gate 4
+checklist): the rules this step and step 3 set "until launch".
+`submitQuizResultV2` takes up v1 challengers too and moves a signed-in
+reader's school, as v1 does (`retakeQuizSchool`); `schoolFromResult`
+takes a school from a v2 result; "Debate them", `assignChallengeTopic`
+and `/me` take v2 results. Left in place, every open v1 challenge could
+never be accepted and no new challenge could be debated. The first is an
+edit to the frozen `src/app/actions.ts`.
 
 `tests/quiz-v2-submit.test.ts` drives the action on both builds against a
 fake database that applies 0027's shape check; `tests/quiz-result-versions.test.ts`
 gains the two leftovers, and its fake now applies `.or()` filters, without
-which the `/me` case could not fail.
+which the `/me` case could not fail; `tests/challenge-topic.test.ts` gains
+the refusal. `tests/quiz-v2-score.test.ts` compares the scorer with the
+simulator's exact counts (`node scripts/simulate-quiz-v2.mjs --json`):
+every school's primary count, every primary and secondary pair, and the
+ties.
 

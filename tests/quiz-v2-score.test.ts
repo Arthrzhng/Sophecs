@@ -16,29 +16,40 @@ const quiz = loadQuizV2ForTest();
 const simulated = execFileSync(process.execPath, ["scripts/simulate-quiz-v2.mjs"], { encoding: "utf8" });
 
 describe("quiz v2's scorer, against scripts/simulate-quiz-v2.mjs", () => {
-  it("gives every school the share of the 1,048,576 patterns the simulator does", () => {
+  it("puts every one of the 1,048,576 patterns where the simulator does: primaries, pairs and ties", () => {
+    // The simulator's exact counts (--json), compared integer for integer,
+    // so one pattern scored differently fails the test.
+    const sim = JSON.parse(
+      execFileSync(process.execPath, ["scripts/simulate-quiz-v2.mjs", "--json"], { encoding: "utf8" })
+    ) as { total: number; primary: Record<string, number>; pair: Record<string, number>; ties: number };
     const Q = quiz.questions;
-    const primary = new Map<string, number>(quiz.schools.map((s) => [s.id, 0]));
+    const primary: Record<string, number> = Object.fromEntries(quiz.schools.map((s) => [s.id, 0]));
+    const pair: Record<string, number> = {};
+    let ties = 0;
     const pick: QuizV2Option[] = new Array(10);
+    const at = new Map(quiz.schools.map((s) => [s.id, { x: Math.cos((s.angle * Math.PI) / 180), y: Math.sin((s.angle * Math.PI) / 180) }]));
+    const d2 = (a: MapPoint, b: MapPoint) => (a.x - b.x) ** 2 + (a.y - b.y) ** 2;
     for (let n = 0; n < 4 ** 10; n++) {
       let k = n;
       for (let i = 0; i < 10; i++) {
         pick[i] = Q[i].options[k & 3];
         k >>= 2;
       }
-      const { primary: p } = scoreQuizV2(pick, quiz.schools);
-      primary.set(p, primary.get(p)! + 1);
+      const r = scoreQuizV2(pick, quiz.schools);
+      primary[r.primary]++;
+      const key = `${r.primary} > ${r.secondary}`;
+      pair[key] = (pair[key] ?? 0) + 1;
+      if (Math.abs(d2(r.point, at.get(r.primary)!) - d2(r.point, at.get(r.secondary)!)) <= 1e-9) ties++;
     }
+    expect(sim.total).toBe(4 ** 10);
+    expect(primary).toEqual(sim.primary);
+    expect(pair).toEqual(sim.pair);
+    expect(ties).toBe(sim.ties);
+    // And the report Arthur accepted the distribution from rounds the same counts.
     for (const s of quiz.schools) {
-      const share = ((100 * primary.get(s.id)!) / 4 ** 10).toFixed(1);
-      // The simulator's row for the school: its name, the options pointing
-      // at it, then its share as primary.
-      const name = RAW.schools[s.id].name;
-      const row = simulated.split("\n").find((l) => l.split("|")[0].trim() === name);
-      expect(row, `no simulator row for ${name}`).toBeTruthy();
-      expect(row!.split("|")[2].trim(), name).toBe(`${share}%`);
+      const row = simulated.split("\n").find((l) => l.split("|")[0].trim() === RAW.schools[s.id].name);
+      expect(row!.split("|")[2].trim()).toBe(`${((100 * primary[s.id]) / 4 ** 10).toFixed(1)}%`);
     }
-    expect(simulated).toContain("exact ties on distance: 0");
   }, 120_000);
 
   it("places each persona where the simulator does", () => {

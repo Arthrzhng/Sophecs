@@ -17,6 +17,7 @@ import { track } from "@/lib/analytics/client";
 import { pickShareLineFrom } from "@/lib/share-line";
 import { SCHOOL_ADHERENT, SCHOOL_ARTICLE } from "@/lib/school-colors";
 import type { SchoolContent } from "@/lib/schools";
+import type { MapPoint } from "@/lib/quiz-v2-score";
 import type { SchoolId } from "@/lib/types";
 
 /**
@@ -24,7 +25,8 @@ import type { SchoolId } from "@/lib/types";
  * The same page as v1's QuizResultClient, with the reader's point on the
  * map beside their card: rendered at once from what QuizShellV2 scored,
  * while submitQuizResultV2 scores the answers again on the server and saves
- * the row. If the server's school differs, the page takes the server's.
+ * the row. If the server's result differs, the page takes the server's
+ * school and point.
  *
  * Saving a v2 result does not move a profile's school (Gate 2, option (i)),
  * so "Start my path" leads to the school the account already has, if any.
@@ -40,7 +42,7 @@ export function QuizResultClientV2({
 }) {
   const router = useRouter();
   const [pending, setPending] = useState<PendingResultV2 | null>(null);
-  const [saved, setSaved] = useState<{ id: string; primary: SchoolId } | null>(null);
+  const [saved, setSaved] = useState<{ id: string; primary: SchoolId; point: MapPoint } | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -58,7 +60,9 @@ export function QuizResultClientV2({
     setPending(parsed);
     const p = parsed;
 
-    submitQuizResultV2({ answers: p.answers, challengeId: p.challengeId, referrer: p.referrer }).then((result) => {
+    submitQuizResultV2({ answers: p.answers, challengeId: p.challengeId, referrer: p.referrer })
+      .catch(() => ({ ok: false as const, error: "network" }))
+      .then((result) => {
       if (!result.ok) {
         setFailed(true);
         return;
@@ -80,7 +84,7 @@ export function QuizResultClientV2({
       }
       // As v1 does: the address becomes the result's own, without a navigation.
       window.history.replaceState(null, "", `/r/${result.id}`);
-      setSaved({ id: result.id, primary: result.primary });
+      setSaved({ id: result.id, primary: result.primary, point: result.point });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -89,7 +93,19 @@ export function QuizResultClientV2({
 
   const primary = saved?.primary ?? pending.primary;
   const school = schools[primary];
-  if (!school) return null;
+  // Only if the server scored a school this build has no page for, which
+  // the same data on both sides rules out; the address is already the
+  // result's own, so say so rather than show nothing.
+  if (!school) {
+    return (
+      <Page width="read">
+        <ErrorState
+          title="Couldn't show this result."
+          body="Your result was saved, but this page could not show its school. Open the link again in a moment."
+        />
+      </Page>
+    );
+  }
   const resultId = saved?.id ?? null;
   const shareLine = resultId ? pickShareLineFrom(school.share_lines, resultId) : null;
 
@@ -108,7 +124,7 @@ export function QuizResultClientV2({
             title="Where your answers put you, on the map of the schools"
             schools={mapSchools}
             axes={axes}
-            reader={pending.point}
+            reader={saved?.point ?? pending.point}
             caption="Where your answers put you"
           />
         </div>

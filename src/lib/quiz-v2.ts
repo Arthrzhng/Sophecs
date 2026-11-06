@@ -17,10 +17,12 @@ import type { SchoolId } from "@/lib/types";
  * bundle. Only a SIX_SCHOOLS build renders anything from it, so only that
  * build's pages carry it at all.
  *
- * The shape is checked when this module loads, as the simulator checks it:
- * ten questions of four options, every option's school one this build
- * shows, every school with an angle. A malformed file fails the build that
- * reads it rather than shipping a quiz that cannot be scored.
+ * The shape is checked the first time a page reads it, which on a
+ * SIX_SCHOOLS build is while the build prerenders /quiz, as the simulator
+ * checks it: ten questions of four options, every option's school one with
+ * an angle and a weight, every vector that school's direction times its
+ * weight, and every school one this build shows. A malformed file fails
+ * the build rather than shipping a quiz that cannot be scored.
  */
 
 /** Whether this build runs quiz v2. The flag is written in as a constant (next.config.ts). */
@@ -37,6 +39,7 @@ export interface QuizV2Data {
 type RawQuiz = {
   axes: Record<"x" | "y", { minus: string; plus: string }>;
   schools: Record<string, { name: string; angle: number }>;
+  radius_by_school: Record<string, number>;
   questions: { id: number; prompt: string; options: { id: string; label: string; leans: string; vector: { x: number; y: number } }[] }[];
 };
 
@@ -52,6 +55,13 @@ function load(): QuizV2Data {
     for (const o of q.options) {
       if (!ids.has(o.leans)) throw new Error(`quiz v2: option ${o.id} leans to "${o.leans}", which has no position`);
       if (!Number.isFinite(o.vector.x) || !Number.isFinite(o.vector.y)) throw new Error(`quiz v2: option ${o.id} has no vector`);
+      // As the simulator checks it: the vector is the school's direction
+      // times the school's weight, to the two places the file rounds to.
+      const weight = quiz.radius_by_school?.[o.leans];
+      if (typeof weight !== "number") throw new Error(`quiz v2: no weight for ${o.leans}`);
+      const a = (quiz.schools[o.leans].angle * Math.PI) / 180;
+      if (Math.abs(Math.cos(a) * weight - o.vector.x) > 0.006 || Math.abs(Math.sin(a) * weight - o.vector.y) > 0.006)
+        throw new Error(`quiz v2: option ${o.id}'s vector is not ${o.leans}'s direction times ${weight}`);
     }
   }
   return {

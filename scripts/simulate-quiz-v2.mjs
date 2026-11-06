@@ -3,7 +3,12 @@
 // of four options is 4^10 = 1,048,576 patterns, each equally likely for a
 // reader answering at random.
 //
-// Usage: node scripts/simulate-quiz-v2.mjs [path to quiz-v2.json]
+// Usage: node scripts/simulate-quiz-v2.mjs [path to quiz-v2.json] [--json]
+//
+// --json prints the exact counts instead of the report: every school's
+// primary count, every primary > secondary pair's count and the number of
+// ties. tests/quiz-v2-score.test.ts compares the quiz's own scorer with
+// them integer for integer.
 //
 // The result logic it applies is the one docs/quiz-v2.md proposes:
 // - a reader's position is the mean of their ten options' vectors;
@@ -18,7 +23,9 @@
 // school's angle and weight.
 import fs from "node:fs";
 
-const file = process.argv[2] ?? "docs/quiz-v2.json";
+const args = process.argv.slice(2);
+const asJson = args.includes("--json");
+const file = args.find((a) => !a.startsWith("--")) ?? "docs/quiz-v2.json";
 const quiz = JSON.parse(fs.readFileSync(file, "utf8"));
 const ids = Object.keys(quiz.schools);
 const pos = Object.fromEntries(
@@ -101,6 +108,11 @@ function persona(target) {
     y: chosen.reduce((s, o) => s + o.vector.y, 0) / 10,
   };
   return { p, ranked: rank(p, chosen[9].vector) };
+}
+
+if (asJson) {
+  console.log(JSON.stringify({ total, primary, pair, ties }));
+  process.exit(0);
 }
 
 const pct = (n) => ((100 * n) / total).toFixed(1).padStart(5) + "%";

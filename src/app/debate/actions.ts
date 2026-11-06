@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { pickChallengeTopic, resolveChallengeSide } from "@/lib/challenge";
+import { quizVersionOf } from "@/lib/quiz-result";
 import { MAX_RETRIEVAL_RESPONSE_CHARS } from "@/lib/micro-lessons";
 import { newId } from "@/lib/ids";
 
@@ -57,14 +58,20 @@ export async function assignChallengeTopic(challengeId: string): Promise<AssignT
   if (!challenge) return { ok: false, error: "Challenge not found." };
   if (!(await resolveChallengeSide(admin, challenge, user.id))) return { ok: false, error: "Challenge not found." };
 
+  // Between two v1 results only, until launch, as /r/[id] offers it: a
+  // challenge made on a SIX_SCHOOLS preview must not lead to debates and
+  // rating changes in production (Gate 2, option (i)). The page hides the
+  // button; this refuses a direct call too.
+  const resultIds = [challenge.challenger_result_id, challenge.challengee_result_id].filter(
+    (id): id is string => Boolean(id)
+  );
+  const { data: results } = await admin.from("quiz_results").select("user_id, quiz_version").in("id", resultIds);
+  if ((results ?? []).some((r) => quizVersionOf(r) !== 1)) return { ok: false, error: "Challenge not found." };
+
   if (challenge.topic_slug) {
     return { ok: true, topicSlug: challenge.topic_slug };
   }
 
-  const resultIds = [challenge.challenger_result_id, challenge.challengee_result_id].filter(
-    (id): id is string => Boolean(id)
-  );
-  const { data: results } = await admin.from("quiz_results").select("user_id").in("id", resultIds);
   const participantUserIds = (results ?? [])
     .map((r) => r.user_id as string | null)
     .filter((id): id is string => Boolean(id));

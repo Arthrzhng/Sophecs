@@ -58,8 +58,8 @@ beforeEach(() => {
   tables.debate_topics = [{ slug: "no-decision", active: true, sort: 1 }];
   tables.debates = [];
   tables.quiz_results = [
-    { id: "r-challenger", user_id: "challenger" },
-    { id: "r-challengee", user_id: "challengee" },
+    { id: "r-challenger", user_id: "challenger", quiz_version: 1 },
+    { id: "r-challengee", user_id: "challengee", quiz_version: 1 },
   ];
   tables.challenges = [
     { id: "c1", topic_slug: null, challenger_result_id: "r-challenger", challengee_result_id: "r-challengee" },
@@ -98,6 +98,15 @@ describe("assignChallengeTopic", () => {
     tables.quiz_results[1].user_id = null;
     signedIn = "challengee";
     expect(await assignChallengeTopic("c1")).toEqual({ ok: false, error: "Challenge not found." });
+  });
+
+  it("refuses a challenge with a v2 side, on any build, until launch (step 4)", async () => {
+    tables.quiz_results[1].quiz_version = 2;
+    signedIn = "challenger";
+    expect(await assignChallengeTopic("c1")).toEqual({ ok: false, error: "Challenge not found." });
+    tables.challenges[0].topic_slug = "crash-arithmetic";
+    expect(await assignChallengeTopic("c1")).toEqual({ ok: false, error: "Challenge not found." });
+    expect(updates).toEqual([]);
   });
 
   it("still needs a signed-in reader", async () => {
