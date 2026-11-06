@@ -28,10 +28,16 @@ export function generateStaticParams() {
 // and passes no referrer on, as every other page showing a sample does
 // (docs/sample-activity.md, "What a sample can never touch"): no event, and
 // no session replay of the text, reaches PostHog from it.
+// Its own link preview, not the root layout's ("Sophecs" and the quiz's
+// description); the image is still the site's (src/app/opengraph-image.tsx).
+const TITLE = "Exemplar ways to argue this motion · Sophecs";
+const DESCRIPTION = "Exemplar ways to argue this motion, from each school.";
 export const metadata = {
-  title: "Exemplar ways to argue this motion · Sophecs",
-  description: "Exemplar ways to argue this motion, from each school.",
+  title: TITLE,
+  description: DESCRIPTION,
   referrer: SAMPLE_PAGE_REFERRER,
+  openGraph: { title: TITLE, description: DESCRIPTION, siteName: "Sophecs", type: "website" as const },
+  twitter: { card: "summary_large_image" as const, title: TITLE, description: DESCRIPTION },
 };
 
 export default async function ExemplarsPage({ params }: { params: Promise<{ slug: string }> }) {

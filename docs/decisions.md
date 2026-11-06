@@ -4174,5 +4174,12 @@ it was.
 New copy: the heading and the line under it, as above; the link "Argue
 this motion"; the page title "Exemplar ways to argue this motion ·
 Sophecs" and its description "Exemplar ways to argue this motion, from
-each school." The arguments are the sample run's, accepted with it on
-2026-11-04.
+each school.", which its link preview uses too. The arguments are the
+sample run's, accepted with it on 2026-11-04.
+
+For Arthur's list at the end of the phase: whether exemplars need a floor
+on the template mark. On the full dataset none of the 72 chosen is one
+the run wrote to be weak, but with only the canary's rows (the first 40
+accounts, after the launch teardown and before `full`) a review probe of
+the generator found 4 of 70 and 6 of 40 were, marked 28 to 36. A floor
+would leave a position out rather than show a weak argument for it.

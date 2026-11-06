@@ -466,13 +466,19 @@ sample teardown and a fresh run into the launch steps". In order:
    and changing it for the live run would break its spot checks, so it
    waits for the fresh run.
 
-Between steps 1 and 3, `/debate/<slug>/exemplars` has no sample
-arguments to show and is not found; the landing page's and verdicts'
-links to it lead there. A not-found page is kept for an hour and rebuilt
-on the first request after that, so the page comes back up to an hour
-after the fresh run writes. After the canary, which writes the first 40
-accounts' activity, it can show fewer than four a school; it fills once
-`full` has written.
+`/debate/<slug>/exemplars` is built at most hourly, and a built page,
+found or not, is served until the first request after its hour, which
+rebuilds it for the request after that; a deploy starts it afresh. So
+after step 1 a motion's page can go on showing the deleted arguments
+until the launch deploy in step 2 or its hour is out, and is then not
+found until the fresh run writes (the landing page's and verdicts' links
+lead there), coming back a rebuild after that. After the canary, which
+writes the first 40 accounts' activity, it can show fewer than four a
+school, and, with few rows to choose from, an argument the run wrote to
+be weak (a template mark around 30) as the strongest under its opening.
+Running `full` soon after the canary keeps that window short; a floor on
+the mark would close it, and is on Arthur's list (docs/decisions.md,
+"Exemplar ways to argue this motion").
 
 ## Stop conditions
 

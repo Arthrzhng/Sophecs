@@ -155,6 +155,9 @@ describe("getExemplars", () => {
         ])
       );
       expect(call.order[0]).toEqual(["score", { ascending: false, nullsFirst: false }]);
+      // Template marks are whole numbers and tie often: newest first among
+      // them, so the same row is shown from one hourly build to the next.
+      expect(call.order[1]).toEqual(["created_at", { ascending: false }]);
       // Every published row, so a rarely used opening is still found.
       expect(call.limit).toBe(EXEMPLAR_CANDIDATES_PER_SCHOOL);
       expect(EXEMPLAR_CANDIDATES_PER_SCHOOL).toBe(1000);

@@ -10,12 +10,17 @@ import type { SchoolId } from "../src/lib/types";
 
 let topic: { data: unknown; error: unknown } = { data: null, error: null };
 let reads = 0;
+const filters: [string, unknown][] = [];
 vi.mock("@/lib/supabase/admin", () => ({
   isAdminConfigured: () => true,
   createAdminClient: () => ({
     from: () => {
       reads++;
-      const b = { select: () => b, eq: () => b, maybeSingle: async () => topic };
+      const b = {
+        select: () => b,
+        eq: (c: string, v: unknown) => (filters.push([c, v]), b),
+        maybeSingle: async () => topic,
+      };
       return b;
     },
   }),
@@ -42,6 +47,7 @@ const MOTION = { slug: "opaque-benefit", motion: "This house would deploy it.", 
 beforeEach(() => {
   topic = { data: MOTION, error: null };
   reads = 0;
+  filters.length = 0;
   asked.length = 0;
   exemplars = new Map([
     ["stoicism", [{ id: "11111111-2222-3333-4444-555555555555", school: "stoicism", argument: "Here is my answer. Deploy it. Because.\n\nMore.", opening: "Deploy it." }]],
@@ -59,6 +65,7 @@ describe("the exemplars page", () => {
     expect(out).not.toContain("11111111-2222");
     // A sample page to analytics: nothing of it reaches PostHog.
     expect(out).toContain('data-sophecs-sample-page=""');
+    expect(filters).toEqual([["slug", "opaque-benefit"]]);
     expect(asked).toEqual([["opaque-benefit", MOTION.motion]]);
   });
 
@@ -71,7 +78,9 @@ describe("the exemplars page", () => {
 
   it("is not found for no motion, an inactive one, or one with nothing to show", async () => {
     topic = { data: null, error: null };
-    await expect(render("opaque-benefit")).rejects.toThrow("NEXT_NOT_FOUND");
+    await expect(render("no-decision")).rejects.toThrow("NEXT_NOT_FOUND");
+    // The motion it looked up is the one in the address.
+    expect(filters).toEqual([["slug", "no-decision"]]);
     topic = { data: { ...MOTION, active: false }, error: null };
     await expect(render("opaque-benefit")).rejects.toThrow("NEXT_NOT_FOUND");
     topic = { data: MOTION, error: null };
