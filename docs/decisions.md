@@ -4211,9 +4211,10 @@ buddhist-strong (62, fidelity 7), confucian-ren-disposition (61, fidelity
 engagement 5) and stoic-analogy (fidelity 7), the first of which was out
 of band in the 4 Nov run itself; its other 23 cases sit where that run
 put them. So the model has not drifted: what moved the scores is in the
-prompt since e83e0a8. The visible symptom is engagement, which on the
-strong cases fell from 5 to 7 on 4 Nov to 3 or 4, taking the composite
-down with it. What is left between the two prompts: the cap-binding
+prompt since e83e0a8. The visible symptom is engagement, whose medians on
+the strong cases ran from 4 to 7 on 4 Nov (three at 4, the other eight 5
+to 7) and fell to 3 or 4, taking the composite down with it. (Corrected
+on review: this first said "5 to 7 on 4 Nov".) What is left between the two prompts: the cap-binding
 sentences under engagement and on the scores, the head comment no
 longer sent, and Utilitarianism's Virtue Ethics voice.
 
@@ -4419,7 +4420,12 @@ the cap-binding sentences removed, and a second stop", "Judge v3: the
 both missed, and a stop". The comment itself says v3 "is not the
 production default" and is "a draft to run the golden set against",
 which become false at launch; that is part of what the judge is sent,
-and is listed for Gate 4.
+and is listed for Gate 4. Two more of its statements are already out of
+date, found on review: it says the paragraph crediting the concept over
+the vocabulary "lives with the criteria, not in this file", while this
+file's body now carries one, and it names `fillOnce`, which `src/` no
+longer has. Both are sent exactly as written, by the ruling, and are
+listed for Gate 4 with the others.
 
 **The check's rule.** "Strong cases in band" is read as: every one of
 the eleven strong cases (score band from 60 up) has its score in band,
@@ -4441,9 +4447,16 @@ three samples a case: 77 calls (two replies failed validation and passed
 on their retries), $1.1677. On the pass test, the median of three on
 every axis with a band:
 - 23 of 25 cases pass.
-- `confucian-hierarchy-school` fails, as in every run that has had it,
-  the accepted 4 Nov run included: 82/83/83 against 40-75, engagement
-  5/6/6 against 0-4.
+- `confucian-hierarchy-school` fails: 82/83/83 against 40-75, engagement
+  5/6/6 against 0-4. It has failed in every run that sent the 4 Nov
+  comment (the 4 Nov run itself, 80, and the checks of 01:08, 06:05 and
+  16:55, at 80 to 83 with engagement 5 or 6), and it was in band in three
+  runs that sent none: 22:08 on 5 Nov (72, engagement 3), and the checks
+  of 00:01 (74, engagement 4) and 01:06 (71, engagement 3) on 6 Nov. So
+  sending the comment again brings the strong cases back and takes this
+  case out of band again, the case #68's cap was written to hold. (On
+  review this line first said it fails "as in every run that has had it",
+  which those three runs contradict.)
 - `stoic-analogy` fails on fidelity: 7/7/7 against 8-10, with its score
   in band (69/71/71). On 4 Nov it was 8/7/8, a pass.
 - The mean of the 25 medians is 55.0, against 54.7 on 4 Nov. Strong
@@ -4456,7 +4469,9 @@ difference in body from the 4 Nov prompt is the paragraph on the concept
 over the vocabulary, kept because the 06:05 check that passed had it;
 the ruling's "if in doubt, drop the moved section" would also cover
 dropping it, at the cost of another full run (about $1.17). Both go to
-Arthur with the Gate 4 pack. Gate 3 and the new-schools run go ahead as
+Arthur with the Gate 4 pack, with the trade-off above: no prompt tried so
+far has had the strong cases and `confucian-hierarchy-school` in band
+together. Gate 3 and the new-schools run go ahead as
 ruled.
 
 Cumulative on the eval key: $11.0704 of $15.00, over the 17 run files on

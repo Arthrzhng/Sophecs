@@ -332,6 +332,18 @@ describe("v3 as sent (Arthur's rulings of 2026-11-05)", () => {
     expect(file.startsWith(head)).toBe(true);
   });
 
+  it("is the prompt the full run of 2026-11-06 16:58 UTC scored, byte for byte", () => {
+    // The head comment is pinned above; this pins the body too. A run
+    // file's prompt_sha256 is the hash of the raw file, and this is the one
+    // recorded by tests/judge/golden-runs/2026-11-06T16-58-30-986Z-v3.json.
+    // An edit anywhere in the file, the vocabulary paragraph included, is a
+    // change to what the judge receives and needs a new run.
+    const file = fs.readFileSync(path.join(process.cwd(), "content/prompts/judge.v3.md"), "utf-8");
+    expect(crypto.createHash("sha256").update(file, "utf-8").digest("hex")).toBe(
+      "5c0bbece85a94d6f924c8a8cf70a37db30a72c6de2777bf4cfdeb00719223856"
+    );
+  });
+
   it("keeps the engagement cap, without the sentences that bound it to the reply", async () => {
     // Arthur's ruling of 2026-11-06: the cap-binding sentences of
     // 2026-11-05 go; the cap stays in its wording of 2026-11-03.
@@ -396,8 +408,9 @@ describe("every judge prompt file", () => {
   // This is the test that would have caught judge.v3.md naming both of its
   // placeholders in its own header comment: the comment was then sent to
   // the model with the rest of the file, and filling a placeholder by name
-  // filled the mention instead of the placeholder. v3's comment is now
-  // stripped before filling, and this still checks the raw file.
+  // filled the mention instead of the placeholder. v3's comment is sent
+  // again since 2026-11-06 (ruling 12 reversed), so this check on the raw
+  // file is again the one that matters.
   const dir = path.join(process.cwd(), "content", "prompts");
   const versions = fs
     .readdirSync(dir)

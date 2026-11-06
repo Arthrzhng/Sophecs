@@ -257,8 +257,8 @@ describe("judge.v3.md", () => {
     // comment included, used to be sent to the model, and anthropic.ts
     // fills a placeholder by name: a header that named one had the mention
     // filled and the real placeholder left standing in the prompt. The
-    // comment is stripped before filling since 2026-11-05, and this still
-    // holds the raw file to the rule. That is
+    // comment was stripped before filling from 2026-11-05 and is sent again
+    // since 2026-11-06 (ruling 12 reversed), so the rule holds. That is
     // exactly what happened when the substitution was first added. See
     // tests/judge-request.test.ts, which checks every version.
     expect(header).not.toContain("{{RUBRIC}}");

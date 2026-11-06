@@ -215,6 +215,25 @@ export async function callJudgeModel(
     );
   }
 
+  // Arthur's ruling of 2026-11-05 accepts null for these two fields on an
+  // original (schema.ts), where a v3 reply sometimes carries them. The
+  // schema cannot tell an original from a revision, so a revision's null is
+  // refused here, as it was before the ruling: on a revision both fields
+  // are the verdict's answer, and production's v2 revisions stay exactly
+  // as they were (tests/judge-null-revision-fields.test.ts).
+  if (revisionOf && typeof parsed === "object" && parsed !== null && (parsed as { rejected?: unknown }).rejected === false) {
+    const nulls = (["objection_answered", "improvement_note"] as const).filter(
+      (field) => (parsed as Record<string, unknown>)[field] === null
+    );
+    if (nulls.length > 0) {
+      throw new JudgeValidationError(
+        nulls.map((field) => `${field}: null on a revision`).join("; "),
+        costUsd,
+        latencyMs
+      );
+    }
+  }
+
   const result = VerdictSchema.safeParse(parsed);
   if (!result.success) {
     // Name the offending field rather than dumping the whole zod issue

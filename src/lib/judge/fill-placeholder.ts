@@ -12,8 +12,9 @@
  *
  * 1. **At most one occurrence.** `String.prototype.replace` with a string
  *    needle fills the first match and says nothing about the rest. A prompt
- *    file was sent to the model whole, HTML comment included (v3's comment
- *    is stripped before filling since 2026-11-05), and
+ *    file is sent to the model whole, HTML comment included (v3's comment
+ *    was stripped from 2026-11-05 until ruling 12 was reversed on
+ *    2026-11-06), and
  *    `content/prompts/judge.v3.md` named both of its placeholders in its
  *    own header before using them, so the naive call filled the mention in
  *    the comment and left the real placeholder standing. The model would

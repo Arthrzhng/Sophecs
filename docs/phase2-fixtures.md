@@ -124,8 +124,10 @@ $1.35 where the unrounded total is $1.34. With the criteria as they stand
 after 2026-11-03 it printed $0.42 and $0.99, or $0.14 and $0.33: v2 is
 unchanged, and v3's criteria are longer. With the twenty-fifth case and
 the line added to `judge.v3.md` the same day, v3 prints $1.05, or $0.35.
-Since 2026-11-05 v3's head comment is not sent, and the estimate counts
-only what is: v3 prints $0.97, or $0.32.
+From 2026-11-05 v3's head comment was not sent, and the estimate counts
+only what is: v3 printed $0.97, or $0.32. Since 2026-11-06 the comment is
+sent again (ruling 12 reversed), with the vocabulary paragraph in the
+body: v3 prints $1.10, or $0.37.
 
 **The ceiling.** Output is capped at `max_tokens: 850` in
 `src/lib/anthropic.ts`. If every call ran to the cap rather than to the
