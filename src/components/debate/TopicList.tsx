@@ -10,6 +10,11 @@ import type { SchoolId } from "@/lib/types";
 /** What this reader can do with a motion right now. */
 export type TopicStatus = "open" | "pending" | "judged" | "locked";
 
+// An "Exemplars" link under each motion, on a SIX_SCHOOLS build only
+// (Arthur, 2026-11-06; docs/daily-path-copy.md, section 13). Every other
+// build's list is as it was.
+const EXEMPLARS = process.env.SIX_SCHOOLS === "1";
+
 const STATUS_LABEL: Record<TopicStatus, string> = {
   open: "Open",
   pending: "Awaiting verdict",
@@ -95,7 +100,7 @@ export function TopicList({
         {topics.map((topic) => {
           const weekly = Boolean(topic.isWeekly && school);
           return (
-            <li key={topic.slug} className="flex">
+            <li key={topic.slug} className={EXEMPLARS ? "flex flex-col" : "flex"}>
               <Link
                 href={`/debate/${topic.slug}`}
                 className={`chunky group flex min-w-0 flex-1 flex-col rounded-panel border-2 border-rule-strong bg-surface p-5 ${
@@ -168,6 +173,17 @@ export function TopicList({
                   </p>
                 </div>
               </Link>
+              {/* Under the card, not inside it: the whole card is a link,
+                  and a link cannot hold another. */}
+              {EXEMPLARS && (
+                <Link
+                  href={`/debate/${topic.slug}/exemplars`}
+                  aria-label={`Exemplars: ${topic.title}`}
+                  className="mt-1 inline-flex min-h-11 items-center self-start text-sm font-semibold text-ink underline underline-offset-4"
+                >
+                  Exemplars
+                </Link>
+              )}
             </li>
           );
         })}

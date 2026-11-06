@@ -5,6 +5,7 @@ import { REPLY_SAVED_COPY } from "@/lib/counterpart";
 import { ExchangePublishToggle } from "./PublishToggle";
 import { SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
+import { COUNTERPART_RULES_HREF } from "@/lib/nav-routes";
 
 /** One reply, as the page shows it. `mine` replaces the author comparison. */
 export interface ViewTurn {
@@ -206,7 +207,7 @@ export function ExchangeView({
           Your verdict
         </Link>
         <Link
-          href="/debate/rubric"
+          href={COUNTERPART_RULES_HREF}
           className="inline-flex min-h-11 items-center text-sm font-semibold text-ink underline underline-offset-4"
         >
           Counterpart rules

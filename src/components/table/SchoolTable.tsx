@@ -9,6 +9,7 @@ import {
 } from "@/lib/school-table";
 import type { SchoolId } from "@/lib/types";
 import { TextLink } from "@/components/ui/TextLink";
+import { SAMPLES_HREF } from "@/lib/nav-routes";
 
 /** A value the week has not produced. Same marker the verdict uses. */
 const NOTHING = "—";
@@ -64,12 +65,27 @@ export function SchoolTable({
   emptyWeek,
   paused,
   sampleNote = null,
-}: SchoolTableProps) {
+  headingAs = "h1",
+}: SchoolTableProps & {
+  /**
+   * `h1` on `/table`, the page's own heading. `h2` on `/schools` (a
+   * SIX_SCHOOLS build), where the table sits under the page's heading and
+   * the schools' cards.
+   */
+  headingAs?: "h1" | "h2";
+}) {
+  const Heading = headingAs;
+  // The two notes under the table sit one level below its heading.
+  const Note = headingAs === "h1" ? "h2" : "h3";
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="text-xl font-extrabold tracking-tight text-ink">School table</h1>
+          <Heading
+            className={`${headingAs === "h1" ? "text-xl" : "text-lg"} font-extrabold tracking-tight text-ink`}
+          >
+            School table
+          </Heading>
           <p className="mt-2 max-w-[60ch] text-base leading-relaxed text-ink-mid">
             How each school argued this week. Fidelity is the judge&apos;s 0&ndash;10 mark
             for arguing the way the school reasons, averaged across every judged
@@ -171,16 +187,16 @@ export function SchoolTable({
       <div className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(min(18rem,100%),1fr))] gap-4">
         {yourLine && (
           <section className="rounded-card border-2 border-rule bg-surface px-5 py-4">
-            <h2 className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
+            <Note className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
               Your week
-            </h2>
+            </Note>
             <p className="mt-2 text-base leading-relaxed text-ink">{yourLine}</p>
           </section>
         )}
         <section className="rounded-card border-2 border-rule bg-surface px-5 py-4">
-          <h2 className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
+          <Note className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
             Joined and left
-          </h2>
+          </Note>
           <p className="mt-2 text-sm leading-relaxed text-ink-mid">
             Joined and left count people who retook the quiz and changed school. No
             names are shown, here or anywhere else.
@@ -188,7 +204,7 @@ export function SchoolTable({
           {sampleNote && (
             <p className="mt-2 text-sm leading-relaxed text-ink-mid">
               {sampleNote}{" "}
-              <TextLink href="/method#samples">What a sample account is</TextLink>
+              <TextLink href={SAMPLES_HREF}>What a sample account is</TextLink>
             </p>
           )}
         </section>

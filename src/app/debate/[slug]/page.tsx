@@ -8,7 +8,10 @@ import { Page } from "@/components/layout/Page";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate } from "@/lib/motion-text";
 
-export const metadata = { title: "Debate · Sophecs" };
+// "Motions" on a SIX_SCHOOLS build (docs/daily-path-copy.md, section 13).
+export const metadata = {
+  title: process.env.SIX_SCHOOLS === "1" ? "Motions · Sophecs" : "Debate · Sophecs",
+};
 
 // Requires auth — the one moment the brief prompts sign-in, per
 // docs/decisions.md. Redirects preserve the topic (and challenge id, if

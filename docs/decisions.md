@@ -4643,3 +4643,114 @@ key: $12.2431 of $15.00, over the 18 run files.
   78 against 75; its objection was `utilitarianism` three times in both
   runs, so the added Ubuntu voice does not show in it) and stoic-analogy's
   fidelity.
+
+### Navigation for six schools, behind SIX_SCHOOLS (2026-11-06)
+
+Arthur, 2026-11-06: "Queue this after Gate 3 and the new-schools run;
+don't let it delay them. Navigation restructure, as part of Stage 5
+behind SIX_SCHOOLS (launches with the six schools; production unchanged
+until then). Signed out: Header: Lessons · Motions · Schools · How it
+works, plus a primary "Take the quiz" button. Logo -> /. Signed in:
+Header: Today · Motions · Lessons · Schools. Logo -> /today. The ME
+button opens a menu: Profile, My debates and challenges, Classes,
+Settings, Retake the quiz, Sign out. Pages: "Schools" (/schools): a card
+per published school linking to its /s/[school] page, with this week's
+table below. /table redirects to it. "How it works": merge /method and
+/debate/rubric into one page with anchors; old URLs redirect, including
+/method#samples. Rename "Debate" to "Motions" in the nav and headings
+(keep /debate URLs). Add an "Exemplars" link on each motion card in the
+list. Mobile: the same items in the existing Menu dropdown. Keep every
+existing URL working (redirect, never 404). Copy goes into
+docs/daily-path-copy.md first. Screenshots of both menus, signed out and
+signed in, at 390px and 1280px, in the Gate 4 pack for my review."
+
+Built after Gate 3 and the new-schools run, as asked. The copy is in
+`docs/daily-path-copy.md`, section 13, with what is new marked for his
+ruling. A build without the flag, production included, renders every
+touched page and component byte for byte as before. Tests pin it against
+fixtures rendered from main (`tests/nav-six-flag-off/`), and two reviews
+served main and the branch, both built without the flag, side by side.
+On such a build `/schools` and `/how-it-works` are rewritten
+(`flagOffRewrites` in `next.config.ts`) to a path no route answers, so
+they get the site's own not-found page, as on main; a page that refuses
+by itself answers with Next's bare error shell instead.
+
+Choices made where the instruction left room, each his to change:
+- **Signed-in or not, before the page is drawn.** Both link sets are in
+  the page; a one-line script in the root layout marks `<html
+  data-auth="in">` from the session cookie, and CSS shows one set. No
+  page reads cookies on the server for it, so static pages stay static,
+  and neither set flashes into the other. The header re-reads the cookie
+  on each page change; Sign out loads the Supabase client only when
+  pressed.
+- **No sign-in link in the signed-out header,** as given. The landing
+  page keeps its own link to `/login`.
+- **The Me menu's targets:** Profile `/me`; My debates and challenges
+  `/me#challenges` (the pending challenges, with the debate history after
+  them); Classes `/me/settings#classes`; Settings `/me/settings`; Retake
+  the quiz `/quiz`. The anchors exist on flag-on builds only.
+- **"A card per published school":** the cards are the schools the
+  build shows, the list every public surface moved to in Stage 5's step
+  2, which is the six on a flag-on build and the six published at launch.
+- **How it works** keeps both pages' text unchanged, shared with them
+  (`src/components/how-it-works/`), under a new heading and a contents
+  line, with anchors `#judge`, `#rubric`, `#counterpart` and `#samples`.
+  The method page's closing sentence ("The criteria the judge is given
+  are published in full, including the fidelity criteria for each
+  school. Read the rubric.") is left out with its link, since the rubric
+  is on the same page. The rubric's own claim to show the judge's
+  criteria in full is unchanged and is Gate 4's item 10. The merged page
+  does not send `rubric_viewed`, which `/debate/rubric` sends: that event
+  counts views of the rubric page, and a visit to `/how-it-works` is not
+  one. Whether it should count the merged page is his.
+- **Redirects** (`sixSchoolsRedirects` in `next.config.ts`, flag-on
+  builds only): `/table` to `/schools`, `/method` to `/how-it-works`
+  (a browser keeps the anchor, so `/method#samples` lands on
+  `#samples`), `/debate/rubric` to `/how-it-works#rubric`. Temporary
+  until the launch makes them permanent. Checked on a served flag-on
+  build: each answers 307 to its destination.
+- **Exemplars** sits under each motion card, not inside it: the card is
+  itself a link, and a link cannot hold another. Read aloud as
+  "Exemplars: {motion title}".
+- **"Debate" to "Motions"** in the header, the footer and the two debate
+  pages' titles; the footer's About column and its disclosure link point
+  at the merged page on a flag-on build.
+- **Widths.** The header keeps to one line from 360 pixels, the
+  design's phone width (`design/layout.md`), up, with nothing pushed
+  sideways; below 360 the quiz button wraps. Between 640 and 768 the
+  bar's links and gaps are a little narrower, so "How it works" stays on
+  one line. Only one of Menu and Me is open at a time.
+- **Links go to the new addresses directly.** On a flag-on build every
+  link inside the site that led to `/method`, `/debate/rubric` or
+  `/table` leads to `/how-it-works`, its anchors, or `/schools`
+  (`src/lib/nav-routes.ts`), and the sitemap lists the new pages. A
+  redirect followed inside the site drops the anchor, so the verdict's
+  "How this was judged" would otherwise land on the top of the page, not
+  the rubric. The old addresses still redirect, for links from outside.
+- **The session cookie test** matches Supabase's auth cookie and its
+  numbered parts (`sb-{ref}-auth-token`, `.0`, `.1`), not the
+  `-code-verifier` cookie a half-finished sign-in leaves, so a reader who
+  abandoned a sign-in is not shown the signed-in header.
+- **The flag-off bundle.** The flag-off build's markup is pinned by
+  fixtures taken from main (`tests/nav-six-flag-off/`). What it sends is
+  not byte for byte main's:
+  - The root layout's script, which every page loads, grows by 1,743
+    bytes (about 560 compressed): the header picks its version at build
+    time, but what the six-school header imports still comes along
+    unused, namely the published three's names and colours and the
+    session-cookie test.
+  - Four page scripts grow by 84 to 117 bytes each (`/today`, a debate,
+    the chunk the debate and revise pages share, `/styleguide/arena`),
+    where `src/lib/nav-routes.ts` is a module of its own.
+  - Each page's HTML is 41 to 65 bytes longer, in the inline data React
+    reads (the layout's unused flag and head, the footer's fragment); the
+    markup itself is the same.
+  - `_buildManifest.js` lists the two rewrites, so the addresses
+    `/schools` and `/how-it-works` are in a public file no page loads.
+  - The stylesheet grows by 684 bytes (103 compressed): rules for
+    classes no flag-off page uses, since Tailwind writes a rule for
+    every class it finds in the source, whichever build uses it.
+
+  No draft school is among any of it (`check:bundle` passes). Measured
+  on flag-off builds of main at 901e3a4 and of this branch; the page
+  scripts and the HTML by the third review.

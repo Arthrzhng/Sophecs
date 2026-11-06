@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { METHOD_HREF } from "@/lib/nav-routes";
 
 /**
  * What the arena says while the judge is off.
@@ -23,7 +24,7 @@ export function JudgingPausedNotice() {
       </p>
       <p className="mt-3 flex flex-wrap gap-5">
         <Link
-          href="/method"
+          href={METHOD_HREF}
           className="inline-flex min-h-11 items-center text-sm font-semibold text-ink underline underline-offset-4"
         >
           How the judge works

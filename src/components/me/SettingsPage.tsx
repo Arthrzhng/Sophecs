@@ -5,9 +5,17 @@ import { SignOutButton } from "./SignOutButton";
 import { DeleteAccountButton } from "./DeleteAccountButton";
 import type { ClassSummary, JoinedClass } from "@/lib/classes";
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+// The anchors the header's Me menu links to, on a SIX_SCHOOLS build only
+// (docs/daily-path-copy.md, section 13); every other build's markup is as
+// it was.
+const ANCHORS = process.env.SIX_SCHOOLS === "1";
+
+function Section({ title, children, id }: { title: string; children: React.ReactNode; id?: string }) {
   return (
-    <section className="mt-12 border-t-2 border-rule pt-10">
+    <section
+      id={ANCHORS ? id : undefined}
+      className={`mt-12 border-t-2 border-rule pt-10${ANCHORS && id ? " scroll-mt-8" : ""}`}
+    >
       <h2 className="text-lg font-extrabold tracking-tight text-ink">{title}</h2>
       <div className="mt-5">{children}</div>
     </section>
@@ -49,7 +57,7 @@ export function SettingsPage({
         <ArgumentVisibilityToggle initial={argumentDefaultPublic} />
       </Section>
 
-      <Section title="Classes">
+      <Section title="Classes" id="classes">
         <ClassesSection owned={owned} joined={joined} prefillCode={prefillCode} />
       </Section>
 

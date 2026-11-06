@@ -220,9 +220,26 @@ the new-schools run 16 or 23 of 25, depending on item 3.
     20-argument rule, and the exemplars pages would show three schools.
     Samples for the new three need new argument banks, which are content.
     Rule whether the run should cover them.
-14. **The navigation's copy and screenshots,** on branch `nav-six` (#99):
-    `docs/daily-path-copy.md`, section 13, and `docs/gate4/`. They are
-    added to this file when #99 merges.
+14. **The navigation's copy and screenshots** (#99). The copy is
+    `docs/daily-path-copy.md`, section 13, with what is new marked: the
+    two pages' descriptions; `/how-it-works`' contents line and that
+    line's spoken name "On this page"; and the Exemplars link. The choices made where your instruction left room are in
+    `docs/decisions.md`, "Navigation for six schools, behind
+    SIX_SCHOOLS": no sign-in link in the signed-out header; where each
+    item under Me goes; the method page's closing sentence ("The criteria
+    the judge is given are published in full ... Read the rubric.") left
+    out of the merged page; `rubric_viewed` not sent from it; the
+    redirects temporary until the launch. Each is yours to change.
+    Taken from a served SIX_SCHOOLS build:
+
+    | | 1280 pixels | 390 pixels |
+    | --- | --- | --- |
+    | Signed out | ![Signed out at 1280 pixels: the header](gate4/nav-signed-out-1280.png) | ![Signed out at 390 pixels: Menu open](gate4/nav-signed-out-390-menu.png) |
+    | Signed in, Me | ![Signed in at 1280 pixels: Me open](gate4/nav-signed-in-1280-me.png) | ![Signed in at 390 pixels: Me open](gate4/nav-signed-in-390-me.png) |
+    | Signed in, Menu | (the links are in the bar) | ![Signed in at 390 pixels: Menu open](gate4/nav-signed-in-390-menu.png) |
+
+    Signed out at 1280 pixels there is no menu: the four links and the
+    button are in the bar.
 
 ## Publishing: (c)
 
@@ -238,7 +255,8 @@ the new-schools run 16 or 23 of 25, depending on item 3.
     section 8); `README.md`; the "until launch" rules of steps 3 and 4
     lifted; a fresh sample run (item 13). Between the teardown and that
     run, `/debate/{slug}/exemplars` answers not found while the landing
-    page links to it (`docs/decisions.md`, the exemplars entry).
+    page links to it (`docs/decisions.md`, the exemplars entry), and,
+    with #99, while each motion card in the list does.
 
 ## Production database writes: (a)
 
@@ -258,8 +276,6 @@ the new-schools run 16 or 23 of 25, depending on item 3.
 
 Mine, and not waiting on anyone:
 
-- The navigation restructure (#99), and its screenshots added here once
-  it merges.
 - The re-screening job's log is read at 06:00 UTC on 2026-11-07: the
   Hobby plan fires its cron at some point in the 05:00 hour and keeps
   runtime logs for an hour, so 06:00 covers the whole hour.

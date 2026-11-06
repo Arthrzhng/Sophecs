@@ -4,6 +4,7 @@ import { spectral, plexSans, plexMono, bricolage } from "@/lib/fonts";
 import { AnalyticsProvider } from "@/components/analytics-provider";
 import { SiteHeader } from "@/components/nav/SiteHeader";
 import { SiteFooter } from "@/components/nav/SiteFooter";
+import { AUTH_HINT_SCRIPT } from "@/components/nav/auth-hint";
 import "./globals.css";
 // The three unpublished schools' colour tokens on a SIX_SCHOOLS build, and
 // an empty stylesheet on any other (next.config.ts resolves the name).
@@ -44,11 +45,24 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // On a SIX_SCHOOLS build, the header's signed-in links are chosen before
+  // the page is drawn: a one-line script marks <html data-auth="in"> from
+  // the session cookie (src/components/nav/auth-hint.ts), without reading
+  // cookies here. The mark is set before React hydrates, hence the
+  // suppressed warning on <html> alone. A build without the flag has
+  // neither.
+  const six = process.env.SIX_SCHOOLS === "1";
   return (
     <html
       lang="en"
       className={`${spectral.variable} ${plexSans.variable} ${plexMono.variable} ${bricolage.variable}`}
+      suppressHydrationWarning={six || undefined}
     >
+      {six && (
+        <head>
+          <script dangerouslySetInnerHTML={{ __html: AUTH_HINT_SCRIPT }} />
+        </head>
+      )}
       <body className="min-h-screen flex flex-col bg-paper text-ink">
         <Suspense fallback={null}>
           <AnalyticsProvider />

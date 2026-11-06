@@ -5,6 +5,7 @@ import { schoolColourVar } from "@/lib/school-registry";
 import { streakLine, STREAK_PAUSED_LINE } from "@/lib/streak-copy";
 import { liveStreak, streakDayLabel, streakWeek } from "@/lib/streak-week";
 import type { SchoolId } from "@/lib/types";
+import { SAMPLES_HREF, TABLE_HREF } from "@/lib/nav-routes";
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
@@ -172,14 +173,14 @@ export function SchoolCard({
       {includesSamples && (
         <p className="mt-1 text-sm text-ink-mid">
           {RANK_SAMPLE_NOTE}{" "}
-          <Link href="/method#samples" className="text-ink underline underline-offset-4">
+          <Link href={SAMPLES_HREF} className="text-ink underline underline-offset-4">
             What a sample account is
           </Link>
         </p>
       )}
       <p className="mt-3">
         <Link
-          href="/table"
+          href={TABLE_HREF}
           className="inline-flex min-h-11 items-center text-sm font-semibold text-ink underline underline-offset-4"
         >
           See the school table

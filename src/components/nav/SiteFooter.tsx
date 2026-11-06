@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import { SHOWN_SCHOOL_IDS } from "@/lib/school-registry";
+import { RUBRIC_HREF } from "@/lib/nav-routes";
 
 // Every school this build shows, each with a page at /s/[school].
 const SCHOOLS = SHOWN_SCHOOL_IDS;
@@ -51,6 +52,12 @@ function Row({ href, children }: { href: string; children: React.ReactNode }) {
 // every link, every destination and every word of the disclosure and the
 // privacy paragraph are unchanged, which is the whole point of touching a
 // footer that says what the product does with a teenager's data.
+// On a SIX_SCHOOLS build: "Motions" for "Debate", and the merged How it
+// works page for the method and the rubric (docs/daily-path-copy.md,
+// section 13). The old addresses redirect there on that build anyway; the
+// links go straight. Every other build, production included, is unchanged.
+const SIX = process.env.SIX_SCHOOLS === "1";
+
 export function SiteFooter() {
   return (
     <footer className="mt-auto border-t-2 border-rule" data-print="hide">
@@ -64,7 +71,7 @@ export function SiteFooter() {
         <div className="mt-10 flex flex-wrap gap-x-16 gap-y-8">
           <Column heading="The site">
             <Row href="/quiz">Quiz</Row>
-            <Row href="/debate">Debate</Row>
+            <Row href="/debate">{SIX ? "Motions" : "Debate"}</Row>
             <Row href="/lessons">Lessons</Row>
             <Row href="/me">Your profile</Row>
           </Column>
@@ -80,8 +87,17 @@ export function SiteFooter() {
           <Column heading="About">
             <li className="flex min-h-11 items-center text-ink-mid">Made by {MADE_BY}</li>
             <li className="flex min-h-11 items-center text-ink-mid">{CONTACT}</li>
-            <Row href="/method">How the judge works</Row>
-            <Row href="/debate/rubric">The rubric</Row>
+            {SIX ? (
+              <>
+                <Row href="/how-it-works">How it works</Row>
+                <Row href="/how-it-works#rubric">The rubric</Row>
+              </>
+            ) : (
+              <>
+                <Row href="/method">How the judge works</Row>
+                <Row href="/debate/rubric">The rubric</Row>
+              </>
+            )}
           </Column>
         </div>
 
@@ -98,7 +114,7 @@ export function SiteFooter() {
             motion and the criteria for your school, and nothing else about
             you. It can be wrong, which is why every verdict names the
             criteria it applied and why you get a revision.{" "}
-            <Link href="/debate/rubric" className="text-ink-mid underline underline-offset-4 hover:text-ink">
+            <Link href={RUBRIC_HREF} className="text-ink-mid underline underline-offset-4 hover:text-ink">
               Read the rubric
             </Link>
             .
