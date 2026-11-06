@@ -3862,3 +3862,64 @@ decided.
 
 Production held no pending reply on 2026-11-05: all 1,700 turns were
 delivered sample turns, read at 22:45 UTC.
+
+### The judge's cap and ceiling, reserved in one step (migration 0028)
+
+Arthur's ruling of 2026-11-05 on Checkpoint B, (d) 1: "Yes: atomic
+reservation for the ceiling and cap."
+
+`/api/judge` counted a reader's judge calls in the last 24 hours, then
+called the judge, so two submissions sent at once could both pass on the
+same count. `reserve_judge_submission` (migration 0028) counts and claims
+in one step under a transaction lock keyed by the reader:
+- the arguments that count toward the cap, and every judge call for the
+  ceiling, as the route counted them;
+- plus the reader's submissions still in flight, each counted as one
+  argument and as three calls (the most one submission can make).
+
+If the new submission fits under both, it is reserved. The route releases
+the reservation when the submission ends, whichever way, from a `finally`
+around the handler. A reservation that is never released expires after
+five minutes, past the route's 60-second limit.
+
+While a submission is in flight its own calls are counted twice, once in
+`ai_calls` and once as its reservation. That errs towards refusing, and
+only for a reader with two submissions running at once. Allowlisted
+reviewers take no reservation: they skip the cap and the ceiling (ruling
+(d) 2).
+
+`scripts/test-0028-judge-reservations.sh` runs the SQL on a throwaway
+database, 30 checks. They include two sessions racing for a reader's last
+slot, where the second waits for the first and is refused at the cap, and
+a second reader who is not held up.
+
+The client roles are refused the table, both functions and the table's
+identity sequence, which Supabase's default privileges would otherwise
+grant them; the migration checks all three before it commits, every
+table privilege included (MAINTAIN too on Postgres 17). Its one
+lock on an existing table is the foreign key's SHARE ROW EXCLUSIVE on
+`auth.users`, which holds up sign-ups and account deletions, not reads,
+until it commits; a five-second `lock_timeout` makes it give up rather
+than queue them.
+
+**Order.** 0028 is a production database write, so it waits for Arthur's
+yes under (a). The route calls the two functions, so it ships only after
+the migration is applied. Before then every non-allowlisted submission
+would be refused with "The daily limit could not be checked", which fails
+closed but stops judging. The rollback, which contains DROP and so is
+Arthur's to run, comes after a deploy without the reservation, for the
+same reason.
+
+### The live table's 20-argument rule, at launch (2026-11-06)
+
+Arthur's ruling of 2026-11-06 on the open item from Checkpoint B's (e) 5:
+"apply it at launch with SIX_SCHOOLS, not before. Note it in the Gate 4
+steps."
+
+Nothing changes now. `rankThresholdApplies()` in `src/lib/school-table.ts`
+reads the flag, so a build without it ranks every school with an average,
+as before, and the launch, which turns the flag on for Production, applies
+the rule to the live table in the same step. `docs/stage5-plan.md`, step 6,
+and Gate 4 list it, so the launch brief says so: from the launch deploy,
+over the week in progress, each school is unranked until it has 20 judged
+original arguments in the week.

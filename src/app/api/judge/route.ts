@@ -36,12 +36,17 @@ const DAILY_CAP = 5;
 // 5-argument cap. Pick a sensible number and state it." 20 judge calls in
 // any 24 hours, every logged call counted, the ones taken off the argument
 // cap included. A submission starts only if all of its possible attempts fit
-// under it, so one submission at a time never passes it (two sent at once
-// can both read the same count): five judged arguments at three attempts
-// each are 15 calls and always fit, with room for at least one failed
-// submission besides. At most $0.20 or so a reader a day at the
+// under it: five judged arguments at three attempts each are 15 calls and
+// always fit, with room for at least one failed submission besides. Since
+// migration 0028 the cap and the ceiling are checked and claimed in one
+// step, so two submissions sent at once cannot both pass on the same
+// count (Arthur's ruling of 2026-11-05 on Checkpoint B, (d) 1). At most $0.20 or so a reader a day at the
 // COST comment's rate. docs/decisions.md, "The judge's caps and budget".
 const JUDGE_CALL_CEILING = 20;
+// How long a submission's reservation holds if the route never releases
+// it (the function stopped mid-call): well past maxDuration, so it never
+// lapses under a submission still running.
+const RESERVATION_HOLD_SECONDS = 300;
 // docs/daily-path-copy.md, "Judging failed": the detail line under the
 // argue screen's generic error when the cap cannot be checked.
 const CAP_UNCHECKED = "The daily limit could not be checked, so nothing was sent to the judge.";
@@ -64,12 +69,27 @@ function paused(reason: PauseReason) {
   return NextResponse.json({ ok: false, paused: true, reason });
 }
 
+// A reservation taken in judge() is released here when the submission
+// ends, whichever way it ends: judged, refused, or thrown.
+export async function POST(request: Request) {
+  const held: { reservation: number | null } = { reservation: null };
+  try {
+    return await judge(request, held);
+  } finally {
+    if (held.reservation !== null) {
+      const { error } = await createAdminClient().rpc("release_judge_reservation", { p_id: held.reservation });
+      // Not the reader's problem: it expires on its own (migration 0028).
+      if (error) console.error("[judge] reservation could not be released:", error.message);
+    }
+  }
+}
+
 // Order follows the brief exactly: session, kill switch, budget, daily cap
-// (and after it the daily call ceiling), topic lock, length, insert, call
+// (and with it the daily call ceiling), topic lock, length, insert, call
 // the model, validate, elo, return. The
 // only two deviations are unavoidable data lookups (profile/topic) needed
 // to perform the checks after them, interleaved rather than done upfront.
-export async function POST(request: Request) {
+async function judge(request: Request, held: { reservation: number | null }) {
   const body = (await request.json().catch(() => null)) as
     | { topicSlug?: string; argument?: string; challengeId?: string; parentDebateId?: string }
     | null;
@@ -142,47 +162,35 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Unknown topic." }, { status: 404 });
   }
 
+  // The five-argument cap and the 20-call ceiling, checked and claimed in
+  // one step (reserve_judge_submission, migration 0028): the reader's
+  // judge calls in the last 24 hours, those that count toward the cap for
+  // the cap and all of them for the ceiling, plus any submission of theirs
+  // still in flight. A submission that ended without a verdict is not one
+  // of the reader's arguments (judgeDebate takes its calls out of the cap).
+  // A reservation that could not be made is not a pass: an error stops
+  // the submission, before anything is written or billed, rather than wave
+  // it past the cap.
   if (!isAllowlisted) {
-    const sinceDaily = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { count: dailyCount, error: capError } = await admin
-      .from("ai_calls")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .eq("kind", "judge")
-      // A submission that ended without a verdict is not one of the
-      // reader's arguments (judgeDebate takes its calls out). Migration
-      // 0019 adds the column with a default of true, so every row written
-      // before it still counts.
-      .eq("counts_toward_cap", true)
-      .gte("created_at", sinceDaily);
-    // A count that failed is not a count of zero. Unread, an error here
-    // (a missing column, before migration 0019 or after its rollback)
-    // would wave every submission past the cap, so it stops the
-    // submission instead, before anything is written or billed.
-    if (capError) {
-      console.error("[judge] daily cap could not be checked:", capError.message);
-      return NextResponse.json({ ok: false, error: CAP_UNCHECKED }, { status: 503 });
-    }
-    if ((dailyCount ?? 0) >= DAILY_CAP) {
+    const { data: reserved, error: reserveError } = await admin.rpc("reserve_judge_submission", {
+      p_user: user.id,
+      p_cap: DAILY_CAP,
+      p_ceiling: JUDGE_CALL_CEILING,
+      p_attempts: MAX_JUDGE_ATTEMPTS,
+      p_hold_seconds: RESERVATION_HOLD_SECONDS,
+    });
+    if (reserved === "daily_cap") {
       return paused("daily_cap");
     }
-
-    // The hard ceiling: every judge call in the window, whether or not it
-    // counts toward the five. Like the cap above, a count that failed stops
-    // the submission rather than waving it through.
-    const { count: callCount, error: ceilingError } = await admin
-      .from("ai_calls")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .eq("kind", "judge")
-      .gte("created_at", sinceDaily);
-    if (ceilingError) {
-      console.error("[judge] daily call ceiling could not be checked:", ceilingError.message);
-      return NextResponse.json({ ok: false, error: CAP_UNCHECKED }, { status: 503 });
-    }
-    if ((callCount ?? 0) + MAX_JUDGE_ATTEMPTS > JUDGE_CALL_CEILING) {
+    if (reserved === "call_ceiling") {
       return paused("call_ceiling");
     }
+    const reservation = typeof reserved === "string" && /^[0-9]+$/.test(reserved) ? Number(reserved) : null;
+    if (reserveError || reservation === null) {
+      console.error("[judge] daily cap could not be checked:", reserveError?.message ?? `got ${String(reserved)}`);
+      return NextResponse.json({ ok: false, error: CAP_UNCHECKED }, { status: 503 });
+    }
+    held.reservation = reservation;
   }
 
   // A revision skips the seven-day topic lock entirely — it is the second

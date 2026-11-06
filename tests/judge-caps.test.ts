@@ -14,6 +14,7 @@ const read = (p: string) => fs.readFileSync(path.join(process.cwd(), p), "utf8")
 const codeOnly = (s: string) =>
   s.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/(^|[^:])\/\/[^\n]*/g, "$1").replace(/\s+/g, " ");
 const route = codeOnly(read("src/app/api/judge/route.ts"));
+const sql = codeOnly(read("supabase/migrations/0028_judge_reservations.sql").replace(/--[^\n]*/g, ""));
 
 describe("/api/judge's daily call ceiling", () => {
   it("is 20, and five arguments at every attempt always fit under it", () => {
@@ -22,22 +23,37 @@ describe("/api/judge's daily call ceiling", () => {
     expect(5 * MAX_JUDGE_ATTEMPTS).toBeLessThanOrEqual(20);
   });
 
-  it("counts every judge call in the window, not only those on the argument cap", () => {
-    const start = route.indexOf("const { count: callCount, error: ceilingError } = await admin");
-    expect(start).toBeGreaterThan(-1);
-    const query = route.slice(start, route.indexOf(";", start));
-    expect(query).toContain('.from("ai_calls")');
-    expect(query).toContain('.eq("user_id", user.id)');
-    expect(query).toContain('.eq("kind", "judge")');
-    expect(query).toContain('.gte("created_at", sinceDaily)');
-    expect(query).not.toContain("counts_toward_cap");
+  it("is checked and claimed in one step, with the route's own numbers (migration 0028)", () => {
+    expect(route).toContain(
+      'await admin.rpc("reserve_judge_submission", { p_user: user.id, p_cap: DAILY_CAP, p_ceiling: JUDGE_CALL_CEILING, p_attempts: MAX_JUDGE_ATTEMPTS, p_hold_seconds: RESERVATION_HOLD_SECONDS, });'
+    );
+    expect(route).toContain('if (reserved === "call_ceiling") { return paused("call_ceiling"); }');
   });
 
-  it("refuses a submission whose attempts would pass it, and fails closed on an error", () => {
+  it("counts every judge call in the window for the ceiling, and only cap calls for the cap", () => {
+    expect(sql).toContain("select count(*) filter (where counts_toward_cap), count(*) into v_arguments, v_calls from public.ai_calls where user_id = p_user and kind = 'judge' and created_at >= v_since;");
+    expect(sql).toContain("v_since timestamptz := now() - interval '24 hours';");
+    expect(sql).toContain("if v_arguments + v_held >= p_cap then return 'daily_cap';");
+    expect(sql).toContain("if v_calls + (v_held + 1) * p_attempts > p_ceiling then return 'call_ceiling';");
+  });
+
+  it("holds a lock per reader while it counts and claims", () => {
+    expect(sql).toContain("perform pg_advisory_xact_lock(hashtextextended('sophecs.judge_reservation:' || p_user::text, 0));");
+    // The lock comes before either count.
+    expect(sql.indexOf("pg_advisory_xact_lock")).toBeLessThan(sql.indexOf("from public.ai_calls"));
+  });
+
+  it("fails closed on an error or an answer it does not know", () => {
     expect(route).toContain(
-      'if (ceilingError) { console.error("[judge] daily call ceiling could not be checked:", ceilingError.message); return NextResponse.json({ ok: false, error: CAP_UNCHECKED }, { status: 503 }); }'
+      'if (reserveError || reservation === null) { console.error("[judge] daily cap could not be checked:", reserveError?.message ?? `got ${String(reserved)}`); return NextResponse.json({ ok: false, error: CAP_UNCHECKED }, { status: 503 }); }'
     );
-    expect(route).toContain('if ((callCount ?? 0) + MAX_JUDGE_ATTEMPTS > JUDGE_CALL_CEILING) { return paused("call_ceiling"); }');
+  });
+
+  it("releases the reservation however the submission ends", () => {
+    expect(route).toContain(
+      'try { return await judge(request, held); } finally { if (held.reservation !== null) { const { error } = await createAdminClient().rpc("release_judge_reservation", { p_id: held.reservation });'
+    );
+    expect(route).toContain("held.reservation = reservation;");
   });
 
   it("comes before anything is written or billed", () => {
