@@ -405,9 +405,9 @@ function estimatedUsdPerCall(): {
 // counts bytes; the criteria are almost all ASCII, so the two agree to
 // within a few tokens. Checked against the 3 Nov v3 run, which billed $0.9934:
 // without this the estimate was $0.9657, with it $0.9791, so the rest of
-// the gap is the rule of thumb itself. That run still sent v3's head
-// comment; the file-size term now counts only what is sent, so a v3
-// estimate is about 1,000 input tokens a call lower than it was then.
+// the gap is the rule of thumb itself. That run sent v3's head comment, as
+// every v3 request does again since 2026-11-06 (ruling 12 reversed); the
+// file-size term counts what is sent, so it counts the comment.
 const V2_CRITERIA_MEAN_LENGTH =
   PUBLISHED_SCHOOL_IDS.reduce((sum, id) => sum + FIDELITY_CRITERIA[id].length, 0) /
   PUBLISHED_SCHOOL_IDS.length;
