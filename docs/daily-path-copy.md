@@ -527,10 +527,13 @@ his ruling with the screenshots in `docs/gate4.md`.
 |---|---|---|
 | Wordmark | `Sophecs` | `/` |
 | Links, in order | `Lessons` · `Motions` · `Schools` · `How it works` | `/lessons`, `/debate`, `/schools`, `/how-it-works` |
+| Quiet text link, beside the button | `Sign in` | `/login` |
 | Primary button | `Take the quiz` | `/quiz` |
 
-There is no sign-in link in this header, as given. A returning reader
-signs in from the landing page, which keeps its own link to `/login`.
+`Sign in` is Arthur's ruling of 2026-11-06 ("returning students need it,
+styled as a quiet text link beside 'Take the quiz'"). It sits beside the
+button where the four links are in the bar; where they are in the
+`Menu`, it is the `Menu`'s last item instead (below).
 
 ### Header, signed in
 
@@ -558,9 +561,11 @@ label only once the page's script has run.)
 
 ### Mobile
 
-Below 640 pixels the four links collapse into the existing `Menu`
-disclosure, in the same order. The wordmark and the button (`Take the
-quiz`, or `Me` and its menu) stay beside it.
+Below 768 pixels the four links collapse into the existing `Menu`
+disclosure, in the same order; signed out, `Sign in` follows them,
+below a rule. The wordmark and the button (`Take the quiz`, or `Me` and
+its menu) stay beside it. (The bar starts at 768 rather than 640 so
+that `Sign in` fits beside the button wherever the bar is shown.)
 
 ### Schools (`/schools`)
 
@@ -588,13 +593,14 @@ site's pattern, as for `/schools`.
 | Heading | `How it works` |
 | Contents (new), linking to each section; read aloud as `On this page` (new) | `How the judge works` · `How this was judged` · `Counterpart rules` · `Sample accounts` |
 | Sections, with their anchors | `How the judge works` (`#judge`), with `Known limitations`; `How this was judged` (`#rubric`), with its three axes and `What counts as faithful`; `Counterpart rules` (`#counterpart`); `Sample accounts` (`#samples`) |
-| Foot | `Questions or corrections: arthur.rzhang@gmail.com` and `Back to the motions`, as on the two pages now |
+| Foot | `The criteria the judge is given are published in full, including the fidelity criteria for each school. Read the rubric.` (the method page's closing sentence, its link to `#rubric`), then `Questions or corrections: arthur.rzhang@gmail.com` and `Back to the motions`, as on the two pages now |
 
-The method page's closing sentence is left out with its link, since the
-rubric is on the same page: `The criteria the judge is given are published
-in full, including the fidelity criteria for each school. Read the rubric.`
+The method page's closing sentence stays, by Arthur's ruling of
+2026-11-06 ("That transparency is part of the site's credibility"); its
+`Read the rubric` leads to the rubric's section on this page.
 `/method` redirects here, and keeps its anchor, so `/method#samples` lands
-on `#samples`; `/debate/rubric` redirects to `#rubric`.
+on `#samples`; `/debate/rubric` redirects to `#rubric`. The redirects are
+temporary until the launch makes them permanent (308).
 
 Every link elsewhere on the site that led to `/method`, `/debate/rubric` or
 `/table` leads, on a flag-on build, straight to the new address: the

@@ -34,6 +34,9 @@ const SIGNED_IN = [
   { href: "/schools", label: "Schools" },
 ] as const;
 
+// Arthur, 2026-11-06: returning readers need it; a quiet text link.
+export const SIGN_IN = { href: "/login", label: "Sign in" } as const;
+
 export const ME_MENU = [
   { href: "/me", label: "Profile" },
   { href: "/me#challenges", label: "My debates and challenges" },
@@ -52,6 +55,9 @@ const IN_INLINE = "hidden [html[data-auth=in]_&]:inline-flex";
 const OUT_FLEX = "flex [html[data-auth=in]_&]:hidden";
 const IN_FLEX = "hidden [html[data-auth=in]_&]:flex";
 const IN_BLOCK = "hidden [html[data-auth=in]_&]:block";
+const OUT_BLOCK = "block [html[data-auth=in]_&]:hidden";
+// Beside the button from md up; in the Menu below it.
+const SIGN_IN_BAR = "hidden md:inline-flex [html[data-auth=in]_&]:hidden";
 
 const WORDMARK = "min-h-11 items-center text-lg font-extrabold tracking-tight text-ink";
 
@@ -100,7 +106,7 @@ function BarLink({
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`${visibility} min-h-11 items-center whitespace-nowrap rounded-chunky border-2 px-2 text-sm font-semibold md:px-3 ${
+      className={`${visibility} min-h-11 items-center whitespace-nowrap rounded-chunky border-2 px-3 text-sm font-semibold ${
         active ? "border-rule-strong bg-surface text-ink" : "border-transparent text-ink-mid hover:text-ink"
       }`}
     >
@@ -154,12 +160,13 @@ export function SiteHeaderSix() {
 
   return (
     <header className="border-b-2 border-rule" data-print="hide">
-      {/* Narrower gaps below sm, so "Take the quiz" stays on one line from
-          the design's 360-pixel phone width up (below it, it wraps rather
-          than push the page sideways); narrower links and gaps from sm to
-          md, so
-          "How it works" stays on one line at 640. */}
-      <div className="mx-auto flex min-h-16 max-w-ui items-center gap-3 px-6 py-2 sm:gap-4 md:gap-5">
+      {/* The bar from md (768 pixels) up; below it the Menu, with "Sign
+          in" in it, since beside the button it would push a phone's page
+          sideways. Narrower gaps below lg: below md so "Take the quiz"
+          stays on one line from the design's 360-pixel phone width up
+          (below it, it wraps rather than push the page sideways), and from
+          md so the signed-out bar fits at 768 with room to spare. */}
+      <div className="mx-auto flex min-h-16 max-w-ui items-center gap-3 px-6 py-2 lg:gap-5">
         <Link href="/" className={`inline-flex ${WORDMARK} ${OUT_INLINE}`}>
           Sophecs
         </Link>
@@ -167,9 +174,9 @@ export function SiteHeaderSix() {
           Sophecs
         </Link>
 
-        {/* Below sm the four links collapse into one disclosure, as they
-            did before; the button at the right stays beside it. */}
-        <details ref={menu} onToggle={() => closeOther(menu, me)} className="relative sm:hidden">
+        {/* Below md the four links collapse into one disclosure, as they
+            did below sm before; the button at the right stays beside it. */}
+        <details ref={menu} onToggle={() => closeOther(menu, me)} className="relative md:hidden">
           <summary className="flex min-h-11 cursor-pointer list-none items-center rounded-chunky px-2 text-sm font-semibold text-ink-mid marker:hidden hover:text-ink [&::-webkit-details-marker]:hidden">
             Menu
           </summary>
@@ -184,10 +191,13 @@ export function SiteHeaderSix() {
             {SIGNED_IN.map((link) => (
               <MenuLink key={`in-${link.href}`} {...link} active={isActive(link.href)} visibility={IN_FLEX} />
             ))}
+            <div className={`${OUT_BLOCK} mt-1 border-t-2 border-rule pt-1`}>
+              <MenuLink {...SIGN_IN} active={isActive(SIGN_IN.href)} visibility="flex" />
+            </div>
           </nav>
         </details>
 
-        <nav aria-label="Main" className="hidden items-center gap-1 sm:flex">
+        <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
           {SIGNED_OUT.map((link) => (
             <BarLink
               key={`out-${link.href}`}
@@ -201,10 +211,16 @@ export function SiteHeaderSix() {
           ))}
         </nav>
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-1">
+          <Link
+            href={SIGN_IN.href}
+            className={`${SIGN_IN_BAR} min-h-11 items-center whitespace-nowrap rounded-chunky px-2 text-sm font-semibold text-ink-mid hover:text-ink`}
+          >
+            {SIGN_IN.label}
+          </Link>
           <Link
             href="/quiz"
-            className={`chunky inline-flex min-h-11 items-center rounded-chunky bg-ink px-3 min-[360px]:whitespace-nowrap text-sm font-extrabold tracking-wide uppercase text-paper sm:px-4 ${OUT_INLINE}`}
+            className={`chunky inline-flex min-h-11 items-center rounded-chunky bg-ink px-3 min-[360px]:whitespace-nowrap text-sm font-extrabold tracking-wide uppercase text-paper md:px-4 ${OUT_INLINE}`}
             style={shade("var(--color-rule-strong)")}
           >
             Take the quiz

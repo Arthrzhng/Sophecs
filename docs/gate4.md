@@ -220,17 +220,19 @@ the new-schools run 16 or 23 of 25, depending on item 3.
     20-argument rule, and the exemplars pages would show three schools.
     Samples for the new three need new argument banks, which are content.
     Rule whether the run should cover them.
-14. **The navigation's copy and screenshots** (#99). The copy is
-    `docs/daily-path-copy.md`, section 13, with what is new marked: the
-    two pages' descriptions; `/how-it-works`' contents line and that
-    line's spoken name "On this page"; and the Exemplars link. The choices made where your instruction left room are in
-    `docs/decisions.md`, "Navigation for six schools, behind
-    SIX_SCHOOLS": no sign-in link in the signed-out header; where each
-    item under Me goes; the method page's closing sentence ("The criteria
-    the judge is given are published in full ... Read the rubric.") left
-    out of the merged page; `rubric_viewed` not sent from it; the
-    redirects temporary until the launch. Each is yours to change.
-    Taken from a served SIX_SCHOOLS build:
+14. **The navigation's copy and screenshots** (#99). **Ruled
+    2026-11-06, and carried out:** a quiet "Sign in" link beside "Take
+    the quiz", in the Menu where the Menu is used; the Me items as
+    built; the method page's closing sentence ("The criteria the judge
+    is given are published in full ... Read the rubric.") kept on
+    `/how-it-works`; `rubric_viewed` counted when that page's rubric
+    section is seen; the redirects temporary until the launch and
+    permanent (308) at it (item 15). `docs/decisions.md`, "Navigation:
+    Arthur's rulings on #99". The copy is `docs/daily-path-copy.md`,
+    section 13, with what is new marked: the two pages' descriptions;
+    `/how-it-works`' contents line and that line's spoken name "On this
+    page"; and the Exemplars link. Taken from a served SIX_SCHOOLS
+    build, with "Sign in":
 
     | | 1280 pixels | 390 pixels |
     | --- | --- | --- |
@@ -238,8 +240,8 @@ the new-schools run 16 or 23 of 25, depending on item 3.
     | Signed in, Me | ![Signed in at 1280 pixels: Me open](gate4/nav-signed-in-1280-me.png) | ![Signed in at 390 pixels: Me open](gate4/nav-signed-in-390-me.png) |
     | Signed in, Menu | (the links are in the bar) | ![Signed in at 390 pixels: Menu open](gate4/nav-signed-in-390-menu.png) |
 
-    Signed out at 1280 pixels there is no menu: the four links and the
-    button are in the bar.
+    Signed out at 1280 pixels there is no menu: the four links, "Sign
+    in" and the button are in the bar. The Menu is used below 768.
 
 ## Publishing: (c)
 
@@ -256,7 +258,10 @@ the new-schools run 16 or 23 of 25, depending on item 3.
     lifted; a fresh sample run (item 13). Between the teardown and that
     run, `/debate/{slug}/exemplars` answers not found while the landing
     page links to it (`docs/decisions.md`, the exemplars entry), and,
-    with #99, while each motion card in the list does.
+    with #99, while each motion card in the list does. In the launch
+    merge, the navigation's three redirects (`/table`, `/method`,
+    `/debate/rubric`) are made permanent (308), as you ruled on
+    2026-11-06.
 
 ## Production database writes: (a)
 

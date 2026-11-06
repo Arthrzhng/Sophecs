@@ -95,6 +95,8 @@ describe("a build without SIX_SCHOOLS", () => {
       beforeFiles: [
         { source: "/schools", destination: "/_flag-off/schools" },
         { source: "/how-it-works", destination: "/_flag-off/how-it-works" },
+        { source: "/schools.rsc", destination: "/_flag-off/schools.rsc" },
+        { source: "/how-it-works.rsc", destination: "/_flag-off/how-it-works.rsc" },
       ],
       afterFiles: [],
       fallback: [],
@@ -212,22 +214,60 @@ describe("a build without SIX_SCHOOLS", () => {
     });
   });
 
-  it("counts a view of /debate/rubric as it did, and none of /how-it-works", async () => {
-    const marked = async (flag: string, page: string) => {
+  it("counts a view of /debate/rubric on load, and of /how-it-works' rubric when its section is seen", async () => {
+    const render = async (flag: string, page: string) => {
       vi.resetModules();
       vi.stubEnv("SIX_SCHOOLS", flag);
       vi.doMock("@/components/debate/RubricViewTracker", () => ({
-        RubricViewTracker: () => createElement("i", { "data-tracker": "rubric_viewed" }),
+        RubricViewTracker: () => createElement("i", { "data-tracker": "page" }),
+      }));
+      vi.doMock("@/components/how-it-works/RubricSectionViewTracker", () => ({
+        RubricSectionViewTracker: ({ id }: { id: string }) => createElement("i", { "data-tracker": `section ${id}` }),
       }));
       try {
         const mod = await import(page);
-        return renderToStaticMarkup(createElement(mod.default)).includes('data-tracker="rubric_viewed"');
+        return renderToStaticMarkup(createElement(mod.default));
       } finally {
         vi.doUnmock("@/components/debate/RubricViewTracker");
+        vi.doUnmock("@/components/how-it-works/RubricSectionViewTracker");
       }
     };
-    expect(await marked("0", "../src/app/debate/rubric/page")).toBe(true);
-    expect(await marked("1", "../src/app/how-it-works/page")).toBe(false);
+    const rubric = await render("0", "../src/app/debate/rubric/page");
+    expect(rubric.match(/data-tracker="[^"]*"/g)).toEqual(['data-tracker="page"']);
+    const merged = await render("1", "../src/app/how-it-works/page");
+    expect(merged.match(/data-tracker="[^"]*"/g)).toEqual(['data-tracker="section rubric"']);
+    // Inside the section it watches.
+    expect(merged).toMatch(/<section id="rubric"[^>]*><i data-tracker="section rubric"><\/i>/);
+  });
+
+  it("sends rubric_viewed once, when the section first reaches the window's upper half", async () => {
+    const { watchSection } = await import("../src/components/how-it-works/RubricSectionViewTracker");
+    let fire: (entries: { isIntersecting: boolean }[]) => void = () => {};
+    const seen = { options: undefined as unknown, observed: [] as unknown[], disconnected: 0 };
+    class FakeObserver {
+      constructor(cb: typeof fire, options: unknown) {
+        fire = cb;
+        seen.options = options;
+      }
+      observe(el: unknown) {
+        seen.observed.push(el);
+      }
+      disconnect() {
+        seen.disconnected++;
+      }
+    }
+    const el = { id: "rubric" };
+    const onSeen = vi.fn();
+    const stop = watchSection(el as never, onSeen, FakeObserver as never);
+    expect(seen.observed).toEqual([el]);
+    expect(seen.options).toEqual({ rootMargin: "0px 0px -50% 0px" });
+    fire([{ isIntersecting: false }]);
+    expect(onSeen).not.toHaveBeenCalled();
+    fire([{ isIntersecting: true }]);
+    expect(onSeen).toHaveBeenCalledTimes(1);
+    expect(seen.disconnected).toBe(1);
+    stop();
+    expect(seen.disconnected).toBe(2);
   });
 
   it("links where it always has, and lists the old pages in the sitemap", async () => {
@@ -266,14 +306,17 @@ describe("a build with SIX_SCHOOLS=1", () => {
     const { header } = await load("1");
     const all = links(renderToStaticMarkup(createElement(header.SiteHeader)));
     const out = all.filter(([, , cls]) => shownSignedOut(cls)).map(([href, text]) => [href, text]);
-    // The wordmark, the Menu's four, the bar's four, the button, then the
-    // Me menu's links, which are in the page but inside a hidden <details>.
-    expect(out.slice(0, 10)).toEqual([
+    // The wordmark, the Menu's four and its Sign in, the bar's four, the
+    // button (the bar's Sign in is hidden below md, so not counted here),
+    // then the Me menu's links, which are in the page but inside a hidden
+    // <details>.
+    expect(out.slice(0, 11)).toEqual([
       ["/", "Sophecs"],
       ["/lessons", "Lessons"],
       ["/debate", "Motions"],
       ["/schools", "Schools"],
       ["/how-it-works", "How it works"],
+      ["/login", "Sign in"],
       ["/lessons", "Lessons"],
       ["/debate", "Motions"],
       ["/schools", "Schools"],
@@ -396,6 +439,27 @@ describe("a build with SIX_SCHOOLS=1", () => {
     expect(src).toMatch(/await createClient\(\)\.auth\.signOut\(\);\s*document\.documentElement\.removeAttribute\("data-auth"\);/);
   });
 
+  // Arthur, 2026-11-06: a quiet text link beside "Take the quiz". Below md,
+  // where it would push a phone's page sideways, it is the Menu's last item.
+  it("offers Sign in to a signed-out reader only: beside the button from md, in the Menu below", async () => {
+    const { header } = await load("1");
+    const html = renderToStaticMarkup(createElement(header.SiteHeader)).replace(/&amp;/g, "&");
+    const signIns = links(html).filter(([href, text]) => href === "/login" && text === "Sign in");
+    expect(signIns).toHaveLength(2);
+    // In the Menu: in a block shown only signed out, last, after the
+    // signed-out four and the signed-in four.
+    expect(html).toMatch(
+      /Schools<\/a><div class="block \[html\[data-auth=in\]_&\]:hidden mt-1 border-t-2 border-rule pt-1"><a [^>]*href="\/login">Sign in<\/a><\/div><\/nav>/
+    );
+    // In the bar: hidden below md and signed in, quiet (no fill), just
+    // before the button.
+    const bar = signIns.find(([, , cls]) => cls.startsWith("hidden md:inline-flex"))!;
+    expect(bar[2]).toContain(`${SIGNED_IN_ONLY}hidden`);
+    expect(bar[2]).toContain("text-ink-mid");
+    expect(bar[2].split(/\s+/).filter((c) => c === "chunky" || c === "border-2" || c.startsWith("bg-"))).toEqual([]);
+    expect(html).toMatch(/>Sign in<\/a><a [^>]*href="\/quiz"[^>]*>Take the quiz<\/a>/);
+  });
+
   it("shows Take the quiz only signed out, and the Me menu only signed in", async () => {
     const { header } = await load("1");
     const html = renderToStaticMarkup(createElement(header.SiteHeader)).replace(/&amp;/g, "&");
@@ -414,6 +478,10 @@ describe("a build with SIX_SCHOOLS=1", () => {
     expect(html).toContain("Known limitations");
     expect(html).toContain("What counts as faithful");
     expect(html).toContain("Questions or corrections: arthur.rzhang@gmail.com");
+    // /method's closing sentence, its link now to the section here.
+    expect(html).toContain(
+      'The criteria the judge is given are published in full, including the fidelity criteria for each school. <a href="#rubric" class="font-semibold text-ink underline underline-offset-4">Read the rubric</a>.'
+    );
     // One h1; the merged pages' headings sit under their sections.
     expect(html.match(/<h1/g)).toHaveLength(1);
     const levels = [...html.matchAll(/<h([1-6])[^>]*>(.*?)<\/h\1>/g)].map(

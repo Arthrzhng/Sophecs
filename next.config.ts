@@ -141,13 +141,19 @@ export function sixSchoolsRedirects(sixSchools: string) {
 // private path no route answers, so they get the site's own not-found page
 // exactly as on main. Left to the pages themselves, a notFound() thrown
 // while their metadata is read answers with Next's bare error shell, with
-// no header, footer or "Nothing here." until the page's script runs.
+// no header, footer or "Nothing here." until the page's script runs. Their
+// `.rsc` addresses too: Vercel serves a page's `.rsc` file from the build
+// and widens only afterFiles rewrites to cover it, so without these two
+// they answered 200 with a not-found payload (Arthur, 2026-11-06: "the
+// small follow-up so they 404 as before").
 export function flagOffRewrites(sixSchools: string) {
   if (sixSchools === "1") return { beforeFiles: [], afterFiles: [], fallback: [] };
   return {
     beforeFiles: [
       { source: "/schools", destination: "/_flag-off/schools" },
       { source: "/how-it-works", destination: "/_flag-off/how-it-works" },
+      { source: "/schools.rsc", destination: "/_flag-off/schools.rsc" },
+      { source: "/how-it-works.rsc", destination: "/_flag-off/how-it-works.rsc" },
     ],
     afterFiles: [],
     fallback: [],
