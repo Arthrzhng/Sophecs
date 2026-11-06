@@ -184,7 +184,11 @@ of the three; Gate 2 is about that.
    launch merge itself), `README.md`, then the fresh sample run. The
    six "elsewhere" passages stay `status: draft`: the flag, not their
    status, shows them, and their status goes when the flag is retired.
-   **Gate 4.**
+   Turning the flag on also holds the live table to the 20-argument rule
+   (`rankThresholdApplies` in `src/lib/school-table.ts`): from the
+   launch deploy, over the week in progress, a school is unranked until it
+   has 20 judged original arguments in the week. Arthur ruled on 2026-11-06 that it applies at launch,
+   with the flag, and not before. **Gate 4.**
 
 ## Gates for Arthur
 
@@ -235,7 +239,9 @@ of the three; Gate 2 is about that.
    run for the three would be a billed run (d).
 4. **(c) Publishing.** The launch itself, with the content judgements
    listed for Checkpoint B (`docs/quiz-v2.md`, section 8, and
-   `docs/decisions.md`), and the adherent nouns from step 1.
+   `docs/decisions.md`), and the adherent nouns from step 1. The launch
+   also holds the live table to the 20-argument rule, which the flag
+   brings with it (ruled 2026-11-06; step 6).
 
 Steps 1 and 2 need no gate and start now.
 

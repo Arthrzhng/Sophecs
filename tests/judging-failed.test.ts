@@ -44,11 +44,11 @@ describe("the copy", () => {
 });
 
 describe("/api/judge", () => {
-  it("counts only calls that count toward the cap", () => {
-    const start = route.indexOf('.from("ai_calls")');
-    const query = route.slice(start, route.indexOf("dailyCount ?? 0", start));
-    expect(query).toContain('.eq("kind", "judge")');
-    expect(query).toContain('.eq("counts_toward_cap", true)');
+  it("counts only calls that count toward the cap (reserve_judge_submission, migration 0028)", () => {
+    const sql = fs.readFileSync(path.join(process.cwd(), "supabase/migrations/0028_judge_reservations.sql"), "utf8");
+    expect(sql).toContain("select count(*) filter (where counts_toward_cap), count(*)");
+    expect(sql).toContain("where user_id = p_user and kind = 'judge' and created_at >= v_since;");
+    expect(sql).toContain("if v_arguments + v_held >= p_cap then");
   });
 
   it("answers a failed submission with the reason, the copy and a 502", () => {
@@ -86,10 +86,11 @@ describe("/api/judge", () => {
 
 describe("when the cap cannot be checked", () => {
   it("refuses the submission before anything is written or billed, rather than skip the cap", () => {
-    const start = route.indexOf('.from("ai_calls")');
-    const block = route.slice(start, route.indexOf('return paused("daily_cap")', start));
-    expect(route.slice(route.lastIndexOf("const {", start), start)).toContain("error: capError");
-    expect(block).toContain("if (capError) {");
+    const start = route.indexOf('admin.rpc("reserve_judge_submission"');
+    expect(start).toBeGreaterThan(-1);
+    const block = route.slice(start, route.indexOf("held.reservation = reservation;", start));
+    expect(route.slice(route.lastIndexOf("const {", start), start)).toContain("error: reserveError");
+    expect(block).toContain("if (reserveError || reservation === null) {");
     expect(block).toContain("{ status: 503 }");
     // Before any row is written or the judge is called.
     expect(start).toBeLessThan(route.indexOf('admin.from("debates").insert('));
