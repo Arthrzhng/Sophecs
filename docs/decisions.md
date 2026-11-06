@@ -4561,6 +4561,41 @@ value other than "1", "0" or none, since the modules treat anything but
 a flag-off one; and runs SIX_SCHOOLS=1 under v3 only, the one version a
 flag-on build sends.
 
+**The new-schools run (18:14 UTC).** Run
+`2026-11-06T18-14-06-111Z-v3-six.json`: SIX_SCHOOLS=1, v3 (the prompt of
+the 16:58 full run, sha256 `5c0bbece85a94d6f...`), three samples a case,
+all 25 cases, the live three's included since their requests change too.
+77 calls (two replies failed validation and passed on their retries),
+$1.1727, under a watchdog set to stop at $1.80. Cumulative on the eval
+key: $12.2431 of $15.00, over the 18 run files.
+- **Bands, median of three:** 23 of 25 cases in every band, and the two
+  that miss are the two the flag-off run of 16:58 missed.
+  `confucian-hierarchy-school` scores 78/80/78 against 40-75, with
+  engagement 4/5/4, now inside its 0-4 (at 16:58: 82/83/83, engagement
+  5/6/6). `stoic-analogy` has fidelity 7/8/7 against 8-10, its score in
+  band (71/78/72).
+- **Objections:** under each fixture's expected schools, written for
+  three rivals, 8 cases fail the objection check, 7 of them passing every
+  band, so 16 of 25 pass. In each of the 8 the majority objection is a
+  voice the flag-on prompt names for that school: `ubuntu` for
+  `stoic-analogy`, `stoic-strong`, `stoic-wrong-school` and
+  `fabricated-source` (Stoicism), and for `confucian-hierarchy`,
+  `confucian-ren-disposition` and `confucian-wrong-school` (Confucianism);
+  `confucian` for `buddhist-wrong-school`. Counting the voices the prompt
+  names, 23 of 25 pass, the same two as above. Three wrong-school cases
+  also drew one objection in three from a school neither reading expects
+  (`confucian` for Utilitarianism and for Virtue Ethics, `virtue-ethics`
+  for Confucianism), a minority that fails neither.
+- **Scores:** the mean of the 25 medians is 54.76, against 55.00 at
+  16:58. Every strong case's score is in band; against 16:58 four are
+  higher, four the same and three lower (buddhist-strong 83 to 80,
+  confucian-strong 86 to 80, util-strong 83 to 80). The eleven cases of
+  the three new schools have a mean of medians of 58.09, against 58.45
+  with three rivals listed.
+- **The records:** all 77 fingerprints reproduce with the flag on and
+  none with it off; `criteria_source` is `draft` for the three's cases
+  and `live` for the rest.
+
 **For Gate 4.** Each is Arthur's; none is decided by being written here.
 - That a flag-on build, and so production at launch, judges with v3.
 - What v3 at launch does to verdicts already stored under v2. A revision
@@ -4593,4 +4628,8 @@ flag-on build sends.
   closely. The runner's pass test keeps the fixtures' sets; its notes now
   say when an objection came from a school the fixture does not expect,
   and whether the prompt named it, apart from one from the argued school.
-  Whether the named voices count is Arthur's.
+  Whether the named voices count is Arthur's: the new-schools run passes
+  16 of 25 if they do not, and 23 of 25 if they do.
+- The new-schools run's two misses, the same as the flag-off run's: the
+  hierarchy case (closer with six rivals, its engagement now in band, its
+  score 78 against 75) and stoic-analogy's fidelity.
