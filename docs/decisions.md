@@ -3964,3 +3964,37 @@ are in tests/judge/golden-runs. Cumulative on the eval key: $8.1681 of
 $12.00. Stopped as ruled; the full v3 run and the new-schools run were
 not started.
 
+### Judge v3: the cap-binding sentences removed, and a second stop (2026-11-06)
+
+Arthur's ruling of 2026-11-06: one single-sample check with only the
+cap-binding sentences removed, the cap kept. If the strong cases return
+to band and the hierarchy cases stay in band, the full v3 run, then Gate
+3 and the new-schools run; if the strong cases return but the hierarchy
+cases fall out, a softened cap and one more check; if the strong cases
+still miss, stop and report.
+
+The prompt (a1d2d0c on this branch) is the 4 Nov body plus the paragraph
+on crediting the concept over the vocabulary; comments stripped; the
+Utilitarianism voice of 2026-11-05.
+
+Run `2026-11-06T01-38-01-934Z-v3.json`: 25 calls, $0.3139, no validation
+failures, 7 cases out of band.
+- **Strong cases** (those whose score band starts at 60 or above): five
+  still miss. buddhist-strong 68 (70-95), confucian-ren-disposition 61
+  (65-95) with fidelity 6, stoic-strong fidelity 7, ubuntu-strong 62,
+  util-obscure-source 68. The other six are in band.
+- **Hierarchy cases:** confucian-hierarchy-school 76 (40-75), out again;
+  confucian-hierarchy 68, in.
+- Also out: buddhist-intention-excuse 44 (5-40).
+
+Engagement on the strong cases came back part of the way (util-strong 6,
+stoic-analogy 5) but the composites did not. So the cap-binding
+sentences were not the main cause. What still separates this prompt from
+the 4 Nov one that reproduces its own run is the head comment, no longer
+sent; the vocabulary paragraph, now in the body; and Utilitarianism's
+Virtue Ethics voice. The strong cases that miss are in four schools, not
+only Utilitarianism.
+
+Stopped as ruled. Cumulative on the eval key: $8.4820 of $12.00. The full
+v3 run, Gate 3 and the new-schools run were not started.
+
