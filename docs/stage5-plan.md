@@ -184,7 +184,11 @@ of the three; Gate 2 is about that.
    launch merge itself), `README.md`, then the fresh sample run. The
    six "elsewhere" passages stay `status: draft`: the flag, not their
    status, shows them, and their status goes when the flag is retired.
-   **Gate 4.**
+   Turning the flag on also holds the live table to the 20-argument rule
+   (`rankThresholdApplies` in `src/lib/school-table.ts`): from that
+   Monday a school is unranked until it has 20 judged original arguments
+   in the week. Arthur ruled on 2026-11-06 that it applies at launch,
+   with the flag, and not before. **Gate 4.**
 
 ## Gates for Arthur
 

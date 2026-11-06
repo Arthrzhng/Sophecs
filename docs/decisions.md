@@ -3889,9 +3889,17 @@ reviewers take no reservation: they skip the cap and the ceiling (ruling
 (d) 2).
 
 `scripts/test-0028-judge-reservations.sh` runs the SQL on a throwaway
-database, 27 checks. They include two sessions racing for a reader's last
+database, 30 checks. They include two sessions racing for a reader's last
 slot, where the second waits for the first and is refused at the cap, and
 a second reader who is not held up.
+
+The client roles are refused the table, both functions and the table's
+identity sequence, which Supabase's default privileges would otherwise
+grant them; the migration checks all three before it commits. Its one
+lock on an existing table is the foreign key's SHARE ROW EXCLUSIVE on
+`auth.users`, which holds up sign-ups and account deletions, not reads,
+until it commits; a five-second `lock_timeout` makes it give up rather
+than queue them.
 
 **Order.** 0028 is a production database write, so it waits for Arthur's
 yes under (a). The route calls the two functions, so it ships only after
@@ -3900,3 +3908,16 @@ would be refused with "The daily limit could not be checked", which fails
 closed but stops judging. The rollback, which contains DROP and so is
 Arthur's to run, comes after a deploy without the reservation, for the
 same reason.
+
+### The live table's 20-argument rule, at launch (2026-11-06)
+
+Arthur's ruling of 2026-11-06 on the open item from Checkpoint B's (e) 5:
+"apply it at launch with SIX_SCHOOLS, not before. Note it in the Gate 4
+steps."
+
+Nothing changes now. `rankThresholdApplies()` in `src/lib/school-table.ts`
+reads the flag, so a build without it ranks every school with an average,
+as before, and the launch, which turns the flag on for Production, applies
+the rule to the live table in the same step. `docs/stage5-plan.md`, step 6,
+lists it, so the launch brief says so: from that Monday each school is
+unranked until it has 20 judged original arguments in the week.

@@ -38,10 +38,11 @@ export interface SchoolChange {
  * and says how many it has (docs/daily-path-copy.md, "School table, a
  * school not yet ranked").
  *
- * On SIX_SCHOOLS builds only, for now: Checkpoint B asked about the
- * preview's table, and the ruling answered that. Whether the live table
- * takes the same rule is put to Arthur; until he says so, a build without
- * the flag ranks as before, every school with an average.
+ * On SIX_SCHOOLS builds only: Checkpoint B asked about the preview's
+ * table, and the ruling answered that. Arthur ruled on 2026-11-06 that the
+ * live table takes it at launch, with the flag, and not before, so a build
+ * without the flag ranks as before, every school with an average, and the
+ * launch applies it by turning the flag on (docs/stage5-plan.md, step 6).
  */
 export const RANK_MIN_ARGUMENTS = 20;
 

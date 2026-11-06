@@ -39,6 +39,16 @@ calls() { # user, how many, counts_toward_cap, hours ago
      from generate_series(1, $2) g" >/dev/null
 }
 
+# Waits until a session holds an advisory lock, so the second session
+# below is known to ask while the first holds it.
+lock_held() {
+  for _ in $(seq 1 100); do
+    [ "$(q "select count(*) from pg_locks where locktype = 'advisory' and granted")" -gt 0 ] && return 0
+    sleep 0.05
+  done
+  echo "  FAIL  the first session never took its lock"; FAILED=1
+}
+
 cleanup() { psql -X -q -d postgres -c "drop database if exists $DB" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 psql -X -v ON_ERROR_STOP=1 -q -d postgres -c "create database $DB"
@@ -48,6 +58,7 @@ apply "$REPO/scripts/local-auth-shim.sql"
 q "grant usage on schema auth to anon, authenticated, service_role" >/dev/null
 q "alter default privileges in schema public grant all on tables to anon, authenticated, service_role" >/dev/null
 q "alter default privileges in schema public grant all on functions to anon, authenticated, service_role" >/dev/null
+q "alter default privileges in schema public grant all on sequences to anon, authenticated, service_role" >/dev/null
 for f in "$REPO"/supabase/migrations/*.sql; do
   [ "$((10#$(basename "$f" | cut -c1-4)))" -lt 28 ] || continue
   apply "$f"
@@ -87,7 +98,7 @@ calls $A 4 true 1
 # session 2 asks a moment later and has to wait for it.
 ( psql -X -At -d "$DB" -c "begin; select public.reserve_judge_submission('$A', 5, 20, 3, 600); select pg_sleep(2); commit;" \
     | grep -v -E '^(BEGIN|COMMIT)?$' | head -1 > "/tmp/0028-race-1-$$" ) &
-sleep 0.5
+lock_held
 START=$(date +%s%N)
 SECOND=$(reserve $A)
 WAITED=$(( ($(date +%s%N) - START) / 1000000 ))
@@ -100,7 +111,7 @@ expect "one reservation held" 1 "$(q "select count(*) from judge_reservations wh
 
 say "another reader is not held up"
 ( psql -X -At -d "$DB" -c "begin; select public.reserve_judge_submission('$A', 5, 20, 3, 600); select pg_sleep(2); commit;" >/dev/null ) &
-sleep 0.5
+lock_held
 START=$(date +%s%N)
 reserve $B >/dev/null
 WAITED=$(( ($(date +%s%N) - START) / 1000000 ))
@@ -122,6 +133,9 @@ expect "anon refused the reservation" denied "$(as_role anon "select public.rese
 expect "authenticated refused the reservation" denied "$(as_role authenticated "select public.reserve_judge_submission('$A', 5, 20, 3, 600)")"
 expect "authenticated refused the release" denied "$(as_role authenticated "select public.release_judge_reservation(1)")"
 expect "authenticated cannot read the table" denied "$(as_role authenticated "select count(*) from public.judge_reservations")"
+expect "anon cannot write the table" denied "$(as_role anon "insert into public.judge_reservations (user_id, expires_at) values ('$A', now())")"
+expect "authenticated cannot use its sequence" denied "$(as_role authenticated "select nextval('public.judge_reservations_id_seq')")"
+expect "anon cannot use its sequence" denied "$(as_role anon "select nextval('public.judge_reservations_id_seq')")"
 expect "the server role may reserve" t "$(as_role service_role "select public.reserve_judge_submission('$C', 5, 20, 3, 600) is not null")"
 expect "its search_path is empty" 'search_path=""' "$(q "select array_to_string(proconfig, ',') from pg_proc where proname = 'reserve_judge_submission'")"
 expect "it runs with the caller's rights" f "$(q "select prosecdef from pg_proc where proname = 'reserve_judge_submission'")"

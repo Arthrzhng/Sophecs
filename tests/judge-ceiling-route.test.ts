@@ -34,6 +34,7 @@ let capCount = 0;
 let ceilingCount = 0;
 let reserveError: { message: string } | null = null;
 let released: number[] = [];
+let debatesReadThrows = false;
 const touched: string[] = [];
 vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => ({
@@ -58,6 +59,7 @@ vi.mock("@/lib/supabase/admin", () => ({
       b.update = () => ((op = "update"), touched.push(`${table}:update`), b);
       b.maybeSingle = async () => {
         touched.push(`${table}:read`);
+        if (table === "debates" && debatesReadThrows) throw new Error("stub: the topic lock read throws");
         if (table === "profiles") return { data: { school: "stoicism", elo: 1200, streak: 0, streak_updated_on: null } };
         if (table === "debate_topics") return { data: { slug: "t1", motion: "This house would test it.", active: true, par_elo: 1200 } };
         return { data: null };
@@ -76,14 +78,15 @@ vi.mock("@/lib/budget", () => ({ budgetState: async () => budget, isBudgetExceed
 const { POST } = await import("../src/app/api/judge/route");
 
 const argument = Array.from({ length: 120 }, (_, i) => `word${i}`).join(" ");
-const send = () =>
-  POST(new Request("http://localhost/api/judge", { method: "POST", body: JSON.stringify({ topicSlug: "t1", argument }) }));
+const send = (text = argument) =>
+  POST(new Request("http://localhost/api/judge", { method: "POST", body: JSON.stringify({ topicSlug: "t1", argument: text }) }));
 
 beforeEach(() => {
   capCount = 0;
   ceilingCount = 0;
   reserveError = null;
   released = [];
+  debatesReadThrows = false;
   budget = "ok";
   judged.length = 0;
   touched.length = 0;
@@ -106,9 +109,24 @@ describe("/api/judge's daily call ceiling, run", () => {
     expect((await res.json()).reason).not.toBe("call_ceiling");
   });
 
-  it("releases the submission's reservation when it ends, judged or not", async () => {
-    await send();
+  it("releases the submission's reservation when judging fails", async () => {
+    expect((await send()).status).toBe(502);
     expect(judged).toHaveLength(1);
+    expect(released).toEqual([41]);
+  });
+
+  it("releases it when the submission is refused after the reservation, before the model", async () => {
+    const res = await send("too short to judge");
+    expect(res.status).toBe(400);
+    expect(touched).toContain("rpc:reserve_judge_submission");
+    expect(judged).toEqual([]);
+    expect(released).toEqual([41]);
+  });
+
+  it("releases it when the route throws after the reservation", async () => {
+    debatesReadThrows = true;
+    await expect(send()).rejects.toThrow("stub: the topic lock read throws");
+    expect(judged).toEqual([]);
     expect(released).toEqual([41]);
   });
 
