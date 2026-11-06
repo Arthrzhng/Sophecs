@@ -4297,3 +4297,78 @@ carries the effect costs more checks than the cap leaves room for beside
 the full v3 run and the new-schools run. Both are his: stopped here and
 put to him. Cumulative on the eval key: $8.8780 of $12.00. The full v3
 run, Gate 3 and the new-schools run were not started.
+
+### Judge v3: steps A and B, both missed, and a stop (2026-11-06)
+
+Arthur, 2026-11-06, after the check of 06:05 UTC: "The old head comment
+is what matters. Proceed under A without stopping: Move every scoring
+instruction in that comment into the prompt body as explicit text (no
+hidden comment), keeping comments stripped. Drop only history and
+anything contradicting current criteria. ... Single-sample check of that
+prompt. If strong cases are in band: full v3 run, then Gate 3 and the
+new-schools run, then Gate 4. If it misses: go to step B (4 Nov prompt +
+objection voices + report-the-known-objection, no engagement cap) ... If
+B misses: stop. Cap $12.00 cumulative." The earlier message it refers to
+never reached this session; both steps were carried out from this one.
+
+**Step A (7687392).** A "Before you score" section after the opening
+paragraph, where the comment used to sit, carrying every scoring
+instruction the 4 Nov comment held, as instructions:
+- three criteria in order of priority, each out of ten, the composite
+  out of a hundred;
+- arguments come in different forms; form alone never lowers a score;
+  the same section says what scores low in every school;
+- call a source fabricated only when confident, unverified otherwise;
+- credit the concept over the vocabulary;
+- the school's best-known objection, named at the end of its criteria,
+  is normally the one returned when the argument leaves it unmet;
+- check that objection first when scoring engagement; leaving it unmet
+  holds engagement to 4 at most;
+- the rejection rule, word caps and revision rules as written, the
+  response format's shape fixed, a response breaking a word cap
+  discarded, `verdict_line` watched most closely, `improvement_note`
+  within 40 words.
+
+Dropped as history or notes for editors: that v3 differs from v2 in
+interpolating the rival schools, and why; that the JSON example no
+longer names a school; the dated change notes; that the criteria are
+Arthur's to write; the placeholder note; and "v3 is not the production
+default ... a draft to run the golden set against", which becomes false
+at launch. Nothing in the comment contradicted the criteria.
+
+Run `2026-11-06T15-51-54-644Z-v3.json`: 25 calls, $0.3367, 9 of 25 out
+of band. The strong cases fell further than without the section:
+buddhist-strong 61, confucian-ren-disposition 58, util-named-text 68,
+util-obscure-source 69, virtue-exemplar 68, ubuntu-strong 68, and
+engagement 3 on most of them.
+
+**Step B (02d01a0).** The 4 Nov body exactly, comments stripped, less the
+two sentences the cap of 2026-11-03 brought into the engagement
+criterion, so engagement reads as it did before the cap. The objection
+section's instruction to return the known objection stays; the voices
+are the code's (`src/lib/judge/objection-voices.ts`). Comments were kept
+stripped, as in step A: the 4 Nov comment restates the cap, which step B
+removes.
+
+Run `2026-11-06T15-55-59-122Z-v3.json`: 25 calls, $0.3086, 7 of 25 out
+of band: buddhist-intention-excuse 44 (5-40), buddhist-strong 61,
+confucian-hierarchy-school 78, confucian-ren-disposition 58, stoic-analogy
+fidelity 7, stoic-strong fidelity 7, util-obscure-source 68.
+
+Stopped as ruled. The full v3 run, Gate 3, the new-schools run and Gate 4
+were not started.
+
+What the six checks of the day show, taken together: with the 4 Nov head
+comment sent, the strong cases score as on 4 Nov (06:05 UTC, 2 out);
+without it they miss, whether its instructions are in the body (step A,
+9 out), the body is exactly 4 Nov's with no cap (step B, 7 out), or
+anything between (00:01, 01:06 and 01:38 UTC, 6 or 7 out). The first of
+those, at 00:01 UTC (`2026-11-06T00-01-04-700Z-v3.json`, $0.3185, the
+order of before #68 restored, f983066), missed buddhist-intention-excuse
+48, buddhist-strong 62, confucian-hierarchy fidelity 6,
+confucian-ren-disposition 61, stoic-strong fidelity 7, util-named-text
+64 and util-obscure-source 68. What lifts the scores is the comment
+itself, its history and framing included, and not any instruction in it.
+
+Cumulative on the eval key: $9.5233 of $12.00, over the 15 run files on
+this branch.
