@@ -3998,3 +3998,42 @@ only Utilitarianism.
 Stopped as ruled. Cumulative on the eval key: $8.4820 of $12.00. The full
 v3 run, Gate 3 and the new-schools run were not started.
 
+
+### Judge v3: the 4 Nov head comment sent again, one check (2026-11-06)
+
+Arthur, 2026-11-06, asked whether to spend about $0.37 on one check with
+the head comment sent again: "Do what you need to".
+
+The check sent the head comment exactly as it stood on 4 Nov (e83e0a8),
+then the body exactly as it stands at ae82585 on this branch: the 4 Nov
+body plus the paragraph on crediting the concept over the vocabulary, the
+cap-binding sentences removed, the cap kept, the Utilitarianism voice of
+2026-11-05. Only the comment differs from the check of 01:38 UTC. It ran
+from a scratch copy whose `asSent` returned v3 unstripped; nothing of
+that copy is committed, and this branch still strips comments.
+
+Run `2026-11-06T06-05-12-649Z-v3.json`: 26 calls (one reply failed
+validation and passed on its retry), $0.3960, 2 of 25 cases out of band,
+the same two the exact 4 Nov prompt missed: confucian-hierarchy-school
+(80, engagement 5), out of band in the 4 Nov run itself, and
+stoic-analogy (fidelity 7, score 70 in band). Every strong case is back
+in band, and 17 of the 25 cases score exactly what the exact 4 Nov
+prompt gave them. Against the check with the comment stripped:
+buddhist-strong 80 (was 68), confucian-strong 86 (72), util-obscure-source
+83 (68), virtue-exemplar 80 (70), ubuntu-strong 72 (62).
+
+So the head comment is what separates the two prompts. The vocabulary
+paragraph and the Utilitarianism voice are not the cause. The comment
+says nothing addressed to the judge, but sending it moves the strong
+cases' engagement up by one or two and their composites by about ten.
+Which of its paragraphs does this is not known: it describes the body
+(form alone never lowers a score; the criteria, scale and composite
+unchanged from v2), restates the engagement cap's history, and calls the
+file a draft to run the golden set against.
+
+Sending it again would reverse Arthur's ruling of 2026-11-05 ("strip
+comments from judge.v3.md before it is sent"), and finding which part
+carries the effect costs more checks than the cap leaves room for beside
+the full v3 run and the new-schools run. Both are his: stopped here and
+put to him. Cumulative on the eval key: $8.8780 of $12.00. The full v3
+run, Gate 3 and the new-schools run were not started.
