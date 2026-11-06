@@ -59,7 +59,9 @@ export default async function SiteOgImage() {
               color: OG_INK_MID,
             }}
           >
-            Ten scenarios. Three schools. One result you&apos;ll want to argue about.
+            {process.env.SIX_SCHOOLS === "1"
+              ? "Ten scenarios. Six schools. One result you'll want to argue about."
+              : "Ten scenarios. Three schools. One result you'll want to argue about."}
           </div>
         </div>
 

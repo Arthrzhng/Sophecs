@@ -1,8 +1,9 @@
 # Quiz v2
 
-Stage 3 of the brief of 2026-11-03. **Nothing here is built yet.** Every
-choice below is a philosophy or content judgement and is Arthur's (CLAUDE.md
-item (e)).
+Stage 3 of the brief of 2026-11-03. **Built on SIX_SCHOOLS builds only**,
+in Stage 5, step 4 (`docs/decisions.md`, "Stage 5, step 4"); production
+still runs v1. Every choice below is a philosophy or content judgement and
+is Arthur's (CLAUDE.md item (e)).
 
 **Ruled on 2026-11-05** (Checkpoint A, item 15; `docs/decisions.md`,
 "Arthur's rulings of 2026-11-05 on Checkpoint A"): the axes, their plain
@@ -371,10 +372,13 @@ inside the brief's range.
 **Retaking uses v2.** A reader who takes the quiz again gets the six-school
 quiz and a new result. Retaking while signed in already replaces the
 profile's school and records the change in `school_history`
-(`retakeQuizSchool` in `src/lib/claim.ts`), and a v2 retake would do the
-same. A reader who never retakes keeps their v1 school.
+(`retakeQuizSchool` in `src/lib/claim.ts`), and a v2 retake will do the
+same from launch. Until then a v2 result on a SIX_SCHOOLS preview moves no
+school (Gate 2, option (i); `docs/decisions.md`, "Stage 5, step 4"). A
+reader who never retakes keeps their v1 school.
 
-**What the build will need** (Stage 5, not now):
+**What the build needed** (Stage 5; built in steps 3 and 4, see
+`docs/decisions.md`):
 - **A version on each result.** v1 stores three school weights in
   `quiz_results.vector`; v2 would store a point. On a result page the
   stored vector is read only by the share page's comparison columns
@@ -388,7 +392,8 @@ same. A reader who never retakes keeps their v1 school.
   v1 without being rewritten. That is a migration, and it is Arthur's yes
   before it is applied.
 - **v1 links keep working.** A v1 result shared before the switch still
-  opens on its triangle; a v2 result opens on the map.
+  opens as it always has, on its card; a v2 result opens with its point on
+  the map.
 - **Challenges across versions.** A friend answering a v1 challenge after
   the switch takes v2. The challenge page reads only the challenger's
   school, so it still works. But the result page (`src/app/r/[id]/page.tsx`)

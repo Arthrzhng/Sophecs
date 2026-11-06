@@ -1,6 +1,8 @@
 /**
- * The two-axis map of schools: Phase 3.0 preview only (Stage 4 of the brief
- * of 2026-11-03). Nothing in the product renders it yet.
+ * The two-axis map of schools (Stage 4 of the brief of 2026-11-03). Quiz v2
+ * draws it on a SIX_SCHOOLS build: beside each question, on the result
+ * page and on a v2 result's shared page (docs/stage5-plan.md, step 4).
+ * Production, without the flag, does not render it.
  *
  * One component for both places the brief puts it. The quiz preview passes
  * `preview`, which draws the dashed "where this answer moves you" ring and

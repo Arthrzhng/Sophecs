@@ -46,11 +46,24 @@ export function ChallengeInvite({
         They came out {SCHOOL_ARTICLE[school]} {adherent}. Find out what you are.
       </h1>
 
+      {/* Quiz v2 on a SIX_SCHOOLS build places a reader in one of six and
+          takes a few minutes (docs/quiz-v2.md, section 8; Checkpoint B (e) 4). */}
       <p className="mt-5 max-w-[54ch] text-base leading-relaxed text-ink-mid">
-        Sophecs asks ten questions about how you decide what&apos;s right and
-        places you in one of three schools of ethics, then asks you to argue
-        for yours against a motion. No account needed for the questions, and
-        about eighty seconds.
+        {process.env.SIX_SCHOOLS === "1" ? (
+          <>
+            Sophecs asks ten questions about how you decide what&apos;s right and
+            places you in one of six schools of ethics, then asks you to argue
+            for yours against a motion. No account needed for the questions, and
+            a few minutes.
+          </>
+        ) : (
+          <>
+            Sophecs asks ten questions about how you decide what&apos;s right and
+            places you in one of three schools of ethics, then asks you to argue
+            for yours against a motion. No account needed for the questions, and
+            about eighty seconds.
+          </>
+        )}
       </p>
 
       <div className="mt-8">

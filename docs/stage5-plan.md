@@ -168,6 +168,10 @@ of the three; Gate 2 is about that.
    `submitQuizResult` in `src/app/actions.ts`, which is frozen and typed
    to v1's three-weight vector, so this step edits a frozen file. It is
    the first step that writes something new, so it follows **Gate 2**.
+   Done on SIX_SCHOOLS builds (`docs/decisions.md`, "Stage 5, step 4"):
+   `src/lib/quiz-v2.ts`, `src/lib/quiz-v2-score.ts`, `QuizShellV2`, and
+   `submitQuizResultV2` in `src/app/actions.ts`, which never moves a
+   profile's school and takes up only a v2 challenger's challenge.
 5. **Debating as a new school.** The arena, the judge and the
    micro-lessons for a reader placed in one of the three. **Gate 3.**
 6. **Launch.** On Arthur's instruction only: the sample teardown; under
@@ -188,7 +192,14 @@ of the three; Gate 2 is about that.
    (`rankThresholdApplies` in `src/lib/school-table.ts`): from the
    launch deploy, over the week in progress, a school is unranked until it
    has 20 judged original arguments in the week. Arthur ruled on 2026-11-06 that it applies at launch,
-   with the flag, and not before. **Gate 4.**
+   with the flag, and not before. The rules steps 3 and 4 set "until
+   launch" are lifted in the launch merge, in every file
+   `docs/decisions.md`, "Stage 5, step 4", lists under "To undo at
+   launch": v2 results take up v1 challengers, move a signed-in reader's
+   school, give a school on sign-in (`schoolFromResult` and the claim's
+   own filter), count on `/me` and in challenges, and can be debated.
+   `src/app/actions.ts` is among them, and is frozen.
+   **Gate 4.**
 
 ## Gates for Arthur
 
@@ -259,8 +270,10 @@ of the three; Gate 2 is about that.
    - [ ] The sample teardown.
    - [ ] The preview's v2 results cleared before the launch merge, an (a)
      write: `challenge_from` set to null where a genuine row points at
-     one, and a real reader's challenge with a v2 challengee reopened
-     rather than deleted.
+     one, a real reader's challenge with a v2 challengee reopened
+     rather than deleted, and `debates.challenge_id` set to null where it
+     points at a cleared challenge (its foreign key has no on-delete
+     action).
    - [ ] The flag on for Production, with `next.config.ts`'s refusal
      removed; the live table's 20-argument rule comes with it.
    - [ ] The three content files' status and colour tokens (the six
@@ -268,6 +281,9 @@ of the three; Gate 2 is about that.
    - [ ] The share lines and other front matter (`docs/quiz-v2.md`,
      section 8), in the launch merge itself.
    - [ ] `README.md`.
+   - [ ] The "until launch" rules of steps 3 and 4 lifted (step 6), in
+     every file `docs/decisions.md`, "Stage 5, step 4", lists, with the
+     tests that pin them.
    - [ ] The fresh sample run.
 
 Steps 1 and 2 need no gate and start now.

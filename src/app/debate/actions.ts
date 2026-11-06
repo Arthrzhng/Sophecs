@@ -55,6 +55,8 @@ export async function assignChallengeTopic(challengeId: string): Promise<AssignT
     .eq("id", challengeId)
     .maybeSingle();
   if (!challenge) return { ok: false, error: "Challenge not found." };
+  // resolveChallengeSide also refuses a challenge with a v2 side, until
+  // launch, so a direct call cannot fix a topic for one either.
   if (!(await resolveChallengeSide(admin, challenge, user.id))) return { ok: false, error: "Challenge not found." };
 
   if (challenge.topic_slug) {

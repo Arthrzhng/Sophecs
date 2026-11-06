@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { LandingQuestion } from "@/components/quiz/LandingQuestion";
+import { LandingQuestionV2 } from "@/components/quiz/LandingQuestionV2";
+import { QUIZ_V2_ON, quizV2, quizV2MapSchools } from "@/lib/quiz-v2";
 import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { getSchool } from "@/lib/schools";
 import { getAllTopicFiles } from "@/lib/topics";
@@ -38,17 +40,34 @@ export default function LandingPage() {
           <h1 className="order-1 max-w-[26ch] text-lg font-extrabold leading-tight tracking-tight text-ink sm:text-xl">
             Find your school of ethics. Then defend it, a little every day.
           </h1>
+          {/* On a SIX_SCHOOLS build the quiz is v2, which places a reader in
+              one of six (docs/quiz-v2.md, section 8; docs/stage5-plan.md,
+              step 4). */}
           <p className="order-3 mt-6 max-w-[52ch] text-base leading-relaxed text-ink-mid sm:order-2 sm:mt-4">
-            A short quiz places you with the Stoics, the Utilitarians or the Virtue
-            Ethicists. Then a few minutes a day: read the case, argue the week&apos;s
-            question about AI, and get judged on how true you stay to your school.
+            {QUIZ_V2_ON ? (
+              <>
+                A short quiz places you in one of six schools of ethics. Then a few
+                minutes a day: read the case, argue the week&apos;s question about AI, and
+                get judged on how true you stay to your school.
+              </>
+            ) : (
+              <>
+                A short quiz places you with the Stoics, the Utilitarians or the Virtue
+                Ethicists. Then a few minutes a day: read the case, argue the week&apos;s
+                question about AI, and get judged on how true you stay to your school.
+              </>
+            )}
           </p>
 
           {/* Question one, live. The triangle beside it is the mockup's hero
               illustration doing a real job: at zero answers the marker sits
               at the centre, which is where you start. */}
           <div className="order-2 mt-4 sm:order-3 sm:mt-8">
-            <LandingQuestion />
+            {QUIZ_V2_ON ? (
+              <LandingQuestionV2 questions={quizV2().questions} mapSchools={quizV2MapSchools()} axes={quizV2().axes} />
+            ) : (
+              <LandingQuestion />
+            )}
           </div>
 
           <p className="order-4 mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-soft">
@@ -57,7 +76,11 @@ export default function LandingPage() {
                 against the anon_id cookie, and PostHog records
                 quiz_completed. What is true is that neither carries a
                 name. */}
-            <span>About 80 seconds. No sign-up, and no name attached to your answers.</span>
+            <span>
+              {QUIZ_V2_ON
+                ? "A few minutes. No sign-up, and no name attached to your answers."
+                : "About 80 seconds. No sign-up, and no name attached to your answers."}
+            </span>
             <Link
               href="/login"
               className="inline-flex min-h-11 items-center font-semibold text-ink underline underline-offset-4"
@@ -173,7 +196,9 @@ export default function LandingPage() {
 const STEPS = [
   {
     title: "Find your school",
-    body: "A short quiz. Every answer moves you across the triangle.",
+    body: QUIZ_V2_ON
+      ? "A short quiz. Every answer moves you across the map."
+      : "A short quiz. Every answer moves you across the triangle.",
     badge: "var(--color-ink)",
     badgeInk: "#ffffff",
   },
