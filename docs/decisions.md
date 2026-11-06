@@ -4684,7 +4684,8 @@ Choices made where the instruction left room, each his to change:
   on each page change; Sign out loads the Supabase client only when
   pressed.
 - **No sign-in link in the signed-out header,** as given. The landing
-  page keeps its own link to `/login`.
+  page keeps its own link to `/login`. (Ruled otherwise on 2026-11-06:
+  a quiet "Sign in" link; below.)
 - **The Me menu's targets:** Profile `/me`; My debates and challenges
   `/me#challenges` (the pending challenges, with the debate history after
   them); Classes `/me/settings#classes`; Settings `/me/settings`; Retake
@@ -4702,13 +4703,16 @@ Choices made where the instruction left room, each his to change:
   criteria in full is unchanged and is Gate 4's item 10. The merged page
   does not send `rubric_viewed`, which `/debate/rubric` sends: that event
   counts views of the rubric page, and a visit to `/how-it-works` is not
-  one. Whether it should count the merged page is his.
+  one. Whether it should count the merged page is his. (Both ruled on
+  2026-11-06: the sentence kept, and `rubric_viewed` counted when the
+  rubric's section is seen; below.)
 - **Redirects** (`sixSchoolsRedirects` in `next.config.ts`, flag-on
   builds only): `/table` to `/schools`, `/method` to `/how-it-works`
   (a browser keeps the anchor, so `/method#samples` lands on
   `#samples`), `/debate/rubric` to `/how-it-works#rubric`. Temporary
-  until the launch makes them permanent. Checked on a served flag-on
-  build: each answers 307 to its destination.
+  until the launch makes them permanent (308; ruled 2026-11-06, below).
+  Checked on a served flag-on build: each answers 307 to its
+  destination.
 - **Exemplars** sits under each motion card, not inside it: the card is
   itself a link, and a link cannot hold another. Read aloud as
   "Exemplars: {motion title}".
@@ -4718,8 +4722,9 @@ Choices made where the instruction left room, each his to change:
 - **Widths.** The header keeps to one line from 360 pixels, the
   design's phone width (`design/layout.md`), up, with nothing pushed
   sideways; below 360 the quiz button wraps. Between 640 and 768 the
-  bar's links and gaps are a little narrower, so "How it works" stays on
-  one line. Only one of Menu and Me is open at a time.
+  bar's links and gaps were a little narrower, so "How it works" stayed
+  on one line; with "Sign in" the bar starts at 768 and that narrower
+  step is gone (below). Only one of Menu and Me is open at a time.
 - **Links go to the new addresses directly.** On a flag-on build every
   link inside the site that led to `/method`, `/debate/rubric` or
   `/table` leads to `/how-it-works`, its anchors, or `/schools`
@@ -4747,10 +4752,83 @@ Choices made where the instruction left room, each his to change:
     markup itself is the same.
   - `_buildManifest.js` lists the two rewrites, so the addresses
     `/schools` and `/how-it-works` are in a public file no page loads.
-  - The stylesheet grows by 684 bytes (103 compressed): rules for
+  - The stylesheet grows by 684 bytes (103 compressed; 664 and 105
+    after the rulings below): rules for
     classes no flag-off page uses, since Tailwind writes a rule for
     every class it finds in the source, whichever build uses it.
 
   No draft school is among any of it (`check:bundle` passes). Measured
   on flag-off builds of main at 901e3a4 and of this branch; the page
   scripts and the HTML by the third review.
+
+### Navigation: Arthur's rulings on #99 (2026-11-06)
+
+Arthur, 2026-11-06, on #99 and Gate 4 item 14:
+
+> - .rsc returning 200: yes, the small follow-up so they 404 as before.
+> - Kill-switch line moved to a shared file: fine. It's a read, not the
+>   enforcement; leave it where it is.
+> - Gate 4 item 14:
+>   - Add a "Sign in" link to the signed-out header (returning students
+>     need it), styled as a quiet text link beside "Take the quiz".
+>   - Me items: accept as built.
+>   - Restore the method page's closing sentence ("The criteria the
+>     judge is given are published in full...") on /how-it-works. That
+>     transparency is part of the site's credibility.
+>   - Count rubric_viewed when the rubric section of /how-it-works is
+>     viewed.
+>   - Redirects: temporary until launch, permanent (308) at launch. Add
+>     that to the Gate 4 steps.
+
+Carried out:
+- **`.rsc`.** On a build without the flag, `/schools.rsc` and
+  `/how-it-works.rsc` are rewritten with the two pages, before any file
+  is looked up (`flagOffRewrites` in `next.config.ts`). After #99 they
+  answered 200 on production with a not-found payload: fetched from the
+  production deployment of 80b8d5b (dpl_4nX8uRi1CKXr4XxoSomo7Lg6AHpJ)
+  at 21:26 UTC, both gave status 200, `x-matched-path` their own `.rsc`
+  address, and a payload whose page segment carries the digest
+  `NEXT_HTTP_ERROR_FALLBACK;404`. Vercel serves a page's `.rsc` file
+  from the build, and widens only afterFiles rewrites to cover it
+  (`@vercel/next` 29.0.0, read by the review). `next start` serves no
+  `.rsc` address at all, so only a production deploy can show the fix.
+- **The kill-switch read** stays in `src/lib/school-table-page.ts`.
+- **"Sign in"** (`/login`), a quiet text link (the bar links' grey, no
+  fill or border) just before "Take the quiz", shown only signed out.
+  Beside the button it does not fit on most phones: the page would scroll
+  sideways from 320 to 413 pixels (6 at 320, 36 at 360, 21 at 375, 6 at
+  390; none from 414 to 639) and between 640 and 719 (up to 62). So
+  it is beside the button wherever the four links are in the bar, and
+  the Menu's last item, below a rule, wherever they are in the Menu; and
+  the bar now starts at 768 (`md`) rather than 640, the Menu below it,
+  for both readers: signed in, the Menu is used from 640 to 767 too,
+  which "Sign in" does not itself need, and is kept so the two headers
+  change at one width. The row's gaps stay at 12 pixels up to 1024, so
+  the signed-out bar has 18 pixels to spare at 768. Measured on a served
+  flag-on build from 320 to 1280 pixels, signed out and in: one line
+  from 360 up (below it the quiz button wraps), nothing pushed sideways.
+  Where it sits on a phone, and the bar's new width for both readers,
+  are his to change (Gate 4 item 14).
+- **The Me items** as built.
+- **The method page's closing sentence** is back at the foot of
+  `/how-it-works`, before "Questions or corrections", its "Read the
+  rubric" now a link to the page's own `#rubric`. Like the rubric's own
+  claim, it says the judge's criteria are published in full; on a
+  flag-on build the page shows v2's criteria for three schools, which is
+  Gate 4's item 10, now naming this file. The link to `#rubric` is a
+  choice his ruling left open.
+- **`rubric_viewed`** is sent from `/how-it-works` once a page view, when
+  the rubric's section first reaches the upper half of the window
+  (`src/components/how-it-works/RubricSectionViewTracker.tsx`); a link
+  to `#rubric` lands it there at once. Same event and properties as
+  `/debate/rubric`, which counts on load; PostHog's own path tells the
+  two apart. What counts as "viewed" is a choice his ruling left open.
+  Checked in a browser by the review: no event on load at the top of
+  the page (390 to 2560 pixels wide), one when the section's top passes
+  the window's middle, none after, one on landing at `#rubric`, none on
+  landing at another section.
+- **Redirects:** temporary until the launch; making them permanent (308)
+  in the launch merge is on Gate 4's item 15 and the checklist in
+  `docs/stage5-plan.md`.
+- The copy is in `docs/daily-path-copy.md`, section 13; the Gate 4
+  screenshots are retaken with "Sign in".

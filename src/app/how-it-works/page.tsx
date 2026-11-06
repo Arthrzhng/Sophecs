@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Page } from "@/components/layout/Page";
 import { JudgeMethod, SampleAccounts } from "@/components/how-it-works/JudgeMethod";
 import { CounterpartRules, RubricCriteria } from "@/components/how-it-works/Rubric";
+import { RubricSectionViewTracker } from "@/components/how-it-works/RubricSectionViewTracker";
 
 // A build without the flag never reaches this page: next.config.ts
 // rewrites its address to one no route answers, so the reader gets the
@@ -62,6 +63,7 @@ export default function HowItWorksPage() {
       </section>
 
       <section id="rubric" className="mt-12 scroll-mt-8 border-t-2 border-rule pt-10">
+        <RubricSectionViewTracker id="rubric" />
         <h2 className="text-lg font-extrabold tracking-tight text-ink">How this was judged</h2>
         <RubricCriteria sub />
       </section>
@@ -71,7 +73,18 @@ export default function HowItWorksPage() {
       <SampleAccounts />
 
       <div className="mt-12 border-t-2 border-rule pt-10">
+        {/* /method's closing sentence, kept (Arthur, 2026-11-06: "That
+            transparency is part of the site's credibility"); its link is to
+            the rubric's section here. */}
         <p className="max-w-[66ch] text-base leading-relaxed text-ink-mid">
+          The criteria the judge is given are published in full, including the
+          fidelity criteria for each school.{" "}
+          <a href="#rubric" className="font-semibold text-ink underline underline-offset-4">
+            Read the rubric
+          </a>
+          .
+        </p>
+        <p className="mt-4 max-w-[66ch] text-base leading-relaxed text-ink-mid">
           Questions or corrections: arthur.rzhang@gmail.com
         </p>
         <Link
