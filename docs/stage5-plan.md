@@ -285,6 +285,49 @@ of the three; Gate 2 is about that.
      every file `docs/decisions.md`, "Stage 5, step 4", lists, with the
      tests that pin them.
    - [ ] The fresh sample run.
+   - [ ] The v2 copy below, read and ruled by Arthur in the Gate 4 pack
+     (asked for on 2026-11-06).
+
+   **The v2 copy, for the Gate 4 pack.** Every piece of text a reader
+   sees only because quiz v2 and the six schools are on, as a flag-on
+   build shows it today, with what a reader sees now. Lines already ruled
+   are marked so; "New" is text for his (e) judgement. The questions,
+   options and axis names themselves were ruled at Checkpoint A
+   (`docs/decisions.md`, "Quiz v2, as ruled"; `docs/quiz-v2.json`) and
+   are not repeated here.
+
+   | Where | Now | With v2 | Status |
+   | --- | --- | --- | --- |
+   | Landing page, under the heading (`src/app/page.tsx`) | A short quiz places you with the Stoics, the Utilitarians or the Virtue Ethicists. Then a few minutes a day: ... | A short quiz places you in one of six schools of ethics. Then a few minutes a day: ... | New |
+   | Landing page, under the first question | About 80 seconds. No sign-up, and no name attached to your answers. | A few minutes. No sign-up, and no name attached to your answers. | "A few minutes" ruled, (e) 4 |
+   | Landing page, first step | A short quiz. Every answer moves you across the triangle. | A short quiz. Every answer moves you across the map. | New |
+   | Landing page, the schools' heading | The three schools | The six schools (counted from the list) | New |
+   | The quiz page's description (`src/app/quiz/page.tsx`) | Ten questions that place you in Stoicism, Utilitarianism or Virtue Ethics, by what you already think rather than what you have read. | Ten questions that place you in one of six schools of ethics, by what you already think rather than what you have read. | New |
+   | The site's sharing image (`src/app/opengraph-image.tsx`) | Ten scenarios. Three schools. One result you'll want to argue about. | Ten scenarios. Six schools. One result you'll want to argue about. The coloured hairline under it is drawn from the published schools, so it shows three colours until they are published. | New |
+   | A challenge's invitation (`src/components/share/ChallengeInvite.tsx`) | ... places you in one of three schools of ethics, ... and about eighty seconds. | ... places you in one of six schools of ethics, ... and a few minutes. | "A few minutes" ruled, (e) 4; "six" new |
+   | A result's share page (`src/components/share/SharePage.tsx`) | ... No account needed, about eighty seconds. | ... No account needed, a few minutes. | Ruled, (e) 4 |
+   | The map beside the landing page's question one | You start here (on v1's triangle) | You start here | Unchanged |
+   | The map beside a question, once an answer is selected | The dashed ring shows where answer A (to D) moves you. | Where this answer moves you | The brief's words, on the Stage 4 preview (`docs/daily-path-copy.md`, section 12) |
+   | The map's accessible title, beside each question | Your position so far; or Your position so far, between X and Y | Where your answers put you, on the map of the schools | New |
+   | The map on the reader's result | (none) | Where your answers put you; accessible title "Where your answers put you, on the map of the schools" | New |
+   | The map on a shared result (`/r/<id>`) | (none) | Where these answers landed; accessible title "Where these answers put them, on the map of the schools" | New |
+   | Every map's description for screen readers (`src/components/phase3/SchoolMap.tsx`) | (none) | The schools sit on a ring, in this order going round: (the six, in order). A filled dot marks where you stand. A dashed ring marks where this answer would move you. A line joins your earlier positions in order. (Each sentence only where it applies.) | New. On `/r/<id>` it says "where you stand" to a reader looking at someone else's answers, while the title there says "them" |
+   | The quiz's last button | See your school | See your school | Unchanged |
+   | If the server scores a school the page cannot show | (none) | Couldn't show this result. Your result was saved, but this page could not show its school. Open the link again in a moment. | New |
+   | Today, after the reader has argued (`src/components/phase3/ElsewhereCard.tsx`) | (none) | Optional; A view from elsewhere; Another tradition on this week's motion. There is no check, and it is not a step.; Read it | When it appears ruled, (e) 6; copy in `docs/daily-path-copy.md`, section 12 |
+   | The lesson player's label for that passage (`src/app/lessons/[slug]/page.tsx`) | (none) | A view from elsewhere | As above |
+   | The six passages it opens (`content/micro/*-elsewhere.md`) | (none) | Each file's own title, passage and source | Content, for his reading |
+   | `/table`, a school under the threshold (`src/lib/school-table.ts`) | (none: the three are always ranked) | Ranked once it has 20 judged original arguments. (n) so far. | The threshold ruled, (e) 5 and 2026-11-06; the copy in `docs/daily-path-copy.md` |
+   | The share lines (`content/schools/*.md`), in a result's share sheet | The three published schools' lines | All six schools' lines; the nine of the three new schools are new to readers | The two rewordings ruled, (e) 3, with "the other lines ... unchanged". Still for him to see: `utilitarianism.md` [1] cites v1's self-driving-car question, which v2 does not ask |
+   | `README.md` | one of three schools | To be written in the launch merge | Not written yet |
+
+   Text that changes only because the list of schools is longer needs no
+   new judgement and is not in the table: "The other five" on a school's
+   page, "All six modules read.", "Fourth", "Fifth" and "Sixth on the
+   table this week" on Today, the school names in the footer, the lessons
+   filter, `/table` and the exemplars page, the adherent nouns in "You
+   argue like an Ubuntu Ethicist" and "They came out a Confucian" (ruled,
+   (e) 1), and the three new schools' own pages and modules.
 
 Steps 1 and 2 need no gate and start now.
 
