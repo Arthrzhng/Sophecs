@@ -16,12 +16,11 @@ import { submitQuizResult } from "@/app/actions";
 import { track } from "@/lib/analytics/client";
 import { pickShareLineFrom } from "@/lib/share-line";
 import type { SchoolContent } from "@/lib/schools";
-import type { SchoolId, SchoolVector } from "@/lib/types";
+import type { SchoolId } from "@/lib/types";
 
 interface PendingResult {
   primary: SchoolId;
   secondary: SchoolId;
-  vector: SchoolVector;
   answers: { q: number; opt: string }[];
   durationMs: number;
   challengeId: string | null;
@@ -37,7 +36,8 @@ interface PendingResult {
 
 // Transient — never linkable. Computes nothing itself (QuizShell already
 // scored the quiz client-side); this renders the card immediately from
-// sessionStorage while the insert happens in the background, then rewrites
+// sessionStorage while the server scores the answers again and saves them,
+// switches to the server's school in the rare case it differs, then rewrites
 // the URL to the real /r/[id] without navigating. If the insert fails, the
 // card stays up and sharing falls back to /s/[school] instead of a dead
 // /r/[id] link.
