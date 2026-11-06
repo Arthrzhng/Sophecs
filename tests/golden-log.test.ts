@@ -1,9 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import os from "node:os";
 import {
   logTarget,
+  parseSixSchools,
   recordCall,
   requestFingerprint,
   sha256,
@@ -220,12 +221,16 @@ describe("requestFingerprint", () => {
   });
 
   it("tells a SIX_SCHOOLS request from production's, and leaves production's as it was", () => {
-    // Gate 3: the flag sets the rival list a v3 prompt is filled with, so
-    // two runs that differ only in it sent different requests.
-    expect(requestFingerprint({ ...base, sixSchools: true })).not.toBe(requestFingerprint(base));
+    // Gate 3: a flag-on build fills a v3 prompt with its rival list, so the
+    // list, in its order, is part of what was sent.
+    const six = ["stoicism", "utilitarianism", "virtue-ethics", "confucian", "ubuntu", "buddhist"];
+    expect(requestFingerprint({ ...base, rivalSchools: six })).not.toBe(requestFingerprint(base));
+    expect(requestFingerprint({ ...base, rivalSchools: [...six].reverse() })).not.toBe(
+      requestFingerprint({ ...base, rivalSchools: six })
+    );
     // Without the flag the fingerprint is computed exactly as before Gate 3,
     // so every committed run file's fingerprints still reproduce.
-    expect(requestFingerprint({ ...base, sixSchools: false })).toBe(requestFingerprint(base));
+    expect(requestFingerprint({ ...base, rivalSchools: undefined })).toBe(requestFingerprint(base));
     expect(requestFingerprint(base)).toBe(
       sha256(
         JSON.stringify([
@@ -241,6 +246,16 @@ describe("requestFingerprint", () => {
     );
   });
 
+  it("is computed by the runner with the rival list on a SIX_SCHOOLS run only", () => {
+    // Pinned as written, like logCall in tests/golden-sample.test.ts: a
+    // runner that dropped the list would write flag-on records that match
+    // flag-off ones that sent three rivals.
+    const runner = fs.readFileSync(path.join(process.cwd(), "tests", "judge", "run-golden.ts"), "utf-8");
+    expect(runner).toContain("rivalSchools: SIX_SCHOOLS_RUN ? SHOWN_SCHOOL_IDS : undefined,");
+    expect(runner).toContain("const SIX_SCHOOLS_RUN = parseSixSchools(process.env.SIX_SCHOOLS);");
+    expect(runner).toContain("sixSchools: SIX_SCHOOLS_RUN,");
+  });
+
   it("hashes the prompt rather than storing it", () => {
     // The fingerprint must not leak the prompt text into every record.
     expect(requestFingerprint(base)).not.toContain("RUBRIC");
@@ -252,24 +267,30 @@ describe("requestFingerprint", () => {
   });
 });
 
-describe("a run file's six_schools mark", () => {
-  // Gate 3: a SIX_SCHOOLS run sends a flag-on build's requests, so its file
-  // says so; a run without the flag is written exactly as before.
-  it("is absent without the flag, so earlier run files and new ones match", () => {
-    vi.stubEnv("SIX_SCHOOLS", "0");
-    try {
-      expect("six_schools" in startRun({ promptVersion: "v3", promptText: "p", model: "m", samplesPerCase: 1 })).toBe(false);
-    } finally {
-      vi.unstubAllEnvs();
-    }
+describe("a SIX_SCHOOLS run", () => {
+  it.each([[undefined], [""], ["0"]])("is off for SIX_SCHOOLS=%j", (value) => {
+    expect(parseSixSchools(value)).toBe(false);
   });
 
-  it("is true with the flag", () => {
-    vi.stubEnv("SIX_SCHOOLS", "1");
-    try {
-      expect(startRun({ promptVersion: "v3", promptText: "p", model: "m", samplesPerCase: 1 }).six_schools).toBe(true);
-    } finally {
-      vi.unstubAllEnvs();
+  it("is on for SIX_SCHOOLS=1", () => {
+    expect(parseSixSchools("1")).toBe(true);
+  });
+
+  it.each([["true"], ["yes"], ["on"], ["2"], [" 1"], ["1 "]])(
+    "refuses SIX_SCHOOLS=%j rather than run flag-off and bill for it",
+    (value) => {
+      expect(() => parseSixSchools(value)).toThrow(/neither "1" nor "0"/);
     }
+  );
+
+  it("is marked in the file, twice, and a run without the flag is written as before", () => {
+    const meta = { promptVersion: "v3", promptText: "p", model: "m", samplesPerCase: 1 };
+    const off = startRun(meta);
+    expect("six_schools" in off).toBe(false);
+    expect(off.run_id).toMatch(/-v3$/);
+    expect("six_schools" in startRun({ ...meta, sixSchools: false })).toBe(false);
+    const on = startRun({ ...meta, sixSchools: true });
+    expect(on.six_schools).toBe(true);
+    expect(on.run_id).toMatch(/-v3-six$/);
   });
 });

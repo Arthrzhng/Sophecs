@@ -4511,15 +4511,17 @@ the full v3 run, as his ruling of 2026-11-06 ordered.
   `content/prompts/fidelity-criteria.draft.md` once, as the module loads,
   and only when `SIX_SCHOOLS` is `"1"`; otherwise its map is empty and
   nothing is read. `fidelityCriteriaFor` gives each of the three its
-  section, verbatim, the text every golden run has judged them against,
-  then the voice paragraph a published school gets. That paragraph names
+  section, verbatim, the text every golden run since 3 Nov 18:15 has
+  judged them against (the file last changed in 8e76d62, at 17:50 that
+  day), then the voice paragraph a published school gets. That paragraph names
   only the voices whose school is among the rivals listed, so with six
   listed Confucianism's also names its Ubuntu voice and Buddhist Ethics'
   its Confucian one, which earlier runs, listing three rivals, did not
   send; Ubuntu's is as before. (Corrected on review: this first said the
   whole text was exactly what earlier runs sent.) Under v1 or v2 it
   throws for them.
-- **A published school's criteria are unchanged.** Its voice paragraph
+- **`rubric.ts`'s criteria for a published school are unchanged.** What
+  fills the prompt's criteria for one is not quite: its voice paragraph
   names only the voices whose school is among the rivals listed, so on a
   flag-on build Stoicism's and Utilitarianism's also name their Ubuntu
   voice, which `src/lib/judge/objection-voices.ts` already held for when
@@ -4529,7 +4531,8 @@ the full v3 run, as his ruling of 2026-11-06 ordered.
 **What does not change.** A build without the flag, production
 included, sends byte for byte what it sent: v2, three rivals, the
 published criteria (the six fixtures in `tests/judge-request/`), and
-`/api/judge` refuses the three before any lookup, write or call. The
+`/api/judge` refuses the three after reading the budget and the profile,
+before the topic lookup, the cap, and any write or call. The
 draft file is not read (`tests/draft-criteria-reads.test.ts` records
 every path the route asks for, and now also shows the recorder catching
 the flag-on read). `next.config.ts` still refuses SIX_SCHOOLS for a
@@ -4547,22 +4550,26 @@ flag-on build and records no further read.
 the build's own path (no draft override), after checking that path sends
 exactly the draft file's text; both read the file with the same parser,
 `parseDraftCriteria`. The new-schools run is that run. The flag sets the
-rival list, so it is now part of a record's request fingerprint, added
-only when on: every fingerprint of a run without it is computed as
-before (all 77 of the 16:58 full run still reproduce), and none of a
-flag-on run's can match one. The runner prints which build's requests
-it sends, and refuses a SIX_SCHOOLS value other than "1", "0" or none,
-since the modules treat anything but "1" as off and an operator meaning
-a flag-on run would otherwise pay for a flag-off one.
+rival list, so on a SIX_SCHOOLS run the list itself, in its order, is
+part of a record's request fingerprint: every fingerprint of a run
+without the flag is computed as before (all 77 of the 16:58 full run
+still reproduce), and none of a flag-on run's can match one. A flag-on
+run file carries `"six_schools": true` and a run id ending `-six`. The
+runner prints which build's requests it sends; refuses a SIX_SCHOOLS
+value other than "1", "0" or none, since the modules treat anything but
+"1" as off and an operator meaning a flag-on run would otherwise pay for
+a flag-off one; and runs SIX_SCHOOLS=1 under v3 only, the one version a
+flag-on build sends.
 
 **For Gate 4.** Each is Arthur's; none is decided by being written here.
 - That a flag-on build, and so production at launch, judges with v3.
 - What v3 at launch does to verdicts already stored under v2. A revision
-  of a v2 original would be judged under v3, and `/api/judge` computes
-  the revision's `scoreDelta` and `fidelityDelta` against the original's
-  scores, which the verdict page shows, so the delta would cross two
-  prompt versions; Elo and a topic's par would take v3 scores beside v2
-  ones. The 3 Nov comparison found v3 scoring the strong cases 3 to 13
+  of a v2 original would be judged under v3. `/api/judge` computes the
+  revision's `scoreDelta` and `fidelityDelta` against the original's
+  scores for the `revision_judged` analytics event, and the verdict page
+  computes its own from the two stored verdicts and shows it, so both
+  would cross two prompt versions; Elo and a topic's par would take v3
+  scores beside v2 ones. The 3 Nov comparison found v3 scoring the strong cases 3 to 13
   higher, and this file's rule is that scores across versions are not
   compared as equivalent ("2F: the 3 Nov v3 re-run").
 - `/debate/rubric` says "These are the criteria the judge is given for
@@ -4570,7 +4577,20 @@ a flag-on run would otherwise pay for a flag-off one.
   shows rubric.ts's v2 text for the published three only, while the
   judge gets v3's text for six. At launch that would be untrue in
   production: copy and publishing, (e) and (c).
-- Statements in frozen files that this makes untrue, and are his to
-  change: v3's head comment says it "is not the production default";
-  the draft criteria file says "One thing reads this file: the golden
-  runner".
+- Statements in frozen files that this makes untrue on a flag-on build,
+  and so at launch, and are his to change: v3's head comment says it "is
+  not the production default"; the draft criteria file says it is "NOT
+  LOADED BY ANYTHING IN PRODUCTION" and that `hasFidelityCriteria`
+  returns false for the three, and "One thing reads this file: the golden
+  runner". (`src/lib/anthropic.ts` said, of `draftCriteria`, that
+  "/api/judge keeps refusing them meanwhile"; that comment is corrected
+  here, under the Gate 3 ruling this PR already edits the file by.)
+- What counts as a fitting objection on a flag-on run. Each golden
+  fixture's expected objection schools were written for three rivals.
+  On a flag-on build the prompt names, from the approved voices,
+  `ubuntu` for Stoicism, Utilitarianism and Confucianism, and
+  `confucian` for Buddhist Ethics, and the judge follows the named voice
+  closely. The runner's pass test keeps the fixtures' sets; its notes now
+  say when an objection came from a school the fixture does not expect,
+  and whether the prompt named it, apart from one from the argued school.
+  Whether the named voices count is Arthur's.

@@ -6,16 +6,17 @@ the judge, and a claim whose evidence was thrown away is not worth much.
 
 Each file holds the run's prompt version and the hash of the prompt file
 it used, the model, the samples per case, the call count and the total
-cost, then one record per call: the fixture, the sample number, the
+cost, and, on a SIX_SCHOOLS run only (Gate 3), `"six_schools": true`, with
+a run id and file name ending `-six`: a file without either was a run
+without the flag. Then one record per call: the fixture, the sample number, the
 attempt (1, then 2 and 3 for the retries a reply that fails validation
 gets: one retry in runs from 2026-11-03 until Arthur's ruling that evening,
 two after it; files written before the retry existed, the v3 run of 16:47
 on 3 Nov among them, have no attempt and are all first calls), where its fidelity criteria came from
 (`live` for `src/lib/judge/rubric.ts`, `draft` for the draft criteria file,
 which a golden run reads and, since Gate 3, a SIX_SCHOOLS build), a request
-fingerprint (which, on a SIX_SCHOOLS run, also covers the flag), the
-response, all
-four axes (score, fidelity, rigor, engagement), the objection school, the
+fingerprint (which, on a SIX_SCHOOLS run, also covers the rival list such a
+build sends), the response, all four axes (score, fidelity, rigor, engagement), the objection school, the
 cost, the latency and any error.
 
 A run starts by printing its planned call count and estimated cost.

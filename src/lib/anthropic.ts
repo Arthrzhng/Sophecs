@@ -131,11 +131,13 @@ export async function callJudgeModel(
   // Golden runs only, and production never passes it either. Criteria for
   // a draft school, which the golden runner reads from the draft criteria
   // file in content/prompts, because Arthur ruled that the approved draft
-  // criteria stay out of rubric.ts until he publishes those schools:
-  // /api/judge keeps refusing them meanwhile. Neither the file nor the
+  // criteria stay out of rubric.ts until he publishes those schools. On a
+  // build without SIX_SCHOOLS /api/judge refuses them meanwhile; on a
+  // flag-on build (Gate 3) they have criteria through rubric.ts, so this is
+  // refused for them as for a published school. Neither the file nor the
   // runner's loader is named here: a confinement test fails on any mention
-  // of either anywhere in src/, comments included, so that a read cannot
-  // hide inside something that looks like a comment.
+  // of either anywhere in src/ but the flag-on loader, comments included,
+  // so that a read cannot hide inside something that looks like a comment.
   //
   // It can only fill a gap, never replace live criteria. A school that has
   // criteria in rubric.ts is always judged against them, and passing this
