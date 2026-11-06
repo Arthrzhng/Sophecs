@@ -37,7 +37,7 @@ messaging, so a sample account is seen in fewer places than the word
 | its card (`opengraph-image`, `card.png`) | anyone shown the link | A "Sample" mark above the quotation. |
 | `/c/<id>` (challenge) | anyone with the link | The Sample label, "A sample account's challenge"; "Take the quiz" goes to `/quiz` without accepting it. Page title "A sample account's challenge". |
 | its link preview | anyone shown the link | The challenger's result card (`/r/<id>/opengraph-image`) with its "Sample" mark; no image if the challenger's result is not a sample, or if the card's lookup fails. |
-| `/debate/<slug>/exemplars` | anyone; linked from the landing page's motion and from a reader's own verdict | The strongest published sample argument under each opening line, per school, under the heading "Exemplar ways to argue this motion" and the line "Written as examples for Sophecs.", which say what they are in place of a label on each (Arthur, 2026-11-06). No deliberate misspellings, no scores, no link to a sample's verdict. A genuine page: no `SamplePageMarker`, so its views reach PostHog. |
+| `/debate/<slug>/exemplars` | anyone; linked from the landing page's motion and from a reader's own verdict | The strongest published sample argument under each opening line, per school, under the heading "Exemplar ways to argue this motion" and the line "Written as examples for Sophecs.", with no label on each (Arthur, 2026-11-06: "without having an obvious sample label"). No deliberate misspellings, no scores, no link to a sample's verdict. A sample page to analytics: `SamplePageMarker`, no referrer. |
 | `/class/<code>` | the class owner only | Never a sample: a reader's class cannot hold one, and the page leaves out any sample member whatever the data says. |
 | `/counterpart/<id>` | the two participants only | Sample exchanges are between sample accounts only. |
 | `/me` | the reader only | Nothing of a sample's. |
@@ -65,7 +65,8 @@ challenges." `/method#samples` explains the rest.
   school table's order, shown on `/table` and as a school's place on
   Today, both with the note; the site has no per-person rank.
 - **Analytics.** PostHog never receives anything from a page showing a
-  sample's verdict, result or challenge: such a page renders
+  sample's verdict, result or challenge, or the exemplars page, which
+  shows nothing else: such a page renders
   `SamplePageMarker`, and `src/lib/analytics/client.ts` checks for it
   twice. `track()` returns before loading PostHog, so `page_viewed`,
   `verdict_viewed`, `card_viewed`, `challenge_viewed` and the rest are not
@@ -467,8 +468,11 @@ sample teardown and a fresh run into the launch steps". In order:
 
 Between steps 1 and 3, `/debate/<slug>/exemplars` has no sample
 arguments to show and is not found; the landing page's and verdicts'
-links to it lead there. It fills again, within the hour, once the fresh
-run's `full` stage has written.
+links to it lead there. A not-found page is kept for an hour and rebuilt
+on the first request after that, so the page comes back up to an hour
+after the fresh run writes. After the canary, which writes the first 40
+accounts' activity, it can show fewer than four a school; it fills once
+`full` has written.
 
 ## Stop conditions
 

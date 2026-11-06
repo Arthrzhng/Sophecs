@@ -15,24 +15,24 @@ import type { SchoolId } from "@/lib/types";
  * author published (`argument_public`), as a sample's own verdict page
  * shows only those.
  *
- * One per opening line in each school: the sample run writes only four to
- * eight different first sentences per school on a motion, so the strongest
- * argument under each is the one shown and the page never lists the same
- * line to open twice in a school (Arthur, 2026-11-06, accepting that in
- * place of 50 that repeat). Highest template mark first, shared out evenly
+ * One per opening line in each school: the sample run writes four positions
+ * per school on a motion, so the strongest argument under each is the one
+ * shown and the page never lists the same line to open twice in a school
+ * (Arthur, 2026-11-06, accepting that in place of 50 that repeat). Highest template mark first, shared out evenly
  * across the schools up to EXEMPLARS_PER_MOTION, which today's data never
  * reaches. No mark is returned: the samples' marks were written from
  * templates, not by the judge.
  */
 
-/** A ceiling, not a target: one per opening came to 14 to 16 a motion on 2026-11-06. */
+/** A ceiling, not a target: one per opening came to 12 a motion on 2026-11-06. */
 export const EXEMPLARS_PER_MOTION = 50;
 
 /**
- * Rows read per school, strongest first. Every published row today (at
+ * Rows read per school, strongest first: every published row today (at
  * most 241 on any motion, 2026-11-06), so a rarely used opening is still
- * found: one first appears at rank 167. PostgREST returns no more than
- * 1000 rows a request in any case.
+ * found. Each opening first appeared within a school's top 15 then; the
+ * rest is margin. PostgREST returns no more than 1000 rows a request in
+ * any case.
  */
 export const EXEMPLAR_CANDIDATES_PER_SCHOOL = 1000;
 
@@ -40,10 +40,39 @@ export interface Exemplar {
   id: string;
   school: SchoolId;
   argument: string;
+  /** The line a reader opens it from: its first sentence after any frame. */
+  opening: string;
 }
 
-export interface ExemplarCandidate extends Exemplar {
+export interface ExemplarCandidate {
+  id: string;
+  school: SchoolId;
+  argument: string;
   is_sample: boolean;
+}
+
+/**
+ * The sentences the sample run puts in front of some arguments before the
+ * position (scripts/seed/banks.ts, FRAMES): "Here is my answer." says
+ * nothing a reader can choose by, and two arguments that differ only by one
+ * open the same way. Skipped for the opening line, never cut from the text.
+ */
+export const SAMPLE_FRAMES = [
+  "Here is my answer.",
+  "My position is simple.",
+  "I will start with where I stand.",
+  "Short version first.",
+  "This is how I see it.",
+  "Let me say where I land.",
+] as const;
+
+/** An argument without a leading frame sentence, for its opening line. */
+export function withoutFrame(argument: string): string {
+  const text = argument.trim();
+  for (const frame of SAMPLE_FRAMES) {
+    if (text.startsWith(frame) && /^\s/.test(text.slice(frame.length))) return text.slice(frame.length).trim();
+  }
+  return text;
 }
 
 /**
@@ -57,7 +86,7 @@ const normalise = (text: string) => text.trim().replace(/\s+/g, " ").toLowerCase
 
 /**
  * From each school's candidates, strongest first, keep the first under each
- * opening line, then choose up to `total` between the schools: an even
+ * opening line (its first sentence after any frame), then choose up to `total` between the schools: an even
  * share each, the remainder to the schools listed first, and any share a
  * school cannot fill passed to the others. An exact repeat of a text
  * already kept, in any school, is dropped too, and so is any argument with
@@ -76,11 +105,12 @@ export function selectExemplars(
     for (const c of candidatesBySchool.get(school) ?? []) {
       if (!c.is_sample || c.school !== school || !c.argument?.trim() || SAMPLE_TYPO.test(c.argument)) continue;
       const text = normalise(c.argument);
-      const opening = normalise(openingOf(c.argument));
-      if (seen.has(text) || openings.has(opening)) continue;
+      const opening = openingOf(withoutFrame(c.argument));
+      const openingKey = normalise(opening);
+      if (seen.has(text) || openings.has(openingKey)) continue;
       seen.add(text);
-      openings.add(opening);
-      pool.push({ id: c.id, school: c.school, argument: c.argument.trim() });
+      openings.add(openingKey);
+      pool.push({ id: c.id, school: c.school, argument: c.argument.trim(), opening });
     }
     pools.set(school, pool);
   }
@@ -105,10 +135,16 @@ export function selectExemplars(
   return chosen;
 }
 
-/** The exemplars for a motion, read from production's sample rows. */
+/**
+ * The exemplars for a motion, read from production's sample rows. Only
+ * rows argued on the motion as it reads now (`motion`, the topic's text),
+ * so an argument written to an earlier wording is never shown under this
+ * one.
+ */
 export async function getExemplars(
   admin: SupabaseClient,
   topicSlug: string,
+  motion: string,
   schools: readonly SchoolId[]
 ): Promise<Map<SchoolId, Exemplar[]>> {
   const reads = await Promise.all(
@@ -117,6 +153,7 @@ export async function getExemplars(
         .from("debates")
         .select("id, school, argument, is_sample")
         .eq("topic_slug", topicSlug)
+        .eq("motion_text", motion)
         .eq("school", school)
         .eq("is_sample", true)
         .eq("argument_public", true)

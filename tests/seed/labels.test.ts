@@ -93,6 +93,9 @@ describe("metrics", () => {
     expect(readFileSync("src/app/r/[id]/page.tsx", "utf8")).toMatch(/\{result\.is_sample \? \(\s*<SamplePageMarker \/>\s*\) : \(\s*<CardViewTracker/);
     expect(readFileSync("src/app/c/[id]/page.tsx", "utf8")).toMatch(/\{challenge\.isSample \? <SamplePageMarker \/> : <ChallengeViewTracker/);
     expect(readFileSync("src/app/debate/[slug]/[debateId]/page.tsx", "utf8")).toMatch(/\{publicRow\.is_sample && <SamplePageMarker \/>\}/);
+    // The exemplars page shows only sample arguments, so it is always marked.
+    expect(readFileSync("src/app/debate/[slug]/exemplars/page.tsx", "utf8")).toMatch(/<Page width="read">\s*<SamplePageMarker \/>/);
+    expect(readFileSync("src/app/debate/[slug]/exemplars/page.tsx", "utf8")).toContain("referrer: SAMPLE_PAGE_REFERRER");
   });
 
   it("nothing reaches PostHog from a page that carries the sample marker", async () => {

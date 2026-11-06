@@ -2,8 +2,9 @@
 // sample argument under each opening line, never a real reader's, shared
 // evenly across the schools, up to 50.
 import { describe, expect, it, vi } from "vitest";
+import { FRAMES } from "../scripts/seed/banks";
 import { TYPOS } from "../scripts/seed/generate";
-import { EXEMPLAR_CANDIDATES_PER_SCHOOL, EXEMPLARS_PER_MOTION, SAMPLE_TYPO, getExemplars, openingOf, selectExemplars, type ExemplarCandidate } from "../src/lib/exemplars";
+import { EXEMPLAR_CANDIDATES_PER_SCHOOL, EXEMPLARS_PER_MOTION, SAMPLE_FRAMES, SAMPLE_TYPO, getExemplars, withoutFrame, openingOf, selectExemplars, type ExemplarCandidate } from "../src/lib/exemplars";
 import type { SchoolId } from "../src/lib/types";
 
 const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
@@ -59,6 +60,34 @@ describe("selectExemplars", () => {
     expect(chosen.get("utilitarianism")!.map((e) => e.id)).toEqual(["u1"]);
   });
 
+  it("reads the opening line after a frame sentence, so a frame never passes for a new opening", () => {
+    expect([...SAMPLE_FRAMES]).toEqual(FRAMES);
+    const row = (id: string, argument: string): ExemplarCandidate => ({ id, school: "stoicism", argument, is_sample: true });
+    const chosen = selectExemplars(
+      new Map([["stoicism", [row("plain", "I oppose the motion. Because of A."), ...FRAMES.map((f, i) => row(`framed-${i}`, `${f} I oppose the motion. Because of B${i}.`)), row("other", "Here is my answer. Deploy it. C.")]]]),
+      ["stoicism"]
+    ).get("stoicism")!;
+    expect(chosen.map((e) => [e.id, e.opening])).toEqual([
+      ["plain", "I oppose the motion."],
+      ["other", "Deploy it."],
+    ]);
+    // The text is shown as written; only the line to open it from skips the frame.
+    expect(chosen[1].argument).toBe("Here is my answer. Deploy it. C.");
+    expect(withoutFrame("Here is my answer.")).toBe("Here is my answer.");
+    expect(withoutFrame("Here is my answering machine. X.")).toBe("Here is my answering machine. X.");
+  });
+
+  it("drops a text already kept in another school", () => {
+    const chosen = selectExemplars(
+      new Map([
+        ["stoicism", [{ id: "s", school: "stoicism", argument: "Same words. Here.", is_sample: true }]],
+        ["utilitarianism", [{ id: "u", school: "utilitarianism", argument: "same  words. here.", is_sample: true }]],
+      ] as [SchoolId, ExemplarCandidate[]][]),
+      ["stoicism", "utilitarianism"]
+    );
+    expect(chosen.get("utilitarianism")).toEqual([]);
+  });
+
   it("never takes an argument with one of the sample run's deliberate misspellings", () => {
     const detectable = TYPOS.map(([, typo]) => typo).filter((typo) => typo !== "its");
     expect(detectable).toHaveLength(TYPOS.length - 1);
@@ -71,11 +100,17 @@ describe("selectExemplars", () => {
       expect(selectExemplars(new Map([["stoicism", rows]]), ["stoicism"]).get("stoicism")!.map((e) => e.id)).toEqual(["clean"]);
     }
     for (const word of ["because", "their", "which", "whether", "the theory", "argument", "it's"]) expect(SAMPLE_TYPO.test(word), word).toBe(false);
+    // A misspelt strongest argument leaves its opening to the next one under it.
+    const rows = [
+      { id: "typo", school: "stoicism" as const, argument: "Deploy it. Becuase of A.", is_sample: true },
+      { id: "clean", school: "stoicism" as const, argument: "Deploy it. Because of B.", is_sample: true },
+    ];
+    expect(selectExemplars(new Map([["stoicism", rows]]), ["stoicism"]).get("stoicism")!.map((e) => e.id)).toEqual(["clean"]);
   });
 
   it("returns no score", () => {
     const [first] = selectExemplars(new Map([["stoicism", made("stoicism", 1)]]), ["stoicism"]).get("stoicism")!;
-    expect(Object.keys(first).sort()).toEqual(["argument", "id", "school"]);
+    expect(Object.keys(first).sort()).toEqual(["argument", "id", "opening", "school"]);
   });
 });
 
@@ -102,13 +137,14 @@ describe("getExemplars", () => {
 
   it("asks the database for sample accounts' published, judged originals on the motion only, strongest first", async () => {
     const { admin, calls } = fakeAdmin(() => ({ data: [], error: null }));
-    await getExemplars(admin, "no-decision", SCHOOLS);
+    await getExemplars(admin, "no-decision", "The motion as it reads.", SCHOOLS);
     expect(calls).toHaveLength(3);
     for (const [i, call] of calls.entries()) {
       expect(call.table).toBe("debates");
       expect(call.filters).toEqual(
         expect.arrayContaining([
           ["eq", "topic_slug", "no-decision"],
+          ["eq", "motion_text", "The motion as it reads."],
           ["eq", "school", SCHOOLS[i]],
           ["eq", "is_sample", true],
           ["eq", "argument_public", true],
@@ -130,7 +166,7 @@ describe("getExemplars", () => {
       school === "utilitarianism" ? { data: null, error: { message: "timeout" } } : { data: made(school as SchoolId, 5), error: null }
     );
     const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
-    await expect(getExemplars(admin, "no-decision", SCHOOLS)).rejects.toThrow("no-decision/utilitarianism");
+    await expect(getExemplars(admin, "no-decision", "The motion.", SCHOOLS)).rejects.toThrow("no-decision/utilitarianism");
     quiet.mockRestore();
   });
 });
