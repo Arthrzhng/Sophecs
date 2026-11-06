@@ -1,13 +1,23 @@
 import { z } from "zod";
-import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "@/lib/school-registry";
+import { SHOWN_SCHOOL_IDS, type SchoolId } from "@/lib/school-registry";
 
-export const PROMPT_VERSION = "v2" as const;
+// The version the live judge sends. v2 on every build without the flag,
+// production included. On a SIX_SCHOOLS build v3, under Gate 3 (Arthur,
+// Checkpoint B, 2026-11-05: "the new schools' fidelity criteria go into
+// what the judge receives on flag-on builds only, and the three join the
+// rival list on flag-on builds"): only v3 lists its rival schools from the
+// registry and carries criteria for the three, so a flag-on build that
+// judged with v2 could judge none of them and would name only three
+// rivals. `process.env.SIX_SCHOOLS` is a build-time constant
+// (next.config.ts), so each build has one version.
+export const PROMPT_VERSION: "v2" | "v3" = process.env.SIX_SCHOOLS === "1" ? "v3" : "v2";
 
 // Every version that has ever been stored. `debates.verdict` rows written
 // before a bump keep their own stamp, so a stored verdict is not typed to
 // whatever the current version happens to be — v1 rows exist in production
-// and have no `unanswered_objection`.
-export type PromptVersion = "v1" | "v2";
+// and have no `unanswered_objection`. v3 is stored only by a SIX_SCHOOLS
+// build.
+export type PromptVersion = "v1" | "v2" | "v3";
 
 function maxWords(max: number) {
   return (val: string) => val.trim().split(/\s+/).filter(Boolean).length <= max;
@@ -21,11 +31,13 @@ function maxUnits(max: number) {
   return (val: string) => val.length <= max;
 }
 
-// The schools a verdict may name. Published only: a verdict naming a
-// school still in draft would be a verdict about something no reader can
-// see. The cast is zod's tuple requirement, not a widening; the enum's
+// The schools a verdict may name: the ones this build shows. On a build
+// without the flag that is the published three, so a verdict naming a
+// school still in draft, which no reader can see, fails as before; on a
+// SIX_SCHOOLS build it is all six, which join the rival list there (Gate
+// 3). The cast is zod's tuple requirement, not a widening; the enum's
 // members are checked against the registry in tests/school-registry.test.ts.
-const JUDGEABLE_SCHOOLS = PUBLISHED_SCHOOL_IDS as unknown as [SchoolId, ...SchoolId[]];
+const JUDGEABLE_SCHOOLS = SHOWN_SCHOOL_IDS as unknown as [SchoolId, ...SchoolId[]];
 
 // What the model must return. `rejected` discriminates the two valid
 // shapes — a judged verdict has every score field, a rejection has none.

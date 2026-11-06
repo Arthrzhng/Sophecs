@@ -4483,3 +4483,64 @@ ruled.
 
 Cumulative on the eval key: $11.0704 of $15.00, over the 17 run files on
 this branch.
+
+### Gate 3: the three judged on SIX_SCHOOLS builds (2026-11-06)
+
+Arthur at Checkpoint B, 2026-11-05, (b) 1: "Gate 3: yes. The new schools'
+fidelity criteria go into what the judge receives on flag-on builds only,
+and the three join the rival list on flag-on builds." Carried out after
+the full v3 run, as his ruling of 2026-11-06 ordered.
+
+**What a flag-on build now sends.**
+- **The prompt is v3.** `PROMPT_VERSION` in `src/lib/judge/schema.ts` is
+  `"v3"` on a SIX_SCHOOLS build and `"v2"` on every other. This is how the
+  ruling is read, and Arthur may rule otherwise at Gate 4: v2 names the
+  three published schools in its prose and asks for an objection from
+  "the two schools the argument was not assigned", so it cannot name six
+  rivals or judge a new school (the golden runner has refused to run the
+  three under v2 since Tier B began). Only v3 takes its rival list from
+  the registry. A flag-on build stores `prompt_version` `"v3"`; the
+  column is plain text.
+- **The rival list is the six.** `RIVAL_SCHOOLS_BLOCK`, `rivalsOf`, and
+  the schools a reply's objection may name (`VerdictSchema`) follow
+  `SHOWN_SCHOOL_IDS`: the published three without the flag, all six with
+  it.
+- **The three's criteria come from the draft file.** Arthur's ruling of
+  2026-10-24 keeps them out of `rubric.ts` until he publishes the
+  schools. `src/lib/judge/draft-criteria.ts` (server-only) reads
+  `content/prompts/fidelity-criteria.draft.md` once, as the module loads,
+  and only when `SIX_SCHOOLS` is `"1"`; otherwise its map is empty and
+  nothing is read. `fidelityCriteriaFor` gives each of the three its
+  section, verbatim, then the same voice paragraph a published school
+  gets: exactly the text every golden run has judged them against. Under
+  v1 or v2 it throws for them.
+- **A published school's criteria are unchanged.** Its voice paragraph
+  names only the voices whose school is among the rivals listed, so on a
+  flag-on build Stoicism's and Utilitarianism's also name their Ubuntu
+  voice, which `src/lib/judge/objection-voices.ts` already held for when
+  Ubuntu joined the list; Virtue Ethics' is unchanged. With the rival
+  list, that is all that differs from a flag-off v3 request.
+
+**What does not change.** A build without the flag, production
+included, sends byte for byte what it sent: v2, three rivals, the
+published criteria (the six fixtures in `tests/judge-request/`), and
+`/api/judge` refuses the three before any lookup, write or call. The
+draft file is not read (`tests/draft-criteria-reads.test.ts` records
+every path the route asks for, and now also shows the recorder catching
+the flag-on read). `next.config.ts` still refuses SIX_SCHOOLS for a
+production build. Previews have no judge key and their budget fails
+closed, so no preview judges anything either.
+
+**Pinned.** Every request a flag-on build can send, for all six schools,
+original and revision, is a committed fixture in
+`tests/judge-request/six-schools/` (`tests/six-schools.test.ts`), so a
+change to what the judge receives on that build moves a fixture.
+
+**The golden runner.** With SIX_SCHOOLS=1 it judges the three through
+the build's own path (no draft override), after checking that path sends
+exactly the draft file's text; both read the file with the same parser,
+`parseDraftCriteria`. The new-schools run is that run.
+
+**For Gate 4.** That a flag-on build, and so production at launch,
+judges with v3; and v3's head comment, which says it "is not the
+production default".

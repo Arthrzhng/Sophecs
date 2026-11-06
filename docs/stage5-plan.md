@@ -174,6 +174,10 @@ of the three; Gate 2 is about that.
    profile's school and takes up only a v2 challenger's challenge.
 5. **Debating as a new school.** The arena, the judge and the
    micro-lessons for a reader placed in one of the three. **Gate 3.**
+   The judge is done on SIX_SCHOOLS builds (`docs/decisions.md`, "Gate 3:
+   the three judged on SIX_SCHOOLS builds"): v3, the six as rivals, and
+   the three's criteria from the draft file; a build without the flag
+   sends what it sent.
 6. **Launch.** On Arthur's instruction only: the sample teardown; under
    Gate 2's option (i), clearing the preview's v2 results before the
    launch merge, since once production writes v2 results the version can

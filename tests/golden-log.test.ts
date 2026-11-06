@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import os from "node:os";
 import {
   logTarget,
@@ -227,5 +227,27 @@ describe("requestFingerprint", () => {
 
   it("writes runs where the repository keeps them", () => {
     expect(RUNS_DIR.endsWith(path.join("tests", "judge", "golden-runs"))).toBe(true);
+  });
+});
+
+describe("a run file's six_schools mark", () => {
+  // Gate 3: a SIX_SCHOOLS run sends a flag-on build's requests, so its file
+  // says so; a run without the flag is written exactly as before.
+  it("is absent without the flag, so earlier run files and new ones match", () => {
+    vi.stubEnv("SIX_SCHOOLS", "0");
+    try {
+      expect("six_schools" in startRun({ promptVersion: "v3", promptText: "p", model: "m", samplesPerCase: 1 })).toBe(false);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("is true with the flag", () => {
+    vi.stubEnv("SIX_SCHOOLS", "1");
+    try {
+      expect(startRun({ promptVersion: "v3", promptText: "p", model: "m", samplesPerCase: 1 }).six_schools).toBe(true);
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 });

@@ -12,7 +12,7 @@ import {
 } from "@/lib/judge/schema";
 import { fidelityCriteriaFor, hasFidelityCriteria } from "@/lib/judge/rubric";
 import { fillPlaceholders } from "@/lib/judge/fill-placeholder";
-import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
+import { SHOWN_SCHOOL_IDS } from "@/lib/school-registry";
 import type { SchoolId } from "@/lib/types";
 
 // COST: model=claude-sonnet-5 | trigger=debate submission | est_in=1700 est_out=650
@@ -35,9 +35,10 @@ function getClient(): Anthropic {
 /**
  * The prompt versions a call can run against.
  *
- * Deliberately not `PromptVersion` from judge/schema.ts: that type is every
- * version a verdict has ever been *stored* under, and v3 has never been
- * stored. This is every version that has a file to read.
+ * Kept apart from `PromptVersion` in judge/schema.ts, which is every
+ * version a verdict can be *stored* under: the two were different until
+ * Gate 3 let a SIX_SCHOOLS build store v3, and this one stays the list of
+ * versions that have a file to read.
  */
 export type RunnablePromptVersion = PromptVersion | "v3";
 
@@ -87,7 +88,7 @@ export function asSent(_version: RunnablePromptVersion, raw: string): string {
 // and the v2 request stays byte for byte what it was. That is pinned by
 // the six fixtures in tests/judge-request.test.ts, which is the test the
 // brief cares about most while judging is live.
-const RIVAL_SCHOOLS_BLOCK = PUBLISHED_SCHOOL_IDS.map((id) => `- \`${id}\``).join("\n");
+const RIVAL_SCHOOLS_BLOCK = SHOWN_SCHOOL_IDS.map((id) => `- \`${id}\``).join("\n");
 
 // Carries cost/latency even on failure — the tokens were still billed by
 // Anthropic even if the response didn't parse, and "every call is logged,

@@ -4,9 +4,11 @@
 // it and loads them afresh.
 //
 // What a flag-on build must do: show the three after the published
-// schools, answer for them in every lookup with the colours chosen under
-// ruling 16, and change nothing the judge receives, because the judge
-// reads the published list and the published list does not move.
+// schools, and answer for them in every lookup with the colours chosen
+// under ruling 16. Since Gate 3 (Arthur, Checkpoint B, 2026-11-05) it also
+// judges them: their approved criteria and their place among the rival
+// schools go into what the judge receives on a flag-on build, and on no
+// other. A build without the flag sends exactly what it sent before.
 import fs from "node:fs";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -165,56 +167,198 @@ describe("a build with SIX_SCHOOLS=1", () => {
   });
 });
 
-describe("the judge on a SIX_SCHOOLS build", () => {
-  // The judge reads PUBLISHED_SCHOOL_IDS (the rival schools in its prompt,
-  // the schools its reply may name), which the flag does not move. Gate 3
-  // is Arthur's before that changes.
-  it("still publishes, and can judge, the original three only", async () => {
-    const { registry, rubric } = await load("1");
-    expect(registry.PUBLISHED_SCHOOL_IDS).toEqual([...LIVE_THREE]);
+// The request a build sends, for the fixed inputs tests/judge-request.test.ts
+// uses, so the two sets of fixtures differ only in what the flag changes.
+const MOTION =
+  "An AI system that reliably reduces suffering should be deployed even where nobody can explain its decisions.";
+const ARGUMENT = "The decision to deploy is the part that is up to us, and the part we answer for.";
+const REVISION = {
+  originalArgument: "An earlier attempt that left the objection standing.",
+  objectionClaim: "It never says who carries the cost when the system is wrong.",
+};
+const REQUESTS = path.join(process.cwd(), "tests", "judge-request");
+
+// A plain file, not a vitest snapshot, for the reason tests/judge-request.test.ts
+// gives: `vitest -u` would rewrite a snapshot without anybody deciding to.
+// Rewriting these needs WRITE_JUDGE_FIXTURES=1, which no script sets.
+function compareRequest(file: string, params: Record<string, unknown>) {
+  const serialised = `${JSON.stringify(params, null, 2)}\n`;
+  if (process.env.WRITE_JUDGE_FIXTURES === "1") {
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, serialised, "utf-8");
+    return;
+  }
+  expect(fs.existsSync(file), `missing fixture ${file}`).toBe(true);
+  expect(serialised).toBe(fs.readFileSync(file, "utf-8"));
+}
+
+const verdictNaming = (school: string) => ({
+  rejected: false,
+  score: 72,
+  fidelity: 8,
+  rigor: 7,
+  engagement: 4,
+  strongest_move: "It locates the agent's responsibility in what is up to her.",
+  weakest_move: "It never says why consenting is itself just.",
+  a_stronger_version_would: "Say why consenting is the just choice.",
+  verdict_line: "Answerable for her choice, not the weather.",
+  unanswered_objection: {
+    school,
+    claim: "The patients waiting care about the ordering.",
+    why_it_stands: "It never weighs what the ordering does to them.",
+  },
+});
+
+describe("the judge on a build without SIX_SCHOOLS", () => {
+  // Gate 3 changes nothing here: production is this build.
+  it("judges with v2, the published three only, and refuses a reply naming one of the three", async () => {
+    const { registry, rubric, schema, anthropic } = await load("0");
+    expect(schema.PROMPT_VERSION).toBe("v2");
+    expect(anthropic.PROMPT_VERSION).toBe("v2");
     expect(rubric.judgeableSchools()).toEqual([...LIVE_THREE]);
-    for (const id of NEW_THREE) expect(() => rubric.FIDELITY_CRITERIA[id]).toThrowError(/no fidelity criteria/);
+    for (const id of NEW_THREE) {
+      expect(rubric.hasFidelityCriteria(id)).toBe(false);
+      expect(() => rubric.fidelityCriteriaFor(id, "v3")).toThrowError(/no fidelity criteria/);
+      expect(rubric.rivalsOf(id)).toEqual([...LIVE_THREE]);
+      expect(schema.VerdictSchema.safeParse(verdictNaming(id)).success, id).toBe(false);
+    }
+    expect(registry.PUBLISHED_SCHOOL_IDS).toEqual([...LIVE_THREE]);
   });
 
-  it("refuses a reply that names one of the three as an objection's school", async () => {
-    const { schema } = await load("1");
-    const verdict = (school: string) => ({
-      rejected: false,
-      score: 72,
-      fidelity: 8,
-      rigor: 7,
-      engagement: 5,
-      strongest_move: "It locates the agent's responsibility in what is up to her.",
-      weakest_move: "It never says why consenting is itself just.",
-      a_stronger_version_would: "Say why consenting is the just choice.",
-      verdict_line: "Answerable for her choice, not the weather.",
-      unanswered_objection: {
-        school,
-        claim: "The patients waiting care about the ordering.",
-        why_it_stands: "It never weighs what the ordering does to them.",
-      },
-    });
-    expect(schema.VerdictSchema.safeParse(verdict("utilitarianism")).success).toBe(true);
-    for (const id of NEW_THREE) expect(schema.VerdictSchema.safeParse(verdict(id)).success, id).toBe(false);
-  });
-
-  it.each(LIVE_THREE)("sends the same request for %s, byte for byte, as the committed fixture", async (school) => {
-    const { anthropic } = await load("1");
-    const dir = path.join(process.cwd(), "tests", "judge-request");
-    const MOTION =
-      "An AI system that reliably reduces suffering should be deployed even where nobody can explain its decisions.";
-    const ARGUMENT = "The decision to deploy is the part that is up to us, and the part we answer for.";
-    const REVISION = {
-      originalArgument: "An earlier attempt that left the objection standing.",
-      objectionClaim: "It never says who carries the cost when the system is wrong.",
-    };
+  it.each(LIVE_THREE)("sends the committed v2 request for %s, byte for byte", async (school) => {
+    const { anthropic } = await load("0");
     created.length = 0;
     await anthropic.callJudgeModel(MOTION, school, ARGUMENT);
     await anthropic.callJudgeModel(MOTION, school, ARGUMENT, REVISION);
     expect(created).toHaveLength(2);
-    expect(`${JSON.stringify(created[0], null, 2)}\n`).toBe(fs.readFileSync(path.join(dir, `${school}.json`), "utf8"));
+    expect(`${JSON.stringify(created[0], null, 2)}\n`).toBe(fs.readFileSync(path.join(REQUESTS, `${school}.json`), "utf8"));
     expect(`${JSON.stringify(created[1], null, 2)}\n`).toBe(
-      fs.readFileSync(path.join(dir, `${school}.revision.json`), "utf8")
+      fs.readFileSync(path.join(REQUESTS, `${school}.revision.json`), "utf8")
     );
+  });
+});
+
+describe("the judge on a SIX_SCHOOLS build (Gate 3)", () => {
+  const draft = () => {
+    const text = fs.readFileSync(path.join(process.cwd(), "content", "prompts", "fidelity-criteria.draft.md"), "utf8");
+    // The section body, as the loader parses it: after the `## \`id\``
+    // heading line, up to the next `## `, trimmed.
+    return (id: string) => {
+      const section = text.split(/^## /m).find((part) => part.startsWith(`\`${id}\``))!;
+      return section.slice(section.indexOf("\n")).trim();
+    };
+  };
+
+  it("judges with v3, the only prompt that lists its rivals from the registry", async () => {
+    const { schema, anthropic } = await load("1");
+    expect(schema.PROMPT_VERSION).toBe("v3");
+    expect(anthropic.PROMPT_VERSION).toBe("v3");
+  });
+
+  it("still publishes the original three, and rubric.ts still holds only theirs", async () => {
+    const { registry, rubric } = await load("1");
+    expect(registry.PUBLISHED_SCHOOL_IDS).toEqual([...LIVE_THREE]);
+    for (const id of NEW_THREE) expect(() => rubric.FIDELITY_CRITERIA[id]).toThrowError(/no fidelity criteria/);
+  });
+
+  it("can judge all six, each against five rivals", async () => {
+    const { rubric } = await load("1");
+    expect(rubric.judgeableSchools()).toEqual([...LIVE_THREE, ...NEW_THREE]);
+    for (const id of [...LIVE_THREE, ...NEW_THREE]) {
+      expect(rubric.hasFidelityCriteria(id), id).toBe(true);
+      expect(rubric.rivalsOf(id)).toEqual([...LIVE_THREE, ...NEW_THREE].filter((other) => other !== id));
+    }
+  });
+
+  it("gives each of the three its approved section of the draft file, then its voice paragraph", async () => {
+    const { rubric } = await load("1");
+    const { objectionVoiceFor } = await import("../src/lib/judge/objection-voices");
+    const sectionOf = draft();
+    for (const id of NEW_THREE) {
+      const section = sectionOf(id);
+      expect(section).toMatch(/^A faithful /);
+      expect(rubric.fidelityCriteriaFor(id, "v3")).toBe(`${section}\n\n${objectionVoiceFor(id, rubric.rivalsOf(id))}`);
+      // Never under a prompt that counts the rivals as two.
+      expect(() => rubric.fidelityCriteriaFor(id, "v2")).toThrowError(/only be judged under a prompt that lists its rivals/);
+      expect(() => rubric.fidelityCriteriaFor(id, "v1")).toThrowError(/only be judged under a prompt that lists its rivals/);
+    }
+  });
+
+  it("keeps each published school's criteria what they are without the flag, but for the rivals its voice names", async () => {
+    const off = await load("0");
+    const offCriteria = Object.fromEntries(LIVE_THREE.map((id) => [id, off.rubric.FIDELITY_CRITERIA[id]]));
+    const on = await load("1");
+    for (const id of LIVE_THREE) expect(on.rubric.FIDELITY_CRITERIA[id]).toBe(offCriteria[id]);
+  });
+
+  it("accepts a reply naming any of the six as the objection's school", async () => {
+    const { schema } = await load("1");
+    for (const id of [...LIVE_THREE, ...NEW_THREE]) {
+      expect(schema.VerdictSchema.safeParse(verdictNaming(id)).success, id).toBe(true);
+    }
+    expect(schema.VerdictSchema.safeParse(verdictNaming("cynicism")).success).toBe(false);
+  });
+
+  it("refuses draft criteria passed in for one of the three, which now has its own", async () => {
+    const { anthropic } = await load("1");
+    created.length = 0;
+    await expect(
+      anthropic.callJudgeModel(MOTION, "ubuntu", ARGUMENT, undefined, "v3", "anything")
+    ).rejects.toThrow(/draft criteria refused for "ubuntu"/);
+    expect(created).toEqual([]);
+  });
+
+  // Every request a flag-on build can send, pinned like v2's, so a change
+  // to what the judge receives on that build moves a fixture.
+  it.each([...LIVE_THREE, ...NEW_THREE])("sends the committed v3 request for %s, byte for byte", async (school) => {
+    const { anthropic } = await load("1");
+    created.length = 0;
+    await anthropic.callJudgeModel(MOTION, school, ARGUMENT);
+    await anthropic.callJudgeModel(MOTION, school, ARGUMENT, REVISION);
+    expect(created).toHaveLength(2);
+    compareRequest(path.join(REQUESTS, "six-schools", `${school}.json`), created[0]);
+    compareRequest(path.join(REQUESTS, "six-schools", `${school}.revision.json`), created[1]);
+
+    const system = String(created[0].system);
+    // The six, as the rival list.
+    for (const id of [...LIVE_THREE, ...NEW_THREE]) expect(system).toContain(`- \`${id}\``);
+    expect(system).not.toContain("{{RUBRIC}}");
+    expect(system).not.toContain("{{RIVAL_SCHOOLS}}");
+  });
+
+  it("has a SIX_SCHOOLS golden run judge the three through the build's own path", async () => {
+    // The new-schools run is meant to measure what a flag-on build sends,
+    // so the runner hands callJudgeModel no override for the three on this
+    // build, and checks first that the build's text is the draft file's.
+    const { rubric } = await load("1");
+    const { planCase, readDraftCriteria } = await import("./judge/draft-criteria");
+    const prompt = (v: string) => fs.readFileSync(path.join(process.cwd(), "content", "prompts", `judge.${v}.md`), "utf8");
+    const sections = readDraftCriteria();
+    for (const id of NEW_THREE) {
+      const plan = planCase(id, prompt("v3"), sections, "v3");
+      expect(plan).toMatchObject({ run: true, source: "draft", draftCriteria: undefined });
+      if (plan.run) expect(plan.criteria).toBe(rubric.fidelityCriteriaFor(id, "v3"));
+      // Still skipped under v2, before the build is asked for criteria it
+      // would refuse.
+      expect(planCase(id, prompt("v2"), sections, "v2").run).toBe(false);
+      // And a run whose draft text differs from the build's stops before
+      // any call.
+      expect(() => planCase(id, prompt("v3"), { ...sections, [id]: "A faithful other text." }, "v3")).toThrowError(
+        /differ from the draft file's/
+      );
+    }
+    for (const id of LIVE_THREE) {
+      expect(planCase(id, prompt("v3"), sections, "v3")).toMatchObject({ run: true, source: "live", draftCriteria: undefined });
+    }
+  });
+
+  it("sends the draft file's text for each of the three, exactly", async () => {
+    const { anthropic } = await load("1");
+    const sectionOf = draft();
+    for (const id of NEW_THREE) {
+      created.length = 0;
+      await anthropic.callJudgeModel(MOTION, id, ARGUMENT);
+      expect(String(created[0].system)).toContain(sectionOf(id));
+    }
   });
 });

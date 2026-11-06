@@ -1,6 +1,7 @@
-import { PUBLISHED_SCHOOL_IDS, type SchoolId } from "@/lib/school-registry";
+import { SHOWN_SCHOOL_IDS, type SchoolId } from "@/lib/school-registry";
 import type { PromptVersion } from "@/lib/judge/schema";
 import { objectionVoiceFor } from "@/lib/judge/objection-voices";
+import { DRAFT_CRITERIA_ON_THIS_BUILD } from "@/lib/judge/draft-criteria";
 
 // Fidelity criteria per school — what makes an argument a genuine instance
 // of that school's reasoning, not just reasoning that happens to reach a
@@ -172,6 +173,20 @@ fidelity.`,
  * for a school with no criteria, rather than handing the judge nothing.
  */
 export function fidelityCriteriaFor(school: SchoolId, version: PromptVersion | "v3"): string {
+  // One of the three on a SIX_SCHOOLS build (Gate 3): its approved section
+  // of the draft criteria file, which already ends with its vocabulary and
+  // objection paragraphs, and then the same voice paragraph a published
+  // school gets, exactly as the golden runner has always built it for a
+  // draft school (its planCase). Only under a prompt that
+  // lists its rivals from the registry: v1 and v2 count the schools as
+  // three, and a SIX_SCHOOLS build judges with v3.
+  const draft = CRITERIA_BY_SCHOOL[school] === undefined ? DRAFT_CRITERIA_ON_THIS_BUILD[school] : undefined;
+  if (draft !== undefined) {
+    if (version === "v1" || version === "v2") {
+      throw new Error(`judge/rubric: "${school}" can only be judged under a prompt that lists its rivals.`);
+    }
+    return `${draft.trimEnd()}\n\n${objectionVoiceFor(school, rivalsOf(school))}`;
+  }
   const base = FIDELITY_CRITERIA[school];
   if (version === "v1" || version === "v2") return base;
   const rule = VOCABULARY_RULE_V3[school];
@@ -195,20 +210,22 @@ export function fidelityCriteriaFor(school: SchoolId, version: PromptVersion | "
  * failing.
  */
 export function hasFidelityCriteria(id: SchoolId): boolean {
-  return CRITERIA_BY_SCHOOL[id] !== undefined;
+  return CRITERIA_BY_SCHOOL[id] !== undefined || DRAFT_CRITERIA_ON_THIS_BUILD[id] !== undefined;
 }
 
 /**
- * The schools a v3 prompt lists as rivals to `school`: every published
- * school but its own. The prompt's list is built from the same registry
+ * The schools a v3 prompt lists as rivals to `school`: every school this
+ * build shows but its own. The published three on a build without the
+ * flag; all six on a SIX_SCHOOLS build, where the three join the rival
+ * list (Gate 3). The prompt's list is built from the same registry
  * (RIVAL_SCHOOLS_BLOCK in src/lib/anthropic.ts) and says the objection may
  * not come from the assigned school.
  */
 export function rivalsOf(school: SchoolId): SchoolId[] {
-  return PUBLISHED_SCHOOL_IDS.filter((id) => id !== school);
+  return SHOWN_SCHOOL_IDS.filter((id) => id !== school);
 }
 
-/** The schools that can be judged: published, and with criteria written. */
+/** The schools that can be judged: shown on this build, and with criteria. */
 export function judgeableSchools(): SchoolId[] {
-  return PUBLISHED_SCHOOL_IDS.filter((id) => CRITERIA_BY_SCHOOL[id] !== undefined);
+  return SHOWN_SCHOOL_IDS.filter((id) => hasFidelityCriteria(id));
 }

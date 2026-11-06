@@ -317,7 +317,8 @@ async function sampleCase(
           // undefined for a live school, so it is judged against rubric.ts
           // exactly as production would; the draft file's text for a draft
           // school, which callJudgeModel accepts only for a school with no
-          // live criteria.
+          // live criteria. Undefined for a draft school too on a
+          // SIX_SCHOOLS run, whose build already sends that text (Gate 3).
           plan.draftCriteria
         ),
       (attempt) => logCall(run, c, plan, i + 1, attempt)

@@ -70,6 +70,11 @@ export interface GoldenRun {
   prompt_sha256: string;
   model: string;
   samples_per_case: number;
+  // Present, and true, only on a run made with SIX_SCHOOLS=1, whose
+  // requests are a flag-on build's: six rivals, and the three new schools
+  // judged through the build's own criteria (Gate 3). Absent otherwise, so
+  // a run without the flag is written exactly as before.
+  six_schools?: true;
   calls: number;
   total_cost_usd: number;
   records: GoldenCallRecord[];
@@ -149,6 +154,7 @@ export function startRun(meta: {
     prompt_sha256: sha(meta.promptText),
     model: meta.model,
     samples_per_case: meta.samplesPerCase,
+    ...(process.env.SIX_SCHOOLS === "1" ? { six_schools: true as const } : {}),
     calls: 0,
     total_cost_usd: 0,
     records: [],
