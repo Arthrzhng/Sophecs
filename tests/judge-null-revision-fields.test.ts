@@ -90,12 +90,29 @@ describe("a reply's null fields, through callJudgeModel", () => {
   for (const field of ["objection_answered", "improvement_note"] as const) {
     it(`refuses ${field}: null on a revision, as before the ruling`, async () => {
       modelReply = { ...reply, objection_answered: true, improvement_note: "It now says who decides.", [field]: null };
-      const e = await refusal();
-      expect(e.message).toBe(`${field}: null on a revision`);
-      expect(e.costUsd).toBeGreaterThan(0);
-      expect(e.latencyMs).toBeGreaterThanOrEqual(0);
+      // The clock read either side of the call, so the latency is the
+      // call's own and not a constant.
+      const clock = vi.spyOn(Date, "now").mockReturnValueOnce(1_000).mockReturnValueOnce(1_250);
+      try {
+        const e = await refusal();
+        expect(e.message).toBe(`${field}: null on a revision`);
+        expect(e.costUsd).toBeGreaterThan(0);
+        expect(e.latencyMs).toBe(250);
+      } finally {
+        clock.mockRestore();
+      }
     });
   }
+
+  it("refuses a revision whose reply is not an object as a validation failure, not a crash", async () => {
+    // A TypeError here would skip the retry and the validation log.
+    for (const notAnObject of [null, "a verdict", 3, [reply]]) {
+      modelReply = notAnObject;
+      const e = await refusal();
+      expect(e.message).toMatch(/^\(root\): /);
+      expect(e.costUsd).toBeGreaterThan(0);
+    }
+  });
 
   it("names both when a revision's reply has both null", async () => {
     modelReply = { ...reply, objection_answered: null, improvement_note: null };

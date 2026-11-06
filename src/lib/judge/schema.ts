@@ -84,8 +84,8 @@ export const VerdictSchema = z.discriminatedUnion("rejected", [
     // replies to originals carried both fields as null and were refused,
     // losing two samples. The schema cannot tell an original from a
     // revision, so callJudgeModel (src/lib/anthropic.ts) refuses a
-    // revision's null before this runs, as it was refused before the
-    // ruling. The transform leaves the key in the parsed verdict with the
+    // revision's null after this runs, with whatever else this refused, as
+    // it was refused before the ruling. The transform leaves the key in the parsed verdict with the
     // value undefined, which JSON.stringify drops, so what is stored is the
     // same as for a reply that omitted it.
     objection_answered: z
