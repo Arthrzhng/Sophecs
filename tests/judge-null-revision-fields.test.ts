@@ -4,9 +4,9 @@
 // did this and were refused, losing two samples.
 //
 // "On originals" only. The schema cannot tell an original from a revision,
-// so callJudgeModel refuses a revision's null before the schema sees it,
-// as it was refused before the ruling: production's v2 revisions keep both
-// fields, and the verdict page its "Objection answered." line.
+// so callJudgeModel refuses a revision's null (a request carrying revision
+// context) as it was refused before the ruling: production's v2 revisions
+// keep both fields, and the verdict page its "Objection answered." line.
 import { describe, expect, it, vi } from "vitest";
 
 let modelReply: unknown;
@@ -74,21 +74,41 @@ describe("a reply's null fields, through callJudgeModel", () => {
     expect(JSON.parse(JSON.stringify(verdict))).toEqual(reply);
   });
 
+  // The exact message, because it is logged to ai_calls and the production
+  // log and must never carry the judge's text; and the call's cost, because
+  // the tokens were billed whether or not the reply was usable.
+  async function refusal(): Promise<InstanceType<typeof JudgeValidationError>> {
+    try {
+      await callJudgeModel(MOTION, "stoicism", "An argument.", REVISION);
+    } catch (e) {
+      expect(e).toBeInstanceOf(JudgeValidationError);
+      return e as InstanceType<typeof JudgeValidationError>;
+    }
+    throw new Error("expected the revision's reply to be refused");
+  }
+
   for (const field of ["objection_answered", "improvement_note"] as const) {
     it(`refuses ${field}: null on a revision, as before the ruling`, async () => {
       modelReply = { ...reply, objection_answered: true, improvement_note: "It now says who decides.", [field]: null };
-      const call = callJudgeModel(MOTION, "stoicism", "An argument.", REVISION);
-      await expect(call).rejects.toBeInstanceOf(JudgeValidationError);
-      await expect(callJudgeModel(MOTION, "stoicism", "An argument.", REVISION)).rejects.toThrow(
-        `${field}: null on a revision`
-      );
+      const e = await refusal();
+      expect(e.message).toBe(`${field}: null on a revision`);
+      expect(e.costUsd).toBeGreaterThan(0);
+      expect(e.latencyMs).toBeGreaterThanOrEqual(0);
     });
   }
 
   it("names both when a revision's reply has both null", async () => {
     modelReply = { ...reply, objection_answered: null, improvement_note: null };
-    await expect(callJudgeModel(MOTION, "stoicism", "An argument.", REVISION)).rejects.toThrow(
+    expect((await refusal()).message).toBe(
       "objection_answered: null on a revision; improvement_note: null on a revision"
+    );
+  });
+
+  it("still names every other failure in the same reply, as the log did before", async () => {
+    const long = Array.from({ length: 21 }, () => "word").join(" ");
+    modelReply = { ...reply, verdict_line: long, objection_answered: null, improvement_note: "It now says who decides." };
+    expect((await refusal()).message).toBe(
+      "verdict_line: verdict_line exceeds 20 words; objection_answered: null on a revision"
     );
   });
 

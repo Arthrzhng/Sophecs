@@ -1128,8 +1128,9 @@ judging is live.
 **The substitution had a bug, and it is worth recording because the shape
 of it will recur.** `String.prototype.replace` with a string pattern fills
 the first occurrence and says nothing about the rest. A prompt file was
-then sent to the model whole, header comment included (v3's comment is
-stripped since 2026-11-05), and `judge.v3.md` named both
+then sent to the model whole, header comment included (v3's comment was
+stripped from 2026-11-05 until ruling 12 was reversed on 2026-11-06), and
+`judge.v3.md` named both
 of its placeholders in that comment before using them. So the first naive
 `.replace("{{RUBRIC}}", criteria)` filled the mention in the comment and
 left the real placeholder standing: the model would have been asked to
@@ -4213,8 +4214,10 @@ of band in the 4 Nov run itself; its other 23 cases sit where that run
 put them. So the model has not drifted: what moved the scores is in the
 prompt since e83e0a8. The visible symptom is engagement, whose medians on
 the strong cases ran from 4 to 7 on 4 Nov (three at 4, the other eight 5
-to 7) and fell to 3 or 4, taking the composite down with it. (Corrected
-on review: this first said "5 to 7 on 4 Nov".) What is left between the two prompts: the cap-binding
+to 7), and which in the fixed prompt's single sample was 3 or 4 on nine
+of the eleven and 5 on the other two, taking the composite down with it.
+(Corrected on review: this first said engagement fell "from 5 to 7 on 4
+Nov to 3 or 4".) What is left between the two prompts: the cap-binding
 sentences under engagement and on the scores, the head comment no
 longer sent, and Utilitarianism's Virtue Ethics voice.
 
@@ -4459,9 +4462,13 @@ every axis with a band:
   which those three runs contradict.)
 - `stoic-analogy` fails on fidelity: 7/7/7 against 8-10, with its score
   in band (69/71/71). On 4 Nov it was 8/7/8, a pass.
-- The mean of the 25 medians is 55.0, against 54.7 on 4 Nov. Strong
-  cases score as on 4 Nov or higher (buddhist-strong 83/80/83,
-  stoic-strong 78, confucian-ren-disposition 78/72/78).
+- The mean of the 25 medians is 55.0, against 54.7 on 4 Nov. Of the
+  eleven strong cases' median scores, nine are as on 4 Nov or higher
+  (buddhist-strong 78 to 83, stoic-strong 70 to 78,
+  confucian-ren-disposition 78 both times) and two lower:
+  stoic-analogy 78 to 71 and util-obscure-source 83 to 80, both still in
+  band. (Corrected on review: this first said the strong
+  cases all scored as on 4 Nov or higher.)
 
 So the full run passes but for those two, one known since 3 Nov and one
 a fidelity point short on a case that passed on 4 Nov. The prompt's one

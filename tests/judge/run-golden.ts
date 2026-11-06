@@ -89,7 +89,7 @@ const VERSION = resolveVersion();
 // single-sample runs against a band of 8-10. Three samples and a median
 // measure the distribution instead of pretending it's a point value, at
 // three times the cost. That was about 18p a run when the set was six
-// cases; it is about $0.42 for the v2 run and $0.97 for v3 now, and the dry
+// cases; it is about $0.42 for the v2 run and $1.10 for v3 now, and the dry
 // run prints the current figure. See docs/decisions.md.
 const SAMPLES = parseSamples(process.env.GOLDEN_SAMPLES);
 

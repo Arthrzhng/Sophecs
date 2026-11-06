@@ -217,25 +217,21 @@ export async function callJudgeModel(
 
   // Arthur's ruling of 2026-11-05 accepts null for these two fields on an
   // original (schema.ts), where a v3 reply sometimes carries them. The
-  // schema cannot tell an original from a revision, so a revision's null is
-  // refused here, as it was before the ruling: on a revision both fields
-  // are the verdict's answer, and production's v2 revisions stay exactly
-  // as they were (tests/judge-null-revision-fields.test.ts).
-  if (revisionOf && typeof parsed === "object" && parsed !== null && (parsed as { rejected?: unknown }).rejected === false) {
-    const nulls = (["objection_answered", "improvement_note"] as const).filter(
-      (field) => (parsed as Record<string, unknown>)[field] === null
-    );
-    if (nulls.length > 0) {
-      throw new JudgeValidationError(
-        nulls.map((field) => `${field}: null on a revision`).join("; "),
-        costUsd,
-        latencyMs
-      );
-    }
-  }
+  // schema cannot tell an original from a revision, so on a revision (a
+  // request carrying revision context) a null is refused here, as it was
+  // before the ruling: there both fields are the verdict's answer, and
+  // production's v2 revisions stay as they were
+  // (tests/judge-null-revision-fields.test.ts). It is reported alongside
+  // whatever else the schema refused, so a log still names every failure.
+  const revisionNulls =
+    revisionOf && typeof parsed === "object" && parsed !== null && (parsed as { rejected?: unknown }).rejected === false
+      ? (["objection_answered", "improvement_note"] as const).filter(
+          (field) => (parsed as Record<string, unknown>)[field] === null
+        )
+      : [];
 
   const result = VerdictSchema.safeParse(parsed);
-  if (!result.success) {
+  if (!result.success || revisionNulls.length > 0) {
     // Name the offending field rather than dumping the whole zod issue
     // array. Word-cap breaches are the common failure here, and the raw
     // message is a multi-line JSON blob that tells neither the golden-set
@@ -246,12 +242,13 @@ export async function callJudgeModel(
     // options only; the clause is still cut, should a wording quote it
     // again: the summary is logged, and it names a field and a rule, never
     // what the judge wrote (tests/model-reply-parsing.test.ts).
-    const summary = result.error.issues
-      .map(
+    const summary = [
+      ...(result.success ? [] : result.error.issues).map(
         (issue) =>
           `${issue.path.join(".") || "(root)"}: ${issue.message.replace(/,? received '[^]*$/, "")}`
-      )
-      .join("; ");
+      ),
+      ...revisionNulls.map((field) => `${field}: null on a revision`),
+    ].join("; ");
     throw new JudgeValidationError(summary, costUsd, latencyMs);
   }
 
