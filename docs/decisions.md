@@ -4102,3 +4102,35 @@ scorer with the simulator's exact output (`node scripts/simulate-quiz-v2.mjs
 --json`): every school's primary count, every primary and secondary pair,
 the ties, and a hash of every pattern's result in order.
 
+### Exemplar ways to argue this motion (2026-11-06)
+
+Arthur, 2026-11-06, choosing among headings put to him for showing sample
+accounts' arguments to visitors: "Please could you do exemplar", then "Do
+exemplar and do like 50 exemplars".
+
+`/debate/<slug>/exemplars` shows, under the heading "Exemplar ways to
+argue this motion", up to 50 of the strongest sample arguments on that
+motion, shared evenly across the schools (17, 17 and 16 with three),
+grouped by school, each opening from its first sentence to its full text.
+The heading says what they are, in place of the "Sample" label on each
+item that the ruling of 2026-11-04 put on every other surface a sample
+appears: these are examples, and the heading does not claim anyone wrote
+them. Three things keep it that way:
+- **Sample accounts' arguments only.** `src/lib/exemplars.ts` reads
+  `is_sample` rows and refuses any other; a real reader's argument is
+  theirs and public only if they publish it.
+- **No scores.** The samples' marks were written from templates, not by
+  the judge, so showing them would present a template as the judge's
+  verdict.
+- **No link to a sample's own pages**, which keep their labels.
+
+The page is public and rebuilt at most hourly. It is linked from the
+landing page's "A motion you could argue" and from a reader's own
+verdict, after they have argued. Not from the motion's own page, where a
+reader writes theirs: 50 finished arguments there would invite copying
+one in to be judged.
+
+New copy: the heading, as Arthur chose it; the link "Argue this motion";
+the page title "Exemplar ways to argue this motion · Sophecs". The
+arguments are the sample run's, accepted with it on 2026-11-04.
+
