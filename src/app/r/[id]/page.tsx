@@ -147,8 +147,8 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
       await getResultOwners(challengeInfo.otherResultId),
     ]);
   // Only between two v1 results, on every build, until launch, so that a
-  // challenge made on a SIX_SCHOOLS preview does not lead to debates and
-  // rating changes in production (Gate 2, option (i)). resolveChallengeSide
+  // challenge made on a SIX_SCHOOLS preview is not recorded, completed or
+  // pairwise-rated in production (Gate 2, option (i)). resolveChallengeSide
   // refuses the same for assignChallengeTopic and /api/judge. A side this
   // build does not show reads as null here, so without SIX_SCHOOLS a v2
   // other side is never offered either.

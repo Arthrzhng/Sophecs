@@ -119,6 +119,9 @@ describe("assignChallengeTopic", () => {
     expect(updates).toEqual([]);
   });
 
+  // With no rows no side can match, so this describes the behaviour rather
+  // than guarding the error check itself; resolveChallengeSide reads the
+  // error so that a later change cannot quietly turn it into a match.
   it("refuses when the results cannot be read", async () => {
     failReads = true;
     signedIn = "challenger";
@@ -172,6 +175,17 @@ describe("resolveChallengeSide", () => {
     expect(await resolveChallengeSide(admin, challenge, "challengee")).toBeNull();
   });
 
+  it("puts a user who owns both results on the challenger's side", async () => {
+    // A quiz taken on two devices, both results claimed at sign-in.
+    tables.quiz_results[1].user_id = "challenger";
+    expect(await resolveChallengeSide(admin, challenge, "challenger")).toBe("challenger");
+    expect(
+      await resolveChallengeSide(admin, { challenger_result_id: "r-challenger", challengee_result_id: "r-challenger" }, "challenger")
+    ).toBe("challenger");
+  });
+
+  // As above: with no rows no side can match, so this describes the
+  // behaviour rather than guarding the error check.
   it("gives no side when the results cannot be read", async () => {
     failReads = true;
     expect(await resolveChallengeSide(admin, challenge, "challenger")).toBeNull();

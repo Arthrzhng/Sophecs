@@ -62,9 +62,11 @@ export function viewerIsChallengeParty(
  *
  * Until launch a challenge counts only between two v1 results, on every
  * build (Gate 2, option (i); docs/decisions.md, "Stage 5, step 4"): one
- * made on a SIX_SCHOOLS preview, with a v2 side, must not lead to debates
- * and rating changes in production. So a challenge with a v2 side has no
- * side for anyone, and a read that fails gives none either.
+ * made on a SIX_SCHOOLS preview, with a v2 side, must not be recorded,
+ * completed or pairwise-rated in production. So a challenge with a v2 side
+ * has no side for anyone, and a read that fails gives none either. (A
+ * debate posted with such a challenge's id is still judged and rated as a
+ * solo debate.)
  */
 export async function resolveChallengeSide(
   admin: SupabaseClient,

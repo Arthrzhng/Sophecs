@@ -270,8 +270,10 @@ of the three; Gate 2 is about that.
    - [ ] The sample teardown.
    - [ ] The preview's v2 results cleared before the launch merge, an (a)
      write: `challenge_from` set to null where a genuine row points at
-     one, and a real reader's challenge with a v2 challengee reopened
-     rather than deleted.
+     one, a real reader's challenge with a v2 challengee reopened
+     rather than deleted, and `debates.challenge_id` set to null where it
+     points at a cleared challenge (its foreign key has no on-delete
+     action).
    - [ ] The flag on for Production, with `next.config.ts`'s refusal
      removed; the live table's 20-argument rule comes with it.
    - [ ] The three content files' status and colour tokens (the six

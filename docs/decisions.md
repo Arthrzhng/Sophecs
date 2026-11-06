@@ -4031,8 +4031,11 @@ two v1 results, until launch:
 - `/me` lists challenges on a reader's own v1 results only.
 
 A debate takes each reader's school from their profile, which option (i)
-never sets from a v2 result; what the limit prevents is a challenge made
-on a preview leading to debates and rating changes in production.
+never sets from a v2 result. What the limit prevents is a challenge made
+on a preview being recorded, completed or pairwise-rated in production.
+Only a hand-built `/debate/<slug>?challenge=<id>` address reaches such a
+challenge now, and a debate posted that way is judged, saved with its
+`challenge_id`, and rated as a solo debate.
 
 **What production carries.** The v2 client code ships in every build,
 though only a SIX_SCHOOLS build renders it: `QuizShellV2`,
@@ -4066,10 +4069,28 @@ quiz would have no school.
 - `src/lib/challenge.ts`: `resolveChallengeSide` and
   `getPendingChallenges` take v2 results.
 - `src/app/r/[id]/page.tsx`: "Debate them" between any two results.
-- The tests that pin these rules flip with them: in
-  `tests/quiz-result-versions.test.ts`, `tests/challenge-topic.test.ts`
-  and `tests/quiz-v2-submit.test.ts`, the cases named "v1 only", "until
-  launch" or "step 4".
+- `schoolFromResult` is also where v1's `submitQuizResult` reads a
+  challenger's school, so changing it lets a v1 quiz take up a v2
+  challenger. At launch v1's quiz is retired and nothing calls it; if it
+  stays, that is a choice to make with the change.
+- The tests that pin these rules, by name, flip with them:
+  - `tests/quiz-result-versions.test.ts`: "takes a school from a v1
+    result only, on every build"; "names the other side's school from a
+    v1 result only"; "gives a new account the school of its newest v1
+    result, passing over a newer v2 one"; "claims a v2-only reader's
+    result but gives the account no school"; "lists no challenge on the
+    reader's own v2 result (step 4)"; "/r/[id] offers Debate them between
+    two v1 results only (step 4)"; "/me's result_claimed event takes the
+    newest v1 result, the one the profile's school came from".
+  - `tests/challenge-topic.test.ts`: "refuses a challenge with a v2 side,
+    on any build, until launch (step 4)"; "gives no side on a challenge
+    with a v2 result, until launch, so /api/judge records no debate on it
+    (step 4)".
+  - `tests/quiz-v2-submit.test.ts`: "never moves a signed-in reader's
+    school"; "leaves a v1 challenger's challenge alone: a production
+    reader's".
+  - `tests/challenge-accept.test.ts`: "treats a v2 challenger's challenge
+    as no challenge, and never reads its school".
 
 `tests/quiz-v2-submit.test.ts` drives the action on both builds against a
 fake database that applies 0027's shape check; `tests/quiz-result-versions.test.ts`
