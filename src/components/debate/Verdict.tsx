@@ -551,6 +551,13 @@ export function Verdict({
         {!sample && (
           <ShareRow debateId={debateId} topicSlug={topicSlug} score={verdict.score ?? 0} shareLine={shareLine} />
         )}
+        {/* The motion's exemplars (src/app/debate/[slug]/exemplars/page.tsx),
+            offered on a reader's own verdict, to compare against. */}
+        {isOwner && !sample && (
+          <p className="mt-6">
+            <TextLink href={`/debate/${topicSlug}/exemplars`}>Exemplar ways to argue this motion</TextLink>
+          </p>
+        )}
         {isOwner && (
           <p className="mt-6">
             <TextLink href="/today">Back to today</TextLink>

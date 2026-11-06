@@ -37,6 +37,7 @@ messaging, so a sample account is seen in fewer places than the word
 | its card (`opengraph-image`, `card.png`) | anyone shown the link | A "Sample" mark above the quotation. |
 | `/c/<id>` (challenge) | anyone with the link | The Sample label, "A sample account's challenge"; "Take the quiz" goes to `/quiz` without accepting it. Page title "A sample account's challenge". |
 | its link preview | anyone shown the link | The challenger's result card (`/r/<id>/opengraph-image`) with its "Sample" mark; no image if the challenger's result is not a sample, or if the card's lookup fails. |
+| `/debate/<slug>/exemplars` | anyone; linked from the landing page's motion and from a reader's own verdict | The strongest published sample argument under each opening line, per school, under the heading "Exemplar ways to argue this motion" and the line "Written as examples for Sophecs.", with no label on each (Arthur, 2026-11-06: "without having an obvious sample label"). No deliberate misspellings, no scores, no link to a sample's verdict. A sample page to analytics: `SamplePageMarker`, no referrer. |
 | `/class/<code>` | the class owner only | Never a sample: a reader's class cannot hold one, and the page leaves out any sample member whatever the data says. |
 | `/counterpart/<id>` | the two participants only | Sample exchanges are between sample accounts only. |
 | `/me` | the reader only | Nothing of a sample's. |
@@ -64,7 +65,8 @@ challenges." `/method#samples` explains the rest.
   school table's order, shown on `/table` and as a school's place on
   Today, both with the note; the site has no per-person rank.
 - **Analytics.** PostHog never receives anything from a page showing a
-  sample's verdict, result or challenge: such a page renders
+  sample's verdict, result or challenge, or the exemplars page, which
+  shows nothing else: such a page renders
   `SamplePageMarker`, and `src/lib/analytics/client.ts` checks for it
   twice. `track()` returns before loading PostHog, so `page_viewed`,
   `verdict_viewed`, `card_viewed`, `challenge_viewed` and the rest are not
@@ -463,6 +465,20 @@ sample teardown and a fresh run into the launch steps". In order:
    that (the addresses are on `sophecs.test` and the users are banned),
    and changing it for the live run would break its spot checks, so it
    waits for the fresh run.
+
+`/debate/<slug>/exemplars` is built at most hourly, and a built page,
+found or not, is served until the first request after its hour, which
+rebuilds it for the request after that; a deploy starts it afresh. So
+after step 1 a motion's page can go on showing the deleted arguments
+until the launch deploy in step 2 or its hour is out, and is then not
+found until the fresh run writes (the landing page's and verdicts' links
+lead there), coming back a rebuild after that. After the canary, which
+writes the first 40 accounts' activity, it can show fewer than four a
+school, and, with few rows to choose from, an argument the run wrote to
+be weak (a template mark around 30) as the strongest under its opening.
+Running `full` soon after the canary keeps that window short; a floor on
+the mark would close it, and is on Arthur's list (docs/decisions.md,
+"Exemplar ways to argue this motion").
 
 ## Stop conditions
 

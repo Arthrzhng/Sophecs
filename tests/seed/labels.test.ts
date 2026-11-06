@@ -56,6 +56,13 @@ describe("labels", () => {
     expect(out).not.toContain(SAMPLE_EXPLANATION);
   });
 
+  it("offers the motion's exemplars on a reader's own genuine verdict only", () => {
+    const link = 'href="/debate/opaque-benefit/exemplars"';
+    expect(html(createElement(Verdict, { ...props, isOwner: true }))).toContain(link);
+    expect(html(createElement(Verdict, { ...props, isOwner: true, sample: { template: true } }))).not.toContain(link);
+    expect(html(createElement(Verdict, props))).not.toContain(link);
+  });
+
   it("a sample challenge is labelled and does not accept on the reader's behalf", () => {
     const content = { one_line: "x", name: "Stoicism" } as never;
     const out = html(createElement(ChallengeInvite, { challengeId: "c1", school: "stoicism", content, isSample: true }));
@@ -86,6 +93,9 @@ describe("metrics", () => {
     expect(readFileSync("src/app/r/[id]/page.tsx", "utf8")).toMatch(/\{result\.is_sample \? \(\s*<SamplePageMarker \/>\s*\) : \(\s*<CardViewTracker/);
     expect(readFileSync("src/app/c/[id]/page.tsx", "utf8")).toMatch(/\{challenge\.isSample \? <SamplePageMarker \/> : <ChallengeViewTracker/);
     expect(readFileSync("src/app/debate/[slug]/[debateId]/page.tsx", "utf8")).toMatch(/\{publicRow\.is_sample && <SamplePageMarker \/>\}/);
+    // The exemplars page shows only sample arguments, so it is always marked.
+    expect(readFileSync("src/app/debate/[slug]/exemplars/page.tsx", "utf8")).toMatch(/<Page width="read">\s*<SamplePageMarker \/>/);
+    expect(readFileSync("src/app/debate/[slug]/exemplars/page.tsx", "utf8")).toContain("referrer: SAMPLE_PAGE_REFERRER");
   });
 
   it("nothing reaches PostHog from a page that carries the sample marker", async () => {

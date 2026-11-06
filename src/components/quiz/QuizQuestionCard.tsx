@@ -1,9 +1,17 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 import { SchoolTriangle } from "./SchoolTriangle";
 import { scoreQuiz } from "@/lib/scoring";
 import type { QuizOption, QuizQuestion } from "../../../content/quiz/questions";
+import type { SchoolId } from "@/lib/types";
+
+/** What the card reads of a question: v1's, or v2's, which has vectors on a map instead. */
+type CardQuestion = Pick<QuizQuestion, "prompt"> & {
+  id: QuizQuestion["id"] | number;
+  options: { id: string; label: string }[];
+};
 
 const LETTERS = ["A", "B", "C", "D"];
 
@@ -32,13 +40,22 @@ export function QuizQuestionCard({
   onBack,
   nextLabel = "Next",
   immediate = false,
+  figure,
+  buttonSchool,
 }: {
-  question: QuizQuestion;
+  question: CardQuestion;
   index: number;
   total: number;
   selectedId: string | null;
   /** The options committed on earlier questions, for the triangle. */
   chosenSoFar: QuizOption[];
+  /**
+   * In place of the triangle: quiz v2's map, on a SIX_SCHOOLS build
+   * (QuizShellV2). With it, `chosenSoFar` is not read, and the Next button
+   * takes `buttonSchool`'s colour, the school the reader is nearest.
+   */
+  figure?: ReactNode;
+  buttonSchool?: SchoolId;
   onSelect: (optionId: string) => void;
   /** Given the option id in `immediate` mode, where state has not settled. */
   onNext: (optionId?: string) => void;
@@ -56,8 +73,10 @@ export function QuizQuestionCard({
 
   // Read through the real scorer rather than re-adding the vectors here,
   // so the picture can never disagree with the result it is previewing.
-  const here = scoreQuiz(chosenSoFar);
-  const preview = selected ? scoreQuiz([...chosenSoFar, selected]) : null;
+  // Only v1's options have a triangle vector; with a figure, the triangle
+  // is not drawn and nothing is scored here.
+  const here = figure === undefined ? scoreQuiz(chosenSoFar) : null;
+  const preview = here && selected ? scoreQuiz([...chosenSoFar, selected as QuizOption]) : null;
 
   return (
     <div>
@@ -140,15 +159,19 @@ export function QuizQuestionCard({
         </fieldset>
 
         <div className="w-full lg:max-w-xs">
-          <SchoolTriangle
-            vector={here.vector}
-            previewVector={preview?.vector ?? null}
-            primary={here.primary}
-            secondary={here.secondary}
-            neutral={chosenSoFar.length === 0}
-            previewLetter={selectedIndex >= 0 ? LETTERS[selectedIndex] : null}
-            caption={immediate ? "You start here" : null}
-          />
+          {here ? (
+            <SchoolTriangle
+              vector={here.vector}
+              previewVector={preview?.vector ?? null}
+              primary={here.primary}
+              secondary={here.secondary}
+              neutral={chosenSoFar.length === 0}
+              previewLetter={selectedIndex >= 0 ? LETTERS[selectedIndex] : null}
+              caption={immediate ? "You start here" : null}
+            />
+          ) : (
+            figure
+          )}
         </div>
       </div>
 
@@ -159,7 +182,7 @@ export function QuizQuestionCard({
               Back
             </ChunkyButton>
           )}
-          <ChunkyButton onClick={() => onNext()} disabled={!selectedId} school={here.primary}>
+          <ChunkyButton onClick={() => onNext()} disabled={!selectedId} school={here?.primary ?? buttonSchool}>
             {nextLabel}
           </ChunkyButton>
         </div>

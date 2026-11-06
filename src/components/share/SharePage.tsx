@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { ResultCard } from "@/components/card/ResultCard";
 import { ShareSheet } from "@/components/share/ShareSheet";
@@ -37,6 +38,11 @@ export interface SharePageProps {
    * a stranger: a sample account takes up no challenge and debates no one.
    */
   isSample?: boolean;
+  /**
+   * Below the card: a v2 result's point on the map, on a SIX_SCHOOLS build
+   * (src/app/r/[id]/page.tsx). Nothing for a v1 result.
+   */
+  figure?: ReactNode;
 }
 
 /**
@@ -68,6 +74,7 @@ export function SharePage({
   shareLine,
   shareLineIndex,
   isSample = false,
+  figure,
 }: SharePageProps) {
   const name = SCHOOL_COLORS[school].name;
 
@@ -97,15 +104,27 @@ export function SharePage({
             oneLineAttribution={oneLineAttribution}
           />
         </div>
+        {figure && <div className="mt-6">{figure}</div>}
 
         {coldRecipient ? (
           <div className="mt-8">
             <ChunkyLink href="/" school={school}>
               Take the quiz
             </ChunkyLink>
+            {/* "A few minutes" where v2 runs, on a SIX_SCHOOLS build (Arthur,
+                Checkpoint B (e) 4): v1, live elsewhere, takes about eighty. */}
             <p className="mt-6 max-w-[54ch] text-sm leading-relaxed text-ink-mid">
-              Ten questions about how you decide what&apos;s right. No account
-              needed, about eighty seconds.
+              {process.env.SIX_SCHOOLS === "1" ? (
+                <>
+                  Ten questions about how you decide what&apos;s right. No account
+                  needed, a few minutes.
+                </>
+              ) : (
+                <>
+                  Ten questions about how you decide what&apos;s right. No account
+                  needed, about eighty seconds.
+                </>
+              )}
             </p>
           </div>
         ) : (

@@ -12,9 +12,12 @@ merge commit and deploy state of the one before.
 Eval key spend is kept as a running total against Arthur's cumulative
 cap: $4.80 in the brief of 2026-11-03, raised to $8.00 by his ruling of
 the same evening (recorded in `docs/decisions.md`, "Arthur's rulings of
-2026-11-03 on the Stage 1 miss"). The total is the sum of `total_cost_usd` over every
-golden run file, including any on a branch not yet merged, which each
-entry names.
+2026-11-03 on the Stage 1 miss"), and to $12.00 by his ruling of
+2026-11-06 on the v3 checks, "Cap $12.00 cumulative." (recorded on
+branch `judge-v3-order` in `docs/decisions.md`, "Judge v3 after #68:
+two single-sample checks, and a stop"). The total is the sum of
+`total_cost_usd` over every golden run file, including any on a branch
+not yet merged, which each entry names.
 
 ## 2026-11-03: 2F, Arthur's rulings on #47 and #48
 
@@ -717,3 +720,56 @@ deploy below was read from Vercel as Ready.
 - #89: the daily re-screening job for pending arena replies, (d) 4, and
   the copy that goes with it. Its merge commit and deploy go in the next
   entry.
+
+## 2026-11-06: 0028, the source check, quiz v2, the exemplars, and a morning check
+
+- #89 merged as `7a6f2e6`: the daily re-screening job for pending arena
+  replies. Two review passes. Deploy `dpl_4jv4atKM7VLLsf522oC8WoQwBD4a`,
+  Ready.
+- #88 merged as `72c58ca`: the judge's cap and ceiling reserved in one
+  step. Two review passes. Arthur ran migration 0028 in the SQL Editor before the merge, so
+  it has no row in `schema_migrations`. Read back: the table's and the
+  sequence's grants are the owner's and `service_role`'s only, as are
+  the two functions' EXECUTE; a functional check of the two functions,
+  run in a transaction that was rolled back, passed. The security
+  advisor shows the same six findings as before, plus the INFO
+  `rls_enabled_no_policy` on `judge_reservations`, which is meant: no
+  client reads or writes it. Deploy `dpl_4J2VXu8KnrirXwpBMJgS1CErPetr`,
+  Ready.
+- #91 merged as `10a8995`: Arthur's check of the Ubuntu sources, and the
+  Gate 4 checklist. One review pass. Deploy `dpl_9fYsLbrJBSrDPuLU495h3aMK6VJo`, Ready.
+- #92 merged as `1c79b84`: Stage 5 step 4, quiz v2 on SIX_SCHOOLS
+  builds. Three review passes. Deploy `dpl_7AQLYsimzpJ5B3FpnMUs1A4imFtL`,
+  Ready.
+- #93 merged as `09a58b9`: "Exemplar ways to argue this motion". Three
+  review passes. Deploy `dpl_8PasLWebRKv6R8NT2iYaXLSAtQPy`, Ready;
+  `https://sophecs.com/debate/opaque-benefit/exemplars` at 06:46 UTC
+  answered 200 with 12 arguments, four a school, the line under the
+  heading, the sample page marker and the site's preview image, and the
+  landing page linked to it.
+- #90 (draft): five single-sample checks of v3 on branch
+  `judge-v3-order`, run files `2026-11-06T00-01-04-700Z`,
+  `T01-06-11-994Z`, `T01-08-52-100Z`, `T01-38-01-934Z` and
+  `T06-05-12-649Z`. The last shows that sending v3's old head comment is
+  what separates the prompt from the 4 Nov one. Stopped, and put to
+  Arthur under (b). Eval key spend is now **$8.8780 of $12.00** (the sum
+  over the 13 run files on that branch).
+- Morning check at 07:10 UTC:
+  - Production: `dpl_8PasLWebRKv6R8NT2iYaXLSAtQPy`, Ready.
+    `https://sophecs.com/robots.txt` answered 200, with no `Location`.
+  - Sample activity: the 18:41 UTC slot ran from 23:50 to 23:52
+    (Actions run 42132397210, success): 13 debates, every check passed.
+    The 00:41 and 06:41 slots had not run by 07:10, and the newest
+    debate in production is dated 23:44 UTC, the end of that run's
+    window. So no run has yet begun after the 06:00
+    cutover, and the round-score check has no rule-2 verdicts to judge.
+    GitHub has started this schedule two to five hours late, or not at
+    all, since it began.
+  - The re-screening job (`43 5 * * *`): Vercel's Hobby plan keeps
+    runtime logs for an hour, so whether it fired at 05:43 could not be
+    read at 07:10. Nothing was waiting for it: every one of the 1,700
+    arena replies in production is a sample's, screened `ok`, so a run
+    would have read none. The next check reads the logs inside the hour.
+- Waiting on Arthur: the v3 prompt under (b), with the two ways forward
+  set out in #90; Supabase Auth's Site URL and redirect list, and the Vercel
+  redirect from www to sophecs.com.
