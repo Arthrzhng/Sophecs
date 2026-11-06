@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Page } from "@/components/layout/Page";
 import { SamplePageMarker } from "@/components/sample/SamplePageMarker";
+import { alt as siteImageAlt, size as siteImageSize } from "@/app/opengraph-image";
 import { TextLink } from "@/components/ui/TextLink";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getExemplars } from "@/lib/exemplars";
@@ -29,15 +30,17 @@ export function generateStaticParams() {
 // (docs/sample-activity.md, "What a sample can never touch"): no event, and
 // no session replay of the text, reaches PostHog from it.
 // Its own link preview, not the root layout's ("Sophecs" and the quiz's
-// description); the image is still the site's (src/app/opengraph-image.tsx).
+// description). Setting openGraph here replaces the layout's, image and
+// all, so the site's image (src/app/opengraph-image.tsx) is named again.
 const TITLE = "Exemplar ways to argue this motion · Sophecs";
 const DESCRIPTION = "Exemplar ways to argue this motion, from each school.";
+const IMAGES = [{ url: "/opengraph-image", ...siteImageSize, alt: siteImageAlt }];
 export const metadata = {
   title: TITLE,
   description: DESCRIPTION,
   referrer: SAMPLE_PAGE_REFERRER,
-  openGraph: { title: TITLE, description: DESCRIPTION, siteName: "Sophecs", type: "website" as const },
-  twitter: { card: "summary_large_image" as const, title: TITLE, description: DESCRIPTION },
+  openGraph: { title: TITLE, description: DESCRIPTION, siteName: "Sophecs", type: "website" as const, images: IMAGES },
+  twitter: { card: "summary_large_image" as const, title: TITLE, description: DESCRIPTION, images: IMAGES },
 };
 
 export default async function ExemplarsPage({ params }: { params: Promise<{ slug: string }> }) {

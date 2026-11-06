@@ -38,7 +38,7 @@ vi.mock("next/navigation", () => ({
   },
 }));
 
-const { default: ExemplarsPage } = await import("../src/app/debate/[slug]/exemplars/page");
+const { default: ExemplarsPage, metadata } = await import("../src/app/debate/[slug]/exemplars/page");
 const render = async (slug: string) =>
   renderToStaticMarkup(await ExemplarsPage({ params: Promise.resolve({ slug }) })).replace(/&#x27;/g, "'");
 
@@ -67,6 +67,12 @@ describe("the exemplars page", () => {
     expect(out).toContain('data-sophecs-sample-page=""');
     expect(filters).toEqual([["slug", "opaque-benefit"]]);
     expect(asked).toEqual([["opaque-benefit", MOTION.motion]]);
+  });
+
+  it("previews as itself, with the site's image", () => {
+    expect(metadata.openGraph.title).toBe("Exemplar ways to argue this motion · Sophecs");
+    expect(metadata.openGraph.images).toEqual([expect.objectContaining({ url: "/opengraph-image", width: 1200, height: 630 })]);
+    expect(metadata.twitter.images).toEqual(metadata.openGraph.images);
   });
 
   it("is not found, without a read, for a slug no motion could have", async () => {
