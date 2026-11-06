@@ -4,7 +4,7 @@ Written on 2026-11-06, after the full v3 run, Gate 3 and the new-schools
 run, as Arthur's ruling of that day ordered: "full v3 run, then Gate 3
 and the new-schools run, then Gate 4." Gate 4 is the launch of the six
 schools; at Checkpoint B he said "not yet. Bring me Gate 4 once the golden
-runs pass." Every open item below is his to decide, except the list
+runs pass." Every open item below is yours to decide, Arthur, except the list
 under Housekeeping, which is mine. Each names the file it lives in.
 Nothing here is decided by being written down.
 
@@ -14,7 +14,7 @@ checklist").
 
 ## Where things stand
 
-- **Judge v3 (#90).** The 4 Nov head comment is sent again, by his
+- **Judge v3 (#90).** The 4 Nov head comment is sent again, by your
   reversal of ruling 12. The full run of 16:58 UTC passes 23 of 25 cases
   (`docs/decisions.md`, "Judge v3: the head comment sent again").
 - **Gate 3 (#97).** A SIX_SCHOOLS build judges all six: v3, the six as
@@ -28,28 +28,32 @@ checklist").
 - **Eval key:** $12.2431 of the $15.00 cap, over 18 run files.
 - **Stage 5.** Steps 1, 2 and 4 are done on flag-on builds, and step 3
   on every build. Of step 5, "debating as a new school", the judge is
-  done; the arena already pairs any two schools that differ
-  (`seekCounterpart` in `src/app/debate/actions.ts`, which migration 0014
-  lets hold any of the six); the micro-lessons are per topic, not per
-  school; the topics' stances are the open item 9 below.
+  done; the arena already pairs any two readers of different schools
+  (`seekCounterpart` in `src/app/debate/actions.ts`), and migration 0014
+  lets an exchange hold any of the six; the topics' stances and the
+  micro-lessons are the open item 9 below.
 - **Production** shows and judges the three published schools exactly as
   before. Nothing promotes a flag-on preview to Production.
-- **The navigation restructure** you asked for on 2026-11-06 is being
-  built; its copy is in `docs/daily-path-copy.md`, section 13, which
-  records the request, and the screenshots of both menus, signed out and
-  signed in, at 390 and 1280 pixels, are added here with it.
+- **The navigation restructure** you asked for on 2026-11-06 is built,
+  on branch `nav-six` (#99), in review: its copy in
+  `docs/daily-path-copy.md`, section 13, your request in
+  `docs/decisions.md`, and the screenshots of both menus, signed out and
+  signed in, at 390 and 1280 pixels, in `docs/gate4/`. They reach this
+  file when #99 merges (item 14).
 
 ## Do the golden runs pass? (b)
 
 The checklist's first item is "The golden runs pass (the condition for
-bringing Gate 4)". Both runs pass all but two cases, the same two.
+bringing Gate 4)". Both runs have every case in every band but two, the
+same two. Counting the objection too, the full run passes 23 of 25, and
+the new-schools run 16 or 23 of 25, depending on item 3.
 
 1. **`confucian-hierarchy-school`**, your held-out case: roles argued
    faithfully in a school timetable, the power of teacher over pupil left
    unmet, which should hold engagement to 4. It fails in every run that
    sent the 4 Nov comment: 82/83/83 at 16:58 against a band of 40-75,
    engagement 5/6/6 against 0-4; 78/80/78 in the new-schools run, its
-   engagement then 4/5/4, in band. Of the six runs that sent no comment,
+   engagement then 4/5/4, a median of 4, in band. Of the six runs that sent no comment,
    it was in band in three (22:08 on 5 Nov, 00:01 and 01:06 on 6 Nov) and
    out in the other three (76 at 01:38, 78 in each of steps A and B); in
    all six the strong cases fell out of band. No prompt tried has had
@@ -87,6 +91,14 @@ bringing Gate 4)". Both runs pass all but two cases, the same two.
    cannot judge a new school or name six rivals. So turning the flag on
    for Production moves every school's judging from v2 to v3. This was my
    reading of Gate 3, not a ruling. `src/lib/judge/schema.ts`.
+
+   **It costs about 70% more a call.** v3's prompt is 13,238 bytes against
+   v2's 4,794. On the live three's 14 cases, v2 averaged $0.00895 a call
+   (26 Oct) and v3 $0.01519 (16:58; $0.01533 in the flag-on run). So the
+   20-call daily ceiling, about $0.20 a reader a day under v2, becomes
+   about $0.30, and the $50 monthly budget, which pauses judging when
+   spent, covers about 40% fewer calls: some 3,300 rather than 5,600.
+   Spending (d), alongside the yes to v3.
 5. **Verdicts already stored under v2.** After launch a revision of a v2
    original is judged under v3. The verdict page shows the revision's
    score change from the original, the share line writes it as
@@ -96,19 +108,21 @@ bringing Gate 4)". Both runs pass all but two cases, the same two.
    topic's par would take v3 scores beside v2 ones. The rule in
    `docs/decisions.md` is that scores across versions are not compared as
    equivalent. The only measure of the gap is from 26 Oct, when v3 scored
-   the strong cases 3 to 13 points above v2 ("2F: Arthur's rulings of
+   the strong and exemplar cases 3 to 13 points above v2 ("2F: Arthur's rulings of
    2026-10-26, on the golden runs"), and that was a v3 prompt since
    replaced: no run has compared v2 with the prompt that would launch.
    Options: (i) accept it; (ii) show no score change, in any of those
    places, when the two verdicts' versions differ, and leave Elo and par
    as they are; (iii) something else you rule. **I would take (ii).**
-   `src/app/debate/[slug]/[debateId]/page.tsx` (where the change is
-   computed), `src/components/debate/Verdict.tsx`,
-   `src/lib/verdict-share.ts`, `src/components/me/ProfilePage.tsx`,
-   `src/app/api/judge/route.ts`.
-6. **The three's criteria at publishing.** Your ruling of 2026-10-26 keeps
+   `src/app/debate/[slug]/[debateId]/page.tsx` (which hands the page the
+   original's scores, and where (ii) would go),
+   `src/components/debate/Verdict.tsx` (which subtracts them),
+   `src/lib/verdict-share.ts`, `src/components/me/ProfilePage.tsx`, and
+   for the event the frozen `src/app/api/judge/route.ts`.
+6. **The three's criteria at publishing.** Your ruling of 2026-10-24 keeps
    them in the draft file: "The live endpoint keeps refusing the three
-   schools until I publish them in Phase 3". The
+   schools until I publish them in Phase 3" (`docs/decisions.md`,
+   "Arthur's rulings of 2026-10-24, verbatim"). The
    flag-on loader reads only schools that are shown and not published, so
    the launch merge must move them into `src/lib/judge/rubric.ts` with
    the same text, or the judge would refuse the three once they are
@@ -116,7 +130,7 @@ bringing Gate 4)". Both runs pass all but two cases, the same two.
    (`tests/judge-request/six-schools/`) pin that text, so the move can be
    shown to change nothing the judge receives. This needs your yes as
    part of the launch.
-7. **Statements in frozen files that become untrue at launch.** All are
+7. **Statements in frozen files that are, or become, untrue.** All are
    sent to the judge or describe what it is sent; each is yours to
    change:
    - `content/prompts/judge.v3.md`, the head comment, sent as written:
@@ -125,9 +139,12 @@ bringing Gate 4)". Both runs pass all but two cases, the same two.
      not in this file" (the body carries one); and it names `fillOnce`,
      which `src/` no longer has.
    - `content/prompts/fidelity-criteria.draft.md`, its header: "NOT
-     LOADED BY ANYTHING IN PRODUCTION", that `hasFidelityCriteria`
-     returns false for the three, and "One thing reads this file: the
-     golden runner".
+     LOADED BY ANYTHING IN PRODUCTION" and that `hasFidelityCriteria`
+     returns false for the three (untrue at launch), and "One thing reads
+     this file: the golden runner" (untrue on a flag-on build since
+     Gate 3).
+   - `src/lib/anthropic.ts`, the judge's COST comment: `est_in=1700` and
+     `est_usd_per_call=0.0098` were measured for v2 (item 4).
 
 ## Content and philosophy: (e)
 
@@ -150,19 +167,27 @@ bringing Gate 4)". Both runs pass all but two cases, the same two.
    test too. Writing them is content (`content/topics/*.md`, frozen) and
    then a production database write (a): `/debate` reads stances from the
    `debate_topics` table, which `npm run seed:topics` fills.
+
+   The micro-lessons are per topic, but they argue from the original
+   three schools (`crash-arithmetic-after`, for one, is Anscombe against
+   Utilitarianism). Whether a reader of one of the new three needs more
+   is also yours. `content/micro/*.md`, frozen.
 10. **`/debate/rubric`** says "These are the criteria the judge is given
     for each school, in full", and shows `rubric.ts`'s v2 text for the
     published three. On a flag-on build, and so at launch, the judge is
     given v3's text, for six. Change the page's claim, or the page.
-    `src/app/debate/rubric/page.tsx`.
+    `src/app/debate/rubric/page.tsx`; with #99, the text moves to
+    `src/components/how-it-works/Rubric.tsx`, shared with `/how-it-works`.
 11. **A floor for exemplars.** On the full dataset none of the 72 chosen
     is one the sample run wrote to be weak; on the canary's rows alone, 4
     of 70 and 6 of 40 were, marked 28 to 36. A floor on the template mark
     would leave a position out rather than show a weak argument for it.
     `src/lib/exemplars.ts`; `docs/decisions.md`, the exemplars entry.
-12. **The re-screening job's two open points and its copy,** on your list
-    since #89 as (e) 8 and not yet ruled (`docs/decisions.md`, the
-    re-screening entry): the lapse clock runs from the exchange's last
+12. **The re-screening job's two open points and its copy.** Checkpoint B's
+    (e) 8 was ruled ("Covered by the re-screening job; keep the copy
+    accurate."); these are #89's follow-ups, put on your list under that
+    number and not yet ruled (`docs/decisions.md`, the re-screening
+    entry): the lapse clock runs from the exchange's last
     delivered reply, so a reply saved on day 13 that cannot be screened
     lapses with the exchange and is never delivered; `/me` lists an
     exchange whose latest reply is the reader's own pending one under
@@ -178,8 +203,9 @@ bringing Gate 4)". Both runs pass all but two cases, the same two.
     20-argument rule, and the exemplars pages would show three schools.
     Samples for the new three need new argument banks, which are content.
     Rule whether the run should cover them.
-14. **The navigation's copy and screenshots** (`docs/daily-path-copy.md`,
-    section 13), below.
+14. **The navigation's copy and screenshots,** on branch `nav-six` (#99):
+    `docs/daily-path-copy.md`, section 13, and `docs/gate4/`. They are
+    added to this file when #99 merges.
 
 ## Publishing: (c)
 
@@ -193,7 +219,9 @@ bringing Gate 4)". Both runs pass all but two cases, the same two.
     Checkpoint B, carried out as ruled (the adherent nouns, (e) 1; the
     share lines, (e) 3; "a few minutes", (e) 4; `docs/quiz-v2.md`,
     section 8); `README.md`; the "until launch" rules of steps 3 and 4
-    lifted; a fresh sample run (item 13).
+    lifted; a fresh sample run (item 13). Between the teardown and that
+    run, `/debate/{slug}/exemplars` answers not found while the landing
+    page links to it (`docs/decisions.md`, the exemplars entry).
 
 ## Production database writes: (a)
 
@@ -213,8 +241,8 @@ bringing Gate 4)". Both runs pass all but two cases, the same two.
 
 Mine, and not waiting on anyone:
 
-- The navigation restructure, behind SIX_SCHOOLS, with its copy in
-  `docs/daily-path-copy.md` first and the screenshots added here.
+- The navigation restructure (#99), and its screenshots added here once
+  it merges.
 - The re-screening job's log is read at 06:00 UTC on 2026-11-07: the
   Hobby plan fires its cron at some point in the 05:00 hour and keeps
   runtime logs for an hour, so 06:00 covers the whole hour.
