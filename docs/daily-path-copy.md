@@ -584,14 +584,21 @@ contents line.
 | Page title (new) | `How it works · Sophecs` |
 | Description (new) | `What the judge scores, the criteria it is given, and what a score does and does not mean.` |
 | Heading (new) | `How it works` |
-| Contents (new), linking to each section | `How the judge works` · `How this was judged` · `Counterpart rules` · `Sample accounts` |
+| Contents (new), linking to each section; read aloud as `On this page` (new) | `How the judge works` · `How this was judged` · `Counterpart rules` · `Sample accounts` |
 | Sections, with their anchors | `How the judge works` (`#judge`), with `Known limitations`; `How this was judged` (`#rubric`), with its three axes and `What counts as faithful`; `Counterpart rules` (`#counterpart`); `Sample accounts` (`#samples`) |
 | Foot | `Questions or corrections: arthur.rzhang@gmail.com` and `Back to the motions`, as on the two pages now |
 
-The method page's `Read the rubric` link, which pointed at the other page,
-is left out: the rubric is on the same page. `/method` redirects here, and
-keeps its anchor, so `/method#samples` lands on `#samples`;
-`/debate/rubric` redirects to `#rubric`.
+The method page's closing sentence is left out with its link, since the
+rubric is on the same page: `The criteria the judge is given are published
+in full, including the fidelity criteria for each school. Read the rubric.`
+`/method` redirects here, and keeps its anchor, so `/method#samples` lands
+on `#samples`; `/debate/rubric` redirects to `#rubric`.
+
+Every link elsewhere on the site that led to `/method`, `/debate/rubric` or
+`/table` leads, on a flag-on build, straight to the new address: the
+verdict's `How this was judged`, the counterpart's rules, the sample
+accounts and the school table's links. A link followed inside the site
+would otherwise lose its anchor on the redirect.
 
 ### Motions
 

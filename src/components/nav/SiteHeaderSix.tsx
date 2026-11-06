@@ -124,6 +124,14 @@ export function SiteHeaderSix() {
     syncAuthHint();
   }, [pathname]);
 
+  // A link in an open menu closes it, even one to the page already open
+  // (where the page change above never comes): Me, then "Settings" from
+  // /me/settings, would otherwise leave the menu over the section asked
+  // for.
+  function closeOnLink(e: React.MouseEvent, menuRef: React.RefObject<HTMLDetailsElement | null>) {
+    if ((e.target as HTMLElement).closest("a")) menuRef.current?.removeAttribute("open");
+  }
+
   async function signOut() {
     // Loaded on the click, not with the header: the Supabase client is
     // ~90 KB that no page should carry for a button most visits never
@@ -154,6 +162,7 @@ export function SiteHeaderSix() {
           </summary>
           <nav
             aria-label="Main"
+            onClick={(e) => closeOnLink(e, menu)}
             className="absolute left-0 top-full z-20 mt-2 min-w-44 rounded-card border-2 border-rule-strong bg-surface p-1"
           >
             {SIGNED_OUT.map((link) => (
@@ -195,7 +204,10 @@ export function SiteHeaderSix() {
             >
               Me
             </summary>
-            <div className="absolute right-0 top-full z-20 mt-2 flex min-w-60 flex-col rounded-card border-2 border-rule-strong bg-surface p-1">
+            <div
+              onClick={(e) => closeOnLink(e, me)}
+              className="absolute right-0 top-full z-20 mt-2 flex min-w-60 flex-col rounded-card border-2 border-rule-strong bg-surface p-1"
+            >
               {ME_MENU.map((item) => (
                 <Link
                   key={item.href}

@@ -39,7 +39,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...lessons,
     // Both were public and unlisted. A product that scores a teenager's
     // reasoning should have the pages explaining the scoring findable.
-    { url: `${BASE}/method`, priority: 0.6 },
-    { url: `${BASE}/debate/rubric`, priority: 0.6 },
+    // On a SIX_SCHOOLS build the two are one page, and the table is
+    // under the schools' cards (docs/daily-path-copy.md, section 13).
+    ...(process.env.SIX_SCHOOLS === "1"
+      ? [
+          { url: `${BASE}/how-it-works`, priority: 0.6 },
+          { url: `${BASE}/schools`, priority: 0.6 },
+        ]
+      : [
+          { url: `${BASE}/method`, priority: 0.6 },
+          { url: `${BASE}/debate/rubric`, priority: 0.6 },
+        ]),
   ];
 }

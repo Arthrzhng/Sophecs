@@ -4688,9 +4688,14 @@ Choices made where the instruction left room, each his to change:
 - **How it works** keeps both pages' text unchanged, shared with them
   (`src/components/how-it-works/`), under a new heading and a contents
   line, with anchors `#judge`, `#rubric`, `#counterpart` and `#samples`.
-  The method page's "Read the rubric" link is left out, since the rubric
-  is on the same page. Its claim to show the judge's criteria in full is
-  unchanged and is Gate 4's item 10.
+  The method page's closing sentence ("The criteria the judge is given
+  are published in full, including the fidelity criteria for each
+  school. Read the rubric.") is left out with its link, since the rubric
+  is on the same page. The rubric's own claim to show the judge's
+  criteria in full is unchanged and is Gate 4's item 10. The merged page
+  does not send `rubric_viewed`, which `/debate/rubric` sends: that event
+  counts views of the rubric page, and a visit to `/how-it-works` is not
+  one. Whether it should count the merged page is his.
 - **Redirects** (`sixSchoolsRedirects` in `next.config.ts`, flag-on
   builds only): `/table` to `/schools`, `/method` to `/how-it-works`
   (a browser keeps the anchor, so `/method#samples` lands on
@@ -4703,3 +4708,23 @@ Choices made where the instruction left room, each his to change:
 - **"Debate" to "Motions"** in the header, the footer and the two debate
   pages' titles; the footer's About column and its disclosure link point
   at the merged page on a flag-on build.
+- **Links go to the new addresses directly.** On a flag-on build every
+  link inside the site that led to `/method`, `/debate/rubric` or
+  `/table` leads to `/how-it-works`, its anchors, or `/schools`
+  (`src/lib/nav-routes.ts`), and the sitemap lists the new pages. A
+  redirect followed inside the site drops the anchor, so the verdict's
+  "How this was judged" would otherwise land on the top of the page, not
+  the rubric. The old addresses still redirect, for links from outside.
+- **The session cookie test** matches Supabase's auth cookie and its
+  numbered parts (`sb-{ref}-auth-token`, `.0`, `.1`), not the
+  `-code-verifier` cookie a half-finished sign-in leaves, so a reader who
+  abandoned a sign-in is not shown the signed-in header.
+- **The flag-off bundle.** The flag-off build's markup is pinned by
+  fixtures rendered from main's components (`tests/nav-six-flag-off/`).
+  Its JavaScript is not byte for byte main's. The root layout's script,
+  which every page loads, grows by 1,743 bytes (563 compressed): the
+  header picks its version at build time, but what the six-school
+  header imports still comes along unused, namely the published three's
+  names and colours and the session-cookie test. No draft school is
+  among it (`check:bundle` passes). Measured on flag-off builds of main
+  at 901e3a4 and of this branch.

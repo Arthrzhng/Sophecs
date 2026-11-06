@@ -1,13 +1,21 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Page } from "@/components/layout/Page";
 import { SchoolCards } from "@/components/schools/SchoolCards";
 import { SchoolTable } from "@/components/table/SchoolTable";
 import { loadSchoolTable } from "@/lib/school-table-page";
 
-export const metadata = {
-  title: "Schools · Sophecs",
-  description: "Each school's page, and how each argued this week.",
-};
+// Metadata rather than a static export, so that a build without the flag
+// says nothing of this page: its 404 has the site's own title and
+// description, as before the page existed.
+export async function generateMetadata(): Promise<Metadata> {
+  if (process.env.SIX_SCHOOLS !== "1") notFound();
+  return {
+    title: "Schools · Sophecs",
+    description:
+      "Each school's page, and how each argued this week.",
+  };
+}
 
 // The schools, a card each linking to its page, with this week's table
 // under them, on a SIX_SCHOOLS build (Arthur, 2026-11-06;
@@ -27,7 +35,7 @@ export default async function SchoolsPage() {
   return (
     <Page width="ui" rhythm="path">
       <h1 className="text-xl font-extrabold tracking-tight text-ink">Schools</h1>
-      <SchoolCards />
+      <SchoolCards headingAs="h2" />
       <section className="mt-12 border-t-2 border-rule pt-10">
         <SchoolTable {...table} headingAs="h2" />
       </section>

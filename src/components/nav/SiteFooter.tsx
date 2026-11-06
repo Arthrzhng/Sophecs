@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import { SHOWN_SCHOOL_IDS } from "@/lib/school-registry";
+import { RUBRIC_HREF } from "@/lib/nav-routes";
 
 // Every school this build shows, each with a page at /s/[school].
 const SCHOOLS = SHOWN_SCHOOL_IDS;
@@ -56,7 +57,6 @@ function Row({ href, children }: { href: string; children: React.ReactNode }) {
 // section 13). The old addresses redirect there on that build anyway; the
 // links go straight. Every other build, production included, is unchanged.
 const SIX = process.env.SIX_SCHOOLS === "1";
-const RUBRIC_HREF = SIX ? "/how-it-works#rubric" : "/debate/rubric";
 
 export function SiteFooter() {
   return (

@@ -17,6 +17,7 @@ import { SampleLabel } from "@/components/sample/SampleLabel";
 import { SAMPLE_ASSESSMENT, SAMPLE_ASSESSMENT_NOTE } from "@/lib/sample";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
 import type { SchoolId } from "@/lib/types";
+import { RUBRIC_HREF, TABLE_HREF } from "@/lib/nav-routes";
 
 export interface VerdictData {
   rejected: boolean;
@@ -248,7 +249,7 @@ export function Verdict({
             action={
               <div className="flex flex-wrap items-center gap-6 text-sm">
                 <TextLink href={`/debate/${topicSlug}`}>Write it again</TextLink>
-                <TextLink href="/debate/rubric">What the judge is looking for</TextLink>
+                <TextLink href={RUBRIC_HREF}>What the judge is looking for</TextLink>
               </div>
             }
           />
@@ -304,7 +305,7 @@ export function Verdict({
             {tableContribution != null && tableContribution > 0 && (
               <span>
                 <Link
-                  href="/table"
+                  href={TABLE_HREF}
                   className="inline-flex min-h-11 items-center text-ink underline underline-offset-4"
                 >
                   <span className="font-mono tabular">+{tableContribution}</span>
@@ -350,7 +351,7 @@ export function Verdict({
         </ul>
       </section>
       <p className="mt-3 text-sm">
-        <TextLink href="/debate/rubric">
+        <TextLink href={RUBRIC_HREF}>
           {template ? "What the judge looks for" : "How this was judged"}
         </TextLink>
       </p>

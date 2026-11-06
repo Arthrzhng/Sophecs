@@ -1,15 +1,21 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Page } from "@/components/layout/Page";
-import { RubricViewTracker } from "@/components/debate/RubricViewTracker";
 import { JudgeMethod, SampleAccounts } from "@/components/how-it-works/JudgeMethod";
 import { CounterpartRules, RubricCriteria } from "@/components/how-it-works/Rubric";
 
-export const metadata = {
-  title: "How it works · Sophecs",
-  description:
-    "What the judge scores, the criteria it is given, and what a score does and does not mean.",
-};
+// Metadata rather than a static export, so that a build without the flag
+// says nothing of this page: its 404 has the site's own title and
+// description, as before the page existed.
+export async function generateMetadata(): Promise<Metadata> {
+  if (process.env.SIX_SCHOOLS !== "1") notFound();
+  return {
+    title: "How it works · Sophecs",
+    description:
+      'What the judge scores, the criteria it is given, and what a score does and does not mean.',
+  };
+}
 
 // The judge's method (/method) and the rubric (/debate/rubric) as one page,
 // on a SIX_SCHOOLS build (Arthur, 2026-11-06; docs/daily-path-copy.md,
@@ -31,7 +37,6 @@ export default function HowItWorksPage() {
   if (process.env.SIX_SCHOOLS !== "1") notFound();
   return (
     <Page width="read" rhythm="path">
-      <RubricViewTracker />
       <h1 className="text-xl font-extrabold leading-tight tracking-tight text-ink">How it works</h1>
 
       <nav aria-label="On this page" className="mt-5">

@@ -2,6 +2,7 @@ import { Page } from "@/components/layout/Page";
 import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 import { PUBLISHED_SCHOOL_IDS } from "@/lib/types";
 import { TextLink } from "@/components/ui/TextLink";
+import { RUBRIC_HREF } from "@/lib/nav-routes";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
@@ -218,7 +219,7 @@ export default function StyleguidePage() {
 
       <Section title="Links" note="Underlined always, not on hover. No arrow glyph is ever appended.">
         <p className="text-base text-ink">
-          The rubric is <TextLink href="/debate/rubric">published in full</TextLink>, and
+          The rubric is <TextLink href={RUBRIC_HREF}>published in full</TextLink>, and
           every verdict links to it.
         </p>
       </Section>

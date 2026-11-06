@@ -7,7 +7,9 @@ import path from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { FIXTURE_PROPS } from "./nav-six-flag-off/props";
 
+vi.mock("posthog-js", () => ({ default: { capture: () => {} } }));
 vi.mock("next/navigation", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/navigation")>()),
   usePathname: () => "/debate/opaque-benefit",
@@ -27,6 +29,11 @@ async function load(flag: string) {
     schools: await import("../src/app/schools/page"),
     debate: await import("../src/app/debate/page"),
     debateSlug: await import("../src/app/debate/[slug]/page"),
+    routes: await import("../src/lib/nav-routes"),
+    sitemap: await import("../src/app/sitemap"),
+    method: await import("../src/app/method/page"),
+    rubric: await import("../src/app/debate/rubric/page"),
+    table: await import("../src/components/table/SchoolTable"),
   };
 }
 afterEach(() => vi.unstubAllEnvs());
@@ -65,12 +72,46 @@ describe("a build without SIX_SCHOOLS", () => {
     ]);
   });
 
-  it("adds no redirects, and has no /schools or /how-it-works", async () => {
+  it("adds no redirects, and has no /schools or /how-it-works, not even their titles", async () => {
     const { config, howItWorks, schools } = await load("0");
     expect(config.sixSchoolsRedirects("0")).toEqual([]);
     expect(await config.default.redirects!()).toEqual([]);
     expect(() => howItWorks.default()).toThrow();
     await expect(schools.default()).rejects.toThrow();
+    // Metadata too: a static title would reach the 404 a reader sees.
+    await expect(howItWorks.generateMetadata()).rejects.toThrow();
+    await expect(schools.generateMetadata()).rejects.toThrow();
+  });
+
+  // Rendered from main's components before the change (tests/nav-six-flag-off).
+  it("renders the pages and components it touches byte for byte as main did", async () => {
+    const { method, rubric, footer, topics, table } = await load("0");
+    const fixture = (n: string) =>
+      fs.readFileSync(path.join(process.cwd(), "tests", "nav-six-flag-off", `${n}.html`), "utf8");
+    expect(`${renderToStaticMarkup(method.default())}\n`).toBe(fixture("method"));
+    expect(`${renderToStaticMarkup(rubric.default())}\n`).toBe(fixture("rubric"));
+    expect(`${renderToStaticMarkup(createElement(footer.SiteFooter))}\n`).toBe(fixture("footer"));
+    expect(`${renderToStaticMarkup(createElement(topics.TopicList, FIXTURE_PROPS.topics as never))}\n`).toBe(
+      fixture("topic-list")
+    );
+    expect(`${renderToStaticMarkup(createElement(table.SchoolTable, FIXTURE_PROPS.table as never))}\n`).toBe(
+      fixture("school-table")
+    );
+  });
+
+  it("links where it always has, and lists the old pages in the sitemap", async () => {
+    const { routes, sitemap } = await load("0");
+    expect({ ...routes }).toEqual({
+      METHOD_HREF: "/method",
+      RUBRIC_HREF: "/debate/rubric",
+      SAMPLES_HREF: "/method#samples",
+      COUNTERPART_RULES_HREF: "/debate/rubric",
+      TABLE_HREF: "/table",
+    });
+    const urls = (await sitemap.default()).map((e) => e.url);
+    expect(urls).toContain("https://sophecs.com/method");
+    expect(urls).toContain("https://sophecs.com/debate/rubric");
+    expect(urls).not.toContain("https://sophecs.com/how-it-works");
   });
 
   it("keeps the footer's labels and the debate pages' titles", async () => {
@@ -153,6 +194,9 @@ describe("a build with SIX_SCHOOLS=1", () => {
     expect(run("sb-tekifezydjlgxgndkxul-auth-token=abc")).toBe("in");
     expect(run("a=1; sb-tekifezydjlgxgndkxul-auth-token.0=abc")).toBe("in");
     expect(run("anon_id=1; anon_since=2")).toBeUndefined();
+    // Set when a sign-in starts, kept whether or not it finishes.
+    expect(run("sb-tekifezydjlgxgndkxul-auth-token-code-verifier=abc")).toBeUndefined();
+    expect(run("sb-x-auth-tokens=1")).toBeUndefined();
     expect(run("")).toBeUndefined();
   });
 
@@ -163,6 +207,34 @@ describe("a build with SIX_SCHOOLS=1", () => {
       { source: "/method", destination: "/how-it-works", permanent: false },
       { source: "/debate/rubric", destination: "/how-it-works#rubric", permanent: false },
     ]);
+    // And the config the build reads carries them.
+    expect(await config.default.redirects!()).toEqual(config.sixSchoolsRedirects("1"));
+  });
+
+  it("links straight to the new pages, anchors and all, rather than through a redirect", async () => {
+    const { routes, sitemap } = await load("1");
+    expect({ ...routes }).toEqual({
+      METHOD_HREF: "/how-it-works",
+      RUBRIC_HREF: "/how-it-works#rubric",
+      SAMPLES_HREF: "/how-it-works#samples",
+      COUNTERPART_RULES_HREF: "/how-it-works#counterpart",
+      TABLE_HREF: "/schools",
+    });
+    const urls = (await sitemap.default()).map((e) => e.url);
+    expect(urls).toContain("https://sophecs.com/how-it-works");
+    expect(urls).toContain("https://sophecs.com/schools");
+    expect(urls).not.toContain("https://sophecs.com/method");
+    expect(urls).not.toContain("https://sophecs.com/debate/rubric");
+  });
+
+  it("shows Take the quiz only signed out, and the Me menu only signed in", async () => {
+    const { header } = await load("1");
+    const html = renderToStaticMarkup(createElement(header.SiteHeader)).replace(/&amp;/g, "&");
+    const quiz = links(html).find(([, text]) => text === "Take the quiz")!;
+    expect(shownSignedOut(quiz[2]) && quiz[2].includes(`${SIGNED_IN_ONLY}hidden`)).toBe(true);
+    const meDetails = /<details[^>]*class="([^"]*)"[^>]*>\s*<summary[^>]*>Me<\/summary>/.exec(html)!;
+    expect(meDetails[1]).toMatch(/(^|\s)hidden(\s|$)/);
+    expect(meDetails[1]).toContain(`${SIGNED_IN_ONLY}block`);
   });
 
   it("merges the method and the rubric into /how-it-works, with the anchors the redirects use", async () => {
@@ -175,7 +247,7 @@ describe("a build with SIX_SCHOOLS=1", () => {
     expect(html).toContain("Questions or corrections: arthur.rzhang@gmail.com");
     // One h1; the merged pages' headings sit under their sections.
     expect(html.match(/<h1/g)).toHaveLength(1);
-    expect(howItWorks.metadata.title).toBe("How it works · Sophecs");
+    expect((await howItWorks.generateMetadata()).title).toBe("How it works · Sophecs");
   });
 
   it("says Motions, and links the merged page, in the footer and the debate titles", async () => {

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { JUDGE_AXES } from "@/lib/judge-axes";
+import { RUBRIC_HREF } from "@/lib/nav-routes";
 
 /**
  * What the judge looks for, on the screen where the argument is written.
@@ -28,7 +29,7 @@ export function AxisPanel() {
       </ol>
       <p className="mt-5">
         <Link
-          href="/debate/rubric"
+          href={RUBRIC_HREF}
           className="inline-flex min-h-11 items-center text-sm font-semibold text-ink underline underline-offset-4"
         >
           Read the full rubric

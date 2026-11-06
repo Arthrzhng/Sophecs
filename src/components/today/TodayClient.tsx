@@ -16,6 +16,7 @@ import {
   hasActionableStep,
 } from "@/lib/today-path";
 import type { SchoolId } from "@/lib/types";
+import { METHOD_HREF } from "@/lib/nav-routes";
 
 export interface CaseProgress {
   read: boolean;
@@ -171,7 +172,7 @@ export function TodayClient({
                         </p>
                         <p className="mt-3 flex flex-wrap gap-5">
                           <Link
-                            href="/method"
+                            href={METHOD_HREF}
                             className="inline-flex min-h-11 items-center text-sm font-semibold text-ink underline underline-offset-4"
                           >
                             How the judge works
