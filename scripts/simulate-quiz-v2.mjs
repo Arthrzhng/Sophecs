@@ -6,9 +6,11 @@
 // Usage: node scripts/simulate-quiz-v2.mjs [path to quiz-v2.json] [--json]
 //
 // --json prints the exact counts instead of the report: every school's
-// primary count, every primary > secondary pair's count and the number of
-// ties. tests/quiz-v2-score.test.ts compares the quiz's own scorer with
-// them integer for integer.
+// primary count, every primary > secondary pair's count, the number of
+// ties, and a SHA-256 of every pattern's "primary>secondary" line in
+// pattern order. tests/quiz-v2-score.test.ts compares the quiz's own
+// scorer with all of it. With --json the 8-30% and persona checks do not
+// run and the exit code is 0; run without it for those.
 //
 // The result logic it applies is the one docs/quiz-v2.md proposes:
 // - a reader's position is the mean of their ten options' vectors;
@@ -22,6 +24,7 @@
 // or if a school has no weight or an option's vector disagrees with its
 // school's angle and weight.
 import fs from "node:fs";
+import { createHash } from "node:crypto";
 
 const args = process.argv.slice(2);
 const asJson = args.includes("--json");
@@ -74,6 +77,7 @@ const primary = Object.fromEntries(ids.map((id) => [id, 0]));
 const pair = {};
 let ties = 0;
 let total = 0;
+const order = asJson ? createHash("sha256") : null;
 const radii = [];
 const pick = new Array(10).fill(0);
 for (let n = 0; n < 4 ** 10; n++) {
@@ -94,6 +98,7 @@ for (let n = 0; n < 4 ** 10; n++) {
   const d1 = d2(p, pos[r[1]]);
   if (Math.abs(d0 - d1) <= EPS) ties++;
   primary[r[0]]++;
+  order?.update(`${r[0]}>${r[1]}\n`);
   const key = `${r[0]} > ${r[1]}`;
   pair[key] = (pair[key] ?? 0) + 1;
   radii.push(Math.hypot(p.x, p.y));
@@ -111,7 +116,7 @@ function persona(target) {
 }
 
 if (asJson) {
-  console.log(JSON.stringify({ total, primary, pair, ties }));
+  console.log(JSON.stringify({ total, primary, pair, ties, order: order.digest("hex") }));
   process.exit(0);
 }
 

@@ -2,9 +2,11 @@
 // scripts/simulate-quiz-v2.mjs is what Arthur accepted the distribution
 // from (docs/quiz-v2.md, section 5); src/lib/quiz-v2-score.ts is what the
 // quiz runs. Every one of the 4^10 answer patterns goes through the
-// scorer here, and the shares, the ties and the personas must be the ones
-// the simulator prints.
+// scorer here: its primary and secondary must be the simulator's for each
+// pattern (a hash over all of them, in order), its counts and ties the
+// simulator's, and its personas the ones the simulator prints.
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { loadQuizV2ForTest } from "../src/lib/quiz-v2";
 import { meanPoint, rankSchools, scoreQuizV2, type MapPoint, type QuizV2Option } from "../src/lib/quiz-v2-score";
@@ -21,7 +23,8 @@ describe("quiz v2's scorer, against scripts/simulate-quiz-v2.mjs", () => {
     // so one pattern scored differently fails the test.
     const sim = JSON.parse(
       execFileSync(process.execPath, ["scripts/simulate-quiz-v2.mjs", "--json"], { encoding: "utf8" })
-    ) as { total: number; primary: Record<string, number>; pair: Record<string, number>; ties: number };
+    ) as { total: number; primary: Record<string, number>; pair: Record<string, number>; ties: number; order: string };
+    const order = createHash("sha256");
     const Q = quiz.questions;
     const primary: Record<string, number> = Object.fromEntries(quiz.schools.map((s) => [s.id, 0]));
     const pair: Record<string, number> = {};
@@ -39,12 +42,16 @@ describe("quiz v2's scorer, against scripts/simulate-quiz-v2.mjs", () => {
       primary[r.primary]++;
       const key = `${r.primary} > ${r.secondary}`;
       pair[key] = (pair[key] ?? 0) + 1;
+      order.update(`${r.primary}>${r.secondary}\n`);
       if (Math.abs(d2(r.point, at.get(r.primary)!) - d2(r.point, at.get(r.secondary)!)) <= 1e-9) ties++;
     }
     expect(sim.total).toBe(4 ** 10);
     expect(primary).toEqual(sim.primary);
     expect(pair).toEqual(sim.pair);
     expect(ties).toBe(sim.ties);
+    // Pattern by pattern, not only in total: two patterns that swapped
+    // results would leave the counts alone and change this.
+    expect(order.digest("hex")).toBe(sim.order);
     // And the report Arthur accepted the distribution from rounds the same counts.
     for (const s of quiz.schools) {
       const row = simulated.split("\n").find((l) => l.split("|")[0].trim() === RAW.schools[s.id].name);

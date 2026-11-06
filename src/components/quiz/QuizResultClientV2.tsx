@@ -23,7 +23,7 @@ import type { SchoolId } from "@/lib/types";
 /**
  * Quiz v2's result, on a SIX_SCHOOLS build (docs/stage5-plan.md, step 4).
  * The same page as v1's QuizResultClient, with the reader's point on the
- * map beside their card: rendered at once from what QuizShellV2 scored,
+ * map below their card: rendered at once from what QuizShellV2 scored,
  * while submitQuizResultV2 scores the answers again on the server and saves
  * the row. If the server's result differs, the page takes the server's
  * school and point.

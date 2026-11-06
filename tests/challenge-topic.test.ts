@@ -9,12 +9,20 @@ const tables: Record<string, Row[]> = {};
 const updates: { table: string; patch: Row; id: unknown }[] = [];
 let signedIn: string | null = null;
 
+let failReads = false;
 function query(table: string) {
   const filters: ((r: Row) => boolean)[] = [];
   let patch: Row | null = null;
+  // Only the columns a select names, as PostgREST returns them: a query
+  // that forgets one reads it as missing, as it would in production.
+  let columns: string[] | null = null;
+  const pick = (r: Row) => (columns ? Object.fromEntries(columns.map((c) => [c, r[c]])) : r);
   const rows = () => (tables[table] ?? []).filter((r) => filters.every((f) => f(r)));
   const b: Record<string, unknown> = {};
-  b.select = () => b;
+  b.select = (cols?: string) => {
+    if (cols) columns = cols.split(",").map((c) => c.trim());
+    return b;
+  };
   b.order = () => b;
   b.gte = () => b;
   b.eq = (col: string, v: unknown) => {
@@ -29,8 +37,8 @@ function query(table: string) {
     patch = p;
     return b;
   };
-  b.maybeSingle = async () => ({ data: rows()[0] ?? null });
-  b.single = async () => ({ data: rows()[0] ?? null });
+  b.maybeSingle = async () => ({ data: rows()[0] ? pick(rows()[0]) : null });
+  b.single = async () => ({ data: rows()[0] ? pick(rows()[0]) : null });
   b.then = (resolve: (v: unknown) => unknown) => {
     if (patch) {
       for (const r of rows()) {
@@ -39,7 +47,8 @@ function query(table: string) {
       }
       return resolve({ data: null, error: null });
     }
-    return resolve({ data: rows(), count: 0, error: null });
+    if (failReads && table === "quiz_results") return resolve({ data: null, error: { message: "read failed" } });
+    return resolve({ data: rows().map(pick), count: 0, error: null });
   };
   return b;
 }
@@ -51,10 +60,11 @@ vi.mock("@/lib/supabase/server", () => ({
 vi.mock("next/cache", () => ({ revalidatePath: () => {} }));
 
 const { assignChallengeTopic } = await import("../src/app/debate/actions");
-const { viewerIsChallengeParty } = await import("../src/lib/challenge");
+const { viewerIsChallengeParty, resolveChallengeSide } = await import("../src/lib/challenge");
 
 beforeEach(() => {
   updates.length = 0;
+  failReads = false;
   tables.debate_topics = [{ slug: "no-decision", active: true, sort: 1 }];
   tables.debates = [];
   tables.quiz_results = [
@@ -109,6 +119,12 @@ describe("assignChallengeTopic", () => {
     expect(updates).toEqual([]);
   });
 
+  it("refuses when the results cannot be read", async () => {
+    failReads = true;
+    signedIn = "challenger";
+    expect(await assignChallengeTopic("c1")).toEqual({ ok: false, error: "Challenge not found." });
+  });
+
   it("still needs a signed-in reader", async () => {
     signedIn = null;
     expect(await assignChallengeTopic("c1")).toEqual({ ok: false, error: "Not signed in." });
@@ -130,5 +146,34 @@ describe("viewerIsChallengeParty (who /r/[id] shows Debate them to)", () => {
   });
   it("never matches on an absent id", () => {
     expect(viewerIsChallengeParty({ anonId: null, userId: null }, [{ anon_id: null, user_id: null }])).toBe(false);
+  });
+});
+
+// The gate both /api/judge and assignChallengeTopic pass through: /api/judge
+// records a debate on the challenge, and runs the pairwise rating, only for
+// a side this returns.
+describe("resolveChallengeSide", () => {
+  const admin = { from: query } as never;
+  const challenge = { challenger_result_id: "r-challenger", challengee_result_id: "r-challengee" };
+
+  it("finds either party between two v1 results, and nobody else", async () => {
+    expect(await resolveChallengeSide(admin, challenge, "challenger")).toBe("challenger");
+    expect(await resolveChallengeSide(admin, challenge, "challengee")).toBe("challengee");
+    expect(await resolveChallengeSide(admin, challenge, "stranger")).toBeNull();
+  });
+
+  it("finds the challenger of a challenge nobody has taken up", async () => {
+    expect(await resolveChallengeSide(admin, { ...challenge, challengee_result_id: null }, "challenger")).toBe("challenger");
+  });
+
+  it("gives no side on a challenge with a v2 result, until launch, so /api/judge records no debate on it (step 4)", async () => {
+    tables.quiz_results[0].quiz_version = 2;
+    expect(await resolveChallengeSide(admin, challenge, "challenger")).toBeNull();
+    expect(await resolveChallengeSide(admin, challenge, "challengee")).toBeNull();
+  });
+
+  it("gives no side when the results cannot be read", async () => {
+    failReads = true;
+    expect(await resolveChallengeSide(admin, challenge, "challenger")).toBeNull();
   });
 });

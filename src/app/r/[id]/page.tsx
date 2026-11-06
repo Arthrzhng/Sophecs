@@ -148,9 +148,10 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
     ]);
   // Only between two v1 results, on every build, until launch, so that a
   // challenge made on a SIX_SCHOOLS preview does not lead to debates and
-  // rating changes in production (Gate 2, option (i)). assignChallengeTopic
-  // refuses the same. A side this build does not show reads as null here,
-  // so without SIX_SCHOOLS a v2 other side is never offered either.
+  // rating changes in production (Gate 2, option (i)). resolveChallengeSide
+  // refuses the same for assignChallengeTopic and /api/judge. A side this
+  // build does not show reads as null here, so without SIX_SCHOOLS a v2
+  // other side is never offered either.
   const showDebateThem = Boolean(
     challengeInfo &&
       challengeInfo.status !== "complete" &&

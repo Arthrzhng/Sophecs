@@ -3957,8 +3957,10 @@ it. Nothing in the content changes. Ticked in the Gate 4 checklist,
 `docs/stage5-plan.md`, step 4, under Gate 2, option (i) (Arthur, Checkpoint
 B, 2026-11-05). Gate 2 names step 4's edit to the frozen
 `src/app/actions.ts` among what it decides.
-Everything here is on a build with `SIX_SCHOOLS=1`; a build without it is
-unchanged, apart from the two step-3 leftovers at the end.
+What a reader sees changes only on a build with `SIX_SCHOOLS=1`. A build
+without it behaves as before except for step 3's leftovers, which narrow
+what challenges can do, and it carries the v2 client code and a new
+sharing-image address (both under "What production carries").
 
 **The quiz.** `/quiz` and the landing page's first question run quiz v2:
 the ten questions of `docs/quiz-v2.json`, the two-axis map (`SchoolMap`)
@@ -4015,13 +4017,22 @@ cannot show, "Couldn't show this result." with "Your result was saved,
 but this page could not show its school. Open the link again in a
 moment."
 
-**Step 3's leftovers, on every build.** "Debate them" on `/r/[id]` is now
-offered only between two v1 results (`comparable`), `assignChallengeTopic`
-refuses a challenge with a v2 side when called directly, and `/me` lists
-challenges on a reader's own v1 results only. A debate takes each
-reader's school from their profile, which option (i) never sets from a
-v2 result; what the limit prevents is a challenge made on a preview
-leading to debates and rating changes in production.
+**Step 3's leftovers, on every build.** A challenge counts only between
+two v1 results, until launch:
+- `resolveChallengeSide` (`src/lib/challenge.ts`) gives no side on a
+  challenge with a v2 result, and a read that fails gives none. Both of
+  its callers stop there: `assignChallengeTopic` fixes no topic, and
+  `/api/judge` still judges and saves the debate but does not record it
+  on the challenge, so no pairwise rating runs. That is a change in the
+  frozen route's behaviour for such a challenge, made through the
+  function it calls, not in the route;
+- "Debate them" on `/r/[id]` is offered only between two v1 results
+  (`comparable`);
+- `/me` lists challenges on a reader's own v1 results only.
+
+A debate takes each reader's school from their profile, which option (i)
+never sets from a v2 result; what the limit prevents is a challenge made
+on a preview leading to debates and rating changes in production.
 
 **What production carries.** The v2 client code ships in every build,
 though only a SIX_SCHOOLS build renders it: `QuizShellV2`,
@@ -4037,20 +4048,36 @@ page's `og:image` address carries a new hash; the image's bytes on a
 build without the flag are the same.
 
 **To undo at launch** (`docs/stage5-plan.md`, step 6 and its Gate 4
-checklist): the rules this step and step 3 set "until launch".
-`submitQuizResultV2` takes up v1 challengers too and moves a signed-in
-reader's school, as v1 does (`retakeQuizSchool`); `schoolFromResult`
-takes a school from a v2 result; "Debate them", `assignChallengeTopic`
-and `/me` take v2 results. Left in place, every open v1 challenge could
-never be accepted and no new challenge could be debated. The first is an
-edit to the frozen `src/app/actions.ts`.
+checklist): the rules this step and step 3 set "until launch", by file.
+Left in place, every open v1 challenge could never be accepted, no new
+challenge could be debated, and a new reader who signed in after the
+quiz would have no school.
+- `src/app/actions.ts` (frozen), `submitQuizResultV2`: take up a v1
+  challenger's challenge too, and move a signed-in reader's school with
+  `retakeQuizSchool`, as v1 does.
+- `src/components/quiz/QuizResultClientV2.tsx`: report a moved school
+  (`schoolChanged`, the `school_changed` event), as v1's client does.
+- `src/lib/quiz-result.ts`, `schoolFromResult`: take a school from a v2
+  result.
+- `src/lib/claim.ts`, `claimAnonymousResults`: drop its
+  `quiz_version = 1` filter, so a v2 result gives a school on sign-in.
+- `src/app/me/page.tsx`: the welcome lookup behind `result_claimed`,
+  v1-only for the same reason.
+- `src/lib/challenge.ts`: `resolveChallengeSide` and
+  `getPendingChallenges` take v2 results.
+- `src/app/r/[id]/page.tsx`: "Debate them" between any two results.
+- The tests that pin these rules flip with them: in
+  `tests/quiz-result-versions.test.ts`, `tests/challenge-topic.test.ts`
+  and `tests/quiz-v2-submit.test.ts`, the cases named "v1 only", "until
+  launch" or "step 4".
 
 `tests/quiz-v2-submit.test.ts` drives the action on both builds against a
 fake database that applies 0027's shape check; `tests/quiz-result-versions.test.ts`
 gains the two leftovers, and its fake now applies `.or()` filters, without
-which the `/me` case could not fail; `tests/challenge-topic.test.ts` gains
-the refusal. `tests/quiz-v2-score.test.ts` compares the scorer with the
-simulator's exact counts (`node scripts/simulate-quiz-v2.mjs --json`):
-every school's primary count, every primary and secondary pair, and the
-ties.
+which the `/me` case could not fail; `tests/challenge-topic.test.ts` tests
+`resolveChallengeSide` directly, against a fake that returns only the
+columns a query selects. `tests/quiz-v2-score.test.ts` compares the
+scorer with the simulator's exact output (`node scripts/simulate-quiz-v2.mjs
+--json`): every school's primary count, every primary and secondary pair,
+the ties, and a hash of every pattern's result in order.
 

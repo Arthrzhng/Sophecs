@@ -392,7 +392,8 @@ reader who never retakes keeps their v1 school.
   v1 without being rewritten. That is a migration, and it is Arthur's yes
   before it is applied.
 - **v1 links keep working.** A v1 result shared before the switch still
-  opens on its triangle; a v2 result opens on the map.
+  opens as it always has, on its card; a v2 result opens with its point on
+  the map.
 - **Challenges across versions.** A friend answering a v1 challenge after
   the switch takes v2. The challenge page reads only the challenger's
   school, so it still works. But the result page (`src/app/r/[id]/page.tsx`)

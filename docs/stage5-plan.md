@@ -193,11 +193,12 @@ of the three; Gate 2 is about that.
    launch deploy, over the week in progress, a school is unranked until it
    has 20 judged original arguments in the week. Arthur ruled on 2026-11-06 that it applies at launch,
    with the flag, and not before. The rules steps 3 and 4 set "until
-   launch" are lifted in the launch merge: `submitQuizResultV2` takes up
-   v1 challengers and moves a signed-in reader's school, as v1 does;
-   `schoolFromResult` takes a school from a v2 result; "Debate them",
-   `assignChallengeTopic` and `/me` take v2 results (`docs/decisions.md`,
-   "Stage 5, step 4"). The first edits the frozen `src/app/actions.ts`.
+   launch" are lifted in the launch merge, in every file
+   `docs/decisions.md`, "Stage 5, step 4", lists under "To undo at
+   launch": v2 results take up v1 challengers, move a signed-in reader's
+   school, give a school on sign-in (`schoolFromResult` and the claim's
+   own filter), count on `/me` and in challenges, and can be debated.
+   `src/app/actions.ts` is among them, and is frozen.
    **Gate 4.**
 
 ## Gates for Arthur
@@ -278,9 +279,9 @@ of the three; Gate 2 is about that.
    - [ ] The share lines and other front matter (`docs/quiz-v2.md`,
      section 8), in the launch merge itself.
    - [ ] `README.md`.
-   - [ ] The "until launch" rules of steps 3 and 4 lifted (step 6): v2
-     results take up v1 challengers, move a signed-in reader's school,
-     give a school on sign-in, and can be debated.
+   - [ ] The "until launch" rules of steps 3 and 4 lifted (step 6), in
+     every file `docs/decisions.md`, "Stage 5, step 4", lists, with the
+     tests that pin them.
    - [ ] The fresh sample run.
 
 Steps 1 and 2 need no gate and start now.
