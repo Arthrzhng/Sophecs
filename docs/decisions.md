@@ -3936,15 +3936,18 @@ gives them:
 
 | Source | Page | Passage | Used in |
 | --- | --- | --- | --- |
-| Metz, "Toward an African Moral Theory", *The Journal of Political Philosophy* 15(3), 2007 | 322 | "a person is a person through other persons." | `content/schools/ubuntu.md`, the `one_line` and its attribution; an objection voice in `src/lib/judge/objection-voices.ts` |
-| Same article | 332 | "moral value fundamentally lies not in the individual, but rather in a relationship between individuals." | `content/modules/relational-data.md` |
+| Metz, "Toward an African Moral Theory", *The Journal of Political Philosophy* 15(3), 2007 | 322 | "a person is a person through other persons." | `content/schools/ubuntu.md`, the `one_line` and its attribution, and its third share line; the Ubuntu section of `content/prompts/fidelity-criteria.draft.md`, which the judge is to receive on flag-on builds under Gate 3; an objection voice in `src/lib/judge/objection-voices.ts`; unattributed, the opening of the golden case `ubuntu-strong` |
+| Same article | 332 | "moral value fundamentally lies not in the individual, but rather in a relationship between individuals." | `content/modules/relational-data.md`; `content/micro/crash-arithmetic-elsewhere.md`, its only source |
 | Mhlambi, "From Rationality to Relationality", Carr Center Discussion Paper 2020-009 | 3 | "Personhood is fundamentally relational." | `content/modules/relational-data.md` |
 | Same paper | 6 | "the notion that truths, and perhaps all truths, about an individual can be rationally computed destroys the core idea of privacy." | `content/modules/relational-data.md`; also cited by the golden case `util-obscure-source` |
 
-Until now these rested on the research file's own report that each was
-"directly visible" in the PDF it linked. They are now checked against the
-sources by a person, which settles the Ubuntu `one_line` that ruling (e)9
-of 2026-11-05 kept on Metz's authority (`docs/review-charter.md`, rule 5).
-Nothing in the content changes. Ticked in the Gate 4 checklist,
+Until now these rested on the research file's own report that the
+wording was visible in the PDF it linked (round 2: "I have reproduced
+only wording visible in the linked text"). They are now checked against
+the sources by a person. That confirms the premise of ruling (e)9 of
+2026-11-05, that Metz 2007, p. 322 gives the `one_line`'s English. The
+`one_line` and its attribution stay as `docs/review-charter.md`, rule 5,
+has them, and the Nguni maxim's English gloss keeps its UNVERIFIED
+translator and date: Metz calls it a maxim and does not say he translated
+it. Nothing in the content changes. Ticked in the Gate 4 checklist,
 `docs/stage5-plan.md`.
-
