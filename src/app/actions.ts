@@ -8,12 +8,13 @@ import { retakeQuizSchool } from "@/lib/claim";
 import { quizVersionOf, schoolFromResult } from "@/lib/quiz-result";
 import { quizV2, QUIZ_V2_ON } from "@/lib/quiz-v2";
 import { scoreQuizV2, type MapPoint, type QuizV2Option } from "@/lib/quiz-v2-score";
-import type { SchoolId, SchoolVector } from "@/lib/types";
+import { scoreQuiz } from "@/lib/scoring";
+import { QUIZ_QUESTIONS, type QuizOption } from "../../content/quiz/questions";
+import type { SchoolId } from "@/lib/types";
 
 export interface SubmitQuizResultInput {
-  primary: SchoolId;
-  secondary: SchoolId;
-  vector: SchoolVector;
+  // Only the answers: the server scores them itself (below), as
+  // submitQuizResultV2 does, and the page shows what it returns.
   answers: { q: number; opt: string }[];
   challengeId?: string | null;
   referrer?: string;
@@ -23,6 +24,9 @@ export type SubmitQuizResultOutput =
   | {
       ok: true;
       id: string;
+      /** The school the server scored from the answers, which the page shows. */
+      primary: SchoolId;
+      secondary: SchoolId;
       challengerSchool?: SchoolId;
       schoolChanged?: { from: SchoolId; to: SchoolId };
     }
@@ -46,6 +50,27 @@ export async function submitQuizResult(
   if (!anonId) {
     return { ok: false, error: "Missing anonymous identity." };
   }
+
+  // Scored here from the answers, never taken from the page (Arthur,
+  // 2026-11-06: "fix the v1 quiz hole by scoring v1 on the server"). Until
+  // then the school, secondary and vector the browser sent were stored as
+  // given, so anyone could write any school to a result, a share card and,
+  // signed in, their profile. Every one of the ten questions needs one of
+  // its own options, in order; the scorer is the page's own
+  // (src/lib/scoring.ts), so an honest page and the server always agree.
+  const given = Array.isArray(input?.answers) ? input.answers : [];
+  if (given.length !== QUIZ_QUESTIONS.length) return { ok: false, error: "Every question needs an answer." };
+  const chosen: QuizOption[] = [];
+  for (const [i, question] of QUIZ_QUESTIONS.entries()) {
+    const answer = given[i];
+    const option =
+      answer && answer.q === question.id ? question.options.find((o) => o.id === answer.opt) : undefined;
+    if (!option) return { ok: false, error: "Every question needs an answer." };
+    chosen.push(option);
+  }
+  const scored = scoreQuiz(chosen);
+  const primary: SchoolId = scored.primary;
+  const secondary: SchoolId = scored.secondary;
 
   const id = newId();
   const admin = createAdminClient();
@@ -100,10 +125,11 @@ export async function submitQuizResult(
     id,
     anon_id: anonId,
     user_id: user?.id ?? null,
-    school: input.primary,
-    secondary: input.secondary,
-    vector: input.vector,
-    answers: input.answers,
+    school: primary,
+    secondary,
+    vector: scored.vector,
+    // As validated, in question order: only the q and opt of each answer.
+    answers: chosen.map((option, i) => ({ q: QUIZ_QUESTIONS[i].id, opt: option.id })),
     challenge_from: challenge?.challengerResultId ?? null,
     referrer: input.referrer ?? null,
   });
@@ -114,7 +140,7 @@ export async function submitQuizResult(
 
   let schoolChanged: { from: SchoolId; to: SchoolId } | undefined;
   if (user) {
-    const result = await retakeQuizSchool(admin, user.id, input.primary);
+    const result = await retakeQuizSchool(admin, user.id, primary);
     if (result.changed && result.from) {
       schoolChanged = { from: result.from, to: result.to };
     }
@@ -139,7 +165,7 @@ export async function submitQuizResult(
     if (accepted?.length) challengerSchool = challenge.challengerSchool;
   }
 
-  return { ok: true, id, challengerSchool, schoolChanged };
+  return { ok: true, id, primary, secondary, challengerSchool, schoolChanged };
 }
 
 export interface SubmitQuizResultV2Input {

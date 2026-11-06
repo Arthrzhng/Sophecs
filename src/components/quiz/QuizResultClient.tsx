@@ -62,9 +62,6 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
     setPending(parsed);
 
     submitQuizResult({
-      primary: parsed.primary,
-      secondary: parsed.secondary,
-      vector: parsed.vector,
       answers: parsed.answers,
       challengeId: parsed.challengeId,
       referrer: parsed.referrer,
@@ -73,11 +70,18 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
         setFailed(true);
         return;
       }
+      // The server scores the answers itself and stores what it scored, so
+      // the card shows that, as the v2 page does. It differs from the
+      // page's own scoring only if the page was tampered with.
+      const { primary, secondary } = result;
+      if (primary !== parsed.primary || secondary !== parsed.secondary) {
+        setPending({ ...parsed, primary, secondary });
+      }
       track({
         name: "quiz_completed",
         props: {
-          school: parsed.primary,
-          secondary: parsed.secondary,
+          school: primary,
+          secondary,
           duration_ms: parsed.durationMs,
           result_id: result.id,
         },
@@ -88,7 +92,7 @@ export function QuizResultClient({ schools }: { schools: Record<SchoolId, School
           props: {
             challenge_id: parsed.challengeId,
             challenger_school: result.challengerSchool,
-            challengee_school: parsed.primary,
+            challengee_school: primary,
           },
         });
       }

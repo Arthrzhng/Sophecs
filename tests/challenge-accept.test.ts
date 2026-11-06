@@ -4,6 +4,8 @@
 // foreign key as Postgres does, so writing a challenge's own id there
 // fails the insert, as it did in production before 2026-11-04.
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { QUIZ_QUESTIONS } from "../content/quiz/questions";
+import { scoreQuiz } from "../src/lib/scoring";
 
 type Row = Record<string, unknown>;
 const tables: Record<string, Row[]> = {};
@@ -54,11 +56,12 @@ vi.mock("next/headers", () => ({
 
 const { submitQuizResult } = await import("../src/app/actions");
 
+// A full set of answers: the server scores them itself (2026-11-06).
 const answers = {
-  primary: "stoicism" as const,
-  secondary: "virtue-ethics" as const,
-  vector: { stoicism: 0.6, utilitarianism: 0.1, "virtue-ethics": 0.3 } as never,
-  answers: [{ q: 1, opt: "a" }],
+  answers: QUIZ_QUESTIONS.map((q) => ({
+    q: q.id,
+    opt: [...q.options].sort((a, b) => b.vector.stoicism - a.vector.stoicism)[0].id,
+  })),
 };
 
 beforeEach(() => {
@@ -117,7 +120,10 @@ describe("submitQuizResult from a challenge link", () => {
     expect(sent).not.toHaveProperty("quiz_version");
     const row = tables.quiz_results.find((r) => r.id === res.id)!;
     expect(row.quiz_version).toBe(1);
-    expect(row.vector).toEqual(answers.vector);
+    // The vector the server scored from the answers (2026-11-06).
+    expect(row.vector).toEqual(
+      scoreQuiz(answers.answers.map((a, i) => QUIZ_QUESTIONS[i].options.find((o) => o.id === a.opt)!)).vector
+    );
   });
 
   it("treats a v2 challenger's challenge as no challenge, and never reads its school", async () => {
