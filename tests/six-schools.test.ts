@@ -34,7 +34,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 const NEW_THREE = ["confucian", "ubuntu", "buddhist"] as const;
 const LIVE_THREE = ["stoicism", "utilitarianism", "virtue-ethics"] as const;
 
-async function load(flag: string) {
+async function load(flag: string | undefined) {
   vi.resetModules();
   vi.stubEnv("SIX_SCHOOLS", flag);
   return {
@@ -211,8 +211,11 @@ const verdictNaming = (school: string) => ({
 
 describe("the judge on a build without SIX_SCHOOLS", () => {
   // Gate 3 changes nothing here: production is this build.
-  it("judges with v2, the published three only, and refuses a reply naming one of the three", async () => {
-    const { registry, rubric, schema, anthropic } = await load("0");
+  // "" and unset as well as "0": next.config.ts always writes "0" or "1",
+  // but a golden run without the flag leaves it unset, and must judge as
+  // production does.
+  it.each([["0"], [""], [undefined]])("judges with v2, the published three only, and refuses a reply naming one of the three (SIX_SCHOOLS=%j)", async (flag) => {
+    const { registry, rubric, schema, anthropic } = await load(flag);
     expect(schema.PROMPT_VERSION).toBe("v2");
     expect(anthropic.PROMPT_VERSION).toBe("v2");
     expect(rubric.judgeableSchools()).toEqual([...LIVE_THREE]);

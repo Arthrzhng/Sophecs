@@ -18,7 +18,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  * exception made for the eval is only worth having while it stays inside
  * the eval, and the flag-on one only while it stays behind the flag. This
  * runs as a build without the flag (vitest.config.mts sets SIX_SCHOOLS=0);
- * tests/judge-six-schools.test.ts is the flag-on side.
+ * tests/six-schools.test.ts and the flag-on case in
+ * tests/draft-criteria-reads.test.ts are the flag-on side.
  */
 
 // ---- the route, driven for real, with its boundaries stubbed ------------

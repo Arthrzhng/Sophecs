@@ -194,6 +194,18 @@ describe("a SIX_SCHOOLS build's reads from disk", () => {
       // with no topic: the three are judgeable on this build.
       expect(res.status).toBe(404);
       expect(reads.slice(before).filter((p) => p.includes(DRAFT_FILE))).toEqual([]);
+
+      // And judging one: the request is built, criteria and all, before
+      // the SDK stub throws. A read added there, once per call, would
+      // show here.
+      const { callJudgeModel } = await import("../src/lib/anthropic");
+      const beforeJudging = reads.length;
+      for (const school of ["confucian", "ubuntu", "buddhist"] as const) {
+        await expect(callJudgeModel("A motion.", school, "An argument.")).rejects.toThrow(
+          "the model must not be called in this test"
+        );
+      }
+      expect(reads.slice(beforeJudging).filter((p) => p.includes(DRAFT_FILE))).toEqual([]);
     } finally {
       vi.unstubAllEnvs();
       vi.resetModules();

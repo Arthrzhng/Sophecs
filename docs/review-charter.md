@@ -67,13 +67,17 @@ So: when a suite's numbers move, find out why before reading the result.
 `src/lib/anthropic.ts` sends for each live school, as an original and as a
 revision. **Judging is live and no production verdict may change**, so a
 diff in any of those six is a change to how a real student's argument would
-be scored.
+be scored. Its `six-schools/` folder holds twelve more, what a SIX_SCHOOLS
+build sends for all six schools (Gate 3); a diff there changes what the
+judge receives on flag-on builds, and so at launch, which is (b) too.
 
 The check is
 
     git diff --stat origin/main...HEAD -- tests/judge-request/
 
-and the expected result is no output. **Write the revision range.** A bare
+and the expected result is no output, or, where Arthur approved a change
+to what a flag-on build sends, only the files under `six-schools/` that
+the approval covers. **Write the revision range.** A bare
 `git diff --stat tests/judge-request/` compares the working tree to the
 index, so in a clean checkout it is empty whatever the branch did; it was
 reported as evidence that the fixtures had not moved, and it was evidence of
@@ -85,11 +89,14 @@ actually fails.
 A fixture may only move where Arthur approved that specific change, and
 then the approval is quoted in the pull request body.
 
-**The fixtures are narrower than the rule.** They cover the v2 path for the
-three live schools and nothing else, so a change to `judge.v3.md`, to a
-draft school's criteria, to `src/lib/judge/rubric.ts` or to
-`content/prompts/fidelity-criteria.draft.md` moves no fixture and passes
-this rule while still changing what the judge receives. Anything that
+**The fixtures are narrower than the rule.** The six cover the v2 path for
+the three live schools; the twelve under `six-schools/` cover v3 on a
+flag-on build, so a change to `judge.v3.md`, to `src/lib/judge/rubric.ts`
+or to `content/prompts/fidelity-criteria.draft.md` now moves those. Nothing
+covers v3 on a build without the flag, which only a golden run sends, or
+the golden runner's own path for a draft school without the flag, so a
+change there moves no fixture and passes this rule while still changing
+what the judge receives. Anything that
 changes the system prompt, the fidelity criteria, the motion, the stance or
 the argument is Arthur's decision **even when no fixture moves**,
 non-default prompt versions and draft-school criteria included.

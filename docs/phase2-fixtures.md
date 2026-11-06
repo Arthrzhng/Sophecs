@@ -484,9 +484,11 @@ file says so. `callJudgeModel` does not hand back the request it built, and
 rebuilding it to hash it would be a second copy of the assembly, which is
 what `tests/judge-request.test.ts` exists to avoid. It covers the prompt
 version, a hash of the prompt file, a hash of the school's criteria, and
-the motion, school and argument. The assembly is a pure function of those
-and is pinned byte for byte by the committed fixtures, so two runs with the
-same fingerprint sent the same thing.
+the motion, school and argument; and, on a SIX_SCHOOLS run only (Gate 3),
+the flag, which sets the rival list a v3 prompt is filled with, so a run
+without it is fingerprinted exactly as before. The assembly is a pure
+function of those and is pinned byte for byte by the committed fixtures,
+so two runs with the same fingerprint sent the same thing.
 
 `GOLDEN_LOG=ai_calls` restores the old behaviour for anyone who wants an
 eval in the production ledger. Production itself is untouched:

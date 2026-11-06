@@ -96,9 +96,14 @@ export function sha256(text: string): string {
  *
  * What it covers instead is every input the assembly is a function of: the
  * prompt version, the prompt file itself, the school's fidelity criteria,
- * and the motion, school and argument. The assembly is pure and is pinned
- * byte for byte by the committed fixtures, so equal inputs mean an equal
- * request. Two runs with the same fingerprint sent the same thing.
+ * the motion, school and argument, and, since Gate 3, whether the build
+ * is a SIX_SCHOOLS one, which sets the rival list a v3 prompt is filled
+ * with. The assembly is pure and is pinned byte for byte by the committed
+ * fixtures, so equal inputs mean an equal request. Two runs with the same
+ * fingerprint sent the same thing.
+ *
+ * The flag is added only when it is on, so every fingerprint a run without
+ * it has written, before Gate 3 or since, is computed exactly as before.
  */
 export function requestFingerprint(input: {
   promptVersion: string;
@@ -108,6 +113,7 @@ export function requestFingerprint(input: {
   school: string;
   argument: string;
   revisionOf?: { originalArgument: string; objectionClaim: string } | null;
+  sixSchools?: boolean;
 }): string {
   return sha(
     JSON.stringify([
@@ -118,6 +124,7 @@ export function requestFingerprint(input: {
       input.school,
       input.argument,
       input.revisionOf ?? null,
+      ...(input.sixSchools ? [{ six_schools: true }] : []),
     ])
   );
 }

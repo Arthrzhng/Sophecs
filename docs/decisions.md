@@ -4511,9 +4511,14 @@ the full v3 run, as his ruling of 2026-11-06 ordered.
   `content/prompts/fidelity-criteria.draft.md` once, as the module loads,
   and only when `SIX_SCHOOLS` is `"1"`; otherwise its map is empty and
   nothing is read. `fidelityCriteriaFor` gives each of the three its
-  section, verbatim, then the same voice paragraph a published school
-  gets: exactly the text every golden run has judged them against. Under
-  v1 or v2 it throws for them.
+  section, verbatim, the text every golden run has judged them against,
+  then the voice paragraph a published school gets. That paragraph names
+  only the voices whose school is among the rivals listed, so with six
+  listed Confucianism's also names its Ubuntu voice and Buddhist Ethics'
+  its Confucian one, which earlier runs, listing three rivals, did not
+  send; Ubuntu's is as before. (Corrected on review: this first said the
+  whole text was exactly what earlier runs sent.) Under v1 or v2 it
+  throws for them.
 - **A published school's criteria are unchanged.** Its voice paragraph
   names only the voices whose school is among the rivals listed, so on a
   flag-on build Stoicism's and Utilitarianism's also name their Ubuntu
@@ -4534,13 +4539,38 @@ closed, so no preview judges anything either.
 **Pinned.** Every request a flag-on build can send, for all six schools,
 original and revision, is a committed fixture in
 `tests/judge-request/six-schools/` (`tests/six-schools.test.ts`), so a
-change to what the judge receives on that build moves a fixture.
+change to what the judge receives on that build moves a fixture. The
+draft file is read once, at load: a test judges one of the three on a
+flag-on build and records no further read.
 
 **The golden runner.** With SIX_SCHOOLS=1 it judges the three through
 the build's own path (no draft override), after checking that path sends
 exactly the draft file's text; both read the file with the same parser,
-`parseDraftCriteria`. The new-schools run is that run.
+`parseDraftCriteria`. The new-schools run is that run. The flag sets the
+rival list, so it is now part of a record's request fingerprint, added
+only when on: every fingerprint of a run without it is computed as
+before (all 77 of the 16:58 full run still reproduce), and none of a
+flag-on run's can match one. The runner prints which build's requests
+it sends, and refuses a SIX_SCHOOLS value other than "1", "0" or none,
+since the modules treat anything but "1" as off and an operator meaning
+a flag-on run would otherwise pay for a flag-off one.
 
-**For Gate 4.** That a flag-on build, and so production at launch,
-judges with v3; and v3's head comment, which says it "is not the
-production default".
+**For Gate 4.** Each is Arthur's; none is decided by being written here.
+- That a flag-on build, and so production at launch, judges with v3.
+- What v3 at launch does to verdicts already stored under v2. A revision
+  of a v2 original would be judged under v3, and `/api/judge` computes
+  the revision's `scoreDelta` and `fidelityDelta` against the original's
+  scores, which the verdict page shows, so the delta would cross two
+  prompt versions; Elo and a topic's par would take v3 scores beside v2
+  ones. The 3 Nov comparison found v3 scoring the strong cases 3 to 13
+  higher, and this file's rule is that scores across versions are not
+  compared as equivalent ("2F: the 3 Nov v3 re-run").
+- `/debate/rubric` says "These are the criteria the judge is given for
+  each school, in full — the same text". On a flag-on build it still
+  shows rubric.ts's v2 text for the published three only, while the
+  judge gets v3's text for six. At launch that would be untrue in
+  production: copy and publishing, (e) and (c).
+- Statements in frozen files that this makes untrue, and are his to
+  change: v3's head comment says it "is not the production default";
+  the draft criteria file says "One thing reads this file: the golden
+  runner".

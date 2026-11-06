@@ -219,6 +219,28 @@ describe("requestFingerprint", () => {
     ).not.toBe(requestFingerprint(base));
   });
 
+  it("tells a SIX_SCHOOLS request from production's, and leaves production's as it was", () => {
+    // Gate 3: the flag sets the rival list a v3 prompt is filled with, so
+    // two runs that differ only in it sent different requests.
+    expect(requestFingerprint({ ...base, sixSchools: true })).not.toBe(requestFingerprint(base));
+    // Without the flag the fingerprint is computed exactly as before Gate 3,
+    // so every committed run file's fingerprints still reproduce.
+    expect(requestFingerprint({ ...base, sixSchools: false })).toBe(requestFingerprint(base));
+    expect(requestFingerprint(base)).toBe(
+      sha256(
+        JSON.stringify([
+          base.promptVersion,
+          sha256(base.promptText),
+          sha256(base.criteria),
+          base.motion,
+          base.school,
+          base.argument,
+          null,
+        ])
+      )
+    );
+  });
+
   it("hashes the prompt rather than storing it", () => {
     // The fingerprint must not leak the prompt text into every record.
     expect(requestFingerprint(base)).not.toContain("RUBRIC");

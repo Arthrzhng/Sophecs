@@ -43,10 +43,12 @@ literals in `card-tokens.ts`, behind the same constant.
 **Shown, not published.** With the flag the three are shown on that
 build: a list of their own beside `PUBLISHED_SCHOOLS`, which every public
 surface moves to in step 2. `PUBLISHED_SCHOOLS` stays the original three
-until launch because the judge reads it: the rival schools in its prompt
-(`anthropic.ts`) and the schools its reply may name (`judge/schema.ts`,
-`judge/rubric.ts`), all frozen under (b). So a flag-on build changes
-nothing the judge receives until Gate 3 says otherwise. `DRAFT_SCHOOLS`
+until launch. The judge read it until Gate 3: the rival schools in its
+prompt (`anthropic.ts`) and the schools its reply may name
+(`judge/schema.ts`, `judge/rubric.ts`), all frozen under (b). Since Gate
+3 it reads the shown list instead, so a flag-on build judges six and a
+build without the flag is unchanged (`docs/decisions.md`, "Gate 3: the
+three judged on SIX_SCHOOLS builds"). `DRAFT_SCHOOLS`
 (server-only) does not depend on the flag either, and carries the
 proposed adherent nouns as well as the ids and names, so `check:bundle`
 always has the three's strings to look for: those, and every colour in
@@ -291,6 +293,12 @@ of the three; Gate 2 is about that.
    - [ ] The fresh sample run.
    - [ ] The v2 copy below, read and ruled by Arthur in the Gate 4 pack
      (asked for on 2026-11-06).
+   - [ ] The judge at launch, ruled by Arthur (`docs/decisions.md`,
+     "Gate 3: the three judged on SIX_SCHOOLS builds", For Gate 4):
+     production judging with v3; what that does to verdicts stored under
+     v2 (a revision's score delta, Elo and par across two versions);
+     `/debate/rubric`'s claim to show the judge's criteria in full; and
+     the frozen files' statements it makes untrue.
 
    **The v2 copy, for the Gate 4 pack.** Every piece of text a reader
    sees only because quiz v2 and the six schools are on, as a flag-on

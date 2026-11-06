@@ -127,6 +127,23 @@ function parseDryRun(value: string | undefined): boolean {
 
 const DRY_RUN = parseDryRun(process.env.GOLDEN_DRY_RUN);
 
+// Which build's requests the run sends (Gate 3): with SIX_SCHOOLS=1, a
+// flag-on build's, six rivals and the three new schools judged through the
+// build's own criteria; otherwise production's. The modules read the flag
+// as next.config.ts writes it, "1" or not, so a value that only looks like
+// yes (SIX_SCHOOLS=true) would quietly run flag-off and bill for it. A
+// value other than "1", "0" or none refuses to start instead.
+function parseSixSchools(value: string | undefined): boolean {
+  if (value === undefined || value === "" || value === "0") return false;
+  if (value === "1") return true;
+  throw new Error(`SIX_SCHOOLS="${value}" is neither "1" nor "0"; refusing to guess which build's requests to send`);
+}
+
+const SIX_SCHOOLS_RUN = parseSixSchools(process.env.SIX_SCHOOLS);
+const BUILD = SIX_SCHOOLS_RUN
+  ? "SIX_SCHOOLS on: a flag-on build's requests (six rivals; the three new schools through the build's own criteria)"
+  : "SIX_SCHOOLS off: production's requests";
+
 interface GoldenCase {
   name: string;
   motion: string;
@@ -273,6 +290,7 @@ function caseContext(c: GoldenCase, plan: RunnablePlan): RecordContext {
       motion: c.motion,
       school: c.school,
       argument: c.argument,
+      sixSchools: SIX_SCHOOLS_RUN,
     }),
     model: MODEL,
   };
@@ -446,7 +464,7 @@ function planSummary(cases: GoldenCase[], plans: Map<string, CasePlan>): string 
 }
 
 function printPlan(cases: GoldenCase[], plans: Map<string, CasePlan>): void {
-  console.log(`\nPrompt ${VERSION}, ${SAMPLES} sample(s) per case. ${planSummary(cases, plans)}\n`);
+  console.log(`\nPrompt ${VERSION}, ${SAMPLES} sample(s) per case. ${BUILD}. ${planSummary(cases, plans)}\n`);
 }
 
 function dryRun(cases: GoldenCase[], plans: Map<string, CasePlan>): void {
@@ -459,7 +477,7 @@ function dryRun(cases: GoldenCase[], plans: Map<string, CasePlan>): void {
       runs: plan.run ? "yes" : `no: ${plan.reason}`,
     };
   });
-  console.log(`\nDry run, prompt ${VERSION}, ${SAMPLES} sample(s) per case. Nothing was sent.\n`);
+  console.log(`\nDry run, prompt ${VERSION}, ${SAMPLES} sample(s) per case. ${BUILD}. Nothing was sent.\n`);
   console.table(rows);
   console.log(`\n${planSummary(cases, plans)}`);
 }
