@@ -47,6 +47,14 @@ function links(html: string): [string, string, string][] {
     (/(?:^|\s)class="([^"]*)"/.exec(m[1])?.[1] ?? "").replace(/&amp;/g, "&"),
   ]);
 }
+// A source file without its comments, which name the old addresses freely.
+function code(file: string): string {
+  return fs
+    .readFileSync(file, "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/(^|[^:"'`])\/\/[^\n]*/g, "$1")
+    .replace(/\{\s*\}/g, "");
+}
 const SIGNED_IN_ONLY = "[html[data-auth=in]_&]:";
 const shownSignedOut = (cls: string) => !/(^|\s)hidden(\s|$)/.test(cls);
 const shownSignedIn = (cls: string) =>
@@ -156,7 +164,7 @@ describe("a build without SIX_SCHOOLS", () => {
         const f = path.join(dir, e.name);
         if (e.isDirectory()) walk(f);
         else if (/\.tsx?$/.test(e.name)) {
-          const n = (fs.readFileSync(f, "utf8").match(/["'](?:\/debate\/rubric|\/method|\/table)["'#]/g) ?? []).length;
+          const n = (code(f).match(/["'`](?:\/debate\/rubric|\/method|\/table)["'`#]/g) ?? []).length;
           if (n) found[path.relative(process.cwd(), f)] = n;
         }
       }
@@ -168,6 +176,58 @@ describe("a build without SIX_SCHOOLS", () => {
       "src/components/nav/SiteFooter.tsx": 2,
       "src/app/method/page.tsx": 1,
     });
+  });
+
+  // Each link that leads to the method, the rubric or the table takes its
+  // address whole from src/lib/nav-routes.ts, the one it was written for:
+  // the right constant, nothing added to it, no local stand-in.
+  it("takes each moved page's address from nav-routes, the right one for each link", () => {
+    const NAMES = "METHOD_HREF|RUBRIC_HREF|SAMPLES_HREF|COUNTERPART_RULES_HREF|TABLE_HREF";
+    const found: Record<string, string[]> = {};
+    const walk = (dir: string) => {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const f = path.join(dir, e.name);
+        if (e.isDirectory()) walk(f);
+        else if (/\.tsx?$/.test(e.name) && !f.endsWith(path.join("lib", "nav-routes.ts"))) {
+          const src = code(f);
+          expect(src, f).not.toMatch(new RegExp(`(?:const|let|var|function)\\s+(?:${NAMES})\\b`));
+          const uses = [...src.matchAll(new RegExp(`(?:${NAMES})`, "g"))].length;
+          const hrefs = [...src.matchAll(/href=\{([^}]*)\}/g)].map((m) => m[1]).filter((x) => new RegExp(NAMES).test(x));
+          const imports = [...src.matchAll(new RegExp(`import \\{[^}]*\\} from "@/lib/nav-routes"`, "g"))].join("");
+          if (hrefs.length || uses) found[path.relative(process.cwd(), f)] = [...hrefs, `uses ${uses - (imports.match(new RegExp(NAMES, "g"))?.length ?? 0)}`];
+        }
+      }
+    };
+    walk(path.join(process.cwd(), "src"));
+    expect(found).toEqual({
+      "src/app/styleguide/page.tsx": ["RUBRIC_HREF", "uses 1"],
+      "src/components/counterpart/ExchangeView.tsx": ["COUNTERPART_RULES_HREF", "uses 1"],
+      "src/components/daily-path/AxisPanel.tsx": ["RUBRIC_HREF", "uses 1"],
+      "src/components/debate/JudgingPausedNotice.tsx": ["METHOD_HREF", "uses 1"],
+      "src/components/debate/Verdict.tsx": ["RUBRIC_HREF", "TABLE_HREF", "RUBRIC_HREF", "uses 3"],
+      "src/components/nav/SiteFooter.tsx": ["RUBRIC_HREF", "uses 1"],
+      "src/components/table/SchoolTable.tsx": ["SAMPLES_HREF", "uses 1"],
+      "src/components/today/TodayCards.tsx": ["SAMPLES_HREF", "TABLE_HREF", "uses 2"],
+      "src/components/today/TodayClient.tsx": ["METHOD_HREF", "uses 1"],
+    });
+  });
+
+  it("counts a view of /debate/rubric as it did, and none of /how-it-works", async () => {
+    const marked = async (flag: string, page: string) => {
+      vi.resetModules();
+      vi.stubEnv("SIX_SCHOOLS", flag);
+      vi.doMock("@/components/debate/RubricViewTracker", () => ({
+        RubricViewTracker: () => createElement("i", { "data-tracker": "rubric_viewed" }),
+      }));
+      try {
+        const mod = await import(page);
+        return renderToStaticMarkup(createElement(mod.default)).includes('data-tracker="rubric_viewed"');
+      } finally {
+        vi.doUnmock("@/components/debate/RubricViewTracker");
+      }
+    };
+    expect(await marked("0", "../src/app/debate/rubric/page")).toBe(true);
+    expect(await marked("1", "../src/app/how-it-works/page")).toBe(false);
   });
 
   it("links where it always has, and lists the old pages in the sitemap", async () => {
@@ -322,6 +382,20 @@ describe("a build with SIX_SCHOOLS=1", () => {
     expect(urls).not.toContain("https://sophecs.com/debate/rubric");
   });
 
+  // Effects and handlers do not run in a static render; these were checked
+  // in a browser, and are pinned here so that they cannot quietly go.
+  it("re-reads the session mark on each page change, and opens one menu at a time", () => {
+    const src = code(path.join(process.cwd(), "src", "components", "nav", "SiteHeaderSix.tsx"));
+    expect(src).toMatch(
+      /useEffect\(\(\) => \{\s*menu\.current\?\.removeAttribute\("open"\);\s*me\.current\?\.removeAttribute\("open"\);\s*syncAuthHint\(\);\s*\}, \[pathname\]\);/
+    );
+    expect(src).toContain('<details ref={menu} onToggle={() => closeOther(menu, me)}');
+    expect(src).toContain('<details ref={me} onToggle={() => closeOther(me, menu)}');
+    expect(src).toContain("onClick={(e) => closeOnLink(e, menu)}");
+    expect(src).toContain("onClick={(e) => closeOnLink(e, me)}");
+    expect(src).toMatch(/await createClient\(\)\.auth\.signOut\(\);\s*document\.documentElement\.removeAttribute\("data-auth"\);/);
+  });
+
   it("shows Take the quiz only signed out, and the Me menu only signed in", async () => {
     const { header } = await load("1");
     const html = renderToStaticMarkup(createElement(header.SiteHeader)).replace(/&amp;/g, "&");
@@ -345,11 +419,21 @@ describe("a build with SIX_SCHOOLS=1", () => {
     const levels = [...html.matchAll(/<h([1-6])[^>]*>(.*?)<\/h\1>/g)].map(
       (m) => `h${m[1]} ${m[2].replace(/<[^>]*>/g, "")}`
     );
-    const at = (title: string) => levels.findIndex((h) => h.slice(3) === title);
-    for (const title of ["How the judge works", "How this was judged", "Counterpart rules", "Sample accounts"])
-      expect(levels[at(title)]).toBe(`h2 ${title}`);
-    expect(levels[at("Known limitations")]).toBe("h3 Known limitations");
-    expect(levels[at("What counts as faithful")]).toBe("h3 What counts as faithful");
+    expect(levels).toEqual([
+      "h1 How it works",
+      "h2 How the judge works",
+      "h3 Known limitations",
+      "h2 How this was judged",
+      "h3 Fidelity",
+      "h3 Rigor",
+      "h3 Engagement",
+      "h3 What counts as faithful",
+      "h4 Stoicism",
+      "h4 Utilitarianism",
+      "h4 Virtue Ethics",
+      "h2 Counterpart rules",
+      "h2 Sample accounts",
+    ]);
     // The contents line links each section, by the id each has.
     const contents = /<nav aria-label="On this page"[^>]*>(.*?)<\/nav>/.exec(html)![1];
     const targets = [...contents.matchAll(/href="#([^"]+)"/g)].map((m) => m[1]);
@@ -393,6 +477,8 @@ describe("a build with SIX_SCHOOLS=1", () => {
       expect.stringContaining("self-start"),
     ]);
     expect(html).toContain('aria-label="Exemplars: The opaque benefit"');
+    // Under the card, not beside it: each item stacks its two links.
+    expect(html.match(/<li class="flex flex-col">/g)).toHaveLength(2);
     // Never nested: no <a> opens before the card's link closes.
     for (const li of html.split("<li").slice(1)) {
       const first = li.indexOf("</a>");

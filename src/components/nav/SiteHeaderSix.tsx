@@ -100,7 +100,7 @@ function BarLink({
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`${visibility} min-h-11 items-center rounded-chunky border-2 px-3 text-sm font-semibold ${
+      className={`${visibility} min-h-11 items-center whitespace-nowrap rounded-chunky border-2 px-2 text-sm font-semibold md:px-3 ${
         active ? "border-rule-strong bg-surface text-ink" : "border-transparent text-ink-mid hover:text-ink"
       }`}
     >
@@ -132,6 +132,14 @@ export function SiteHeaderSix() {
     if ((e.target as HTMLElement).closest("a")) menuRef.current?.removeAttribute("open");
   }
 
+  // One menu open at a time: below sm, signed in, Me would open over Menu.
+  function closeOther(
+    opened: React.RefObject<HTMLDetailsElement | null>,
+    other: React.RefObject<HTMLDetailsElement | null>
+  ) {
+    if (opened.current?.open) other.current?.removeAttribute("open");
+  }
+
   async function signOut() {
     // Loaded on the click, not with the header: the Supabase client is
     // ~90 KB that no page should carry for a button most visits never
@@ -146,7 +154,12 @@ export function SiteHeaderSix() {
 
   return (
     <header className="border-b-2 border-rule" data-print="hide">
-      <div className="mx-auto flex min-h-16 max-w-ui items-center gap-5 px-6 py-2">
+      {/* Narrower gaps below sm, so "Take the quiz" stays on one line from
+          the design's 360-pixel phone width up (below it, it wraps rather
+          than push the page sideways); narrower links and gaps from sm to
+          md, so
+          "How it works" stays on one line at 640. */}
+      <div className="mx-auto flex min-h-16 max-w-ui items-center gap-3 px-6 py-2 sm:gap-4 md:gap-5">
         <Link href="/" className={`inline-flex ${WORDMARK} ${OUT_INLINE}`}>
           Sophecs
         </Link>
@@ -156,7 +169,7 @@ export function SiteHeaderSix() {
 
         {/* Below sm the four links collapse into one disclosure, as they
             did before; the button at the right stays beside it. */}
-        <details ref={menu} className="relative sm:hidden">
+        <details ref={menu} onToggle={() => closeOther(menu, me)} className="relative sm:hidden">
           <summary className="flex min-h-11 cursor-pointer list-none items-center rounded-chunky px-2 text-sm font-semibold text-ink-mid marker:hidden hover:text-ink [&::-webkit-details-marker]:hidden">
             Menu
           </summary>
@@ -191,13 +204,13 @@ export function SiteHeaderSix() {
         <div className="ml-auto">
           <Link
             href="/quiz"
-            className={`chunky inline-flex min-h-11 items-center rounded-chunky bg-ink px-4 text-sm font-extrabold tracking-wide uppercase text-paper ${OUT_INLINE}`}
+            className={`chunky inline-flex min-h-11 items-center rounded-chunky bg-ink px-3 min-[360px]:whitespace-nowrap text-sm font-extrabold tracking-wide uppercase text-paper sm:px-4 ${OUT_INLINE}`}
             style={shade("var(--color-rule-strong)")}
           >
             Take the quiz
           </Link>
 
-          <details ref={me} className={`relative ${IN_BLOCK}`}>
+          <details ref={me} onToggle={() => closeOther(me, menu)} className={`relative ${IN_BLOCK}`}>
             <summary
               className="chunky flex min-h-11 cursor-pointer list-none items-center rounded-chunky border-2 border-rule-strong bg-surface px-4 text-sm font-extrabold tracking-wide uppercase text-ink marker:hidden [&::-webkit-details-marker]:hidden"
               style={shade("var(--color-rule-strong)")}

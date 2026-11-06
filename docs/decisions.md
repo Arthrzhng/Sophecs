@@ -4715,6 +4715,11 @@ Choices made where the instruction left room, each his to change:
 - **"Debate" to "Motions"** in the header, the footer and the two debate
   pages' titles; the footer's About column and its disclosure link point
   at the merged page on a flag-on build.
+- **Widths.** The header keeps to one line from 360 pixels, the
+  design's phone width (`design/layout.md`), up, with nothing pushed
+  sideways; below 360 the quiz button wraps. Between 640 and 768 the
+  bar's links and gaps are a little narrower, so "How it works" stays on
+  one line. Only one of Menu and Me is open at a time.
 - **Links go to the new addresses directly.** On a flag-on build every
   link inside the site that led to `/method`, `/debate/rubric` or
   `/table` leads to `/how-it-works`, its anchors, or `/schools`
@@ -4727,14 +4732,25 @@ Choices made where the instruction left room, each his to change:
   `-code-verifier` cookie a half-finished sign-in leaves, so a reader who
   abandoned a sign-in is not shown the signed-in header.
 - **The flag-off bundle.** The flag-off build's markup is pinned by
-  fixtures taken from main (`tests/nav-six-flag-off/`).
-  Its JavaScript is not byte for byte main's. The root layout's script,
-  which every page loads, grows by 1,743 bytes (563 compressed): the
-  header picks its version at build time, but what the six-school
-  header imports still comes along unused, namely the published three's
-  names and colours and the session-cookie test. No draft school is
-  among it (`check:bundle` passes). The stylesheet grows too, by
-  387 bytes (62 compressed), seven rules for classes no flag-off page
-  uses, since Tailwind writes a rule for every class it finds in the
-  source, whichever build uses it. Measured on flag-off builds of
-  main at 901e3a4 and of this branch.
+  fixtures taken from main (`tests/nav-six-flag-off/`). What it sends is
+  not byte for byte main's:
+  - The root layout's script, which every page loads, grows by 1,743
+    bytes (about 560 compressed): the header picks its version at build
+    time, but what the six-school header imports still comes along
+    unused, namely the published three's names and colours and the
+    session-cookie test.
+  - Four page scripts grow by 84 to 117 bytes each (`/today`, a debate,
+    the chunk the debate and revise pages share, `/styleguide/arena`),
+    where `src/lib/nav-routes.ts` is a module of its own.
+  - Each page's HTML is 41 to 65 bytes longer, in the inline data React
+    reads (the layout's unused flag and head, the footer's fragment); the
+    markup itself is the same.
+  - `_buildManifest.js` lists the two rewrites, so the addresses
+    `/schools` and `/how-it-works` are in a public file no page loads.
+  - The stylesheet grows by 684 bytes (103 compressed): rules for
+    classes no flag-off page uses, since Tailwind writes a rule for
+    every class it finds in the source, whichever build uses it.
+
+  No draft school is among any of it (`check:bundle` passes). Measured
+  on flag-off builds of main at 901e3a4 and of this branch; the page
+  scripts and the HTML by the third review.

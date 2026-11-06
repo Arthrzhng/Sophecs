@@ -577,14 +577,15 @@ quiz`, or `Me` and its menu) stay beside it.
 ### How it works (`/how-it-works`)
 
 The judge's method page (`/method`) and the rubric (`/debate/rubric`)
-merged, their text unchanged. New: the page title, the heading and the
-contents line.
+merged, their text unchanged. New: the description and the contents
+line. The title and the heading are his page name, the title in the
+site's pattern, as for `/schools`.
 
 | Element | Copy |
 |---|---|
-| Page title (new) | `How it works · Sophecs` |
+| Page title | `How it works · Sophecs` |
 | Description (new) | `What the judge scores, the criteria it is given, and what a score does and does not mean.` |
-| Heading (new) | `How it works` |
+| Heading | `How it works` |
 | Contents (new), linking to each section; read aloud as `On this page` (new) | `How the judge works` · `How this was judged` · `Counterpart rules` · `Sample accounts` |
 | Sections, with their anchors | `How the judge works` (`#judge`), with `Known limitations`; `How this was judged` (`#rubric`), with its three axes and `What counts as faithful`; `Counterpart rules` (`#counterpart`); `Sample accounts` (`#samples`) |
 | Foot | `Questions or corrections: arthur.rzhang@gmail.com` and `Back to the motions`, as on the two pages now |
