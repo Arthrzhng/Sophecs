@@ -4106,22 +4106,38 @@ the ties, and a hash of every pattern's result in order.
 
 Arthur, 2026-11-06, choosing among headings put to him for showing sample
 accounts' arguments to visitors: "Please could you do exemplar", then "Do
-exemplar and do like 50 exemplars". The heading and the count are his;
-where the page is linked from is mine, and his to move.
+exemplar and do like 50 exemplars". Then, asked whether to show one per
+different opening line instead of 50 that repeat, and whether to put a
+line under the heading saying where they come from, with "Written as
+examples for Sophecs." offered: "Do what you need to", taken as yes to
+both. The heading, the count and the line are his; where the page is
+linked from is mine, and his to move.
 
 `/debate/<slug>/exemplars` shows, under the heading "Exemplar ways to
-argue this motion", up to 50 of the strongest sample arguments on that
-motion (highest template mark first), shared evenly across the schools
-(17, 17 and 16 with three), grouped by school, each opening from its
-first sentence to its full text. The heading says what they are, in
-place of the "Sample" label on each item that the ruling of 2026-11-04
-put on every other surface a sample appears: these are examples, and the
-heading does not claim anyone wrote them. Three things keep it that way:
+argue this motion" and the line "Written as examples for Sophecs.", the
+strongest sample argument under each opening line in each school,
+grouped by school, each opening from its first sentence to its full text.
+The sample run writes only four to eight different first sentences per
+school on a motion, so 50 would have repeated them: on `opaque-benefit`
+the first build's 50 had 12 different openings, "Deploy it." and "Do not
+deploy it." ten times each. One per opening came to 14 to 16 a motion
+(read-only count, 2026-11-06). Highest template mark first; 50 stays as a
+ceiling, shared evenly across the schools, that today's data never
+reaches. Every published row is read (up to 1000 a school; at most 241
+today), as the rarest opening first appears at rank 167.
+
+The heading and the line say what they are, in place of the "Sample"
+label on each item that the ruling of 2026-11-04 put on every other
+surface a sample appears. Four things keep it that way:
 - **Sample accounts' published arguments only.** `src/lib/exemplars.ts`
   reads `is_sample` rows whose sample author published the argument
   (`argument_public`), as a sample's own verdict page shows only those,
   and refuses any row that is not a sample's. A real reader's argument is
   theirs and public only if they publish it.
+- **No deliberate misspellings.** The sample run writes one or two into
+  about 8% of its arguments to look like real writing; none is chosen
+  (`SAMPLE_TYPO`, tested against the generator's own list). "its" for
+  "it's" is the one that cannot be told from a correct word.
 - **No scores.** The samples' marks were written from templates, not by
   the judge, so showing them would present a template as the judge's
   verdict.
@@ -4137,14 +4153,8 @@ own verdict. The motion's own page, where a reader writes theirs, is left
 as it was. It is a genuine page, not a sample's: it renders no
 `SamplePageMarker`, so its page views reach PostHog like any other page's.
 
-Open, put to Arthur with the pull request: the sample run writes about
-six distinct opening sentences per school per motion, so 50 arguments
-repeat their openings heavily (four distinct ones among a school's top
-17 on `opaque-benefit`); and about 8% of sample originals carry
-deliberate typos (`withTypos`), which an "exemplar" heading makes look
-like the site's own mistakes.
-
-New copy: the heading, as Arthur chose it; the link "Argue this motion";
-the page title "Exemplar ways to argue this motion · Sophecs" and its
-description "Exemplar ways to argue this motion, from each school." The
-arguments are the sample run's, accepted with it on 2026-11-04.
+New copy: the heading and the line under it, as above; the link "Argue
+this motion"; the page title "Exemplar ways to argue this motion ·
+Sophecs" and its description "Exemplar ways to argue this motion, from
+each school." The arguments are the sample run's, accepted with it on
+2026-11-04.

@@ -1,8 +1,9 @@
 // "Exemplar ways to argue this motion" (Arthur, 2026-11-06): the strongest
-// sample arguments on a motion, never a real reader's, shared evenly
-// across the schools, up to 50.
+// sample argument under each opening line, never a real reader's, shared
+// evenly across the schools, up to 50.
 import { describe, expect, it, vi } from "vitest";
-import { EXEMPLARS_PER_MOTION, getExemplars, openingOf, selectExemplars, type ExemplarCandidate } from "../src/lib/exemplars";
+import { TYPOS } from "../scripts/seed/generate";
+import { EXEMPLAR_CANDIDATES_PER_SCHOOL, EXEMPLARS_PER_MOTION, SAMPLE_TYPO, getExemplars, openingOf, selectExemplars, type ExemplarCandidate } from "../src/lib/exemplars";
 import type { SchoolId } from "../src/lib/types";
 
 const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
@@ -45,6 +46,33 @@ describe("selectExemplars", () => {
     expect(selectExemplars(new Map([["stoicism", rows]]), ["stoicism"]).get("stoicism")!.map((e) => e.id)).toEqual(["a"]);
   });
 
+  it("keeps the strongest under each opening line in a school, and the same line in another school", () => {
+    const row = (id: string, school: SchoolId, argument: string): ExemplarCandidate => ({ id, school, argument, is_sample: true });
+    const chosen = selectExemplars(
+      new Map([
+        ["stoicism", [row("s1", "stoicism", "Deploy it. Because of A."), row("s2", "stoicism", "deploy  it. Because of B."), row("s3", "stoicism", "Do not deploy it. C.")]],
+        ["utilitarianism", [row("u1", "utilitarianism", "Deploy it. Because of D.")]],
+      ] as [SchoolId, ExemplarCandidate[]][]),
+      ["stoicism", "utilitarianism"]
+    );
+    expect(chosen.get("stoicism")!.map((e) => e.id)).toEqual(["s1", "s3"]);
+    expect(chosen.get("utilitarianism")!.map((e) => e.id)).toEqual(["u1"]);
+  });
+
+  it("never takes an argument with one of the sample run's deliberate misspellings", () => {
+    const detectable = TYPOS.map(([, typo]) => typo).filter((typo) => typo !== "its");
+    expect(detectable).toHaveLength(TYPOS.length - 1);
+    for (const typo of detectable) {
+      expect(SAMPLE_TYPO.test(`It holds ${typo} it does.`), typo).toBe(true);
+      const rows = [
+        { id: "typo", school: "stoicism" as const, argument: `First, ${typo} so. More.`, is_sample: true },
+        { id: "clean", school: "stoicism" as const, argument: "Second, and clean. More.", is_sample: true },
+      ];
+      expect(selectExemplars(new Map([["stoicism", rows]]), ["stoicism"]).get("stoicism")!.map((e) => e.id)).toEqual(["clean"]);
+    }
+    for (const word of ["because", "their", "which", "whether", "the theory", "argument", "it's"]) expect(SAMPLE_TYPO.test(word), word).toBe(false);
+  });
+
   it("returns no score", () => {
     const [first] = selectExemplars(new Map([["stoicism", made("stoicism", 1)]]), ["stoicism"]).get("stoicism")!;
     expect(Object.keys(first).sort()).toEqual(["argument", "id", "school"]);
@@ -55,17 +83,17 @@ describe("getExemplars", () => {
   // A stand-in for the admin client that records each query's filters and
   // ordering, and answers each school's read with `answer(school)`.
   const fakeAdmin = (answer: (school: unknown) => { data: unknown; error: unknown }) => {
-    const calls: { table: string; filters: [string, string, unknown][]; order: [string, unknown][] }[] = [];
+    const calls: { table: string; filters: [string, string, unknown][]; order: [string, unknown][]; limit?: number }[] = [];
     const admin = {
       from(table: string) {
-        const call = { table, filters: [] as [string, string, unknown][], order: [] as [string, unknown][] };
+        const call = { table, filters: [] as [string, string, unknown][], order: [] as [string, unknown][], limit: undefined as number | undefined };
         calls.push(call);
         const b: Record<string, unknown> = {};
         b.select = () => b;
         b.eq = (c: string, v: unknown) => (call.filters.push(["eq", c, v]), b);
         b.not = (c: string, op: string, v: unknown) => (call.filters.push([`not.${op}`, c, v]), b);
         b.order = (c: string, o: unknown) => (call.order.push([c, o]), b);
-        b.limit = () => Promise.resolve(answer(call.filters.find(([, c]) => c === "school")?.[2]));
+        b.limit = (n: number) => ((call.limit = n), Promise.resolve(answer(call.filters.find(([, c]) => c === "school")?.[2])));
         return b;
       },
     };
@@ -91,6 +119,9 @@ describe("getExemplars", () => {
         ])
       );
       expect(call.order[0]).toEqual(["score", { ascending: false, nullsFirst: false }]);
+      // Every published row, so a rarely used opening is still found.
+      expect(call.limit).toBe(EXEMPLAR_CANDIDATES_PER_SCHOOL);
+      expect(EXEMPLAR_CANDIDATES_PER_SCHOOL).toBe(1000);
     }
   });
 

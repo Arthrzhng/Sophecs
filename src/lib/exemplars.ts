@@ -3,11 +3,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { SchoolId } from "@/lib/types";
 
 /**
- * "Exemplar ways to argue this motion" (Arthur, 2026-11-06): up to
- * EXEMPLARS_PER_MOTION of the strongest sample arguments on a motion, shown
- * on /debate/<slug>/exemplars under that heading, which is what tells a
- * reader what they are (docs/decisions.md, "Exemplar ways to argue this
- * motion").
+ * "Exemplar ways to argue this motion" (Arthur, 2026-11-06): sample
+ * arguments on a motion, shown on /debate/<slug>/exemplars under that
+ * heading, which is what tells a reader what they are (docs/decisions.md,
+ * "Exemplar ways to argue this motion").
  *
  * Sample accounts' arguments only (docs/sample-activity.md), never a real
  * reader's: a reader's argument is theirs, and is public only if they
@@ -16,13 +15,26 @@ import type { SchoolId } from "@/lib/types";
  * author published (`argument_public`), as a sample's own verdict page
  * shows only those.
  *
- * Shared out evenly across the schools, highest template mark first within
- * each, with exact repeats of the same text dropped (the sample run allows
- * a few). No mark is returned: the samples' marks were written from
+ * One per opening line in each school: the sample run writes only four to
+ * eight different first sentences per school on a motion, so the strongest
+ * argument under each is the one shown and the page never lists the same
+ * line to open twice in a school (Arthur, 2026-11-06, accepting that in
+ * place of 50 that repeat). Highest template mark first, shared out evenly
+ * across the schools up to EXEMPLARS_PER_MOTION, which today's data never
+ * reaches. No mark is returned: the samples' marks were written from
  * templates, not by the judge.
  */
 
+/** A ceiling, not a target: one per opening came to 14 to 16 a motion on 2026-11-06. */
 export const EXEMPLARS_PER_MOTION = 50;
+
+/**
+ * Rows read per school, strongest first. Every published row today (at
+ * most 241 on any motion, 2026-11-06), so a rarely used opening is still
+ * found: one first appears at rank 167. PostgREST returns no more than
+ * 1000 rows a request in any case.
+ */
+export const EXEMPLAR_CANDIDATES_PER_SCHOOL = 1000;
 
 export interface Exemplar {
   id: string;
@@ -34,12 +46,22 @@ export interface ExemplarCandidate extends Exemplar {
   is_sample: boolean;
 }
 
+/**
+ * The misspellings the sample run writes into about 8% of its arguments
+ * (scripts/seed/generate.ts, TYPOS), so that no exemplar carries one. "its"
+ * for "it's" is the one that cannot be told from a correct word.
+ */
+export const SAMPLE_TYPO = /\b(?:becuase|definately|thier|wich|arguement|realy|doesnt|seperate|responsable|wether|the the)\b/i;
+
 const normalise = (text: string) => text.trim().replace(/\s+/g, " ").toLowerCase();
 
 /**
- * From each school's candidates, strongest first, choose up to `total`
- * between them: an even share each, the remainder to the schools listed
- * first, and any share a school cannot fill passed to the others.
+ * From each school's candidates, strongest first, keep the first under each
+ * opening line, then choose up to `total` between the schools: an even
+ * share each, the remainder to the schools listed first, and any share a
+ * school cannot fill passed to the others. An exact repeat of a text
+ * already kept, in any school, is dropped too, and so is any argument with
+ * one of the sample run's deliberate misspellings.
  */
 export function selectExemplars(
   candidatesBySchool: ReadonlyMap<SchoolId, readonly ExemplarCandidate[]>,
@@ -50,11 +72,14 @@ export function selectExemplars(
   const pools = new Map<SchoolId, Exemplar[]>();
   for (const school of schools) {
     const pool: Exemplar[] = [];
+    const openings = new Set<string>();
     for (const c of candidatesBySchool.get(school) ?? []) {
-      if (!c.is_sample || c.school !== school || !c.argument?.trim()) continue;
-      const key = normalise(c.argument);
-      if (seen.has(key)) continue;
-      seen.add(key);
+      if (!c.is_sample || c.school !== school || !c.argument?.trim() || SAMPLE_TYPO.test(c.argument)) continue;
+      const text = normalise(c.argument);
+      const opening = normalise(openingOf(c.argument));
+      if (seen.has(text) || openings.has(opening)) continue;
+      seen.add(text);
+      openings.add(opening);
       pool.push({ id: c.id, school: c.school, argument: c.argument.trim() });
     }
     pools.set(school, pool);
@@ -101,9 +126,7 @@ export async function getExemplars(
         .not("argument", "is", null)
         .order("score", { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false })
-        // Enough to fill every place even if this school must cover for
-        // others and some texts repeat.
-        .limit(EXEMPLARS_PER_MOTION * 2)
+        .limit(EXEMPLAR_CANDIDATES_PER_SCHOOL)
     )
   );
   const bySchool = new Map<SchoolId, ExemplarCandidate[]>();

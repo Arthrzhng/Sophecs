@@ -1146,7 +1146,8 @@ function writeTurn(
 // The slips people make typing fast. Applied to about one argument in
 // twelve, never inside a phrase the verdict quotes, so the quote still
 // matches the argument exactly.
-const TYPOS: [RegExp, string][] = [
+// Exported for src/lib/exemplars.ts's test: an exemplar is never one of these.
+export const TYPOS: [RegExp, string][] = [
   [/\bbecause\b/, "becuase"],
   [/\bdefinitely\b/, "definately"],
   [/\btheir\b/, "thier"],

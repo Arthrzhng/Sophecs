@@ -6,11 +6,12 @@ import { getExemplars, openingOf } from "@/lib/exemplars";
 import { schoolColourVar, schoolName } from "@/lib/school-registry";
 import { SHOWN_SCHOOL_IDS } from "@/lib/types";
 
-// "Exemplar ways to argue this motion": the heading and the count are
-// Arthur's (2026-11-06). Sample accounts' published arguments only, never
-// a real reader's (src/lib/exemplars.ts), grouped by school, each opening
-// to its full text. Not shown on the motion's own page, where a reader
-// writes theirs.
+// "Exemplar ways to argue this motion": the heading is Arthur's, and so is
+// one per opening line with the line under it saying where they come from
+// (2026-11-06). Sample accounts' published arguments only, never a real
+// reader's (src/lib/exemplars.ts), grouped by school, each opening to its
+// full text. Not shown on the motion's own page, where a reader writes
+// theirs.
 //
 // Built on first request and then at most hourly (the sample run adds
 // arguments every six hours). generateStaticParams returning nothing is
@@ -56,6 +57,7 @@ export default async function ExemplarsPage({ params }: { params: Promise<{ slug
       <h1 className="text-xl font-extrabold leading-tight tracking-tight text-ink">
         Exemplar ways to argue this motion
       </h1>
+      <p className="mt-2 text-sm text-ink-mid">Written as examples for Sophecs.</p>
       <p className="mt-4 font-serif text-md leading-relaxed text-ink">{topic.motion as string}</p>
       <p className="mt-4">
         <TextLink href={`/debate/${topic.slug}`} className="text-sm font-semibold">
