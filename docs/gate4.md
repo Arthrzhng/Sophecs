@@ -256,7 +256,8 @@ the new-schools run 16 or 23 of 25, depending on item 3.
     section 8); `README.md`; the "until launch" rules of steps 3 and 4
     lifted; a fresh sample run (item 13). Between the teardown and that
     run, `/debate/{slug}/exemplars` answers not found while the landing
-    page links to it (`docs/decisions.md`, the exemplars entry).
+    page links to it (`docs/decisions.md`, the exemplars entry), and,
+    with #99, while each motion card in the list does.
 
 ## Production database writes: (a)
 
