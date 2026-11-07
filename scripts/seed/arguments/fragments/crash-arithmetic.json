@@ -128,13 +128,13 @@
       "reasons": [
         "What you owe is never owed in the abstract. The maker takes on duties to the passenger by putting them in the car, much as a host takes on duties to a guest, and a rule that sets those duties aside for an aggregate has stopped asking what the role requires.",
         "Care is graded by relationship: one owes more to those one stands in relation to than to strangers, without owing strangers nothing. The car should avoid harming pedestrians wherever it can, but it may not be built to treat its own passenger as expendable.",
-        "Correct names matter. A car sold as carrying someone safely, and secretly programmed to kill them when the count favours it, is not what its name says, and the gap between the name and the thing corrodes trust in every car.",
+        "Correct names matter. A car sold as carrying someone safely, and programmed to give them up when the count favours it, is not what its name says, and the gap between the name and the thing corrodes trust in every car.",
         "Humaneness is shown in fidelity to those who rely on you. A society whose machines are built to abandon the people in their care whenever arithmetic favours it is teaching everyone that relationships hold only until they cost something."
       ],
       "examples": [
         "A taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home.",
         "A parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it.",
-        "A ferry company that secretly instructed its crew to abandon passengers whenever more lives could be saved elsewhere would not keep its passengers for long."
+        "A ferry company that instructed its crew to abandon passengers whenever more lives could be saved elsewhere would have stopped being what passengers mean by a ferry company."
       ],
       "objections": [
         {
@@ -179,7 +179,7 @@
         },
         {
           "rival": "utilitarianism",
-          "claim": "a community is not one voice, and any process of deliberation will produce a rule that some reject, while people die in crashes the minimising rule would have prevented.",
+          "claim": "any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on.",
           "answer": "That is true, and deliberation needs a way to decide without unanimity. But a rule that some reject after being heard is shared in a way a rule nobody was asked about is not, and its legitimacy is part of whether people will use the roads with it.",
           "why": "It speaks of what the community would accept as if the community agreed, and never says how disagreement is settled."
         }
@@ -189,8 +189,8 @@
       "direction": "for",
       "positions": [
         "Programming the car is a volition formed in advance about who will die, so the makers own that intention whatever the rule, and impartial compassion counts the passenger as neither more nor less than anyone else.",
-        "I accept the motion. Compassion that does not rest on a fixed, separate self has no ground for counting the passenger's life above the lives in the road.",
-        "A Buddhist can accept minimising deaths, while insisting that this is an intention to cause death formed in advance, and that the makers must carry it as such.",
+        "I accept the motion. The compassion later traditions draw from there being no fixed, separate self has no ground for counting the passenger's life above the lives in the road.",
+        "A Buddhist Ethicist can accept minimising deaths, while insisting that this is an intention to cause death formed in advance, and that the makers must carry it as such.",
         "Minimise the deaths, and do not pretend the rule is innocent: whoever writes it has formed the intention of a death, and must keep examining it."
       ],
       "reasons": [

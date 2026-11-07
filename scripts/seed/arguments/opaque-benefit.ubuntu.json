@@ -17,8 +17,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Do not deploy it until the people it decides about have a part in deciding. A benefit that cannot be questioned by those it lands on treats them as recipients, not as members. On Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nMetz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to. A school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
-    "words": 239
+    "text": "Do not deploy it until the people it decides about have a part in deciding. A benefit that cannot be questioned by those it lands on treats them as recipients, not as members. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nMetz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to. A school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
+    "words": 238
   },
   {
     "id": "opaque-benefit.ubuntu.02",
@@ -59,8 +59,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject this motion, because harm here is not only a bad outcome but a broken relationship, and an unexplained decision breaks the one between a person and those who govern their care. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nOn Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life. A clinic adopts a model that triages referrals well. The families it turns away cannot ask why, and the elders who once explained such decisions to them no longer can.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. So the measure is not the total but what people become through one another once the system is in place.",
-    "words": 243
+    "text": "I reject this motion, because harm here is not only a bad outcome but a broken relationship, and an unexplained decision breaks the one between a person and those who govern their care. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nOn Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life. A clinic adopts a model that triages referrals well. The families it turns away cannot ask why, and the elders who once explained such decisions to them no longer can.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. So the measure is not the total but what people become through one another once the system is in place.",
+    "words": 242
   },
   {
     "id": "opaque-benefit.ubuntu.04",
@@ -80,8 +80,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. Sabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nMetz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to. A village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged.\n\nA Utilitarian will object that a community is not one voice, and waiting for everyone affected to have a say leaves suffering in place while the consultations run. That is the strongest worry about appeals to community, and somebody must decide who counts and how. The answer is not to wait for unanimity but to bring the people affected into deciding, so that the system answers to them rather than to an average. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
-    "words": 233
+    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. Sabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nMetz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to. A village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged.\n\nA Utilitarian will object that the suffering the system prevents is real, and waiting for everyone affected to have a say leaves it in place while the consultations run. That is a real cost, and somebody must decide who counts and how. The answer is not to wait for unanimity but to bring the people affected into deciding, so that the system answers to them rather than to an average. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
+    "words": 230
   },
   {
     "id": "opaque-benefit.ubuntu.05",
@@ -89,7 +89,7 @@
     "school": "ubuntu",
     "tier": "strong",
     "parts": {
-      "position": 2,
+      "position": 1,
       "reasons": [
         1,
         0
@@ -101,8 +101,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nOn Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. So the measure is not the total but what people become through one another once the system is in place.",
-    "words": 221
+    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nOn Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. So the measure is not the total but what people become through one another once the system is in place.",
+    "words": 222
   },
   {
     "id": "opaque-benefit.ubuntu.06",
@@ -122,8 +122,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I reject this motion, because harm here is not only a bad outcome but a broken relationship, and an unexplained decision breaks the one between a person and those who govern their care. On Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nMetz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to. A school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. That is why the Ubuntu Ethicist asks who else is in this, and who was not asked.",
-    "words": 239
+    "text": "I reject this motion, because harm here is not only a bad outcome but a broken relationship, and an unexplained decision breaks the one between a person and those who govern their care. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nMetz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to. A school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. That is why the Ubuntu Ethicist asks who else is in this, and who was not asked.",
+    "words": 238
   },
   {
     "id": "opaque-benefit.ubuntu.07",
@@ -131,20 +131,20 @@
     "school": "ubuntu",
     "tier": "strong",
     "parts": {
-      "position": 1,
+      "position": 0,
       "reasons": [
         2,
-        3
+        0
       ],
       "example": 0,
       "objections": [
-        1
+        0
       ],
-      "closing": 3,
+      "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Sabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nMetz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to. A clinic adopts a model that triages referrals well. The families it turns away cannot ask why, and the elders who once explained such decisions to them no longer can.\n\nA Utilitarian will object that a community is not one voice, and waiting for everyone affected to have a say leaves suffering in place while the consultations run. That is the strongest worry about appeals to community, and somebody must decide who counts and how. The answer is not to wait for unanimity but to bring the people affected into deciding, so that the system answers to them rather than to an average. That is why the Ubuntu Ethicist asks who else is in this, and who was not asked.",
-    "words": 235
+    "text": "Do not deploy it until the people it decides about have a part in deciding. A benefit that cannot be questioned by those it lands on treats them as recipients, not as members. Sabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nOn Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life. A clinic adopts a model that triages referrals well. The families it turns away cannot ask why, and the elders who once explained such decisions to them no longer can.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. A harm here is a failure of relationship, and that is what has to be repaired.",
+    "words": 243
   },
   {
     "id": "opaque-benefit.ubuntu.08",
@@ -152,20 +152,20 @@
     "school": "ubuntu",
     "tier": "strong",
     "parts": {
-      "position": 0,
+      "position": 2,
       "reasons": [
         3,
-        1
+        2
       ],
       "example": 1,
       "objections": [
-        0
+        1
       ],
       "closing": 1,
       "weak": []
     },
-    "text": "Do not deploy it until the people it decides about have a part in deciding. A benefit that cannot be questioned by those it lands on treats them as recipients, not as members. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nYour data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity. A village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
-    "words": 240
+    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nSabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered. A village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged.\n\nA Utilitarian will object that the suffering the system prevents is real, and waiting for everyone affected to have a say leaves it in place while the consultations run. That is a real cost, and somebody must decide who counts and how. The answer is not to wait for unanimity but to bring the people affected into deciding, so that the system answers to them rather than to an average. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
+    "words": 230
   },
   {
     "id": "opaque-benefit.ubuntu.09",
@@ -173,10 +173,10 @@
     "school": "ubuntu",
     "tier": "strong",
     "parts": {
-      "position": 1,
+      "position": 3,
       "reasons": [
-        1,
-        0
+        0,
+        1
       ],
       "example": null,
       "objections": [
@@ -185,8 +185,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nOn Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. So the measure is not the total but what people become through one another once the system is in place.",
-    "words": 223
+    "text": "I reject this motion, because harm here is not only a bad outcome but a broken relationship, and an unexplained decision breaks the one between a person and those who govern their care. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nYour data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. So the measure is not the total but what people become through one another once the system is in place.",
+    "words": 221
   },
   {
     "id": "opaque-benefit.ubuntu.10",
@@ -196,18 +196,18 @@
     "parts": {
       "position": 0,
       "reasons": [
-        0,
-        3
+        1,
+        2
       ],
       "example": 2,
       "objections": [
-        1
+        0
       ],
-      "closing": 0,
+      "closing": 3,
       "weak": []
     },
-    "text": "Do not deploy it until the people it decides about have a part in deciding. A benefit that cannot be questioned by those it lands on treats them as recipients, not as members. On Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nMetz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to. A school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation.\n\nA Utilitarian will object that a community is not one voice, and waiting for everyone affected to have a say leaves suffering in place while the consultations run. That is the strongest worry about appeals to community, and somebody must decide who counts and how. The answer is not to wait for unanimity but to bring the people affected into deciding, so that the system answers to them rather than to an average. So the measure is not the total but what people become through one another once the system is in place.",
-    "words": 240
+    "text": "Do not deploy it until the people it decides about have a part in deciding. A benefit that cannot be questioned by those it lands on treats them as recipients, not as members. Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nSabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered. A school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. That is why the Ubuntu Ethicist asks who else is in this, and who was not asked.",
+    "words": 244
   },
   {
     "id": "opaque-benefit.ubuntu.11",
@@ -260,8 +260,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Do not deploy it until the people it decides about have a part in deciding. A benefit that cannot be questioned by those it lands on treats them as recipients, not as members. On Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
-    "words": 127
+    "text": "Do not deploy it until the people it decides about have a part in deciding. A benefit that cannot be questioned by those it lands on treats them as recipients, not as members. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
+    "words": 126
   },
   {
     "id": "opaque-benefit.ubuntu.14",
@@ -314,8 +314,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. On Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. So the measure is not the total but what people become through one another once the system is in place.",
-    "words": 130
+    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. So the measure is not the total but what people become through one another once the system is in place.",
+    "words": 129
   },
   {
     "id": "opaque-benefit.ubuntu.17",
@@ -404,8 +404,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Do not deploy it until the people it decides about have a part in deciding. A benefit that cannot be questioned by those it lands on treats them as recipients, not as members. On Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
-    "words": 126
+    "text": "Do not deploy it until the people it decides about have a part in deciding. A benefit that cannot be questioned by those it lands on treats them as recipients, not as members. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
+    "words": 125
   },
   {
     "id": "opaque-benefit.ubuntu.22",
@@ -494,8 +494,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I reject this motion, because harm here is not only a bad outcome but a broken relationship, and an unexplained decision breaks the one between a person and those who govern their care. On Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
-    "words": 127
+    "text": "I reject this motion, because harm here is not only a bad outcome but a broken relationship, and an unexplained decision breaks the one between a person and those who govern their care. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
+    "words": 126
   },
   {
     "id": "opaque-benefit.ubuntu.27",
@@ -566,8 +566,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. On Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. So the measure is not the total but what people become through one another once the system is in place.",
-    "words": 128
+    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. So the measure is not the total but what people become through one another once the system is in place.",
+    "words": 127
   },
   {
     "id": "opaque-benefit.ubuntu.31",

@@ -13,7 +13,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Rng } from "./rng";
-import { QUIZ_SCHOOLS, type QuizSchoolId } from "../../src/lib/school-registry";
+import { QUIZ_SCHOOLS, type QuizSchoolId, type SchoolId as RegistrySchoolId } from "../../src/lib/school-registry";
 import { DRAFT_SCHOOL_IDS, schoolEntry } from "../../src/lib/school-registry.drafts";
 
 export const SEED_DIR = join(process.cwd(), "scripts", "seed");
@@ -35,7 +35,7 @@ export type SchoolId = QuizSchoolId;
 // the drafts list is empty, and SCHOOLS has to name all six by then.
 export const LAUNCH_SCHOOLS = DRAFT_SCHOOL_IDS;
 /** Every school with a bank: the run's three, then the launch's three. */
-export const BANK_SCHOOLS = [...SCHOOLS, ...LAUNCH_SCHOOLS] as readonly string[] as readonly SchoolId[];
+export const BANK_SCHOOLS: readonly RegistrySchoolId[] = [...SCHOOLS, ...LAUNCH_SCHOOLS];
 export const TOPICS = [
   "opaque-benefit",
   "crash-arithmetic",
@@ -314,7 +314,11 @@ export function writeBanks(): string[] {
   const written: string[] = [];
   for (const topic of TOPICS) {
     const fr = loadFragments(topic);
-    for (const school of BANK_SCHOOLS) {
+    for (const id of BANK_SCHOOLS) {
+      // The bank functions are typed to the run's three, which is all the
+      // generator reads; the passages and closings hold all six, and the
+      // second part of item 13 widens the types with the generator.
+      const school = id as SchoolId;
       writeFileSync(bankPath(topic, school), serialiseBank(buildBank(fr, closings, school)));
       written.push(bankPath(topic, school));
     }

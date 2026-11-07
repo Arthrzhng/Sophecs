@@ -2,7 +2,7 @@
 
 Arthur, 2026-11-07: "Write argument banks for the three new schools from their school files, criteria and the research file (quotation guard applies), at the same depth as the live three's, so launch week shows six active schools. Show me 3 sample arguments per new school before running."
 
-Three per school, one of each tier the sample run writes, each the first of its tier in that topic's bank (`scripts/seed/arguments/<topic>.<school>.json`), exactly as a sample account would post it. A strong argument takes a position, two reasons, an example, a rival's objection answered and a closing; a mid one a position, one reason, an example and a closing; a weak one a position, and one or two of the deliberately weak passages every school's weak arguments share, which are not new. The passages are mine, written under the ruling from each school's file and approved criteria; none quotes a source without naming it. The sample run does not use them until it covers six schools, which comes in a later pull request and runs only on your word.
+Three per school, one of each tier the sample run writes, each the first of its tier in that topic's bank (`scripts/seed/arguments/<topic>.<school>.json`). The run draws from the same compositions, and some posts then gain a typo or an opening sentence, as the live three's do. A strong argument takes a position, two reasons, an example, a rival's objection answered and a closing; a mid one a position, one reason, an example and a closing; a weak one a position and either two of the deliberately weak passages every school's weak arguments share, which are not new, or one of them and one of the school's own examples. The passages are mine, written under the ruling from each school's file and approved criteria; where one uses a source's verified wording (the Nguni maxim as Metz gives it, Metz's principle), it names the source, and Book 13 of the Analects is paraphrased, not quoted. The sample run does not use them until it covers six schools, which comes in a later pull request and runs only on your word.
 
 ## Confucianism
 
@@ -34,21 +34,21 @@ Motion: Handing daily choices to an AI assistant costs something that matters, e
 
 ## Ubuntu
 
-### Strong: The opaque benefit (239 words)
+### Strong: The opaque benefit (238 words)
 
 Motion: An AI system that reliably reduces suffering should be deployed even where the people it decides about cannot be told why.
 
-> Do not deploy it until the people it decides about have a part in deciding. A benefit that cannot be questioned by those it lands on treats them as recipients, not as members. On Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.
+> Do not deploy it until the people it decides about have a part in deciding. A benefit that cannot be questioned by those it lands on treats them as recipients, not as members. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.
 >
 > Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to. A school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation.
 >
 > A Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.
 
-### Mid: Trained to be good (118 words)
+### Mid: Trained to be good (122 words)
 
 Motion: Training a model on human feedback can make it good in the same sense that moral upbringing makes a person good.
 
-> Training can make a model safer to use, but calling it good in the sense of upbringing mistakes being adjusted by people for being made a person among them. Menkiti's view is that personhood is achieved over a life within a community, by meeting its demands, and even Gyekye's moderate reading, which keeps individual worth, has goodness growing within relationships. Neither picture has room for goodness installed by an optimiser.
+> Training can make a model safer to use, but calling it good in the sense of upbringing mistakes being adjusted by people for being made a person among them. On Menkiti's view the community confers personhood once its demands are met; on Gyekye's moderate reading individuals keep their own worth and rights, but community is still essential. Neither picture has room for goodness installed by an optimiser, with no community whose demands it meets.
 >
 > A child raised by an extended family learns to share because her cousins share with her. A model learns to sound generous because raters scored generous replies higher. So the measure is not the total but what people become through one another once the system is in place.
 
@@ -62,7 +62,7 @@ Motion: A self-driving car should be programmed to minimise total deaths in an u
 
 ## Buddhist Ethics
 
-### Strong: The careful builder (225 words)
+### Strong: The careful builder (228 words)
 
 Motion: When an AI system causes harm, the people who built it are to blame in proportion to the harm, however careful they were.
 
@@ -70,13 +70,13 @@ Motion: When an AI system causes harm, the people who built it are to blame in p
 >
 > Good intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not. A team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week.
 >
-> A Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. Keep looking at who is being hurt, and keep looking after the launch.
+> A Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. Keep looking at who is being hurt, before the choice is made and long after it.
 
-### Mid: Does the model decide? (95 words)
+### Mid: Does the model decide? (107 words)
 
 Motion: It is a mistake to say that a language model decides anything.
 
-> I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. No fixed, bounded self sits inside the model making choices. Saying it decided invents just such a self, and invented selves are where responsibility goes to hide.
+> I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. Buddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide.
 >
 > A content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform. What arises here comes from many conditions, and each of them is ours to examine.
 

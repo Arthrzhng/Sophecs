@@ -7,17 +7,19 @@ describe("argument banks", () => {
   it("are exactly what the passages build (rerun npm run seed:banks after editing one)", () => {
     const closings = loadClosings();
     for (const topic of TOPICS)
-      for (const school of BANK_SCHOOLS)
+      for (const id of BANK_SCHOOLS) {
+        const school = id as SchoolId;
         expect(readFileSync(bankPath(topic, school), "utf8"), `${topic}.${school}`).toBe(
           serialiseBank(buildBank(loadFragments(topic), closings, school))
         );
+      }
   });
 
   it("hold forty arguments each, 10 strong, 20 mid, 10 weak, 80 to 250 words, all different", () => {
     expect(BANK_SCHOOLS).toHaveLength(6);
     for (const topic of TOPICS)
-      for (const school of BANK_SCHOOLS) {
-        const bank = JSON.parse(readFileSync(bankPath(topic, school), "utf8")) as { tier: string; text: string }[];
+      for (const id of BANK_SCHOOLS) {
+        const bank = JSON.parse(readFileSync(bankPath(topic, id as SchoolId), "utf8")) as { tier: string; text: string }[];
         expect(bank).toHaveLength(40);
         expect(bank.filter((a) => a.tier === "strong")).toHaveLength(10);
         expect(bank.filter((a) => a.tier === "mid")).toHaveLength(20);
@@ -73,9 +75,11 @@ describe("argument banks", () => {
     const { loadBanks, compose, partsWords, wordCount, TOPICS, SCHOOLS } = await import("../../scripts/seed/banks");
     const banks = loadBanks();
     let checked = 0;
+    const { BANK_SCHOOLS } = await import("../../scripts/seed/banks");
     for (const topic of TOPICS)
-      for (const school of SCHOOLS)
+      for (const id of BANK_SCHOOLS)
         for (const tier of ["strong", "mid", "weak"] as const) {
+          const school = id as (typeof SCHOOLS)[number];
           const all = allCompositions(banks, topic, school, tier);
           for (let i = 0; i < all.length; i += 97) {
             const p = all[i];
@@ -86,7 +90,7 @@ describe("argument banks", () => {
           const texts = all.map((p) => compose(banks.fragments[topic], banks.closings, school, p));
           expect(new Set(texts).size).toBe(texts.length);
         }
-    expect(checked).toBeGreaterThan(1000);
+    expect(checked).toBeGreaterThan(2000);
   });
 });
 

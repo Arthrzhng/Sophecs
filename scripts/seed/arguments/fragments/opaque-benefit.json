@@ -127,7 +127,7 @@
       ],
       "reasons": [
         "The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer who decides about patients or applicants holds a position of that kind, and the position carries duties to the people under it, not only results.",
-        "Book 13 warns that when names are not correct, nothing said accords with things. A system that cannot say why it refused someone has issued something that looks like a judgement and is not one, and deploying it trains everyone to accept the look in place of the thing.",
+        "Book 13 warns that when names are not correct, what is said stops matching how things are. A system that cannot say why it refused someone has issued something that looks like a judgement and is not one, and deploying it trains everyone to accept the look in place of the thing.",
         "What the parties to a relationship owe one another is how they hold each other to account. A person refused by a system whose reasons nobody can give has lost the means of holding the decider to anything, however much suffering the system prevents on average.",
         "Humaneness is realised in how people are treated within their relationships, not only in how many are spared harm. A benefit delivered without any account to the person it touches treats them as a case to be processed rather than as someone the decider stands in relation to."
       ],
@@ -160,7 +160,7 @@
         "I reject this motion, because harm here is not only a bad outcome but a broken relationship, and an unexplained decision breaks the one between a person and those who govern their care."
       ],
       "reasons": [
-        "On Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.",
+        "On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.",
         "Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.",
         "Sabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.",
         "Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to."
@@ -179,9 +179,9 @@
         },
         {
           "rival": "utilitarianism",
-          "claim": "a community is not one voice, and waiting for everyone affected to have a say leaves suffering in place while the consultations run.",
-          "answer": "That is the strongest worry about appeals to community, and somebody must decide who counts and how. The answer is not to wait for unanimity but to bring the people affected into deciding, so that the system answers to them rather than to an average.",
-          "why": "It talks about the community as if it spoke with one voice, and never says who decides for it or what happens to those who disagree."
+          "claim": "the suffering the system prevents is real, and waiting for everyone affected to have a say leaves it in place while the consultations run.",
+          "answer": "That is a real cost, and somebody must decide who counts and how. The answer is not to wait for unanimity but to bring the people affected into deciding, so that the system answers to them rather than to an average.",
+          "why": "It never says how long the people affected should wait for a say, or what the suffering in the meantime is weighed against."
         }
       ]
     },
@@ -190,7 +190,7 @@
       "positions": [
         "Deploy it, but only if those running it can keep checking, while it runs and after, whom it is still hurting. The suffering it spares is real, and non-harm does not end at the launch.",
         "I accept the motion with a condition. Suffering prevented matters greatly, but non-harm requires that the people running the system keep looking for the harm it does, explained or not.",
-        "A Buddhist can accept deployment here, because the suffering at stake is real, yet the obligation does not end with approval: the system has to stay under continuing examination for the harm it causes.",
+        "A Buddhist Ethicist can accept deployment here, because the suffering at stake is real, yet the obligation does not end with approval: the system has to stay under continuing examination for the harm it causes.",
         "Deploy it, with the opacity named as a risk to keep watching. An explanation for each person matters less than an honest, continuing account of whom the system is still hurting."
       ],
       "reasons": [

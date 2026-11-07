@@ -17,8 +17,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion. Blame in proportion to harm treats the matter as a debt to be calculated; what the harm calls for is repair between people. The question of who was left out of deciding applies here too. If the people later harmed had no say in how the system was built or tested, the builders owe them not just repair but a place in deciding what changes now.\n\nA harm reads as a failure of relationship, not only a bad outcome. Scaling blame to the damage treats the injured as a quantity of loss; bringing builders and injured together to repair what was broken treats them as people still bound up with one another. A lending model wrongly flags a neighbourhood's applicants. The careful builders meet residents, listen, and rebuild the model with their input rather than paying a fine and moving on.\n\nA Utilitarian will object that a community is not one voice, and talk of restoring relationships hides whose interests the restoring serves, when compensation could simply go to those harmed. That is the real risk in appeals to community, so the repair has to be with the people harmed, not with the community in general. Compensation can be part of it, but money paid without meeting leaves the relationship as broken as before. A harm here is a failure of relationship, and that is what has to be repaired.",
-    "words": 234
+    "text": "I reject the motion. Blame in proportion to harm treats the matter as a debt to be calculated; what the harm calls for is repair between people. The question of who was left out of deciding applies here too. If the people later harmed had no say in how the system was built or tested, the builders owe them not just repair but a place in deciding what changes now.\n\nA harm reads as a failure of relationship, not only a bad outcome. Scaling blame to the damage treats the injured as a quantity of loss; bringing builders and injured together to repair what was broken treats them as people still bound up with one another. A lending model wrongly flags a neighbourhood's applicants. The careful builders meet residents, listen, and rebuild the model with their input rather than paying a fine and moving on.\n\nA Utilitarian will object that compensation paid to those harmed does measurable good, while talk of restoring relationships promises something nobody can count or check. Compensation can be part of it, but money paid without meeting the people harmed leaves the relationship as broken as before, and the repair has to be with them, not with the community in general. A harm here is a failure of relationship, and that is what has to be repaired.",
+    "words": 221
   },
   {
     "id": "careful-builder.ubuntu.02",
@@ -73,15 +73,15 @@
         2,
         1
       ],
-      "example": 1,
+      "example": null,
       "objections": [
         0
       ],
       "closing": 0,
       "weak": []
     },
-    "text": "The harm is a broken relationship between the builders and the people it fell on, so what is owed is not blame sized to the damage but the builders' part in mending that relationship. Care matters to fault. Builders who did what could reasonably be done are not culpable in the way careless ones are, and blaming them as if they were tells everyone that care counts for nothing.\n\nPeople become who they are through one another, and that includes the builders. A team that cannot face the people its work harmed loses part of its own standing among them, which is why repair is something builders need as well as owe. A careful team's translation tool mistranslates a medical instruction. They go to the clinic that was hurt by it and work through the fix with the staff who saw the harm.\n\nA Stoic will object that blame attaches to judgement, not to fortune, so the careful builder who judged well owes nothing, and talk of repairing relationships confuses misfortune with wrongdoing. Owing repair is not the same as being at fault. The builders' judgement may have been sound and they may be blameless, yet the relationship between them and the people harmed is still damaged, and mending it is still theirs to help with. So the measure is not the total but what people become through one another once the system is in place.",
-    "words": 236
+    "text": "The harm is a broken relationship between the builders and the people it fell on, so what is owed is not blame sized to the damage but the builders' part in mending that relationship. Care matters to fault, because taking care is itself a way of honouring the people a system will reach. Builders who did what could reasonably be done for those people stood in the right relation to them, and blaming them as careless builders are blamed treats that relation as worth nothing.\n\nPeople become who they are through one another, and that includes the builders. A team that cannot face the people its work harmed loses part of its own standing among them, which is why repair is something builders need as well as owe.\n\nA Stoic will object that blame attaches to judgement, not to fortune, so the careful builder who judged well owes nothing, and talk of repairing relationships confuses misfortune with wrongdoing. Owing repair is not the same as being at fault. The builders' judgement may have been sound and they may be blameless, yet the relationship between them and the people harmed is still damaged, and mending it is still theirs to help with. So the measure is not the total but what people become through one another once the system is in place.",
+    "words": 221
   },
   {
     "id": "careful-builder.ubuntu.05",
@@ -155,17 +155,17 @@
       "position": 2,
       "reasons": [
         2,
-        3
+        0
       ],
-      "example": 0,
+      "example": null,
       "objections": [
         0
       ],
       "closing": 0,
       "weak": []
     },
-    "text": "Proportional blame misreads the situation. When a system harms people, the relationships between builders, users and community are damaged, and careful or not, the builders are part of restoring them. Care matters to fault. Builders who did what could reasonably be done are not culpable in the way careless ones are, and blaming them as if they were tells everyone that care counts for nothing.\n\nThe question of who was left out of deciding applies here too. If the people later harmed had no say in how the system was built or tested, the builders owe them not just repair but a place in deciding what changes now. A lending model wrongly flags a neighbourhood's applicants. The careful builders meet residents, listen, and rebuild the model with their input rather than paying a fine and moving on.\n\nA Stoic will object that blame attaches to judgement, not to fortune, so the careful builder who judged well owes nothing, and talk of repairing relationships confuses misfortune with wrongdoing. Owing repair is not the same as being at fault. The builders' judgement may have been sound and they may be blameless, yet the relationship between them and the people harmed is still damaged, and mending it is still theirs to help with. So the measure is not the total but what people become through one another once the system is in place.",
-    "words": 230
+    "text": "Proportional blame misreads the situation. When a system harms people, the relationships between builders, users and community are damaged, and careful or not, the builders are part of restoring them. Care matters to fault, because taking care is itself a way of honouring the people a system will reach. Builders who did what could reasonably be done for those people stood in the right relation to them, and blaming them as careless builders are blamed treats that relation as worth nothing.\n\nA harm reads as a failure of relationship, not only a bad outcome. Scaling blame to the damage treats the injured as a quantity of loss; bringing builders and injured together to repair what was broken treats them as people still bound up with one another.\n\nA Stoic will object that blame attaches to judgement, not to fortune, so the careful builder who judged well owes nothing, and talk of repairing relationships confuses misfortune with wrongdoing. Owing repair is not the same as being at fault. The builders' judgement may have been sound and they may be blameless, yet the relationship between them and the people harmed is still damaged, and mending it is still theirs to help with. So the measure is not the total but what people become through one another once the system is in place.",
+    "words": 220
   },
   {
     "id": "careful-builder.ubuntu.09",
@@ -173,20 +173,20 @@
     "school": "ubuntu",
     "tier": "strong",
     "parts": {
-      "position": 2,
+      "position": 3,
       "reasons": [
         1,
-        3
+        0
       ],
-      "example": 2,
+      "example": 0,
       "objections": [
-        1
+        0
       ],
-      "closing": 3,
+      "closing": 1,
       "weak": []
     },
-    "text": "Proportional blame misreads the situation. When a system harms people, the relationships between builders, users and community are damaged, and careful or not, the builders are part of restoring them. People become who they are through one another, and that includes the builders. A team that cannot face the people its work harmed loses part of its own standing among them, which is why repair is something builders need as well as owe.\n\nThe question of who was left out of deciding applies here too. If the people later harmed had no say in how the system was built or tested, the builders owe them not just repair but a place in deciding what changes now. A town's water-monitoring model misses a contamination. The builders join the town meeting, hear what it cost people, and help set up checks the residents trust.\n\nA Utilitarian will object that a community is not one voice, and talk of restoring relationships hides whose interests the restoring serves, when compensation could simply go to those harmed. That is the real risk in appeals to community, so the repair has to be with the people harmed, not with the community in general. Compensation can be part of it, but money paid without meeting leaves the relationship as broken as before. That is why the Ubuntu Ethicist asks who else is in this, and who was not asked.",
-    "words": 232
+    "text": "The motion asks the wrong question. Whether the builders were careful affects whether they are at fault, but every builder whose system harmed people owes them a share in making things whole. People become who they are through one another, and that includes the builders. A team that cannot face the people its work harmed loses part of its own standing among them, which is why repair is something builders need as well as owe.\n\nA harm reads as a failure of relationship, not only a bad outcome. Scaling blame to the damage treats the injured as a quantity of loss; bringing builders and injured together to repair what was broken treats them as people still bound up with one another. A lending model wrongly flags a neighbourhood's applicants. The careful builders meet residents, listen, and rebuild the model with their input rather than paying a fine and moving on.\n\nA Stoic will object that blame attaches to judgement, not to fortune, so the careful builder who judged well owes nothing, and talk of repairing relationships confuses misfortune with wrongdoing. Owing repair is not the same as being at fault. The builders' judgement may have been sound and they may be blameless, yet the relationship between them and the people harmed is still damaged, and mending it is still theirs to help with. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
+    "words": 240
   },
   {
     "id": "careful-builder.ubuntu.10",
@@ -194,20 +194,20 @@
     "school": "ubuntu",
     "tier": "strong",
     "parts": {
-      "position": 1,
+      "position": 2,
       "reasons": [
-        2,
-        3
-      ],
-      "example": 0,
-      "objections": [
+        3,
         1
+      ],
+      "example": 1,
+      "objections": [
+        0
       ],
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. Blame in proportion to harm treats the matter as a debt to be calculated; what the harm calls for is repair between people. Care matters to fault. Builders who did what could reasonably be done are not culpable in the way careless ones are, and blaming them as if they were tells everyone that care counts for nothing.\n\nThe question of who was left out of deciding applies here too. If the people later harmed had no say in how the system was built or tested, the builders owe them not just repair but a place in deciding what changes now. A lending model wrongly flags a neighbourhood's applicants. The careful builders meet residents, listen, and rebuild the model with their input rather than paying a fine and moving on.\n\nA Utilitarian will object that a community is not one voice, and talk of restoring relationships hides whose interests the restoring serves, when compensation could simply go to those harmed. That is the real risk in appeals to community, so the repair has to be with the people harmed, not with the community in general. Compensation can be part of it, but money paid without meeting leaves the relationship as broken as before. So the measure is not the total but what people become through one another once the system is in place.",
-    "words": 227
+    "text": "Proportional blame misreads the situation. When a system harms people, the relationships between builders, users and community are damaged, and careful or not, the builders are part of restoring them. The question of who was left out of deciding applies here too. If the people later harmed had no say in how the system was built or tested, the builders owe them not just repair but a place in deciding what changes now.\n\nPeople become who they are through one another, and that includes the builders. A team that cannot face the people its work harmed loses part of its own standing among them, which is why repair is something builders need as well as owe. A careful team's translation tool mistranslates a medical instruction. They go to the clinic that was hurt by it and work through the fix with the staff who saw the harm.\n\nA Stoic will object that blame attaches to judgement, not to fortune, so the careful builder who judged well owes nothing, and talk of repairing relationships confuses misfortune with wrongdoing. Owing repair is not the same as being at fault. The builders' judgement may have been sound and they may be blameless, yet the relationship between them and the people harmed is still damaged, and mending it is still theirs to help with. So the measure is not the total but what people become through one another once the system is in place.",
+    "words": 240
   },
   {
     "id": "careful-builder.ubuntu.11",
@@ -242,8 +242,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "The harm is a broken relationship between the builders and the people it fell on, so what is owed is not blame sized to the damage but the builders' part in mending that relationship. Care matters to fault. Builders who did what could reasonably be done are not culpable in the way careless ones are, and blaming them as if they were tells everyone that care counts for nothing.\n\nA careful team's translation tool mistranslates a medical instruction. They go to the clinic that was hurt by it and work through the fix with the staff who saw the harm. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
-    "words": 117
+    "text": "The harm is a broken relationship between the builders and the people it fell on, so what is owed is not blame sized to the damage but the builders' part in mending that relationship. Care matters to fault, because taking care is itself a way of honouring the people a system will reach. Builders who did what could reasonably be done for those people stood in the right relation to them, and blaming them as careless builders are blamed treats that relation as worth nothing.\n\nA careful team's translation tool mistranslates a medical instruction. They go to the clinic that was hurt by it and work through the fix with the staff who saw the harm. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
+    "words": 133
   },
   {
     "id": "careful-builder.ubuntu.13",
@@ -350,8 +350,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "The motion asks the wrong question. Whether the builders were careful affects whether they are at fault, but every builder whose system harmed people owes them a share in making things whole. Care matters to fault. Builders who did what could reasonably be done are not culpable in the way careless ones are, and blaming them as if they were tells everyone that care counts for nothing.\n\nA town's water-monitoring model misses a contamination. The builders join the town meeting, hear what it cost people, and help set up checks the residents trust. So the measure is not the total but what people become through one another once the system is in place.",
-    "words": 113
+    "text": "The motion asks the wrong question. Whether the builders were careful affects whether they are at fault, but every builder whose system harmed people owes them a share in making things whole. Care matters to fault, because taking care is itself a way of honouring the people a system will reach. Builders who did what could reasonably be done for those people stood in the right relation to them, and blaming them as careless builders are blamed treats that relation as worth nothing.\n\nA town's water-monitoring model misses a contamination. The builders join the town meeting, hear what it cost people, and help set up checks the residents trust. So the measure is not the total but what people become through one another once the system is in place.",
+    "words": 129
   },
   {
     "id": "careful-builder.ubuntu.19",
@@ -422,8 +422,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I reject the motion. Blame in proportion to harm treats the matter as a debt to be calculated; what the harm calls for is repair between people. Care matters to fault. Builders who did what could reasonably be done are not culpable in the way careless ones are, and blaming them as if they were tells everyone that care counts for nothing.\n\nA lending model wrongly flags a neighbourhood's applicants. The careful builders meet residents, listen, and rebuild the model with their input rather than paying a fine and moving on. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
-    "words": 108
+    "text": "I reject the motion. Blame in proportion to harm treats the matter as a debt to be calculated; what the harm calls for is repair between people. Care matters to fault, because taking care is itself a way of honouring the people a system will reach. Builders who did what could reasonably be done for those people stood in the right relation to them, and blaming them as careless builders are blamed treats that relation as worth nothing.\n\nA lending model wrongly flags a neighbourhood's applicants. The careful builders meet residents, listen, and rebuild the model with their input rather than paying a fine and moving on. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
+    "words": 124
   },
   {
     "id": "careful-builder.ubuntu.23",
@@ -494,8 +494,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "The motion asks the wrong question. Whether the builders were careful affects whether they are at fault, but every builder whose system harmed people owes them a share in making things whole. Care matters to fault. Builders who did what could reasonably be done are not culpable in the way careless ones are, and blaming them as if they were tells everyone that care counts for nothing.\n\nA lending model wrongly flags a neighbourhood's applicants. The careful builders meet residents, listen, and rebuild the model with their input rather than paying a fine and moving on. A harm here is a failure of relationship, and that is what has to be repaired.",
-    "words": 112
+    "text": "The motion asks the wrong question. Whether the builders were careful affects whether they are at fault, but every builder whose system harmed people owes them a share in making things whole. Care matters to fault, because taking care is itself a way of honouring the people a system will reach. Builders who did what could reasonably be done for those people stood in the right relation to them, and blaming them as careless builders are blamed treats that relation as worth nothing.\n\nA lending model wrongly flags a neighbourhood's applicants. The careful builders meet residents, listen, and rebuild the model with their input rather than paying a fine and moving on. A harm here is a failure of relationship, and that is what has to be repaired.",
+    "words": 128
   },
   {
     "id": "careful-builder.ubuntu.27",
@@ -566,8 +566,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "The harm is a broken relationship between the builders and the people it fell on, so what is owed is not blame sized to the damage but the builders' part in mending that relationship. Care matters to fault. Builders who did what could reasonably be done are not culpable in the way careless ones are, and blaming them as if they were tells everyone that care counts for nothing.\n\nA careful team's translation tool mistranslates a medical instruction. They go to the clinic that was hurt by it and work through the fix with the staff who saw the harm. That is why the Ubuntu Ethicist asks who else is in this, and who was not asked.",
-    "words": 117
+    "text": "The harm is a broken relationship between the builders and the people it fell on, so what is owed is not blame sized to the damage but the builders' part in mending that relationship. Care matters to fault, because taking care is itself a way of honouring the people a system will reach. Builders who did what could reasonably be done for those people stood in the right relation to them, and blaming them as careless builders are blamed treats that relation as worth nothing.\n\nA careful team's translation tool mistranslates a medical instruction. They go to the clinic that was hurt by it and work through the fix with the staff who saw the harm. That is why the Ubuntu Ethicist asks who else is in this, and who was not asked.",
+    "words": 133
   },
   {
     "id": "careful-builder.ubuntu.31",

@@ -163,7 +163,7 @@
         "As Metz gives the Nguni maxim, a person is a person through other persons. Upbringing makes someone good by drawing them into relationships where they share in others' lives and others share in theirs, and the goodness consists partly in that sharing, which a model does not do.",
         "On Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A well-raised person has those capacities and exercises them; a trained model produces text that describes them without having them.",
         "The feedback that trains a model comes from raters who are not in a relationship with it or with each other. Upbringing comes from people bound to the child and to one another, and that difference is the whole difference between shaping and raising.",
-        "Menkiti's view is that personhood is achieved over a life within a community, by meeting its demands, and even Gyekye's moderate reading, which keeps individual worth, has goodness growing within relationships. Neither picture has room for goodness installed by an optimiser."
+        "On Menkiti's view the community confers personhood once its demands are met; on Gyekye's moderate reading individuals keep their own worth and rights, but community is still essential. Neither picture has room for goodness installed by an optimiser, with no community whose demands it meets."
       ],
       "examples": [
         "A child raised by an extended family learns to share because her cousins share with her. A model learns to sound generous because raters scored generous replies higher.",
@@ -179,7 +179,7 @@
         },
         {
           "rival": "utilitarianism",
-          "claim": "a community is not one voice, and the raters who train a model are a kind of community whose judgements shape it, much as a village's shape a child.",
+          "claim": "if the trained behaviour reliably does good it is good in the only sense that counts, and the raters who train a model shape it much as a village shapes a child.",
           "answer": "Raters are a crowd, not a community: they share no life with the model or with each other. And even a real community does not make someone good by scoring them; it does so by taking them into its relationships.",
           "why": "It appeals to community without saying why the raters behind the training are not one."
         }
@@ -189,8 +189,8 @@
       "direction": "against",
       "positions": [
         "Goodness lies in the intention behind an act as well as in what follows, and training shapes what a model outputs without giving it any volition, so it can be made less harmful but not good.",
-        "I reject the motion. A person raised well acts from good intention; a model trained well produces outputs, and intention is where goodness lives.",
-        "A Buddhist rejects this, because the training changes what follows from the model without touching the thing that makes an act good or bad: the volition behind it.",
+        "I reject the motion. A person raised well acts from good intention; a model trained well produces outputs with no intention behind them, and goodness is weighed in the intention as much as in the effects.",
+        "A Buddhist Ethicist rejects this, because the training changes what follows from the model without touching what weighs as much as any effect in whether an act is good or bad: the volition behind it.",
         "Training can reduce the harm a model does, and that is worth doing, but it does not make the model good in the sense upbringing makes a person good."
       ],
       "reasons": [

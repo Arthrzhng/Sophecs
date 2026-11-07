@@ -5094,16 +5094,26 @@ seen the samples.
 - **The passages** (`scripts/seed/arguments/fragments/*.json`) for
   Confucianism, Ubuntu and Buddhist Ethics, at the live three's depth: for
   each of the six topics, a direction, 4 positions, 4 reasons, 3 examples
-  and 2 objections each with its answer, and 4 closings per school. 234
-  passages, mine, written from each school's file (`read`, `gets_wrong`),
-  its approved criteria, and, for the scholars a school file names, what
-  the school file says of them.
+  and 2 objections each with its answer, and 4 closings per school: 234
+  passages and 12 closings, 246 in all, mine, written from each school's
+  file (`read`, `gets_wrong`), its approved criteria, and, for the
+  scholars a school file names, what the school file says of them:
+  Mhlambi, that a discriminatory automated decision is a failure of
+  relational personhood; Menkiti, that the community confers personhood
+  once its demands are met; Gyekye, that individuals keep their own worth
+  and rights while community stays essential.
 - **Sources.** A passage names a scholar or text only where the school
   file does (the Analects' Books 12 and 13; Metz, Menkiti, Gyekye and
-  Mhlambi; the discourse to Rahula) and quotes none of them. The two
-  wordings the criteria declare as quotations, the Nguni maxim and Metz's
-  principle, appear only with Metz named, which ruling (e) 9 allows for
-  verified wording; the research file's UNVERIFIED items are not used.
+  Mhlambi; the discourse to Rahula). Two verified wordings are used, each
+  word for word as the research file has it and with its source named in
+  the same passage, as ruling (e) 9 allows: the Nguni maxim, as Metz gives
+  it, and Metz's principle. Book 13 is paraphrased, not given in Legge's
+  words. Nothing is put in the mouth of Confucius or the Buddha, and the
+  research file's UNVERIFIED items are not used.
+  `tests/seed/launch-passages.test.ts` holds the passages to those rules
+  and to the house style, since the quotation guard reads only quotation
+  marks under `content/` and the passages carry none. The arguer is "a
+  Buddhist Ethicist", not "a Buddhist", as accepted at Checkpoint B (e) 1.
   Buddhist Ethics is not reduced to reducing suffering, which the research
   file warns against: suffering is weighed with intention and non-harm.
 - **Objections.** Two per topic, as the live three have, from two rivals:
@@ -5122,6 +5132,15 @@ seen the samples.
   quiz's three (`SCHOOLS`), so no run changes and the live three's 18
   banks rebuild byte for byte; `tests/seed/banks.test.ts` holds all 36 to
   their passages, and the new three to two objections from two rivals,
-  their named voices among them.
+  their named voices among them. `tests/seed/determinism.test.ts` pins
+  the datasets `main` gave at 3008b29, before the new banks, for the base
+  window and for ten days of extension, so a change that would move rows
+  a live run has written fails the tests.
 - **The samples** for Arthur: `docs/gate4-samples.md`, one argument of
   each tier per school, the first of its tier in its topic's bank.
+- **Directions** follow the stances #103 wrote, and several positions
+  restate a stance almost word for word. So the question already on
+  Arthur's list from item 9, whether non-harm lets Buddhist Ethics program
+  a death at all on `crash-arithmetic`, covers these passages too: they
+  argue for minimising deaths, owning the rule as an intention about who
+  dies.
