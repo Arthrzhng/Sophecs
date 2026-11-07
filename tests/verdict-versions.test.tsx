@@ -70,7 +70,7 @@ describe("scores compared only within one version of the judge", () => {
     ).replace(/&#x27;/g, "'");
     expect(html).not.toContain("version of the judge");
     expect(html).not.toContain("Compared with your first attempt");
-    expect(html).not.toContain(">61<");
+    expect(html).not.toMatch(/\b61\b/);
     expect(html).toContain("Objection answered.");
   });
 

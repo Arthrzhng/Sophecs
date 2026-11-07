@@ -4925,9 +4925,15 @@ Items 1 to 7, carried out together:
     The event is fired by `src/components/debate/ArgumentEditor.tsx`
     from the change the judge route works out (`src/app/api/judge/route.ts`,
     frozen, unchanged); the revise page tells the editor whether the
-    original was judged under the version this build judges with.
-  Each row's own `prompt_version` column is compared
-  (`src/lib/verdict-versions.ts`), never the copy in a verdict read
+    original was judged under the version this build judges with. A
+    revise page opened on the v2 build and sent after the launch deploy
+    would still record a change across versions; that window is minutes,
+    affects only the event, and the frozen route returns no version to
+    check against.
+  The verdict page reads both rows in one query, and across two versions
+  hands the component no first scores at all, so they are not in the
+  page's payload either. Each row's own `prompt_version` column is
+  compared (`src/lib/verdict-versions.ts`), never the copy in a verdict read
   through `debates_public`: that view keeps a withheld verdict's version
   only when it reads `v<n>` (migration 0023), so a sample's template
   version would vanish and two same-version verdicts would look

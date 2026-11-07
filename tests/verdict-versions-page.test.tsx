@@ -12,14 +12,22 @@ import { withheldVerdict } from "../src/lib/verdict-privacy";
 type Row = Record<string, unknown>;
 const db: { tables: Record<string, Row[]>; shares: string[] } = { tables: {}, shares: [] };
 
-// Enough of supabase-js for this page: equality filters, and maybeSingle
-// answering the first row that matches them.
+// Enough of supabase-js for this page: `eq` and `in` filters, only the
+// selected columns returned, as a list or by maybeSingle.
 function from(table: string) {
-  const filters: [string, unknown][] = [];
+  const filters: ((r: Row) => boolean)[] = [];
+  let columns: string[] | null = null;
   const b: Record<string, unknown> = {};
-  for (const m of ["select", "or", "limit", "order", "in", "not"]) b[m] = () => b;
-  b.eq = (c: string, v: unknown) => (filters.push([c, v]), b);
-  b.maybeSingle = async () => ({ data: (db.tables[table] ?? []).find((r) => filters.every(([c, v]) => r[c] === v)) ?? null });
+  for (const m of ["or", "limit", "order", "not"]) b[m] = () => b;
+  b.select = (cols: string) => ((columns = cols.split(",").map((c) => c.trim())), b);
+  b.eq = (c: string, v: unknown) => (filters.push((r) => r[c] === v), b);
+  b.in = (c: string, vs: unknown[]) => (filters.push((r) => vs.includes(r[c])), b);
+  const rows = () =>
+    (db.tables[table] ?? [])
+      .filter((r) => filters.every((f) => f(r)))
+      .map((r) => (columns ? Object.fromEntries(columns.filter((c) => c in r).map((c) => [c, r[c]])) : r));
+  b.maybeSingle = async () => ({ data: rows()[0] ?? null, error: null });
+  b.then = (resolve: (v: unknown) => unknown) => resolve({ data: rows(), error: null });
   return b;
 }
 vi.mock("@/lib/supabase/admin", () => ({ isAdminConfigured: () => true, createAdminClient: () => ({ from }) }));
@@ -64,7 +72,7 @@ async function page(o: { first: string; revision: string; revisionPublic: boolea
     debate_topics: [{ slug: "opaque-benefit", motion: "A motion.", micro_after: "none" }],
     debates: [
       { id: "o1", verdict: judged(o.first, 61), argument_public: true, prompt_version: o.first },
-      { id: "r1", prompt_version: o.revision },
+      { id: "r1", verdict, argument_public: o.revisionPublic, prompt_version: o.revision },
     ],
   };
   const element = await VerdictPage({
@@ -72,11 +80,16 @@ async function page(o: { first: string; revision: string; revisionPublic: boolea
     searchParams: Promise.resolve({}),
   });
   const html = renderToStaticMarkup(element).replace(/&#x27;/g, "'");
+  // What the page hands Verdict, a client component: its props are the
+  // page's payload, whether or not they are shown.
+  const children = ([] as unknown[]).concat((element as { props: { children: unknown } }).props.children);
+  const verdictProps = (children.find((c) => (c as { props?: Row } | null)?.props && "comparison" in (c as { props: Row }).props) as { props: Row }).props;
   return {
     html,
+    handed: verdictProps.comparison as { comparable: boolean; first: Record<string, unknown> } | null,
     table: html.includes("Compared with your first attempt"),
     line: html.includes("The first attempt was judged by an earlier version of the judge"),
-    firstScore: html.includes(">61<"),
+    firstScore: /\b61\b/.test(html),
     share: db.shares.at(-1) ?? "",
   };
 }
@@ -112,6 +125,12 @@ describe("the verdict page compares a revision with its original only within one
       expect(r.html).toContain("Objection answered.");
       expect(r.html).toContain('href="/debate/opaque-benefit/o1"');
     }
+    // The first scores are not handed to the client component at all.
+    const across = await page({ first: "v2", revision: "v3", revisionPublic: true, sample: false });
+    expect(across.handed?.comparable).toBe(false);
+    expect(Object.values(across.handed!.first).every((v) => v === null)).toBe(true);
+    const within = await page({ first: "v2", revision: "v2", revisionPublic: true, sample: false });
+    expect(within.handed?.first.score).toBe(61);
     const shared = await page({ first: "v2", revision: "v3", revisionPublic: true, sample: false });
     expect(shared.share).not.toContain("61");
     expect(shared.share).not.toContain("→");
@@ -120,6 +139,8 @@ describe("the verdict page compares a revision with its original only within one
   it("between two sample templates: no table and no first score, and not called two versions of the judge", async () => {
     const r = await page({ first: "sample-template-1", revision: "sample-template-2", revisionPublic: true, sample: true });
     expect(r.table).toBe(false);
+    // Not in what the page hands the component either.
+    expect(r.html).not.toMatch(/\b61\b/);
     expect(r.firstScore).toBe(false);
     expect(r.line).toBe(false);
     expect(r.html).not.toContain("version of the judge");

@@ -35,12 +35,19 @@ Every item below was ruled on 2026-11-07, verbatim in `docs/decisions.md`,
 | 15 | Preview link and click-through when 8 to 13 are done; launch on your word | When 8 to 13 are done |
 | 16 | The SQL to you when the time comes | At the launch |
 
-For your next list, from carrying these out: the line item 5 adds ("The
-first attempt was judged by an earlier version of the judge, so the two
-scores are not compared.", `docs/daily-path-copy.md`); and a frozen
-comment item 4 makes stale, in `src/app/api/judge/route.ts`: "At most
-$0.20 or so a reader a day at the COST comment's rate", which at v3's
-$0.0152 is about $0.30 (20 calls), left as it is.
+For your next list, from carrying these out:
+- the line item 5 adds ("The first attempt was judged by an earlier
+  version of the judge, so the two scores are not compared.",
+  `docs/daily-path-copy.md`). It says "earlier" because every case that
+  can arise is v2 then v3; "a different version" would stay true if the
+  versions ever went the other way;
+- that item 5 counts a sample's two template rules as two versions, so 3
+  sample revisions (`sample-template-1` then `-2`) lose their table, with
+  no line, since no judge wrote either; your ruling said prompt versions,
+  and these are template rules;
+- a frozen comment item 4 makes stale, in `src/app/api/judge/route.ts`:
+  "At most $0.20 or so a reader a day at the COST comment's rate", which
+  at v3's $0.0152 is about $0.30 (20 calls), left as it is.
 
 ## Where things stand
 
