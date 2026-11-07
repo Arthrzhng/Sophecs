@@ -15,6 +15,8 @@
 // What it reuses from the app rather than reimplementing:
 // - the quiz bank and scoreQuiz, so a sample's school comes out of answers
 //   it gave, as a reader's does (answers are biased, outcomes are not set);
+//   in a run made with `quiz: 2`, quiz v2's questions (docs/quiz-v2.json,
+//   the file the app reads) and scoreQuizV2, across all six schools;
 // - soloElo, pairwiseElo and applyStreakDay, replayed in time order
 //   (replay.ts), with a par of its own so no genuine topic par is read or
 //   written;
@@ -24,13 +26,17 @@
 //
 // docs/sample-activity.md describes the model and its parameters.
 
+import { createHmac } from "node:crypto";
 import { QUIZ_QUESTIONS, type QuizOption } from "../../content/quiz/questions";
 import { scoreQuiz } from "../../src/lib/scoring";
+import { onCircle, scoreQuizV2, type MapPoint, type MapSchoolPosition, type QuizV2Option } from "../../src/lib/quiz-v2-score";
+import quizV2Raw from "../../docs/quiz-v2.json";
 import { checkBody, checkQuote, authorForSeq, quoteSourceForSeq, LAPSE_DAYS, MAX_SEQ } from "../../src/lib/counterpart";
 import { getWeeklyMotion } from "../../src/lib/weekly-motion";
 import { Rng, ID_ALPHABET, ID_LENGTH, CLASS_CODE_ALPHABET, CLASS_CODE_LENGTH } from "./rng";
 import {
   SCHOOLS,
+  BANK_SCHOOLS,
   TOPICS,
   compose,
   fit,
@@ -74,11 +80,29 @@ export interface GenConfig {
   challenges: number;
   exchanges: number;
   classes: number;
+  /**
+   * 2: place samples by quiz v2, among all six schools, as the launch does
+   * (Arthur, 2026-11-07, Gate 4 item 13: "the fresh sample run covers all
+   * six schools, placed by quiz v2"). Absent, as in every run made before
+   * the launch: quiz v1 and its three, every row exactly as before.
+   */
+  quiz?: 2;
   topics: { slug: string; title: string; motion: string; sort: number; microBefore: string }[];
 }
 
 // 3,278 accounts, Arthur's ruling of 2026-11-04, and the other volumes
 // scaled from the brief's 4,000 by the same factor.
+/**
+ * The quiz the scheduled job's runs place samples by: none named, so quiz
+ * v1, until the launch merge sets it to 2, after the sample teardown, so
+ * that the fresh run and every extension of it cover all six schools
+ * (docs/sample-activity.md, "At launch"). A run's base hash includes the
+ * quiz when one is named, so the live run, whose plan names none, cannot be
+ * extended under quiz v2: the dry run refuses a plan whose base hash is not
+ * the run's.
+ */
+export const RUN_QUIZ: GenConfig["quiz"] = undefined;
+
 export const DEFAULTS = {
   users: 3278,
   anonResults: 4917,
@@ -114,7 +138,12 @@ export interface QuizResultRow {
   user_id: string | null;
   school: SchoolId;
   secondary: SchoolId;
-  vector: Record<SchoolId, number>;
+  /** Quiz v1's three weights; null on a quiz v2 result, which has a point instead (migration 0027). */
+  vector: Partial<Record<SchoolId, number>> | null;
+  /** On a quiz v2 result only, as the app writes one: the version and the point. */
+  quiz_version?: 2;
+  map_x?: number;
+  map_y?: number;
   answers: { q: number; opt: string }[];
   challenge_from: string | null;
   /** Always null: sample results carry no referrer (Arthur, 2026-11-04). */
@@ -249,6 +278,18 @@ export function emailFor(runId: string, n: number, tag: string): string {
   return `seed+${runId}-${n}-${tag}@sophecs.test`;
 }
 
+/**
+ * The address tag of a run made with quiz v2, which is the fresh run at
+ * the launch: HMAC-SHA256 of the run and the user's number, keyed by the
+ * seed, as docs/sample-activity.md ("At launch") set out for that run. A
+ * run before it takes its tag from the generator's own random streams,
+ * which are not meant for secrets; changing that for the live run would
+ * break its spot checks.
+ */
+export function emailTag(seed: string, runId: string, n: number): string {
+  return createHmac("sha256", seed).update(`${runId}/${n}`).digest("hex").slice(0, 12);
+}
+
 // ---- internal working types ----
 
 type ActivityClass = "quiz" | "light" | "regular" | "heavy";
@@ -292,6 +333,19 @@ interface Slot {
   revise: { delay: number; answered: boolean } | null;
 }
 
+// Quiz v2 as the app reads it (src/lib/quiz-v2.ts, from the same file):
+// the questions with each option's vector, and the schools in the file's
+// order, which breaks the last tie. The app's loader is server-only and
+// shows the quiz on SIX_SCHOOLS builds only; the seed reads the file.
+const QUIZ_V2: { questions: { id: number; options: QuizV2Option[] }[]; schools: MapSchoolPosition[] } = {
+  questions: quizV2Raw.questions.map((q) => ({
+    id: q.id,
+    options: q.options.map((o) => ({ id: o.id, label: o.label, vector: { x: o.vector.x, y: o.vector.y } })),
+  })),
+  schools: Object.entries(quizV2Raw.schools).map(([id, s]) => ({ id, angle: s.angle })),
+};
+const QUIZ_V2_DIRECTION = new Map<string, MapPoint>(QUIZ_V2.schools.map((s) => [s.id, onCircle(s.angle)]));
+
 export function generate(cfg: GenConfig, banks: Banks): Dataset {
   const from = Date.parse(cfg.from);
   // Everything but the arguments ends at the base window's end, which is
@@ -327,26 +381,57 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     return Math.max(from, earliest) + r.int(1, 60) * MINUTE;
   };
 
-  // ---- 2. the quiz: answers biased by a leaning, outcomes by scoreQuiz ----
+  // ---- 2. the quiz: answers biased by a leaning, outcomes by the quiz's own scorer ----
+  // A run with `quiz: 2` places samples by quiz v2 among all six schools;
+  // any other run by quiz v1 among its three, drawing exactly as before.
+  const v2 = cfg.quiz === 2;
+  const schools: readonly SchoolId[] = v2 ? BANK_SCHOOLS : SCHOOLS;
+  if (v2) for (const s of schools) if (!QUIZ_V2_DIRECTION.has(s)) throw new Error(`quiz v2 places no one in ${s}`);
   const quizRng = root.fork("quiz-calibration");
-  const target: Record<SchoolId, number> = { stoicism: 0.4, utilitarianism: 0.35, "virtue-ethics": 0.25 };
+  // Quiz v1's mix as it was; under quiz v2 an equal share each, so the six
+  // are equally active (the ruling: "launch week shows six active schools").
+  const target: Partial<Record<SchoolId, number>> = v2
+    ? Object.fromEntries(schools.map((s) => [s, 1 / schools.length]))
+    : { stoicism: 0.4, utilitarianism: 0.35, "virtue-ethics": 0.25 };
   const answer = (r: Rng, leaning: SchoolId, strength: number): QuizOption[] =>
-    QUIZ_QUESTIONS.map((q) => r.weighted(q.options.map((o) => [o, Math.exp(3 * strength * o.vector[leaning])] as const)));
+    QUIZ_QUESTIONS.map((q) => r.weighted(q.options.map((o) => [o, Math.exp(3 * strength * o.vector[leaning as keyof typeof o.vector])] as const)));
+  // The same bias under quiz v2: an option weighs by how far its vector
+  // points towards the leaning's place on the map.
+  const answerV2 = (r: Rng, leaning: SchoolId, strength: number): QuizV2Option[] => {
+    const d = QUIZ_V2_DIRECTION.get(leaning)!;
+    return QUIZ_V2.questions.map((q) => r.weighted(q.options.map((o) => [o, Math.exp(3 * strength * (o.vector.x * d.x + o.vector.y * d.y))] as const)));
+  };
+  const primaryOf = (r: Rng, lean: SchoolId, strength: number): SchoolId =>
+    (v2 ? scoreQuizV2(answerV2(r, lean, strength), QUIZ_V2.schools).primary : scoreQuiz(answer(r, lean, strength)).primary) as SchoolId;
   // Leanings are weighted so that outcomes land near the target mix; the
   // weights are found on a calibration sample, deterministically.
-  let leanWeights = { ...target };
+  let leanWeights = { ...target } as Record<SchoolId, number>;
   for (let iter = 0; iter < 4; iter++) {
-    const counts: Record<SchoolId, number> = { stoicism: 0, utilitarianism: 0, "virtue-ethics": 0 };
+    const counts = Object.fromEntries(schools.map((s) => [s, 0])) as Record<SchoolId, number>;
     const r = quizRng.fork(`iter-${iter}`);
     for (let i = 0; i < 3000; i++) {
-      const lean = r.weighted(SCHOOLS.map((s) => [s, leanWeights[s]] as const));
-      counts[scoreQuiz(answer(r, lean, r.float(0.4, 1.4))).primary as SchoolId]++;
+      const lean = r.weighted(schools.map((s) => [s, leanWeights[s]] as const));
+      counts[primaryOf(r, lean, r.float(0.4, 1.4))]++;
     }
     leanWeights = Object.fromEntries(
-      SCHOOLS.map((s) => [s, leanWeights[s] * (target[s] / Math.max(0.01, counts[s] / 3000))])
+      schools.map((s) => [s, leanWeights[s] * (target[s]! / Math.max(0.01, counts[s] / 3000))])
     ) as Record<SchoolId, number>;
   }
-  const takeQuiz = (r: Rng, lean: SchoolId) => {
+  const takeQuiz = (r: Rng, lean: SchoolId): Pick<QuizResultRow, "school" | "secondary" | "vector" | "quiz_version" | "map_x" | "map_y" | "answers"> => {
+    if (v2) {
+      const chosen = answerV2(r, lean, r.float(0.4, 1.4));
+      const result = scoreQuizV2(chosen, QUIZ_V2.schools);
+      // In the order and shape submitQuizResultV2 writes them.
+      return {
+        school: result.primary as SchoolId,
+        secondary: result.secondary as SchoolId,
+        vector: null,
+        quiz_version: 2,
+        map_x: result.point.x,
+        map_y: result.point.y,
+        answers: chosen.map((o, i) => ({ q: QUIZ_V2.questions[i].id, opt: o.id })),
+      };
+    }
     const chosen = answer(r, lean, r.float(0.4, 1.4));
     const result = scoreQuiz(chosen);
     return {
@@ -392,7 +477,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     let handle = `${given.toLowerCase()}_${initial.toLowerCase()}${r.int(10, 9999)}`;
     while (usedHandles.has(handle)) handle = `${handle}${r.int(0, 9)}`;
     usedHandles.add(handle);
-    const leaning = r.weighted(SCHOOLS.map((s) => [s, leanWeights[s]] as const));
+    const leaning = r.weighted(schools.map((s) => [s, leanWeights[s]] as const));
     return {
       n,
       id: r.uuid(),
@@ -415,7 +500,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     logicalId: `user:${u.n}`,
     rowId: u.id,
     cohort: u.n,
-    row: { id: u.id, email: emailFor(runId, u.n, root.fork(`email/${u.n}`).token("abcdefghijklmnopqrstuvwxyz0123456789", 12)) },
+    row: { id: u.id, email: emailFor(runId, u.n, v2 ? emailTag(cfg.seed, runId, u.n) : root.fork(`email/${u.n}`).token("abcdefghijklmnopqrstuvwxyz0123456789", 12)) },
   }));
 
   // Cohort for rows that belong to no user: the number of users who had
@@ -473,7 +558,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
       const current = u.schoolAt[u.schoolAt.length - 1].school;
       let retake = null;
       for (let tries = 0; tries < 30 && !retake; tries++) {
-        const lean = r.pick(SCHOOLS.filter((s) => s !== current));
+        const lean = r.pick(schools.filter((s) => s !== current));
         const q = takeQuiz(r, lean);
         if (q.school !== current) retake = q;
       }
@@ -504,7 +589,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     const r = anonRng.fork(`a${i}`);
     const tz = r.weighted(TIMEZONES);
     const t = arrival(r, tz);
-    const lean = r.weighted(SCHOOLS.map((s) => [s, leanWeights[s]] as const));
+    const lean = r.weighted(schools.map((s) => [s, leanWeights[s]] as const));
     const quiz = takeQuiz(r, lean);
     const rid = id(r);
     const item: Item<QuizResultRow> = {
@@ -1134,8 +1219,12 @@ function writeTurn(
   if (!quote) quote = source.split(/\s+/).slice(0, 8).join(" ");
   const reason = r.pick(mine.reasons);
   let body: string;
-  if (seq === 1) body = `That is where I disagree. ${capital(againstThem?.claim ?? reason)} ${reason}`;
-  else if (seq === 2) body = `${capital(answerToThem ? answerToThem.answer : reason)} ${reason}`;
+  // Among six schools a pair can have no objection between them; then the
+  // turn argues from a reason and an example rather than saying one reason
+  // twice. Among quiz v1's three every pair has one, so those turns are as
+  // they were.
+  if (seq === 1) body = againstThem ? `That is where I disagree. ${capital(againstThem.claim)} ${reason}` : `That is where I disagree. ${reason}`;
+  else if (seq === 2) body = answerToThem ? `${capital(answerToThem.answer)} ${reason}` : `${reason} ${r.pick(mine.examples)}`;
   else if (seq === 3) body = `That reply does not settle it. ${reason} ${r.pick(mine.examples)}`;
   else body = `${reason} ${r.pick(banks.closings[author.row.school])}`;
   body = body.replace(/\s+/g, " ").trim();

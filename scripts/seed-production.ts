@@ -25,7 +25,7 @@ import { contentTopics } from "./seed/topics";
 import { execute, finishValidation, releaseHeld, VALIDATING } from "./seed/engine";
 import { validate } from "./seed/validate";
 import { dryRun } from "./seed/dryrun";
-import { cancelSignal, int, isoFlag, log, main, nowFloored, parseFlags, refuseUnsupported, str, writeReport } from "./seed/cli";
+import { cancelSignal, int, isoFlag, log, main, nowFloored, parseFlags, quizFlag, refuseUnsupported, str, writeReport } from "./seed/cli";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
@@ -37,7 +37,7 @@ main(async () => {
     values: ["expected-project-ref", "confirm-production", "run-id", "plan", "seed", "from", "base-to", "to", "users", "anon-results", "challenges", "exchanges", "classes", "canary", "out", "real-judge", "concurrency", "batch-size", "rows-per-second", "auth-per-second"],
     booleans: ["execute", "validate", "six-schools", "break-stale-lock", "dry-run"],
   });
-  refuseUnsupported(f);
+  refuseUnsupported(f, "production");
   const ref = str(f, "expected-project-ref");
   if (f["dry-run"] && (f.execute || f.validate)) throw new GuardError("--dry-run cannot be combined with --execute or --validate");
   // A dry run with no plan makes the plan: nothing but the plan file is written.
@@ -61,6 +61,7 @@ main(async () => {
       challenges: int(f, "challenges", DEFAULTS.challenges, 0, 5000),
       exchanges: int(f, "exchanges", DEFAULTS.exchanges, 0, 5000),
       classes: int(f, "classes", DEFAULTS.classes, 0, 100),
+      ...(quizFlag(f) ? { quiz: quizFlag(f) } : {}),
       topics: contentTopics(),
     };
     const measured = str(f, "rows-per-second")

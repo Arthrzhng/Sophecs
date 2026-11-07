@@ -3,7 +3,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { checkLocalUrl, checkProduction, localTarget, parseEnvFile, productionTarget, GuardError } from "../../scripts/seed/env";
-import { parseFlags, refuseUnsupported } from "../../scripts/seed/cli";
+import { parseFlags, quizFlag, refuseUnsupported } from "../../scripts/seed/cli";
 
 const REF = "tekifezydjlgxgndkxul";
 const jwt = (payload: object) =>
@@ -101,8 +101,11 @@ describe("flags", () => {
   it("refuses unknown flags", () => {
     expect(() => parseFlags(["--exeucte"], { values: [], booleans: ["execute"] })).toThrow(/unknown flag/);
   });
-  it("refuses --six-schools and --real-judge with the reason", () => {
-    expect(() => refuseUnsupported({ "six-schools": true })).toThrow(/scores three schools/);
+  it("refuses --real-judge, and --six-schools on production before the launch, with the reason", () => {
+    expect(() => refuseUnsupported({ "six-schools": true }, "production")).toThrow(/only after the launch/);
+    expect(() => refuseUnsupported({ "six-schools": true })).not.toThrow();
+    expect(quizFlag({ "six-schools": true })).toBe(2);
+    expect(quizFlag({})).toBeUndefined();
     expect(() => refuseUnsupported({ "real-judge": "10" })).toThrow(/disabled/);
   });
 });

@@ -21,7 +21,7 @@ import { execute, finishValidation, releaseHeld, VALIDATING } from "./seed/engin
 import { validate } from "./seed/validate";
 import { dryRun } from "./seed/dryrun";
 import { getAllTopicFiles } from "../src/lib/topics";
-import { REPORT_DIR, cancelSignal, int, isoFlag, log, main, nowFloored, parseFlags, refuseUnsupported, str, writeReport } from "./seed/cli";
+import { REPORT_DIR, cancelSignal, int, isoFlag, log, main, nowFloored, parseFlags, quizFlag, refuseUnsupported, str, writeReport } from "./seed/cli";
 
 const MARKER = "sophecs seed-local: disposable database made by scripts/seed-local.ts --create-db";
 
@@ -81,6 +81,7 @@ main(async () => {
         challenges: int(f, "challenges", DEFAULTS.challenges, 0, 5000),
         exchanges: int(f, "exchanges", DEFAULTS.exchanges, 0, 5000),
         classes: int(f, "classes", DEFAULTS.classes, 0, 100),
+        ...(quizFlag(f) ? { quiz: quizFlag(f) } : {}),
         topics: contentTopics(),
       },
     });

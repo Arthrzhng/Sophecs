@@ -5320,3 +5320,64 @@ seen the samples.
   - Buddhist Ethics' best-known objection, the gap between moral teaching
     and institutions (who audits, how one appeals), appears only obliquely,
     in a Confucian objection on `no-decision`.
+
+### Gate 4 item 13, second part: the generator for six schools, placed by quiz v2 (2026-11-07)
+
+Arthur's ruling, quoted in full in "Gate 4: Arthur's rulings
+(2026-11-07)", begins "Yes: the fresh sample run covers all six schools,
+placed by quiz v2". The first part wrote the banks and the samples; this
+writes the generator that uses them. Nothing runs: the fresh run is a
+launch step, after the teardown, on his word.
+
+- **A run's quiz.** `GenConfig.quiz`, 2 or absent, chooses the quiz and
+  so the schools: quiz v2 and all six, or quiz v1 and its three. The
+  scheduled job takes it from `RUN_QUIZ` in `scripts/seed/generate.ts`,
+  absent until the launch merge sets it to 2 (on the launch checklist in
+  `docs/stage5-plan.md`). The command line takes `--six-schools`, which
+  used to be refused as "the six-school quiz ... is a draft that is not
+  built"; production still refuses it until `RUN_QUIZ` is 2, since before
+  the launch production shows three schools.
+- **Placed by quiz v2.** Each sample answers quiz v2's questions, read
+  from `docs/quiz-v2.json` as the app reads them, and is scored by the
+  app's `scoreQuizV2`. Its answers lean towards a school by how far each
+  option's vector points towards that school's place on the map, as quiz
+  v1's answers lean by the option's weight for the school. The result is
+  written as `submitQuizResultV2` writes one: version 2, the point, no
+  vector, the answers by question id.
+- **The mix.** Equal, one sixth each, by the same calibration quiz v1's
+  40, 35 and 25 use. The ruling asks for six active schools at launch;
+  equal shares take no view on which are more popular. Mine, on Arthur's
+  list. At production volume each school has 74 to 123 judged originals
+  in each of the two weeks after the base window, against the table's
+  threshold of 20.
+- **Verdicts.** A template verdict names a school and its adherent from
+  the full registry, so it reads the same on any build, with the
+  adherent's article ("an Ubuntu Ethicist", "an Ubuntu position"). The
+  live three's verdicts are word for word as before. Nine new lines say
+  what standing on a new school's own ground looks like (`FEATURE`), from
+  the school files and criteria; mine, on Arthur's list. Every verdict of
+  a six-school run passes the judge's schema as a six-school build has it.
+- **Exchanges.** Two of the six can have no objection between them in the
+  passages; a turn between them argues from a reason and an example. The
+  old fallback would have said one reason twice. Among quiz v1's three
+  every pair has one, so those turns are unchanged.
+- **Addresses.** A quiz v2 run's sample addresses carry HMAC-SHA256 of
+  the run and the user's number, keyed by the seed, which
+  `docs/sample-activity.md` had set out for the fresh run.
+- **The live run is untouched.** The quiz enters a plan's base hash and
+  config only when one is named, so every existing plan hashes as it did
+  (pinned), and the datasets of a run that names no quiz are pinned as
+  `main` gave them at 3008b29, for the base window and ten days on. A
+  plan with a quiz has another base hash, so the live run cannot be
+  extended as a six-school run: the dry run refuses it.
+- **Checked on Postgres.** A quiz v2 plan of 600 accounts written to a
+  disposable local database with every migration: canary and full
+  stages, every check passed (migration 0027's check on a result's shape
+  among the writes), and teardown left nothing.
+- **Left as they are**, because changing them would change rows the live
+  run has written: in about 1 revision in 20, the verdict says the
+  revision now answers an objection and still suggests answering it (4 of
+  81 revisions in the test fixture's three-school run, 10 of 81 in its
+  six-school run); and a name ending in "s" takes "'s" ("Virtue Ethics's",
+  and now "Buddhist Ethics's"). Both could change for the fresh run only,
+  if Arthur wants that.

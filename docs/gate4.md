@@ -30,7 +30,7 @@ Every item below was ruled on 2026-11-07, verbatim in `docs/decisions.md`,
 | 10 | The rubric shows v3's criteria for all six | Done on SIX_SCHOOLS builds (#102) |
 | 11 | An exemplar floor | Done, at 50 (#102) |
 | 12 | A pending reply holds the lapse clock; `/me` label | Done (#102) |
-| 13 | Argument banks for the new three; samples to you first | Banks and samples (#104, `docs/gate4-samples.md`); the six-school run waits for your word on the samples |
+| 13 | Argument banks for the new three; samples to you first | Banks and samples (#104, `docs/gate4-samples.md`); the generator for six schools placed by quiz v2 (#105). The run itself waits for your word on the samples, and for the launch |
 | 14 | Navigation as built | Nothing to do |
 | 15 | Preview link and click-through when 8 to 13 are done; launch on your word | When 8 to 13 are done |
 | 16 | The SQL to you when the time comes | At the launch |
@@ -76,7 +76,12 @@ For your next list, from carrying these out:
   read as spreading an AI harm's responsibility, which the criteria call
   an inference; Ubuntu's best-known objection (a community is not one
   voice) not stated in any objection; and Buddhist Ethics' (the gap to
-  institutions) only obliquely.
+  institutions) only obliquely;
+- item 13, the run: the six schools are equally likely in a fresh run,
+  which is mine (the live three's 40, 35 and 25 had no counterpart for
+  six), and the nine lines a template verdict uses to praise an argument
+  for standing on a new school's ground, in `scripts/seed/verdicts.ts`
+  (`FEATURE`), are mine too, for your reading.
 
 ## Where things stand
 
