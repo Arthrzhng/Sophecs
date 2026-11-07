@@ -6,7 +6,7 @@ import {
   type ExchangeStatus,
 } from "@/components/counterpart/ExchangeView";
 import { latestReplyPending, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
-import { closeIfLapsed } from "@/lib/counterpart-lapse";
+import { closeIfLapsed, exchangeForLapse } from "@/lib/counterpart-lapse";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate } from "@/lib/motion-text";
 
@@ -56,7 +56,7 @@ export default async function CounterpartPage({
   const theirDebateId = iAmA ? exchange.debate_b : exchange.debate_a;
   const theirUserId = iAmA ? exchange.user_b : exchange.user_a;
 
-  const [{ data: topic }, { data: debates }, { data: turnRows }] = await Promise.all([
+  const [{ data: topic }, { data: debates }, { data: turnRows, error: turnsError }] = await Promise.all([
     admin.from("debate_topics").select("motion, title").eq("slug", exchange.topic_slug).maybeSingle(),
     admin
       .from("debates")
@@ -76,18 +76,8 @@ export default async function CounterpartPage({
   // closed is whoever opens it. A reply waiting to be screened holds the
   // clock (src/lib/counterpart.ts, exchangeLapsed), and the close takes only
   // while the exchange is as it was read (src/lib/counterpart-lapse.ts).
-  const status = await closeIfLapsed(
-    admin,
-    {
-      id,
-      status: exchange.status as string,
-      user_a: (exchange.user_a as string | null) ?? null,
-      user_b: (exchange.user_b as string | null) ?? null,
-      next_turn: (exchange.next_turn as string | null) ?? null,
-      last_turn_at: exchange.last_turn_at as string,
-    },
-    turns
-  );
+  // A turns read that failed closes nothing.
+  const status = await closeIfLapsed(admin, exchangeForLapse(exchange), turnsError ? null : turns);
 
   const argumentById = new Map((debates ?? []).map((d) => [d.id as string, d.argument as string]));
 

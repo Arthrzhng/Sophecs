@@ -100,8 +100,13 @@ export interface LapseTurn {
  * latest, by an author whose turn it is by sequence and by `next_turn`, in
  * an exchange both of whose parties still have accounts. A reply to someone
  * who has since left can never be delivered, so it holds nothing. A reply
- * the job has passed but not yet handed over (screened `ok`, `next_turn`
- * not yet moved) holds too, so the exchange is not closed in that moment.
+ * already screened holds nothing either, whether or not its exchange moved
+ * on: the ruling holds the clock "until it is screened", and a hold on a
+ * screened reply whose hand-over failed would never end. That leaves one
+ * race, a round trip wide: the exchange page reading the turns just after
+ * the job marks a reply `ok` and just before it hands the turn over. The
+ * close then takes, the job's hand-over is refused, and the job puts the
+ * reply back to pending and answers non-2xx, so the cron log shows it.
  */
 export function exchangeLapsed(
   exchange: LapseExchange,
@@ -112,7 +117,7 @@ export function exchangeLapsed(
   const { user_a, user_b, next_turn } = exchange;
   const deliverable =
     last !== undefined &&
-    (last.screen_result === "pending" || last.screen_result === "ok") &&
+    last.screen_result === "pending" &&
     user_a !== null &&
     user_b !== null &&
     last.author_id !== null &&

@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import matter from "gray-matter";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { exchangeLapsed, LAPSE_DAYS, type LapseExchange, type LapseTurn } from "../src/lib/counterpart";
-import { closeIfLapsed, meExchangeRows, type OpenExchangeRow, type TurnState } from "../src/lib/counterpart-lapse";
+import { closeIfLapsed, exchangeForLapse, meExchangeRows, readExchangeTurns, type OpenExchangeRow, type TurnState } from "../src/lib/counterpart-lapse";
 import { OpenExchanges } from "../src/components/me/OpenExchanges";
 import { SchoolMap } from "../src/components/phase3/SchoolMap";
 
@@ -113,8 +113,13 @@ describe("item 12: a reply waiting to be screened holds the lapse clock", () => 
 
   it("does not lapse while the latest reply, by the author whose turn it is, waits to be screened", () => {
     expect(exchangeLapsed(ex(), [t(1, "a", "ok"), t(2, "b", "pending")], now)).toBe(false);
-    // Or has just passed and not yet been handed over by the daily job.
-    expect(exchangeLapsed(ex(), [t(1, "a", "ok"), t(2, "b", "ok")], now)).toBe(false);
+  });
+
+  it("is not held by a screened reply whose hand-over never happened (review of #102, pass 2)", () => {
+    // Screened ok, but the exchange still waits on its author: the ruling
+    // holds the clock until a reply is screened, and a hold here would
+    // never end, since nothing reads an ok reply again.
+    expect(exchangeLapsed(ex(), [t(1, "a", "ok"), t(2, "b", "ok")], now)).toBe(true);
   });
 
   it("lapses as before once the reply is delivered or held", () => {
@@ -136,6 +141,8 @@ describe("item 12: a reply waiting to be screened holds the lapse clock", () => 
     expect(exchangeLapsed(ex(), [t(1, "a", "ok"), t(2, "a", "ok"), t(3, "b", "pending")], now)).toBe(true);
     // Its author's account is gone.
     expect(exchangeLapsed(ex({ user_b: null, next_turn: null }), [t(1, "a", "ok"), t(2, null, "pending")], now)).toBe(true);
+    // The opener has left: B's reply can never be handed over either.
+    expect(exchangeLapsed(ex({ user_a: null }), [t(1, "a", "ok"), t(2, "b", "pending")], now)).toBe(true);
     // The counterpart has left: A's reply can never be handed over (review
     // of #102, B1). Held, it would keep the exchange open for good.
     expect(exchangeLapsed(ex({ user_b: null, next_turn: "a" }), [t(1, "a", "ok"), t(2, "b", "ok"), t(3, "a", "pending")], now)).toBe(true);
@@ -159,6 +166,31 @@ describe("item 12: /me's open exchanges", () => {
     expect(r).toEqual({ id: "x1", topicTitle: "Title of careful-builder", theirSchool: "utilitarianism", myTurn: true, myReplyPending: true });
   });
 
+  it("keeps each exchange's turns apart", () => {
+    const turns = [turn("x1", 1, "me"), turn("x2", 1, "me"), turn("x2", 2, "them"), turn("x1", 2, "them"), turn("x1", 3, "me", "pending")];
+    const r = rows([row("x1"), row("x2")], turns);
+    // x1's latest is the reader's pending reply; x2's latest is delivered, so it has lapsed.
+    expect(r.map((e) => [e.id, e.myReplyPending])).toEqual([["x1", true]]);
+  });
+
+  it("reads each open exchange's turns in one query, with no text, and none when there are none", async () => {
+    const calls: { table: string; select?: string; in?: [string, unknown[]] }[] = [];
+    const admin = {
+      from(table: string) {
+        const call: (typeof calls)[number] = { table };
+        calls.push(call);
+        const b: Record<string, unknown> = {};
+        b.select = (cols: string) => ((call.select = cols), b);
+        b.in = (c: string, vs: unknown[]) => ((call.in = [c, vs]), Promise.resolve({ data: [turn("x1", 1, "me")] }));
+        return b;
+      },
+    } as never;
+    expect(await readExchangeTurns(admin, [])).toEqual([]);
+    expect(calls).toHaveLength(0);
+    expect(await readExchangeTurns(admin, ["x1", "x2"])).toEqual([turn("x1", 1, "me")]);
+    expect(calls).toEqual([{ table: "turns", select: "exchange_id, seq, author_id, screen_result", in: ["exchange_id", ["x1", "x2"]] }]);
+  });
+
   it("leaves out an old exchange with nothing waiting, and one whose counterpart has left", () => {
     expect(rows([row("x1")], [turn("x1", 1, "me"), turn("x1", 2, "them")])).toEqual([]);
     expect(rows([row("x2", { user_b: null })], [turn("x2", 1, "me"), turn("x2", 2, "them"), turn("x2", 3, "me", "pending")])).toEqual([]);
@@ -170,10 +202,10 @@ describe("item 12: /me's open exchanges", () => {
     expect(r).toEqual([{ id: "x3", topicTitle: "Title of careful-builder", theirSchool: "virtue-ethics", myTurn: false, myReplyPending: false }]);
   });
 
-  it("is what /me builds its list with, from turns read with their place and no text", () => {
+  it("is what /me builds its list with", () => {
     const me = read("src/app/me/page.tsx");
-    expect(me).toContain("exchanges = meExchangeRows(");
-    expect(me).toContain('.select("exchange_id, seq, author_id, screen_result")');
+    expect(me).toContain("const openTurns = await readExchangeTurns(admin, openRows.map((row) => row.id));");
+    expect(me).toContain("exchanges = meExchangeRows(openRows, openTurns, user.id,");
     expect(me).toContain('.select("id, topic_slug, user_a, user_b, school_a, school_b, next_turn, last_turn_at")');
   });
 });
@@ -184,13 +216,13 @@ describe("item 12: the exchange page's close on view", () => {
   // A stand-in for the admin client: records each call, and answers the
   // conditional update with `closes` rows and the re-read with `nowStatus`.
   const fake = (closes: number, nowStatus = "open") => {
-    const calls: { kind: string; filters: [string, string, unknown][] }[] = [];
+    const calls: { kind: string; filters: [string, string, unknown][]; patch?: unknown }[] = [];
     const admin = {
       from() {
-        const call = { kind: "read", filters: [] as [string, string, unknown][] };
+        const call: (typeof calls)[number] = { kind: "read", filters: [] };
         calls.push(call);
         const b: Record<string, unknown> = {};
-        b.update = () => ((call.kind = "update"), b);
+        b.update = (patch: unknown) => ((call.kind = "update"), (call.patch = patch), b);
         b.eq = (c: string, v: unknown) => (call.filters.push(["eq", c, v]), b);
         b.is = (c: string, v: unknown) => (call.filters.push(["is", c, v]), b);
         b.select = () => (call.kind === "update" ? Promise.resolve({ data: Array.from({ length: closes }, () => ({ id: "x" })) }) : b);
@@ -206,7 +238,11 @@ describe("item 12: the exchange page's close on view", () => {
   it("closes a lapsed exchange only while it is still open and waiting on the same reader", async () => {
     const { admin, calls } = fake(1);
     expect(await closeIfLapsed(admin, exchange(), [t(1, "a")], now)).toBe("lapsed");
-    expect(calls[0]).toEqual({ kind: "update", filters: [["eq", "id", "x"], ["eq", "status", "open"], ["eq", "next_turn", "b"]] });
+    expect(calls[0]).toEqual({
+      kind: "update",
+      patch: { status: "lapsed", next_turn: null },
+      filters: [["eq", "id", "x"], ["eq", "status", "open"], ["eq", "next_turn", "b"]],
+    });
     const nobody = fake(1);
     await closeIfLapsed(nobody.admin, exchange({ next_turn: null }), [t(1, "a")], now);
     expect(nobody.calls[0].filters).toContainEqual(["is", "next_turn", null]);
@@ -226,9 +262,22 @@ describe("item 12: the exchange page's close on view", () => {
     expect(closed.calls).toHaveLength(0);
   });
 
+  it("closes nothing when the turns could not be read", async () => {
+    const failed = fake(1);
+    expect(await closeIfLapsed(failed.admin, exchange(), null, now)).toBe("open");
+    expect(failed.calls).toHaveLength(0);
+  });
+
+  it("reads the exchange row as the lapse rule needs it", () => {
+    expect(exchangeForLapse({ id: "x", status: "open", user_a: "a", user_b: null, next_turn: "a", last_turn_at: old, topic_slug: "t" })).toEqual({
+      id: "x", status: "open", user_a: "a", user_b: null, next_turn: "a", last_turn_at: old,
+    });
+    expect(exchangeForLapse({ id: "y", status: "open", user_a: "a", user_b: "b", next_turn: "b", last_turn_at: old })).toMatchObject({ user_b: "b", next_turn: "b" });
+  });
+
   it("is what the exchange page decides its status with", () => {
     const page = read("src/app/counterpart/[id]/page.tsx");
-    expect(page).toContain("const status = await closeIfLapsed(");
+    expect(page).toContain("const status = await closeIfLapsed(admin, exchangeForLapse(exchange), turnsError ? null : turns);");
     expect(page).not.toMatch(/\bisLapsed\(|\bexchangeLapsed\(/);
   });
 });

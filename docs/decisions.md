@@ -5022,7 +5022,8 @@ Carried out:
   criteria with v3's vocabulary, objection and voice paragraphs, and the
   three new schools' approved sections. The text is shown as the judge
   is given it, including the voice paragraph's "Of the rival schools this
-  prompt lists" and its school ids in backticks. A build without the flag
+  prompt lists" and its school ids in backticks (on Arthur's next list:
+  "in full" requires it, and it reads as text written for the judge). A build without the flag
   shows the published three's criteria, which are exactly what the v2
   judge is given (`fidelityCriteriaFor(id, "v2")` returns them
   unchanged), so production's rubric is as it was. `/method`'s "published
@@ -5044,7 +5045,7 @@ Carried out:
     will be: weak arguments were marked 18 to 49 on the seed I used, and
     the review of #102 found 16 to 52 across five others. Rule 2 has no
     clamp, so a weak argument can now and then be marked 50 or a little
-    over (about 56 at most). At full size the 72 chosen were the same with
+    over (59 at most by the arithmetic). At full size the 72 chosen were the same with
     or without the floor on every seed tried. At the canary's size (40
     accounts) the floor drops a few, and on some seeds leaves a school, or
     a whole motion, with nothing to show: that school's section is left
@@ -5058,9 +5059,9 @@ Carried out:
   long ago its last delivered reply was, while its latest reply is one the
   daily job could still deliver: waiting to be screened, by the author
   whose turn it is by sequence and by `next_turn`, in an exchange both of
-  whose parties still have accounts. A reply the job has passed but not
-  yet handed over holds too, so the exchange is not closed in that
-  moment. Screened and delivered, the reply restarts the clock as any
+  whose parties still have accounts. A reply already screened holds
+  nothing, even one whose hand-over failed: the ruling holds the clock
+  "until it is screened", and such a hold would never end. Screened and delivered, the reply restarts the clock as any
   delivery does; screened and held, the clock runs from the last
   delivered reply again, as it does for a reply held when it is sent (the
   held author cannot post again until it is resolved, so the exchange
@@ -5071,10 +5072,16 @@ Carried out:
     exchange only while it is still open and waiting on the reader it was
     waiting on when read, so one the daily job has just moved on is not
     closed under it. If the close does not take, the page shows the
-    exchange as it now stands.
+    exchange's status as it now stands (only the status is read again),
+    and a turns read that failed closes nothing. One race is left, a
+    round trip wide, once a day: a view reading the turns between the
+    job marking a reply `ok` and handing the turn over closes the
+    exchange; the job's hand-over is then refused, the reply goes back to
+    pending, and the job answers non-2xx, which the cron log shows.
   - `/me` leaves out lapsed exchanges by the same rule
-    (`meExchangeRows`), from a read of each open exchange's turns: who
-    wrote each, its place and how it was screened, no text.
+    (`meExchangeRows`, `readExchangeTurns`), from one read of the open
+    exchanges' turns: who wrote each, its place and how it was screened,
+    no text.
   - The daily job (`src/lib/rescreen.ts`) no longer skips a pending reply
     whose exchange's last delivered reply is over 14 days old, and no
     longer reads one to a counterpart who has left, so such replies can
@@ -5082,7 +5089,10 @@ Carried out:
   - A reply whose screening call keeps failing is tried once a day, and
     holds its exchange, until a call succeeds, which is what "until it is
     screened" says; the job's batch and the monthly budget still cap what
-    that costs. On Arthur's next list, in case he wants a limit.
+    that costs. Because the job takes the oldest first, 20 such replies
+    would take every run's calls and starve newer ones (on main they left
+    the queue after 14 days). On Arthur's next list, in case he wants a
+    limit.
   - `/me` shows an exchange whose latest reply is the reader's own,
     waiting to be screened, with "Waiting to be checked" where "Reply"
     was, the exchange's title linking to it, under "Your counterpart is

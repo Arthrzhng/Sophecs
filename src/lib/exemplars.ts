@@ -43,10 +43,10 @@ export const EXEMPLAR_CANDIDATES_PER_SCHOOL = 1000;
  * rather than showing a weak one"). The ruling sets a floor; 50 is the
  * implementer's choice, where the sample plan's middle band starts
  * (scripts/seed/verdicts.ts: 70-90, 50-69, 25-49). It is a floor on the
- * mark, not on the tier: under rule 1, which clamps each tier, every
- * argument written to be weak is under it (production, 2026-11-07: all 707
- * published, marked 25 to 45), but rule 2 has no clamp, and a weak one can
- * occasionally be marked 50 or a little over. A position whose strongest
+ * mark, not on the tier: under rule 1 every argument written to be weak is
+ * under it, its axis bands keeping the mark to 48 at most (production,
+ * 2026-11-07: all 707 published, marked 25 to 45), but rule 2 has no tier
+ * clamp, and a weak one can occasionally be marked 50 or a little over. A position whose strongest
  * argument is under it is left out.
  */
 export const EXEMPLAR_FLOOR = 50;

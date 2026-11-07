@@ -7,7 +7,7 @@ import { getPendingChallenges } from "@/lib/challenge";
 import { getOpenObjections, type OpenObjection } from "@/lib/objections";
 import { getWeeklyMotion } from "@/lib/weekly-motion";
 import { getCaseStates, type CaseState } from "@/lib/cases";
-import { meExchangeRows, type OpenExchangeRow, type TurnState } from "@/lib/counterpart-lapse";
+import { meExchangeRows, readExchangeTurns, type OpenExchangeRow } from "@/lib/counterpart-lapse";
 import type { ExchangeRow } from "@/components/me/OpenExchanges";
 import { scoresComparable } from "@/lib/verdict-versions";
 import { WelcomeTracker } from "@/components/me/WelcomeTracker";
@@ -188,12 +188,9 @@ export default async function MePage({
     // Gate 4 item 12). Who wrote each, its place and how it was screened;
     // no text. src/lib/counterpart-lapse.ts.
     const openRows = (exchangeRows ?? []) as OpenExchangeRow[];
-    const openIds = openRows.map((row) => row.id);
-    const { data: turnRows } = openIds.length
-      ? await admin.from("turns").select("exchange_id, seq, author_id, screen_result").in("exchange_id", openIds)
-      : { data: [] as TurnState[] };
+    const openTurns = await readExchangeTurns(admin, openRows.map((row) => row.id));
     const titles = titleBySlug;
-    exchanges = meExchangeRows(openRows, (turnRows as TurnState[] | null) ?? [], user.id, (slug) => titles.get(slug) ?? slug);
+    exchanges = meExchangeRows(openRows, openTurns, user.id, (slug) => titles.get(slug) ?? slug);
 
     caseStates = await getCaseStates(admin, user.id, activeRows);
     // Six of six closed is the only completion signal in the product: one

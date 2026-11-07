@@ -183,7 +183,10 @@ describe("rescreenPending", () => {
   // be handed over, so it must not be read, however old, or such replies
   // would fill every run ahead of ones that can be delivered.
   it("never reads a reply to a counterpart who has left, and so still delivers one that can be", async () => {
-    tables.exchanges = Array.from({ length: 100 }, (_, i) => exchange(`gone${i}`, { user_b: null, next_turn: "a", last_turn_at: ago(60 * 24 * 60) }));
+    // Half whose counterpart left, half whose opener left.
+    tables.exchanges = Array.from({ length: 100 }, (_, i) =>
+      exchange(`gone${i}`, i % 2 ? { user_b: null, next_turn: "a", last_turn_at: ago(60 * 24 * 60) } : { user_a: null, next_turn: "a", last_turn_at: ago(60 * 24 * 60) })
+    );
     tables.turns = Array.from({ length: 100 }, (_, i) =>
       turn(`left${i}`, { exchange_id: `gone${i}`, author_id: "a", seq: 3, created_at: ago(50 * 24 * 60 - i) })
     );
