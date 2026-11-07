@@ -809,3 +809,82 @@ deploy below was read from Vercel as Ready.
 - Gate 4 is brought to Arthur in `docs/gate4.md`.
 - Waiting on Arthur: the Gate 4 pack; Supabase Auth's Site URL and
   redirect list, and the Vercel redirect from www to sophecs.com.
+
+## 2026-11-07: Gate 4, Arthur's rulings carried out
+
+- #98 merged as `901e3a4`: the Gate 4 pack (`docs/gate4.md`) and the
+  previous entry. Three review passes. Deploy
+  `dpl_6c6WozQ4Xtn236J5sG89gEQxpWZT`, Ready.
+- #99 merged as `80b8d5b`: navigation for six schools, behind
+  SIX_SCHOOLS. Three review passes. Deploy
+  `dpl_4nX8uRi1CKXr4XxoSomo7Lg6AHpJ`, Ready.
+- #100 merged as `8786380`: Arthur's rulings on #99 (the `.rsc` paths
+  404 again without the flag, "Sign in" in the signed-out header, the
+  method page's closing sentence, `rubric_viewed`, the redirects
+  temporary until launch). One review pass. Deploy
+  `dpl_6rfaf7DrCTDQG3dq7jhedvypP1a7`, Ready.
+- #101 merged as `5bad9ea`: Gate 4 items 1 to 7 (the judge). Two review
+  passes. Deploy `dpl_2FKy4zAixUMJQwdVgXtmBxSEs7fS`, Ready.
+- #103 merged as `3008b29`: Gate 4 item 9, the three new schools'
+  stances on the six topics. Two review passes. Deploy
+  `dpl_32XCiZKLbsyKXdUJYdtfT9367ssJ`, Ready.
+- The stances seeded into `debate_topics` (a write Arthur approved, (a)),
+  after #103's merge (no page reads the new lines before launch, so the
+  write did not wait for the deploy):
+  - Before: each row's `stances` md5 matched the snapshot in
+    `docs/seed-snapshots/2026-11-07-debate-topics.json`.
+  - The write: `docs/seed-snapshots/2026-11-07-debate-topics-stances.sql`
+    as merged, run once.
+  - Read back at 06:29:31 UTC: each row's `stances` md5 is the one the
+    file gives (opaque-benefit `82d42cbf…`, crash-arithmetic
+    `0c46c464…`, no-decision `cf53750d…`, moral-training `aceb73e7…`,
+    careful-builder `eca34a47…`, borrowed-judgement `69b992d9…`); every
+    row has six keys; every other column's md5 is unchanged, `par_elo`
+    and `par_n` included.
+  - The rollback, `…-stances-rollback.sql`, was tested on local
+    Postgres and not run.
+- #102 merged as `6433342`: Gate 4 items 8, 10, 11 and 12. Three review
+  passes. Deploy `dpl_542G2uYHvh7vNfgHqK3RmfvPcTju`, Ready. With the
+  exemplar floor live, `/debate/opaque-benefit/exemplars` answered 200
+  with its heading and note (fetched through Vercel at 06:50 UTC).
+- #104 merged as `11f1c6e`: Gate 4 item 13, first part, the argument
+  banks and samples for the three new schools. Nothing reads them yet,
+  and the live run's datasets are pinned as `main` gave them. Three review
+  passes. Deploy `dpl_F7fwfSXWfZEoPK1rrAbyATUHuRYm`, Ready.
+- Sample activity: Actions runs 42281713225 (6 Nov, 19:40 to 19:43 UTC)
+  and 42347652604 (today, 06:34 to 06:37 UTC), both scheduled extensions,
+  both success. No run had started on #104's merge when this was written;
+  the datasets the live run regenerates are pinned in
+  `tests/seed/determinism.test.ts` as `main` gave them before #104.
+- The re-screening job (`43 5 * * *`) at 05:43 UTC: not confirmed from
+  here. The route writes no log on any path, and in the hour that
+  Vercel's Hobby plan keeps there was no log at any level. Nothing was
+  waiting for it: every arena reply in production is screened `ok`.
+  Whether it fired shows in Vercel's dashboard, under the project's cron
+  jobs.
+- #105 merged as `0920d67`: Gate 4 item 13, second part, the generator
+  for a run of all six schools placed by quiz v2. Nothing runs: the
+  scheduled job names no quiz until the launch merge sets `RUN_QUIZ` to 2,
+  and the live run's datasets are byte for byte as before (pinned). Three
+  review passes. Deploy `dpl_6NWc4QPaG8GMSasCJiV8wpeM7fHD`, Ready.
+- Item 15: `docs/gate4-clickthrough.md`, checked against the flag-on
+  preview built from #105 at `88212cf` (`sophecs-jyeih4imh-…`). Fetched
+  from it: the landing page (six schools, the first question live beside
+  the map), `/s/ubuntu`, `/table` (which redirects to `/schools` on the
+  flag, the table under the six cards, the new three each "Ranked once
+  it has 20 judged original arguments. 0 so far."), and `/how-it-works`
+  (the method, then the rubric for six). The quiz, `/me` and the motions
+  were not walked through from here. The preview has no judge: its key,
+  budget and kill switch are set for Production only (read in Vercel
+  today, names and targets, no values), so the click-through asks for no
+  verdict.
+- Found on the way: the method page's "Known limitations" says "That is
+  why judging is paused rather than running.", on production's `/method`
+  as written on 2026-10-05 (`a43753e`), while production judges. It is
+  copy, so it is on Arthur's next list (`docs/gate4.md`), not changed
+  here.
+- Eval key spend is unchanged at **$12.2431 of $15.00**: no run today.
+- Waiting on Arthur: the three sample arguments per new school (item 13)
+  before the fresh sample run; the click-through and the word "launch"
+  (item 15); Supabase Auth's Site URL and redirect list, and the Vercel
+  redirect from www to sophecs.com.

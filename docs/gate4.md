@@ -30,9 +30,9 @@ Every item below was ruled on 2026-11-07, verbatim in `docs/decisions.md`,
 | 10 | The rubric shows v3's criteria for all six | Done on SIX_SCHOOLS builds (#102) |
 | 11 | An exemplar floor | Done, at 50 (#102) |
 | 12 | A pending reply holds the lapse clock; `/me` label | Done (#102) |
-| 13 | Argument banks for the new three; samples to you first | Banks and samples (#104, `docs/gate4-samples.md`); the generator for six schools placed by quiz v2 (#105). The run itself waits for your word on the samples, and for the launch |
+| 13 | Argument banks for the new three; samples to you first | Done: banks and samples (#104, `docs/gate4-samples.md`); the generator for six schools placed by quiz v2 (#105). The run itself waits for your word on the samples, and for the launch |
 | 14 | Navigation as built | Nothing to do |
-| 15 | Preview link and click-through when 8 to 13 are done; launch on your word | When 8 to 13 are done |
+| 15 | Preview link and click-through when 8 to 13 are done; launch on your word | Sent with the click-through, `docs/gate4-clickthrough.md`; launch waits for your word |
 | 16 | The SQL to you when the time comes | At the launch |
 
 For your next list, from carrying these out:
@@ -97,7 +97,16 @@ For your next list, from carrying these out:
   whose name ends in "s" takes "'s", so a fresh run writes "Buddhist
   Ethics's" as the live run writes "Virtue Ethics's" (the templates that
   write `` `${NAME(…)}'s` ``). All three are in
-  `scripts/seed/verdicts.ts`.
+  `scripts/seed/verdicts.ts`;
+- found while checking the click-through: the method page's "Known
+  limitations" says "Verdict quality is still being checked against real
+  arguments. That is why judging is paused rather than running."
+  (`src/components/how-it-works/JudgeMethod.tsx`, written on 2026-10-05).
+  Production judges, so the second sentence is untrue on production's
+  `/method` today, and on `/how-it-works` after the launch. The judge's
+  other paused copy reads the kill switch (`docs/daily-path-copy.md`, Q2);
+  this line does not. Whether to cut the sentence, or have it read the
+  switch as the others do, is yours.
 
 ## Where things stand
 
