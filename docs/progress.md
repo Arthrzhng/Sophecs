@@ -860,10 +860,12 @@ deploy below was read from Vercel as Ready.
   pinned in `tests/seed/determinism.test.ts` said it would.
 - The re-screening job (`43 5 * * *`, fired at some point in the 05:00
   hour on Hobby): not confirmed from here, and the read could not have
-  confirmed it. The route writes nothing to the runtime log on any path,
-  a 401 included; its outcome shows only in the request's status code,
-  which the runtime-log read does not see. Nothing was waiting for it:
-  every arena reply in production is screened `ok`.
+  confirmed it either way. The route writes nothing to the runtime log
+  on a 401, which is all it can answer without `CRON_SECRET`, and the
+  log read used here returns no request statuses. (It writes a line only
+  when the budget, or a screening call's record, cannot be read.)
+  Nothing was waiting for it: every arena reply in production is
+  screened `ok`.
 - **Both cron jobs probably answer 401.** The project has no
   `CRON_SECRET` (Vercel's environment variables, names and targets read
   today: ten, none of them that), and both `/api/cron/keepalive` and
@@ -878,10 +880,16 @@ deploy below was read from Vercel as Ready.
   random value of 32 characters or more, then a redeploy (the next merge
   to `main` is one). It turns the re-screening job on, which pays for a
   screening call whenever a reply is pending, as approved under (d) 4.
-  To confirm it after: run `/api/cron/keepalive` once (`vercel crons run`
-  or the dashboard), one cheap read, and read that request's status code
-  in the request logs. Not the re-screening job by hand while a reply is
-  pending, since that is a billed call.
+  To confirm it after: trigger the keep-alive once (`vercel crons run
+  /api/cron/keepalive`, or the project's cron settings), a head-only
+  count of six rows that writes nothing and calls no model, and read
+  that request's status code in the request logs (`vercel logs`, or the
+  dashboard's logs for that path); a 200 shows the secret works. This
+  container has no Vercel CLI or token, so that is Arthur's too. Not the
+  re-screening job by hand while a reply is pending, since that is a
+  billed call. Until it is set, the arena's line "A check that could not
+  run is tried again once a day." (`src/lib/counterpart.ts`) is not
+  true; no reader sees it today, since no reply is pending.
 - #105 merged as `0920d67`: Gate 4 item 13, second part, the generator
   for a run of all six schools placed by quiz v2. Nothing runs: the
   scheduled job names no quiz until the launch merge sets `RUN_QUIZ` to 2,

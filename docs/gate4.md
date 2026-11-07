@@ -101,8 +101,8 @@ For your next list, from carrying these out:
 - found while checking the click-through: the method page's "Known
   limitations" says "Verdict quality is still being checked against real
   arguments. That is why judging is paused rather than running."
-  (`src/components/how-it-works/JudgeMethod.tsx`; written in `a43753e`,
-  2026-10-05).
+  (`src/components/how-it-works/JudgeMethod.tsx`; written in
+  `a43753e`, 2026-10-05).
   Production judges, so the second sentence is untrue on production's
   `/method` today, and on `/how-it-works` after the launch. The judge's
   other paused copy reads the kill switch (`docs/daily-path-copy.md`, Q2);
@@ -395,10 +395,15 @@ the new-schools run 16 or 23 of 25, depending on item 3.
   keep-alive and the re-screening job, probably answer 401 and do
   nothing (`docs/progress.md`, 2026-11-07). Vercel's settings,
   Environment Variables: `CRON_SECRET`, sensitive, Production only, a
-  random value of 32 characters or more, then a redeploy. It is a
-  secret, so it is yours to set rather than mine. It turns the
-  re-screening job on, which pays for screening whenever a reply is
-  pending, as you approved under (d) 4.
+  random value of 32 characters or more, then a redeploy. Yours rather
+  than mine, so the value never passes through an agent's transcript.
+  It turns the re-screening job on, which pays for screening whenever a
+  reply is pending, as you approved under (d) 4. Then trigger the
+  keep-alive once (`vercel crons run /api/cron/keepalive`, or the
+  project's cron settings) and look for a 200 in its request log: it
+  reads six rows, writes nothing and costs nothing. Until then the
+  arena's "A check that could not run is tried again once a day." is
+  not true, though no reader sees it today.
 
 ## Still waiting on you from before
 
@@ -409,6 +414,7 @@ the new-schools run 16 or 23 of 25, depending on item 3.
 
 Mine, and not waiting on anyone:
 
-- Once `CRON_SECRET` is set: run the keep-alive once and read that
-  request's status code in the request logs. The runtime log cannot
-  show it: neither cron route writes to it on any path.
+- Once `CRON_SECRET` is set and the keep-alive answers 200, the next
+  pending reply's re-screening is read in its exchange: the log read I
+  have returns no request statuses, and the route writes a line only
+  when the budget or a screening call's record cannot be read.

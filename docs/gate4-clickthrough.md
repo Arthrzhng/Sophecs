@@ -9,11 +9,11 @@ click-through. Launch only on my explicit 'launch'").
 
 That is the preview of branch `gate4-progress` (#106): a SIX_SCHOOLS
 build of `main` at `0920d67`, with everything from items 8 to 13 in it,
-plus these docs. The message that sent you this also gives the fixed
-address of that deployment, which stays the same whatever the branch
-does; the branch stays until the launch. It
-shows what production will show once the launch merge turns the flag on,
-apart from what the launch merge itself changes (at the end). Vercel
+plus these docs. GitHub deletes the branch when #106 merges; the address
+keeps working, as #105's does. The message that sent you this also gives
+the fixed address of the deployment itself. It shows what production
+will show once the launch merge turns the flag on, apart from what the
+launch merge itself changes (at the end). Vercel
 asks you to sign in first; use the account that owns the project.
 
 ## Before you start
@@ -34,11 +34,10 @@ The preview shares production's database but not its judge
   for Production only. If you submit an argument you will see "The judge
   could not be reached.", and below it "The spending limit could not be
   checked, so nothing was sent to the judge.": the budget check failing
-  closed,
-  as it should with no budget set, not a fault. Nothing is written or
-  billed. Production judges with v2 until the launch merge turns the flag
-  on, then with v3, as you ruled; the flag-on judge was tested in the
-  new-schools run of 2026-11-06.
+  closed, as it should with no budget set, not a fault. Nothing is
+  written or billed. Production judges with v2 until the launch merge
+  turns the flag on, then with v3, as you ruled; the flag-on judge was
+  tested in the new-schools run of 2026-11-06.
 - **Sign-in** sends its link back to the address you signed in from. It
   reaches the preview only if Supabase's redirect list allows preview
   addresses, which is still open with you (Supabase's Site URL and
