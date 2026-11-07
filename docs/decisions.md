@@ -5011,8 +5011,13 @@ reviewer of #103 raised for him, kept as written: Buddhist Ethics on
 volition weighing as much as outcome implies, while saying the intention
 excuses nothing left unchecked; on `crash-arithmetic` it argues impartial
 compassion from no fixed self, the later traditions' inference the
-criteria accept when argued; Confucianism on `crash-arithmetic` keeps the
-maker's partiality to its passenger, the objection its school file names.
+criteria accept when argued, though non-harm might instead refuse to
+program a death at all; Confucianism on `crash-arithmetic` keeps the
+maker's partiality to its passenger, the objection its school file names;
+Confucianism on `opaque-benefit` makes an account the decider owes, where
+the site's own Confucian passage on that motion
+(`content/micro/opaque-benefit-elsewhere.md`) says the people's confidence
+does not rest on explanation alone.
 
 `tests/topic-stances.test.ts` is unchanged, as ruled: it checks the
 published schools, which are the three until the launch publishes the
@@ -5025,8 +5030,8 @@ the repository is.
 Seeding: after the merge, the six rows' `stances` are written to
 production's `debate_topics`, which he approved ((a)). `npm run
 seed:topics` needs the service key, which this environment does not hold,
-so the write goes through the Supabase connector, as charter rule 10
-asks:
+so the write goes through the Supabase connector. Charter rule 10's three
+items, and the checks either side:
 - **Snapshot:** `docs/seed-snapshots/2026-11-07-debate-topics.json`, the
   six rows as read at 06:06 UTC on 2026-11-07, in the format
   `npm run restore:topics` reads. Loaded into local Postgres, every row's
@@ -5036,18 +5041,37 @@ asks:
   generated from the topic files: six `UPDATE ... SET stances` statements
   in one transaction, nothing else. Only `stances` differs between the
   files and production (checked with `seedDiff` by the reviewer of #103),
-  so this is exactly what `npm run seed:topics` would write. Each
-  statement takes ROW EXCLUSIVE on the table and a row lock on one row
-  for milliseconds; the only thing it can wait on is `/api/judge`
-  updating the same row's `par_elo`. `par_elo` and `par_n` are not
-  touched.
+  so this is exactly what `npm run seed:topics` would write. `par_elo`
+  and `par_n` are not touched.
+- **Locks:** each statement takes ROW EXCLUSIVE on `debate_topics` and
+  FOR NO KEY UPDATE on its row (`stances` is in no unique index, so
+  inserts into tables referencing `debate_topics` are not blocked); the
+  row locks are held until the commit, milliseconds in all. From the app
+  only `/api/judge`, updating a row's `par_elo`, can make it wait;
+  otherwise a seed, a restore or DDL could.
 - **Rollback:** `docs/seed-snapshots/2026-11-07-debate-topics-stances-rollback.sql`,
   generated from the snapshot. Tested on local Postgres 16 on a copy of
   the snapshot: the write gave each row six stances and left every other
   column as it was; the rollback brought all six rows' md5s back to
   production's.
+- **Before the write:** each row's `md5(stances::text)` must still equal
+  the snapshot's, or the rollback would not restore what was there:
+  opaque-benefit `2ab4a93974fdbf294458cb7c2f03582c`, crash-arithmetic
+  `ecb72e1cc234f9f958f5f0937466e92a`, no-decision
+  `f25846b9f7bb4cec044aceb29f561abb`, moral-training
+  `b79fbd23b4109cb4515b732d92e0cfa5`, careful-builder
+  `9d343a518e0b88cbcfe6af4f1f96d17c`, borrowed-judgement
+  `64f321e5715308fdf33f7caac073a974`.
 - **Read-back:** after the write, each row's `md5(stances::text)` must
-  equal the one the write gave locally.
+  equal what the write gave locally: opaque-benefit
+  `82d42cbfbd9a8189c0408f36dfcab6d1`, crash-arithmetic
+  `0c46c464b4e696d5d3b0d867800c9bab`, no-decision
+  `cf53750d9d42b22a9fee95a3a91d4d29`, moral-training
+  `aceb73e7903f50ebfafda951aa05e558`, careful-builder
+  `eca34a4781323f537cee179a406ff61a`, borrowed-judgement
+  `69b992d93e0293fc461bbc912bfcfb89`. jsonb's text form is canonical, and
+  the snapshot loaded on local Postgres 16 hashes as production's 17
+  does.
 
 No micro-lesson is added: the ruling says the elsewhere passages are
 enough for launch.

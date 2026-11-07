@@ -1,7 +1,11 @@
 -- Rollback: put back the stances in docs/seed-snapshots/2026-11-07-debate-topics.json.
--- debate_topics, stances only, one row per statement. Each UPDATE takes ROW EXCLUSIVE on
--- the table and a row lock on its one row, held for milliseconds; it can wait only on a
--- concurrent par_elo update to the same row by /api/judge.
+-- debate_topics, stances only, six UPDATEs in one transaction. Each takes ROW EXCLUSIVE
+-- on the table and FOR NO KEY UPDATE on its row (stances is in no unique index, so
+-- inserts referencing debate_topics are not blocked); the row locks are held until
+-- commit, milliseconds in all. It can wait on another write to the same rows: from the
+-- app, only /api/judge updating par_elo; otherwise a seed, a restore or DDL.
+-- After: every row's md5(stances::text) equals the snapshot's again.
+-- See docs/decisions.md, "Gate 4 item 9: the new schools' stances".
 begin;
 update public.debate_topics set stances = $stances${"stoicism":"Deploy it if the people responsible judged the evidence well; the mechanism is an external, and a sound judgement does not become unsound because the reasons cannot be passed on.","virtue-ethics":"Do not deploy it, because justice to the person a decision lands on includes owing them an answer, and a practice of withholding one forms the wrong character.","utilitarianism":"Deploy it, because the suffering it prevents is real and an explanation was only ever a means to that end."}$stances$::jsonb where slug = 'opaque-benefit';
 update public.debate_topics set stances = $stances${"stoicism":"Whatever the rule is, it must be one a rational passenger could assent to before getting in, so the wrong lies in concealing the rule, not in the count.","virtue-ethics":"No rule written in advance can stand in for the judgement a wise person would exercise in the moment, so the real question is whether the engineers deliberated justly, not whether their arithmetic balances.","utilitarianism":"Two deaths are worse than one whoever the one is, and a rule that counts the passenger as exactly one person is the only impartial rule on offer."}$stances$::jsonb where slug = 'crash-arithmetic';
