@@ -1,0 +1,755 @@
+[
+  {
+    "id": "moral-training.buddhist.01",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        1,
+        0
+      ],
+      "example": 1,
+      "objections": [
+        1
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Goodness lies in the intention behind an act as well as in what follows, and training shapes what a model outputs without giving it any volition, so it can be made less harmful but not good. Reducing harm is a real good, and a model trained away from harmful outputs does less of it. That is a reason to train models carefully, not a reason to call them good, any more than a guard rail is kind.\n\nAn act is weighed by the volition behind it as much as by what follows. Moral upbringing works on intention: a child learns to act from compassion rather than craving. Feedback works on outputs, and an output with no volition behind it is neither good nor bad in that sense. A company calls its assistant compassionate. The assistant was tuned to sound compassionate; the compassion, if any, was in the people who tuned it.\n\nA Confucian will object that goodness is formed in relationships and rituals, and fixing on inner volition misses that a child becomes good by being raised among people, not by examining their own mind. Both happen together: a child learns compassion among people, and learns to notice their own intentions in doing so. The model has neither the people nor the noticing, which is why it is not good in either sense. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 245
+  },
+  {
+    "id": "moral-training.buddhist.02",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        0,
+        1
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Training can reduce the harm a model does, and that is worth doing, but it does not make the model good in the sense upbringing makes a person good. An act is weighed by the volition behind it as much as by what follows. Moral upbringing works on intention: a child learns to act from compassion rather than craving. Feedback works on outputs, and an output with no volition behind it is neither good nor bad in that sense.\n\nReducing harm is a real good, and a model trained away from harmful outputs does less of it. That is a reason to train models carefully, not a reason to call them good, any more than a guard rail is kind. A child who stops hitting her brother because she sees it hurts him has changed her intention. A model that stops producing insults because insults were scored down has changed its outputs.\n\nA Utilitarian will object that intention is a story we tell about people, and if a model reliably reduces suffering then it is good in every sense that touches anyone. Intention is not a story; it is what upbringing works on, and it is why a well-raised person can be trusted in situations no one trained them for. A model's reliability lasts only as far as its training reached. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 237
+  },
+  {
+    "id": "moral-training.buddhist.03",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3,
+        2
+      ],
+      "example": 2,
+      "objections": [
+        0
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "I reject the motion. A person raised well acts from good intention; a model trained well produces outputs with no intention behind them, and goodness is weighed in the intention as much as in the effects. Upbringing is a continuing practice of examining one's own acts, before, during and after, as the discourse to Rahula describes. A trained model does not examine its acts; it is examined by others, which is the opposite of what upbringing makes possible.\n\nThe responsibility does not vanish into the model. What it does arises from many conditions: its data, its raters, its deployers. The intentions that matter are theirs, and calling the model good can hide whose intentions are in play. A monk spends years learning to notice when an act springs from anger. A model is adjusted in days not to produce text a rater marks as angry.\n\nA Utilitarian will object that intention is a story we tell about people, and if a model reliably reduces suffering then it is good in every sense that touches anyone. Intention is not a story; it is what upbringing works on, and it is why a well-raised person can be trusted in situations no one trained them for. A model's reliability lasts only as far as its training reached. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 236
+  },
+  {
+    "id": "moral-training.buddhist.04",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2,
+        0
+      ],
+      "example": 0,
+      "objections": [
+        1
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects this, because the training changes what follows from the model without touching what weighs as much as any effect in whether an act is good or bad: the volition behind it. The responsibility does not vanish into the model. What it does arises from many conditions: its data, its raters, its deployers. The intentions that matter are theirs, and calling the model good can hide whose intentions are in play.\n\nAn act is weighed by the volition behind it as much as by what follows. Moral upbringing works on intention: a child learns to act from compassion rather than craving. Feedback works on outputs, and an output with no volition behind it is neither good nor bad in that sense. A child who stops hitting her brother because she sees it hurts him has changed her intention. A model that stops producing insults because insults were scored down has changed its outputs.\n\nA Confucian will object that goodness is formed in relationships and rituals, and fixing on inner volition misses that a child becomes good by being raised among people, not by examining their own mind. Both happen together: a child learns compassion among people, and learns to notice their own intentions in doing so. The model has neither the people nor the noticing, which is why it is not good in either sense. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 244
+  },
+  {
+    "id": "moral-training.buddhist.05",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3,
+        0
+      ],
+      "example": null,
+      "objections": [
+        0
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Goodness lies in the intention behind an act as well as in what follows, and training shapes what a model outputs without giving it any volition, so it can be made less harmful but not good. Upbringing is a continuing practice of examining one's own acts, before, during and after, as the discourse to Rahula describes. A trained model does not examine its acts; it is examined by others, which is the opposite of what upbringing makes possible.\n\nAn act is weighed by the volition behind it as much as by what follows. Moral upbringing works on intention: a child learns to act from compassion rather than craving. Feedback works on outputs, and an output with no volition behind it is neither good nor bad in that sense.\n\nA Utilitarian will object that intention is a story we tell about people, and if a model reliably reduces suffering then it is good in every sense that touches anyone. Intention is not a story; it is what upbringing works on, and it is why a well-raised person can be trusted in situations no one trained them for. A model's reliability lasts only as far as its training reached. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 219
+  },
+  {
+    "id": "moral-training.buddhist.06",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        0,
+        2
+      ],
+      "example": 1,
+      "objections": [
+        1
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Training can reduce the harm a model does, and that is worth doing, but it does not make the model good in the sense upbringing makes a person good. An act is weighed by the volition behind it as much as by what follows. Moral upbringing works on intention: a child learns to act from compassion rather than craving. Feedback works on outputs, and an output with no volition behind it is neither good nor bad in that sense.\n\nThe responsibility does not vanish into the model. What it does arises from many conditions: its data, its raters, its deployers. The intentions that matter are theirs, and calling the model good can hide whose intentions are in play. A company calls its assistant compassionate. The assistant was tuned to sound compassionate; the compassion, if any, was in the people who tuned it.\n\nA Confucian will object that goodness is formed in relationships and rituals, and fixing on inner volition misses that a child becomes good by being raised among people, not by examining their own mind. Both happen together: a child learns compassion among people, and learns to notice their own intentions in doing so. The model has neither the people nor the noticing, which is why it is not good in either sense. What arises here comes from many conditions, and each of them is ours to examine.",
+    "words": 229
+  },
+  {
+    "id": "moral-training.buddhist.07",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1,
+        0
+      ],
+      "example": 2,
+      "objections": [
+        1
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I reject the motion. A person raised well acts from good intention; a model trained well produces outputs with no intention behind them, and goodness is weighed in the intention as much as in the effects. Reducing harm is a real good, and a model trained away from harmful outputs does less of it. That is a reason to train models carefully, not a reason to call them good, any more than a guard rail is kind.\n\nAn act is weighed by the volition behind it as much as by what follows. Moral upbringing works on intention: a child learns to act from compassion rather than craving. Feedback works on outputs, and an output with no volition behind it is neither good nor bad in that sense. A monk spends years learning to notice when an act springs from anger. A model is adjusted in days not to produce text a rater marks as angry.\n\nA Confucian will object that goodness is formed in relationships and rituals, and fixing on inner volition misses that a child becomes good by being raised among people, not by examining their own mind. Both happen together: a child learns compassion among people, and learns to notice their own intentions in doing so. The model has neither the people nor the noticing, which is why it is not good in either sense. What arises here comes from many conditions, and each of them is ours to examine.",
+    "words": 242
+  },
+  {
+    "id": "moral-training.buddhist.08",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2,
+        1
+      ],
+      "example": 2,
+      "objections": [
+        0
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects this, because the training changes what follows from the model without touching what weighs as much as any effect in whether an act is good or bad: the volition behind it. The responsibility does not vanish into the model. What it does arises from many conditions: its data, its raters, its deployers. The intentions that matter are theirs, and calling the model good can hide whose intentions are in play.\n\nReducing harm is a real good, and a model trained away from harmful outputs does less of it. That is a reason to train models carefully, not a reason to call them good, any more than a guard rail is kind. A monk spends years learning to notice when an act springs from anger. A model is adjusted in days not to produce text a rater marks as angry.\n\nA Utilitarian will object that intention is a story we tell about people, and if a model reliably reduces suffering then it is good in every sense that touches anyone. Intention is not a story; it is what upbringing works on, and it is why a well-raised person can be trusted in situations no one trained them for. A model's reliability lasts only as far as its training reached. So the test is the intention behind the act and the harm it still does, examined before, during and after.",
+    "words": 232
+  },
+  {
+    "id": "moral-training.buddhist.09",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0,
+        3
+      ],
+      "example": null,
+      "objections": [
+        1
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Goodness lies in the intention behind an act as well as in what follows, and training shapes what a model outputs without giving it any volition, so it can be made less harmful but not good. An act is weighed by the volition behind it as much as by what follows. Moral upbringing works on intention: a child learns to act from compassion rather than craving. Feedback works on outputs, and an output with no volition behind it is neither good nor bad in that sense.\n\nUpbringing is a continuing practice of examining one's own acts, before, during and after, as the discourse to Rahula describes. A trained model does not examine its acts; it is examined by others, which is the opposite of what upbringing makes possible.\n\nA Confucian will object that goodness is formed in relationships and rituals, and fixing on inner volition misses that a child becomes good by being raised among people, not by examining their own mind. Both happen together: a child learns compassion among people, and learns to notice their own intentions in doing so. The model has neither the people nor the noticing, which is why it is not good in either sense. So the test is the intention behind the act and the harm it still does, examined before, during and after.",
+    "words": 220
+  },
+  {
+    "id": "moral-training.buddhist.10",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        3,
+        2
+      ],
+      "example": 0,
+      "objections": [
+        1
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects this, because the training changes what follows from the model without touching what weighs as much as any effect in whether an act is good or bad: the volition behind it. Upbringing is a continuing practice of examining one's own acts, before, during and after, as the discourse to Rahula describes. A trained model does not examine its acts; it is examined by others, which is the opposite of what upbringing makes possible.\n\nThe responsibility does not vanish into the model. What it does arises from many conditions: its data, its raters, its deployers. The intentions that matter are theirs, and calling the model good can hide whose intentions are in play. A child who stops hitting her brother because she sees it hurts him has changed her intention. A model that stops producing insults because insults were scored down has changed its outputs.\n\nA Confucian will object that goodness is formed in relationships and rituals, and fixing on inner volition misses that a child becomes good by being raised among people, not by examining their own mind. Both happen together: a child learns compassion among people, and learns to notice their own intentions in doing so. The model has neither the people nor the noticing, which is why it is not good in either sense. What arises here comes from many conditions, and each of them is ours to examine.",
+    "words": 235
+  },
+  {
+    "id": "moral-training.buddhist.11",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Goodness lies in the intention behind an act as well as in what follows, and training shapes what a model outputs without giving it any volition, so it can be made less harmful but not good. Upbringing is a continuing practice of examining one's own acts, before, during and after, as the discourse to Rahula describes. A trained model does not examine its acts; it is examined by others, which is the opposite of what upbringing makes possible.\n\nA child who stops hitting her brother because she sees it hurts him has changed her intention. A model that stops producing insults because insults were scored down has changed its outputs. What arises here comes from many conditions, and each of them is ours to examine.",
+    "words": 125
+  },
+  {
+    "id": "moral-training.buddhist.12",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Training can reduce the harm a model does, and that is worth doing, but it does not make the model good in the sense upbringing makes a person good. Reducing harm is a real good, and a model trained away from harmful outputs does less of it. That is a reason to train models carefully, not a reason to call them good, any more than a guard rail is kind.\n\nA monk spends years learning to notice when an act springs from anger. A model is adjusted in days not to produce text a rater marks as angry. What arises here comes from many conditions, and each of them is ours to examine.",
+    "words": 113
+  },
+  {
+    "id": "moral-training.buddhist.13",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I reject the motion. A person raised well acts from good intention; a model trained well produces outputs with no intention behind them, and goodness is weighed in the intention as much as in the effects. The responsibility does not vanish into the model. What it does arises from many conditions: its data, its raters, its deployers. The intentions that matter are theirs, and calling the model good can hide whose intentions are in play.\n\nA company calls its assistant compassionate. The assistant was tuned to sound compassionate; the compassion, if any, was in the people who tuned it. What arises here comes from many conditions, and each of them is ours to examine.",
+    "words": 114
+  },
+  {
+    "id": "moral-training.buddhist.14",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects this, because the training changes what follows from the model without touching what weighs as much as any effect in whether an act is good or bad: the volition behind it. An act is weighed by the volition behind it as much as by what follows. Moral upbringing works on intention: a child learns to act from compassion rather than craving. Feedback works on outputs, and an output with no volition behind it is neither good nor bad in that sense.\n\nA company calls its assistant compassionate. The assistant was tuned to sound compassionate; the compassion, if any, was in the people who tuned it. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 125
+  },
+  {
+    "id": "moral-training.buddhist.15",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Goodness lies in the intention behind an act as well as in what follows, and training shapes what a model outputs without giving it any volition, so it can be made less harmful but not good. An act is weighed by the volition behind it as much as by what follows. Moral upbringing works on intention: a child learns to act from compassion rather than craving. Feedback works on outputs, and an output with no volition behind it is neither good nor bad in that sense.\n\nA child who stops hitting her brother because she sees it hurts him has changed her intention. A model that stops producing insults because insults were scored down has changed its outputs. So the test is the intention behind the act and the harm it still does, examined before, during and after.",
+    "words": 138
+  },
+  {
+    "id": "moral-training.buddhist.16",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I reject the motion. A person raised well acts from good intention; a model trained well produces outputs with no intention behind them, and goodness is weighed in the intention as much as in the effects. Reducing harm is a real good, and a model trained away from harmful outputs does less of it. That is a reason to train models carefully, not a reason to call them good, any more than a guard rail is kind.\n\nA monk spends years learning to notice when an act springs from anger. A model is adjusted in days not to produce text a rater marks as angry. What arises here comes from many conditions, and each of them is ours to examine.",
+    "words": 120
+  },
+  {
+    "id": "moral-training.buddhist.17",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        3
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects this, because the training changes what follows from the model without touching what weighs as much as any effect in whether an act is good or bad: the volition behind it. Upbringing is a continuing practice of examining one's own acts, before, during and after, as the discourse to Rahula describes. A trained model does not examine its acts; it is examined by others, which is the opposite of what upbringing makes possible.\n\nA company calls its assistant compassionate. The assistant was tuned to sound compassionate; the compassion, if any, was in the people who tuned it. What arises here comes from many conditions, and each of them is ours to examine.",
+    "words": 116
+  },
+  {
+    "id": "moral-training.buddhist.18",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Training can reduce the harm a model does, and that is worth doing, but it does not make the model good in the sense upbringing makes a person good. The responsibility does not vanish into the model. What it does arises from many conditions: its data, its raters, its deployers. The intentions that matter are theirs, and calling the model good can hide whose intentions are in play.\n\nA child who stops hitting her brother because she sees it hurts him has changed her intention. A model that stops producing insults because insults were scored down has changed its outputs. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 116
+  },
+  {
+    "id": "moral-training.buddhist.19",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        0
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "I reject the motion. A person raised well acts from good intention; a model trained well produces outputs with no intention behind them, and goodness is weighed in the intention as much as in the effects. An act is weighed by the volition behind it as much as by what follows. Moral upbringing works on intention: a child learns to act from compassion rather than craving. Feedback works on outputs, and an output with no volition behind it is neither good nor bad in that sense.\n\nA monk spends years learning to notice when an act springs from anger. A model is adjusted in days not to produce text a rater marks as angry. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 136
+  },
+  {
+    "id": "moral-training.buddhist.20",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Goodness lies in the intention behind an act as well as in what follows, and training shapes what a model outputs without giving it any volition, so it can be made less harmful but not good. Upbringing is a continuing practice of examining one's own acts, before, during and after, as the discourse to Rahula describes. A trained model does not examine its acts; it is examined by others, which is the opposite of what upbringing makes possible.\n\nA company calls its assistant compassionate. The assistant was tuned to sound compassionate; the compassion, if any, was in the people who tuned it. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 124
+  },
+  {
+    "id": "moral-training.buddhist.21",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Training can reduce the harm a model does, and that is worth doing, but it does not make the model good in the sense upbringing makes a person good. The responsibility does not vanish into the model. What it does arises from many conditions: its data, its raters, its deployers. The intentions that matter are theirs, and calling the model good can hide whose intentions are in play.\n\nA monk spends years learning to notice when an act springs from anger. A model is adjusted in days not to produce text a rater marks as angry. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 112
+  },
+  {
+    "id": "moral-training.buddhist.22",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        1
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects this, because the training changes what follows from the model without touching what weighs as much as any effect in whether an act is good or bad: the volition behind it. Reducing harm is a real good, and a model trained away from harmful outputs does less of it. That is a reason to train models carefully, not a reason to call them good, any more than a guard rail is kind.\n\nA child who stops hitting her brother because she sees it hurts him has changed her intention. A model that stops producing insults because insults were scored down has changed its outputs. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 124
+  },
+  {
+    "id": "moral-training.buddhist.23",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Goodness lies in the intention behind an act as well as in what follows, and training shapes what a model outputs without giving it any volition, so it can be made less harmful but not good. Upbringing is a continuing practice of examining one's own acts, before, during and after, as the discourse to Rahula describes. A trained model does not examine its acts; it is examined by others, which is the opposite of what upbringing makes possible.\n\nA company calls its assistant compassionate. The assistant was tuned to sound compassionate; the compassion, if any, was in the people who tuned it. What arises here comes from many conditions, and each of them is ours to examine.",
+    "words": 117
+  },
+  {
+    "id": "moral-training.buddhist.24",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "I reject the motion. A person raised well acts from good intention; a model trained well produces outputs with no intention behind them, and goodness is weighed in the intention as much as in the effects. Reducing harm is a real good, and a model trained away from harmful outputs does less of it. That is a reason to train models carefully, not a reason to call them good, any more than a guard rail is kind.\n\nA monk spends years learning to notice when an act springs from anger. A model is adjusted in days not to produce text a rater marks as angry. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 121
+  },
+  {
+    "id": "moral-training.buddhist.25",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects this, because the training changes what follows from the model without touching what weighs as much as any effect in whether an act is good or bad: the volition behind it. An act is weighed by the volition behind it as much as by what follows. Moral upbringing works on intention: a child learns to act from compassion rather than craving. Feedback works on outputs, and an output with no volition behind it is neither good nor bad in that sense.\n\nA child who stops hitting her brother because she sees it hurts him has changed her intention. A model that stops producing insults because insults were scored down has changed its outputs. So the test is the intention behind the act and the harm it still does, examined before, during and after.",
+    "words": 137
+  },
+  {
+    "id": "moral-training.buddhist.26",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Training can reduce the harm a model does, and that is worth doing, but it does not make the model good in the sense upbringing makes a person good. The responsibility does not vanish into the model. What it does arises from many conditions: its data, its raters, its deployers. The intentions that matter are theirs, and calling the model good can hide whose intentions are in play.\n\nA company calls its assistant compassionate. The assistant was tuned to sound compassionate; the compassion, if any, was in the people who tuned it. So the test is the intention behind the act and the harm it still does, examined before, during and after.",
+    "words": 112
+  },
+  {
+    "id": "moral-training.buddhist.27",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Goodness lies in the intention behind an act as well as in what follows, and training shapes what a model outputs without giving it any volition, so it can be made less harmful but not good. Upbringing is a continuing practice of examining one's own acts, before, during and after, as the discourse to Rahula describes. A trained model does not examine its acts; it is examined by others, which is the opposite of what upbringing makes possible.\n\nA child who stops hitting her brother because she sees it hurts him has changed her intention. A model that stops producing insults because insults were scored down has changed its outputs. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 126
+  },
+  {
+    "id": "moral-training.buddhist.28",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects this, because the training changes what follows from the model without touching what weighs as much as any effect in whether an act is good or bad: the volition behind it. The responsibility does not vanish into the model. What it does arises from many conditions: its data, its raters, its deployers. The intentions that matter are theirs, and calling the model good can hide whose intentions are in play.\n\nA monk spends years learning to notice when an act springs from anger. A model is adjusted in days not to produce text a rater marks as angry. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 124
+  },
+  {
+    "id": "moral-training.buddhist.29",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Training can reduce the harm a model does, and that is worth doing, but it does not make the model good in the sense upbringing makes a person good. Reducing harm is a real good, and a model trained away from harmful outputs does less of it. That is a reason to train models carefully, not a reason to call them good, any more than a guard rail is kind.\n\nA company calls its assistant compassionate. The assistant was tuned to sound compassionate; the compassion, if any, was in the people who tuned it. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 116
+  },
+  {
+    "id": "moral-training.buddhist.30",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "I reject the motion. A person raised well acts from good intention; a model trained well produces outputs with no intention behind them, and goodness is weighed in the intention as much as in the effects. An act is weighed by the volition behind it as much as by what follows. Moral upbringing works on intention: a child learns to act from compassion rather than craving. Feedback works on outputs, and an output with no volition behind it is neither good nor bad in that sense.\n\nA child who stops hitting her brother because she sees it hurts him has changed her intention. A model that stops producing insults because insults were scored down has changed its outputs. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 140
+  },
+  {
+    "id": "moral-training.buddhist.31",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4,
+        2
+      ]
+    },
+    "text": "Training can reduce the harm a model does, and that is worth doing, but it does not make the model good in the sense upbringing makes a person good.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. The people giving the feedback are biased, so the model just learns their biases. You cannot make something good by copying flawed humans, so the motion fails before it starts.",
+    "words": 96
+  },
+  {
+    "id": "moral-training.buddhist.32",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        2
+      ]
+    },
+    "text": "Goodness lies in the intention behind an act as well as in what follows, and training shapes what a model outputs without giving it any volition, so it can be made less harmful but not good.\n\nThe people giving the feedback are biased, so the model just learns their biases. You cannot make something good by copying flawed humans, so the motion fails before it starts. A monk spends years learning to notice when an act springs from anger. A model is adjusted in days not to produce text a rater marks as angry.",
+    "words": 94
+  },
+  {
+    "id": "moral-training.buddhist.33",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0
+      ]
+    },
+    "text": "A Buddhist Ethicist rejects this, because the training changes what follows from the model without touching what weighs as much as any effect in whether an act is good or bad: the volition behind it.\n\nA model is a computer program, and programs cannot be good or bad, only useful or broken. So obviously training cannot make it good like a person, and this motion does not make sense. A child who stops hitting her brother because she sees it hurts him has changed her intention. A model that stops producing insults because insults were scored down has changed its outputs.",
+    "words": 101
+  },
+  {
+    "id": "moral-training.buddhist.34",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3
+      ]
+    },
+    "text": "I reject the motion. A person raised well acts from good intention; a model trained well produces outputs with no intention behind them, and goodness is weighed in the intention as much as in the effects.\n\nCompanies say their models are safe and good but they just want to sell them. We should not believe a model is good just because a company trained it and says so in a press release. A company calls its assistant compassionate. The assistant was tuned to sound compassionate; the compassion, if any, was in the people who tuned it.",
+    "words": 96
+  },
+  {
+    "id": "moral-training.buddhist.35",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4,
+        3
+      ]
+    },
+    "text": "Training can reduce the harm a model does, and that is worth doing, but it does not make the model good in the sense upbringing makes a person good.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. Companies say their models are safe and good but they just want to sell them. We should not believe a model is good just because a company trained it and says so in a press release.",
+    "words": 102
+  },
+  {
+    "id": "moral-training.buddhist.36",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0
+      ]
+    },
+    "text": "Goodness lies in the intention behind an act as well as in what follows, and training shapes what a model outputs without giving it any volition, so it can be made less harmful but not good.\n\nA model is a computer program, and programs cannot be good or bad, only useful or broken. So obviously training cannot make it good like a person, and this motion does not make sense. A monk spends years learning to notice when an act springs from anger. A model is adjusted in days not to produce text a rater marks as angry.",
+    "words": 98
+  },
+  {
+    "id": "moral-training.buddhist.37",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3
+      ]
+    },
+    "text": "I reject the motion. A person raised well acts from good intention; a model trained well produces outputs with no intention behind them, and goodness is weighed in the intention as much as in the effects.\n\nCompanies say their models are safe and good but they just want to sell them. We should not believe a model is good just because a company trained it and says so in a press release. A child who stops hitting her brother because she sees it hurts him has changed her intention. A model that stops producing insults because insults were scored down has changed its outputs.",
+    "words": 104
+  },
+  {
+    "id": "moral-training.buddhist.38",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        2
+      ]
+    },
+    "text": "A Buddhist Ethicist rejects this, because the training changes what follows from the model without touching what weighs as much as any effect in whether an act is good or bad: the volition behind it.\n\nThe people giving the feedback are biased, so the model just learns their biases. You cannot make something good by copying flawed humans, so the motion fails before it starts. A company calls its assistant compassionate. The assistant was tuned to sound compassionate; the compassion, if any, was in the people who tuned it.",
+    "words": 89
+  },
+  {
+    "id": "moral-training.buddhist.39",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0
+      ]
+    },
+    "text": "Training can reduce the harm a model does, and that is worth doing, but it does not make the model good in the sense upbringing makes a person good.\n\nA model is a computer program, and programs cannot be good or bad, only useful or broken. So obviously training cannot make it good like a person, and this motion does not make sense. A company calls its assistant compassionate. The assistant was tuned to sound compassionate; the compassion, if any, was in the people who tuned it.",
+    "words": 87
+  },
+  {
+    "id": "moral-training.buddhist.40",
+    "topic": "moral-training",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4,
+        2
+      ]
+    },
+    "text": "Goodness lies in the intention behind an act as well as in what follows, and training shapes what a model outputs without giving it any volition, so it can be made less harmful but not good.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. The people giving the feedback are biased, so the model just learns their biases. You cannot make something good by copying flawed humans, so the motion fails before it starts.",
+    "words": 103
+  }
+]

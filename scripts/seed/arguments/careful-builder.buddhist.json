@@ -1,0 +1,755 @@
+[
+  {
+    "id": "careful-builder.buddhist.01",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0,
+        1
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Proportional blame ignores intention, which is half of what makes an act what it is, but a good intention does not end the builders' duty to find and stop the harm. An act is weighed by the volition behind it as much as by what follows. Builders who intended to help, and took real care, acted from a sound intention, and blaming them as if they had acted carelessly ignores half of what their act was.\n\nGood intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not. A team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week.\n\nA Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 228
+  },
+  {
+    "id": "careful-builder.buddhist.02",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3,
+        1
+      ],
+      "example": 2,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects the motion, with a warning: care and good intention lessen blame, yet they never excuse a builder from looking hard at what their system goes on doing. What happened arose from many conditions: the data, the users, the setting, the builders' choices. Blame in proportion to harm treats the builders as the single cause, when compassion asks for an honest account of all the conditions and of their part among them.\n\nGood intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not. A well-meaning startup's tool harms users and the founders point to their good intentions. Their intention was sound at launch; their refusal to look again is not.\n\nA Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 223
+  },
+  {
+    "id": "careful-builder.buddhist.03",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        2,
+        0
+      ],
+      "example": 1,
+      "objections": [
+        0
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Volition weighs as much as what follows, so builders who acted with care and good intention are not to blame in proportion to the harm, though they stay bound to keep examining the system. The discourse to Rahula asks that an act be examined after it is done, and if it is found to harm oneself or another, that it be acknowledged and not repeated. That is the builders' duty here: to admit the harm and change what caused it.\n\nAn act is weighed by the volition behind it as much as by what follows. Builders who intended to help, and took real care, acted from a sound intention, and blaming them as if they had acted carelessly ignores half of what their act was. A careful builder's model denies a loan it should have granted. She is not blamed, yet she spends the next month reviewing every similar refusal for the same mistake.\n\nA Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 241
+  },
+  {
+    "id": "careful-builder.buddhist.04",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1,
+        0
+      ],
+      "example": 2,
+      "objections": [
+        0
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I reject the motion. Blame follows intention as well as outcome, and careful builders acting to reduce harm are not culpable for what they could not foresee. Good intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not.\n\nAn act is weighed by the volition behind it as much as by what follows. Builders who intended to help, and took real care, acted from a sound intention, and blaming them as if they had acted carelessly ignores half of what their act was. A well-meaning startup's tool harms users and the founders point to their good intentions. Their intention was sound at launch; their refusal to look again is not.\n\nA Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. What arises here comes from many conditions, and each of them is ours to examine.",
+    "words": 219
+  },
+  {
+    "id": "careful-builder.buddhist.05",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2,
+        1
+      ],
+      "example": 0,
+      "objections": [
+        1
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Proportional blame ignores intention, which is half of what makes an act what it is, but a good intention does not end the builders' duty to find and stop the harm. The discourse to Rahula asks that an act be examined after it is done, and if it is found to harm oneself or another, that it be acknowledged and not repeated. That is the builders' duty here: to admit the harm and change what caused it.\n\nGood intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not. A team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week.\n\nA Confucian will object that the builders owe the people their system serves an account and repair because of the relationship they stand in, whatever their intentions were. That is right, and it is what examining the act afterwards requires: acknowledging the harm to those it fell on and working to undo it. Good intention lessens blame; it does not lessen what is owed to the injured. So the test is the intention behind the act and the harm it still does, examined before, during and after.",
+    "words": 235
+  },
+  {
+    "id": "careful-builder.buddhist.06",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1,
+        0
+      ],
+      "example": 1,
+      "objections": [
+        0
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects the motion, with a warning: care and good intention lessen blame, yet they never excuse a builder from looking hard at what their system goes on doing. Good intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not.\n\nAn act is weighed by the volition behind it as much as by what follows. Builders who intended to help, and took real care, acted from a sound intention, and blaming them as if they had acted carelessly ignores half of what their act was. A careful builder's model denies a loan it should have granted. She is not blamed, yet she spends the next month reviewing every similar refusal for the same mistake.\n\nA Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 232
+  },
+  {
+    "id": "careful-builder.buddhist.07",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3,
+        2
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "I reject the motion. Blame follows intention as well as outcome, and careful builders acting to reduce harm are not culpable for what they could not foresee. What happened arose from many conditions: the data, the users, the setting, the builders' choices. Blame in proportion to harm treats the builders as the single cause, when compassion asks for an honest account of all the conditions and of their part among them.\n\nThe discourse to Rahula asks that an act be examined after it is done, and if it is found to harm oneself or another, that it be acknowledged and not repeated. That is the builders' duty here: to admit the harm and change what caused it. A team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week.\n\nA Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 229
+  },
+  {
+    "id": "careful-builder.buddhist.08",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0,
+        2
+      ],
+      "example": 1,
+      "objections": [
+        0
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Volition weighs as much as what follows, so builders who acted with care and good intention are not to blame in proportion to the harm, though they stay bound to keep examining the system. An act is weighed by the volition behind it as much as by what follows. Builders who intended to help, and took real care, acted from a sound intention, and blaming them as if they had acted carelessly ignores half of what their act was.\n\nThe discourse to Rahula asks that an act be examined after it is done, and if it is found to harm oneself or another, that it be acknowledged and not repeated. That is the builders' duty here: to admit the harm and change what caused it. A careful builder's model denies a loan it should have granted. She is not blamed, yet she spends the next month reviewing every similar refusal for the same mistake.\n\nA Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 241
+  },
+  {
+    "id": "careful-builder.buddhist.09",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1,
+        0
+      ],
+      "example": 2,
+      "objections": [
+        0
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects the motion, with a warning: care and good intention lessen blame, yet they never excuse a builder from looking hard at what their system goes on doing. Good intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not.\n\nAn act is weighed by the volition behind it as much as by what follows. Builders who intended to help, and took real care, acted from a sound intention, and blaming them as if they had acted carelessly ignores half of what their act was. A well-meaning startup's tool harms users and the founders point to their good intentions. Their intention was sound at launch; their refusal to look again is not.\n\nA Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. So the test is the intention behind the act and the harm it still does, examined before, during and after.",
+    "words": 228
+  },
+  {
+    "id": "careful-builder.buddhist.10",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        2,
+        1
+      ],
+      "example": 1,
+      "objections": [
+        1
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Volition weighs as much as what follows, so builders who acted with care and good intention are not to blame in proportion to the harm, though they stay bound to keep examining the system. The discourse to Rahula asks that an act be examined after it is done, and if it is found to harm oneself or another, that it be acknowledged and not repeated. That is the builders' duty here: to admit the harm and change what caused it.\n\nGood intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not. A careful builder's model denies a loan it should have granted. She is not blamed, yet she spends the next month reviewing every similar refusal for the same mistake.\n\nA Confucian will object that the builders owe the people their system serves an account and repair because of the relationship they stand in, whatever their intentions were. That is right, and it is what examining the act afterwards requires: acknowledging the harm to those it fell on and working to undo it. Good intention lessens blame; it does not lessen what is owed to the injured. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 238
+  },
+  {
+    "id": "careful-builder.buddhist.11",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        2
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Volition weighs as much as what follows, so builders who acted with care and good intention are not to blame in proportion to the harm, though they stay bound to keep examining the system. The discourse to Rahula asks that an act be examined after it is done, and if it is found to harm oneself or another, that it be acknowledged and not repeated. That is the builders' duty here: to admit the harm and change what caused it.\n\nA team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 127
+  },
+  {
+    "id": "careful-builder.buddhist.12",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects the motion, with a warning: care and good intention lessen blame, yet they never excuse a builder from looking hard at what their system goes on doing. Good intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not.\n\nA careful builder's model denies a loan it should have granted. She is not blamed, yet she spends the next month reviewing every similar refusal for the same mistake. So the test is the intention behind the act and the harm it still does, examined before, during and after.",
+    "words": 120
+  },
+  {
+    "id": "careful-builder.buddhist.13",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Proportional blame ignores intention, which is half of what makes an act what it is, but a good intention does not end the builders' duty to find and stop the harm. An act is weighed by the volition behind it as much as by what follows. Builders who intended to help, and took real care, acted from a sound intention, and blaming them as if they had acted carelessly ignores half of what their act was.\n\nA well-meaning startup's tool harms users and the founders point to their good intentions. Their intention was sound at launch; their refusal to look again is not. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 119
+  },
+  {
+    "id": "careful-builder.buddhist.14",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "I reject the motion. Blame follows intention as well as outcome, and careful builders acting to reduce harm are not culpable for what they could not foresee. What happened arose from many conditions: the data, the users, the setting, the builders' choices. Blame in proportion to harm treats the builders as the single cause, when compassion asks for an honest account of all the conditions and of their part among them.\n\nA team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 124
+  },
+  {
+    "id": "careful-builder.buddhist.15",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Volition weighs as much as what follows, so builders who acted with care and good intention are not to blame in proportion to the harm, though they stay bound to keep examining the system. The discourse to Rahula asks that an act be examined after it is done, and if it is found to harm oneself or another, that it be acknowledged and not repeated. That is the builders' duty here: to admit the harm and change what caused it.\n\nA careful builder's model denies a loan it should have granted. She is not blamed, yet she spends the next month reviewing every similar refusal for the same mistake. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 131
+  },
+  {
+    "id": "careful-builder.buddhist.16",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        1
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Proportional blame ignores intention, which is half of what makes an act what it is, but a good intention does not end the builders' duty to find and stop the harm. Good intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not.\n\nA well-meaning startup's tool harms users and the founders point to their good intentions. Their intention was sound at launch; their refusal to look again is not. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 120
+  },
+  {
+    "id": "careful-builder.buddhist.17",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects the motion, with a warning: care and good intention lessen blame, yet they never excuse a builder from looking hard at what their system goes on doing. What happened arose from many conditions: the data, the users, the setting, the builders' choices. Blame in proportion to harm treats the builders as the single cause, when compassion asks for an honest account of all the conditions and of their part among them.\n\nA careful builder's model denies a loan it should have granted. She is not blamed, yet she spends the next month reviewing every similar refusal for the same mistake. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 120
+  },
+  {
+    "id": "careful-builder.buddhist.18",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "I reject the motion. Blame follows intention as well as outcome, and careful builders acting to reduce harm are not culpable for what they could not foresee. An act is weighed by the volition behind it as much as by what follows. Builders who intended to help, and took real care, acted from a sound intention, and blaming them as if they had acted carelessly ignores half of what their act was.\n\nA team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 125
+  },
+  {
+    "id": "careful-builder.buddhist.19",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects the motion, with a warning: care and good intention lessen blame, yet they never excuse a builder from looking hard at what their system goes on doing. What happened arose from many conditions: the data, the users, the setting, the builders' choices. Blame in proportion to harm treats the builders as the single cause, when compassion asks for an honest account of all the conditions and of their part among them.\n\nA well-meaning startup's tool harms users and the founders point to their good intentions. Their intention was sound at launch; their refusal to look again is not. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 124
+  },
+  {
+    "id": "careful-builder.buddhist.20",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Proportional blame ignores intention, which is half of what makes an act what it is, but a good intention does not end the builders' duty to find and stop the harm. The discourse to Rahula asks that an act be examined after it is done, and if it is found to harm oneself or another, that it be acknowledged and not repeated. That is the builders' duty here: to admit the harm and change what caused it.\n\nA team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week. So the test is the intention behind the act and the harm it still does, examined before, during and after.",
+    "words": 128
+  },
+  {
+    "id": "careful-builder.buddhist.21",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        1
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Volition weighs as much as what follows, so builders who acted with care and good intention are not to blame in proportion to the harm, though they stay bound to keep examining the system. Good intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not.\n\nA careful builder's model denies a loan it should have granted. She is not blamed, yet she spends the next month reviewing every similar refusal for the same mistake. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 119
+  },
+  {
+    "id": "careful-builder.buddhist.22",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        0
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "I reject the motion. Blame follows intention as well as outcome, and careful builders acting to reduce harm are not culpable for what they could not foresee. An act is weighed by the volition behind it as much as by what follows. Builders who intended to help, and took real care, acted from a sound intention, and blaming them as if they had acted carelessly ignores half of what their act was.\n\nA well-meaning startup's tool harms users and the founders point to their good intentions. Their intention was sound at launch; their refusal to look again is not. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 121
+  },
+  {
+    "id": "careful-builder.buddhist.23",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects the motion, with a warning: care and good intention lessen blame, yet they never excuse a builder from looking hard at what their system goes on doing. Good intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not.\n\nA careful builder's model denies a loan it should have granted. She is not blamed, yet she spends the next month reviewing every similar refusal for the same mistake. Keep looking at who is being hurt, before the choice is made and long after it.",
+    "words": 116
+  },
+  {
+    "id": "careful-builder.buddhist.24",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        2
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I reject the motion. Blame follows intention as well as outcome, and careful builders acting to reduce harm are not culpable for what they could not foresee. The discourse to Rahula asks that an act be examined after it is done, and if it is found to harm oneself or another, that it be acknowledged and not repeated. That is the builders' duty here: to admit the harm and change what caused it.\n\nA team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week. So the test is the intention behind the act and the harm it still does, examined before, during and after.",
+    "words": 124
+  },
+  {
+    "id": "careful-builder.buddhist.25",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Proportional blame ignores intention, which is half of what makes an act what it is, but a good intention does not end the builders' duty to find and stop the harm. An act is weighed by the volition behind it as much as by what follows. Builders who intended to help, and took real care, acted from a sound intention, and blaming them as if they had acted carelessly ignores half of what their act was.\n\nA well-meaning startup's tool harms users and the founders point to their good intentions. Their intention was sound at launch; their refusal to look again is not. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 125
+  },
+  {
+    "id": "careful-builder.buddhist.26",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Volition weighs as much as what follows, so builders who acted with care and good intention are not to blame in proportion to the harm, though they stay bound to keep examining the system. What happened arose from many conditions: the data, the users, the setting, the builders' choices. Blame in proportion to harm treats the builders as the single cause, when compassion asks for an honest account of all the conditions and of their part among them.\n\nA team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week. What arises here comes from many conditions, and each of them is ours to examine.",
+    "words": 124
+  },
+  {
+    "id": "careful-builder.buddhist.27",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist rejects the motion, with a warning: care and good intention lessen blame, yet they never excuse a builder from looking hard at what their system goes on doing. Good intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not.\n\nA careful builder's model denies a loan it should have granted. She is not blamed, yet she spends the next month reviewing every similar refusal for the same mistake. That is why the Buddhist Ethicist asks not only what the system was built to do but whom it is hurting now.",
+    "words": 122
+  },
+  {
+    "id": "careful-builder.buddhist.28",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Proportional blame ignores intention, which is half of what makes an act what it is, but a good intention does not end the builders' duty to find and stop the harm. The discourse to Rahula asks that an act be examined after it is done, and if it is found to harm oneself or another, that it be acknowledged and not repeated. That is the builders' duty here: to admit the harm and change what caused it.\n\nA well-meaning startup's tool harms users and the founders point to their good intentions. Their intention was sound at launch; their refusal to look again is not. So the test is the intention behind the act and the harm it still does, examined before, during and after.",
+    "words": 124
+  },
+  {
+    "id": "careful-builder.buddhist.29",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Volition weighs as much as what follows, so builders who acted with care and good intention are not to blame in proportion to the harm, though they stay bound to keep examining the system. An act is weighed by the volition behind it as much as by what follows. Builders who intended to help, and took real care, acted from a sound intention, and blaming them as if they had acted carelessly ignores half of what their act was.\n\nA team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week. What arises here comes from many conditions, and each of them is ours to examine.",
+    "words": 125
+  },
+  {
+    "id": "careful-builder.buddhist.30",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I reject the motion. Blame follows intention as well as outcome, and careful builders acting to reduce harm are not culpable for what they could not foresee. What happened arose from many conditions: the data, the users, the setting, the builders' choices. Blame in proportion to harm treats the builders as the single cause, when compassion asks for an honest account of all the conditions and of their part among them.\n\nA well-meaning startup's tool harms users and the founders point to their good intentions. Their intention was sound at launch; their refusal to look again is not. What arises here comes from many conditions, and each of them is ours to examine.",
+    "words": 113
+  },
+  {
+    "id": "careful-builder.buddhist.31",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        2
+      ]
+    },
+    "text": "I reject the motion. Blame follows intention as well as outcome, and careful builders acting to reduce harm are not culpable for what they could not foresee.\n\nNobody can predict everything an AI will do. It would be unfair to blame engineers for things they could not have known, so they should not be blamed at all if they followed the rules. A well-meaning startup's tool harms users and the founders point to their good intentions. Their intention was sound at launch; their refusal to look again is not.",
+    "words": 89
+  },
+  {
+    "id": "careful-builder.buddhist.32",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3,
+        4
+      ]
+    },
+    "text": "Proportional blame ignores intention, which is half of what makes an act what it is, but a good intention does not end the builders' duty to find and stop the harm.\n\nThe law already decides this with liability and insurance, so there is no point in a philosophical debate about blame. The courts will sort it out case by case like they always do. AI is too complicated for anyone to fully understand, including the people who build it. So really nobody is to blame when it goes wrong, it is just a risk we accept by using new technology.",
+    "words": 100
+  },
+  {
+    "id": "careful-builder.buddhist.33",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4
+      ]
+    },
+    "text": "Volition weighs as much as what follows, so builders who acted with care and good intention are not to blame in proportion to the harm, though they stay bound to keep examining the system.\n\nAI is too complicated for anyone to fully understand, including the people who build it. So really nobody is to blame when it goes wrong, it is just a risk we accept by using new technology. A team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week.",
+    "words": 101
+  },
+  {
+    "id": "careful-builder.buddhist.34",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4
+      ]
+    },
+    "text": "A Buddhist Ethicist rejects the motion, with a warning: care and good intention lessen blame, yet they never excuse a builder from looking hard at what their system goes on doing.\n\nAI is too complicated for anyone to fully understand, including the people who build it. So really nobody is to blame when it goes wrong, it is just a risk we accept by using new technology. A careful builder's model denies a loan it should have granted. She is not blamed, yet she spends the next month reviewing every similar refusal for the same mistake.",
+    "words": 96
+  },
+  {
+    "id": "careful-builder.buddhist.35",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        2,
+        4
+      ]
+    },
+    "text": "I reject the motion. Blame follows intention as well as outcome, and careful builders acting to reduce harm are not culpable for what they could not foresee.\n\nNobody can predict everything an AI will do. It would be unfair to blame engineers for things they could not have known, so they should not be blamed at all if they followed the rules. AI is too complicated for anyone to fully understand, including the people who build it. So really nobody is to blame when it goes wrong, it is just a risk we accept by using new technology.",
+    "words": 98
+  },
+  {
+    "id": "careful-builder.buddhist.36",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3
+      ]
+    },
+    "text": "A Buddhist Ethicist rejects the motion, with a warning: care and good intention lessen blame, yet they never excuse a builder from looking hard at what their system goes on doing.\n\nThe law already decides this with liability and insurance, so there is no point in a philosophical debate about blame. The courts will sort it out case by case like they always do. A team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week.",
+    "words": 95
+  },
+  {
+    "id": "careful-builder.buddhist.37",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4
+      ]
+    },
+    "text": "Volition weighs as much as what follows, so builders who acted with care and good intention are not to blame in proportion to the harm, though they stay bound to keep examining the system.\n\nAI is too complicated for anyone to fully understand, including the people who build it. So really nobody is to blame when it goes wrong, it is just a risk we accept by using new technology. A careful builder's model denies a loan it should have granted. She is not blamed, yet she spends the next month reviewing every similar refusal for the same mistake.",
+    "words": 99
+  },
+  {
+    "id": "careful-builder.buddhist.38",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        2
+      ]
+    },
+    "text": "Proportional blame ignores intention, which is half of what makes an act what it is, but a good intention does not end the builders' duty to find and stop the harm.\n\nNobody can predict everything an AI will do. It would be unfair to blame engineers for things they could not have known, so they should not be blamed at all if they followed the rules. A well-meaning startup's tool harms users and the founders point to their good intentions. Their intention was sound at launch; their refusal to look again is not.",
+    "words": 93
+  },
+  {
+    "id": "careful-builder.buddhist.39",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3,
+        4
+      ]
+    },
+    "text": "Volition weighs as much as what follows, so builders who acted with care and good intention are not to blame in proportion to the harm, though they stay bound to keep examining the system.\n\nThe law already decides this with liability and insurance, so there is no point in a philosophical debate about blame. The courts will sort it out case by case like they always do. AI is too complicated for anyone to fully understand, including the people who build it. So really nobody is to blame when it goes wrong, it is just a risk we accept by using new technology.",
+    "words": 103
+  },
+  {
+    "id": "careful-builder.buddhist.40",
+    "topic": "careful-builder",
+    "school": "buddhist",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        2
+      ]
+    },
+    "text": "I reject the motion. Blame follows intention as well as outcome, and careful builders acting to reduce harm are not culpable for what they could not foresee.\n\nNobody can predict everything an AI will do. It would be unfair to blame engineers for things they could not have known, so they should not be blamed at all if they followed the rules. A team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week.",
+    "words": 93
+  }
+]

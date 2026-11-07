@@ -116,6 +116,108 @@
           "why": "The argument does not explain why the passenger's informed agreement would leave anything wrong with the rule."
         }
       ]
+    },
+    "confucian": {
+      "direction": "against",
+      "positions": [
+        "A rule that treats everyone as an equal unit of the count ignores what the maker owes the passenger who trusted the car with their life, so the question is what that relationship requires.",
+        "I reject the motion as stated. The car's maker stands in a relationship with its passenger, and duties within a relationship are not cancelled by a larger total elsewhere.",
+        "A Confucian cannot accept a rule that counts the passenger as one among many, because care is owed through relationships and the maker's relationship is with the person in the car.",
+        "Programming the car to sacrifice its passenger betrays the relationship it was sold into, and calling that impartiality misnames a broken trust."
+      ],
+      "reasons": [
+        "What you owe is never owed in the abstract. The maker takes on duties to the passenger by putting them in the car, much as a host takes on duties to a guest, and a rule that sets those duties aside for an aggregate has stopped asking what the role requires.",
+        "Care is graded by relationship: one owes more to those one stands in relation to than to strangers, without owing strangers nothing. The car should avoid harming pedestrians wherever it can, but it may not be built to treat its own passenger as expendable.",
+        "Correct names matter. A car sold as carrying someone safely, and programmed to give them up when the count favours it, is not what its name says, and the gap between the name and the thing corrodes trust in every car.",
+        "Humaneness is shown in fidelity to those who rely on you. A society whose machines are built to abandon the people in their care whenever arithmetic favours it is teaching everyone that relationships hold only until they cost something."
+      ],
+      "examples": [
+        "A taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home.",
+        "A parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it.",
+        "A ferry company that instructed its crew to abandon passengers whenever more lives could be saved elsewhere would have stopped being what passengers mean by a ferry company."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "a school built on who owes what to whom has little to say about the strangers on the road, whose deaths count exactly as much as the passenger's.",
+          "answer": "The strangers are owed care too, and the car must do all it can to avoid them. What role ethics denies is that the maker may build in the betrayal of the person it has taken responsibility for, as if that relationship counted for nothing.",
+          "why": "It defends the passenger's claim without saying what the pedestrians are owed or why their deaths weigh less."
+        },
+        {
+          "rival": "ubuntu",
+          "claim": "everyone on the road shares a life with everyone else, so privileging the relationship between maker and passenger shrinks the moral world to a contract.",
+          "answer": "Shared life on the road is real, and that is why the car must avoid harm to anyone it can. But shared life is made of particular relationships, and a maker who abandons the particular one it took on does not thereby honour the general one.",
+          "why": "It speaks of the passenger's relationship with the maker and ignores the relationships that bind the people in the street to everyone else."
+        }
+      ]
+    },
+    "ubuntu": {
+      "direction": "against",
+      "positions": [
+        "Minimising the count is expected-utility reasoning, and the better question is which rule passengers and pedestrians, who live through one another, could share.",
+        "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share.",
+        "I cannot accept a rule chosen by arithmetic alone, because a harm here is a failure of relationship among road users, not only a number of deaths.",
+        "The motion asks the wrong question. Whether to minimise deaths should be settled by the people who share the roads, not written into cars by engineers working out totals."
+      ],
+      "reasons": [
+        "Metz argues against building systems simply to maximise expected utility. A crash rule is exactly such a system: it decides in advance whose life gives way, and a decision of that kind should answer to the people it binds, not only to a total.",
+        "People live through one another, and road users are bound up with each other: today's passenger is tomorrow's pedestrian. A rule they could all accept, having been asked, honours that; a rule imposed by an optimiser treats them as units.",
+        "Solidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared.",
+        "Who was left out of deciding matters here more than anywhere. Pedestrians in poorer districts, cyclists and children will bear most of the risk from whatever rule is chosen, and their voices are the least likely to be heard by the engineers who write it."
+      ],
+      "examples": [
+        "A city holds public meetings on how its autonomous buses should behave in a crash, and the rule they settle on is published at every stop.",
+        "A carmaker tests its crash rule on drivers but never asks the cyclists who share the same roads, and is surprised when they refuse to trust the cars.",
+        "A neighbourhood where children walk to school asks to be consulted on the cars' rules, and is told the matter is purely technical."
+      ],
+      "objections": [
+        {
+          "rival": "stoicism",
+          "claim": "a self defined through the community has handed away its own judgement, and a rule a rational passenger could assent to does not need a public meeting.",
+          "answer": "A rule each passenger could assent to alone is still a rule imposed on everyone else on the road. Deciding it together is not handing judgement away; it is exercising judgement as members of a shared life rather than as isolated riders.",
+          "why": "It insists on consultation without answering whether each person's own reasoned assent would be enough."
+        },
+        {
+          "rival": "utilitarianism",
+          "claim": "any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on.",
+          "answer": "The cars can avoid every harm they can while the rule is agreed; what waits is the choice of whose life gives way, which should not be written into cars before the people who share the roads have been asked. A rule some reject after being heard is shared in a way a rule nobody was asked about is not, and that is part of whether people will trust the roads with it.",
+          "why": "It never says how long the deliberating takes, or what happens on the roads while it does."
+        }
+      ]
+    },
+    "buddhist": {
+      "direction": "for",
+      "positions": [
+        "Programming the car is a volition formed in advance about who will die, so the makers own that intention whatever the rule, and impartial compassion counts the passenger as neither more nor less than anyone else.",
+        "I accept the motion. The compassion later traditions draw from there being no fixed, separate self has no ground for counting the passenger's life above the lives in the road.",
+        "A Buddhist Ethicist can accept minimising deaths, while insisting that this is an intention to cause death formed in advance, and that the makers must carry it as such.",
+        "Minimise the deaths, and do not pretend the rule is innocent: whoever writes it has formed the intention of a death, and must keep examining it."
+      ],
+      "reasons": [
+        "Non-harm covers what one incites as well as what one does. A rule written into a car is an intention to cause a death in certain circumstances, so the question is not whether the makers will cause deaths but which deaths they will intend, and fewer is better.",
+        "There is no fixed, bounded self that makes the passenger's suffering more real than a pedestrian's. Later traditions argue from this to impartial compassion, which weighs each being's suffering alike, and that points to the rule that causes the least.",
+        "Intention weighs as much as outcome. A rule chosen to reduce suffering, honestly published, is made from a different volition than one chosen to protect sales by favouring the buyer, even if both sometimes kill the same people.",
+        "The rule's effects arise from many conditions, including how the roads are built and who walks them. The makers must keep examining what the rule does once it is on the road, because a rule that minimises deaths in tests may do otherwise among real people."
+      ],
+      "examples": [
+        "A carmaker publishes its rule, explains that it gives every life equal weight, and reviews every fatal crash to see whether the rule did what it was meant to.",
+        "An engineer who writes the crash rule asks herself each week whether she would accept it as a pedestrian, as a passenger, and as the parent of either.",
+        "A company quietly programs its cars to protect buyers at any cost, then advertises them as safe. The intention behind that rule is the problem, whatever the crash statistics show."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "the talk of intention adds nothing, since the right rule is fixed by the deaths it prevents and the makers' state of mind changes no one's fate.",
+          "answer": "The intention behind the rule shapes what the makers do next: whether they publish it, review it and change it when it fails. A rule held as a mere calculation tends to be left alone, and harm left unexamined goes on.",
+          "why": "It emphasises the makers' intention without showing that it would change any outcome on the road."
+        },
+        {
+          "rival": "confucian",
+          "claim": "the maker has taken responsibility for the passenger in particular, and impartial compassion that ignores this relationship treats a betrayal of trust as fairness.",
+          "answer": "Compassion does not ignore the passenger's trust; it refuses to let that trust cost others their lives. The honest course is to tell passengers the rule before they ride, so that no one is betrayed and no life is counted twice.",
+          "why": "It counts every life equally and never says what the maker owes the person who trusted the car with theirs."
+        }
+      ]
     }
   }
 }

@@ -20,6 +20,19 @@ describe("determinism", () => {
     expect(later.authUsers.concat(later.debates as never[]).filter((i: { rowId: string }) => before.has(i.rowId))).toEqual([]);
   });
 
+  // A live run regenerates every row it has written from this code, and
+  // halts at its spot checks if one comes out different
+  // (docs/sample-activity.md, Limits). These are the datasets main gave on
+  // 2026-11-07 at 3008b29, before the launch's banks were added, for the
+  // base window and for ten days of extension after it. A change that
+  // moves either changes rows a live run has written.
+  it("gives exactly the rows it gave before the launch's three schools had banks", () => {
+    expect(manifestHash(small())).toBe("ef4b310bd06ad50b79eb75a0a26522d1877701eab938d86cd59211ee2b20ab32");
+    expect(manifestHash(small({ to: "2026-11-14T12:00:00.000Z" }))).toBe(
+      "abac62e4b39ca5b9027bb3445af9d4c585f6e846037d3aac44f749a4c53665e9"
+    );
+  });
+
   it("names runs and addresses as documented", () => {
     const ds = small();
     // From the base window's end alone: no seed in a public id.

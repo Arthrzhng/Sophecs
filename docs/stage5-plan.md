@@ -296,9 +296,11 @@ of the three; Gate 2 is about that.
      "elsewhere" passages keep `status: draft`).
    - [ ] The share lines and other front matter (`docs/quiz-v2.md`,
      section 8), in the launch merge itself.
-   - [ ] The three new schools' stances on the six topics (Arthur,
-     2026-11-07, Gate 4 item 9): written in `content/topics/*.md`, then
-     seeded into `debate_topics` (a write he approved, (a)).
+   - [x] The three new schools' stances on the six topics (Arthur,
+     2026-11-07, Gate 4 item 9): written in `content/topics/*.md` (#103),
+     then seeded into `debate_topics` (a write he approved, (a)) at 06:29
+     UTC on 2026-11-07, and read back equal to the hashes `docs/decisions.md`,
+     "Gate 4 item 9", gives.
    - [ ] `README.md`.
    - [ ] The "until launch" rules of steps 3 and 4 lifted (step 6), in
      every file `docs/decisions.md`, "Stage 5, step 4", lists, with the

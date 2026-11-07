@@ -116,6 +116,108 @@
           "why": "The argument does not explain why a feeling that matches no fault is anything other than a misjudgement."
         }
       ]
+    },
+    "confucian": {
+      "direction": "against",
+      "positions": [
+        "A builder's blame is measured by what the position of builder owed the people the system serves, so a careful builder who met those duties is not to blame in proportion to the harm.",
+        "I reject the motion. Blame attaches to failing what one's role requires, not to the size of what went wrong, though the role still requires an account and repair.",
+        "The motion misnames the duty. A builder is not answerable for the harm as such but for whether they did what the position of builder requires towards the people who rely on the system.",
+        "Proportional blame is wrong, but so is walking away. The careful builder owes the injured an account and a share in repairing things, because that is part of the role too."
+      ],
+      "reasons": [
+        "What you owe attaches to a position, not to the world at large. A builder owes the people their system touches care in making it, honesty about its limits, and an answer when it fails. A builder who did all of that has done what the position requires.",
+        "Getting names right matters. To call a careful builder culpable in proportion to the harm is to use blame for something that is not fault, and once the word means that, it no longer distinguishes the builders who cut corners from those who did not.",
+        "Roles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right.",
+        "Humaneness is shown in how one responds to those one's work has affected. A builder who points only to the audit has misunderstood the relationship; one who meets the injured, explains and repairs is being what a builder should be."
+      ],
+      "examples": [
+        "A team that tested its model carefully learns it misread one group's medical scans. They are not culpable, but they contact the clinics, explain what happened, and fund the follow-up scans.",
+        "An apprentice builder follows every check her master taught and still a joint fails. The master does not blame her, but both go to the house to make it good.",
+        "A firm's lawyer says the careful team has no liability. The team's lead visits the family anyway, because whatever the law says, they are the people who built it."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "talk of what the role requires is beside the point, because blame exists to change future behaviour and should be assigned wherever it prevents the most harm.",
+          "answer": "Blame used only as a lever stops tracking what anyone did, and people who cannot see why they are blamed stop trusting the roles that hold them together. The role tells you what to change; blaming the careful does not.",
+          "why": "It sets out what the builder owes without saying whether assigning blame that way would make systems any safer."
+        },
+        {
+          "rival": "ubuntu",
+          "claim": "the Confucian measures the builder's duty from inside the role, when the people harmed were never asked what the builders owed them in the first place.",
+          "answer": "That is a real gap in letting roles define duties: the people on the other end of a role may never have agreed to its terms. The answer is that a role's duties include listening to those it serves, and a builder who never asked has not met them.",
+          "why": "It defines the builder's duty by the role without asking who set the role's terms or whether the injured had any part in them."
+        }
+      ]
+    },
+    "ubuntu": {
+      "direction": "against",
+      "positions": [
+        "The harm is a broken relationship between the builders and the people it fell on, so what is owed is not blame sized to the damage but the builders' part in mending that relationship.",
+        "I reject the motion. Blame in proportion to harm treats the matter as a debt to be calculated; what the harm calls for is repair between people.",
+        "Proportional blame misreads the situation. When a system harms people, the relationships between builders, users and community are damaged, and careful or not, the builders are part of restoring them.",
+        "The motion asks the wrong question. Whether the builders were careful affects whether they are at fault, but every builder whose system harmed people owes them a share in making things whole."
+      ],
+      "reasons": [
+        "A harm reads as a failure of relationship, not only a bad outcome. Scaling blame to the damage treats the injured as a quantity of loss; bringing builders and injured together to repair what was broken treats them as people still bound up with one another.",
+        "People become who they are through one another, and that includes the builders. A team that cannot face the people its work harmed loses part of its own standing among them, which is why repair is something builders need as well as owe.",
+        "Care matters to fault, because taking care is itself a way of honouring the people a system will reach. Builders who did what could reasonably be done for those people stood in the right relation to them, and blaming them as careless builders are blamed treats that relation as worth nothing.",
+        "The question of who was left out of deciding applies here too. If the people later harmed had no say in how the system was built or tested, the builders owe them not just repair but a place in deciding what changes now."
+      ],
+      "examples": [
+        "A lending model wrongly flags a neighbourhood's applicants. The careful builders meet residents, listen, and rebuild the model with their input rather than paying a fine and moving on.",
+        "A careful team's translation tool mistranslates a medical instruction. They go to the clinic that was hurt by it and work through the fix with the staff who saw the harm.",
+        "A town's water-monitoring model misses a contamination. The builders join the town meeting, hear what it cost people, and help set up checks the residents trust."
+      ],
+      "objections": [
+        {
+          "rival": "stoicism",
+          "claim": "blame attaches to judgement, not to fortune, so the careful builder who judged well owes nothing, and talk of repairing relationships confuses misfortune with wrongdoing.",
+          "answer": "Owing repair is not the same as being at fault. The builders' judgement may have been sound and they may be blameless, yet the relationship between them and the people harmed is still damaged, and mending it is still theirs to help with.",
+          "why": "It asks for repair without explaining why blameless builders owe anything at all."
+        },
+        {
+          "rival": "utilitarianism",
+          "claim": "compensation paid to those harmed does measurable good, while talk of restoring relationships promises something nobody can count or check.",
+          "answer": "Compensation can be counted, and it should be paid. But whether the people harmed are restored can be checked too, by asking them whether the builders met them, explained what went wrong and changed what they do. Money paid without that leaves the relationship as broken as before.",
+          "why": "It speaks of restoring relationships without saying what the restoring adds to compensation, or whether the injured want it."
+        }
+      ]
+    },
+    "buddhist": {
+      "direction": "against",
+      "positions": [
+        "Volition weighs as much as what follows, so builders who acted with care and good intention are not to blame in proportion to the harm, though they stay bound to keep examining the system.",
+        "I reject the motion. Blame follows intention as well as outcome, and careful builders acting to reduce harm are not culpable for what they could not foresee.",
+        "Proportional blame ignores intention, which is half of what makes an act what it is, but a good intention does not end the builders' duty to find and stop the harm.",
+        "A Buddhist Ethicist rejects the motion, with a warning: care and good intention lessen blame, yet they never excuse a builder from looking hard at what their system goes on doing."
+      ],
+      "reasons": [
+        "An act is weighed by the volition behind it as much as by what follows. Builders who intended to help, and took real care, acted from a sound intention, and blaming them as if they had acted carelessly ignores half of what their act was.",
+        "Good intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not.",
+        "The discourse to Rahula asks that an act be examined after it is done, and if it is found to harm oneself or another, that it be acknowledged and not repeated. That is the builders' duty here: to admit the harm and change what caused it.",
+        "What happened arose from many conditions: the data, the users, the setting, the builders' choices. Blame in proportion to harm treats the builders as the single cause, when compassion asks for an honest account of all the conditions and of their part among them."
+      ],
+      "examples": [
+        "A team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week.",
+        "A careful builder's model denies a loan it should have granted. She is not blamed, yet she spends the next month reviewing every similar refusal for the same mistake.",
+        "A well-meaning startup's tool harms users and the founders point to their good intentions. Their intention was sound at launch; their refusal to look again is not."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states.",
+          "answer": "Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all.",
+          "why": "It weighs the builders' intention heavily and never says what that does for the people who were harmed."
+        },
+        {
+          "rival": "confucian",
+          "claim": "the builders owe the people their system serves an account and repair because of the relationship they stand in, whatever their intentions were.",
+          "answer": "That is right, and it is what examining the act afterwards requires: acknowledging the harm to those it fell on and working to undo it. Good intention lessens blame; it does not lessen what is owed to the injured.",
+          "why": "It treats intention as settling the matter and never says what the builders owe the particular people who were hurt."
+        }
+      ]
     }
   }
 }

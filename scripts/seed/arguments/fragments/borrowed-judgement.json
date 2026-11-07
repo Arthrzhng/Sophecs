@@ -116,6 +116,108 @@
           "why": "The argument does not explain why a single delegated choice is not already a loss in its own right."
         }
       ]
+    },
+    "confucian": {
+      "direction": "for",
+      "positions": [
+        "It costs something that matters. Conduct is learned by doing it within one's roles, and the daily choices made as a parent, a friend or a colleague are where a person becomes humane.",
+        "I accept the motion. The better choice made for you is still a lost occasion to act as your role requires, and roles are learned only by acting in them.",
+        "A Confucian accepts this, because the small daily acts of propriety are not overheads to be delegated but the practice through which a person is formed.",
+        "Handing these choices over costs something, even when the assistant chooses better, because what you owe the people around you is shown in choosing for them yourself."
+      ],
+      "reasons": [
+        "Cultivating oneself proceeds through roles and ritual, not apart from them. Remembering a parent's preferences, choosing what to bring a host, deciding how to answer a colleague: these are the forms in which humaneness is practised, and practice is what forms it.",
+        "Ritual propriety is not etiquette for its own sake. It is the shared form through which people show each other what they mean to one another, and a gesture chosen by an assistant carries the form without the person who was supposed to be in it.",
+        "Relationships constitute a person; you are somebody's child, somebody's friend. If the choices that make up those relationships are made elsewhere, the relationships thin out, and the person they were making thins out with them.",
+        "Getting names right matters here. A birthday message an assistant chose and sent is not quite a son remembering his mother, and calling it that hides the fact that the remembering has stopped."
+      ],
+      "examples": [
+        "A daughter lets an assistant choose and order her father's birthday present. He loves it, and she cannot remember what it was.",
+        "A manager lets a tool draft every reply to her team. The replies are kinder than hers were, and the team no longer knows what she thinks.",
+        "A host lets an app plan the menu for her in-laws. The meal is better than she would have managed, and the evening carries nothing she chose for them."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "if the present is better and the people involved are happier, the only cost is a sentiment about who did the choosing.",
+          "answer": "But the choosing is not a sentiment; it is the conduct through which the relationship exists. A better present from no one in particular improves an object and weakens the tie it was meant to express.",
+          "why": "It asserts that the choosing matters without saying what anyone in the relationship actually loses."
+        },
+        {
+          "rival": "ubuntu",
+          "claim": "the Confucian treats the relationship as a matter of role duties, when what matters is what the people become through each other, which a shared assistant need not damage.",
+          "answer": "Roles are not the opposite of what people become through each other; they are the forms that becoming takes. The worry is exactly that the assistant removes the occasions on which people meet each other in those forms.",
+          "why": "It speaks of duties attaching to roles without saying how the people on the other side of them are affected."
+        }
+      ]
+    },
+    "ubuntu": {
+      "direction": "for",
+      "positions": [
+        "It costs something when the choices handed over are ones made with and for other people, because people become who they are through exactly those exchanges.",
+        "I accept the motion. Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another.",
+        "I accept this with a qualification: the cost falls where choices were shared with others, not where they were only ever one's own.",
+        "Delegating daily choices costs something that matters, because what is delegated is often not a choice but a piece of a relationship."
+      ],
+      "reasons": [
+        "As Metz gives the Nguni maxim, a person is a person through other persons. Asking a neighbour for advice, deciding together what the family eats, sorting out who collects the children: these small exchanges are how people come to share a life, and an assistant that settles them quietly takes the sharing away.",
+        "On Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A capacity is kept by using it, and a household whose coordination runs through an assistant has fewer chances to exercise exactly the capacities that make it a household.",
+        "The better choice is measured against the person alone. But much of what the assistant optimises was never only one person's to make; it carried other people's needs and wishes, and those people are no longer part of the deciding.",
+        "Gyekye's moderate reading keeps individual worth, so not every choice must be communal. The cost arises where the choice was a meeting point with others, and those are the ones assistants are most often given."
+      ],
+      "examples": [
+        "A family lets an assistant plan the week's meals. The food improves, and the Sunday argument about what to cook, which was also how they caught up, stops happening.",
+        "A student lets an app choose his study group. The group works, and he never has the awkward conversation in which he would have got to know the others.",
+        "An elderly man's assistant books his appointments. It is more efficient than his daughter's calls, which were also how she knew how he was."
+      ],
+      "objections": [
+        {
+          "rival": "stoicism",
+          "claim": "what is truly yours is your own judgement, and the worry about losing exchanges with other people hands your good over to things outside your control.",
+          "answer": "But a self defined apart from others is exactly what this school denies. The exchanges are not external comforts; they are where a person is made, so losing them is losing part of what one is.",
+          "why": "It assumes the exchanges matter without answering the charge that a person's good should not depend on them."
+        },
+        {
+          "rival": "utilitarianism",
+          "claim": "if everyone in the household is better off with the assistant's choices, the loss of a few conversations is outweighed, and calling it a cost to personhood inflates it.",
+          "answer": "The loss is not a few conversations but the practice of deciding together, which is how a household stays one. A total that counts each person's satisfaction separately cannot see what they lose together.",
+          "why": "It never weighs the conversations lost against the better choices gained, or says why the comparison favours the conversations."
+        }
+      ]
+    },
+    "buddhist": {
+      "direction": "neutral",
+      "positions": [
+        "The cost is not to a fixed self that owned the choices, since there is none, but to the attention to intention and harm that each choice is an occasion for.",
+        "I accept the motion only in part. Handing choices over costs something when it ends the attention to intention and harm that choosing was an occasion for, and not otherwise.",
+        "A Buddhist Ethicist does not mourn the loss of a self that chooses, since that self was never fixed, but does worry about losing the habit of examining what one's acts do.",
+        "Whether it costs something depends on what goes with the choices: if the attention to harm goes too, it costs a great deal; if it stays, very little."
+      ],
+      "reasons": [
+        "There is no fixed, bounded self that owns its choices and is diminished when another makes them. What matters is the volition with which acts are done and whether they cause harm, and those can be attended to whoever selects the option.",
+        "Each choice is an occasion to examine intention: am I doing this from care, from craving, from habit? An assistant that removes the choice removes the occasion, and the habit of examining is learned only by doing it.",
+        "The discourse to Rahula's method is reflection before, during and after acting. A life in which the acts are selected elsewhere can still be reflected on, but only if someone keeps asking what those acts are doing to oneself and others.",
+        "What a choice leads to arises from many conditions, and the assistant becomes one of them. Handing choices over does not remove one's part in what follows; it turns it into a duty to keep watching what the assistant's choices are causing."
+      ],
+      "examples": [
+        "A man lets an assistant manage his shopping. It buys better food, and he stops noticing that it also buys from a supplier he once refused for how it treats workers.",
+        "A woman delegates her calendar and gains hours. She uses some of them to sit each evening and review what the day's arrangements did to the people around her.",
+        "A parent lets an app choose the children's activities. The choices are good, but no one is any longer asking what the children are being pushed towards, or why."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "if the assistant's choices are better, the attention the Buddhist Ethicist wants preserved is only a means, and its loss is a cost only if outcomes get worse.",
+          "answer": "Attention to intention is not only a means. Volition weighs in its own right, and an act done without anyone attending to why it is done is a worse act even when its effects are the same.",
+          "why": "It speaks of attention to intention without saying how its loss would ever show up in what happens to anyone."
+        },
+        {
+          "rival": "confucian",
+          "claim": "the choices handed over are mostly ones made for other people in particular relationships, and denying a fixed self does not make the loss of those relationships any smaller.",
+          "answer": "No-self does not deny relationships; it denies a bounded owner behind them. The relationships matter, and the harm in losing them is real suffering, which is exactly what attention to one's acts is meant to catch.",
+          "why": "It treats the loss as a matter of private attention and never says what happens to the people the choices were made for."
+        }
+      ]
     }
   }
 }

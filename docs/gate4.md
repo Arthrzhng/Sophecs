@@ -26,11 +26,11 @@ Every item below was ruled on 2026-11-07, verbatim in `docs/decisions.md`,
 | 6 | Criteria into `rubric.ts` at launch | On the launch checklist |
 | 7 | v3's head comment as sent, stale by design | Recorded; draft header and COST comment fixed |
 | 8 | v2 copy accepted, two fixes | Done (#102) |
-| 9 | The 18 stances; seeding approved | To do |
+| 9 | The 18 stances; seeding approved | Done (#103); seeded at 06:29 UTC and read back |
 | 10 | The rubric shows v3's criteria for all six | Done on SIX_SCHOOLS builds (#102) |
 | 11 | An exemplar floor | Done, at 50 (#102) |
 | 12 | A pending reply holds the lapse clock; `/me` label | Done (#102) |
-| 13 | Argument banks for the new three; samples to you first | To do |
+| 13 | Argument banks for the new three; samples to you first | Banks and samples (#104, `docs/gate4-samples.md`); the six-school run waits for your word on the samples |
 | 14 | Navigation as built | Nothing to do |
 | 15 | Preview link and click-through when 8 to 13 are done; launch on your word | When 8 to 13 are done |
 | 16 | The SQL to you when the time comes | At the launch |
@@ -70,7 +70,13 @@ For your next list, from carrying these out:
 - item 10: on a SIX_SCHOOLS build the rubric shows the v3 criteria as the
   judge gets them, including text written to the judge ("Of the rival
   schools this prompt lists", school ids in backticks). "In full"
-  requires that; whether you want it presented differently.
+  requires that; whether you want it presented differently;
+- item 13: three readings the new schools' passages take, listed in
+  `docs/decisions.md`, "Gate 4 item 13, first part": dependent origination
+  read as spreading an AI harm's responsibility, which the criteria call
+  an inference; Ubuntu's best-known objection (a community is not one
+  voice) not stated in any objection; and Buddhist Ethics' (the gap to
+  institutions) only obliquely.
 
 ## Where things stand
 

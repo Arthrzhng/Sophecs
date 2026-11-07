@@ -1,5 +1,5 @@
 // The argument banks: scripts/seed/arguments/<topic>.<school>.json, forty
-// arguments each, composed from the hand-written passages in
+// arguments each, for BANK_SCHOOLS, composed from the hand-written passages in
 // arguments/fragments/<topic>.json and arguments/fragments/closings.json.
 //
 // The passages are the reviewable source; the banks are built from them by
@@ -13,7 +13,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Rng } from "./rng";
-import { QUIZ_SCHOOLS, schoolAdherent, type QuizSchoolId } from "../../src/lib/school-registry";
+import { QUIZ_SCHOOLS, type QuizSchoolId, type SchoolId as RegistrySchoolId } from "../../src/lib/school-registry";
+import { DRAFT_SCHOOL_IDS, schoolEntry } from "../../src/lib/school-registry.drafts";
 
 export const SEED_DIR = join(process.cwd(), "scripts", "seed");
 export const ARGUMENT_DIR = join(SEED_DIR, "arguments");
@@ -22,6 +23,19 @@ export const ARGUMENT_DIR = join(SEED_DIR, "arguments");
 // can only hold a school a reader could be placed in.
 export const SCHOOLS = QUIZ_SCHOOLS;
 export type SchoolId = QuizSchoolId;
+
+// The three schools the launch publishes, which are the registry's drafts
+// until then (Arthur, 2026-11-07, Gate 4 item 13: argument banks "at the
+// same depth as the live three's"). Their banks are written and tested with
+// the others; the generator takes them up only once the sample run covers
+// six schools, so until then nothing reads them and no run changes. Each
+// has two objections, from two rivals, as the live three do: its named
+// voices (src/lib/judge/objection-voices.ts), and for Ubuntu, whose
+// criteria name one, Utilitarianism as well. Once the launch publishes them
+// the drafts list is empty, and SCHOOLS has to name all six by then.
+export const LAUNCH_SCHOOLS = DRAFT_SCHOOL_IDS;
+/** Every school with a bank: the run's three, then the launch's three. */
+export const BANK_SCHOOLS: readonly RegistrySchoolId[] = [...SCHOOLS, ...LAUNCH_SCHOOLS];
 export const TOPICS = [
   "opaque-benefit",
   "crash-arithmetic",
@@ -95,9 +109,15 @@ export interface BankArgument {
   words: number;
 }
 
-/** "A Stoic", as the class page names a member with no display name. */
+/**
+ * "A Stoic", "An Ubuntu Ethicist", as the class page names a member with no
+ * display name. Read from the full registry, drafts included, so a bank
+ * reads the same whichever build writes it (the new three's banks name
+ * each other as rivals).
+ */
 export function rivalIntro(school: SchoolId): string {
-  return `A ${schoolAdherent(school)}`;
+  const entry = schoolEntry(school);
+  return `${entry?.adherentArticle === "an" ? "An" : "A"} ${entry?.adherent ?? school}`;
 }
 
 export function wordCount(text: string): number {
@@ -294,7 +314,11 @@ export function writeBanks(): string[] {
   const written: string[] = [];
   for (const topic of TOPICS) {
     const fr = loadFragments(topic);
-    for (const school of SCHOOLS) {
+    for (const id of BANK_SCHOOLS) {
+      // The bank functions are typed to the run's three, which is all the
+      // generator reads; the passages and closings hold all six, and the
+      // second part of item 13 widens the types with the generator.
+      const school = id as SchoolId;
       writeFileSync(bankPath(topic, school), serialiseBank(buildBank(fr, closings, school)));
       written.push(bankPath(topic, school));
     }

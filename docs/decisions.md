@@ -5079,6 +5079,19 @@ items, and the checks either side:
 No micro-lesson is added: the ruling says the elsewhere passages are
 enough for launch.
 
+**Carried out, 2026-11-07.** #103 merged at 06:29:02 UTC. Before the
+write, each row's `md5(stances::text)` in production was the snapshot's,
+as listed above. The write, `docs/seed-snapshots/2026-11-07-debate-topics-stances.sql`
+as merged, ran once through the Supabase connector straight after the
+merge. Read back at 06:29:31 UTC, each row's hash was the one listed
+above for after the write (opaque-benefit `82d42cbf…`, crash-arithmetic
+`0c46c464…`, no-decision `cf53750d…`, moral-training `aceb73e7…`,
+careful-builder `eca34a47…`, borrowed-judgement `69b992d9…`); every row
+had six stances; the md5 of every other column, `par_elo` and `par_n`
+included, was unchanged. The rollback was not run. No page reads the
+new lines before the launch, so the write did not wait for #103's
+deploy.
+
 ### Gate 4: items 8, 10, 11 and 12 (2026-11-07)
 
 Arthur's rulings of 2026-11-07, quoted in full in "Gate 4: Arthur's
@@ -5221,3 +5234,90 @@ Carried out:
   - Production held no reply other than a delivered one when this was
     written (read 2026-11-07), so no exchange's state changes with the
     merge.
+
+### Gate 4 item 13, first part: the new schools' argument banks (2026-11-07)
+
+Arthur, 2026-11-07, quoted in full in "Gate 4: Arthur's rulings
+(2026-11-07)":
+
+> 13. Yes: the fresh sample run covers all six schools, placed by quiz v2.
+>     Write argument banks for the three new schools from their school
+>     files, criteria and the research file (quotation guard applies), at
+>     the same depth as the live three's, so launch week shows six active
+>     schools. Show me 3 sample arguments per new school before running.
+
+This first part writes the banks and the samples. The run itself, six
+schools placed by quiz v2, is the second part, and runs only after he has
+seen the samples.
+
+- **The passages** (`scripts/seed/arguments/fragments/*.json`) for
+  Confucianism, Ubuntu and Buddhist Ethics, at the live three's depth: for
+  each of the six topics, a direction, 4 positions, 4 reasons, 3 examples
+  and 2 objections each with its answer, and 4 closings per school: 234
+  passages and 12 closings, 246 in all, mine, written from each school's
+  file (`read`, `gets_wrong`), its approved criteria, and, for the
+  scholars a school file names, what the school file and the research
+  file say of them: Mhlambi, that a discriminatory automated decision is
+  a failure of relational personhood; Menkiti, that the community confers
+  personhood once its demands are met; Gyekye, that individuals keep
+  their own worth and rights (the school file) while community stays
+  essential (the research file).
+- **Sources.** A passage names a scholar or text only where the school
+  file does (the Analects' Books 12 and 13; Metz, Menkiti, Gyekye and
+  Mhlambi; the discourse to Rahula). Two verified wordings are used, each
+  word for word as the research file has it and with its source named in
+  the same passage, as ruling (e) 9 allows: the Nguni maxim, as Metz gives
+  it, and Metz's principle. Book 13 is paraphrased, not given in Legge's
+  words. Nothing is put in the mouth of Confucius or the Buddha, and the
+  research file's UNVERIFIED items are not used.
+  `tests/seed/launch-passages.test.ts` holds the passages to those rules
+  and to the house style, since the quotation guard reads only quotation
+  marks under `content/` and the passages carry none. The arguer is "a
+  Buddhist Ethicist", not "a Buddhist", as accepted at Checkpoint B (e) 1.
+  Buddhist Ethics is not reduced to reducing suffering, which the research
+  file warns against: suffering is weighed with intention and non-harm.
+- **Objections.** Two per topic, as the live three have, from two rivals:
+  the rivals each school's criteria name as voicing its best-known
+  objection (`src/lib/judge/objection-voices.ts`), and for Ubuntu, whose
+  criteria name one, Utilitarianism too. A rival is introduced with its
+  own article ("An Ubuntu Ethicist will object that"), read from the full
+  registry so a bank reads the same on any build; the live three's
+  articles were all "a", so their banks are unchanged.
+- **The banks** (`scripts/seed/arguments/<topic>.<school>.json`, 18 new
+  files): built by `npm run seed:banks` as the live three's are, 40
+  arguments each, 10 strong, 20 mid and 10 weak, 80 to 250 words, all
+  different. The weak tier draws on the topic's shared weak passages, as
+  the live three's does.
+- **Nothing reads them yet.** The generator's schools are still the
+  quiz's three (`SCHOOLS`), so no run changes and the live three's 18
+  banks rebuild byte for byte; `tests/seed/banks.test.ts` holds all 36 to
+  their passages, and the new three to two objections from two rivals,
+  their named voices among them. `tests/seed/determinism.test.ts` pins
+  the datasets `main` gave at 3008b29, before the new banks, for the base
+  window and for ten days of extension, so a change that would move rows
+  a live run has written fails the tests.
+- **The samples** for Arthur: `docs/gate4-samples.md`, one argument of
+  each tier per school, the first of its tier in its topic's bank.
+- **Directions** follow the stances #103 wrote, and several positions
+  restate a stance almost word for word. So the question already on
+  Arthur's list from item 9, whether non-harm lets Buddhist Ethics program
+  a death at all on `crash-arithmetic`, covers these passages too: they
+  argue for minimising deaths, owning the rule as an intention about who
+  dies.
+- **For Arthur's list**, three readings the passages take that are his to
+  judge:
+  - several Buddhist passages read dependent origination as spreading
+    responsibility for an AI's harm across the many people and conditions
+    behind it (`careful-builder`, `moral-training`, `borrowed-judgement`,
+    `no-decision` and `opaque-benefit`, and one closing). The approved
+    criteria call that reading "an inference, not doctrine" and draw
+    nothing from it;
+  - no Ubuntu passage states Ubuntu's best-known objection as the
+    criteria give it (a community is not one voice, and an appeal to it
+    can make a dissenter the problem): the Stoic objections make the point
+    about one's own judgement but not the one about dissent, and the
+    Utilitarian ones now argue as Utilitarians;
+  - Buddhist Ethics' best-known objection, the gap between moral teaching
+    and institutions (who audits, how one appeals), appears only obliquely:
+    in a Confucian objection on `no-decision`, and in one on
+    `opaque-benefit` that an account is owed to the person refused.

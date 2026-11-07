@@ -17,7 +17,7 @@
     "review:turns": "tsx --env-file=.env.local scripts/review-turns.ts",
     "screen:check": "tsx --require ./scripts/preload-server-only-shim.cjs --env-file=.env.local tests/screen/run-screen.ts",
     "restore:topics": "tsx --require ./scripts/preload-server-only-shim.cjs --env-file=.env.local scripts/restore-topics.ts",
-    "seed:banks": "tsx scripts/seed/build-banks.ts",
+    "seed:banks": "tsx --require ./scripts/preload-server-only-shim.cjs scripts/seed/build-banks.ts",
     "seed:plan": "tsx --require ./scripts/preload-server-only-shim.cjs scripts/seed-production.ts plan",
     "seed:ci": "tsx --require ./scripts/preload-server-only-shim.cjs scripts/seed-ci.ts",
     "seed:production": "tsx --require ./scripts/preload-server-only-shim.cjs scripts/seed-production.ts",

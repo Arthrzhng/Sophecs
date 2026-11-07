@@ -116,6 +116,108 @@
           "why": "The argument does not explain why the absence of any judging faculty is not already decisive against the motion."
         }
       ]
+    },
+    "confucian": {
+      "direction": "against",
+      "positions": [
+        "Upbringing makes a person humane by forming them inside relationships and their rituals, and a model rewarded for outputs stands in no relationship it could owe anything to.",
+        "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences.",
+        "A Confucian rejects this, because goodness in a person is humaneness realised in relationships, and feedback shapes outputs without placing the model in any relationship at all.",
+        "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that."
+      ],
+      "reasons": [
+        "A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.",
+        "Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.",
+        "Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.",
+        "Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense."
+      ],
+      "examples": [
+        "A child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers.",
+        "A company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal.",
+        "An apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "what makes behaviour good is what it does to people, so a model that reliably helps and does not harm is good in the only sense that matters, whatever its upbringing.",
+          "answer": "Helpful outputs are good to have, but the motion claims more: that the model is good the way a well-raised person is. That sense includes standing in relationships where one can be held to account, and an output profile does not supply it.",
+          "why": "It denies the model goodness without saying why good outcomes would not be enough."
+        },
+        {
+          "rival": "ubuntu",
+          "claim": "the Confucian ties goodness to fixed roles, when a person becomes good through relationships of solidarity that need not follow any hierarchy of roles.",
+          "answer": "Relationships of solidarity are not opposed to roles; they are carried in them, as friend, neighbour, colleague. Either way the point stands: the model enters no relationships at all, so neither account makes it good.",
+          "why": "It talks of roles and relationships without saying which relationships a person must enter to become good."
+        }
+      ]
+    },
+    "ubuntu": {
+      "direction": "against",
+      "positions": [
+        "A person becomes good by being drawn into the lives of others, and feedback scores shape outputs without drawing the model into anyone's life.",
+        "I reject the motion. Moral upbringing makes a person good by bringing them into a community of persons, and training brings the model into nothing.",
+        "I reject this, because goodness here is what a person becomes through others, and a model is shaped by others without becoming anything through them.",
+        "Training can make a model safer to use, but calling it good in the sense of upbringing mistakes being adjusted by people for being made a person among them."
+      ],
+      "reasons": [
+        "As Metz gives the Nguni maxim, a person is a person through other persons. Upbringing makes someone good by drawing them into relationships where they share in others' lives and others share in theirs, and the goodness consists partly in that sharing, which a model does not do.",
+        "On Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A well-raised person has those capacities and exercises them; a trained model produces text that describes them without having them.",
+        "The feedback that trains a model comes from raters who are not in a relationship with it or with each other. Upbringing comes from people bound to the child and to one another, and that difference is the whole difference between shaping and raising.",
+        "On Menkiti's view the community confers personhood once its demands are met; on Gyekye's moderate reading individuals keep their own worth and rights, but community is still essential. Neither picture has room for goodness installed by an optimiser, with no community whose demands it meets."
+      ],
+      "examples": [
+        "A child raised by an extended family learns to share because her cousins share with her. A model learns to sound generous because raters scored generous replies higher.",
+        "A village elder is called good because of decades of keeping faith with neighbours. A chatbot is called good because it passed a safety benchmark last month.",
+        "A teenager learns fairness by being on both sides of unfair treatment among friends. A model learns fairness-shaped outputs without ever being treated unfairly by anyone."
+      ],
+      "objections": [
+        {
+          "rival": "stoicism",
+          "claim": "goodness is a matter of the agent's own judgement, not of relationships, so the real reason a model is not good is that it has no ruling faculty to assent with.",
+          "answer": "A model lacks a ruling faculty, but a person alone with a perfect ruling faculty would still not be good in the way upbringing makes people good, because that goodness is formed and shown in relationships with others.",
+          "why": "It denies the model goodness by pointing to relationships without engaging the claim that what is missing is the model's own judgement."
+        },
+        {
+          "rival": "utilitarianism",
+          "claim": "if the trained behaviour reliably does good it is good in the only sense that counts, and the raters who train a model shape it much as a village shapes a child.",
+          "answer": "Doing good reliably is not the sense the motion asks about, which is being made good as a person is. And raters are a crowd, not a community: they share no life with the model or with each other, and even a real community makes someone good by taking them into its relationships, not by scoring them.",
+          "why": "It appeals to community without saying why the raters behind the training are not one."
+        }
+      ]
+    },
+    "buddhist": {
+      "direction": "against",
+      "positions": [
+        "Goodness lies in the intention behind an act as well as in what follows, and training shapes what a model outputs without giving it any volition, so it can be made less harmful but not good.",
+        "I reject the motion. A person raised well acts from good intention; a model trained well produces outputs with no intention behind them, and goodness is weighed in the intention as much as in the effects.",
+        "A Buddhist Ethicist rejects this, because the training changes what follows from the model without touching what weighs as much as any effect in whether an act is good or bad: the volition behind it.",
+        "Training can reduce the harm a model does, and that is worth doing, but it does not make the model good in the sense upbringing makes a person good."
+      ],
+      "reasons": [
+        "An act is weighed by the volition behind it as much as by what follows. Moral upbringing works on intention: a child learns to act from compassion rather than craving. Feedback works on outputs, and an output with no volition behind it is neither good nor bad in that sense.",
+        "Reducing harm is a real good, and a model trained away from harmful outputs does less of it. That is a reason to train models carefully, not a reason to call them good, any more than a guard rail is kind.",
+        "The responsibility does not vanish into the model. What it does arises from many conditions: its data, its raters, its deployers. The intentions that matter are theirs, and calling the model good can hide whose intentions are in play.",
+        "Upbringing is a continuing practice of examining one's own acts, before, during and after, as the discourse to Rahula describes. A trained model does not examine its acts; it is examined by others, which is the opposite of what upbringing makes possible."
+      ],
+      "examples": [
+        "A child who stops hitting her brother because she sees it hurts him has changed her intention. A model that stops producing insults because insults were scored down has changed its outputs.",
+        "A company calls its assistant compassionate. The assistant was tuned to sound compassionate; the compassion, if any, was in the people who tuned it.",
+        "A monk spends years learning to notice when an act springs from anger. A model is adjusted in days not to produce text a rater marks as angry."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "intention is a story we tell about people, and if a model reliably reduces suffering then it is good in every sense that touches anyone.",
+          "answer": "Intention is not a story; it is what upbringing works on, and it is why a well-raised person can be trusted in situations no one trained them for. A model's reliability lasts only as far as its training reached.",
+          "why": "It insists on intention without saying what difference it would make to the people the model serves."
+        },
+        {
+          "rival": "confucian",
+          "claim": "goodness is formed in relationships and rituals, and fixing on inner volition misses that a child becomes good by being raised among people, not by examining their own mind.",
+          "answer": "Both happen together: a child learns compassion among people, and learns to notice their own intentions in doing so. The model has neither the people nor the noticing, which is why it is not good in either sense.",
+          "why": "It looks only at the model's lack of volition and never at what a child learns from the people who raise them."
+        }
+      ]
     }
   }
 }
