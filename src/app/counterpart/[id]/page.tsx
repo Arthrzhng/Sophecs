@@ -5,7 +5,8 @@ import {
   ExchangeView,
   type ExchangeStatus,
 } from "@/components/counterpart/ExchangeView";
-import { isLapsed, latestReplyPending, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
+import { latestReplyPending, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
+import { closeIfLapsed, exchangeForLapse } from "@/lib/counterpart-lapse";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate } from "@/lib/motion-text";
 
@@ -55,16 +56,7 @@ export default async function CounterpartPage({
   const theirDebateId = iAmA ? exchange.debate_b : exchange.debate_a;
   const theirUserId = iAmA ? exchange.user_b : exchange.user_a;
 
-  // Lapse is closed on view rather than by a job: an exchange nobody opens
-  // does no harm sitting open, and the only person who needs to see it
-  // closed is whoever opens it.
-  let status = exchange.status as string;
-  if (status === "open" && isLapsed(exchange.last_turn_at as string)) {
-    await admin.from("exchanges").update({ status: "lapsed", next_turn: null }).eq("id", id);
-    status = "lapsed";
-  }
-
-  const [{ data: topic }, { data: debates }, { data: turnRows }] = await Promise.all([
+  const [{ data: topic }, { data: debates }, { data: turnRows, error: turnsError }] = await Promise.all([
     admin.from("debate_topics").select("motion, title").eq("slug", exchange.topic_slug).maybeSingle(),
     admin
       .from("debates")
@@ -77,6 +69,15 @@ export default async function CounterpartPage({
       .order("seq", { ascending: true }),
   ]);
   if (!topic) notFound();
+  const turns = (turnRows as TurnRow[] | null) ?? [];
+
+  // Lapse is closed on view rather than by a job: an exchange nobody opens
+  // does no harm sitting open, and the only person who needs to see it
+  // closed is whoever opens it. A reply waiting to be screened holds the
+  // clock (src/lib/counterpart.ts, exchangeLapsed), and the close takes only
+  // while the exchange is as it was read (src/lib/counterpart-lapse.ts).
+  // A turns read that failed closes nothing.
+  const status = await closeIfLapsed(admin, exchangeForLapse(exchange), turnsError ? null : turns);
 
   const argumentById = new Map((debates ?? []).map((d) => [d.id as string, d.argument as string]));
 
@@ -91,7 +92,6 @@ export default async function CounterpartPage({
     motionTextById.get(exchange.debate_a as string) ?? null,
     topic.motion as string
   );
-  const turns = (turnRows as TurnRow[] | null) ?? [];
 
   // What each party may read. The admin client bypasses RLS, so the same
   // rule the policy encodes is applied here explicitly: a screened turn is

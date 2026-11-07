@@ -52,6 +52,7 @@ export function SchoolMap({
   preview,
   history,
   caption,
+  whose = "your",
 }: {
   title: string;
   schools: MapSchool[];
@@ -60,6 +61,12 @@ export function SchoolMap({
   preview?: MapPoint;
   history?: MapPoint[];
   caption?: string;
+  /**
+   * Whose answers the dot shows: the reader's own, or, on a shared result
+   * (/r/<id>), someone else's, where the description says "they" (Arthur,
+   * 2026-11-07, Gate 4 item 8).
+   */
+  whose?: "your" | "their";
 }) {
   const titleId = `map-${title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
   const descId = `${titleId}-desc`;
@@ -71,7 +78,7 @@ export function SchoolMap({
       .sort((a, b) => a.angle - b.angle)
       .map((s) => s.name)
       .join(", ")}.`,
-    reader ? "A filled dot marks where you stand." : "",
+    reader ? `A filled dot marks where ${whose === "their" ? "they stand" : "you stand"}.` : "",
     preview ? "A dashed ring marks where this answer would move you." : "",
     history && history.length > 1 ? "A line joins your earlier positions in order." : "",
   ]

@@ -75,6 +75,65 @@ export function isLapsed(lastTurnAt: string | Date, now: Date = new Date()): boo
   return now.getTime() - last.getTime() > LAPSE_DAYS * 24 * 60 * 60 * 1000;
 }
 
+export interface LapseExchange {
+  user_a: string | null;
+  user_b: string | null;
+  next_turn: string | null;
+  last_turn_at: string | Date;
+}
+
+export interface LapseTurn {
+  seq: number;
+  author_id: string | null;
+  screen_result: string;
+}
+
+/**
+ * Whether an open exchange has lapsed: LAPSE_DAYS since its last delivered
+ * reply, except that a reply saved and not yet screened holds the clock
+ * until it is screened (Arthur, 2026-11-07, Gate 4 item 12). The daily job
+ * in src/lib/rescreen.ts may still deliver it, which restarts the clock as
+ * any delivery does; held instead, it leaves the clock running from the
+ * last delivered reply, as a reply held when it is sent does.
+ *
+ * Only a reply the job could deliver holds it, by the job's own tests: the
+ * latest, by an author whose turn it is by sequence and by `next_turn`, in
+ * an exchange both of whose parties still have accounts. A reply to someone
+ * who has since left can never be delivered, so it holds nothing. A reply
+ * already screened holds nothing either, whether or not its exchange moved
+ * on: the ruling holds the clock "until it is screened", and a hold on a
+ * screened reply whose hand-over failed would never end. That leaves two
+ * races, each a round trip wide and each only for a reply sent after its
+ * exchange's 14 days have run out, before anyone opened it. The exchange
+ * page can read the turns just after the job marks a reply `ok` and just
+ * before it hands the turn over: the close takes, the job's hand-over is
+ * refused, and the job puts the reply back to pending and answers non-2xx,
+ * so the cron log shows it. The frozen turn route has the same gap and
+ * hands over with no condition on the exchange's status, so a close in it
+ * leaves a delivered reply in a lapsed exchange; and a close by a page
+ * that read the turns before the route saved a reply leaves that reply
+ * pending in a lapsed exchange (docs/decisions.md, "Gate 4: items 8, 10,
+ * 11 and 12").
+ */
+export function exchangeLapsed(
+  exchange: LapseExchange,
+  turns: readonly LapseTurn[],
+  now: Date = new Date()
+): boolean {
+  const last = turns.reduce<LapseTurn | undefined>((a, t) => (a && a.seq > t.seq ? a : t), undefined);
+  const { user_a, user_b, next_turn } = exchange;
+  const deliverable =
+    last !== undefined &&
+    last.screen_result === "pending" &&
+    user_a !== null &&
+    user_b !== null &&
+    last.author_id !== null &&
+    last.author_id === next_turn &&
+    authorForSeq(last.seq, user_a, user_b) === last.author_id;
+  if (deliverable) return false;
+  return isLapsed(exchange.last_turn_at, now);
+}
+
 // What a turn must quote: the counterpart's original argument for the first
 // exchange of replies, and their previous turn once the exchange is under
 // way. Turn 1 and 2 answer arguments; 3 and 4 answer replies.

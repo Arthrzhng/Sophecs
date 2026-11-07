@@ -165,7 +165,7 @@ describe("rescreenPending", () => {
     const screen = vi.fn(ok);
     tables.exchanges = [
       exchange("x1", { status: "complete" }),
-      exchange("x2", { last_turn_at: ago(15 * 24 * 60) }),
+      exchange("x2", { status: "lapsed", next_turn: null }),
       exchange("x3", { is_sample: true }),
       exchange("x4", { user_b: null, next_turn: null }),
     ];
@@ -174,6 +174,34 @@ describe("rescreenPending", () => {
     expect(await rescreenPending(admin, deps({ screen }))).toMatchObject({ read: 0, delivered: 0 });
     expect(screen).not.toHaveBeenCalled();
     expect(JSON.stringify(tables)).toBe(before);
+  });
+
+  // Arthur, 2026-11-07, Gate 4 item 12: a pending reply holds the lapse
+  // clock until it is screened, so a reply saved on day 13 and not checked
+  // until day 20 is still delivered, and the clock restarts from then.
+  // Review of #102: a reply to a counterpart who has since left can never
+  // be handed over, so it must not be read, however old, or such replies
+  // would fill every run ahead of ones that can be delivered.
+  it("never reads a reply to a counterpart who has left, and so still delivers one that can be", async () => {
+    // Half whose counterpart left, half whose opener left.
+    tables.exchanges = Array.from({ length: 100 }, (_, i) =>
+      exchange(`gone${i}`, i % 2 ? { user_b: null, next_turn: "a", last_turn_at: ago(60 * 24 * 60) } : { user_a: null, next_turn: "a", last_turn_at: ago(60 * 24 * 60) })
+    );
+    tables.turns = Array.from({ length: 100 }, (_, i) =>
+      turn(`left${i}`, { exchange_id: `gone${i}`, author_id: "a", seq: 3, created_at: ago(50 * 24 * 60 - i) })
+    );
+    tables.exchanges.push(exchange("live"));
+    tables.turns.push(turn("fine", { exchange_id: "live", created_at: ago(100) }));
+    expect(await rescreenPending(admin, deps())).toMatchObject({ read: 1, delivered: 1, stranded: 0 });
+    expect(tables.turns.find((t) => t.id === "fine")!.screen_result).toBe("ok");
+    expect(tables.turns.filter((t) => String(t.id).startsWith("left")).every((t) => t.screen_result === "pending")).toBe(true);
+  });
+
+  it("delivers a pending reply however long ago the last delivered one was: the reply holds the clock", async () => {
+    Object.assign(tables.exchanges[0], { last_turn_at: ago(20 * 24 * 60) });
+    Object.assign(tables.turns[0], { created_at: ago(7 * 24 * 60) });
+    expect(await rescreenPending(admin, deps())).toMatchObject({ read: 1, delivered: 1 });
+    expect(tables.exchanges[0]).toMatchObject({ status: "open", next_turn: "a", last_turn_at: NOW.toISOString() });
   });
 
   it("does not let replies it cannot deliver fill a run ahead of one it can", async () => {

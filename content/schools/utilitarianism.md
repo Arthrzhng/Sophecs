@@ -40,8 +40,8 @@ share_lines:
     whichever option leaves the most people better off. Sophecs says
     that's Utilitarianism.
   - >-
-    My verdict on the self-driving car problem: minimize total harm, even
-    if that means the car chooses you. Sophecs called that Utilitarian.
+    Turns out I'd pick whatever does the most good for the most people,
+    even when I'm the one who pays for it. Sophecs called that Utilitarian.
   - >-
     Ten questions about how I decide what's right, and I kept landing on the
     same answer: count everyone it touches, not just the person in front of

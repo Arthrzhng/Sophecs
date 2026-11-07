@@ -310,16 +310,18 @@ of the three; Gate 2 is about that.
      (`docs/decisions.md`, "Gate 4: Arthur's rulings"): production judges
      with v3, its cost accepted; no score change shown across two
      versions, Elo and par unchanged; v3's head comment left as sent.
-   - [ ] The rubric showing the v3 criteria the judge is given for all
+   - [x] The rubric showing the v3 criteria the judge is given for all
      six, on every page that says they are published in full (Arthur,
-     2026-11-07, Gate 4 item 10).
+     2026-11-07, Gate 4 item 10): a SIX_SCHOOLS build shows them (#102).
    - [ ] In the launch merge, the three new schools' criteria moved from
      `content/prompts/fidelity-criteria.draft.md` into
      `src/lib/judge/rubric.ts` with the same text, shown by the flag-on
      request fixtures (`tests/judge-request/six-schools/`) passing
      unchanged (Arthur, 2026-11-07, Gate 4 item 6).
 
-   **The v2 copy, for the Gate 4 pack.** Every piece of text a reader
+   **The v2 copy, for the Gate 4 pack.** Accepted by Arthur on
+   2026-11-07 (Gate 4 item 8), with the two fixes marked in the table.
+   Every piece of text a reader
    sees only because quiz v2 and the six schools are on, as a flag-on
    build shows it today, with what a reader sees now. Lines already ruled
    are marked so; "New" is text for his (e) judgement. The questions,
@@ -342,14 +344,14 @@ of the three; Gate 2 is about that.
    | The map's accessible title, beside each question | Your position so far; or Your position so far, between X and Y | Where your answers put you, on the map of the schools | New |
    | The map on the reader's result | (none) | Where your answers put you; accessible title "Where your answers put you, on the map of the schools" | New |
    | The map on a shared result (`/r/<id>`) | (none) | Where these answers landed; accessible title "Where these answers put them, on the map of the schools" | New |
-   | Every map's description for screen readers (`src/components/phase3/SchoolMap.tsx`) | (none) | The schools sit on a ring, in this order going round: (the six, in order). A filled dot marks where you stand. A dashed ring marks where this answer would move you. A line joins your earlier positions in order. (Each sentence only where it applies.) | New. On `/r/<id>` it says "where you stand" to a reader looking at someone else's answers, while the title there says "them" |
+   | Every map's description for screen readers (`src/components/phase3/SchoolMap.tsx`) | (none) | The schools sit on a ring, in this order going round: (the six, in order). A filled dot marks where you stand. A dashed ring marks where this answer would move you. A line joins your earlier positions in order. (Each sentence only where it applies.) | Accepted, 2026-11-07, with one fix: on `/r/<id>` the dot is "where they stand" |
    | The quiz's last button | See your school | See your school | Unchanged |
    | If the server scores a school the page cannot show | (none) | Couldn't show this result. Your result was saved, but this page could not show its school. Open the link again in a moment. | New |
    | Today, after the reader has argued (`src/components/phase3/ElsewhereCard.tsx`) | (none) | Optional; A view from elsewhere; Another tradition on this week's motion. There is no check, and it is not a step.; Read it | When it appears ruled, (e) 6; copy in `docs/daily-path-copy.md`, section 12 |
    | The lesson player's label for that passage (`src/app/lessons/[slug]/page.tsx`) | (none) | A view from elsewhere | As above |
    | The six passages it opens (`content/micro/*-elsewhere.md`) | (none) | Each file's own title, passage and source | Content, for his reading |
    | `/table`, a school under the threshold (`src/lib/school-table.ts`) | (none: the three are always ranked) | Ranked once it has 20 judged original arguments. (n) so far. | The threshold ruled, (e) 5 and 2026-11-06; the copy in `docs/daily-path-copy.md` |
-   | The share lines (`content/schools/*.md`), in a result's share sheet | The three published schools' lines | All six schools' lines; the nine of the three new schools are new to readers | The two rewordings ruled, (e) 3, with "the other lines ... unchanged". Still for him to see: `utilitarianism.md` [1] cites v1's self-driving-car question, which v2 does not ask |
+   | The share lines (`content/schools/*.md`), in a result's share sheet | The three published schools' lines | All six schools' lines; the nine of the three new schools are new to readers | The two rewordings ruled, (e) 3, with "the other lines ... unchanged". `utilitarianism.md` [1] rewritten by his ruling of 2026-11-07, not to cite v1's self-driving-car question: "Turns out I'd pick whatever does the most good for the most people, even when I'm the one who pays for it. Sophecs called that Utilitarian." (new wording, for his reading) |
    | `README.md` | one of three schools | To be written in the launch merge | Not written yet |
 
    Text that changes only because the list of schools is longer needs no

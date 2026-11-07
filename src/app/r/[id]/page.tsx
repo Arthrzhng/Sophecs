@@ -169,6 +169,7 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
         axes={quizV2().axes}
         reader={{ x: result.map_x, y: result.map_y }}
         caption="Where these answers landed"
+        whose="their"
       />
     ) : null;
 
