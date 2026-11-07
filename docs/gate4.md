@@ -82,19 +82,22 @@ For your next list, from carrying these out:
   six), and the nine lines a template verdict uses to praise an argument
   for standing on a new school's ground, in `scripts/seed/verdicts.ts`
   (`FEATURE`), are mine too, for your reading. Two more: most exchanges
-  between the six open with no objection to raise, since most pairs of
-  schools have none between them in the passages, so they argue past each
-  other more than the live three's do; and a fresh run's base window
+  between the six open with no objection to raise, since in 18 of the 30
+  pairings of two schools, taken one way round, the passages give none,
+  so they argue past each other more than the live three's do; and a fresh run's base window
   still starts on 2026-09-18, so its quiz v2 results and the new three's
   arguments are dated weeks before readers could have made them;
-- item 13, two things the run's verdicts do that I left as they are,
+- item 13, three things the run's verdicts do that I left as they are,
   since changing them would change rows the live run has written; the
-  fresh run is the one chance to change them, for it alone. About 1
-  revision verdict in 8 says the revision now answers an objection and
-  still suggests answering it (`templateRevisionVerdict`), and a school
+  fresh run is the one chance to change them, for it alone. About half of
+  revision verdicts keep the first attempt's weakest move, "The argument
+  never meets an objection.", while saying the revision now meets one;
+  about 1 in 8 say the revision now answers an objection and still
+  suggest answering it (both `templateRevisionVerdict`); and a school
   whose name ends in "s" takes "'s", so a fresh run writes "Buddhist
   Ethics's" as the live run writes "Virtue Ethics's" (the templates that
-  write `` `${NAME(…)}'s` ``). Both are in `scripts/seed/verdicts.ts`.
+  write `` `${NAME(…)}'s` ``). All three are in
+  `scripts/seed/verdicts.ts`.
 
 ## Where things stand
 

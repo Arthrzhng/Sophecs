@@ -5367,7 +5367,8 @@ launch step, after the teardown, on his word.
   a six-school run passes the judge's schema as a six-school build has it.
 - **Exchanges.** Among the six, two schools often have no objection
   between them in the passages: 12 of the 15 pairs lack one in at least one
-  direction on some motion, and 6 in both. Between them the opening turn
+  direction, and 6 in both, on every motion, since a school's two rivals
+  are the same on all six. Between them the opening turn
   argues from a reason and the reply from a reason and an example, where
   the old fallback would have said one reason twice in each. That is most
   exchanges of a six-school run: at production
@@ -5389,18 +5390,24 @@ launch step, after the teardown, on his word.
   stages, every check passed (migration 0027's check on a result's shape
   among the writes), and teardown left nothing.
 - **Left as they are**, because changing them would change rows the live
-  run has written: in about 1 revision in 8, the verdict says the
-  revision now answers an objection and still suggests answering it (at
-  production volume, 71 of 545 revisions in a three-school run and 66 of
-  545 in a six-school one); and a name ending in "s" takes "'s" ("Virtue
-  Ethics's", and now "Buddhist Ethics's"). Both could change for the fresh
-  run only, if Arthur wants that.
+  run has written. About half of revision verdicts keep the first
+  attempt's weakest move, "The argument never meets an objection.",
+  while saying the revision now meets one (at production volume, seed
+  `six-check`, 279 of 545 revisions carry that line, 224 of them judged
+  as answering the objection, in a three-school run and a six-school one
+  alike). In about 1 revision in 8 the verdict says the revision now
+  answers an objection and still suggests answering it (71 of 545 in a
+  three-school run, 66 of 545 in a six-school one); with the first, 350
+  and 345 of 545 revisions carry at least one of the two. Both are in
+  `templateRevisionVerdict`. And a name ending in "s" takes "'s" ("Virtue
+  Ethics's", and now "Buddhist Ethics's"). All three could change for the
+  fresh run only, if Arthur wants that.
 - **Commands.** `--six-schools` is refused with `--plan`, since a plan
   names its own quiz, and production refuses a plan whose quiz is not
   `RUN_QUIZ`, which every scheduled extension of that run would refuse.
 - **For Arthur's list**, besides the mix and the `FEATURE` lines: the
-  exchanges above; the two left as they are above, which the fresh run is
-  the one chance to change (`scripts/seed/verdicts.ts`:
+  exchanges above; the three left as they are above, which the fresh run
+  is the one chance to change (`scripts/seed/verdicts.ts`:
   `templateRevisionVerdict`, and the templates that write
   `` `${NAME(…)}'s` ``); and that a fresh run's base window still starts
   on 2026-09-18, so its quiz v2 results and the new three's arguments are

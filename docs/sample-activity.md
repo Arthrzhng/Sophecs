@@ -258,8 +258,8 @@ exact duplicates stay near zero; near duplicates (the same composition with
 another opening, closing or example) are measured and reported. The banks
 (`arguments/<topic>.<school>.json`, forty each) are a reviewable sample of
 the same compositions. The launch's three schools have passages and banks
-too (Gate 4 item 13), which no run reads until the generator covers six
-schools.
+too (Gate 4 item 13), which only a run made with quiz v2 reads ("Six
+schools, placed by quiz v2", below).
 
 Measured on a plan with the defaults and a test seed, base window to
 2026-11-04 09:00 UTC:
@@ -309,7 +309,7 @@ ways only:
   Between two schools with no objection between them, an exchange opens
   from a reason and replies from a reason and an example, which among the
   six is most exchanges: 12 of the 15 pairs lack an objection one way or
-  the other on some motion.
+  the other, on every motion.
 - The six and their order come from `docs/quiz-v2.json`, not the
   registry's lists, and the run is refused unless every motion's passages,
   the closings and the verdicts' lines cover the same six.

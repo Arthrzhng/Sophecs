@@ -89,8 +89,6 @@ export interface GenConfig {
   topics: { slug: string; title: string; motion: string; sort: number; microBefore: string }[];
 }
 
-// 3,278 accounts, Arthur's ruling of 2026-11-04, and the other volumes
-// scaled from the brief's 4,000 by the same factor.
 /**
  * The quiz the scheduled job's runs place samples by: none named, so quiz
  * v1, until the launch merge sets it to 2, after the sample teardown, so
@@ -102,6 +100,8 @@ export interface GenConfig {
  */
 export const RUN_QUIZ: GenConfig["quiz"] = undefined;
 
+// 3,278 accounts, Arthur's ruling of 2026-11-04, and the other volumes
+// scaled from the brief's 4,000 by the same factor.
 export const DEFAULTS = {
   users: 3278,
   anonResults: 4917,
