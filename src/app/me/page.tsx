@@ -7,7 +7,7 @@ import { getPendingChallenges } from "@/lib/challenge";
 import { getOpenObjections, type OpenObjection } from "@/lib/objections";
 import { getWeeklyMotion } from "@/lib/weekly-motion";
 import { getCaseStates, type CaseState } from "@/lib/cases";
-import { isLapsed } from "@/lib/counterpart";
+import { exchangeLapsed, latestReplyPending } from "@/lib/counterpart";
 import type { ExchangeRow } from "@/components/me/OpenExchanges";
 import { WelcomeTracker } from "@/components/me/WelcomeTracker";
 import { MeViewTracker } from "@/components/me/MeViewTracker";
@@ -179,13 +179,31 @@ export default async function MePage({
     titleBySlug = new Map(
       (activeTopics.data ?? []).map((t) => [t.slug as string, t.title as string])
     );
+    // Their turns, for whether each is waiting on a reply not yet screened:
+    // one holds the lapse clock, and the reader's own is shown as waiting
+    // to be checked, as the exchange page shows it (Arthur, 2026-11-07,
+    // Gate 4 item 12). Who wrote each and how it was screened, no text.
+    type TurnState = { exchange_id: string; author_id: string | null; screen_result: string };
+    const openIds = (exchangeRows ?? []).map((row) => row.id as string);
+    const { data: turnRows } = openIds.length
+      ? await admin
+          .from("turns")
+          .select("exchange_id, author_id, screen_result")
+          .in("exchange_id", openIds)
+          .order("seq", { ascending: true })
+      : { data: [] as TurnState[] };
+    const turnsByExchange = new Map<string, TurnState[]>();
+    for (const t of (turnRows as TurnState[] | null) ?? []) {
+      turnsByExchange.set(t.exchange_id, [...(turnsByExchange.get(t.exchange_id) ?? []), t]);
+    }
     exchanges = (exchangeRows ?? [])
-      .filter((row) => !isLapsed(row.last_turn_at as string))
+      .filter((row) => !exchangeLapsed(row.last_turn_at as string, turnsByExchange.get(row.id as string) ?? [], (row.next_turn as string | null) ?? null))
       .map((row) => ({
         id: row.id as string,
         topicTitle: titleBySlug.get(row.topic_slug as string) ?? (row.topic_slug as string),
         theirSchool: (row.user_a === user.id ? row.school_b : row.school_a) as SchoolId,
         myTurn: row.next_turn === user.id,
+        myReplyPending: latestReplyPending(turnsByExchange.get(row.id as string) ?? [], user.id),
       }));
 
     caseStates = await getCaseStates(admin, user.id, activeRows);

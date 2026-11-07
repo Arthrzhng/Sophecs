@@ -3837,8 +3837,9 @@ after 40 seconds. Each of its calls has a 15-second limit and no retries
 (`screenAndLog` takes them as options; the turn route passes none), so a
 call started at 40 seconds ends inside the route's 60 and is logged.
 
-Two things are left as they are and go on the list for Arthur, (e) 8:
-the lapse clock runs from the exchange's last delivered reply, so a reply
+Two things are left as they are and go on the list for Arthur, (e) 8
+(ruled 2026-11-07, Gate 4 item 12; "Gate 4: items 8, 10, 11 and 12"
+below): the lapse clock runs from the exchange's last delivered reply, so a reply
 saved on day 13 that cannot be screened lapses with the exchange and is
 never delivered; and `/me` still lists an exchange whose latest reply is
 the reader's own pending one under "Reply", where the exchange page now
@@ -4184,6 +4185,8 @@ the run wrote to be weak, but with only the canary's rows (the first 40
 accounts, after the launch teardown and before `full`) a review probe of
 the generator found 4 of 70 and 6 of 40 were, marked 28 to 36. A floor
 would leave a position out rather than show a weak argument for it.
+Ruled 2026-11-07 (Gate 4 item 11): a floor of 50; "Gate 4: items 8, 10,
+11 and 12" below.
 
 ### Judge v3 after #68: two single-sample checks, and a stop (2026-11-06)
 
@@ -4832,3 +4835,91 @@ Carried out:
   `docs/stage5-plan.md`.
 - The copy is in `docs/daily-path-copy.md`, section 13; the Gate 4
   screenshots are retaken with "Sign in".
+
+### Gate 4: items 8, 10, 11 and 12 (2026-11-07)
+
+Arthur's rulings of 2026-11-07, quoted in full in "Gate 4: Arthur's
+rulings (2026-11-07)":
+
+> 8. v2 copy accepted, with two fixes: rewrite Utilitarianism's share line
+>    [1] so it doesn't cite v1's self-driving-car question; on /r/<id> the
+>    map's screen-reader description says "where they stand".
+> 10. At launch the rubric shows the v3 criteria for all six, so "in full"
+>     stays true, on /how-it-works and anywhere else that makes the claim.
+> 11. Yes: an exemplar floor on the template mark, dropping a position
+>     rather than showing a weak one.
+> 12. Re-screening: a pending reply holds the lapse clock until it is
+>     screened; /me shows "Waiting to be checked" for it, matching the
+>     exchange page; copy accepted.
+
+Carried out:
+
+- **8, the two fixes.**
+  - `content/schools/utilitarianism.md`, share line [1] (frozen
+    `content/**`; this ruling is the authority), now reads: "Turns out
+    I'd pick whatever does the most good for the most people, even when
+    I'm the one who pays for it. Sophecs called that Utilitarian." It
+    keeps the old line's point, impartiality that counts the speaker too,
+    without v1's question. The words are mine, for his reading.
+    Share lines are not behind the flag, so this one changes on
+    production with the merge; it is as true of a v1 result as of a v2
+    one.
+  - `SchoolMap` takes whose dot it draws (`whose`, "your" by default);
+    `/r/<id>` passes "their", so its description says "A filled dot marks
+    where they stand.", matching that map's title ("Where these answers
+    put them"). Every other map is the reader's own and is unchanged. The
+    map is drawn on a SIX_SCHOOLS build only.
+  - `docs/stage5-plan.md`, the v2 copy table, records the acceptance and
+    both fixes.
+- **10, the rubric in full.** `src/components/how-it-works/Rubric.tsx`,
+  which both `/how-it-works` and `/debate/rubric` render, shows on a
+  SIX_SCHOOLS build what `fidelityCriteriaFor` hands the judge under
+  that build's version (v3) for all six shown schools: each school's
+  criteria with v3's vocabulary, objection and voice paragraphs, and the
+  three new schools' approved sections. The text is shown as the judge
+  is given it, including the voice paragraph's "Of the rival schools this
+  prompt lists" and its school ids in backticks. A build without the flag
+  shows the published three's criteria, which are exactly what the v2
+  judge is given (`fidelityCriteriaFor(id, "v2")` returns them
+  unchanged), so production's rubric is as it was. `/method`'s "published
+  in full" links to this rubric and needs nothing of its own. At the
+  launch, when the three's criteria move into `src/lib/judge/rubric.ts`
+  (item 6), the page goes on reading them through the same function.
+- **11, the exemplar floor.** `EXEMPLAR_FLOOR = 50`
+  (`src/lib/exemplars.ts`): nothing marked under it is read or chosen,
+  so a position whose strongest argument is under it is left out. 50 is
+  where the sample plan's middle band starts (`scripts/seed/verdicts.ts`,
+  70-90 / 50-69 / 25-49). Measured before choosing it:
+  - production, read-only on 2026-11-07: all 707 published originals
+    the run wrote to be weak are marked 25 to 45. Of the 2,496 others, one
+    is under 50 (49), and 24 stronger arguments share its opening, so it
+    is never shown. The floor changes nothing on today's pages;
+  - the generator run in memory under rule 2, as the run after the launch
+    will be: weak arguments are marked 18 to 49. At full size the 72
+    chosen are the same with or without the floor; at the canary's size
+    (40 accounts) it drops 2 weak arguments and one other marked under
+    50, 14 chosen becoming 11.
+- **12, a pending reply holds the lapse clock.** `exchangeLapsed`
+  (`src/lib/counterpart.ts`): an open exchange whose latest reply is
+  pending, by an author who still has an account and whose turn it is,
+  does not lapse, however long ago its last delivered reply was. Screened
+  and delivered, the reply restarts the clock as any delivery does;
+  screened and held, the clock runs from the last delivered reply again,
+  as it does for a reply held when it is sent (the held author cannot
+  post again until it is resolved, so the exchange cannot move anyway).
+  - The exchange page decides lapse with it, after reading the turns,
+    and closes an exchange only while it is still open and waiting on the
+    reader it was waiting on when read, so one the daily job has just
+    moved on is not closed under it.
+  - `/me` leaves out lapsed exchanges by the same rule, from a read of
+    each open exchange's turns (who wrote each and how it was screened,
+    no text).
+  - The daily job (`src/lib/rescreen.ts`) no longer skips a pending reply
+    whose exchange's last delivered reply is over 14 days old.
+  - `/me` shows an exchange whose latest reply is the reader's own,
+    waiting to be screened, with "Waiting to be checked" where "Reply"
+    was, the exchange's title linking to it, under "Your counterpart is
+    waiting", which is still true. The copy is the label he accepted.
+  - Production held no reply other than a delivered one when this was
+    written (read 2026-11-07), so no exchange's state changes with the
+    merge.

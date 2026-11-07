@@ -5,7 +5,7 @@ import {
   ExchangeView,
   type ExchangeStatus,
 } from "@/components/counterpart/ExchangeView";
-import { isLapsed, latestReplyPending, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
+import { exchangeLapsed, latestReplyPending, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate } from "@/lib/motion-text";
 
@@ -55,15 +55,6 @@ export default async function CounterpartPage({
   const theirDebateId = iAmA ? exchange.debate_b : exchange.debate_a;
   const theirUserId = iAmA ? exchange.user_b : exchange.user_a;
 
-  // Lapse is closed on view rather than by a job: an exchange nobody opens
-  // does no harm sitting open, and the only person who needs to see it
-  // closed is whoever opens it.
-  let status = exchange.status as string;
-  if (status === "open" && isLapsed(exchange.last_turn_at as string)) {
-    await admin.from("exchanges").update({ status: "lapsed", next_turn: null }).eq("id", id);
-    status = "lapsed";
-  }
-
   const [{ data: topic }, { data: debates }, { data: turnRows }] = await Promise.all([
     admin.from("debate_topics").select("motion, title").eq("slug", exchange.topic_slug).maybeSingle(),
     admin
@@ -77,6 +68,23 @@ export default async function CounterpartPage({
       .order("seq", { ascending: true }),
   ]);
   if (!topic) notFound();
+  const turns = (turnRows as TurnRow[] | null) ?? [];
+
+  // Lapse is closed on view rather than by a job: an exchange nobody opens
+  // does no harm sitting open, and the only person who needs to see it
+  // closed is whoever opens it. A reply waiting to be screened holds the
+  // clock (src/lib/counterpart.ts, exchangeLapsed). Only while the exchange
+  // is waiting on the same reader as when it was read: a delivery moves
+  // next_turn, so one the daily job (src/lib/rescreen.ts) has just made is
+  // not closed under it. That view shows the exchange as read, and the next
+  // one as it is.
+  let status = exchange.status as string;
+  const nextTurn = (exchange.next_turn as string | null) ?? null;
+  if (status === "open" && exchangeLapsed(exchange.last_turn_at as string, turns, nextTurn)) {
+    const close = admin.from("exchanges").update({ status: "lapsed", next_turn: null }).eq("id", id).eq("status", "open");
+    const { data: closed } = await (nextTurn ? close.eq("next_turn", nextTurn) : close.is("next_turn", null)).select("id");
+    if (closed?.length) status = "lapsed";
+  }
 
   const argumentById = new Map((debates ?? []).map((d) => [d.id as string, d.argument as string]));
 
@@ -91,7 +99,6 @@ export default async function CounterpartPage({
     motionTextById.get(exchange.debate_a as string) ?? null,
     topic.motion as string
   );
-  const turns = (turnRows as TurnRow[] | null) ?? [];
 
   // What each party may read. The admin client bypasses RLS, so the same
   // rule the policy encodes is applied here explicitly: a screened turn is

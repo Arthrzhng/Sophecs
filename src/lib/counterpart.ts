@@ -75,6 +75,29 @@ export function isLapsed(lastTurnAt: string | Date, now: Date = new Date()): boo
   return now.getTime() - last.getTime() > LAPSE_DAYS * 24 * 60 * 60 * 1000;
 }
 
+/**
+ * Whether an open exchange has lapsed: LAPSE_DAYS since its last delivered
+ * reply, except that a reply saved and not yet screened holds the clock
+ * until it is screened (Arthur, 2026-11-07, Gate 4 item 12). The daily job
+ * in src/lib/rescreen.ts may still deliver it, which restarts the clock as
+ * any delivery does; held instead, it leaves the clock running from the
+ * last delivered reply, as a reply held when it is sent does.
+ *
+ * Only a reply the job could deliver holds it: the latest, by an author
+ * who still has an account and whose turn it is (`nextTurn`). `turns` in
+ * sequence order.
+ */
+export function exchangeLapsed(
+  lastTurnAt: string | Date,
+  turns: readonly { author_id: string | null; screen_result: string }[],
+  nextTurn: string | null,
+  now: Date = new Date()
+): boolean {
+  const last = turns[turns.length - 1];
+  if (last && last.screen_result === "pending" && last.author_id !== null && last.author_id === nextTurn) return false;
+  return isLapsed(lastTurnAt, now);
+}
+
 // What a turn must quote: the counterpart's original argument for the first
 // exchange of replies, and their previous turn once the exchange is under
 // way. Turn 1 and 2 answer arguments; 3 and 4 answer replies.

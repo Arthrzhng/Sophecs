@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { budgetState } from "@/lib/budget";
-import { authorForSeq, LAPSE_DAYS, MAX_SEQ } from "@/lib/counterpart";
+import { authorForSeq, MAX_SEQ } from "@/lib/counterpart";
 import { screenAndLog, SCREEN_DAILY_CAP, type ScreenCallResult } from "@/lib/screen";
 
 /**
@@ -25,9 +25,11 @@ import { screenAndLog, SCREEN_DAILY_CAP, type ScreenCallResult } from "@/lib/scr
  *   holds it, as the route does. A failed call leaves it pending;
  * - only a reply the route could have delivered is read at all: in an open
  *   exchange, not a sample account's (the sample engine writes its turns
- *   already screened, and its rows are its own), not lapsed (LAPSE_DAYS,
- *   which the exchange page applies on its next visit), by an author who
- *   still has an account, whose turn it is by sequence and by next_turn;
+ *   already screened, and its rows are its own), by an author who still
+ *   has an account, whose turn it is by sequence and by next_turn. However
+ *   long ago the exchange's last delivered reply was: a pending reply
+ *   holds the lapse clock until it is screened (Arthur, 2026-11-07, Gate 4
+ *   item 12; exchangeLapsed in src/lib/counterpart.ts);
  * - every write is conditional on what was read: the reply only while
  *   still pending, the hand-over only while the exchange is still open and
  *   waiting on that author. If the hand-over does not take, the reply goes
@@ -116,7 +118,8 @@ export async function rescreenPending(
   const now = d.now();
   // Filtered in the query, so replies that can never be delivered (a
   // closed, lapsed or sample exchange, a deleted author) are never read
-  // and can never fill a run ahead of ones that can.
+  // and can never fill a run ahead of ones that can. No filter on the
+  // exchange's last_turn_at: its pending reply holds the lapse clock.
   const { data, error } = await admin
     .from("turns")
     .select("id, author_id, seq, quoted_claim, body, exchanges!inner(id, user_a, user_b, next_turn)")
@@ -125,7 +128,6 @@ export async function rescreenPending(
     .lt("created_at", new Date(now.getTime() - RESCREEN_MIN_AGE_MS).toISOString())
     .eq("exchanges.status", "open")
     .eq("exchanges.is_sample", false)
-    .gt("exchanges.last_turn_at", new Date(now.getTime() - LAPSE_DAYS * 24 * 60 * 60 * 1000).toISOString())
     .order("created_at", { ascending: true })
     .limit(RESCREEN_READ_LIMIT);
   if (error) throw new Error(`pending replies could not be read: ${error.message}`);

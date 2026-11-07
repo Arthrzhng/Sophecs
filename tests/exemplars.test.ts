@@ -4,12 +4,12 @@
 import { describe, expect, it, vi } from "vitest";
 import { FRAMES } from "../scripts/seed/banks";
 import { TYPOS } from "../scripts/seed/generate";
-import { EXEMPLAR_CANDIDATES_PER_SCHOOL, EXEMPLARS_PER_MOTION, SAMPLE_FRAMES, SAMPLE_TYPO, getExemplars, withoutFrame, openingOf, selectExemplars, type ExemplarCandidate } from "../src/lib/exemplars";
+import { EXEMPLAR_CANDIDATES_PER_SCHOOL, EXEMPLAR_FLOOR, EXEMPLARS_PER_MOTION, SAMPLE_FRAMES, SAMPLE_TYPO, getExemplars, withoutFrame, openingOf, selectExemplars, type ExemplarCandidate } from "../src/lib/exemplars";
 import type { SchoolId } from "../src/lib/types";
 
 const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
 const made = (school: SchoolId, n: number, extra: Partial<ExemplarCandidate> = {}): ExemplarCandidate[] =>
-  Array.from({ length: n }, (_, i) => ({ id: `${school}-${i}`, school, argument: `${school} argument ${i}.`, is_sample: true, ...extra }));
+  Array.from({ length: n }, (_, i) => ({ id: `${school}-${i}`, school, argument: `${school} argument ${i}.`, is_sample: true, score: 80, ...extra }));
 
 describe("selectExemplars", () => {
   it("chooses 50 between three schools, 17, 17 and 16, strongest first", () => {
@@ -39,16 +39,16 @@ describe("selectExemplars", () => {
 
   it("drops a repeat of the same text, whatever its spacing or case, and a row filed under another school", () => {
     const rows: ExemplarCandidate[] = [
-      { id: "a", school: "stoicism", argument: "The same  argument.", is_sample: true },
-      { id: "b", school: "stoicism", argument: "the same argument.", is_sample: true },
-      { id: "c", school: "utilitarianism", argument: "Filed wrong.", is_sample: true },
-      { id: "d", school: "stoicism", argument: "   ", is_sample: true },
+      { id: "a", school: "stoicism", argument: "The same  argument.", is_sample: true, score: 80 },
+      { id: "b", school: "stoicism", argument: "the same argument.", is_sample: true, score: 80 },
+      { id: "c", school: "utilitarianism", argument: "Filed wrong.", is_sample: true, score: 80 },
+      { id: "d", school: "stoicism", argument: "   ", is_sample: true, score: 80 },
     ];
     expect(selectExemplars(new Map([["stoicism", rows]]), ["stoicism"]).get("stoicism")!.map((e) => e.id)).toEqual(["a"]);
   });
 
   it("keeps the strongest under each opening line in a school, and the same line in another school", () => {
-    const row = (id: string, school: SchoolId, argument: string): ExemplarCandidate => ({ id, school, argument, is_sample: true });
+    const row = (id: string, school: SchoolId, argument: string): ExemplarCandidate => ({ id, school, argument, is_sample: true, score: 80 });
     const chosen = selectExemplars(
       new Map([
         ["stoicism", [row("s1", "stoicism", "Deploy it. Because of A."), row("s2", "stoicism", "deploy  it. Because of B."), row("s3", "stoicism", "Do not deploy it. C.")]],
@@ -62,7 +62,7 @@ describe("selectExemplars", () => {
 
   it("reads the opening line after a frame sentence, so a frame never passes for a new opening", () => {
     expect([...SAMPLE_FRAMES]).toEqual(FRAMES);
-    const row = (id: string, argument: string): ExemplarCandidate => ({ id, school: "stoicism", argument, is_sample: true });
+    const row = (id: string, argument: string): ExemplarCandidate => ({ id, school: "stoicism", argument, is_sample: true, score: 80 });
     const chosen = selectExemplars(
       new Map([["stoicism", [row("plain", "I oppose the motion. Because of A."), ...FRAMES.map((f, i) => row(`framed-${i}`, `${f} I oppose the motion. Because of B${i}.`)), row("other", "Here is my answer. Deploy it. C.")]]]),
       ["stoicism"]
@@ -80,8 +80,8 @@ describe("selectExemplars", () => {
   it("drops a text already kept in another school", () => {
     const chosen = selectExemplars(
       new Map([
-        ["stoicism", [{ id: "s", school: "stoicism", argument: "Same words. Here.", is_sample: true }]],
-        ["utilitarianism", [{ id: "u", school: "utilitarianism", argument: "same  words. here.", is_sample: true }]],
+        ["stoicism", [{ id: "s", school: "stoicism", argument: "Same words. Here.", is_sample: true, score: 80 }]],
+        ["utilitarianism", [{ id: "u", school: "utilitarianism", argument: "same  words. here.", is_sample: true, score: 80 }]],
       ] as [SchoolId, ExemplarCandidate[]][]),
       ["stoicism", "utilitarianism"]
     );
@@ -94,18 +94,45 @@ describe("selectExemplars", () => {
     for (const typo of detectable) {
       expect(SAMPLE_TYPO.test(`It holds ${typo} it does.`), typo).toBe(true);
       const rows = [
-        { id: "typo", school: "stoicism" as const, argument: `First, ${typo} so. More.`, is_sample: true },
-        { id: "clean", school: "stoicism" as const, argument: "Second, and clean. More.", is_sample: true },
+        { id: "typo", school: "stoicism" as const, argument: `First, ${typo} so. More.`, is_sample: true, score: 80 },
+        { id: "clean", school: "stoicism" as const, argument: "Second, and clean. More.", is_sample: true, score: 80 },
       ];
       expect(selectExemplars(new Map([["stoicism", rows]]), ["stoicism"]).get("stoicism")!.map((e) => e.id)).toEqual(["clean"]);
     }
     for (const word of ["because", "their", "which", "whether", "the theory", "argument", "it's"]) expect(SAMPLE_TYPO.test(word), word).toBe(false);
     // A misspelt strongest argument leaves its opening to the next one under it.
     const rows = [
-      { id: "typo", school: "stoicism" as const, argument: "Deploy it. Becuase of A.", is_sample: true },
-      { id: "clean", school: "stoicism" as const, argument: "Deploy it. Because of B.", is_sample: true },
+      { id: "typo", school: "stoicism" as const, argument: "Deploy it. Becuase of A.", is_sample: true, score: 80 },
+      { id: "clean", school: "stoicism" as const, argument: "Deploy it. Because of B.", is_sample: true, score: 80 },
     ];
     expect(selectExemplars(new Map([["stoicism", rows]]), ["stoicism"]).get("stoicism")!.map((e) => e.id)).toEqual(["clean"]);
+  });
+
+  it("shows nothing marked under the floor of 50, leaving a position out rather than showing a weak argument for it", () => {
+    expect(EXEMPLAR_FLOOR).toBe(50);
+    const row = (id: string, argument: string, score: number | null): ExemplarCandidate => ({ id, school: "stoicism", argument, is_sample: true, score });
+    const rows = [
+      row("strong", "Deploy it. Because of A.", 72),
+      row("at-floor", "Wait for the trial. Because of B.", 50),
+      row("weak", "Do not deploy it. Because of C.", 49),
+      row("weaker", "do not deploy it. Because of D.", 31),
+      row("unmarked", "Ask the patient. Because of E.", null),
+    ];
+    // "Do not deploy it." has no argument at 50 or above, so it is not shown,
+    // and an unmarked row is never taken.
+    expect(selectExemplars(new Map([["stoicism", rows]]), ["stoicism"]).get("stoicism")!.map((e) => e.id)).toEqual(["strong", "at-floor"]);
+  });
+
+  it("gives a school's places to the others when none of its arguments reach the floor", () => {
+    const chosen = selectExemplars(
+      new Map([
+        ["stoicism", made("stoicism", 100)],
+        ["utilitarianism", made("utilitarianism", 100, { score: 49 })],
+        ["virtue-ethics", made("virtue-ethics", 100)],
+      ] as [SchoolId, ExemplarCandidate[]][]),
+      SCHOOLS
+    );
+    expect(SCHOOLS.map((s) => chosen.get(s)!.length)).toEqual([25, 0, 25]);
   });
 
   it("returns no score", () => {
@@ -127,6 +154,7 @@ describe("getExemplars", () => {
         b.select = () => b;
         b.eq = (c: string, v: unknown) => (call.filters.push(["eq", c, v]), b);
         b.not = (c: string, op: string, v: unknown) => (call.filters.push([`not.${op}`, c, v]), b);
+        b.gte = (c: string, v: unknown) => (call.filters.push(["gte", c, v]), b);
         b.order = (c: string, o: unknown) => (call.order.push([c, o]), b);
         b.limit = (n: number) => ((call.limit = n), Promise.resolve(answer(call.filters.find(([, c]) => c === "school")?.[2])));
         return b;
@@ -150,6 +178,7 @@ describe("getExemplars", () => {
           ["eq", "argument_public", true],
           ["eq", "kind", "original"],
           ["eq", "rejected", false],
+          ["gte", "score", 50],
           ["not.is", "verdict", null],
           ["not.is", "argument", null],
         ])

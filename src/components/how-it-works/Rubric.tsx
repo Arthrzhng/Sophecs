@@ -1,7 +1,8 @@
 import { SCHOOL_CHUNKY } from "@/components/daily-path/chunky";
-import { FIDELITY_CRITERIA } from "@/lib/judge/rubric";
+import { FIDELITY_CRITERIA, fidelityCriteriaFor } from "@/lib/judge/rubric";
+import { PROMPT_VERSION } from "@/lib/judge/schema";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
-import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
+import { PUBLISHED_SCHOOL_IDS, SHOWN_SCHOOL_IDS, type SchoolId } from "@/lib/school-registry";
 
 /**
  * The rubric: the three axes in order of weight, and the fidelity criteria
@@ -17,7 +18,17 @@ import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
  * given.
  */
 
-const SCHOOLS = PUBLISHED_SCHOOL_IDS;
+// "These are the criteria the judge is given for each school, in full."
+// On a SIX_SCHOOLS build, and so at the launch, the judge is given v3's
+// text for six schools, so the page shows exactly that: what
+// fidelityCriteriaFor hands the judge under this build's prompt version,
+// for every school the build shows (Arthur, 2026-11-07, Gate 4 item 10).
+// A build without the flag shows the published three's criteria as the v2
+// judge is given them, as before.
+const SIX = process.env.SIX_SCHOOLS === "1";
+const SCHOOLS = SIX ? SHOWN_SCHOOL_IDS : PUBLISHED_SCHOOL_IDS;
+const criteriaGiven = (id: SchoolId): string =>
+  SIX ? fidelityCriteriaFor(id, PROMPT_VERSION) : FIDELITY_CRITERIA[id];
 
 const AXES = [
   {
@@ -88,7 +99,7 @@ export function RubricCriteria({ sub = false }: { sub?: boolean }) {
                 {SCHOOL_COLORS[id].name}
               </H3>
               <div className="prose-reading mt-3">
-                {FIDELITY_CRITERIA[id].split("\n\n").map((paragraph, i) => (
+                {criteriaGiven(id).split("\n\n").map((paragraph, i) => (
                   <p key={i}>{paragraph.replace(/\n/g, " ")}</p>
                 ))}
               </div>

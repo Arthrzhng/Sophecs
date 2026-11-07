@@ -20,8 +20,9 @@ import type { SchoolId } from "@/lib/types";
  * shown and the page never lists the same line to open twice in a school
  * (Arthur, 2026-11-06, accepting that in place of 50 that repeat). Highest template mark first, shared out evenly
  * across the schools up to EXEMPLARS_PER_MOTION, which today's data never
- * reaches. No mark is returned: the samples' marks were written from
- * templates, not by the judge.
+ * reaches. Nothing marked under EXEMPLAR_FLOOR is shown. No mark is
+ * returned: the samples' marks were written from templates, not by the
+ * judge.
  */
 
 /** A ceiling, not a target: one per opening came to 12 a motion on 2026-11-06. */
@@ -36,6 +37,17 @@ export const EXEMPLARS_PER_MOTION = 50;
  */
 export const EXEMPLAR_CANDIDATES_PER_SCHOOL = 1000;
 
+/**
+ * The lowest template mark an exemplar may have (Arthur, 2026-11-07, Gate 4
+ * item 11: "an exemplar floor on the template mark, dropping a position
+ * rather than showing a weak one"). 50 is where the sample plan's middle
+ * band starts (scripts/seed/verdicts.ts: 70-90, 50-69, 25-49), and every
+ * argument the sample run writes to be weak is marked under it: on
+ * production on 2026-11-07, all 707 published, marked 25 to 45. A position
+ * whose strongest argument is under it is left out.
+ */
+export const EXEMPLAR_FLOOR = 50;
+
 export interface Exemplar {
   id: string;
   school: SchoolId;
@@ -49,6 +61,8 @@ export interface ExemplarCandidate {
   school: SchoolId;
   argument: string;
   is_sample: boolean;
+  /** The template mark, read for the floor and never passed on. */
+  score: number | null;
 }
 
 /**
@@ -90,7 +104,9 @@ const normalise = (text: string) => text.trim().replace(/\s+/g, " ").toLowerCase
  * share each, the remainder to the schools listed first, and any share a
  * school cannot fill passed to the others. An exact repeat of a text
  * already kept, in any school, is dropped too, and so is any argument with
- * one of the sample run's deliberate misspellings.
+ * one of the sample run's deliberate misspellings or marked under
+ * EXEMPLAR_FLOOR. As the candidates come strongest first, an opening whose
+ * strongest argument is under the floor is left out.
  */
 export function selectExemplars(
   candidatesBySchool: ReadonlyMap<SchoolId, readonly ExemplarCandidate[]>,
@@ -104,6 +120,7 @@ export function selectExemplars(
     const openings = new Set<string>();
     for (const c of candidatesBySchool.get(school) ?? []) {
       if (!c.is_sample || c.school !== school || !c.argument?.trim() || SAMPLE_TYPO.test(c.argument)) continue;
+      if (typeof c.score !== "number" || c.score < EXEMPLAR_FLOOR) continue;
       const text = normalise(c.argument);
       const opening = openingOf(withoutFrame(c.argument));
       const openingKey = normalise(opening);
@@ -139,7 +156,7 @@ export function selectExemplars(
  * The exemplars for a motion, read from production's sample rows. Only
  * rows argued on the motion as it reads now (`motion`, the topic's text),
  * so an argument written to an earlier wording is never shown under this
- * one.
+ * one, and only those marked at EXEMPLAR_FLOOR or above.
  */
 export async function getExemplars(
   admin: SupabaseClient,
@@ -151,7 +168,7 @@ export async function getExemplars(
     schools.map((school) =>
       admin
         .from("debates")
-        .select("id, school, argument, is_sample")
+        .select("id, school, argument, is_sample, score")
         .eq("topic_slug", topicSlug)
         .eq("motion_text", motion)
         .eq("school", school)
@@ -159,6 +176,7 @@ export async function getExemplars(
         .eq("argument_public", true)
         .eq("kind", "original")
         .eq("rejected", false)
+        .gte("score", EXEMPLAR_FLOOR)
         .not("verdict", "is", null)
         .not("argument", "is", null)
         .order("score", { ascending: false, nullsFirst: false })

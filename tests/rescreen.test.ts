@@ -165,7 +165,7 @@ describe("rescreenPending", () => {
     const screen = vi.fn(ok);
     tables.exchanges = [
       exchange("x1", { status: "complete" }),
-      exchange("x2", { last_turn_at: ago(15 * 24 * 60) }),
+      exchange("x2", { status: "lapsed", next_turn: null }),
       exchange("x3", { is_sample: true }),
       exchange("x4", { user_b: null, next_turn: null }),
     ];
@@ -174,6 +174,16 @@ describe("rescreenPending", () => {
     expect(await rescreenPending(admin, deps({ screen }))).toMatchObject({ read: 0, delivered: 0 });
     expect(screen).not.toHaveBeenCalled();
     expect(JSON.stringify(tables)).toBe(before);
+  });
+
+  // Arthur, 2026-11-07, Gate 4 item 12: a pending reply holds the lapse
+  // clock until it is screened, so a reply saved on day 13 and not checked
+  // until day 20 is still delivered, and the clock restarts from then.
+  it("delivers a pending reply however long ago the last delivered one was: the reply holds the clock", async () => {
+    Object.assign(tables.exchanges[0], { last_turn_at: ago(20 * 24 * 60) });
+    Object.assign(tables.turns[0], { created_at: ago(7 * 24 * 60) });
+    expect(await rescreenPending(admin, deps())).toMatchObject({ read: 1, delivered: 1 });
+    expect(tables.exchanges[0]).toMatchObject({ status: "open", next_turn: "a", last_turn_at: NOW.toISOString() });
   });
 
   it("does not let replies it cannot deliver fill a run ahead of one it can", async () => {
