@@ -126,27 +126,27 @@
         "Deploying it is wrong as stated. Whoever takes the place of the one who decides takes on what that place requires, and giving reasons to the people beneath it is part of the role."
       ],
       "reasons": [
-        "The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer who decides about patients or applicants holds a position of that kind, and the position carries duties to the people under it, not only results.",
-        "Book 13 warns that when names are not correct, what is said stops matching how things are. A system that cannot say why it refused someone has issued something that looks like a judgement and is not one, and deploying it trains everyone to accept the look in place of the thing.",
-        "What the parties to a relationship owe one another is how they hold each other to account. A person refused by a system whose reasons nobody can give has lost the means of holding the decider to anything, however much suffering the system prevents on average.",
-        "Humaneness is realised in how people are treated within their relationships, not only in how many are spared harm. A benefit delivered without any account to the person it touches treats them as a case to be processed rather than as someone the decider stands in relation to."
+        "The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results.",
+        "Book 13 warns that when names are not correct, what is said stops matching how things are. A system that cannot say why it refused someone issues something that looks like a judgement and is not one, and deploying it teaches everyone to accept the look for the thing.",
+        "Parties to a relationship hold each other to account through what they owe one another. A person refused by a system whose reasons nobody can give cannot hold the decider to anything, however much suffering it prevents on average.",
+        "Humaneness is realised in how people are treated within their relationships, not only in how many are spared harm. A benefit delivered with no account to the person it touches treats them as a case to process, not as someone the decider stands in relation to."
       ],
       "examples": [
-        "A hospital lets a model decide who is called back for further tests. A patient who is not called back asks her doctor why, and the doctor has nothing to say but that the system said so.",
-        "A council uses a model to rank housing applications. A family that drops down the list asks the officer who used to know them by name, and the officer can no longer explain her own office.",
-        "A teacher who marks a pupil down owes the pupil a reason, because that is part of being the pupil's teacher. A marking system that cannot give one has not taken the teacher's place."
+        "A hospital lets a model decide who is called back for more tests. A patient left off asks her doctor why, and the doctor can say only that the system said so.",
+        "A council ranks housing applications with a model. A family that drops down the list asks the officer who knew them by name, and she can no longer explain her own office.",
+        "A teacher who marks a pupil down owes the pupil a reason, as part of being their teacher. A marking system that cannot give one has not taken the teacher's place."
       ],
       "objections": [
         {
           "rival": "utilitarianism",
           "claim": "the people decided about are far better off with the suffering prevented than with an explanation, so insisting on reasons trades real welfare for a formality.",
-          "answer": "But an explanation is not a formality between people who stand in a relationship; it is how the one with power is held to what the position requires. A gain counted in aggregate does not tell you whether that relationship still works for the person refused.",
+          "answer": "An explanation is not a formality between people in a relationship; it is how the one with power is held to what the position requires. A gain counted in aggregate cannot say whether that relationship still works for the person refused.",
           "why": "It never says what a refused person gains from an account that outweighs the suffering a delay would leave in place."
         },
         {
           "rival": "ubuntu",
           "claim": "the Confucian frames the duty as running down a hierarchy from decider to decided, when what the people affected need is a say in whether the system is used at all.",
-          "answer": "That is a fair warning about how role ethics can settle into deference. But a position that owes an account to those beneath it is a check on the hierarchy, not a licence for it, and being owed reasons is where a say begins.",
+          "answer": "That is a fair warning about role ethics settling into deference. But a position that owes an account to those beneath it is checked by that duty, not licensed by it, and being owed reasons is where a say begins.",
           "why": "It speaks of what the decider owes without asking whether the people decided about had any part in choosing the arrangement."
         }
       ]
@@ -180,7 +180,7 @@
         {
           "rival": "utilitarianism",
           "claim": "the suffering the system prevents is real, and waiting for everyone affected to have a say leaves it in place while the consultations run.",
-          "answer": "That is a real cost, and somebody must decide who counts and how. The answer is not to wait for unanimity but to bring the people affected into deciding, so that the system answers to them rather than to an average.",
+          "answer": "The suffering is real, and a say need not wait for everyone: the system can run while the people it decides about are brought into how it is used and can question what it does to them. What it cannot do is run as a verdict nobody answers for, since that falls on the same people the benefit is for.",
           "why": "It never says how long the people affected should wait for a say, or what the suffering in the meantime is weighed against."
         }
       ]

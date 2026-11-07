@@ -180,7 +180,7 @@
         {
           "rival": "utilitarianism",
           "claim": "if the trained behaviour reliably does good it is good in the only sense that counts, and the raters who train a model shape it much as a village shapes a child.",
-          "answer": "Raters are a crowd, not a community: they share no life with the model or with each other. And even a real community does not make someone good by scoring them; it does so by taking them into its relationships.",
+          "answer": "Doing good reliably is not the sense the motion asks about, which is being made good as a person is. And raters are a crowd, not a community: they share no life with the model or with each other, and even a real community makes someone good by taking them into its relationships, not by scoring them.",
           "why": "It appeals to community without saying why the raters behind the training are not one."
         }
       ]

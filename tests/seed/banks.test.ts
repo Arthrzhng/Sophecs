@@ -72,14 +72,13 @@ describe("argument banks", () => {
 
   it("count words from the passages exactly as composing and counting would", async () => {
     const { allCompositions } = await import("../../scripts/seed/compositions");
-    const { loadBanks, compose, partsWords, wordCount, TOPICS, SCHOOLS } = await import("../../scripts/seed/banks");
+    const { loadBanks, compose, partsWords, wordCount, TOPICS, BANK_SCHOOLS } = await import("../../scripts/seed/banks");
     const banks = loadBanks();
     let checked = 0;
-    const { BANK_SCHOOLS } = await import("../../scripts/seed/banks");
     for (const topic of TOPICS)
       for (const id of BANK_SCHOOLS)
         for (const tier of ["strong", "mid", "weak"] as const) {
-          const school = id as (typeof SCHOOLS)[number];
+          const school = id as SchoolId;
           const all = allCompositions(banks, topic, school, tier);
           for (let i = 0; i < all.length; i += 97) {
             const p = all[i];

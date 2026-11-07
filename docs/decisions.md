@@ -5079,6 +5079,19 @@ items, and the checks either side:
 No micro-lesson is added: the ruling says the elsewhere passages are
 enough for launch.
 
+**Carried out, 2026-11-07.** #103 merged at 06:29:02 UTC. Before the
+write, each row's `md5(stances::text)` in production was the snapshot's,
+as listed above. The write, `docs/seed-snapshots/2026-11-07-debate-topics-stances.sql`
+as merged, ran once through the Supabase connector straight after the
+merge. Read back at 06:29:31 UTC, each row's hash was the one listed
+above for after the write (opaque-benefit `82d42cbf…`, crash-arithmetic
+`0c46c464…`, no-decision `cf53750d…`, moral-training `aceb73e7…`,
+careful-builder `eca34a47…`, borrowed-judgement `69b992d9…`); every row
+had six stances; the md5 of every other column, `par_elo` and `par_n`
+included, was unchanged. The rollback was not run. No page reads the
+new lines before the launch, so the write did not wait for #103's
+deploy.
+
 ### Gate 4: items 8, 10, 11 and 12 (2026-11-07)
 
 Arthur's rulings of 2026-11-07, quoted in full in "Gate 4: Arthur's
@@ -5243,11 +5256,12 @@ seen the samples.
   and 2 objections each with its answer, and 4 closings per school: 234
   passages and 12 closings, 246 in all, mine, written from each school's
   file (`read`, `gets_wrong`), its approved criteria, and, for the
-  scholars a school file names, what the school file says of them:
-  Mhlambi, that a discriminatory automated decision is a failure of
-  relational personhood; Menkiti, that the community confers personhood
-  once its demands are met; Gyekye, that individuals keep their own worth
-  and rights while community stays essential.
+  scholars a school file names, what the school file and the research
+  file say of them: Mhlambi, that a discriminatory automated decision is
+  a failure of relational personhood; Menkiti, that the community confers
+  personhood once its demands are met; Gyekye, that individuals keep
+  their own worth and rights (the school file) while community stays
+  essential (the research file).
 - **Sources.** A passage names a scholar or text only where the school
   file does (the Analects' Books 12 and 13; Metz, Menkiti, Gyekye and
   Mhlambi; the discourse to Rahula). Two verified wordings are used, each
@@ -5290,3 +5304,19 @@ seen the samples.
   a death at all on `crash-arithmetic`, covers these passages too: they
   argue for minimising deaths, owning the rule as an intention about who
   dies.
+- **For Arthur's list**, three readings the passages take that are his to
+  judge:
+  - several Buddhist passages read dependent origination as spreading
+    responsibility for an AI's harm across the many people and conditions
+    behind it (`careful-builder`, `moral-training`, `borrowed-judgement`,
+    `no-decision` and `opaque-benefit`, and one closing). The approved
+    criteria call that reading "an inference, not doctrine" and draw
+    nothing from it;
+  - no Ubuntu passage states Ubuntu's best-known objection as the
+    criteria give it (a community is not one voice, and an appeal to it
+    can make a dissenter the problem): the Stoic objections make the point
+    about one's own judgement but not the one about dissent, and the
+    Utilitarian ones now argue as Utilitarians;
+  - Buddhist Ethics' best-known objection, the gap between moral teaching
+    and institutions (who audits, how one appeals), appears only obliquely,
+    in a Confucian objection on `no-decision`.

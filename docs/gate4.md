@@ -70,7 +70,13 @@ For your next list, from carrying these out:
 - item 10: on a SIX_SCHOOLS build the rubric shows the v3 criteria as the
   judge gets them, including text written to the judge ("Of the rival
   schools this prompt lists", school ids in backticks). "In full"
-  requires that; whether you want it presented differently.
+  requires that; whether you want it presented differently;
+- item 13: three readings the new schools' passages take, listed in
+  `docs/decisions.md`, "Gate 4 item 13, first part": dependent origination
+  read as spreading an AI harm's responsibility, which the criteria call
+  an inference; Ubuntu's best-known objection (a community is not one
+  voice) not stated in any objection; and Buddhist Ethics' (the gap to
+  institutions) only obliquely.
 
 ## Where things stand
 

@@ -62,17 +62,39 @@ const VERIFIED = [
   },
 ];
 
-// Scholars the research file discusses. A passage may name one only if
-// the school's own file does.
+// Scholars and translators the research file names. A passage may name one
+// only if the school's own file does.
 const SCHOLARS = [
-  "Metz", "Menkiti", "Gyekye", "Mhlambi", "Segun", "Matolino", "Kwindingwi",
-  "Ames", "Rosemont", "Vallor", "Rosenlee", "Legge", "Sujato", "Müller",
+  "Metz", "Menkiti", "Gyekye", "Mhlambi", "Segun", "Matolino", "Kwindingwi", "Shutte", "Louw", "Ramose",
+  "Ames", "Rosemont", "Vallor", "Rosenlee", "Legge", "Slingerland", "Lau",
+  "Keown", "Goodman", "Hallisey", "Garfield", "Hongladarom", "Hershock", "Harvey", "Sujato", "Müller",
 ];
+// Every other word a passage capitalises in mid-sentence: a school or its
+// adherent, a text, a people. Anything else, a name above all, has to be
+// one the school's own file names.
+const PROPER = new Set([
+  "Confucian", "Confucians", "Confucianism", "Ubuntu", "Buddhist", "Buddhists", "Ethicist", "Ethicists", "Ethics",
+  "Stoic", "Stoics", "Stoicism", "Utilitarian", "Utilitarians", "Utilitarianism", "Virtue",
+  "Analects", "Book", "Nguni", "Rahula", "Thaddeus", "Sabelo",
+  "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
+]);
+// Words any quotation in the research file shares with a passage, five in a
+// row, outside the verified wordings above: a quotation used without being
+// declared (Legge's 13.3, say).
+const words = (t: string) => t.toLowerCase().replace(/[\u2018\u2019']/g, "'").replace(/[^a-z0-9' ]+/g, " ").split(/\s+/).filter(Boolean);
+const fiveGrams = (t: string) => {
+  const w = words(t);
+  return new Set(w.slice(0, Math.max(0, w.length - 4)).map((_, i) => w.slice(i, i + 5).join(" ")));
+};
+// Line by line, so a stray mark cannot pair one quotation's close with the
+// next one's open.
+const QUOTED = RESEARCH.split("\n").flatMap((line) => [...line.matchAll(/["\u201C]([^"\u201C\u201D]{20,}?)["\u201D]/g)].map((m) => m[1]));
+const QUOTED_GRAMS = new Set(QUOTED.flatMap((q) => [...fiveGrams(q)]));
 
 describe("the launch schools' passages", () => {
   const all = passages();
 
-  it("are all read: six topics, three schools, thirteen passages each plus three per objection, and the closings", () => {
+  it("are all read: six topics, three schools, four positions, four reasons, three examples and two objections of three parts each, and the closings", () => {
     expect(LAUNCH_SCHOOLS).toHaveLength(3);
     // 4 positions, 4 reasons, 3 examples, and 2 objections of 3 parts.
     expect(all.length).toBe(6 * 3 * (4 + 4 + 3 + 2 * 3) + 3 * 4);
@@ -89,25 +111,38 @@ describe("the launch schools' passages", () => {
   });
 
   it("name only scholars their own school's file names", () => {
-    for (const p of all)
-      for (const name of SCHOLARS)
-        if (p.text.includes(name)) expect(schoolFile(p.school), `${p.where} names ${name}`).toContain(name);
+    for (const p of all) {
+      const own = schoolFile(p.school);
+      for (const name of SCHOLARS) if (p.text.includes(name)) expect(own, `${p.where} names ${name}`).toContain(name);
+      // Any other capitalised word in mid-sentence is a known proper noun or
+      // one the school's file uses.
+      for (const m of p.text.matchAll(/(?<![.!?]\s)(?<=\s)([A-Z][\p{L}'\u2019-]+)/gu)) {
+        const w = m[1].replace(/['\u2019]s$/, "");
+        if (!PROPER.has(w)) expect(own, `${p.where}: "${w}"`).toContain(w);
+      }
+    }
   });
 
-  it("put no words in the mouth of Confucius or the Buddha", () => {
-    for (const p of all) expect(p.text, p.where).not.toMatch(/\b(Confucius|the Buddha)\s+(said|says|taught|teaches|tells|told)\b/);
+  it("share no five words in a row with a quotation in the research file, beyond the verified wordings they credit", () => {
+    expect(QUOTED.length).toBeGreaterThan(20);
+    const allowed = new Set(VERIFIED.flatMap((v) => [...fiveGrams(v.wording)]));
+    for (const p of all)
+      for (const g of fiveGrams(p.text)) if (QUOTED_GRAMS.has(g) && !allowed.has(g)) expect.fail(`${p.where}: "${g}"`);
+  });
+
+  it("put no words in the mouth of Confucius or the Buddha: neither is named, nor \"the Master\"", () => {
+    for (const p of all) expect(p.text, p.where).not.toMatch(/\b(Confucius|Buddha|the Master)\b/);
   });
 
   it("keep the house style: no dashes, no quotation marks, British spelling", () => {
-    const american = /\b(\w*(?:iz(?:e|es|ed|ing|ation|ations))|behaviou?r(?<!our)|honor\w*|favor\w*|labor\w*|center\w*|color\w*|defense|analyz\w*)\b/i;
+    const american = /\b(\w*(?:iz(?:e|es|ed|ing|ation|ations))|behaviou?r(?<!our)|honor\w*|favor\w*|labor\w*|center\w*|color\w*|defense|analyz\w*|judgment\w*)\b/gi;
     const allowed = new Set(["size", "sizes", "sized", "seize", "seized", "prize", "prizes", "citizen"]);
     for (const p of all) {
       expect(p.text, p.where).not.toMatch(/[‒-―]/);
       expect(p.text, p.where).not.toMatch(/["“”‘‛]/);
       // An apostrophe only inside or at the end of a word: a possessive.
       for (const m of p.text.matchAll(/['’]/g)) expect(p.text[(m.index ?? 0) - 1] ?? "", p.where).toMatch(/[A-Za-z0-9]/);
-      const hit = p.text.match(american);
-      if (hit && !allowed.has(hit[0].toLowerCase())) expect.fail(`${p.where}: ${hit[0]}`);
+      for (const hit of p.text.matchAll(american)) if (!allowed.has(hit[0].toLowerCase())) expect.fail(`${p.where}: ${hit[0]}`);
     }
   });
 
