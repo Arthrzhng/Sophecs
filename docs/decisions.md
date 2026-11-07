@@ -4832,3 +4832,47 @@ Carried out:
   `docs/stage5-plan.md`.
 - The copy is in `docs/daily-path-copy.md`, section 13; the Gate 4
   screenshots are retaken with "Sign in".
+
+### Gate 4 item 9: the new schools' stances (2026-11-07)
+
+Arthur, 2026-11-07, quoted in full in "Gate 4: Arthur's rulings
+(2026-11-07)":
+
+> 9. Write the 18 stances (6 topics x the three new schools), one sentence
+>    each, from content/schools/*.md and the approved criteria, no new
+>    quotations. Keep the test as it is. Seeding debate_topics is approved
+>    (a). The elsewhere passages are enough on micro-lessons for launch.
+
+Each of the six topics in `content/topics/*.md` (frozen `content/**`;
+this ruling is the authority) now gives Confucianism, Ubuntu and Buddhist
+Ethics a stance, one sentence each, after the published three's. Each is
+written from that school's file (`read` and `gets_wrong`) and its approved
+criteria (`content/prompts/fidelity-criteria.draft.md`), and quotes
+nothing:
+- Confucianism reasons from what a role and a relationship require, and
+  from holding a name to its work (`no-decision`);
+- Ubuntu reasons from what people become through one another, reads a
+  harm as a failure of relationship, and asks who was left out of
+  deciding;
+- Buddhist Ethics reasons from intention as much as outcome, from
+  non-harm and the reflection that goes on after acting, from no fixed
+  self (`borrowed-judgement`), from many conditions rather than one cause
+  (`no-decision`), and from impartial compassion (`crash-arithmetic`).
+
+They are mine, written under the ruling, and his to read.
+
+`tests/topic-stances.test.ts` is unchanged, as ruled: it checks the
+published schools, which are the three until the launch publishes the
+others. `/debate` prints only the reader's own school's stance
+(`TopicList`, a server component), and a reader on a build without the
+flag is placed only in the three, so the new lines are not seen on
+production before the launch. `debate_topics` is publicly readable, as
+the repository is.
+
+Seeding: after the merge, the six rows' `stances` are written to
+production's `debate_topics`, which he approved ((a)). `npm run
+seed:topics` needs the service key, which this environment does not hold,
+so the write goes through the Supabase connector. It is checked first that
+every other column already matches the files, and the rows are read back
+afterwards. No micro-lesson is added: the ruling says the elsewhere
+passages are enough for launch.
