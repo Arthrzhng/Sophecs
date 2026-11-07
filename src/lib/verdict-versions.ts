@@ -4,11 +4,14 @@
  * versions are not compared as equivalent (docs/decisions.md), and Arthur
  * ruled on 2026-11-07 (Gate 4 item 5, option (ii)) that no score change is
  * shown where the two verdicts' versions differ: not on the verdict page,
- * not in the share line. Elo and a topic's par are left as they are.
+ * in the share line, on /me or in the revision_judged event. Elo and a
+ * topic's par are left as they are.
  *
- * Each verdict carries the version it was judged under, `prompt_version`
- * (src/app/api/judge/route.ts stores it in the verdict and on the row; a
- * sample's is its template's). A verdict without one cannot be shown to
+ * Each row carries the version it was judged under in its own
+ * `prompt_version` column (src/app/api/judge/route.ts writes it there and
+ * in the verdict; a sample's is its template's, sample-template-1 or -2).
+ * Read the column: debates_public drops a withheld verdict's copy unless
+ * it reads v<n> (migration 0023). A row without one cannot be shown to
  * match, so it is not compared.
  */
 export function scoresComparable(a: unknown, b: unknown): boolean {

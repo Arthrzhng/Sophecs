@@ -352,7 +352,10 @@ Where a revision and its first attempt were judged by different versions,
 the comparison's heading and its table (first, now, change) are replaced
 by one line; the objection's outcome, the judge's note and the link to
 the first attempt stay. The share line uses the school's line instead of
-`{first score} → {score}`.
+`{first score} → {score}`. `/me` lists the revision under its original
+without its score (no new copy). On a sample account's page, whose
+verdicts come from templates and say so, the line is not shown: two
+template rules are not two versions of the judge.
 
 | Where | Copy |
 |---|---|

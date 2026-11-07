@@ -54,6 +54,9 @@ describe("scores compared only within one version of the judge", () => {
     expect(html).not.toContain("Compared with your first attempt");
     expect(html).not.toContain(">Change</th>");
     expect(html).not.toContain(">+13<");
+    // Not the first score either, anywhere on the page.
+    expect(html).not.toContain(">61<");
+    expect(html).not.toMatch(/\b61\b/);
     // What is not a score stays: whether the objection was answered, the
     // judge's note, and the way back to the first attempt.
     expect(html).toContain("Objection answered.");
@@ -61,11 +64,61 @@ describe("scores compared only within one version of the judge", () => {
     expect(html).toContain('href="/debate/opaque-benefit/o1"');
   });
 
-  it("gives the verdict page's comparison and share line the two versions", () => {
+  it("says nothing about versions of the judge for a sample's template verdicts", () => {
+    const html = renderToStaticMarkup(
+      createElement(Verdict, { ...props, isOwner: false, sample: { template: true }, comparison: { parentDebateId: "o1", comparable: false, first } })
+    ).replace(/&#x27;/g, "'");
+    expect(html).not.toContain("version of the judge");
+    expect(html).not.toContain("Compared with your first attempt");
+    expect(html).not.toContain(">61<");
+    expect(html).toContain("Objection answered.");
+  });
+
+  // The page itself, from rows as the database gives them, is
+  // tests/verdict-versions-page.test.tsx.
+
+  it("on /me, leaves a revision's score off beside its original's across two versions", async () => {
+    const { ProfilePage } = await import("../src/components/me/ProfilePage");
+    const me = (comparable: boolean, rejected = false) =>
+      renderToStaticMarkup(
+        createElement(ProfilePage, {
+          school: null, displayName: null, elo: 1200, percentile: 50, streak: 0, streakUpdatedOn: null,
+          today: "2026-11-07", ratingPoints: [], objections: [], weeklyMotion: null, hasAnyDebate: true,
+          exchanges: [], pendingChallenges: [], caseStates: {}, allClosed: false,
+          debates: [
+            {
+              id: "o1", topicSlug: "opaque-benefit", topicTitle: "The opaque benefit", score: 61, rejected: false,
+              revision: { id: "r1", topicSlug: "opaque-benefit", score: 74, rejected, comparable },
+            },
+          ],
+        })
+      );
+    expect(me(true)).toContain(">74<");
+    const across = me(false);
+    expect(across).not.toContain(">74<");
+    expect(across).toContain(">61<");
+    // The revision is still listed, and its own page shows its score.
+    expect(across).toContain('href="/debate/opaque-benefit/r1"');
+    // "not judged" is not a score, and stays.
+    expect(me(false, true)).toContain("not judged");
+    // /me compares the two rows' own versions.
+    const page = fs.readFileSync(path.join(process.cwd(), "src/app/me/page.tsx"), "utf8");
+    expect(page).toContain("comparable: scoresComparable(d.prompt_version, revision.prompt_version),");
+    expect(page.match(/parent_debate_id, prompt_version"\)/g)).toHaveLength(2);
+  });
+
+  it("records no score or fidelity change in revision_judged across two versions", () => {
+    const revise = fs.readFileSync(path.join(process.cwd(), "src/app/debate/[slug]/[debateId]/revise/page.tsx"), "utf8");
+    expect(revise).toContain("comparableWithParent={scoresComparable(parent.prompt_version, PROMPT_VERSION)}");
+    expect(revise).toMatch(/\.select\("[^"]*\bprompt_version"\)/);
+    const editor = fs.readFileSync(path.join(process.cwd(), "src/components/debate/ArgumentEditor.tsx"), "utf8");
+    expect(editor).toContain("score_delta: comparableWithParent ? response.revision.scoreDelta : null,");
+    expect(editor).toContain("fidelity_delta: comparableWithParent ? response.revision.fidelityDelta : null,");
+    expect(editor).toContain("comparableWithParent = true,");
+  });
+
+  it("gives the share line its first score only within one version", () => {
     const page = fs.readFileSync(path.join(process.cwd(), "src/app/debate/[slug]/[debateId]/page.tsx"), "utf8");
-    expect(page).toContain(
-      "comparable: scoresComparable(\n          (parentVerdict as { prompt_version?: unknown }).prompt_version,\n          (publicRow.verdict as { prompt_version?: unknown } | null)?.prompt_version\n        ),"
-    );
     // The share line's "{first} → {score}" only within one version.
     expect(page).toContain(
       "comparison && comparison.comparable && parentObjectionSchool && verdict.objection_answered"

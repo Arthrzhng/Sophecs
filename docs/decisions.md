@@ -4892,7 +4892,12 @@ Items 1 to 7, carried out together:
   the rivals their schools' voices name. Read
   against the two v3 run files, every one of the 25 cases now passes the
   objection check in both, so each run passes 23 of 25 whole cases, the
-  two misses above. The bands are untouched.
+  two misses above. The bands are untouched. The objection check is a
+  majority over a case's samples: of the 75 samples per run, 68 (16:58)
+  and 72 (18:14) named one of the school's voices, and two in the 18:14
+  run (`util-wrong-school`, `virtue-wrong-school`) named `confucian`,
+  outside even the widened sets. `tests/objection-voices.test.ts` now
+  holds every fixture to its school's named voices.
 - **4, v3 at launch.** Nothing changes before the launch: the flag
   chooses the version (`PROMPT_VERSION`, `src/lib/judge/schema.ts`), and
   the launch turns the flag on. The judge's COST comment
@@ -4903,22 +4908,37 @@ Items 1 to 7, carried out together:
   stay, marked as v2's measurement, because the golden runner prices a
   run from them by adding the larger v3 prompt to that base
   (`tests/judge/run-golden.ts`).
-- **5, option (ii).** Where a revision and its first attempt were judged
-  under different prompt versions, the verdict page shows neither the
-  first scores nor the change, but one line saying why (new copy,
-  `docs/daily-path-copy.md`, "A revision judged by a newer version of the
-  judge", for his ruling), and the share line uses the school's line
-  rather than `{first} → {score}`. `src/lib/verdict-versions.ts`;
-  `src/app/debate/[slug]/[debateId]/page.tsx`;
-  `src/components/debate/Verdict.tsx`. The versions are compared as
-  stored, so a sample's template versions count as versions: three
-  sample revisions judged under `sample-template-2` whose originals were
-  `sample-template-1` (production, read 2026-11-07) lose their table now.
-  Not changed, since the ruling is of what is shown: `/me`, which shows
-  each verdict's own score beside the other's and no change; and the
-  `revision_judged` event, which goes on recording the raw change
-  (`src/app/api/judge/route.ts`, frozen), so an analysis of it across the
-  launch has to split by version. Elo and par are untouched.
+- **5, option (ii).** The option as put to him: "show no score change, in
+  any of those places, when the two verdicts' versions differ, and leave
+  Elo and par as they are", the places being the verdict page, the share
+  line, `/me` and the `revision_judged` event (`docs/gate4.md`, item 5).
+  Where a revision and its first attempt were judged under different
+  prompt versions:
+  - the verdict page shows neither the first scores nor the change, but
+    one line saying why (new copy, `docs/daily-path-copy.md`, "A revision
+    judged by a newer version of the judge", for his ruling);
+  - the share line uses the school's line rather than
+    `{first} → {score}`;
+  - `/me` lists the revision under its original without its score, which
+    its own page shows, so the two are not set side by side;
+  - `revision_judged` records `score_delta` and `fidelity_delta` as null.
+    The event is fired by `src/components/debate/ArgumentEditor.tsx`
+    from the change the judge route works out (`src/app/api/judge/route.ts`,
+    frozen, unchanged); the revise page tells the editor whether the
+    original was judged under the version this build judges with.
+  Each row's own `prompt_version` column is compared
+  (`src/lib/verdict-versions.ts`), never the copy in a verdict read
+  through `debates_public`: that view keeps a withheld verdict's version
+  only when it reads `v<n>` (migration 0023), so a sample's template
+  version would vanish and two same-version verdicts would look
+  different. The versions are compared as stored, so a sample's two
+  template rules count as two: of the 484 sample revisions with a judged
+  original (production, read 2026-11-07; there are no genuine ones yet),
+  the 3 judged under `sample-template-2` whose originals were
+  `sample-template-1` lose their table, and the 481 others keep it. The
+  line is not shown on a sample's page, which already says no judge read
+  the argument: two template rules are not two versions of the judge.
+  Elo and par are untouched.
 - **6, the criteria at launch.** On the launch checklist
   (`docs/stage5-plan.md`): the three sections move from the draft file
   into `src/lib/judge/rubric.ts` unchanged, and the flag-on request
@@ -4938,8 +4958,14 @@ Items 1 to 7, carried out together:
   the launch; only its per-school sections (each headed `## ` and the
   school's id) reach the judge, and the
   flag-on request fixtures pass unchanged, so the edit is not one the
-  judge sees. The test that pins its wording
-  (`tests/judge-v3-and-refusal.test.ts`) is updated with it.
+  judge sees. The same goes for the line under its `# Draft fidelity
+  criteria` heading, which made the same claim and is rewritten with the
+  header. The test that pins its wording
+  (`tests/judge-v3-and-refusal.test.ts`) is updated with it. One frozen
+  comment the judge is not sent becomes stale with item 4 and is left
+  for Arthur's next list: `src/app/api/judge/route.ts`'s "At most $0.20
+  or so a reader a day at the COST comment's rate", about $0.30 at
+  v3's $0.0152.
 
 Items 8 to 13 follow in their own pull requests; 14 needs nothing; 15
 and 16 come at the launch.

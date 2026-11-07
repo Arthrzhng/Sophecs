@@ -10,6 +10,8 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { TextLink } from "@/components/ui/TextLink";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate } from "@/lib/motion-text";
+import { PROMPT_VERSION } from "@/lib/judge/schema";
+import { scoresComparable } from "@/lib/verdict-versions";
 
 export const metadata = { title: "Answer the objection · Sophecs" };
 
@@ -40,7 +42,7 @@ export default async function RevisePage({
 
   const { data: parent } = await admin
     .from("debates")
-    .select("id, user_id, kind, rejected, verdict, argument, school, topic_slug, motion_text")
+    .select("id, user_id, kind, rejected, verdict, argument, school, topic_slug, motion_text, prompt_version")
     .eq("id", debateId)
     .maybeSingle();
 
@@ -110,6 +112,10 @@ export default async function RevisePage({
             mode="revision"
             parentDebateId={parent.id}
             initialArgument={parent.argument ?? ""}
+            // The revision is judged under this build's version; across two
+            // versions the revision_judged event records no change (Arthur,
+            // 2026-11-07, Gate 4 item 5, option (ii)).
+            comparableWithParent={scoresComparable(parent.prompt_version, PROMPT_VERSION)}
           />
         </div>
       )}

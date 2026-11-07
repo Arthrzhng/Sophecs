@@ -105,11 +105,19 @@ export default async function VerdictPage({
   // shown the original, so the revision's verdict can quote it.
   let parentPublic: boolean | null = null;
   if (isRevision && publicRow.parent_debate_id) {
-    const { data: parentRow } = await admin
-      .from("debates")
-      .select("id, verdict, argument_public")
-      .eq("id", publicRow.parent_debate_id)
-      .maybeSingle();
+    // Each row's prompt_version column, never the verdict's copy read
+    // through debates_public: that view keeps a withheld verdict's version
+    // only when it reads v<n> (migration 0023), so a sample's template
+    // version would be dropped and two same-version verdicts would look
+    // different.
+    const [{ data: parentRow }, { data: versionRow }] = await Promise.all([
+      admin
+        .from("debates")
+        .select("id, verdict, argument_public, prompt_version")
+        .eq("id", publicRow.parent_debate_id)
+        .maybeSingle(),
+      admin.from("debates").select("prompt_version").eq("id", debateId).maybeSingle(),
+    ]);
     parentPublic = Boolean(parentRow?.argument_public);
     const parentVerdict = (parentRow?.verdict ?? null) as VerdictData | null;
     if (parentRow && parentVerdict && !parentVerdict.rejected) {
@@ -117,12 +125,7 @@ export default async function VerdictPage({
         parentDebateId: parentRow.id as string,
         // No score change across two versions of the judge (Arthur,
         // 2026-11-07, Gate 4 item 5): src/lib/verdict-versions.ts.
-        // debates_public keeps prompt_version even in a withheld verdict
-        // (migrations 0018 and 0020).
-        comparable: scoresComparable(
-          (parentVerdict as { prompt_version?: unknown }).prompt_version,
-          (publicRow.verdict as { prompt_version?: unknown } | null)?.prompt_version
-        ),
+        comparable: scoresComparable(parentRow.prompt_version, versionRow?.prompt_version),
         first: {
           score: parentVerdict.score,
           fidelity: parentVerdict.fidelity,

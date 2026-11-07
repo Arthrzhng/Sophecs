@@ -22,7 +22,7 @@ Every item below was ruled on 2026-11-07, verbatim in `docs/decisions.md`,
 | 1, 2 | Both misses accepted as known | Recorded; checklist ticked |
 | 3 | Count the named voices | Fixtures widened |
 | 4 | v3 in production at launch; cost accepted | COST comment updated; v3 comes with the flag |
-| 5 | Option (ii) | Verdict page and share line |
+| 5 | Option (ii) | Verdict page, share line, `/me` and the `revision_judged` event; one new line of copy, for your ruling |
 | 6 | Criteria into `rubric.ts` at launch | On the launch checklist |
 | 7 | v3's head comment as sent, stale by design | Recorded; draft header and COST comment fixed |
 | 8 | v2 copy accepted, two fixes | To do |
@@ -34,6 +34,13 @@ Every item below was ruled on 2026-11-07, verbatim in `docs/decisions.md`,
 | 14 | Navigation as built | Nothing to do |
 | 15 | Preview link and click-through when 8 to 13 are done; launch on your word | When 8 to 13 are done |
 | 16 | The SQL to you when the time comes | At the launch |
+
+For your next list, from carrying these out: the line item 5 adds ("The
+first attempt was judged by an earlier version of the judge, so the two
+scores are not compared.", `docs/daily-path-copy.md`); and a frozen
+comment item 4 makes stale, in `src/app/api/judge/route.ts`: "At most
+$0.20 or so a reader a day at the COST comment's rate", which at v3's
+$0.0152 is about $0.30 (20 calls), left as it is.
 
 ## Where things stand
 

@@ -265,8 +265,9 @@ of the three; Gate 2 is about that.
    asked on 2026-11-06 to have ticked here; each is ticked as it is done,
    and the launch itself waits for Arthur's instruction.
    - [x] The golden runs pass (the condition for bringing Gate 4). 23 of
-     25 in band in both v3 runs, and every objection a named voice once
-     the fixtures count them; the two misses, `confucian-hierarchy-school`
+     25 in band in both v3 runs, and every case passing the objection
+     check once the fixtures count each school's named voices (a sample's
+     objection need not be one of them); the two misses, `confucian-hierarchy-school`
      and `stoic-analogy`'s fidelity, accepted by Arthur as known misses,
      2026-11-07 (`docs/decisions.md`, "Gate 4: Arthur's rulings").
    - [x] The primary sources behind the Ubuntu quotations opened by
@@ -305,8 +306,10 @@ of the three; Gate 2 is about that.
    - [x] The judge at launch, ruled by Arthur on 2026-11-07
      (`docs/decisions.md`, "Gate 4: Arthur's rulings"): production judges
      with v3, its cost accepted; no score change shown across two
-     versions, Elo and par unchanged; the rubric's claim kept true by
-     showing v3's criteria for all six; v3's head comment left as sent.
+     versions, Elo and par unchanged; v3's head comment left as sent.
+   - [ ] The rubric showing the v3 criteria the judge is given for all
+     six, on every page that says they are published in full (Arthur,
+     2026-11-07, Gate 4 item 10).
    - [ ] In the launch merge, the three new schools' criteria moved from
      `content/prompts/fidelity-criteria.draft.md` into
      `src/lib/judge/rubric.ts` with the same text, shown by the flag-on

@@ -23,7 +23,18 @@ export interface ProfileDebate {
   topicTitle: string;
   score: number | null;
   rejected: boolean;
-  revision?: { id: string; topicSlug: string; score: number | null; rejected: boolean };
+  revision?: {
+    id: string;
+    topicSlug: string;
+    score: number | null;
+    rejected: boolean;
+    /**
+     * Both judged under the same version (src/lib/verdict-versions.ts).
+     * When not, the revision's score is left to its own page rather than
+     * set beside the original's (Arthur, 2026-11-07, Gate 4 item 5).
+     */
+    comparable: boolean;
+  };
 }
 
 // The anchors the header's Me menu links to, on a SIX_SCHOOLS build only
@@ -201,9 +212,11 @@ export function ProfilePage({
                     >
                       Revision
                     </Link>
-                    <span className="font-mono tabular text-sm text-ink-soft">
-                      {d.revision.rejected ? "not judged" : d.revision.score}
-                    </span>
+                    {(d.revision.rejected || d.revision.comparable) && (
+                      <span className="font-mono tabular text-sm text-ink-soft">
+                        {d.revision.rejected ? "not judged" : d.revision.score}
+                      </span>
+                    )}
                   </div>
                 )}
               </li>

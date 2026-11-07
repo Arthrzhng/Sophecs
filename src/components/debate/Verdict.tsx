@@ -536,11 +536,13 @@ export function Verdict({
                 </tbody>
               </table>
             </>
-          ) : (
+          ) : template ? null : (
             // Across two versions of the judge no score change is shown
             // (Arthur, 2026-11-07, Gate 4 item 5). docs/daily-path-copy.md,
             // "A revision judged by a newer version of the judge" (new, for
-            // his ruling).
+            // his ruling). Not said of a sample's template verdicts, which
+            // no judge wrote: two template rules are not two versions of the
+            // judge, so their scores are simply not compared.
             <p className="text-sm text-ink-soft max-w-[50ch]">
               The first attempt was judged by an earlier version of the judge, so the two scores
               are not compared.
