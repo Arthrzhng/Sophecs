@@ -15,6 +15,7 @@ import { join } from "node:path";
 import { Rng } from "./rng";
 import { QUIZ_SCHOOLS, type SchoolId as RegistrySchoolId } from "../../src/lib/school-registry";
 import { DRAFT_SCHOOL_IDS, schoolEntry } from "../../src/lib/school-registry.drafts";
+import quizV2 from "../../docs/quiz-v2.json";
 
 export const SEED_DIR = join(process.cwd(), "scripts", "seed");
 export const ARGUMENT_DIR = join(SEED_DIR, "arguments");
@@ -33,10 +34,15 @@ export type SchoolId = RegistrySchoolId;
 // has two objections, from two rivals, as the live three do: its named
 // voices (src/lib/judge/objection-voices.ts), and for Ubuntu, whose
 // criteria name one, Utilitarianism as well. Once the launch publishes them
-// the drafts list is empty, and SCHOOLS has to name all six by then.
+// the drafts list is empty, and the tests that read LAUNCH_SCHOOLS have to
+// name the three another way by then.
 export const LAUNCH_SCHOOLS = DRAFT_SCHOOL_IDS;
-/** Every school with a bank: the run's three, then the launch's three. */
-export const BANK_SCHOOLS: readonly SchoolId[] = [...SCHOOLS, ...LAUNCH_SCHOOLS];
+/**
+ * Every school with a bank: the six quiz v2 places readers in, in the quiz
+ * file's order, as a run made with quiz v2 takes them. Not the registry's
+ * lists, which the launch changes when it publishes the three.
+ */
+export const BANK_SCHOOLS: readonly SchoolId[] = Object.keys(quizV2.schools) as SchoolId[];
 export const TOPICS = [
   "opaque-benefit",
   "crash-arithmetic",

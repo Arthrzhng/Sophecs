@@ -306,9 +306,10 @@ ways only:
 - Arguments, verdicts and exchange turns draw on all six schools'
   passages. A verdict names a school and its adherent from the full
   registry, with their own article ("an Ubuntu Ethicist"), on any build.
-  Two schools with no objection between them argue an exchange from a
-  reason and an example, which among the six is most exchanges: 12 of the
-  15 pairs lack an objection one way or the other on some motion.
+  Between two schools with no objection between them, an exchange opens
+  from a reason and replies from a reason and an example, which among the
+  six is most exchanges: 12 of the 15 pairs lack an objection one way or
+  the other on some motion.
 - The six and their order come from `docs/quiz-v2.json`, not the
   registry's lists, and the run is refused unless every motion's passages,
   the closings and the verdicts' lines cover the same six.
@@ -613,7 +614,9 @@ refusal" or "the run failed while writing"), and the detail goes to
   it back on.
 - Streaks use UTC days, as the app does.
 - A run made with quiz v2 also holds fixed `docs/quiz-v2.json` (its
-  questions, vectors and schools), the registry's names and articles for
+  questions, vectors and schools), its scorer (`scoreQuizV2` and
+  `onCircle` in `src/lib/quiz-v2-score.ts`, held to the simulator by
+  `tests/quiz-v2-score.test.ts`), the registry's names and articles for
   the six, and the six schools' passages and verdict lines: a change to
   any of them changes rows it has written. A run made with quiz v1 holds
   fixed v1's question bank and scorer, which the generator still imports.

@@ -86,7 +86,15 @@ For your next list, from carrying these out:
   schools have none between them in the passages, so they argue past each
   other more than the live three's do; and a fresh run's base window
   still starts on 2026-09-18, so its quiz v2 results and the new three's
-  arguments are dated weeks before readers could have made them.
+  arguments are dated weeks before readers could have made them;
+- item 13, two things the run's verdicts do that I left as they are,
+  since changing them would change rows the live run has written; the
+  fresh run is the one chance to change them, for it alone. About 1
+  revision verdict in 8 says the revision now answers an objection and
+  still suggests answering it (`templateRevisionVerdict`), and a school
+  whose name ends in "s" takes "'s", so a fresh run writes "Buddhist
+  Ethics's" as the live run writes "Virtue Ethics's" (the templates that
+  write `` `${NAME(…)}'s` ``). Both are in `scripts/seed/verdicts.ts`.
 
 ## Where things stand
 

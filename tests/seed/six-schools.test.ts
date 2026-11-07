@@ -67,6 +67,12 @@ describe("a sample run made with quiz v2", () => {
     }
   });
 
+  it("is the dataset this file was written against, pinned at production volume", () => {
+    // Beside the small pins in determinism.test.ts: eight thousand quiz
+    // results and every exchange pair reach paths a small run need not.
+    expect(manifestHash(six())).toBe("1edf1643d68dfd6b9b7085892c892159403d45b2d8e89c9fb97a7fe93fc5f9dc");
+  });
+
   it("covers all six schools about equally", () => {
     const ds = six();
     for (const shares of [share(ds.quizResults.map((q) => q.row.school)), share(ds.profiles.map((p) => p.row.school))]) {
@@ -161,6 +167,24 @@ describe("a quiz v2 run's schools", () => {
     expect(() => generate(gen, { ...banks, closings: closings as typeof banks.closings })).toThrow(/the closings/);
     const fragments = { ...banks.fragments, "no-decision": { ...banks.fragments["no-decision"], schools: Object.fromEntries(Object.entries(banks.fragments["no-decision"].schools).filter(([s]) => s !== "ubuntu")) } };
     expect(() => generate(gen, { ...banks, fragments: fragments as typeof banks.fragments })).toThrow(/the passages of no-decision/);
+  });
+});
+
+describe("a quiz v2 run's verdicts", () => {
+  it("are refused unless the verdicts' lines cover the same six as the quiz", async () => {
+    vi.resetModules();
+    vi.doMock("../../scripts/seed/verdicts", async (importOriginal) => {
+      const real = await importOriginal<typeof import("../../scripts/seed/verdicts")>();
+      return { ...real, FEATURE_SCHOOLS: real.FEATURE_SCHOOLS.filter((s) => s !== "confucian") };
+    });
+    try {
+      const fresh = await import("../../scripts/seed/generate");
+      const { loadBanks: load } = await import("../../scripts/seed/banks");
+      expect(() => fresh.generate({ ...SMALL, quiz: 2, topics: contentTopics() }, load())).toThrow(/the template verdicts' lines/);
+    } finally {
+      vi.doUnmock("../../scripts/seed/verdicts");
+      vi.resetModules();
+    }
   });
 });
 

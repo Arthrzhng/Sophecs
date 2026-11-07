@@ -388,17 +388,20 @@ describe("the scheduled workflow's path", () => {
 // one with none; the scheduled job takes the quiz from RUN_QUIZ.
 describe("a run's quiz on the scheduled path", () => {
   const v2Results = (db: MemoryAdapter) => [...db.table("quiz_results").values()].filter((r) => r.is_sample && r.quiz_version === 2).length;
+  // Named outright, so these hold whatever RUN_QUIZ says; the test below
+  // and tests/seed/six-schools.test.ts are the ones that read the switch.
+  const noQuiz = { config: { ...SMALL, quiz: undefined } };
 
   it("refuses to extend a run that names no quiz as a quiz v2 run, writing nothing; the next ordinary extension still writes", async () => {
     const db = freshDb();
-    await step(db, "canary", 0);
-    await step(db, "full", 1);
+    await step(db, "canary", 0, SEED, undefined, noQuiz);
+    await step(db, "full", 1, SEED, undefined, noQuiz);
     const debates = samples(db, "debates");
     const refused = await step(db, "extend", 24 * 7, SEED, undefined, { config: { ...SMALL, quiz: 2 } });
     expect(refused.out).toMatchObject({ ok: false, outcome: "dry-run-failed" });
     expect(samples(db, "debates")).toBe(debates);
     expect(v2Results(db)).toBe(0);
-    expect((await step(db, "extend", 24 * 7)).out).toMatchObject({ ok: true, outcome: "written" });
+    expect((await step(db, "extend", 24 * 7, SEED, undefined, noQuiz)).out).toMatchObject({ ok: true, outcome: "written" });
   });
 
   it("makes a quiz v2 run through canary and full, and refuses to extend it as a run with no quiz", async () => {
@@ -408,7 +411,7 @@ describe("a run's quiz on the scheduled path", () => {
     expect((await step(db, "full", 1, SEED, undefined, quiz2)).out.ok).toBe(true);
     expect(v2Results(db)).toBe(samples(db, "quiz_results"));
     const debates = samples(db, "debates");
-    expect((await step(db, "extend", 24 * 7)).out).toMatchObject({ ok: false, outcome: "dry-run-failed" });
+    expect((await step(db, "extend", 24 * 7, SEED, undefined, noQuiz)).out).toMatchObject({ ok: false, outcome: "dry-run-failed" });
     expect(samples(db, "debates")).toBe(debates);
     expect((await step(db, "extend", 24 * 7, SEED, undefined, quiz2)).out).toMatchObject({ ok: true, outcome: "written" });
   });

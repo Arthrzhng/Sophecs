@@ -5367,9 +5367,10 @@ launch step, after the teardown, on his word.
   a six-school run passes the judge's schema as a six-school build has it.
 - **Exchanges.** Among the six, two schools often have no objection
   between them in the passages: 12 of the 15 pairs lack one in at least one
-  direction on some motion, and 6 in both. A turn between them argues from
-  a reason and an example, where the old fallback would have said one
-  reason twice. That is most exchanges of a six-school run: at production
+  direction on some motion, and 6 in both. Between them the opening turn
+  argues from a reason and the reply from a reason and an example, where
+  the old fallback would have said one reason twice in each. That is most
+  exchanges of a six-school run: at production
   volume 286 of 492 open with no objection to raise, and 258 of 440
   replies have none to answer, so they argue past each other more than the
   live three's do. Among quiz v1's three every pair has an objection both
@@ -5398,6 +5399,9 @@ launch step, after the teardown, on his word.
   names its own quiz, and production refuses a plan whose quiz is not
   `RUN_QUIZ`, which every scheduled extension of that run would refuse.
 - **For Arthur's list**, besides the mix and the `FEATURE` lines: the
-  exchanges above, and that a fresh run's base window still starts on
-  2026-09-18, so its quiz v2 results and the new three's arguments are
+  exchanges above; the two left as they are above, which the fresh run is
+  the one chance to change (`scripts/seed/verdicts.ts`:
+  `templateRevisionVerdict`, and the templates that write
+  `` `${NAME(…)}'s` ``); and that a fresh run's base window still starts
+  on 2026-09-18, so its quiz v2 results and the new three's arguments are
   dated weeks before readers could have made them.

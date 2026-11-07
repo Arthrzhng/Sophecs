@@ -1232,9 +1232,9 @@ function writeTurn(
   const reason = r.pick(mine.reasons);
   let body: string;
   // Among six schools a pair can have no objection between them; then the
-  // turn argues from a reason and an example rather than saying one reason
-  // twice. Among quiz v1's three every pair has one, so those turns are as
-  // they were.
+  // opening turn argues from a reason, and the reply from a reason and an
+  // example, rather than either saying one reason twice. Among quiz v1's
+  // three every pair has one, so those turns are as they were.
   if (seq === 1) body = againstThem ? `That is where I disagree. ${capital(againstThem.claim)} ${reason}` : `That is where I disagree. ${reason}`;
   else if (seq === 2) body = answerToThem ? `${capital(answerToThem.answer)} ${reason}` : `${reason} ${r.pick(mine.examples)}`;
   else if (seq === 3) body = `That reply does not settle it. ${reason} ${r.pick(mine.examples)}`;
