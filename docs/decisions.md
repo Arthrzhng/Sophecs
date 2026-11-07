@@ -4988,21 +4988,31 @@ Arthur, 2026-11-07, quoted in full in "Gate 4: Arthur's rulings
 
 Each of the six topics in `content/topics/*.md` (frozen `content/**`;
 this ruling is the authority) now gives Confucianism, Ubuntu and Buddhist
-Ethics a stance, one sentence each, after the published three's. Each is
-written from that school's file (`read` and `gets_wrong`) and its approved
-criteria (`content/prompts/fidelity-criteria.draft.md`), and quotes
-nothing:
+Ethics a stance, one sentence each, after the published three's, at about
+their length (29 to 34 words; theirs are 20 to 34). Each is written from
+that school's file (`read` and `gets_wrong`) and its approved criteria
+(`content/prompts/fidelity-criteria.draft.md`), and quotes nothing, not
+even wording a source has verified:
 - Confucianism reasons from what a role and a relationship require, and
-  from holding a name to its work (`no-decision`);
+  from holding a name to its work (`moral-training`, `no-decision`);
 - Ubuntu reasons from what people become through one another, reads a
   harm as a failure of relationship, and asks who was left out of
-  deciding;
+  deciding, on Metz's relational reading rather than Menkiti's stronger
+  one;
 - Buddhist Ethics reasons from intention as much as outcome, from
-  non-harm and the reflection that goes on after acting, from no fixed
-  self (`borrowed-judgement`), from many conditions rather than one cause
-  (`no-decision`), and from impartial compassion (`crash-arithmetic`).
+  non-harm and the checking that goes on after acting, from no fixed self
+  (`borrowed-judgement`, `crash-arithmetic`), and from many conditions
+  rather than one cause (`no-decision`). None reduces it to reducing
+  suffering, which the research file warns against.
 
-They are mine, written under the ruling, and his to read.
+They are mine, written under the ruling, and his to read. Readings a
+reviewer of #103 raised for him, kept as written: Buddhist Ethics on
+`careful-builder` lowers blame for careful, well-meant builders, as
+volition weighing as much as outcome implies, while saying the intention
+excuses nothing left unchecked; on `crash-arithmetic` it argues impartial
+compassion from no fixed self, the later traditions' inference the
+criteria accept when argued; Confucianism on `crash-arithmetic` keeps the
+maker's partiality to its passenger, the objection its school file names.
 
 `tests/topic-stances.test.ts` is unchanged, as ruled: it checks the
 published schools, which are the three until the launch publishes the
@@ -5015,7 +5025,29 @@ the repository is.
 Seeding: after the merge, the six rows' `stances` are written to
 production's `debate_topics`, which he approved ((a)). `npm run
 seed:topics` needs the service key, which this environment does not hold,
-so the write goes through the Supabase connector. It is checked first that
-every other column already matches the files, and the rows are read back
-afterwards. No micro-lesson is added: the ruling says the elsewhere
-passages are enough for launch.
+so the write goes through the Supabase connector, as charter rule 10
+asks:
+- **Snapshot:** `docs/seed-snapshots/2026-11-07-debate-topics.json`, the
+  six rows as read at 06:06 UTC on 2026-11-07, in the format
+  `npm run restore:topics` reads. Loaded into local Postgres, every row's
+  `md5(stances::text)` and the md5 of its other columns equal
+  production's.
+- **The write:** `docs/seed-snapshots/2026-11-07-debate-topics-stances.sql`,
+  generated from the topic files: six `UPDATE ... SET stances` statements
+  in one transaction, nothing else. Only `stances` differs between the
+  files and production (checked with `seedDiff` by the reviewer of #103),
+  so this is exactly what `npm run seed:topics` would write. Each
+  statement takes ROW EXCLUSIVE on the table and a row lock on one row
+  for milliseconds; the only thing it can wait on is `/api/judge`
+  updating the same row's `par_elo`. `par_elo` and `par_n` are not
+  touched.
+- **Rollback:** `docs/seed-snapshots/2026-11-07-debate-topics-stances-rollback.sql`,
+  generated from the snapshot. Tested on local Postgres 16 on a copy of
+  the snapshot: the write gave each row six stances and left every other
+  column as it was; the rollback brought all six rows' md5s back to
+  production's.
+- **Read-back:** after the write, each row's `md5(stances::text)` must
+  equal the one the write gave locally.
+
+No micro-lesson is added: the ruling says the elsewhere passages are
+enough for launch.
