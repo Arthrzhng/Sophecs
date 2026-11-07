@@ -75,6 +75,19 @@ export function isLapsed(lastTurnAt: string | Date, now: Date = new Date()): boo
   return now.getTime() - last.getTime() > LAPSE_DAYS * 24 * 60 * 60 * 1000;
 }
 
+export interface LapseExchange {
+  user_a: string | null;
+  user_b: string | null;
+  next_turn: string | null;
+  last_turn_at: string | Date;
+}
+
+export interface LapseTurn {
+  seq: number;
+  author_id: string | null;
+  screen_result: string;
+}
+
 /**
  * Whether an open exchange has lapsed: LAPSE_DAYS since its last delivered
  * reply, except that a reply saved and not yet screened holds the clock
@@ -83,19 +96,30 @@ export function isLapsed(lastTurnAt: string | Date, now: Date = new Date()): boo
  * any delivery does; held instead, it leaves the clock running from the
  * last delivered reply, as a reply held when it is sent does.
  *
- * Only a reply the job could deliver holds it: the latest, by an author
- * who still has an account and whose turn it is (`nextTurn`). `turns` in
- * sequence order.
+ * Only a reply the job could deliver holds it, by the job's own tests: the
+ * latest, by an author whose turn it is by sequence and by `next_turn`, in
+ * an exchange both of whose parties still have accounts. A reply to someone
+ * who has since left can never be delivered, so it holds nothing. A reply
+ * the job has passed but not yet handed over (screened `ok`, `next_turn`
+ * not yet moved) holds too, so the exchange is not closed in that moment.
  */
 export function exchangeLapsed(
-  lastTurnAt: string | Date,
-  turns: readonly { author_id: string | null; screen_result: string }[],
-  nextTurn: string | null,
+  exchange: LapseExchange,
+  turns: readonly LapseTurn[],
   now: Date = new Date()
 ): boolean {
-  const last = turns[turns.length - 1];
-  if (last && last.screen_result === "pending" && last.author_id !== null && last.author_id === nextTurn) return false;
-  return isLapsed(lastTurnAt, now);
+  const last = turns.reduce<LapseTurn | undefined>((a, t) => (a && a.seq > t.seq ? a : t), undefined);
+  const { user_a, user_b, next_turn } = exchange;
+  const deliverable =
+    last !== undefined &&
+    (last.screen_result === "pending" || last.screen_result === "ok") &&
+    user_a !== null &&
+    user_b !== null &&
+    last.author_id !== null &&
+    last.author_id === next_turn &&
+    authorForSeq(last.seq, user_a, user_b) === last.author_id;
+  if (deliverable) return false;
+  return isLapsed(exchange.last_turn_at, now);
 }
 
 // What a turn must quote: the counterpart's original argument for the first

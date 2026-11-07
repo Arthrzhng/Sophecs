@@ -5,7 +5,8 @@ import {
   ExchangeView,
   type ExchangeStatus,
 } from "@/components/counterpart/ExchangeView";
-import { exchangeLapsed, latestReplyPending, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
+import { latestReplyPending, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpart";
+import { closeIfLapsed } from "@/lib/counterpart-lapse";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate } from "@/lib/motion-text";
 
@@ -73,18 +74,20 @@ export default async function CounterpartPage({
   // Lapse is closed on view rather than by a job: an exchange nobody opens
   // does no harm sitting open, and the only person who needs to see it
   // closed is whoever opens it. A reply waiting to be screened holds the
-  // clock (src/lib/counterpart.ts, exchangeLapsed). Only while the exchange
-  // is waiting on the same reader as when it was read: a delivery moves
-  // next_turn, so one the daily job (src/lib/rescreen.ts) has just made is
-  // not closed under it. That view shows the exchange as read, and the next
-  // one as it is.
-  let status = exchange.status as string;
-  const nextTurn = (exchange.next_turn as string | null) ?? null;
-  if (status === "open" && exchangeLapsed(exchange.last_turn_at as string, turns, nextTurn)) {
-    const close = admin.from("exchanges").update({ status: "lapsed", next_turn: null }).eq("id", id).eq("status", "open");
-    const { data: closed } = await (nextTurn ? close.eq("next_turn", nextTurn) : close.is("next_turn", null)).select("id");
-    if (closed?.length) status = "lapsed";
-  }
+  // clock (src/lib/counterpart.ts, exchangeLapsed), and the close takes only
+  // while the exchange is as it was read (src/lib/counterpart-lapse.ts).
+  const status = await closeIfLapsed(
+    admin,
+    {
+      id,
+      status: exchange.status as string,
+      user_a: (exchange.user_a as string | null) ?? null,
+      user_b: (exchange.user_b as string | null) ?? null,
+      next_turn: (exchange.next_turn as string | null) ?? null,
+      last_turn_at: exchange.last_turn_at as string,
+    },
+    turns
+  );
 
   const argumentById = new Map((debates ?? []).map((d) => [d.id as string, d.argument as string]));
 

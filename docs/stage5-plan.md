@@ -307,9 +307,9 @@ of the three; Gate 2 is about that.
      (`docs/decisions.md`, "Gate 4: Arthur's rulings"): production judges
      with v3, its cost accepted; no score change shown across two
      versions, Elo and par unchanged; v3's head comment left as sent.
-   - [ ] The rubric showing the v3 criteria the judge is given for all
+   - [x] The rubric showing the v3 criteria the judge is given for all
      six, on every page that says they are published in full (Arthur,
-     2026-11-07, Gate 4 item 10).
+     2026-11-07, Gate 4 item 10): a SIX_SCHOOLS build shows them (#102).
    - [ ] In the launch merge, the three new schools' criteria moved from
      `content/prompts/fidelity-criteria.draft.md` into
      `src/lib/judge/rubric.ts` with the same text, shown by the flag-on

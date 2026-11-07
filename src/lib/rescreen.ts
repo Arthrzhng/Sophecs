@@ -26,7 +26,8 @@ import { screenAndLog, SCREEN_DAILY_CAP, type ScreenCallResult } from "@/lib/scr
  * - only a reply the route could have delivered is read at all: in an open
  *   exchange, not a sample account's (the sample engine writes its turns
  *   already screened, and its rows are its own), by an author who still
- *   has an account, whose turn it is by sequence and by next_turn. However
+ *   has an account, to a counterpart who still has one, whose turn it is
+ *   by sequence and by next_turn. However
  *   long ago the exchange's last delivered reply was: a pending reply
  *   holds the lapse clock until it is screened (Arthur, 2026-11-07, Gate 4
  *   item 12; exchangeLapsed in src/lib/counterpart.ts);
@@ -117,9 +118,11 @@ export async function rescreenPending(
 
   const now = d.now();
   // Filtered in the query, so replies that can never be delivered (a
-  // closed, lapsed or sample exchange, a deleted author) are never read
-  // and can never fill a run ahead of ones that can. No filter on the
-  // exchange's last_turn_at: its pending reply holds the lapse clock.
+  // closed, lapsed or sample exchange, a deleted author, a counterpart who
+  // has since left) are never read and can never fill a run ahead of ones
+  // that can. No filter on the exchange's last_turn_at: a reply that can be
+  // delivered holds the lapse clock (src/lib/counterpart.ts,
+  // exchangeLapsed).
   const { data, error } = await admin
     .from("turns")
     .select("id, author_id, seq, quoted_claim, body, exchanges!inner(id, user_a, user_b, next_turn)")
@@ -128,6 +131,8 @@ export async function rescreenPending(
     .lt("created_at", new Date(now.getTime() - RESCREEN_MIN_AGE_MS).toISOString())
     .eq("exchanges.status", "open")
     .eq("exchanges.is_sample", false)
+    .not("exchanges.user_a", "is", null)
+    .not("exchanges.user_b", "is", null)
     .order("created_at", { ascending: true })
     .limit(RESCREEN_READ_LIMIT);
   if (error) throw new Error(`pending replies could not be read: ${error.message}`);

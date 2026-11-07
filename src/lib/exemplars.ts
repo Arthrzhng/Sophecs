@@ -40,11 +40,14 @@ export const EXEMPLAR_CANDIDATES_PER_SCHOOL = 1000;
 /**
  * The lowest template mark an exemplar may have (Arthur, 2026-11-07, Gate 4
  * item 11: "an exemplar floor on the template mark, dropping a position
- * rather than showing a weak one"). 50 is where the sample plan's middle
- * band starts (scripts/seed/verdicts.ts: 70-90, 50-69, 25-49), and every
- * argument the sample run writes to be weak is marked under it: on
- * production on 2026-11-07, all 707 published, marked 25 to 45. A position
- * whose strongest argument is under it is left out.
+ * rather than showing a weak one"). The ruling sets a floor; 50 is the
+ * implementer's choice, where the sample plan's middle band starts
+ * (scripts/seed/verdicts.ts: 70-90, 50-69, 25-49). It is a floor on the
+ * mark, not on the tier: under rule 1, which clamps each tier, every
+ * argument written to be weak is under it (production, 2026-11-07: all 707
+ * published, marked 25 to 45), but rule 2 has no clamp, and a weak one can
+ * occasionally be marked 50 or a little over. A position whose strongest
+ * argument is under it is left out.
  */
 export const EXEMPLAR_FLOOR = 50;
 

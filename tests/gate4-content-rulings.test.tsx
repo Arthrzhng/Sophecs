@@ -5,7 +5,8 @@ import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import matter from "gray-matter";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { exchangeLapsed, LAPSE_DAYS } from "../src/lib/counterpart";
+import { exchangeLapsed, LAPSE_DAYS, type LapseExchange, type LapseTurn } from "../src/lib/counterpart";
+import { closeIfLapsed, meExchangeRows, type OpenExchangeRow, type TurnState } from "../src/lib/counterpart-lapse";
 import { OpenExchanges } from "../src/components/me/OpenExchanges";
 import { SchoolMap } from "../src/components/phase3/SchoolMap";
 
@@ -106,42 +107,129 @@ describe("item 12: a reply waiting to be screened holds the lapse clock", () => 
   const now = new Date("2026-11-20T12:00:00Z");
   const old = new Date(now.getTime() - (LAPSE_DAYS + 6) * 24 * 60 * 60 * 1000).toISOString();
   const recent = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString();
-  const t = (author_id: string | null, screen_result: string) => ({ author_id, screen_result });
+  // A opens (turns 1 and 3 are A's), B replies (2 and 4).
+  const ex = (extra: Partial<LapseExchange> = {}): LapseExchange => ({ user_a: "a", user_b: "b", next_turn: "b", last_turn_at: old, ...extra });
+  const t = (seq: number, author_id: string | null, screen_result: string): LapseTurn => ({ seq, author_id, screen_result });
 
-  it("does not lapse while the latest reply, the author's whose turn it is, is pending", () => {
-    expect(exchangeLapsed(old, [t("a", "ok"), t("b", "pending")], "b", now)).toBe(false);
+  it("does not lapse while the latest reply, by the author whose turn it is, waits to be screened", () => {
+    expect(exchangeLapsed(ex(), [t(1, "a", "ok"), t(2, "b", "pending")], now)).toBe(false);
+    // Or has just passed and not yet been handed over by the daily job.
+    expect(exchangeLapsed(ex(), [t(1, "a", "ok"), t(2, "b", "ok")], now)).toBe(false);
   });
 
-  it("lapses as before once it is screened: delivered, or held", () => {
-    // Delivered, the exchange has moved on (next_turn and last_turn_at).
-    expect(exchangeLapsed(old, [t("a", "ok"), t("b", "ok")], "a", now)).toBe(true);
-    expect(exchangeLapsed(recent, [t("a", "ok"), t("b", "ok")], "a", now)).toBe(false);
-    // Held: the clock runs from the last delivered reply, as for a reply
-    // held when it was sent.
-    expect(exchangeLapsed(old, [t("a", "ok"), t("b", "flagged")], "b", now)).toBe(true);
-    expect(exchangeLapsed(old, [], "b", now)).toBe(true);
+  it("lapses as before once the reply is delivered or held", () => {
+    // Delivered: the exchange has moved on to A.
+    expect(exchangeLapsed(ex({ next_turn: "a" }), [t(1, "a", "ok"), t(2, "b", "ok")], now)).toBe(true);
+    expect(exchangeLapsed(ex({ next_turn: "a", last_turn_at: recent }), [t(1, "a", "ok"), t(2, "b", "ok")], now)).toBe(false);
+    // Held or removed: the clock runs from the last delivered reply.
+    expect(exchangeLapsed(ex(), [t(1, "a", "ok"), t(2, "b", "flagged")], now)).toBe(true);
+    expect(exchangeLapsed(ex(), [t(1, "a", "ok"), t(2, "b", "removed")], now)).toBe(true);
+    expect(exchangeLapsed(ex(), [], now)).toBe(true);
   });
 
   it("is held only by a reply the daily job could deliver", () => {
-    // Not the latest reply.
-    expect(exchangeLapsed(old, [t("b", "pending"), t("a", "ok")], "b", now)).toBe(true);
-    // Not its author's turn.
-    expect(exchangeLapsed(old, [t("a", "ok"), t("b", "pending")], "a", now)).toBe(true);
+    // Not the latest reply (turns in any order).
+    expect(exchangeLapsed(ex(), [t(3, "a", "ok"), t(2, "b", "pending")], now)).toBe(true);
+    // Not the author's turn by next_turn.
+    expect(exchangeLapsed(ex({ next_turn: "a" }), [t(1, "a", "ok"), t(2, "b", "pending")], now)).toBe(true);
+    // Not the author's turn by sequence.
+    expect(exchangeLapsed(ex(), [t(1, "a", "ok"), t(2, "a", "ok"), t(3, "b", "pending")], now)).toBe(true);
     // Its author's account is gone.
-    expect(exchangeLapsed(old, [t("a", "ok"), t(null, "pending")], null, now)).toBe(true);
+    expect(exchangeLapsed(ex({ user_b: null, next_turn: null }), [t(1, "a", "ok"), t(2, null, "pending")], now)).toBe(true);
+    // The counterpart has left: A's reply can never be handed over (review
+    // of #102, B1). Held, it would keep the exchange open for good.
+    expect(exchangeLapsed(ex({ user_b: null, next_turn: "a" }), [t(1, "a", "ok"), t(2, "b", "ok"), t(3, "a", "pending")], now)).toBe(true);
+  });
+});
+
+describe("item 12: /me's open exchanges", () => {
+  const now = new Date("2026-11-20T12:00:00Z");
+  const old = new Date(now.getTime() - (LAPSE_DAYS + 6) * 24 * 60 * 60 * 1000).toISOString();
+  const row = (id: string, extra: Partial<OpenExchangeRow> = {}): OpenExchangeRow => ({
+    id, topic_slug: "careful-builder", school_a: "stoicism", school_b: "utilitarianism",
+    user_a: "me", user_b: "them", next_turn: "me", last_turn_at: old, ...extra,
+  });
+  const turn = (exchange_id: string, seq: number, author_id: string, screen_result = "ok"): TurnState => ({ exchange_id, seq, author_id, screen_result });
+  const rows = (exchanges: OpenExchangeRow[], turns: TurnState[]) =>
+    meExchangeRows(exchanges, turns, "me", (slug) => `Title of ${slug}`, now);
+
+  it("keeps an old exchange whose latest reply is the reader's own, waiting to be checked, in any order the turns come", () => {
+    const turns = [turn("x1", 3, "me", "pending"), turn("x1", 1, "me"), turn("x1", 2, "them")];
+    const [r] = rows([row("x1")], turns);
+    expect(r).toEqual({ id: "x1", topicTitle: "Title of careful-builder", theirSchool: "utilitarianism", myTurn: true, myReplyPending: true });
   });
 
-  it("is what the exchange page and /me decide lapse by, and the job no longer skips a pending reply in an old exchange", () => {
-    const page = read("src/app/counterpart/[id]/page.tsx");
-    expect(page).toMatch(/exchangeLapsed\(exchange\.last_turn_at as string, turns, nextTurn\)/);
-    expect(page).not.toMatch(/\bisLapsed\(/);
-    // Closed only while the exchange still waits on the same reader.
-    expect(page).toMatch(/\.eq\("status", "open"\)/);
-    expect(page).toMatch(/close\.eq\("next_turn", nextTurn\)/);
+  it("leaves out an old exchange with nothing waiting, and one whose counterpart has left", () => {
+    expect(rows([row("x1")], [turn("x1", 1, "me"), turn("x1", 2, "them")])).toEqual([]);
+    expect(rows([row("x2", { user_b: null })], [turn("x2", 1, "me"), turn("x2", 2, "them"), turn("x2", 3, "me", "pending")])).toEqual([]);
+  });
+
+  it("keeps a recent exchange, and says whose turn it is", () => {
+    const recent = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+    const r = rows([row("x3", { last_turn_at: recent, next_turn: "them", user_a: "them", user_b: "me", school_a: "virtue-ethics" })], [turn("x3", 1, "them"), turn("x3", 2, "me")]);
+    expect(r).toEqual([{ id: "x3", topicTitle: "Title of careful-builder", theirSchool: "virtue-ethics", myTurn: false, myReplyPending: false }]);
+  });
+
+  it("is what /me builds its list with, from turns read with their place and no text", () => {
     const me = read("src/app/me/page.tsx");
-    expect(me).toMatch(/\.filter\(\(row\) => !exchangeLapsed\(/);
-    expect(me).not.toMatch(/\bisLapsed\(/);
-    expect(read("src/lib/rescreen.ts")).not.toMatch(/last_turn_at"?, ?new Date/);
+    expect(me).toContain("exchanges = meExchangeRows(");
+    expect(me).toContain('.select("exchange_id, seq, author_id, screen_result")');
+    expect(me).toContain('.select("id, topic_slug, user_a, user_b, school_a, school_b, next_turn, last_turn_at")');
+  });
+});
+
+describe("item 12: the exchange page's close on view", () => {
+  const now = new Date("2026-11-20T12:00:00Z");
+  const old = new Date(now.getTime() - (LAPSE_DAYS + 6) * 24 * 60 * 60 * 1000).toISOString();
+  // A stand-in for the admin client: records each call, and answers the
+  // conditional update with `closes` rows and the re-read with `nowStatus`.
+  const fake = (closes: number, nowStatus = "open") => {
+    const calls: { kind: string; filters: [string, string, unknown][] }[] = [];
+    const admin = {
+      from() {
+        const call = { kind: "read", filters: [] as [string, string, unknown][] };
+        calls.push(call);
+        const b: Record<string, unknown> = {};
+        b.update = () => ((call.kind = "update"), b);
+        b.eq = (c: string, v: unknown) => (call.filters.push(["eq", c, v]), b);
+        b.is = (c: string, v: unknown) => (call.filters.push(["is", c, v]), b);
+        b.select = () => (call.kind === "update" ? Promise.resolve({ data: Array.from({ length: closes }, () => ({ id: "x" })) }) : b);
+        b.maybeSingle = () => Promise.resolve({ data: { status: nowStatus } });
+        return b;
+      },
+    };
+    return { admin: admin as never, calls };
+  };
+  const exchange = (extra = {}) => ({ id: "x", status: "open", user_a: "a", user_b: "b", next_turn: "b", last_turn_at: old, ...extra });
+  const t = (seq: number, author_id: string, screen_result = "ok") => ({ seq, author_id, screen_result });
+
+  it("closes a lapsed exchange only while it is still open and waiting on the same reader", async () => {
+    const { admin, calls } = fake(1);
+    expect(await closeIfLapsed(admin, exchange(), [t(1, "a")], now)).toBe("lapsed");
+    expect(calls[0]).toEqual({ kind: "update", filters: [["eq", "id", "x"], ["eq", "status", "open"], ["eq", "next_turn", "b"]] });
+    const nobody = fake(1);
+    await closeIfLapsed(nobody.admin, exchange({ next_turn: null }), [t(1, "a")], now);
+    expect(nobody.calls[0].filters).toContainEqual(["is", "next_turn", null]);
+  });
+
+  it("shows the exchange as it now stands when the close does not take", async () => {
+    expect(await closeIfLapsed(fake(0, "complete").admin, exchange(), [t(1, "a")], now)).toBe("complete");
+    expect(await closeIfLapsed(fake(0, "open").admin, exchange(), [t(1, "a")], now)).toBe("open");
+  });
+
+  it("does not touch an exchange a pending reply holds, or one already closed", async () => {
+    const held = fake(1);
+    expect(await closeIfLapsed(held.admin, exchange(), [t(1, "a"), t(2, "b", "pending")], now)).toBe("open");
+    expect(held.calls).toHaveLength(0);
+    const closed = fake(1);
+    expect(await closeIfLapsed(closed.admin, exchange({ status: "complete" }), [t(1, "a")], now)).toBe("complete");
+    expect(closed.calls).toHaveLength(0);
+  });
+
+  it("is what the exchange page decides its status with", () => {
+    const page = read("src/app/counterpart/[id]/page.tsx");
+    expect(page).toContain("const status = await closeIfLapsed(");
+    expect(page).not.toMatch(/\bisLapsed\(|\bexchangeLapsed\(/);
   });
 });
 
@@ -160,12 +248,5 @@ describe("item 12: /me says a reader's own pending reply is waiting to be checke
     const html = renderToStaticMarkup(<OpenExchanges exchanges={[row, { ...row, id: "x2", myReplyPending: false }]} school="stoicism" />);
     expect(html.match(/>Reply</g)).toHaveLength(2);
     expect(html).not.toContain("Waiting to be checked");
-  });
-
-  it("is told by the reader's own latest reply, from /me's read of the turns", () => {
-    const me = read("src/app/me/page.tsx");
-    expect(me).toMatch(/myReplyPending: latestReplyPending\(turnsByExchange\.get\(row\.id as string\) \?\? \[\], user\.id\)/);
-    // Who wrote each turn and how it was screened, never its text.
-    expect(me).toMatch(/\.select\("exchange_id, author_id, screen_result"\)/);
   });
 });
