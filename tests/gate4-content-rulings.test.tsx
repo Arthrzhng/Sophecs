@@ -104,7 +104,9 @@ describe("item 10: the rubric shows what the judge is given, in full", () => {
 });
 
 describe("item 12: a reply waiting to be screened holds the lapse clock", () => {
-  const now = new Date("2026-11-20T12:00:00Z");
+  // In the past, so code that read the real clock in place of `now` would
+  // see even the recent exchanges here as lapsed, on any date.
+  const now = new Date("2026-10-01T12:00:00Z");
   const old = new Date(now.getTime() - (LAPSE_DAYS + 6) * 24 * 60 * 60 * 1000).toISOString();
   const recent = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString();
   // A opens (turns 1 and 3 are A's), B replies (2 and 4).
@@ -150,7 +152,9 @@ describe("item 12: a reply waiting to be screened holds the lapse clock", () => 
 });
 
 describe("item 12: /me's open exchanges", () => {
-  const now = new Date("2026-11-20T12:00:00Z");
+  // In the past, so code that read the real clock in place of `now` would
+  // see even the recent exchanges here as lapsed, on any date.
+  const now = new Date("2026-10-01T12:00:00Z");
   const old = new Date(now.getTime() - (LAPSE_DAYS + 6) * 24 * 60 * 60 * 1000).toISOString();
   const row = (id: string, extra: Partial<OpenExchangeRow> = {}): OpenExchangeRow => ({
     id, topic_slug: "careful-builder", school_a: "stoicism", school_b: "utilitarianism",
@@ -191,6 +195,15 @@ describe("item 12: /me's open exchanges", () => {
     expect(calls).toEqual([{ table: "turns", select: "exchange_id, seq, author_id, screen_result", in: ["exchange_id", ["x1", "x2"]] }]);
   });
 
+  it("leaves none out, and says no reply is waiting, when the turns could not be read (review of #102, pass 3)", async () => {
+    const r = meExchangeRows([row("x1"), row("x2")], null, "me", (slug) => `Title of ${slug}`, now);
+    expect(r.map((e) => [e.id, e.myReplyPending])).toEqual([["x1", false], ["x2", false]]);
+    const admin = {
+      from: () => ({ select: () => ({ in: () => Promise.resolve({ data: null, error: { message: "down" } }) }) }),
+    } as never;
+    expect(await readExchangeTurns(admin, ["x1"])).toBeNull();
+  });
+
   it("leaves out an old exchange with nothing waiting, and one whose counterpart has left", () => {
     expect(rows([row("x1")], [turn("x1", 1, "me"), turn("x1", 2, "them")])).toEqual([]);
     expect(rows([row("x2", { user_b: null })], [turn("x2", 1, "me"), turn("x2", 2, "them"), turn("x2", 3, "me", "pending")])).toEqual([]);
@@ -211,7 +224,9 @@ describe("item 12: /me's open exchanges", () => {
 });
 
 describe("item 12: the exchange page's close on view", () => {
-  const now = new Date("2026-11-20T12:00:00Z");
+  // In the past, so code that read the real clock in place of `now` would
+  // see even the recent exchanges here as lapsed, on any date.
+  const now = new Date("2026-10-01T12:00:00Z");
   const old = new Date(now.getTime() - (LAPSE_DAYS + 6) * 24 * 60 * 60 * 1000).toISOString();
   // A stand-in for the admin client: records each call, and answers the
   // conditional update with `closes` rows and the re-read with `nowStatus`.
@@ -235,7 +250,7 @@ describe("item 12: the exchange page's close on view", () => {
   const exchange = (extra = {}) => ({ id: "x", status: "open", user_a: "a", user_b: "b", next_turn: "b", last_turn_at: old, ...extra });
   const t = (seq: number, author_id: string, screen_result = "ok") => ({ seq, author_id, screen_result });
 
-  it("closes a lapsed exchange only while it is still open and waiting on the same reader", async () => {
+  it("closes a lapsed exchange only while it is still open and waiting on whoever it was waiting on", async () => {
     const { admin, calls } = fake(1);
     expect(await closeIfLapsed(admin, exchange(), [t(1, "a")], now)).toBe("lapsed");
     expect(calls[0]).toEqual({
@@ -260,6 +275,13 @@ describe("item 12: the exchange page's close on view", () => {
     const closed = fake(1);
     expect(await closeIfLapsed(closed.admin, exchange({ status: "complete" }), [t(1, "a")], now)).toBe("complete");
     expect(closed.calls).toHaveLength(0);
+  });
+
+  it("does not close a recent exchange", async () => {
+    const recent = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+    const kept = fake(1);
+    expect(await closeIfLapsed(kept.admin, exchange({ last_turn_at: recent }), [t(1, "a")], now)).toBe("open");
+    expect(kept.calls).toHaveLength(0);
   });
 
   it("closes nothing when the turns could not be read", async () => {

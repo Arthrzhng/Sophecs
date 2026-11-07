@@ -102,11 +102,18 @@ export interface LapseTurn {
  * who has since left can never be delivered, so it holds nothing. A reply
  * already screened holds nothing either, whether or not its exchange moved
  * on: the ruling holds the clock "until it is screened", and a hold on a
- * screened reply whose hand-over failed would never end. That leaves one
- * race, a round trip wide: the exchange page reading the turns just after
- * the job marks a reply `ok` and just before it hands the turn over. The
- * close then takes, the job's hand-over is refused, and the job puts the
- * reply back to pending and answers non-2xx, so the cron log shows it.
+ * screened reply whose hand-over failed would never end. That leaves two
+ * races, each a round trip wide and each only for a reply sent after its
+ * exchange's 14 days have run out, before anyone opened it. The exchange
+ * page can read the turns just after the job marks a reply `ok` and just
+ * before it hands the turn over: the close takes, the job's hand-over is
+ * refused, and the job puts the reply back to pending and answers non-2xx,
+ * so the cron log shows it. The frozen turn route has the same gap and
+ * hands over with no condition on the exchange's status, so a close in it
+ * leaves a delivered reply in a lapsed exchange; and a close by a page
+ * that read the turns before the route saved a reply leaves that reply
+ * pending in a lapsed exchange (docs/decisions.md, "Gate 4: items 8, 10,
+ * 11 and 12").
  */
 export function exchangeLapsed(
   exchange: LapseExchange,

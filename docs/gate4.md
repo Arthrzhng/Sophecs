@@ -57,7 +57,16 @@ For your next list, from carrying these out:
 - item 12: a reply whose screening call keeps failing is retried daily
   and holds its exchange with no end, as "until it is screened" says;
   since the job takes the oldest first, 20 of them would take every run
-  and starve newer replies. Whether you want a limit;
+  and starve newer replies (3, if each call times out rather than failing
+  fast). And while screening is stopped (the kill switch on, the month's
+  budget spent or unreadable), every exchange with a pending reply is
+  held until it resumes, and the daily job answers 200, since nothing
+  failed. Whether you want a limit on either;
+- item 8: Utilitarianism's new share line [1], in
+  `content/schools/utilitarianism.md`: "Turns out I'd pick whatever does
+  the most good for the most people, even when I'm the one who pays for
+  it. Sophecs called that Utilitarian." The words are mine, for your
+  reading; it ships with #102;
 - item 10: on a SIX_SCHOOLS build the rubric shows the v3 criteria as the
   judge gets them, including text written to the judge ("Of the rival
   schools this prompt lists", school ids in backticks). "In full"

@@ -21,11 +21,14 @@ export interface TurnState extends LapseTurn {
 
 /**
  * The turns of the reader's open exchanges, for /me: who wrote each, its
- * place and how it was screened, no text. None to read, none read.
+ * place and how it was screened, no text. None to read, none read. Null if
+ * the read failed, which is not the same as no turns: a pending reply may
+ * be holding an exchange open.
  */
-export async function readExchangeTurns(admin: SupabaseClient, exchangeIds: readonly string[]): Promise<TurnState[]> {
+export async function readExchangeTurns(admin: SupabaseClient, exchangeIds: readonly string[]): Promise<TurnState[] | null> {
   if (exchangeIds.length === 0) return [];
-  const { data } = await admin.from("turns").select("exchange_id, seq, author_id, screen_result").in("exchange_id", [...exchangeIds]);
+  const { data, error } = await admin.from("turns").select("exchange_id, seq, author_id, screen_result").in("exchange_id", [...exchangeIds]);
+  if (error) return null;
   return (data as TurnState[] | null) ?? [];
 }
 
@@ -34,24 +37,27 @@ export async function readExchangeTurns(admin: SupabaseClient, exchangeIds: read
  * page's job, on view), each saying whether the reader's own latest reply
  * is waiting to be screened, which /me shows as "Waiting to be checked"
  * (Arthur, 2026-11-07, Gate 4 item 12). The turns may come in any order.
+ * Turns null means they could not be read: then no exchange is left out,
+ * as the exchange page closes nothing on a read that failed, and none
+ * says a reply is waiting.
  */
 export function meExchangeRows(
   exchanges: readonly OpenExchangeRow[],
-  turns: readonly TurnState[],
+  turns: readonly TurnState[] | null,
   userId: string,
   titleOf: (slug: string) => string,
   now: Date = new Date()
 ): ExchangeRow[] {
-  const bySeq = [...turns].sort((a, b) => a.seq - b.seq);
+  const bySeq = [...(turns ?? [])].sort((a, b) => a.seq - b.seq);
   const turnsOf = (id: string) => bySeq.filter((t) => t.exchange_id === id);
   return exchanges
-    .filter((row) => !exchangeLapsed(row, turnsOf(row.id), now))
+    .filter((row) => turns === null || !exchangeLapsed(row, turnsOf(row.id), now))
     .map((row) => ({
       id: row.id,
       topicTitle: titleOf(row.topic_slug),
       theirSchool: row.user_a === userId ? row.school_b : row.school_a,
       myTurn: row.next_turn === userId,
-      myReplyPending: latestReplyPending(turnsOf(row.id), userId),
+      myReplyPending: turns !== null && latestReplyPending(turnsOf(row.id), userId),
     }));
 }
 
@@ -69,7 +75,7 @@ export function exchangeForLapse(row: Record<string, unknown>): LapseExchange & 
 
 /**
  * The exchange page's close on view. Closes an open exchange that has
- * lapsed, only while it is still open and waiting on the reader it was
+ * lapsed, only while it is still open and waiting on whoever it was
  * waiting on when read: a delivery moves `next_turn`, so one the daily job
  * has just made is not closed under it. Returns the status to show: if the
  * close did not take, the exchange's status as it now stands (only the

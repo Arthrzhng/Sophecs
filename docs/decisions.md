@@ -5169,19 +5169,30 @@ Carried out:
   nothing: it can never be handed over.
   - The exchange page decides lapse with it, after reading the turns
     (`closeIfLapsed`, `src/lib/counterpart-lapse.ts`), and closes an
-    exchange only while it is still open and waiting on the reader it was
+    exchange only while it is still open and waiting on whoever it was
     waiting on when read, so one the daily job has just moved on is not
     closed under it. If the close does not take, the page shows the
     exchange's status as it now stands (only the status is read again),
-    and a turns read that failed closes nothing. One race is left, a
-    round trip wide, once a day: a view reading the turns between the
-    job marking a reply `ok` and handing the turn over closes the
-    exchange; the job's hand-over is then refused, the reply goes back to
-    pending, and the job answers non-2xx, which the cron log shows.
+    and a turns read that failed closes nothing. Two races are left,
+    each a round trip wide, and only for a reply that arrives after its
+    exchange's 14 days have already run out, before anyone has opened the
+    exchange (from a tab left open, say). The job's: a view reading the
+    turns between the job marking a reply `ok` and handing the turn over
+    closes the exchange; the job's hand-over is then refused, the reply
+    goes back to pending, and the job answers non-2xx, which the cron log
+    shows. The turn route's (frozen `src/app/api/counterpart/turn`): it
+    marks a reply `ok` and then hands the turn over with no condition on
+    the exchange's status, so a close in between leaves a delivered reply
+    in an exchange marked lapsed, with `next_turn` set; and a view that
+    read the turns before the route saved a reply, and closes after,
+    leaves that reply pending in a lapsed exchange, where the job no
+    longer reads it. Both are narrower than on `main`, where any view
+    during the screening call closed the exchange.
   - `/me` leaves out lapsed exchanges by the same rule
     (`meExchangeRows`, `readExchangeTurns`), from one read of the open
     exchanges' turns: who wrote each, its place and how it was screened,
-    no text.
+    no text. If that read fails it leaves none out, as the page closes
+    nothing on a failed read.
   - The daily job (`src/lib/rescreen.ts`) no longer skips a pending reply
     whose exchange's last delivered reply is over 14 days old, and no
     longer reads one to a counterpart who has left, so such replies can
@@ -5190,9 +5201,19 @@ Carried out:
     holds its exchange, until a call succeeds, which is what "until it is
     screened" says; the job's batch and the monthly budget still cap what
     that costs. Because the job takes the oldest first, 20 such replies
-    would take every run's calls and starve newer ones (on main they left
-    the queue after 14 days). On Arthur's next list, in case he wants a
-    limit.
+    would take every run's calls and starve newer ones, when each call
+    fails fast; if each times out at 15 seconds, three use up the run's
+    40-second limit. On main they left the queue 14 days after their
+    exchange's last delivered reply. On Arthur's next list, in case he
+    wants a limit. So is screening stopped altogether (the kill switch on,
+    the month's budget spent or unreadable): then every exchange with a
+    pending reply is held until screening resumes, and the cron answers
+    200, since nothing failed.
+  - `scripts/review-turns.ts` now moves an exchange on only when the
+    reply approved was held. Approving a reported reply that had already
+    been delivered moved the exchange on a second time, handing the turn
+    back to its author and stranding any reply then waiting, which the
+    job would read on every run.
   - `/me` shows an exchange whose latest reply is the reader's own,
     waiting to be screened, with "Waiting to be checked" where "Reply"
     was, the exchange's title linking to it, under "Your counterpart is

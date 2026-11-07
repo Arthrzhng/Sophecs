@@ -23,11 +23,12 @@ import { screenAndLog, SCREEN_DAILY_CAP, type ScreenCallResult } from "@/lib/scr
  *   whose count cannot be read, waits for the next run;
  * - a reply is delivered only if the screen returns `ok`; anything else
  *   holds it, as the route does. A failed call leaves it pending;
- * - only a reply the route could have delivered is read at all: in an open
- *   exchange, not a sample account's (the sample engine writes its turns
- *   already screened, and its rows are its own), by an author who still
- *   has an account, to a counterpart who still has one, whose turn it is
- *   by sequence and by next_turn. However
+ * - only a reply the route could have delivered is screened. The read
+ *   takes replies in an open exchange, not a sample account's (the sample
+ *   engine writes its turns already screened, and its rows are its own),
+ *   by an author who still has an account, to a counterpart who still has
+ *   one; a reply that is not its exchange's latest, or whose author's turn
+ *   it is not by sequence and by next_turn, is then skipped. However
  *   long ago the exchange's last delivered reply was: a pending reply
  *   holds the lapse clock until it is screened (Arthur, 2026-11-07, Gate 4
  *   item 12; exchangeLapsed in src/lib/counterpart.ts);

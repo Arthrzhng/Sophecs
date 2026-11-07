@@ -145,13 +145,13 @@ describe("getExemplars", () => {
   // A stand-in for the admin client that records each query's filters and
   // ordering, and answers each school's read with `answer(school)`.
   const fakeAdmin = (answer: (school: unknown) => { data: unknown; error: unknown }) => {
-    const calls: { table: string; filters: [string, string, unknown][]; order: [string, unknown][]; limit?: number }[] = [];
+    const calls: { table: string; select?: string; filters: [string, string, unknown][]; order: [string, unknown][]; limit?: number }[] = [];
     const admin = {
       from(table: string) {
-        const call = { table, filters: [] as [string, string, unknown][], order: [] as [string, unknown][], limit: undefined as number | undefined };
+        const call = { table, select: undefined as string | undefined, filters: [] as [string, string, unknown][], order: [] as [string, unknown][], limit: undefined as number | undefined };
         calls.push(call);
         const b: Record<string, unknown> = {};
-        b.select = () => b;
+        b.select = (cols: string) => ((call.select = cols), b);
         b.eq = (c: string, v: unknown) => (call.filters.push(["eq", c, v]), b);
         b.not = (c: string, op: string, v: unknown) => (call.filters.push([`not.${op}`, c, v]), b);
         b.gte = (c: string, v: unknown) => (call.filters.push(["gte", c, v]), b);
@@ -169,6 +169,10 @@ describe("getExemplars", () => {
     expect(calls).toHaveLength(3);
     for (const [i, call] of calls.entries()) {
       expect(call.table).toBe("debates");
+      // The floor is applied to the score again when choosing, so the score
+      // has to be read: without it every row fails the floor and every
+      // motion's page is not found (review of #102, pass 3).
+      expect(call.select?.split(",").map((c) => c.trim())).toEqual(expect.arrayContaining(["id", "school", "argument", "score"]));
       expect(call.filters).toEqual(
         expect.arrayContaining([
           ["eq", "topic_slug", "no-decision"],
