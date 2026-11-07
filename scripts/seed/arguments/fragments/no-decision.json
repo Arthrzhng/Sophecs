@@ -116,6 +116,108 @@
           "why": "The argument does not say why the absence of assent alone would not settle the question."
         }
       ]
+    },
+    "confucian": {
+      "direction": "for",
+      "positions": [
+        "It is a mistake that matters, because the word decide does work the system has not done, and getting the name right keeps responsibility with the people whose roles the decision belongs to.",
+        "I accept the motion. To say the model decided is to give a role's responsibility to something that holds no role, and the people who do hold it slip out from under it.",
+        "A Confucian accepts this as a case of incorrect names: decide names an act by someone in a position, and the model occupies no position.",
+        "The motion is right. Calling the output a decision lets the officer, the manager and the clinician speak as if they had not decided, which is the real harm."
+      ],
+      "reasons": [
+        "Book 13 warns that when names are not correct, speech does not accord with things and affairs cannot be carried on. Calling an output a decision is such a case: it names an act of someone answerable, when no one answerable has acted.",
+        "Decisions belong to positions. A judge decides, a doctor decides, a manager decides, and each answers to the people their role serves. A model produces text that someone in such a position then adopts, and the deciding was theirs.",
+        "Responsibility in a role cannot be handed to something that holds no role. A loan officer who says the model decided is still the loan officer; the misnaming lets her stop acting as one.",
+        "The practical cost of the word is in the relationships. People told that a system decided about them have no one to hold to what the position owes them, and that leaves the relationship between institution and person empty."
+      ],
+      "examples": [
+        "A bank tells a customer that the system decided to refuse her. The customer asks to speak to whoever decided, and there is no such person on the list.",
+        "A teacher tells a parent the grading software decided the mark. The parent wants to talk to the teacher, whose job it was.",
+        "A hospital manager says the scheduling model decided to cancel the operation. The surgeon who signed off on it is not mentioned."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "whether we call it a decision changes nothing about what the output does to people, so the dispute is about words while the harms are real.",
+          "answer": "Words are not idle here. What we call the act decides whom we hold to account for it, and harms that no one is held to account for are harms that go on.",
+          "why": "It argues about the word without showing that the misnaming has any effect on what happens to people."
+        },
+        {
+          "rival": "ubuntu",
+          "claim": "insisting the decision belongs to whoever holds the position keeps responsibility in a chain of command, when the people affected should also have a say in the decision.",
+          "answer": "Holding the position to account is the first step to giving the affected a say, since there is then someone to answer them. A decision credited to a model has no one to answer anybody.",
+          "why": "It locates responsibility in roles without asking whether the people decided about had any part in the decision."
+        }
+      ]
+    },
+    "ubuntu": {
+      "direction": "for",
+      "positions": [
+        "It is a mistake, because a decision belongs to people answerable to the others it affects, and crediting the model hides who decided and who was left out of deciding.",
+        "I accept the motion. To decide is to take part in a shared life by choosing for or with others, and a model takes part in no shared life.",
+        "I accept this, because saying the model decided turns a relationship between people into a fact about a machine.",
+        "The motion is right, and the reason is relational: decisions are made among persons, and a language model is not one of them."
+      ],
+      "reasons": [
+        "People are bound to one another, and deciding is one of the ways they are bound. A decision binds the decider to those it affects, who may answer, object or forgive. A model's output binds it to nobody.",
+        "Saying the model decided hides the people who did. Somebody chose to deploy it, to accept its output and to apply it to a family. Naming them keeps the decision inside the web of relationships where it can be questioned.",
+        "Who was left out of deciding is the key question for any system. When an output is called a decision, that question disappears, because there seems to be no deciding for anyone to have been left out of.",
+        "Sabelo Mhlambi argues that an unfair automated decision is a failure of relational personhood. That failure belongs to the people, not the model: they let a process stand where a relationship should have been."
+      ],
+      "examples": [
+        "A family is told the model decided their child's school place. No one from the school will meet them, because the school says there is no one to meet.",
+        "A community clinic's triage model is described as deciding who is seen first. The nurses who adopted it no longer explain the order to the people in the waiting room.",
+        "A town says its benefits model decided to cut payments. The council members who approved it say the decision was not theirs."
+      ],
+      "objections": [
+        {
+          "rival": "stoicism",
+          "claim": "decision is assent by a ruling faculty, and the model lacks one; relationships have nothing to do with why the word is misapplied.",
+          "answer": "The model lacks a ruling faculty, and it also lacks the relationships a decision creates. The second matters more for what follows, because it is what lets people wronged by a decision hold someone to it.",
+          "why": "It explains the misuse of the word through relationships without addressing the simpler point that the model has no judgement to decide with."
+        },
+        {
+          "rival": "utilitarianism",
+          "claim": "a community is not one voice, and appealing to who was left out does not settle what to call an output that affects people the same either way.",
+          "answer": "The appeal is not to a single communal voice but to the particular people affected and their chance to answer. What we call the output decides whether they have anyone to answer, so it does not affect them the same either way.",
+          "why": "It talks about who was left out of deciding without saying who should have been included or how."
+        }
+      ]
+    },
+    "buddhist": {
+      "direction": "for",
+      "positions": [
+        "An output arises from many conditions, its training data, its prompt and the people who deployed it, with no volition of its own among them, so calling it a decision places an intention where there is none.",
+        "I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions.",
+        "A Buddhist accepts this, because deciding is intending, and to say the model decided moves the intention from the people who have it to a process that does not.",
+        "The motion is right, and it matters: calling the output a decision hides the volitions that actually shaped it, which are the ones that can be examined and changed."
+      ],
+      "reasons": [
+        "In Buddhist ethics an act is weighed by its volition. A decision is a volition settling on a course, and a language model's output has no volition of its own behind it. Calling it a decision credits an intention that is not there.",
+        "What arises comes from many conditions, not one cause. The output arises from data, training, prompt and deployment, and among those conditions the only volitions are human: those of the builders, the deployers and the users.",
+        "No fixed, bounded self sits inside the model making choices. Saying it decided invents just such a self, and invented selves are where responsibility goes to hide.",
+        "The practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model."
+      ],
+      "examples": [
+        "A clinic says its model decided to discharge a patient early. The decision to trust that output without review was a nurse's, and so was the chance to look again.",
+        "A recruiter says the screening tool decided against a candidate. The tool's output arose from years of past hiring choices, every one of them made by someone.",
+        "A content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "whether we call it a decision changes nothing about what the output does to people, so the stress on volition is a distraction from the harms.",
+          "answer": "The stress on volition is how the harms get addressed. If no one intended anything, no one examines anything, and harm left unexamined keeps arising from the same conditions.",
+          "why": "It stresses who intended what without showing how the word would change what happens to anyone."
+        },
+        {
+          "rival": "confucian",
+          "claim": "the issue is not hidden volitions but misnamed roles, and dissolving responsibility into many conditions makes it harder, not easier, to hold a particular person to account.",
+          "answer": "Many conditions does not mean no one. It means the account must name each person whose intention shaped the outcome, rather than one scapegoat or the model, and for each of them the duty to examine and change their part is real.",
+          "why": "It spreads the causes across many conditions and never says who in particular should answer for the outcome."
+        }
+      ]
     }
   }
 }

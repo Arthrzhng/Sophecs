@@ -1,0 +1,755 @@
+[
+  {
+    "id": "moral-training.confucian.01",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        2,
+        3
+      ],
+      "example": 1,
+      "objections": [
+        1
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Upbringing makes a person humane by forming them inside relationships and their rituals, and a model rewarded for outputs stands in no relationship it could owe anything to. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nHumaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense. A company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal.\n\nAn Ubuntu Ethicist will object that the Confucian ties goodness to fixed roles, when a person becomes good through relationships of solidarity that need not follow any hierarchy of roles. Relationships of solidarity are not opposed to roles; they are carried in them, as friend, neighbour, colleague. Either way the point stands: the model enters no relationships at all, so neither account makes it good. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 234
+  },
+  {
+    "id": "moral-training.confucian.02",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        0,
+        2
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.\n\nBook 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense. A child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers.\n\nA Utilitarian will object that what makes behaviour good is what it does to people, so a model that reliably helps and does not harm is good in the only sense that matters, whatever its upbringing. Helpful outputs are good to have, but the motion claims more: that the model is good the way a well-raised person is. That sense includes standing in relationships where one can be held to account, and an output profile does not supply it. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 243
+  },
+  {
+    "id": "moral-training.confucian.03",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1,
+        3
+      ],
+      "example": null,
+      "objections": [
+        0
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nHumaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nA Utilitarian will object that what makes behaviour good is what it does to people, so a model that reliably helps and does not harm is good in the only sense that matters, whatever its upbringing. Helpful outputs are good to have, but the motion claims more: that the model is good the way a well-raised person is. That sense includes standing in relationships where one can be held to account, and an output profile does not supply it. That is why the Confucian asks not what the system maximises but whom it leaves able to hold whom to account.",
+    "words": 222
+  },
+  {
+    "id": "moral-training.confucian.04",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        3,
+        0
+      ],
+      "example": 2,
+      "objections": [
+        1
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "A Confucian rejects this, because goodness in a person is humaneness realised in relationships, and feedback shapes outputs without placing the model in any relationship at all. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nA child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves. An apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice.\n\nAn Ubuntu Ethicist will object that the Confucian ties goodness to fixed roles, when a person becomes good through relationships of solidarity that need not follow any hierarchy of roles. Relationships of solidarity are not opposed to roles; they are carried in them, as friend, neighbour, colleague. Either way the point stands: the model enters no relationships at all, so neither account makes it good. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 232
+  },
+  {
+    "id": "moral-training.confucian.05",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3,
+        2
+      ],
+      "example": 1,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nBook 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense. A company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal.\n\nA Utilitarian will object that what makes behaviour good is what it does to people, so a model that reliably helps and does not harm is good in the only sense that matters, whatever its upbringing. Helpful outputs are good to have, but the motion claims more: that the model is good the way a well-raised person is. That sense includes standing in relationships where one can be held to account, and an output profile does not supply it. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 239
+  },
+  {
+    "id": "moral-training.confucian.06",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        2,
+        0
+      ],
+      "example": 0,
+      "objections": [
+        1
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nA child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves. A child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers.\n\nAn Ubuntu Ethicist will object that the Confucian ties goodness to fixed roles, when a person becomes good through relationships of solidarity that need not follow any hierarchy of roles. Relationships of solidarity are not opposed to roles; they are carried in them, as friend, neighbour, colleague. Either way the point stands: the model enters no relationships at all, so neither account makes it good. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 230
+  },
+  {
+    "id": "moral-training.confucian.07",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        1,
+        2
+      ],
+      "example": 2,
+      "objections": [
+        1
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Upbringing makes a person humane by forming them inside relationships and their rituals, and a model rewarded for outputs stands in no relationship it could owe anything to. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nBook 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense. An apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice.\n\nAn Ubuntu Ethicist will object that the Confucian ties goodness to fixed roles, when a person becomes good through relationships of solidarity that need not follow any hierarchy of roles. Relationships of solidarity are not opposed to roles; they are carried in them, as friend, neighbour, colleague. Either way the point stands: the model enters no relationships at all, so neither account makes it good. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 232
+  },
+  {
+    "id": "moral-training.confucian.08",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0,
+        3
+      ],
+      "example": 1,
+      "objections": [
+        0
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A Confucian rejects this, because goodness in a person is humaneness realised in relationships, and feedback shapes outputs without placing the model in any relationship at all. A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.\n\nHumaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense. A company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal.\n\nA Utilitarian will object that what makes behaviour good is what it does to people, so a model that reliably helps and does not harm is good in the only sense that matters, whatever its upbringing. Helpful outputs are good to have, but the motion claims more: that the model is good the way a well-raised person is. That sense includes standing in relationships where one can be held to account, and an output profile does not supply it. That is why the Confucian asks not what the system maximises but whom it leaves able to hold whom to account.",
+    "words": 247
+  },
+  {
+    "id": "moral-training.confucian.09",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3,
+        2
+      ],
+      "example": null,
+      "objections": [
+        0
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nBook 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nA Utilitarian will object that what makes behaviour good is what it does to people, so a model that reliably helps and does not harm is good in the only sense that matters, whatever its upbringing. Helpful outputs are good to have, but the motion claims more: that the model is good the way a well-raised person is. That sense includes standing in relationships where one can be held to account, and an output profile does not supply it. That is why the Confucian asks not what the system maximises but whom it leaves able to hold whom to account.",
+    "words": 221
+  },
+  {
+    "id": "moral-training.confucian.10",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2,
+        3
+      ],
+      "example": 0,
+      "objections": [
+        1
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nHumaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense. A child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers.\n\nAn Ubuntu Ethicist will object that the Confucian ties goodness to fixed roles, when a person becomes good through relationships of solidarity that need not follow any hierarchy of roles. Relationships of solidarity are not opposed to roles; they are carried in them, as friend, neighbour, colleague. Either way the point stands: the model enters no relationships at all, so neither account makes it good. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 231
+  },
+  {
+    "id": "moral-training.confucian.11",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Upbringing makes a person humane by forming them inside relationships and their rituals, and a model rewarded for outputs stands in no relationship it could owe anything to. A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.\n\nA child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 124
+  },
+  {
+    "id": "moral-training.confucian.12",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nAn apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 116
+  },
+  {
+    "id": "moral-training.confucian.13",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 126
+  },
+  {
+    "id": "moral-training.confucian.14",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A Confucian rejects this, because goodness in a person is humaneness realised in relationships, and feedback shapes outputs without placing the model in any relationship at all. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nA child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 123
+  },
+  {
+    "id": "moral-training.confucian.15",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        0
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 126
+  },
+  {
+    "id": "moral-training.confucian.16",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        2
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Upbringing makes a person humane by forming them inside relationships and their rituals, and a model rewarded for outputs stands in no relationship it could owe anything to. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nAn apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 117
+  },
+  {
+    "id": "moral-training.confucian.17",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nA child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 122
+  },
+  {
+    "id": "moral-training.confucian.18",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        1
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "A Confucian rejects this, because goodness in a person is humaneness realised in relationships, and feedback shapes outputs without placing the model in any relationship at all. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nAn apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 122
+  },
+  {
+    "id": "moral-training.confucian.19",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 120
+  },
+  {
+    "id": "moral-training.confucian.20",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Upbringing makes a person humane by forming them inside relationships and their rituals, and a model rewarded for outputs stands in no relationship it could owe anything to. A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.\n\nA child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 123
+  },
+  {
+    "id": "moral-training.confucian.21",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        1
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A Confucian rejects this, because goodness in a person is humaneness realised in relationships, and feedback shapes outputs without placing the model in any relationship at all. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nAn apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 123
+  },
+  {
+    "id": "moral-training.confucian.22",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. That is why the Confucian asks not what the system maximises but whom it leaves able to hold whom to account.",
+    "words": 128
+  },
+  {
+    "id": "moral-training.confucian.23",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Upbringing makes a person humane by forming them inside relationships and their rituals, and a model rewarded for outputs stands in no relationship it could owe anything to. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nA child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers. That is why the Confucian asks not what the system maximises but whom it leaves able to hold whom to account.",
+    "words": 126
+  },
+  {
+    "id": "moral-training.confucian.24",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A Confucian rejects this, because goodness in a person is humaneness realised in relationships, and feedback shapes outputs without placing the model in any relationship at all. A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.\n\nAn apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 122
+  },
+  {
+    "id": "moral-training.confucian.25",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 121
+  },
+  {
+    "id": "moral-training.confucian.26",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        2
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nAn apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 120
+  },
+  {
+    "id": "moral-training.confucian.27",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.\n\nA child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 121
+  },
+  {
+    "id": "moral-training.confucian.28",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A Confucian rejects this, because goodness in a person is humaneness realised in relationships, and feedback shapes outputs without placing the model in any relationship at all. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 122
+  },
+  {
+    "id": "moral-training.confucian.29",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nA child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 127
+  },
+  {
+    "id": "moral-training.confucian.30",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Upbringing makes a person humane by forming them inside relationships and their rituals, and a model rewarded for outputs stands in no relationship it could owe anything to. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nAn apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 119
+  },
+  {
+    "id": "moral-training.confucian.31",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4
+      ]
+    },
+    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. A company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal.",
+    "words": 98
+  },
+  {
+    "id": "moral-training.confucian.32",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0
+      ]
+    },
+    "text": "A Confucian rejects this, because goodness in a person is humaneness realised in relationships, and feedback shapes outputs without placing the model in any relationship at all.\n\nA model is a computer program, and programs cannot be good or bad, only useful or broken. So obviously training cannot make it good like a person, and this motion does not make sense. A child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers.",
+    "words": 92
+  },
+  {
+    "id": "moral-training.confucian.33",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        2,
+        4
+      ]
+    },
+    "text": "Upbringing makes a person humane by forming them inside relationships and their rituals, and a model rewarded for outputs stands in no relationship it could owe anything to.\n\nThe people giving the feedback are biased, so the model just learns their biases. You cannot make something good by copying flawed humans, so the motion fails before it starts. Morality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer.",
+    "words": 95
+  },
+  {
+    "id": "moral-training.confucian.34",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3
+      ]
+    },
+    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that.\n\nCompanies say their models are safe and good but they just want to sell them. We should not believe a model is good just because a company trained it and says so in a press release. An apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice.",
+    "words": 91
+  },
+  {
+    "id": "moral-training.confucian.35",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        2
+      ]
+    },
+    "text": "A Confucian rejects this, because goodness in a person is humaneness realised in relationships, and feedback shapes outputs without placing the model in any relationship at all.\n\nThe people giving the feedback are biased, so the model just learns their biases. You cannot make something good by copying flawed humans, so the motion fails before it starts. A company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal.",
+    "words": 87
+  },
+  {
+    "id": "moral-training.confucian.36",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3,
+        4
+      ]
+    },
+    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences.\n\nCompanies say their models are safe and good but they just want to sell them. We should not believe a model is good just because a company trained it and says so in a press release. Morality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer.",
+    "words": 104
+  },
+  {
+    "id": "moral-training.confucian.37",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0
+      ]
+    },
+    "text": "Upbringing makes a person humane by forming them inside relationships and their rituals, and a model rewarded for outputs stands in no relationship it could owe anything to.\n\nA model is a computer program, and programs cannot be good or bad, only useful or broken. So obviously training cannot make it good like a person, and this motion does not make sense. An apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice.",
+    "words": 92
+  },
+  {
+    "id": "moral-training.confucian.38",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4
+      ]
+    },
+    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. A child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers.",
+    "words": 93
+  },
+  {
+    "id": "moral-training.confucian.39",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4
+      ]
+    },
+    "text": "A Confucian rejects this, because goodness in a person is humaneness realised in relationships, and feedback shapes outputs without placing the model in any relationship at all.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. A child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers.",
+    "words": 95
+  },
+  {
+    "id": "moral-training.confucian.40",
+    "topic": "moral-training",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0,
+        3
+      ]
+    },
+    "text": "Upbringing makes a person humane by forming them inside relationships and their rituals, and a model rewarded for outputs stands in no relationship it could owe anything to.\n\nA model is a computer program, and programs cannot be good or bad, only useful or broken. So obviously training cannot make it good like a person, and this motion does not make sense. Companies say their models are safe and good but they just want to sell them. We should not believe a model is good just because a company trained it and says so in a press release.",
+    "words": 98
+  }
+]

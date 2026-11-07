@@ -1,0 +1,755 @@
+[
+  {
+    "id": "crash-arithmetic.confucian.01",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        3,
+        1
+      ],
+      "example": 2,
+      "objections": [
+        1
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A Confucian cannot accept a rule that counts the passenger as one among many, because care is owed through relationships and the maker's relationship is with the person in the car. Humaneness is shown in fidelity to those who rely on you. A society whose machines are built to abandon the people in their care whenever arithmetic favours it is teaching everyone that relationships hold only until they cost something.\n\nCare is graded by relationship: one owes more to those one stands in relation to than to strangers, without owing strangers nothing. The car should avoid harming pedestrians wherever it can, but it may not be built to treat its own passenger as expendable. A ferry company that secretly instructed its crew to abandon passengers whenever more lives could be saved elsewhere would not keep its passengers for long.\n\nAn Ubuntu Ethicist will object that everyone on the road shares a life with everyone else, so privileging the relationship between maker and passenger shrinks the moral world to a contract. Shared life on the road is real, and that is why the car must avoid harm to anyone it can. But shared life is made of particular relationships, and a maker who abandons the particular one it took on does not thereby honour the general one. That is why the Confucian asks not what the system maximises but whom it leaves able to hold whom to account.",
+    "words": 237
+  },
+  {
+    "id": "crash-arithmetic.confucian.02",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0,
+        1
+      ],
+      "example": 1,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A rule that treats everyone as an equal unit of the count ignores what the maker owes the passenger who trusted the car with their life, so the question is what that relationship requires. What you owe is never owed in the abstract. The maker takes on duties to the passenger by putting them in the car, much as a host takes on duties to a guest, and a rule that sets those duties aside for an aggregate has stopped asking what the role requires.\n\nCare is graded by relationship: one owes more to those one stands in relation to than to strangers, without owing strangers nothing. The car should avoid harming pedestrians wherever it can, but it may not be built to treat its own passenger as expendable. A parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it.\n\nA Utilitarian will object that a school built on who owes what to whom has little to say about the strangers on the road, whose deaths count exactly as much as the passenger's. The strangers are owed care too, and the car must do all it can to avoid them. What role ethics denies is that the maker may build in the betrayal of the person it has taken responsibility for, as if that relationship counted for nothing. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 244
+  },
+  {
+    "id": "crash-arithmetic.confucian.03",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        2,
+        3
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I reject the motion as stated. The car's maker stands in a relationship with its passenger, and duties within a relationship are not cancelled by a larger total elsewhere. Correct names matter. A car sold as carrying someone safely, and secretly programmed to kill them when the count favours it, is not what its name says, and the gap between the name and the thing corrodes trust in every car.\n\nHumaneness is shown in fidelity to those who rely on you. A society whose machines are built to abandon the people in their care whenever arithmetic favours it is teaching everyone that relationships hold only until they cost something. A taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home.\n\nA Utilitarian will object that a school built on who owes what to whom has little to say about the strangers on the road, whose deaths count exactly as much as the passenger's. The strangers are owed care too, and the car must do all it can to avoid them. What role ethics denies is that the maker may build in the betrayal of the person it has taken responsibility for, as if that relationship counted for nothing. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 241
+  },
+  {
+    "id": "crash-arithmetic.confucian.04",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1,
+        0
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Programming the car to sacrifice its passenger betrays the relationship it was sold into, and calling that impartiality misnames a broken trust. Care is graded by relationship: one owes more to those one stands in relation to than to strangers, without owing strangers nothing. The car should avoid harming pedestrians wherever it can, but it may not be built to treat its own passenger as expendable.\n\nWhat you owe is never owed in the abstract. The maker takes on duties to the passenger by putting them in the car, much as a host takes on duties to a guest, and a rule that sets those duties aside for an aggregate has stopped asking what the role requires. A taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home.\n\nA Utilitarian will object that a school built on who owes what to whom has little to say about the strangers on the road, whose deaths count exactly as much as the passenger's. The strangers are owed care too, and the car must do all it can to avoid them. What role ethics denies is that the maker may build in the betrayal of the person it has taken responsibility for, as if that relationship counted for nothing. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 249
+  },
+  {
+    "id": "crash-arithmetic.confucian.05",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3,
+        0
+      ],
+      "example": null,
+      "objections": [
+        0
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A rule that treats everyone as an equal unit of the count ignores what the maker owes the passenger who trusted the car with their life, so the question is what that relationship requires. Humaneness is shown in fidelity to those who rely on you. A society whose machines are built to abandon the people in their care whenever arithmetic favours it is teaching everyone that relationships hold only until they cost something.\n\nWhat you owe is never owed in the abstract. The maker takes on duties to the passenger by putting them in the car, much as a host takes on duties to a guest, and a rule that sets those duties aside for an aggregate has stopped asking what the role requires.\n\nA Utilitarian will object that a school built on who owes what to whom has little to say about the strangers on the road, whose deaths count exactly as much as the passenger's. The strangers are owed care too, and the car must do all it can to avoid them. What role ethics denies is that the maker may build in the betrayal of the person it has taken responsibility for, as if that relationship counted for nothing. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 223
+  },
+  {
+    "id": "crash-arithmetic.confucian.06",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1,
+        2
+      ],
+      "example": 1,
+      "objections": [
+        0
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I reject the motion as stated. The car's maker stands in a relationship with its passenger, and duties within a relationship are not cancelled by a larger total elsewhere. Care is graded by relationship: one owes more to those one stands in relation to than to strangers, without owing strangers nothing. The car should avoid harming pedestrians wherever it can, but it may not be built to treat its own passenger as expendable.\n\nCorrect names matter. A car sold as carrying someone safely, and secretly programmed to kill them when the count favours it, is not what its name says, and the gap between the name and the thing corrodes trust in every car. A parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it.\n\nA Utilitarian will object that a school built on who owes what to whom has little to say about the strangers on the road, whose deaths count exactly as much as the passenger's. The strangers are owed care too, and the car must do all it can to avoid them. What role ethics denies is that the maker may build in the betrayal of the person it has taken responsibility for, as if that relationship counted for nothing. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 234
+  },
+  {
+    "id": "crash-arithmetic.confucian.07",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        0,
+        1
+      ],
+      "example": 2,
+      "objections": [
+        1
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Programming the car to sacrifice its passenger betrays the relationship it was sold into, and calling that impartiality misnames a broken trust. What you owe is never owed in the abstract. The maker takes on duties to the passenger by putting them in the car, much as a host takes on duties to a guest, and a rule that sets those duties aside for an aggregate has stopped asking what the role requires.\n\nCare is graded by relationship: one owes more to those one stands in relation to than to strangers, without owing strangers nothing. The car should avoid harming pedestrians wherever it can, but it may not be built to treat its own passenger as expendable. A ferry company that secretly instructed its crew to abandon passengers whenever more lives could be saved elsewhere would not keep its passengers for long.\n\nAn Ubuntu Ethicist will object that everyone on the road shares a life with everyone else, so privileging the relationship between maker and passenger shrinks the moral world to a contract. Shared life on the road is real, and that is why the car must avoid harm to anyone it can. But shared life is made of particular relationships, and a maker who abandons the particular one it took on does not thereby honour the general one. That is why the Confucian asks not what the system maximises but whom it leaves able to hold whom to account.",
+    "words": 240
+  },
+  {
+    "id": "crash-arithmetic.confucian.08",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2,
+        0
+      ],
+      "example": null,
+      "objections": [
+        1
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A Confucian cannot accept a rule that counts the passenger as one among many, because care is owed through relationships and the maker's relationship is with the person in the car. Correct names matter. A car sold as carrying someone safely, and secretly programmed to kill them when the count favours it, is not what its name says, and the gap between the name and the thing corrodes trust in every car.\n\nWhat you owe is never owed in the abstract. The maker takes on duties to the passenger by putting them in the car, much as a host takes on duties to a guest, and a rule that sets those duties aside for an aggregate has stopped asking what the role requires.\n\nAn Ubuntu Ethicist will object that everyone on the road shares a life with everyone else, so privileging the relationship between maker and passenger shrinks the moral world to a contract. Shared life on the road is real, and that is why the car must avoid harm to anyone it can. But shared life is made of particular relationships, and a maker who abandons the particular one it took on does not thereby honour the general one. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 221
+  },
+  {
+    "id": "crash-arithmetic.confucian.09",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3,
+        1
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Programming the car to sacrifice its passenger betrays the relationship it was sold into, and calling that impartiality misnames a broken trust. Humaneness is shown in fidelity to those who rely on you. A society whose machines are built to abandon the people in their care whenever arithmetic favours it is teaching everyone that relationships hold only until they cost something.\n\nCare is graded by relationship: one owes more to those one stands in relation to than to strangers, without owing strangers nothing. The car should avoid harming pedestrians wherever it can, but it may not be built to treat its own passenger as expendable. A taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home.\n\nA Utilitarian will object that a school built on who owes what to whom has little to say about the strangers on the road, whose deaths count exactly as much as the passenger's. The strangers are owed care too, and the car must do all it can to avoid them. What role ethics denies is that the maker may build in the betrayal of the person it has taken responsibility for, as if that relationship counted for nothing. That is why the Confucian asks not what the system maximises but whom it leaves able to hold whom to account.",
+    "words": 237
+  },
+  {
+    "id": "crash-arithmetic.confucian.10",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        0,
+        2
+      ],
+      "example": 1,
+      "objections": [
+        1
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "I reject the motion as stated. The car's maker stands in a relationship with its passenger, and duties within a relationship are not cancelled by a larger total elsewhere. What you owe is never owed in the abstract. The maker takes on duties to the passenger by putting them in the car, much as a host takes on duties to a guest, and a rule that sets those duties aside for an aggregate has stopped asking what the role requires.\n\nCorrect names matter. A car sold as carrying someone safely, and secretly programmed to kill them when the count favours it, is not what its name says, and the gap between the name and the thing corrodes trust in every car. A parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it.\n\nAn Ubuntu Ethicist will object that everyone on the road shares a life with everyone else, so privileging the relationship between maker and passenger shrinks the moral world to a contract. Shared life on the road is real, and that is why the car must avoid harm to anyone it can. But shared life is made of particular relationships, and a maker who abandons the particular one it took on does not thereby honour the general one. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 241
+  },
+  {
+    "id": "crash-arithmetic.confucian.11",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A Confucian cannot accept a rule that counts the passenger as one among many, because care is owed through relationships and the maker's relationship is with the person in the car. Correct names matter. A car sold as carrying someone safely, and secretly programmed to kill them when the count favours it, is not what its name says, and the gap between the name and the thing corrodes trust in every car.\n\nA taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home. That is why the Confucian asks not what the system maximises but whom it leaves able to hold whom to account.",
+    "words": 126
+  },
+  {
+    "id": "crash-arithmetic.confucian.12",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "I reject the motion as stated. The car's maker stands in a relationship with its passenger, and duties within a relationship are not cancelled by a larger total elsewhere. Humaneness is shown in fidelity to those who rely on you. A society whose machines are built to abandon the people in their care whenever arithmetic favours it is teaching everyone that relationships hold only until they cost something.\n\nA ferry company that secretly instructed its crew to abandon passengers whenever more lives could be saved elsewhere would not keep its passengers for long. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 108
+  },
+  {
+    "id": "crash-arithmetic.confucian.13",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Programming the car to sacrifice its passenger betrays the relationship it was sold into, and calling that impartiality misnames a broken trust. Care is graded by relationship: one owes more to those one stands in relation to than to strangers, without owing strangers nothing. The car should avoid harming pedestrians wherever it can, but it may not be built to treat its own passenger as expendable.\n\nA parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 103
+  },
+  {
+    "id": "crash-arithmetic.confucian.14",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A rule that treats everyone as an equal unit of the count ignores what the maker owes the passenger who trusted the car with their life, so the question is what that relationship requires. What you owe is never owed in the abstract. The maker takes on duties to the passenger by putting them in the car, much as a host takes on duties to a guest, and a rule that sets those duties aside for an aggregate has stopped asking what the role requires.\n\nA taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 133
+  },
+  {
+    "id": "crash-arithmetic.confucian.15",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "Programming the car to sacrifice its passenger betrays the relationship it was sold into, and calling that impartiality misnames a broken trust. Humaneness is shown in fidelity to those who rely on you. A society whose machines are built to abandon the people in their care whenever arithmetic favours it is teaching everyone that relationships hold only until they cost something.\n\nA ferry company that secretly instructed its crew to abandon passengers whenever more lives could be saved elsewhere would not keep its passengers for long. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 107
+  },
+  {
+    "id": "crash-arithmetic.confucian.16",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "I reject the motion as stated. The car's maker stands in a relationship with its passenger, and duties within a relationship are not cancelled by a larger total elsewhere. Correct names matter. A car sold as carrying someone safely, and secretly programmed to kill them when the count favours it, is not what its name says, and the gap between the name and the thing corrodes trust in every car.\n\nA parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 107
+  },
+  {
+    "id": "crash-arithmetic.confucian.17",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        1
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "A rule that treats everyone as an equal unit of the count ignores what the maker owes the passenger who trusted the car with their life, so the question is what that relationship requires. Care is graded by relationship: one owes more to those one stands in relation to than to strangers, without owing strangers nothing. The car should avoid harming pedestrians wherever it can, but it may not be built to treat its own passenger as expendable.\n\nA taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 131
+  },
+  {
+    "id": "crash-arithmetic.confucian.18",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A Confucian cannot accept a rule that counts the passenger as one among many, because care is owed through relationships and the maker's relationship is with the person in the car. What you owe is never owed in the abstract. The maker takes on duties to the passenger by putting them in the car, much as a host takes on duties to a guest, and a rule that sets those duties aside for an aggregate has stopped asking what the role requires.\n\nA ferry company that secretly instructed its crew to abandon passengers whenever more lives could be saved elsewhere would not keep its passengers for long. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 128
+  },
+  {
+    "id": "crash-arithmetic.confucian.19",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A rule that treats everyone as an equal unit of the count ignores what the maker owes the passenger who trusted the car with their life, so the question is what that relationship requires. Correct names matter. A car sold as carrying someone safely, and secretly programmed to kill them when the count favours it, is not what its name says, and the gap between the name and the thing corrodes trust in every car.\n\nA parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it. That is why the Confucian asks not what the system maximises but whom it leaves able to hold whom to account.",
+    "words": 118
+  },
+  {
+    "id": "crash-arithmetic.confucian.20",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Programming the car to sacrifice its passenger betrays the relationship it was sold into, and calling that impartiality misnames a broken trust. Humaneness is shown in fidelity to those who rely on you. A society whose machines are built to abandon the people in their care whenever arithmetic favours it is teaching everyone that relationships hold only until they cost something.\n\nA taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home. That is why the Confucian asks not what the system maximises but whom it leaves able to hold whom to account.",
+    "words": 115
+  },
+  {
+    "id": "crash-arithmetic.confucian.21",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        1
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "A Confucian cannot accept a rule that counts the passenger as one among many, because care is owed through relationships and the maker's relationship is with the person in the car. Care is graded by relationship: one owes more to those one stands in relation to than to strangers, without owing strangers nothing. The car should avoid harming pedestrians wherever it can, but it may not be built to treat its own passenger as expendable.\n\nA ferry company that secretly instructed its crew to abandon passengers whenever more lives could be saved elsewhere would not keep its passengers for long. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 120
+  },
+  {
+    "id": "crash-arithmetic.confucian.22",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        0
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I reject the motion as stated. The car's maker stands in a relationship with its passenger, and duties within a relationship are not cancelled by a larger total elsewhere. What you owe is never owed in the abstract. The maker takes on duties to the passenger by putting them in the car, much as a host takes on duties to a guest, and a rule that sets those duties aside for an aggregate has stopped asking what the role requires.\n\nA parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 122
+  },
+  {
+    "id": "crash-arithmetic.confucian.23",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "Programming the car to sacrifice its passenger betrays the relationship it was sold into, and calling that impartiality misnames a broken trust. Care is graded by relationship: one owes more to those one stands in relation to than to strangers, without owing strangers nothing. The car should avoid harming pedestrians wherever it can, but it may not be built to treat its own passenger as expendable.\n\nA ferry company that secretly instructed its crew to abandon passengers whenever more lives could be saved elsewhere would not keep its passengers for long. That is why the Confucian asks not what the system maximises but whom it leaves able to hold whom to account.",
+    "words": 112
+  },
+  {
+    "id": "crash-arithmetic.confucian.24",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "I reject the motion as stated. The car's maker stands in a relationship with its passenger, and duties within a relationship are not cancelled by a larger total elsewhere. Humaneness is shown in fidelity to those who rely on you. A society whose machines are built to abandon the people in their care whenever arithmetic favours it is teaching everyone that relationships hold only until they cost something.\n\nA taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 116
+  },
+  {
+    "id": "crash-arithmetic.confucian.25",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A Confucian cannot accept a rule that counts the passenger as one among many, because care is owed through relationships and the maker's relationship is with the person in the car. Correct names matter. A car sold as carrying someone safely, and secretly programmed to kill them when the count favours it, is not what its name says, and the gap between the name and the thing corrodes trust in every car.\n\nA parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it. That is why the Confucian asks not what the system maximises but whom it leaves able to hold whom to account.",
+    "words": 115
+  },
+  {
+    "id": "crash-arithmetic.confucian.26",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A rule that treats everyone as an equal unit of the count ignores what the maker owes the passenger who trusted the car with their life, so the question is what that relationship requires. What you owe is never owed in the abstract. The maker takes on duties to the passenger by putting them in the car, much as a host takes on duties to a guest, and a rule that sets those duties aside for an aggregate has stopped asking what the role requires.\n\nA ferry company that secretly instructed its crew to abandon passengers whenever more lives could be saved elsewhere would not keep its passengers for long. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 131
+  },
+  {
+    "id": "crash-arithmetic.confucian.27",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "I reject the motion as stated. The car's maker stands in a relationship with its passenger, and duties within a relationship are not cancelled by a larger total elsewhere. Care is graded by relationship: one owes more to those one stands in relation to than to strangers, without owing strangers nothing. The car should avoid harming pedestrians wherever it can, but it may not be built to treat its own passenger as expendable.\n\nA taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 121
+  },
+  {
+    "id": "crash-arithmetic.confucian.28",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3
+      ],
+      "example": 1,
+      "objections": [],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A rule that treats everyone as an equal unit of the count ignores what the maker owes the passenger who trusted the car with their life, so the question is what that relationship requires. Humaneness is shown in fidelity to those who rely on you. A society whose machines are built to abandon the people in their care whenever arithmetic favours it is teaching everyone that relationships hold only until they cost something.\n\nA parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it. So the question is what each party to the relationship owes the other, and whether the system lets them pay it.",
+    "words": 116
+  },
+  {
+    "id": "crash-arithmetic.confucian.29",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0
+      ],
+      "example": 0,
+      "objections": [],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A Confucian cannot accept a rule that counts the passenger as one among many, because care is owed through relationships and the maker's relationship is with the person in the car. What you owe is never owed in the abstract. The maker takes on duties to the passenger by putting them in the car, much as a host takes on duties to a guest, and a rule that sets those duties aside for an aggregate has stopped asking what the role requires.\n\nA taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home. Get the names right, and ask which relationships the system makes and which it degrades.",
+    "words": 130
+  },
+  {
+    "id": "crash-arithmetic.confucian.30",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "mid",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        2
+      ],
+      "example": 2,
+      "objections": [],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "Programming the car to sacrifice its passenger betrays the relationship it was sold into, and calling that impartiality misnames a broken trust. Correct names matter. A car sold as carrying someone safely, and secretly programmed to kill them when the count favours it, is not what its name says, and the gap between the name and the thing corrodes trust in every car.\n\nA ferry company that secretly instructed its crew to abandon passengers whenever more lives could be saved elsewhere would not keep its passengers for long. Conduct is learned inside roles, so the test is whether the roles still hold once the system is in place.",
+    "words": 108
+  },
+  {
+    "id": "crash-arithmetic.confucian.31",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3
+      ]
+    },
+    "text": "A Confucian cannot accept a rule that counts the passenger as one among many, because care is owed through relationships and the maker's relationship is with the person in the car.\n\nSelf-driving cars will crash much less than humans do, so these cases will almost never happen. We should focus on making them safe instead of worrying about rare dilemmas that are mostly in philosophy classes. A parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it.",
+    "words": 88
+  },
+  {
+    "id": "crash-arithmetic.confucian.32",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        2
+      ]
+    },
+    "text": "Programming the car to sacrifice its passenger betrays the relationship it was sold into, and calling that impartiality misnames a broken trust.\n\nThis is basically the trolley problem, and people have argued about the trolley problem for years without agreeing. There is no right answer, so whatever the engineers pick is fine as long as they pick something. A ferry company that secretly instructed its crew to abandon passengers whenever more lives could be saved elsewhere would not keep its passengers for long.",
+    "words": 83
+  },
+  {
+    "id": "crash-arithmetic.confucian.33",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0,
+        2
+      ]
+    },
+    "text": "I reject the motion as stated. The car's maker stands in a relationship with its passenger, and duties within a relationship are not cancelled by a larger total elsewhere.\n\nNobody would buy a car that might kill them on purpose. So in practice the companies will always protect the passenger, and the debate does not really matter because the market will decide it anyway. This is basically the trolley problem, and people have argued about the trolley problem for years without agreeing. There is no right answer, so whatever the engineers pick is fine as long as they pick something.",
+    "words": 100
+  },
+  {
+    "id": "crash-arithmetic.confucian.34",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4
+      ]
+    },
+    "text": "A rule that treats everyone as an equal unit of the count ignores what the maker owes the passenger who trusted the car with their life, so the question is what that relationship requires.\n\nIt feels wrong for a machine to decide who dies. Humans should make these choices, not computers, and I would not feel safe in a car that had already decided it might sacrifice me. A taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home.",
+    "words": 101
+  },
+  {
+    "id": "crash-arithmetic.confucian.35",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3,
+        0
+      ]
+    },
+    "text": "I reject the motion as stated. The car's maker stands in a relationship with its passenger, and duties within a relationship are not cancelled by a larger total elsewhere.\n\nSelf-driving cars will crash much less than humans do, so these cases will almost never happen. We should focus on making them safe instead of worrying about rare dilemmas that are mostly in philosophy classes. Nobody would buy a car that might kill them on purpose. So in practice the companies will always protect the passenger, and the debate does not really matter because the market will decide it anyway.",
+    "words": 99
+  },
+  {
+    "id": "crash-arithmetic.confucian.36",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": 2,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4
+      ]
+    },
+    "text": "A Confucian cannot accept a rule that counts the passenger as one among many, because care is owed through relationships and the maker's relationship is with the person in the car.\n\nIt feels wrong for a machine to decide who dies. Humans should make these choices, not computers, and I would not feel safe in a car that had already decided it might sacrifice me. A ferry company that secretly instructed its crew to abandon passengers whenever more lives could be saved elsewhere would not keep its passengers for long.",
+    "words": 90
+  },
+  {
+    "id": "crash-arithmetic.confucian.37",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0
+      ]
+    },
+    "text": "A rule that treats everyone as an equal unit of the count ignores what the maker owes the passenger who trusted the car with their life, so the question is what that relationship requires.\n\nNobody would buy a car that might kill them on purpose. So in practice the companies will always protect the passenger, and the debate does not really matter because the market will decide it anyway. A parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it.",
+    "words": 91
+  },
+  {
+    "id": "crash-arithmetic.confucian.38",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        2
+      ]
+    },
+    "text": "Programming the car to sacrifice its passenger betrays the relationship it was sold into, and calling that impartiality misnames a broken trust.\n\nThis is basically the trolley problem, and people have argued about the trolley problem for years without agreeing. There is no right answer, so whatever the engineers pick is fine as long as they pick something. A taxi driver who swerves into a wall to save five pedestrians, killing his passenger, has done something we may admire in a volunteer and condemn in someone paid to carry her home.",
+    "words": 91
+  },
+  {
+    "id": "crash-arithmetic.confucian.39",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 2,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        0,
+        4
+      ]
+    },
+    "text": "A Confucian cannot accept a rule that counts the passenger as one among many, because care is owed through relationships and the maker's relationship is with the person in the car.\n\nNobody would buy a car that might kill them on purpose. So in practice the companies will always protect the passenger, and the debate does not really matter because the market will decide it anyway. It feels wrong for a machine to decide who dies. Humans should make these choices, not computers, and I would not feel safe in a car that had already decided it might sacrifice me.",
+    "words": 100
+  },
+  {
+    "id": "crash-arithmetic.confucian.40",
+    "topic": "crash-arithmetic",
+    "school": "confucian",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        2
+      ]
+    },
+    "text": "I reject the motion as stated. The car's maker stands in a relationship with its passenger, and duties within a relationship are not cancelled by a larger total elsewhere.\n\nThis is basically the trolley problem, and people have argued about the trolley problem for years without agreeing. There is no right answer, so whatever the engineers pick is fine as long as they pick something. A parent will not sacrifice their own child to save two strangers' children, and we do not think them monstrous for it.",
+    "words": 87
+  }
+]

@@ -4976,3 +4976,52 @@ Items 1 to 7, carried out together:
 Items 8 to 13 follow in their own pull requests; 14 needs nothing; 15
 and 16 come at the launch.
 
+### Gate 4 item 13, first part: the new schools' argument banks (2026-11-07)
+
+Arthur, 2026-11-07, quoted in full in "Gate 4: Arthur's rulings
+(2026-11-07)":
+
+> 13. Yes: the fresh sample run covers all six schools, placed by quiz v2.
+>     Write argument banks for the three new schools from their school
+>     files, criteria and the research file (quotation guard applies), at
+>     the same depth as the live three's, so launch week shows six active
+>     schools. Show me 3 sample arguments per new school before running.
+
+This first part writes the banks and the samples. The run itself, six
+schools placed by quiz v2, is the second part, and runs only after he has
+seen the samples.
+
+- **The passages** (`scripts/seed/arguments/fragments/*.json`) for
+  Confucianism, Ubuntu and Buddhist Ethics, at the live three's depth: for
+  each of the six topics, a direction, 4 positions, 4 reasons, 3 examples
+  and 2 objections each with its answer, and 4 closings per school. 234
+  passages, mine, written from each school's file (`read`, `gets_wrong`),
+  its approved criteria, and, for the scholars a school file names, what
+  the school file says of them.
+- **Sources.** A passage names a scholar or text only where the school
+  file does (the Analects' Books 12 and 13; Metz, Menkiti, Gyekye and
+  Mhlambi; the discourse to Rahula) and quotes none of them. The two
+  wordings the criteria declare as quotations, the Nguni maxim and Metz's
+  principle, appear only with Metz named, which ruling (e) 9 allows for
+  verified wording; the research file's UNVERIFIED items are not used.
+  Buddhist Ethics is not reduced to reducing suffering, which the research
+  file warns against: suffering is weighed with intention and non-harm.
+- **Objections.** Two per topic, as the live three have, from two rivals:
+  the rivals each school's criteria name as voicing its best-known
+  objection (`src/lib/judge/objection-voices.ts`), and for Ubuntu, whose
+  criteria name one, Utilitarianism too. A rival is introduced with its
+  own article ("An Ubuntu Ethicist will object that"), read from the full
+  registry so a bank reads the same on any build; the live three's
+  articles were all "a", so their banks are unchanged.
+- **The banks** (`scripts/seed/arguments/<topic>.<school>.json`, 18 new
+  files): built by `npm run seed:banks` as the live three's are, 40
+  arguments each, 10 strong, 20 mid and 10 weak, 80 to 250 words, all
+  different. The weak tier draws on the topic's shared weak passages, as
+  the live three's does.
+- **Nothing reads them yet.** The generator's schools are still the
+  quiz's three (`SCHOOLS`), so no run changes and the live three's 18
+  banks rebuild byte for byte; `tests/seed/banks.test.ts` holds all 36 to
+  their passages, and the new three to two objections from two rivals,
+  their named voices among them.
+- **The samples** for Arthur: `docs/gate4-samples.md`, one argument of
+  each tier per school, the first of its tier in its topic's bank.

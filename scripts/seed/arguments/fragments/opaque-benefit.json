@@ -116,6 +116,108 @@
           "why": "It does not say why judging the evidence soundly is not already enough to discharge the deployers' responsibility."
         }
       ]
+    },
+    "confucian": {
+      "direction": "against",
+      "positions": [
+        "Do not deploy it as it stands. The person a decision lands on stands in a relationship with whoever decides, and a decision nobody can account for leaves that relationship empty.",
+        "I reject the motion. Reducing suffering is not the whole of what a deployer owes; they owe the people they decide about an account fitting the position they hold over them.",
+        "A Confucian cannot accept this motion, because calling an unexplained verdict a decision lets a word do work the system has not done, and the people decided about pay for the misnaming.",
+        "Deploying it is wrong as stated. Whoever takes the place of the one who decides takes on what that place requires, and giving reasons to the people beneath it is part of the role."
+      ],
+      "reasons": [
+        "The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer who decides about patients or applicants holds a position of that kind, and the position carries duties to the people under it, not only results.",
+        "Book 13 warns that when names are not correct, nothing said accords with things. A system that cannot say why it refused someone has issued something that looks like a judgement and is not one, and deploying it trains everyone to accept the look in place of the thing.",
+        "What the parties to a relationship owe one another is how they hold each other to account. A person refused by a system whose reasons nobody can give has lost the means of holding the decider to anything, however much suffering the system prevents on average.",
+        "Humaneness is realised in how people are treated within their relationships, not only in how many are spared harm. A benefit delivered without any account to the person it touches treats them as a case to be processed rather than as someone the decider stands in relation to."
+      ],
+      "examples": [
+        "A hospital lets a model decide who is called back for further tests. A patient who is not called back asks her doctor why, and the doctor has nothing to say but that the system said so.",
+        "A council uses a model to rank housing applications. A family that drops down the list asks the officer who used to know them by name, and the officer can no longer explain her own office.",
+        "A teacher who marks a pupil down owes the pupil a reason, because that is part of being the pupil's teacher. A marking system that cannot give one has not taken the teacher's place."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "the people decided about are far better off with the suffering prevented than with an explanation, so insisting on reasons trades real welfare for a formality.",
+          "answer": "But an explanation is not a formality between people who stand in a relationship; it is how the one with power is held to what the position requires. A gain counted in aggregate does not tell you whether that relationship still works for the person refused.",
+          "why": "It never says what a refused person gains from an account that outweighs the suffering a delay would leave in place."
+        },
+        {
+          "rival": "ubuntu",
+          "claim": "the Confucian frames the duty as running down a hierarchy from decider to decided, when what the people affected need is a say in whether the system is used at all.",
+          "answer": "That is a fair warning about how role ethics can settle into deference. But a position that owes an account to those beneath it is a check on the hierarchy, not a licence for it, and being owed reasons is where a say begins.",
+          "why": "It speaks of what the decider owes without asking whether the people decided about had any part in choosing the arrangement."
+        }
+      ]
+    },
+    "ubuntu": {
+      "direction": "against",
+      "positions": [
+        "Do not deploy it until the people it decides about have a part in deciding. A benefit that cannot be questioned by those it lands on treats them as recipients, not as members.",
+        "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve.",
+        "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it.",
+        "I reject this motion, because harm here is not only a bad outcome but a broken relationship, and an unexplained decision breaks the one between a person and those who govern their care."
+      ],
+      "reasons": [
+        "On Thaddeus Metz's relational reading, right action honours people's capacity for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.",
+        "Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.",
+        "Sabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.",
+        "Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to."
+      ],
+      "examples": [
+        "A clinic adopts a model that triages referrals well. The families it turns away cannot ask why, and the elders who once explained such decisions to them no longer can.",
+        "A village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged.",
+        "A school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation."
+      ],
+      "objections": [
+        {
+          "rival": "stoicism",
+          "claim": "a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters.",
+          "answer": "But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are.",
+          "why": "It assumes being told why matters without saying what the person loses, beyond comfort, when they are not."
+        },
+        {
+          "rival": "utilitarianism",
+          "claim": "a community is not one voice, and waiting for everyone affected to have a say leaves suffering in place while the consultations run.",
+          "answer": "That is the strongest worry about appeals to community, and somebody must decide who counts and how. The answer is not to wait for unanimity but to bring the people affected into deciding, so that the system answers to them rather than to an average.",
+          "why": "It talks about the community as if it spoke with one voice, and never says who decides for it or what happens to those who disagree."
+        }
+      ]
+    },
+    "buddhist": {
+      "direction": "for",
+      "positions": [
+        "Deploy it, but only if those running it can keep checking, while it runs and after, whom it is still hurting. The suffering it spares is real, and non-harm does not end at the launch.",
+        "I accept the motion with a condition. Suffering prevented matters greatly, but non-harm requires that the people running the system keep looking for the harm it does, explained or not.",
+        "A Buddhist can accept deployment here, because the suffering at stake is real, yet the obligation does not end with approval: the system has to stay under continuing examination for the harm it causes.",
+        "Deploy it, with the opacity named as a risk to keep watching. An explanation for each person matters less than an honest, continuing account of whom the system is still hurting."
+      ],
+      "reasons": [
+        "The discourse to Rahula asks that an act be examined before it is done, while it is being done, and after, for whether it tends to harm oneself, another, or both. A deployed model is an act still being done, so the examination has no end date.",
+        "Suffering is at stake here, weighed alongside intention and non-harm, and a system that reliably reduces it does real good. Refusing it to keep an explanation in place would leave people in pain for the sake of a procedure.",
+        "Intention weighs as much as what follows. Deployers who adopt the system to relieve suffering, and who mean to withdraw it if it harms, act from a sound volition; deployers who adopt it to avoid the work of explaining do not, whatever the results.",
+        "What happens to a patient arises from many conditions, not from the model alone. Opacity matters because it hides some of those conditions, so the deployers must widen their watch to the outcomes they can see when the mechanism is one they cannot."
+      ],
+      "examples": [
+        "A hospital deploys a sepsis alert that cannot say why it fires. Every month a nurse reviews the cases it missed and the ones it flagged wrongly, and reports back.",
+        "A charity's model reduces missed medication doses. It cannot explain its choices, so the charity tracks complaints and harms as closely as it tracks doses.",
+        "A screening tool catches more early cancers than doctors do. The clinic keeps a running list of patients it wrongly reassured and reads it every week."
+      ],
+      "objections": [
+        {
+          "rival": "utilitarianism",
+          "claim": "the condition adds nothing, since a reliable reduction in suffering already settles the question and the watching is just good management.",
+          "answer": "Watching is not management added on. Non-harm covers what one does and keeps doing, and a system whose harms are hidden from those running it is one they can no longer be said to be doing well, however good the average looks.",
+          "why": "It treats continued watching as a condition without saying what it would show that the reliability figures had not."
+        },
+        {
+          "rival": "confucian",
+          "claim": "the person refused is owed an account by whoever decides about them, and monitoring harms in aggregate does not give that person anything.",
+          "answer": "An account owed to the person matters, and where it can be given it should be. But compassion for the person refused is shown first in finding and ending the harm done to them, and that requires watching outcomes the mechanism will not reveal.",
+          "why": "It speaks of monitoring harms in general and never says what the person on the receiving end is given."
+        }
+      ]
     }
   }
 }
