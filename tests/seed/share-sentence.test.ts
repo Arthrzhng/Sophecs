@@ -88,7 +88,8 @@ describe("a verdict page's share sentence", () => {
       "const shareLine = verdictShareLine({ sample: Boolean(publicRow.is_sample), " +
         "template: schoolContent.verdict_share_line, textWithheld, school, shortMotion, " +
         "score: verdict.score, verdictLine: verdict.verdict_line, slug, debateId, " +
-        "answeredObjection: comparison && parentObjectionSchool && verdict.objection_answered " +
+        // Within one version of the judge only (Arthur, 2026-11-07, Gate 4 item 5).
+        "answeredObjection: comparison && comparison.comparable && parentObjectionSchool && verdict.objection_answered " +
         "? { school: parentObjectionSchool, firstScore: comparison.first.score } : null, });"
     );
     // ...and nothing else on the page reads or fills in the school's template.

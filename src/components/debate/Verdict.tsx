@@ -69,6 +69,11 @@ function withheldObjection(school: SchoolId): string {
 // The parent's four marks, so a revision can be read against its original.
 export interface RevisionComparison {
   parentDebateId: string;
+  /**
+   * Both verdicts judged under the same prompt version
+   * (src/lib/verdict-versions.ts). When not, no score change is shown.
+   */
+  comparable: boolean;
   first: {
     score: number | null;
     fidelity: number | null;
@@ -491,43 +496,58 @@ export function Verdict({
 
       {comparison && (
         <div className="mt-10 max-w-[34rem] border-t border-rule pt-8">
-          <p className="text-sm text-ink-soft">Compared with your first attempt</p>
+          {comparison.comparable ? (
+            <>
+              <p className="text-sm text-ink-soft">Compared with your first attempt</p>
 
-          {/* The same four axes as the verdict above, read against the
-              original. Lost its rows in the Phase 3 rewrite and rendered an
-              empty heading until lint flagged DeltaRow as unused. */}
-          <table className="mt-4 w-full border-t border-rule">
-            <thead>
-              <tr className="border-b border-rule">
-                <th scope="col" className="py-2 text-left text-sm font-normal text-ink-soft">
-                  Axis
-                </th>
-                <th scope="col" className="py-2 text-right text-sm font-normal text-ink-soft">
-                  First
-                </th>
-                <th scope="col" className="py-2 pl-4 text-right text-sm font-normal text-ink-soft">
-                  Now
-                </th>
-                <th scope="col" className="py-2 pl-6 text-right text-sm font-normal text-ink-soft">
-                  Change
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <DeltaRow label="Overall" before={comparison.first.score} after={verdict.score} />
-              <DeltaRow
-                label="Fidelity"
-                before={comparison.first.fidelity}
-                after={verdict.fidelity}
-              />
-              <DeltaRow label="Rigor" before={comparison.first.rigor} after={verdict.rigor} />
-              <DeltaRow
-                label="Engagement"
-                before={comparison.first.engagement}
-                after={verdict.engagement}
-              />
-            </tbody>
-          </table>
+              {/* The same four axes as the verdict above, read against the
+                  original. Lost its rows in the Phase 3 rewrite and rendered an
+                  empty heading until lint flagged DeltaRow as unused. */}
+              <table className="mt-4 w-full border-t border-rule">
+                <thead>
+                  <tr className="border-b border-rule">
+                    <th scope="col" className="py-2 text-left text-sm font-normal text-ink-soft">
+                      Axis
+                    </th>
+                    <th scope="col" className="py-2 text-right text-sm font-normal text-ink-soft">
+                      First
+                    </th>
+                    <th scope="col" className="py-2 pl-4 text-right text-sm font-normal text-ink-soft">
+                      Now
+                    </th>
+                    <th scope="col" className="py-2 pl-6 text-right text-sm font-normal text-ink-soft">
+                      Change
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <DeltaRow label="Overall" before={comparison.first.score} after={verdict.score} />
+                  <DeltaRow
+                    label="Fidelity"
+                    before={comparison.first.fidelity}
+                    after={verdict.fidelity}
+                  />
+                  <DeltaRow label="Rigor" before={comparison.first.rigor} after={verdict.rigor} />
+                  <DeltaRow
+                    label="Engagement"
+                    before={comparison.first.engagement}
+                    after={verdict.engagement}
+                  />
+                </tbody>
+              </table>
+            </>
+          ) : template ? null : (
+            // Across two versions of the judge no score change is shown
+            // (Arthur, 2026-11-07, Gate 4 item 5). docs/daily-path-copy.md,
+            // "A revision judged by a newer version of the judge" (new, for
+            // his ruling). Not said of a sample's template verdicts, which
+            // no judge wrote: two template rules are not two versions of the
+            // judge, so their scores are simply not compared.
+            <p className="text-sm text-ink-soft max-w-[50ch]">
+              The first attempt was judged by an earlier version of the judge, so the two scores
+              are not compared.
+            </p>
+          )}
 
           {verdict.objection_answered != null && (
             <p className="mt-6 text-sm text-ink">

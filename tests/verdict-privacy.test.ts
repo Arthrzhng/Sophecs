@@ -446,7 +446,7 @@ describe("the verdict page's wiring", () => {
     expect(page).toContain(
       "verdictForViewer({ isOwner, ownVerdict, publicVerdict: publicRow.verdict, publicArgument: publicRow.argument as string | null, parentPublic, })"
     );
-    expect(page).toContain('.select("id, verdict, argument_public")');
+    expect(page).toContain('.select("id, verdict, argument_public, prompt_version")');
     expect(page).toContain("parentPublic = Boolean(parentRow?.argument_public);");
     expect(page).toContain("textWithheld={textWithheld}");
     // The share sentence is built by verdictShareLine, which passes

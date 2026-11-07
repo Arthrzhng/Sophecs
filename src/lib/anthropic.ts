@@ -15,8 +15,12 @@ import { fillPlaceholders } from "@/lib/judge/fill-placeholder";
 import { SHOWN_SCHOOL_IDS } from "@/lib/school-registry";
 import type { SchoolId } from "@/lib/types";
 
-// COST: model=claude-sonnet-5 | trigger=debate submission | est_in=1700 est_out=650
-// est_usd_per_call=0.0098 | cap=5/user/day | kill_switch=KILL_SWITCH_JUDGE | logged_to=ai_calls
+// COST: model=claude-sonnet-5 | trigger=debate submission | est_in=1700 est_out=650 (measured under v2;
+// tests/judge/run-golden.ts adds the larger v3 prompt to this base) | cap=5/user/day
+// est_usd_per_call=0.0152 under v3, which production judges with from the launch (Arthur, 2026-11-07,
+// Gate 4 item 4): the mean of the two v3 golden runs of 2026-11-06, 154 calls (v2: $0.0089, 26 Oct).
+// budget=$50/month (AI_MONTHLY_BUDGET_USD), about 3,300 judge calls, fewer with screening's share
+// kill_switch=KILL_SWITCH_JUDGE | logged_to=ai_calls
 // retries=2 on a reply that fails validation, each attempt logged (see judgeWithRetries):
 // a submission makes at most 3 calls. The cap counts arguments, not calls: a judged
 // submission counts once however many attempts it took, and one that ends without a
