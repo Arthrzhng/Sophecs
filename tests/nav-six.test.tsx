@@ -490,6 +490,11 @@ describe("a build with SIX_SCHOOLS=1", () => {
       "h4 Stoicism",
       "h4 Utilitarianism",
       "h4 Virtue Ethics",
+      // All six, as the judge is given them on this build (Arthur,
+      // 2026-11-07, Gate 4 item 10; tests/gate4-content-rulings.test.tsx).
+      "h4 Confucianism",
+      "h4 Ubuntu",
+      "h4 Buddhist Ethics",
       "h2 Counterpart rules",
       "h2 Sample accounts",
     ]);

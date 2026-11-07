@@ -8,6 +8,13 @@ export interface ExchangeRow {
   topicTitle: string;
   theirSchool: SchoolId;
   myTurn: boolean;
+  /**
+   * The reader's own latest reply is saved and not yet screened: still
+   * their turn, but there is nothing for them to do until it is checked,
+   * so it says so where "Reply" would be (Arthur, 2026-11-07, Gate 4 item
+   * 12), as the exchange page does.
+   */
+  myReplyPending?: boolean;
 }
 
 // Two groups, and the one that needs something from you leads. Nothing is
@@ -45,14 +52,27 @@ export function OpenExchanges({
                   <p className={`text-sm font-bold ${SCHOOL_TEXT_CLASS[exchange.theirSchool]}`}>
                     {SCHOOL_COLORS[exchange.theirSchool].name}
                   </p>
-                  <p className="mt-1 font-serif text-base text-ink">{exchange.topicTitle}</p>
+                  {exchange.myReplyPending ? (
+                    <Link
+                      href={`/counterpart/${exchange.id}`}
+                      className="mt-1 block font-serif text-base text-ink-mid underline-offset-4 hover:text-ink hover:underline"
+                    >
+                      {exchange.topicTitle}
+                    </Link>
+                  ) : (
+                    <p className="mt-1 font-serif text-base text-ink">{exchange.topicTitle}</p>
+                  )}
                 </div>
-                <ChunkyLink
-                  href={`/counterpart/${exchange.id}`}
-                  school={school ?? exchange.theirSchool}
-                >
-                  Reply
-                </ChunkyLink>
+                {exchange.myReplyPending ? (
+                  <span className="text-sm text-ink-soft">Waiting to be checked</span>
+                ) : (
+                  <ChunkyLink
+                    href={`/counterpart/${exchange.id}`}
+                    school={school ?? exchange.theirSchool}
+                  >
+                    Reply
+                  </ChunkyLink>
+                )}
               </li>
             ))}
           </ul>

@@ -483,7 +483,9 @@ By file, with each line's index in `share_lines`:
 - `stoicism.md`: [0] "the only thing an AI can't take from me"; [2]
   "including the algorithm's verdict".
 - `utilitarianism.md`: [1] "My verdict on the self-driving car problem",
-  v1's question 8, which v2 does not ask; [2], edited here, "count
+  v1's question 8, which v2 does not ask (rewritten under Arthur's ruling
+  of 2026-11-07, Gate 4 item 8, in words that are not his;
+  `docs/decisions.md`); [2], edited here, "count
   everyone it touches", where "it" meant the AI the line no longer
   names.
 - `virtue-ethics.md`: [1] "I judge an algorithm the same way I judge a

@@ -119,8 +119,11 @@ async function main() {
     if (answer === "a") {
       await admin.from("turns").update({ screen_result: "ok" }).eq("id", turn.id);
       // Approving a held turn delivers it, so the exchange has to move on:
-      // the other party is now owed a reply.
-      await advanceExchange(turn);
+      // the other party is now owed a reply. A reported turn that was
+      // already delivered moved the exchange on when it was delivered;
+      // moving it again would hand the turn back to its author and strand
+      // whatever reply is waiting (review of #102, pass 3).
+      if (turn.screen_result === "flagged") await advanceExchange(turn);
       console.log("approved.");
     } else if (answer === "r") {
       await admin.from("turns").update({ screen_result: "removed" }).eq("id", turn.id);

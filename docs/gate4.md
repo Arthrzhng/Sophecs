@@ -25,11 +25,11 @@ Every item below was ruled on 2026-11-07, verbatim in `docs/decisions.md`,
 | 5 | Option (ii) | Verdict page, share line, `/me` and the `revision_judged` event; one new line of copy, for your ruling |
 | 6 | Criteria into `rubric.ts` at launch | On the launch checklist |
 | 7 | v3's head comment as sent, stale by design | Recorded; draft header and COST comment fixed |
-| 8 | v2 copy accepted, two fixes | To do |
+| 8 | v2 copy accepted, two fixes | Done (#102) |
 | 9 | The 18 stances; seeding approved | To do |
-| 10 | The rubric shows v3's criteria for all six | To do |
-| 11 | An exemplar floor | To do |
-| 12 | A pending reply holds the lapse clock; `/me` label | To do |
+| 10 | The rubric shows v3's criteria for all six | Done on SIX_SCHOOLS builds (#102) |
+| 11 | An exemplar floor | Done, at 50 (#102) |
+| 12 | A pending reply holds the lapse clock; `/me` label | Done (#102) |
 | 13 | Argument banks for the new three; samples to you first | To do |
 | 14 | Navigation as built | Nothing to do |
 | 15 | Preview link and click-through when 8 to 13 are done; launch on your word | When 8 to 13 are done |
@@ -47,7 +47,30 @@ For your next list, from carrying these out:
   and these are template rules;
 - a frozen comment item 4 makes stale, in `src/app/api/judge/route.ts`:
   "At most $0.20 or so a reader a day at the COST comment's rate", which
-  at v3's $0.0152 is about $0.30 (20 calls), left as it is.
+  at v3's $0.0152 is about $0.30 (20 calls), left as it is;
+- item 11's floor value, 50, which is mine: your ruling set a floor and
+  no number. It is on the mark, as you said; under the sample run's
+  current scoring rule a weak argument is now and then marked 50 or a
+  little over, and at the canary's size the floor can leave a school, or a
+  motion, with nothing to show (`docs/decisions.md`, "Gate 4: items 8, 10,
+  11 and 12");
+- item 12: a reply whose screening call keeps failing is retried daily
+  and holds its exchange with no end, as "until it is screened" says;
+  since the job takes the oldest first, 20 of them would take every run
+  and starve newer replies (3, if each call times out rather than failing
+  fast). And while screening is stopped (the kill switch on, the month's
+  budget spent or unreadable), every exchange with a pending reply is
+  held until it resumes, and the daily job answers 200, since nothing
+  failed. Whether you want a limit on either;
+- item 8: Utilitarianism's new share line [1], in
+  `content/schools/utilitarianism.md`: "Turns out I'd pick whatever does
+  the most good for the most people, even when I'm the one who pays for
+  it. Sophecs called that Utilitarian." The words are mine, for your
+  reading; it ships with #102;
+- item 10: on a SIX_SCHOOLS build the rubric shows the v3 criteria as the
+  judge gets them, including text written to the judge ("Of the rival
+  schools this prompt lists", school ids in backticks). "In full"
+  requires that; whether you want it presented differently.
 
 ## Where things stand
 

@@ -7,7 +7,7 @@ import { getPendingChallenges } from "@/lib/challenge";
 import { getOpenObjections, type OpenObjection } from "@/lib/objections";
 import { getWeeklyMotion } from "@/lib/weekly-motion";
 import { getCaseStates, type CaseState } from "@/lib/cases";
-import { isLapsed } from "@/lib/counterpart";
+import { meExchangeRows, readExchangeTurns, type OpenExchangeRow } from "@/lib/counterpart-lapse";
 import type { ExchangeRow } from "@/components/me/OpenExchanges";
 import { scoresComparable } from "@/lib/verdict-versions";
 import { WelcomeTracker } from "@/components/me/WelcomeTracker";
@@ -175,21 +175,22 @@ export default async function MePage({
     // be writing rows as a side effect of rendering.
     const { data: exchangeRows } = await admin
       .from("exchanges")
-      .select("id, topic_slug, user_a, school_a, school_b, next_turn, last_turn_at")
+      .select("id, topic_slug, user_a, user_b, school_a, school_b, next_turn, last_turn_at")
       .eq("status", "open")
       .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
       .order("last_turn_at", { ascending: false });
     titleBySlug = new Map(
       (activeTopics.data ?? []).map((t) => [t.slug as string, t.title as string])
     );
-    exchanges = (exchangeRows ?? [])
-      .filter((row) => !isLapsed(row.last_turn_at as string))
-      .map((row) => ({
-        id: row.id as string,
-        topicTitle: titleBySlug.get(row.topic_slug as string) ?? (row.topic_slug as string),
-        theirSchool: (row.user_a === user.id ? row.school_b : row.school_a) as SchoolId,
-        myTurn: row.next_turn === user.id,
-      }));
+    // Their turns, for whether each is waiting on a reply not yet screened:
+    // one holds the lapse clock, and the reader's own is shown as waiting
+    // to be checked, as the exchange page shows it (Arthur, 2026-11-07,
+    // Gate 4 item 12). Who wrote each, its place and how it was screened;
+    // no text. src/lib/counterpart-lapse.ts.
+    const openRows = (exchangeRows ?? []) as OpenExchangeRow[];
+    const openTurns = await readExchangeTurns(admin, openRows.map((row) => row.id));
+    const titles = titleBySlug;
+    exchanges = meExchangeRows(openRows, openTurns, user.id, (slug) => titles.get(slug) ?? slug);
 
     caseStates = await getCaseStates(admin, user.id, activeRows);
     // Six of six closed is the only completion signal in the product: one
