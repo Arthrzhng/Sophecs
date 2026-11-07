@@ -9,6 +9,7 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { GuardError } from "./env";
 import { StopError } from "./engine";
+import { RUN_QUIZ, type GenConfig } from "./generate";
 
 export const REPORT_DIR = join(process.cwd(), "scripts", "seed", "reports");
 
@@ -55,15 +56,37 @@ export function nowFloored(): string {
 }
 
 /** Options the brief names that this build cannot honour, refused with the reason. */
-export function refuseUnsupported(f: Flags) {
-  if (f["six-schools"])
+export function refuseUnsupported(f: Flags, target: "local" | "production" = "local") {
+  // Quiz v2 is built, behind SIX_SCHOOLS, and the launch ships it (Gate 4
+  // item 13). Production shows three schools until then, and a sample placed
+  // in another would reach pages that cannot show it.
+  if (f["six-schools"] && target === "production" && RUN_QUIZ !== 2)
     throw new GuardError(
-      "--six-schools is not supported: the published quiz (content/quiz/questions.ts) scores three schools, and the six-school quiz (docs/quiz-v2.md) is a draft that is not built. Sample results can only come from the quiz readers actually take."
+      "--six-schools is for production only after the launch: the launch merge sets RUN_QUIZ to 2 (scripts/seed/generate.ts), after the sample teardown. Until then production shows three schools and readers take quiz v1, and a sample placed by quiz v2 could land in a school its pages cannot show."
     );
   if (f["real-judge"] !== undefined)
     throw new GuardError(
       "--real-judge is disabled. The real judging pipeline is /api/judge, which needs a signed-in session, and sample accounts cannot sign in by design. Calling the judge library directly would skip the route's daily cap, kill switch and budget checks and write ai_calls rows for accounts that never made a request. Enabling it needs: a decision on that path (it changes what is billed, so it is Arthur's under (d)), a selection rule, and a cap of 50. Until then every sample verdict is a template, labelled as one."
     );
+}
+
+/**
+ * For a command given a plan. --six-schools only makes a plan, since a plan
+ * names its own quiz, so it is refused with --plan rather than ignored.
+ * And production refuses a plan whose quiz is not the scheduled job's
+ * (RUN_QUIZ): every scheduled extension of that run would be refused.
+ */
+export function checkPlanQuiz(f: Flags, planQuiz: GenConfig["quiz"], target: "local" | "production"): void {
+  if (f["six-schools"]) throw new GuardError("--six-schools makes a plan with quiz v2; a plan names its own quiz, so it is not taken with --plan");
+  if (target === "production" && (planQuiz ?? undefined) !== RUN_QUIZ)
+    throw new GuardError(
+      `the plan ${planQuiz ? "places samples by quiz v2" : "names no quiz"}, but the scheduled job's runs ${RUN_QUIZ ? "place them by quiz v2" : "name none"} (RUN_QUIZ in scripts/seed/generate.ts), so every scheduled extension would refuse this run`
+    );
+}
+
+/** The quiz a run places samples by: quiz v2 and six schools with --six-schools, else what the scheduled job uses. */
+export function quizFlag(f: Flags): GenConfig["quiz"] {
+  return f["six-schools"] ? 2 : RUN_QUIZ;
 }
 
 // Readers' data stays in Supabase (Arthur, 2026-11-04). A baseline holds

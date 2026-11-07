@@ -67,7 +67,7 @@ describe("argument banks", () => {
   it("leave the run's own schools as they were: the generator still reads the quiz's three", () => {
     expect(LAUNCH_SCHOOLS).toHaveLength(3);
     expect([...SCHOOLS]).toEqual(["stoicism", "utilitarianism", "virtue-ethics"]);
-    expect(BANK_SCHOOLS.slice(0, 3)).toEqual(SCHOOLS);
+    expect([...BANK_SCHOOLS].sort()).toEqual([...SCHOOLS, ...LAUNCH_SCHOOLS].sort());
   });
 
   it("count words from the passages exactly as composing and counting would", async () => {

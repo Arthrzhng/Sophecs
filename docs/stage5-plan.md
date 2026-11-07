@@ -305,7 +305,15 @@ of the three; Gate 2 is about that.
    - [ ] The "until launch" rules of steps 3 and 4 lifted (step 6), in
      every file `docs/decisions.md`, "Stage 5, step 4", lists, with the
      tests that pin them.
-   - [ ] The fresh sample run.
+   - [ ] `RUN_QUIZ` set to 2 in `scripts/seed/generate.ts` in the launch
+     merge, after the sample teardown, so the scheduled job's runs cover
+     all six schools placed by quiz v2 (Gate 4 item 13;
+     `docs/sample-activity.md`, "At launch"). The same merge updates the
+     one test that pins today's switch, "is still what the scheduled job
+     makes" in `tests/seed/six-schools.test.ts`, which expects `RUN_QUIZ`
+     unset. The command checks and the scheduled path are tested with it
+     set either way, so nothing else changes.
+   - [ ] The fresh sample run, canary then full, each on Arthur's word.
    - [ ] The v2 copy below, read and ruled by Arthur in the Gate 4 pack
      (asked for on 2026-11-06).
    - [x] The judge at launch, ruled by Arthur on 2026-11-07

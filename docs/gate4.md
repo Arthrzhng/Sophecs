@@ -30,7 +30,7 @@ Every item below was ruled on 2026-11-07, verbatim in `docs/decisions.md`,
 | 10 | The rubric shows v3's criteria for all six | Done on SIX_SCHOOLS builds (#102) |
 | 11 | An exemplar floor | Done, at 50 (#102) |
 | 12 | A pending reply holds the lapse clock; `/me` label | Done (#102) |
-| 13 | Argument banks for the new three; samples to you first | Banks and samples (#104, `docs/gate4-samples.md`); the six-school run waits for your word on the samples |
+| 13 | Argument banks for the new three; samples to you first | Banks and samples (#104, `docs/gate4-samples.md`); the generator for six schools placed by quiz v2 (#105). The run itself waits for your word on the samples, and for the launch |
 | 14 | Navigation as built | Nothing to do |
 | 15 | Preview link and click-through when 8 to 13 are done; launch on your word | When 8 to 13 are done |
 | 16 | The SQL to you when the time comes | At the launch |
@@ -76,7 +76,28 @@ For your next list, from carrying these out:
   read as spreading an AI harm's responsibility, which the criteria call
   an inference; Ubuntu's best-known objection (a community is not one
   voice) not stated in any objection; and Buddhist Ethics' (the gap to
-  institutions) only obliquely.
+  institutions) only obliquely;
+- item 13, the run: the six schools are equally likely in a fresh run,
+  which is mine (the live three's 40, 35 and 25 had no counterpart for
+  six), and the nine lines a template verdict uses to praise an argument
+  for standing on a new school's ground, in `scripts/seed/verdicts.ts`
+  (`FEATURE`), are mine too, for your reading. Two more: most exchanges
+  between the six open with no objection to raise, since in 18 of the 30
+  pairings of two schools, taken one way round, the passages give none,
+  so they argue past each other more than the live three's do; and a fresh run's base window
+  still starts on 2026-09-18, so its quiz v2 results and the new three's
+  arguments are dated weeks before readers could have made them;
+- item 13, three things the run's verdicts do that I left as they are,
+  since changing them would change rows the live run has written; the
+  fresh run is the one chance to change them, for it alone. About half of
+  revision verdicts keep the first attempt's weakest move, "The argument
+  never meets an objection.", while saying the revision now meets one;
+  about 1 in 8 say the revision now answers an objection and still
+  suggest answering it (both `templateRevisionVerdict`); and a school
+  whose name ends in "s" takes "'s", so a fresh run writes "Buddhist
+  Ethics's" as the live run writes "Virtue Ethics's" (the templates that
+  write `` `${NAME(…)}'s` ``). All three are in
+  `scripts/seed/verdicts.ts`.
 
 ## Where things stand
 

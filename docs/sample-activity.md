@@ -258,8 +258,8 @@ exact duplicates stay near zero; near duplicates (the same composition with
 another opening, closing or example) are measured and reported. The banks
 (`arguments/<topic>.<school>.json`, forty each) are a reviewable sample of
 the same compositions. The launch's three schools have passages and banks
-too (Gate 4 item 13), which no run reads until the generator covers six
-schools.
+too (Gate 4 item 13), which only a run made with quiz v2 reads ("Six
+schools, placed by quiz v2", below).
 
 Measured on a plan with the defaults and a test seed, base window to
 2026-11-04 09:00 UTC:
@@ -288,6 +288,53 @@ whole-number criteria and no range to hold it in, and some scores on a
 multiple of 5 move a point or two. The strongest and weakest moves quote the
 argument verbatim. The named objection is the rival whose objection the
 argument does not answer, and a revision adds that answer.
+
+**Six schools, placed by quiz v2.** Arthur, 2026-11-07, Gate 4 item 13:
+"the fresh sample run covers all six schools, placed by quiz v2". A run
+made with `quiz: 2` (`GenConfig.quiz`; `--six-schools` on the command
+line; `RUN_QUIZ` for the scheduled job) differs from the others in these
+ways only:
+
+- Every quiz result is a quiz v2 result, as the app writes one: the
+  questions and vectors of `docs/quiz-v2.json`, scored by `scoreQuizV2`,
+  stored with `quiz_version` 2, the point in `map_x` and `map_y`, and no
+  vector. Answers are biased towards a leaning as before: an option
+  weighs by how far its vector points towards the leaning's place on the
+  map.
+- The six schools are equally likely, by the same calibration as quiz
+  v1's mix, so that each is active in the week of the launch.
+- Arguments, verdicts and exchange turns draw on all six schools'
+  passages. A verdict names a school and its adherent from the full
+  registry, with their own article ("an Ubuntu Ethicist"), on any build.
+  Between two schools with no objection between them, an exchange opens
+  from a reason and replies from a reason and an example, which among the
+  six is most exchanges: 12 of the 15 pairs lack an objection one way or
+  the other, on every motion.
+- The six and their order come from `docs/quiz-v2.json`, not the
+  registry's lists, and the run is refused unless every motion's passages,
+  the closings and the verdicts' lines cover the same six.
+- Sample addresses carry the HMAC tag set out under "At launch".
+- The base hash includes the quiz, so such a run is a run of its own,
+  and the live run, whose plan names no quiz, cannot be extended as one.
+
+A run that names no quiz is exactly as before: `tests/seed/determinism.test.ts`
+pins its datasets as `main` gave them before any of this, and a quiz v2
+run's as this code first made them. Measured on a plan at production
+volume, seed `six-check`, base window to 2026-11-10 09:00 UTC, two weeks
+on, counting the weeks as seven-day windows from the base window's end:
+
+| | Target | Measured |
+| --- | --- | --- |
+| Schools, all quiz results | one sixth each | 15.5 to 17.6 |
+| Judged originals a school, in each of the two weeks after the base window | at least 20 (the table's threshold) | 88 to 111, then 85 to 107 |
+| Exact duplicates | under 5% | 0.2% |
+| Exchange turns repeating a sentence | none | 0 of 1,630 |
+| Exchanges opening with no objection between the two schools | measured | 286 of 492 |
+
+On a disposable local Postgres with every migration (`npm run
+seed:local -- --create-db`), a quiz v2 plan of 600 accounts wrote
+through its canary and full stages, every check passed, migration 0027's
+check on the result's shape among them, and teardown left nothing.
 
 ## How it runs
 
@@ -455,13 +502,20 @@ sample teardown and a fresh run into the launch steps". In order:
    no rollback (Teardown), and every existing sample link ends here. Doing
    it first means no scheduled `extend` runs against the changed quiz.
 2. **The launch merges**, and its production deploy is confirmed Ready.
+   The merge sets `RUN_QUIZ` to 2 in `scripts/seed/generate.ts`, so the
+   scheduled job's runs from then on are made with quiz v2 and cover all
+   six schools (Six schools, placed by quiz v2, above). Not before the
+   teardown: a plan with a quiz has another base hash, so the dry run
+   would refuse to extend the live run under it, and every scheduled
+   `extend` would fail until the teardown.
 3. **A fresh run:** `canary`, then `full`, as in Rollout steps 4 and 5,
    each with Arthur's go-ahead. The new run has a new id (the canary's
    start time), and the schedule extends it once its full stage has
    passed. Every verdict in it follows score rule 2, so the rule-1 rows
-   go with the old run. Before its canary, the sample users' email tag becomes
-   HMAC-SHA256 of the run and the user's number, keyed by the seed: the
-   current tag comes from the generator's own random streams, which are
+   go with the old run. In it, the sample users' email tag is
+   HMAC-SHA256 of the run and the user's number, keyed by the seed
+   (`emailTag`, for every run made with quiz v2): the live run's tag
+   comes from the generator's own random streams, which are
    not meant for secrets, so someone who reconstructed a stream from
    public outputs could work out every address. Nothing is exposed by
    that (the addresses are on `sophecs.test` and the users are banned),
@@ -559,6 +613,13 @@ refusal" or "the run failed while writing"), and the detail goes to
   with no commit; a commit, or re-enabling it in the Actions tab, turns
   it back on.
 - Streaks use UTC days, as the app does.
+- A run made with quiz v2 also holds fixed `docs/quiz-v2.json` (its
+  questions, vectors and schools), its scorer (`scoreQuizV2` and
+  `onCircle` in `src/lib/quiz-v2-score.ts`, held to the simulator by
+  `tests/quiz-v2-score.test.ts`), the registry's names and articles for
+  the six, and the six schools' passages and verdict lines: a change to
+  any of them changes rows it has written. A run made with quiz v1 holds
+  fixed v1's question bank and scorer, which the generator still imports.
 - Exact duplicates rise once a composition list runs out. Measured in
   review on 2026-11-04 at production volumes: 0.02% at the start, 0.28%
   after 90 days, 3.29% after a year and 9.85% after two, so the 5% check

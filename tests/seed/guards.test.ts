@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { checkLocalUrl, checkProduction, localTarget, parseEnvFile, productionTarget, GuardError } from "../../scripts/seed/env";
-import { parseFlags, refuseUnsupported } from "../../scripts/seed/cli";
+import { checkPlanQuiz, parseFlags, refuseUnsupported } from "../../scripts/seed/cli";
 
 const REF = "tekifezydjlgxgndkxul";
 const jwt = (payload: object) =>
@@ -101,8 +101,42 @@ describe("flags", () => {
   it("refuses unknown flags", () => {
     expect(() => parseFlags(["--exeucte"], { values: [], booleans: ["execute"] })).toThrow(/unknown flag/);
   });
-  it("refuses --six-schools and --real-judge with the reason", () => {
-    expect(() => refuseUnsupported({ "six-schools": true })).toThrow(/scores three schools/);
+  it("refuses --real-judge, and --six-schools on production before the launch, with the reason", async () => {
+    const before = await cliWith(undefined);
+    expect(() => before.refuseUnsupported({ "six-schools": true }, "production")).toThrow(/only after the launch/);
+    expect(() => before.refuseUnsupported({ "six-schools": true })).not.toThrow();
+    expect(before.quizFlag({ "six-schools": true })).toBe(2);
+    expect(before.quizFlag({})).toBeUndefined();
     expect(() => refuseUnsupported({ "real-judge": "10" })).toThrow(/disabled/);
   });
+  it("refuses --six-schools with a plan, and on production a plan the scheduled job could not extend", async () => {
+    expect(() => checkPlanQuiz({ "six-schools": true }, 2, "local")).toThrow(/not taken with --plan/);
+    expect(() => checkPlanQuiz({}, 2, "local")).not.toThrow();
+    expect(() => checkPlanQuiz({}, undefined, "local")).not.toThrow();
+    // Before the launch the scheduled job names no quiz (RUN_QUIZ).
+    const before = await cliWith(undefined);
+    expect(() => before.checkPlanQuiz({}, undefined, "production")).not.toThrow();
+    expect(() => before.checkPlanQuiz({}, 2, "production")).toThrow(/places samples by quiz v2.*every scheduled extension would refuse/);
+  });
+  it("after the launch merge sets RUN_QUIZ to 2: takes --six-schools on production, and there refuses a plan that names no quiz", async () => {
+    const after = await cliWith(2);
+    expect(() => after.refuseUnsupported({ "six-schools": true }, "production")).not.toThrow();
+    expect(after.quizFlag({})).toBe(2);
+    expect(() => after.checkPlanQuiz({}, 2, "production")).not.toThrow();
+    expect(() => after.checkPlanQuiz({}, undefined, "production")).toThrow(/names no quiz.*every scheduled extension would refuse/);
+    expect(() => after.checkPlanQuiz({ "six-schools": true }, 2, "production")).toThrow(/not taken with --plan/);
+  });
 });
+
+// The command checks as they read RUN_QUIZ, set either way, so these tests
+// hold before and after the launch merge sets it.
+async function cliWith(runQuiz: 2 | undefined) {
+  vi.resetModules();
+  vi.doMock("../../scripts/seed/generate", async (importOriginal) => ({ ...(await importOriginal<object>()), RUN_QUIZ: runQuiz }));
+  try {
+    return await import("../../scripts/seed/cli");
+  } finally {
+    vi.doUnmock("../../scripts/seed/generate");
+    vi.resetModules();
+  }
+}

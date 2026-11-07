@@ -382,3 +382,53 @@ describe("the scheduled workflow's path", () => {
   });
 });
 
+
+// Gate 4 item 13: a run's quiz on the scheduled path. The live run names
+// no quiz and must never be extended as a quiz v2 run, nor a quiz v2 run as
+// one with none; the scheduled job takes the quiz from RUN_QUIZ.
+describe("a run's quiz on the scheduled path", () => {
+  const v2Results = (db: MemoryAdapter) => [...db.table("quiz_results").values()].filter((r) => r.is_sample && r.quiz_version === 2).length;
+  // Named outright, so these hold whatever RUN_QUIZ says; the test below
+  // and tests/seed/six-schools.test.ts are the ones that read the switch.
+  const noQuiz = { config: { ...SMALL, quiz: undefined } };
+
+  it("refuses to extend a run that names no quiz as a quiz v2 run, writing nothing; the next ordinary extension still writes", async () => {
+    const db = freshDb();
+    await step(db, "canary", 0, SEED, undefined, noQuiz);
+    await step(db, "full", 1, SEED, undefined, noQuiz);
+    const debates = samples(db, "debates");
+    const refused = await step(db, "extend", 24 * 7, SEED, undefined, { config: { ...SMALL, quiz: 2 } });
+    expect(refused.out).toMatchObject({ ok: false, outcome: "dry-run-failed" });
+    expect(samples(db, "debates")).toBe(debates);
+    expect(v2Results(db)).toBe(0);
+    expect((await step(db, "extend", 24 * 7, SEED, undefined, noQuiz)).out).toMatchObject({ ok: true, outcome: "written" });
+  });
+
+  it("makes a quiz v2 run through canary and full, and refuses to extend it as a run with no quiz", async () => {
+    const db = freshDb();
+    const quiz2 = { config: { ...SMALL, quiz: 2 as const } };
+    expect((await step(db, "canary", 0, SEED, undefined, quiz2)).out).toMatchObject({ ok: true, outcome: "written" });
+    expect((await step(db, "full", 1, SEED, undefined, quiz2)).out.ok).toBe(true);
+    expect(v2Results(db)).toBe(samples(db, "quiz_results"));
+    const debates = samples(db, "debates");
+    expect((await step(db, "extend", 24 * 7, SEED, undefined, noQuiz)).out).toMatchObject({ ok: false, outcome: "dry-run-failed" });
+    expect(samples(db, "debates")).toBe(debates);
+    expect((await step(db, "extend", 24 * 7, SEED, undefined, quiz2)).out).toMatchObject({ ok: true, outcome: "written" });
+  });
+
+  it("takes the quiz from RUN_QUIZ, so the launch merge's one line makes the scheduled job's runs quiz v2", async () => {
+    vi.resetModules();
+    vi.doMock("../../scripts/seed/generate", async (importOriginal) => ({ ...(await importOriginal<object>()), RUN_QUIZ: 2 }));
+    try {
+      const ci = await import("../../scripts/seed/ci");
+      const db = freshDb();
+      const out = await ci.runCi({ mode: "canary", adapter: db, seed: SEED, projectRef: "tekifezydjlgxgndkxul", now: () => at(0), log: () => {}, config: SMALL, batchSize: 100 });
+      expect(out).toMatchObject({ ok: true, outcome: "written" });
+      expect(v2Results(db)).toBeGreaterThan(0);
+      expect(v2Results(db)).toBe(samples(db, "quiz_results"));
+    } finally {
+      vi.doUnmock("../../scripts/seed/generate");
+      vi.resetModules();
+    }
+  });
+});

@@ -13,29 +13,36 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Rng } from "./rng";
-import { QUIZ_SCHOOLS, type QuizSchoolId, type SchoolId as RegistrySchoolId } from "../../src/lib/school-registry";
+import { QUIZ_SCHOOLS, type SchoolId as RegistrySchoolId } from "../../src/lib/school-registry";
 import { DRAFT_SCHOOL_IDS, schoolEntry } from "../../src/lib/school-registry.drafts";
+import quizV2 from "../../docs/quiz-v2.json";
 
 export const SEED_DIR = join(process.cwd(), "scripts", "seed");
 export const ARGUMENT_DIR = join(SEED_DIR, "arguments");
 
-// The schools the quiz sorts into, from the registry: a sample account
-// can only hold a school a reader could be placed in.
-export const SCHOOLS = QUIZ_SCHOOLS;
-export type SchoolId = QuizSchoolId;
+// The schools quiz v1 sorts into, from the registry: a sample account can
+// only hold a school a reader could be placed in, and a run made before
+// the launch places them by quiz v1.
+export const SCHOOLS: readonly SchoolId[] = QUIZ_SCHOOLS;
+export type SchoolId = RegistrySchoolId;
 
 // The three schools the launch publishes, which are the registry's drafts
 // until then (Arthur, 2026-11-07, Gate 4 item 13: argument banks "at the
 // same depth as the live three's"). Their banks are written and tested with
-// the others; the generator takes them up only once the sample run covers
-// six schools, so until then nothing reads them and no run changes. Each
+// the others; the generator takes them up only in a run made with quiz v2
+// (GenConfig.quiz), so a run made before the launch never reads them. Each
 // has two objections, from two rivals, as the live three do: its named
 // voices (src/lib/judge/objection-voices.ts), and for Ubuntu, whose
 // criteria name one, Utilitarianism as well. Once the launch publishes them
-// the drafts list is empty, and SCHOOLS has to name all six by then.
+// the drafts list is empty, and the tests that read LAUNCH_SCHOOLS have to
+// name the three another way by then.
 export const LAUNCH_SCHOOLS = DRAFT_SCHOOL_IDS;
-/** Every school with a bank: the run's three, then the launch's three. */
-export const BANK_SCHOOLS: readonly RegistrySchoolId[] = [...SCHOOLS, ...LAUNCH_SCHOOLS];
+/**
+ * Every school with a bank: the six quiz v2 places readers in, in the quiz
+ * file's order, as a run made with quiz v2 takes them. Not the registry's
+ * lists, which the launch changes when it publishes the three.
+ */
+export const BANK_SCHOOLS: readonly SchoolId[] = Object.keys(quizV2.schools) as SchoolId[];
 export const TOPICS = [
   "opaque-benefit",
   "crash-arithmetic",
@@ -314,11 +321,7 @@ export function writeBanks(): string[] {
   const written: string[] = [];
   for (const topic of TOPICS) {
     const fr = loadFragments(topic);
-    for (const id of BANK_SCHOOLS) {
-      // The bank functions are typed to the run's three, which is all the
-      // generator reads; the passages and closings hold all six, and the
-      // second part of item 13 widens the types with the generator.
-      const school = id as SchoolId;
+    for (const school of BANK_SCHOOLS) {
       writeFileSync(bankPath(topic, school), serialiseBank(buildBank(fr, closings, school)));
       written.push(bankPath(topic, school));
     }
@@ -332,11 +335,12 @@ export interface Banks {
   arguments: Record<string, BankArgument[]>; // key: `${topic}.${school}`
 }
 
-export function loadBanks(): Banks {
+/** The passages, closings and banks, with the banks of `schools` (quiz v1's three unless a run says otherwise). */
+export function loadBanks(schools: readonly SchoolId[] = SCHOOLS): Banks {
   const fragments = Object.fromEntries(TOPICS.map((t) => [t, loadFragments(t)])) as Record<TopicSlug, TopicFragments>;
   const args: Record<string, BankArgument[]> = {};
   for (const topic of TOPICS)
-    for (const school of SCHOOLS)
+    for (const school of schools)
       args[`${topic}.${school}`] = JSON.parse(readFileSync(bankPath(topic, school), "utf8"));
   return { fragments, closings: loadClosings(), arguments: args };
 }

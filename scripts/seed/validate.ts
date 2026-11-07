@@ -69,7 +69,10 @@ export async function validate(
     let firstBad = "";
     for (const s of sample) {
       const r = byId.get(s.rowId);
-      const cols = SPOT_COLUMNS[p.table] ?? [];
+      // A quiz v2 result's version and point too. Not a v1 row's: the plan
+      // row has none, and the table's default reads back as version 1.
+      const v2 = p.table === "quiz_results" && (s.row as { quiz_version?: number }).quiz_version === 2;
+      const cols = [...(SPOT_COLUMNS[p.table] ?? []), ...(v2 ? ["quiz_version", "map_x", "map_y", "vector"] : [])];
       const diff = r ? cols.find((c) => !same(r[c] ?? null, (s.row as Record<string, unknown>)[c] ?? null)) : "missing";
       if (diff) {
         bad++;

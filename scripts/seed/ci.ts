@@ -4,7 +4,7 @@
 
 import type { Adapter } from "./adapter";
 import { buildPlan, describe } from "./plan";
-import { DEFAULTS, type GenConfig } from "./generate";
+import { DEFAULTS, RUN_QUIZ, type GenConfig } from "./generate";
 import { contentTopics } from "./topics";
 import { execute, finishValidation, HaltedError, isHalted, LockLostError, recordedOnRun, releaseHeld, StopError, thrownWhileWriting, VALIDATING } from "./engine";
 import { validate } from "./validate";
@@ -36,7 +36,7 @@ export interface CiOptions {
   now: () => string;
   log: (line: string) => void;
   /** Volumes; the defaults are production's. Tests pass smaller ones. */
-  config?: Partial<Pick<GenConfig, "users" | "anonResults" | "challenges" | "exchanges" | "classes">>;
+  config?: Partial<Pick<GenConfig, "users" | "anonResults" | "challenges" | "exchanges" | "classes" | "quiz">>;
   batchSize?: number;
   /** Teardown only: must repeat the active run's id exactly. */
   confirmTeardown?: string;
@@ -96,6 +96,7 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
     challenges: DEFAULTS.challenges,
     exchanges: DEFAULTS.exchanges,
     classes: DEFAULTS.classes,
+    ...(RUN_QUIZ ? { quiz: RUN_QUIZ } : {}),
     ...o.config,
     topics: contentTopics(),
   };

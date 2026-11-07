@@ -40,7 +40,7 @@
 // prompt_version and in nothing else.
 
 import type { Rng } from "./rng";
-import { schoolAdherent, schoolName } from "../../src/lib/school-registry";
+import { schoolEntry } from "../../src/lib/school-registry.drafts";
 import {
   rivalIntro,
   quoteFrom,
@@ -86,8 +86,15 @@ const AXIS_BANDS: Record<Tier, { f: [number, number]; r: [number, number]; e: [n
   weak: { f: [2, 5], r: [2.5, 5], e: [1, 3.5] },
 };
 
-const NAME = (s: SchoolId) => schoolName(s);
-const ADHERENT = (s: SchoolId) => schoolAdherent(s);
+// From the full registry, so a verdict reads the same on any build: the
+// shown registry names a draft school only where SIX_SCHOOLS is on, and
+// the seed scripts run without it. The live three read as they did.
+const NAME = (s: SchoolId) => schoolEntry(s)?.name ?? s;
+const ADHERENT = (s: SchoolId) => schoolEntry(s)?.adherent ?? NAME(s);
+/** "a Stoic", "an Ubuntu Ethicist". */
+const AN_ADHERENT = (s: SchoolId) => `${schoolEntry(s)?.adherentArticle ?? "a"} ${ADHERENT(s)}`;
+/** "a Stoicism position", "an Ubuntu position": every name starts with its adherent noun's sound. */
+const AN_NAME = (s: SchoolId) => `${schoolEntry(s)?.adherentArticle ?? "a"} ${NAME(s)}`;
 
 // What each school's own ground is, in the words a verdict uses to praise
 // an argument for standing on it. Sample text keyed by school, as the
@@ -108,7 +115,27 @@ const FEATURE: Record<SchoolId, string[]> = {
     "reasons from practical wisdom rather than from a rule",
     "treats the question as one of what a good person would do",
   ],
+  // The launch's three (Gate 4 item 13), from their school files and
+  // approved criteria, as the passages are.
+  confucian: [
+    "asks what each party to the relationship owes the other",
+    "reasons from the duties a role carries rather than from a total",
+    "takes care to get the names right, as the school insists",
+  ],
+  ubuntu: [
+    "asks what the people affected become through one another",
+    "treats the harm as a failure of relationship that has to be repaired",
+    "asks who else is in this, and who was not asked",
+  ],
+  buddhist: [
+    "weighs the intention behind the act as much as what follows from it",
+    "names who is still being hurt, as non-harm requires",
+    "treats what happens as arising from many conditions, not one cause",
+  ],
 };
+
+/** The schools a template verdict can praise on their own ground. */
+export const FEATURE_SCHOOLS: readonly string[] = Object.keys(FEATURE);
 
 export interface Verdict {
   rejected: false;
@@ -255,11 +282,11 @@ export function templateVerdict(
     const q = quoteFrom(s.positions[parts.position], rng);
     const wq = quoteFrom(parts.weak.length ? fr.weak[parts.weak[0]] : s.examples[parts.example ?? 0], rng);
     strongest = `The opening, "${q}", states the ${NAME(arg.school)} position clearly, though little after it reasons from that position.`;
-    weakest = `"${wq}" is an opinion about the topic rather than a reason a ${ADHERENT(arg.school)} would give, and most of the argument is like it.`;
+    weakest = `"${wq}" is an opinion about the topic rather than a reason ${AN_ADHERENT(arg.school)} would give, and most of the argument is like it.`;
     const reasonSentence = shortestSentence(s.reasons);
-    stronger = `argue from what a ${ADHERENT(arg.school)} actually holds, for instance: ${reasonSentence}`;
+    stronger = `argue from what ${AN_ADHERENT(arg.school)} actually holds, for instance: ${reasonSentence}`;
     line = rng.pick([
-      `States a ${NAME(arg.school)} position but argues mostly from general opinion.`,
+      `States ${AN_NAME(arg.school)} position but argues mostly from general opinion.`,
       `The position is ${NAME(arg.school)}'s; the reasons offered for it are not.`,
     ]);
   } else {
@@ -273,7 +300,7 @@ export function templateVerdict(
       stronger = `also answer the ${rivalName} objection, that ${open.claim} As it stands the argument leaves that reply to the reader.`;
       line = rng.pick([
         `A faithful ${NAME(arg.school)} case that meets one objection head on.`,
-        `Reasons as a ${ADHERENT(arg.school)} reasons, and answers a hard reply.`,
+        `Reasons as ${AN_ADHERENT(arg.school)} reasons, and answers a hard reply.`,
       ]);
     } else {
       weakest = `The argument never meets an objection. "${wq}" is left to stand alone where a rival school would push hardest.`;

@@ -59,7 +59,16 @@ export function baseHash(gen: GenConfig): string {
     seed: gen.seed,
     from: gen.from,
     baseTo: gen.baseTo,
-    config: { users: gen.users, anonResults: gen.anonResults, challenges: gen.challenges, exchanges: gen.exchanges, classes: gen.classes },
+    // The quiz only when a run names one, so every plan made before it
+    // hashes as it did.
+    config: {
+      users: gen.users,
+      anonResults: gen.anonResults,
+      challenges: gen.challenges,
+      exchanges: gen.exchanges,
+      classes: gen.classes,
+      ...(gen.quiz ? { quiz: gen.quiz } : {}),
+    },
     topics: gen.topics.map((t) => [t.slug, t.motion]),
   };
   return createHash("sha256").update(JSON.stringify(fixed)).digest("hex");
@@ -228,6 +237,7 @@ export function buildPlan(input: PlanInput, banks: Banks = loadBanks()): { plan:
       challenges: input.gen.challenges,
       exchanges: input.gen.exchanges,
       classes: input.gen.classes,
+      ...(input.gen.quiz ? { quiz: input.gen.quiz } : {}),
     },
     topics: input.gen.topics.map((t) => ({ slug: t.slug, motion: t.motion })),
     baseHash: baseHash(input.gen),
