@@ -835,8 +835,9 @@ deploy below was read from Vercel as Ready.
     `docs/seed-snapshots/2026-11-07-debate-topics.json`.
   - The write: `docs/seed-snapshots/2026-11-07-debate-topics-stances.sql`
     as merged, run once.
-  - Read back at 06:29:31 UTC: each row's `stances` md5 is the one the
-    file gives (opaque-benefit `82d42cbf…`, crash-arithmetic
+  - Read back at 06:29:31 UTC: each row's `stances` md5 is the one
+    `docs/decisions.md`, "Gate 4 item 9", gives for the file's literal
+    (opaque-benefit `82d42cbf…`, crash-arithmetic
     `0c46c464…`, no-decision `cf53750d…`, moral-training `aceb73e7…`,
     careful-builder `eca34a47…`, borrowed-judgement `69b992d9…`); every
     row has six keys; every other column's md5 is unchanged, `par_elo`
@@ -857,11 +858,21 @@ deploy below was read from Vercel as Ready.
   the datasets the live run regenerates are pinned in
   `tests/seed/determinism.test.ts` as `main` gave them before #104.
 - The re-screening job (`43 5 * * *`) at 05:43 UTC: not confirmed from
-  here. The route writes no log on any path, and in the hour that
+  here. The route logs only when something fails, and in the hour that
   Vercel's Hobby plan keeps there was no log at any level. Nothing was
   waiting for it: every arena reply in production is screened `ok`.
-  Whether it fired shows in Vercel's dashboard, under the project's cron
-  jobs.
+- **Both cron jobs probably answer 401.** The project has no
+  `CRON_SECRET` (Vercel's environment variables, names and targets read
+  today: ten, none of them that), and both `/api/cron/keepalive` and
+  `/api/cron/rescreen` refuse every call without it. Vercel's
+  documentation has the project add the variable itself; the note in
+  `docs/decisions.md`, Task 7, that Vercel creates it was never
+  confirmed. If so, the re-screening job has never run, and the
+  keep-alive has never kept anything alive (production's own traffic and
+  the sample runs have). Setting it needs a secret value in Production,
+  so it is Arthur's: Settings, Environment Variables, `CRON_SECRET`,
+  sensitive, Production only, a random value of 32 characters or more,
+  then a redeploy. Vercel's Cron Jobs tab shows each job's last status.
 - #105 merged as `0920d67`: Gate 4 item 13, second part, the generator
   for a run of all six schools placed by quiz v2. Nothing runs: the
   scheduled job names no quiz until the launch merge sets `RUN_QUIZ` to 2,
@@ -886,5 +897,5 @@ deploy below was read from Vercel as Ready.
 - Eval key spend is unchanged at **$12.2431 of $15.00**: no run today.
 - Waiting on Arthur: the three sample arguments per new school (item 13)
   before the fresh sample run; the click-through and the word "launch"
-  (item 15); Supabase Auth's Site URL and redirect list, and the Vercel
+  (item 15); `CRON_SECRET`; Supabase Auth's Site URL and redirect list, and the Vercel
   redirect from www to sophecs.com.

@@ -4,11 +4,14 @@ For Arthur, on a phone, before the word "launch" (Gate 4 item 15: "when
 8-13 are done, send me the flag-on preview link and the 10-minute phone
 click-through. Launch only on my explicit 'launch'").
 
-The preview is a SIX_SCHOOLS build of `main` with everything from items 8
-to 13 in it. It shows what production will show once the launch merge
-turns the flag on, apart from what the launch merge itself changes (at
-the end). If Vercel asks you to sign in first, use the account that owns
-the project.
+**Open:**
+<https://sophecs-git-gate4-progress-arthurrzhang-1874s-projects.vercel.app>
+
+That is the preview of this branch: a SIX_SCHOOLS build of `main` at
+`0920d67`, with everything from items 8 to 13 in it, plus these docs. It
+shows what production will show once the launch merge turns the flag on,
+apart from what the launch merge itself changes (at the end). Vercel
+asks you to sign in first; use the account that owns the project.
 
 ## Before you start
 
@@ -18,27 +21,37 @@ The preview shares production's database but not its judge
 - **A quiz you finish writes a quiz v2 result to production.** Item 16's
   SQL clears the preview's v2 results before the launch merge
   (`docs/stage5-plan.md`, step 6), so this is expected.
+- **Do not share or challenge from the result.** Share and challenge
+  links point at sophecs.com, which answers "Nothing here." for a v2
+  result until the launch, and a challenge writes a challenge to
+  production.
+- **Do not reply in an open exchange.** A reply sent from the preview is
+  saved to production and would reach a real reader once screened.
 - **Nothing is judged.** The judge's key, budget and kill switch are set
-  for Production only, so an argument submitted on the preview is told
-  judging is paused, and nothing is written or billed. Production judges
-  with v3, as you ruled; the flag-on judge was tested in the new-schools
-  run of 2026-11-06.
+  for Production only. If you submit an argument you will see "The judge
+  could not be reached." over "The spending limit could not be checked,
+  so nothing was sent to the judge.": the budget check failing closed,
+  as it should with no budget set, not a fault. Nothing is written or
+  billed. Production judges with v2 until the launch merge turns the flag
+  on, then with v3, as you ruled; the flag-on judge was tested in the
+  new-schools run of 2026-11-06.
 - **Sign-in** sends its link back to the address you signed in from. It
   reaches the preview only if Supabase's redirect list allows preview
   addresses, which is still open with you (Supabase's Site URL and
-  redirect list). If the link opens sophecs.com instead, skip steps 6
-  and 7.
+  redirect list). If the link opens sophecs.com instead, skip step 6 and
+  the stance line in step 7.
 
 ## The steps
 
 1. **The landing page** (1 minute). It says a short quiz places you in
-   one of six schools of ethics. Question one is live beside the map;
-   answering it moves the dot.
-2. **The quiz** (3 minutes). Ten questions, the dot moving across the map
-   with each answer. Finish. The result names your school, shows where
-   your answers put you on the map, and offers a share line. A school
-   has three share lines and the result picks one; Utilitarianism's
-   second is the new one from item 8.
+   one of six schools of ethics. Question one is live, with the map of
+   the six below it on a phone. Tapping an answer takes you straight
+   into the quiz, at question two.
+2. **The quiz** (3 minutes). The other nine questions, the map showing
+   where your answers put you as you go. Finish. The result names your
+   school, shows your point on the map, and offers a share line. A
+   school has three share lines and the result picks one;
+   Utilitarianism's second is the new one from item 8.
 3. **Your school's page** (1 minute). From the result, or open
    `/s/ubuntu`. Its quotation and source, the school's read, what it gets
    wrong, then the other five.
@@ -53,10 +66,12 @@ The preview shares production's database but not its judge
    "Known limitations" one line is out of date: "That is why judging is
    paused rather than running." Production judges. It is on your next
    list (`docs/gate4.md`), and production's `/method` shows it too.
-6. **Sign in, then `/me`** (1 minute). Your quiz results, your arguments
-   and any open exchanges. On the preview a quiz never moves an account's
-   school, a rule the launch lifts (`docs/decisions.md`, "Stage 5, step
-   4"), so your account keeps the school it has.
+6. **Sign in, then `/me`** (1 minute). Your account's school, any open
+   objection and open exchanges, where you stand (rating, streak and
+   chart), pending challenges, your last five arguments, and your display
+   name. On the preview a quiz never moves an account's school, a rule
+   the launch lifts (`docs/decisions.md`, "Stage 5, step 4"), so your
+   account keeps the school it has.
 7. **The motions** (1 minute). `/debate` lists them; signed in, each shows
    your school's stance on it. That is your account's school, so the new
    three's stances (item 9) are not shown here; they are in

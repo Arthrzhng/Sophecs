@@ -101,7 +101,8 @@ For your next list, from carrying these out:
 - found while checking the click-through: the method page's "Known
   limitations" says "Verdict quality is still being checked against real
   arguments. That is why judging is paused rather than running."
-  (`src/components/how-it-works/JudgeMethod.tsx`, written on 2026-10-05).
+  (`src/components/how-it-works/JudgeMethod.tsx`; written in `a43753e`,
+  2026-10-05).
   Production judges, so the second sentence is untrue on production's
   `/method` today, and on `/how-it-works` after the launch. The judge's
   other paused copy reads the kill switch (`docs/daily-path-copy.md`, Q2);
@@ -126,16 +127,16 @@ For your next list, from carrying these out:
   on every build. Of step 5, "debating as a new school", the judge is
   done; the arena already pairs any two readers of different schools
   (`seekCounterpart` in `src/app/debate/actions.ts`), and migration 0014
-  lets an exchange hold any of the six; the topics' stances and the
-  micro-lessons are the open item 9 below.
+  lets an exchange hold any of the six; the topics' stances were item 9,
+  now done (#103), and you ruled the elsewhere passages enough on
+  micro-lessons for launch.
 - **Production** shows and judges the three published schools exactly as
   before. Nothing promotes a flag-on preview to Production.
-- **The navigation restructure** you asked for on 2026-11-06 is built,
-  on branch `nav-six` (#99), in review: its copy in
+- **The navigation restructure** you asked for on 2026-11-06 is merged
+  (#99, then #100 for your rulings on it): its copy in
   `docs/daily-path-copy.md`, section 13, your request in
   `docs/decisions.md`, and the screenshots of both menus, signed out and
-  signed in, at 390 and 1280 pixels, in `docs/gate4/`. They reach this
-  file when #99 merges (item 14).
+  signed in, at 390 and 1280 pixels, in `docs/gate4/` (item 14).
 
 ## Do the golden runs pass? (b)
 
@@ -392,11 +393,17 @@ the new-schools run 16 or 23 of 25, depending on item 3.
 
 - Supabase Auth's Site URL and redirect list, and the Vercel redirect
   from `www.sophecs.com` to `sophecs.com`.
+- **`CRON_SECRET`.** The project has none, so both cron jobs, the
+  keep-alive and the re-screening job, probably answer 401 and do
+  nothing (`docs/progress.md`, 2026-11-07). Vercel's settings,
+  Environment Variables: `CRON_SECRET`, sensitive, Production only, a
+  random value of 32 characters or more, then a redeploy. It is a
+  secret, so it is yours to set rather than mine.
 
 ## Housekeeping
 
 Mine, and not waiting on anyone:
 
-- The re-screening job's log is read at 06:00 UTC on 2026-11-07: the
-  Hobby plan fires its cron at some point in the 05:00 hour and keeps
-  runtime logs for an hour, so 06:00 covers the whole hour.
+- The re-screening job's log was read on 2026-11-07 and showed nothing:
+  see `CRON_SECRET` above. Once it is set, I read the next run's log in
+  the hour after 05:43 UTC.

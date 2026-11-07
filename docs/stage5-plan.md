@@ -79,7 +79,10 @@ project key are set for Production only. So on a preview:
 
 - **The judge writes nothing.** `/api/judge` checks the monthly budget
   before it inserts a debate, and the budget fails closed when its
-  ceiling is unset, so the reader is told judging is paused. Behind that
+  ceiling is unset, so the reader is told "The judge could not be
+  reached." over "The spending limit could not be checked, so nothing
+  was sent to the judge." (corrected on 2026-11-07; this said "told
+  judging is paused"). Behind that
   there is no key either. A preview can show the arena but not judge an
   argument in it; step 5 is tested locally, or on a preview only once
   Gate 3 says how.
