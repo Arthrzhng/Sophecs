@@ -852,34 +852,45 @@ deploy below was read from Vercel as Ready.
   banks and samples for the three new schools. Nothing reads them yet,
   and the live run's datasets are pinned as `main` gave them. Three review
   passes. Deploy `dpl_F7fwfSXWfZEoPK1rrAbyATUHuRYm`, Ready.
-- Sample activity: Actions runs 42281713225 (6 Nov, 19:40 to 19:43 UTC)
-  and 42347652604 (today, 06:34 to 06:37 UTC), both scheduled extensions,
-  both success. No run had started on #104's merge when this was written;
-  the datasets the live run regenerates are pinned in
-  `tests/seed/determinism.test.ts` as `main` gave them before #104.
-- The re-screening job (`43 5 * * *`) at 05:43 UTC: not confirmed from
-  here. The route logs only when something fails, and in the hour that
-  Vercel's Hobby plan keeps there was no log at any level. Nothing was
-  waiting for it: every arena reply in production is screened `ok`.
+- Sample activity: Actions runs 42281713225 (6 Nov, 19:40 to 19:43 UTC),
+  42347652604 (today, 06:34 to 06:37 UTC) and 42377356986 (today, 13:31
+  to 13:34 UTC), all scheduled extensions, all success. The third ran on
+  `0920d67`, the first with #104 and #105 in it: the live run regenerated
+  its rows from the new code and every check passed, as the datasets
+  pinned in `tests/seed/determinism.test.ts` said it would.
+- The re-screening job (`43 5 * * *`, fired at some point in the 05:00
+  hour on Hobby): not confirmed from here, and the read could not have
+  confirmed it. The route writes nothing to the runtime log on any path,
+  a 401 included; its outcome shows only in the request's status code,
+  which the runtime-log read does not see. Nothing was waiting for it:
+  every arena reply in production is screened `ok`.
 - **Both cron jobs probably answer 401.** The project has no
   `CRON_SECRET` (Vercel's environment variables, names and targets read
   today: ten, none of them that), and both `/api/cron/keepalive` and
   `/api/cron/rescreen` refuse every call without it. Vercel's
   documentation has the project add the variable itself; the note in
   `docs/decisions.md`, Task 7, that Vercel creates it was never
-  confirmed. If so, the re-screening job has never run, and the
-  keep-alive has never kept anything alive (production's own traffic and
-  the sample runs have). Setting it needs a secret value in Production,
-  so it is Arthur's: Settings, Environment Variables, `CRON_SECRET`,
-  sensitive, Production only, a random value of 32 characters or more,
-  then a redeploy. Vercel's Cron Jobs tab shows each job's last status.
+  confirmed. If so, neither job does anything while it is unset:
+  production's own traffic and the sample runs, not the keep-alive, keep
+  the database active, and no pending reply is re-screened. Setting it
+  needs a secret value in Production, so it is Arthur's: Settings,
+  Environment Variables, `CRON_SECRET`, sensitive, Production only, a
+  random value of 32 characters or more, then a redeploy (the next merge
+  to `main` is one). It turns the re-screening job on, which pays for a
+  screening call whenever a reply is pending, as approved under (d) 4.
+  To confirm it after: run `/api/cron/keepalive` once (`vercel crons run`
+  or the dashboard), one cheap read, and read that request's status code
+  in the request logs. Not the re-screening job by hand while a reply is
+  pending, since that is a billed call.
 - #105 merged as `0920d67`: Gate 4 item 13, second part, the generator
   for a run of all six schools placed by quiz v2. Nothing runs: the
   scheduled job names no quiz until the launch merge sets `RUN_QUIZ` to 2,
   and the live run's datasets are byte for byte as before (pinned). Three
   review passes. Deploy `dpl_6NWc4QPaG8GMSasCJiV8wpeM7fHD`, Ready.
 - Item 15: `docs/gate4-clickthrough.md`, checked against the flag-on
-  preview built from #105 at `88212cf` (`sophecs-jyeih4imh-…`). Fetched
+  preview built from #105 at `88212cf` (`sophecs-jyeih4imh-…`), and
+  again by review against this branch's (no file under `src/`,
+  `content/` or `next.config.ts` differs between the two). Fetched
   from it: the landing page (six schools, the first question live beside
   the map), `/s/ubuntu`, `/table` (which redirects to `/schools` on the
   flag, the table under the six cards, the new three each "Ranked once
@@ -897,5 +908,5 @@ deploy below was read from Vercel as Ready.
 - Eval key spend is unchanged at **$12.2431 of $15.00**: no run today.
 - Waiting on Arthur: the three sample arguments per new school (item 13)
   before the fresh sample run; the click-through and the word "launch"
-  (item 15); `CRON_SECRET`; Supabase Auth's Site URL and redirect list, and the Vercel
-  redirect from www to sophecs.com.
+  (item 15); `CRON_SECRET`; Supabase Auth's Site URL and redirect list,
+  and the Vercel redirect from www to sophecs.com.

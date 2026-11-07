@@ -7,8 +7,11 @@ click-through. Launch only on my explicit 'launch'").
 **Open:**
 <https://sophecs-git-gate4-progress-arthurrzhang-1874s-projects.vercel.app>
 
-That is the preview of this branch: a SIX_SCHOOLS build of `main` at
-`0920d67`, with everything from items 8 to 13 in it, plus these docs. It
+That is the preview of branch `gate4-progress` (#106): a SIX_SCHOOLS
+build of `main` at `0920d67`, with everything from items 8 to 13 in it,
+plus these docs. The message that sent you this also gives the fixed
+address of that deployment, which stays the same whatever the branch
+does; the branch stays until the launch. It
 shows what production will show once the launch merge turns the flag on,
 apart from what the launch merge itself changes (at the end). Vercel
 asks you to sign in first; use the account that owns the project.
@@ -29,8 +32,9 @@ The preview shares production's database but not its judge
   saved to production and would reach a real reader once screened.
 - **Nothing is judged.** The judge's key, budget and kill switch are set
   for Production only. If you submit an argument you will see "The judge
-  could not be reached." over "The spending limit could not be checked,
-  so nothing was sent to the judge.": the budget check failing closed,
+  could not be reached.", and below it "The spending limit could not be
+  checked, so nothing was sent to the judge.": the budget check failing
+  closed,
   as it should with no budget set, not a fault. Nothing is written or
   billed. Production judges with v2 until the launch merge turns the flag
   on, then with v3, as you ruled; the flag-on judge was tested in the
@@ -39,7 +43,9 @@ The preview shares production's database but not its judge
   reaches the preview only if Supabase's redirect list allows preview
   addresses, which is still open with you (Supabase's Site URL and
   redirect list). If the link opens sophecs.com instead, skip step 6 and
-  the stance line in step 7.
+  the stance line in step 7. On a phone, "Continue with Google" is the
+  surer way: an emailed link opened in a mail app's own browser lacks
+  the sign-in it started from, and Vercel's.
 
 ## The steps
 
@@ -61,11 +67,12 @@ The preview shares production's database but not its judge
    three's only, so the new three are unranked, each with "Ranked once it
    has 20 judged original arguments." and its count, 0 so far.
 5. **`/how-it-works`** (1 minute). The method, then the rubric: each of
-   the six schools' criteria exactly as the judge receives them, under
-   the sentence that says they are published in full (item 10). Under
-   "Known limitations" one line is out of date: "That is why judging is
-   paused rather than running." Production judges. It is on your next
-   list (`docs/gate4.md`), and production's `/method` shows it too.
+   the six schools' criteria, in full, exactly as the judge receives
+   them, and below them the sentence that says they are published in
+   full (item 10). Under "Known limitations" one line is out of date:
+   "That is why judging is paused rather than running." Production
+   judges. It is on your next list (`docs/gate4.md`), and production's
+   `/method` shows it too.
 6. **Sign in, then `/me`** (1 minute). Your account's school, any open
    objection and open exchanges, where you stand (rating, streak and
    chart), pending challenges, your last five arguments, and your display

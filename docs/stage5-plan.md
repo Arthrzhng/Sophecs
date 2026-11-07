@@ -94,7 +94,10 @@ project key are set for Production only. So on a preview:
   ways (`src/lib/claim.ts`): a signed-in reader's quiz replaces their
   school (`retakeQuizSchool`), and signing in after an anonymous quiz
   claims the result and gives a new or schoolless account its school
-  (`claimAnonymousResults`).
+  (`claimAnonymousResults`). Since step 4 a quiz v2 result does neither
+  (`docs/decisions.md`, "Stage 5, step 4"): `submitQuizResultV2` never
+  calls `retakeQuizSchool`, and `claimAnonymousResults` takes a school
+  from v1 results only (noted on 2026-11-07).
 - **No analytics are sent:** with no project key the client and the
   server send nothing.
 - **Links leave the preview.** Share and challenge links are written for

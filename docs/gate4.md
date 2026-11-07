@@ -389,21 +389,26 @@ the new-schools run 16 or 23 of 25, depending on item 3.
     points at a cleared challenge. The SQL comes to you for the SQL
     Editor.
 
-## Still waiting on you from before
+## New, and waiting on you
 
-- Supabase Auth's Site URL and redirect list, and the Vercel redirect
-  from `www.sophecs.com` to `sophecs.com`.
 - **`CRON_SECRET`.** The project has none, so both cron jobs, the
   keep-alive and the re-screening job, probably answer 401 and do
   nothing (`docs/progress.md`, 2026-11-07). Vercel's settings,
   Environment Variables: `CRON_SECRET`, sensitive, Production only, a
   random value of 32 characters or more, then a redeploy. It is a
-  secret, so it is yours to set rather than mine.
+  secret, so it is yours to set rather than mine. It turns the
+  re-screening job on, which pays for screening whenever a reply is
+  pending, as you approved under (d) 4.
+
+## Still waiting on you from before
+
+- Supabase Auth's Site URL and redirect list, and the Vercel redirect
+  from `www.sophecs.com` to `sophecs.com`.
 
 ## Housekeeping
 
 Mine, and not waiting on anyone:
 
-- The re-screening job's log was read on 2026-11-07 and showed nothing:
-  see `CRON_SECRET` above. Once it is set, I read the next run's log in
-  the hour after 05:43 UTC.
+- Once `CRON_SECRET` is set: run the keep-alive once and read that
+  request's status code in the request logs. The runtime log cannot
+  show it: neither cron route writes to it on any path.
