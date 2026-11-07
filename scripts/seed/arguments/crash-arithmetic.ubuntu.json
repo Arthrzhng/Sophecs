@@ -35,11 +35,11 @@
       "objections": [
         1
       ],
-      "closing": 3,
+      "closing": null,
       "weak": []
     },
-    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Who was left out of deciding matters here more than anywhere. Pedestrians in poorer districts, cyclists and children will bear most of the risk from whatever rule is chosen, and their voices are the least likely to be heard by the engineers who write it.\n\nSolidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared.\n\nA Utilitarian will object that any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on. Deliberating need not hold the cars back: a rule can run while it is reviewed, and the people who share the roads can be asked as it is revised. A rule some reject after being heard is shared in a way a rule nobody was asked about is not, and that is part of whether people will trust the roads with it. That is why the Ubuntu Ethicist asks who else is in this, and who was not asked.",
-    "words": 241
+    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Who was left out of deciding matters here more than anywhere. Pedestrians in poorer districts, cyclists and children will bear most of the risk from whatever rule is chosen, and their voices are the least likely to be heard by the engineers who write it.\n\nSolidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared.\n\nA Utilitarian will object that any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on. The cars can avoid every harm they can while the rule is agreed; what waits is the choice of whose life gives way, which should not be written into cars before the people who share the roads have been asked. A rule some reject after being heard is shared in a way a rule nobody was asked about is not, and that is part of whether people will trust the roads with it.",
+    "words": 235
   },
   {
     "id": "crash-arithmetic.ubuntu.03",
@@ -50,17 +50,17 @@
       "position": 2,
       "reasons": [
         1,
-        2
+        3
       ],
-      "example": 2,
+      "example": 0,
       "objections": [
-        1
+        0
       ],
-      "closing": 1,
+      "closing": 0,
       "weak": []
     },
-    "text": "I cannot accept a rule chosen by arithmetic alone, because a harm here is a failure of relationship among road users, not only a number of deaths. People live through one another, and road users are bound up with each other: today's passenger is tomorrow's pedestrian. A rule they could all accept, having been asked, honours that; a rule imposed by an optimiser treats them as units.\n\nSolidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared. A neighbourhood where children walk to school asks to be consulted on the cars' rules, and is told the matter is purely technical.\n\nA Utilitarian will object that any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on. Deliberating need not hold the cars back: a rule can run while it is reviewed, and the people who share the roads can be asked as it is revised. A rule some reject after being heard is shared in a way a rule nobody was asked about is not, and that is part of whether people will trust the roads with it. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
-    "words": 247
+    "text": "I cannot accept a rule chosen by arithmetic alone, because a harm here is a failure of relationship among road users, not only a number of deaths. People live through one another, and road users are bound up with each other: today's passenger is tomorrow's pedestrian. A rule they could all accept, having been asked, honours that; a rule imposed by an optimiser treats them as units.\n\nWho was left out of deciding matters here more than anywhere. Pedestrians in poorer districts, cyclists and children will bear most of the risk from whatever rule is chosen, and their voices are the least likely to be heard by the engineers who write it. A city holds public meetings on how its autonomous buses should behave in a crash, and the rule they settle on is published at every stop.\n\nA Stoic will object that a self defined through the community has handed away its own judgement, and a rule a rational passenger could assent to does not need a public meeting. A rule each passenger could assent to alone is still a rule imposed on everyone else on the road. Deciding it together is not handing judgement away; it is exercising judgement as members of a shared life rather than as isolated riders. So the measure is not the total but what people become through one another once the system is in place.",
+    "words": 232
   },
   {
     "id": "crash-arithmetic.ubuntu.04",
@@ -71,17 +71,17 @@
       "position": 3,
       "reasons": [
         0,
-        3
+        2
       ],
-      "example": 0,
+      "example": 2,
       "objections": [
         0
       ],
       "closing": 1,
       "weak": []
     },
-    "text": "The motion asks the wrong question. Whether to minimise deaths should be settled by the people who share the roads, not written into cars by engineers working out totals. Metz argues against building systems simply to maximise expected utility. A crash rule is exactly such a system: it decides in advance whose life gives way, and a decision of that kind should answer to the people it binds, not only to a total.\n\nWho was left out of deciding matters here more than anywhere. Pedestrians in poorer districts, cyclists and children will bear most of the risk from whatever rule is chosen, and their voices are the least likely to be heard by the engineers who write it. A city holds public meetings on how its autonomous buses should behave in a crash, and the rule they settle on is published at every stop.\n\nA Stoic will object that a self defined through the community has handed away its own judgement, and a rule a rational passenger could assent to does not need a public meeting. A rule each passenger could assent to alone is still a rule imposed on everyone else on the road. Deciding it together is not handing judgement away; it is exercising judgement as members of a shared life rather than as isolated riders. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
-    "words": 235
+    "text": "The motion asks the wrong question. Whether to minimise deaths should be settled by the people who share the roads, not written into cars by engineers working out totals. Metz argues against building systems simply to maximise expected utility. A crash rule is exactly such a system: it decides in advance whose life gives way, and a decision of that kind should answer to the people it binds, not only to a total.\n\nSolidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared. A neighbourhood where children walk to school asks to be consulted on the cars' rules, and is told the matter is purely technical.\n\nA Stoic will object that a self defined through the community has handed away its own judgement, and a rule a rational passenger could assent to does not need a public meeting. A rule each passenger could assent to alone is still a rule imposed on everyone else on the road. Deciding it together is not handing judgement away; it is exercising judgement as members of a shared life rather than as isolated riders. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
+    "words": 233
   },
   {
     "id": "crash-arithmetic.ubuntu.05",
@@ -101,8 +101,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Solidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared.\n\nPeople live through one another, and road users are bound up with each other: today's passenger is tomorrow's pedestrian. A rule they could all accept, having been asked, honours that; a rule imposed by an optimiser treats them as units.\n\nA Utilitarian will object that any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on. Deliberating need not hold the cars back: a rule can run while it is reviewed, and the people who share the roads can be asked as it is revised. A rule some reject after being heard is shared in a way a rule nobody was asked about is not, and that is part of whether people will trust the roads with it. So the measure is not the total but what people become through one another once the system is in place.",
-    "words": 239
+    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Solidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared.\n\nPeople live through one another, and road users are bound up with each other: today's passenger is tomorrow's pedestrian. A rule they could all accept, having been asked, honours that; a rule imposed by an optimiser treats them as units.\n\nA Utilitarian will object that any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on. The cars can avoid every harm they can while the rule is agreed; what waits is the choice of whose life gives way, which should not be written into cars before the people who share the roads have been asked. A rule some reject after being heard is shared in a way a rule nobody was asked about is not, and that is part of whether people will trust the roads with it. So the measure is not the total but what people become through one another once the system is in place.",
+    "words": 250
   },
   {
     "id": "crash-arithmetic.ubuntu.06",
@@ -155,17 +155,17 @@
       "position": 3,
       "reasons": [
         1,
-        2
+        0
       ],
       "example": 2,
       "objections": [
-        1
+        0
       ],
       "closing": 1,
       "weak": []
     },
-    "text": "The motion asks the wrong question. Whether to minimise deaths should be settled by the people who share the roads, not written into cars by engineers working out totals. People live through one another, and road users are bound up with each other: today's passenger is tomorrow's pedestrian. A rule they could all accept, having been asked, honours that; a rule imposed by an optimiser treats them as units.\n\nSolidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared. A neighbourhood where children walk to school asks to be consulted on the cars' rules, and is told the matter is purely technical.\n\nA Utilitarian will object that any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on. Deliberating need not hold the cars back: a rule can run while it is reviewed, and the people who share the roads can be asked as it is revised. A rule some reject after being heard is shared in a way a rule nobody was asked about is not, and that is part of whether people will trust the roads with it. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
-    "words": 249
+    "text": "The motion asks the wrong question. Whether to minimise deaths should be settled by the people who share the roads, not written into cars by engineers working out totals. People live through one another, and road users are bound up with each other: today's passenger is tomorrow's pedestrian. A rule they could all accept, having been asked, honours that; a rule imposed by an optimiser treats them as units.\n\nMetz argues against building systems simply to maximise expected utility. A crash rule is exactly such a system: it decides in advance whose life gives way, and a decision of that kind should answer to the people it binds, not only to a total. A neighbourhood where children walk to school asks to be consulted on the cars' rules, and is told the matter is purely technical.\n\nA Stoic will object that a self defined through the community has handed away its own judgement, and a rule a rational passenger could assent to does not need a public meeting. A rule each passenger could assent to alone is still a rule imposed on everyone else on the road. Deciding it together is not handing judgement away; it is exercising judgement as members of a shared life rather than as isolated riders. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
+    "words": 227
   },
   {
     "id": "crash-arithmetic.ubuntu.09",
@@ -194,20 +194,20 @@
     "school": "ubuntu",
     "tier": "strong",
     "parts": {
-      "position": 1,
+      "position": 2,
       "reasons": [
-        2,
-        1
+        1,
+        2
       ],
       "example": null,
       "objections": [
         1
       ],
-      "closing": 3,
+      "closing": 1,
       "weak": []
     },
-    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Solidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared.\n\nPeople live through one another, and road users are bound up with each other: today's passenger is tomorrow's pedestrian. A rule they could all accept, having been asked, honours that; a rule imposed by an optimiser treats them as units.\n\nA Utilitarian will object that any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on. Deliberating need not hold the cars back: a rule can run while it is reviewed, and the people who share the roads can be asked as it is revised. A rule some reject after being heard is shared in a way a rule nobody was asked about is not, and that is part of whether people will trust the roads with it. That is why the Ubuntu Ethicist asks who else is in this, and who was not asked.",
-    "words": 236
+    "text": "I cannot accept a rule chosen by arithmetic alone, because a harm here is a failure of relationship among road users, not only a number of deaths. People live through one another, and road users are bound up with each other: today's passenger is tomorrow's pedestrian. A rule they could all accept, having been asked, honours that; a rule imposed by an optimiser treats them as units.\n\nSolidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared.\n\nA Utilitarian will object that any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on. The cars can avoid every harm they can while the rule is agreed; what waits is the choice of whose life gives way, which should not be written into cars before the people who share the roads have been asked. A rule some reject after being heard is shared in a way a rule nobody was asked about is not, and that is part of whether people will trust the roads with it. Ask whose relationships are at stake and who was left out of deciding, and the answer follows.",
+    "words": 235
   },
   {
     "id": "crash-arithmetic.ubuntu.11",
