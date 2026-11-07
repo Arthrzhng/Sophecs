@@ -344,6 +344,20 @@ verdict page is unchanged.
 | A rejected argument, in place of the judge's reason | `The judge set this argument aside without a score. Its reason can quote the argument, so only the person who wrote it can read it.` |
 | A revision's note on what changed | Not shown: the note can quote the argument too |
 
+### A revision judged by a newer version of the judge
+
+Added 2026-11-07, by Arthur's Gate 4 ruling (item 5, option (ii)): no
+score change is shown where the two verdicts' prompt versions differ.
+Where a revision and its first attempt were judged by different versions,
+the comparison's heading and its table (first, now, change) are replaced
+by one line; the objection's outcome, the judge's note and the link to
+the first attempt stay. The share line uses the school's line instead of
+`{first score} → {score}`.
+
+| Where | Copy |
+|---|---|
+| In place of `Compared with your first attempt` and its table (new) | `The first attempt was judged by an earlier version of the judge, so the two scores are not compared.` |
+
 ## 7. Objection and revise (mockup 05)
 
 | Element | Copy |

@@ -14,6 +14,7 @@ import type { SchoolId } from "@/lib/types";
 import { motionForDebate, shortMotionForShare } from "@/lib/motion-text";
 import { verdictShareLine } from "@/lib/verdict-share";
 import { verdictForViewer } from "@/lib/verdict-privacy";
+import { scoresComparable } from "@/lib/verdict-versions";
 
 // A sample account's verdict says so in the title too, which is what a
 // link preview shows first.
@@ -114,6 +115,14 @@ export default async function VerdictPage({
     if (parentRow && parentVerdict && !parentVerdict.rejected) {
       comparison = {
         parentDebateId: parentRow.id as string,
+        // No score change across two versions of the judge (Arthur,
+        // 2026-11-07, Gate 4 item 5): src/lib/verdict-versions.ts.
+        // debates_public keeps prompt_version even in a withheld verdict
+        // (migrations 0018 and 0020).
+        comparable: scoresComparable(
+          (parentVerdict as { prompt_version?: unknown }).prompt_version,
+          (publicRow.verdict as { prompt_version?: unknown } | null)?.prompt_version
+        ),
         first: {
           score: parentVerdict.score,
           fidelity: parentVerdict.fidelity,
@@ -205,7 +214,7 @@ export default async function VerdictPage({
     slug,
     debateId,
     answeredObjection:
-      comparison && parentObjectionSchool && verdict.objection_answered
+      comparison && comparison.comparable && parentObjectionSchool && verdict.objection_answered
         ? { school: parentObjectionSchool, firstScore: comparison.first.score }
         : null,
   });

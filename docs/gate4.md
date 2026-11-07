@@ -12,6 +12,29 @@ What shipped is in `docs/progress.md`; why, in `docs/decisions.md`; the
 plan and the launch checklist, in `docs/stage5-plan.md` ("Gate 4
 checklist").
 
+## Ruled, 2026-11-07
+
+Every item below was ruled on 2026-11-07, verbatim in `docs/decisions.md`,
+"Gate 4: Arthur's rulings". In short, with where each stands:
+
+| Item | Ruling | Done |
+| --- | --- | --- |
+| 1, 2 | Both misses accepted as known | Recorded; checklist ticked |
+| 3 | Count the named voices | Fixtures widened |
+| 4 | v3 in production at launch; cost accepted | COST comment updated; v3 comes with the flag |
+| 5 | Option (ii) | Verdict page and share line |
+| 6 | Criteria into `rubric.ts` at launch | On the launch checklist |
+| 7 | v3's head comment as sent, stale by design | Recorded; draft header and COST comment fixed |
+| 8 | v2 copy accepted, two fixes | To do |
+| 9 | The 18 stances; seeding approved | To do |
+| 10 | The rubric shows v3's criteria for all six | To do |
+| 11 | An exemplar floor | To do |
+| 12 | A pending reply holds the lapse clock; `/me` label | To do |
+| 13 | Argument banks for the new three; samples to you first | To do |
+| 14 | Navigation as built | Nothing to do |
+| 15 | Preview link and click-through when 8 to 13 are done; launch on your word | When 8 to 13 are done |
+| 16 | The SQL to you when the time comes | At the launch |
+
 ## Where things stand
 
 - **Judge v3 (#90).** The 4 Nov head comment is sent again, by your

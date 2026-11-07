@@ -264,7 +264,11 @@ of the three; Gate 2 is about that.
    runs from the Checkpoint B ruling below and the source check Arthur
    asked on 2026-11-06 to have ticked here; each is ticked as it is done,
    and the launch itself waits for Arthur's instruction.
-   - [ ] The golden runs pass (the condition for bringing Gate 4).
+   - [x] The golden runs pass (the condition for bringing Gate 4). 23 of
+     25 in band in both v3 runs, and every objection a named voice once
+     the fixtures count them; the two misses, `confucian-hierarchy-school`
+     and `stoic-analogy`'s fidelity, accepted by Arthur as known misses,
+     2026-11-07 (`docs/decisions.md`, "Gate 4: Arthur's rulings").
    - [x] The primary sources behind the Ubuntu quotations opened by
      Arthur and checked against the research file word for word: Metz,
      "Toward an African Moral Theory" (2007), pp. 322 and 332; Mhlambi,
@@ -298,12 +302,16 @@ of the three; Gate 2 is about that.
    - [ ] The fresh sample run.
    - [ ] The v2 copy below, read and ruled by Arthur in the Gate 4 pack
      (asked for on 2026-11-06).
-   - [ ] The judge at launch, ruled by Arthur (`docs/decisions.md`,
-     "Gate 3: the three judged on SIX_SCHOOLS builds", For Gate 4):
-     production judging with v3; what that does to verdicts stored under
-     v2 (a revision's score delta, Elo and par across two versions);
-     `/debate/rubric`'s claim to show the judge's criteria in full; and
-     the frozen files' statements it makes untrue.
+   - [x] The judge at launch, ruled by Arthur on 2026-11-07
+     (`docs/decisions.md`, "Gate 4: Arthur's rulings"): production judges
+     with v3, its cost accepted; no score change shown across two
+     versions, Elo and par unchanged; the rubric's claim kept true by
+     showing v3's criteria for all six; v3's head comment left as sent.
+   - [ ] In the launch merge, the three new schools' criteria moved from
+     `content/prompts/fidelity-criteria.draft.md` into
+     `src/lib/judge/rubric.ts` with the same text, shown by the flag-on
+     request fixtures (`tests/judge-request/six-schools/`) passing
+     unchanged (Arthur, 2026-11-07, Gate 4 item 6).
 
    **The v2 copy, for the Gate 4 pack.** Every piece of text a reader
    sees only because quiz v2 and the six schools are on, as a flag-on

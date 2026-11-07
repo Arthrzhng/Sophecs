@@ -4832,3 +4832,115 @@ Carried out:
   `docs/stage5-plan.md`.
 - The copy is in `docs/daily-path-copy.md`, section 13; the Gate 4
   screenshots are retaken with "Sign in".
+
+### Gate 4: Arthur's rulings (2026-11-07)
+
+Arthur, 2026-11-07, on `docs/gate4.md`:
+
+> 1. confucian-hierarchy-school: accept as a known miss. Record it.
+> 2. stoic-analogy: accept as a known miss.
+> 3. Count the named voices; widen the fixtures' objection sets to match.
+> 4. Yes: production judges with v3 at launch. Spending accepted ($50/month
+>    covers ~3,300 calls). Update the COST comment.
+> 5. Option (ii): no score change shown where the two verdicts' prompt
+>    versions differ; Elo and par unchanged.
+> 6. Yes: at launch move the three's criteria into rubric.ts, same text,
+>    proven by the flag-on request fixtures.
+> 7. Leave judge.v3.md's head comment exactly as sent (it is what makes
+>    the judge work); record in decisions.md that its wording is stale by
+>    design. Fix the draft criteria header and the COST comment, which the
+>    judge doesn't receive.
+> 8. v2 copy accepted, with two fixes: rewrite Utilitarianism's share line
+>    [1] so it doesn't cite v1's self-driving-car question; on /r/<id> the
+>    map's screen-reader description says "where they stand".
+> 9. Write the 18 stances (6 topics x the three new schools), one sentence
+>    each, from content/schools/*.md and the approved criteria, no new
+>    quotations. Keep the test as it is. Seeding debate_topics is approved
+>    (a). The elsewhere passages are enough on micro-lessons for launch.
+> 10. At launch the rubric shows the v3 criteria for all six, so "in full"
+>     stays true, on /how-it-works and anywhere else that makes the claim.
+> 11. Yes: an exemplar floor on the template mark, dropping a position
+>     rather than showing a weak one.
+> 12. Re-screening: a pending reply holds the lapse clock until it is
+>     screened; /me shows "Waiting to be checked" for it, matching the
+>     exchange page; copy accepted.
+> 13. Yes: the fresh sample run covers all six schools, placed by quiz v2.
+>     Write argument banks for the three new schools from their school
+>     files, criteria and the research file (quotation guard applies), at
+>     the same depth as the live three's, so launch week shows six active
+>     schools. Show me 3 sample arguments per new school before running.
+> 14. Navigation: accepted as built.
+> 16. Clearing the preview's v2 rows: send me the SQL for the SQL Editor
+>     when the time comes.
+> 15. Launch: when 8-13 are done, send me the flag-on preview link and the
+>     10-minute phone click-through. Launch only on my explicit "launch".
+
+Items 1 to 7, carried out together:
+- **1 and 2, the known misses.** `confucian-hierarchy-school` (82/83/83
+  at 16:58 against 40-75, engagement 5/6/6 against 0-4; 78/80/78 in the
+  new-schools run) and `stoic-analogy`'s fidelity (7/7/7 and 7/8/7
+  against 8-10, its score in band) are accepted as known misses of v3.
+  Their fixtures keep their bands: a later prompt that brings either into
+  band shows as a pass, and one that moves the rest out still fails.
+  The Gate 4 checklist's first item is ticked on that footing.
+- **3, the named voices.** Each golden fixture's
+  `expected_objection_school` now holds, beside the rivals it was written
+  for, every rival its school's voice paragraph names
+  (`src/lib/judge/objection-voices.ts`): `ubuntu` for the fifteen Stoic,
+  Utilitarian and Confucian fixtures, `confucian` for the three Buddhist
+  ones; 18 files. The Virtue Ethics and Ubuntu fixtures already listed
+  the rivals their schools' voices name. Read
+  against the two v3 run files, every one of the 25 cases now passes the
+  objection check in both, so each run passes 23 of 25 whole cases, the
+  two misses above. The bands are untouched.
+- **4, v3 at launch.** Nothing changes before the launch: the flag
+  chooses the version (`PROMPT_VERSION`, `src/lib/judge/schema.ts`), and
+  the launch turns the flag on. The judge's COST comment
+  (`src/lib/anthropic.ts`, frozen; this ruling is the authority, and the
+  judge does not receive it) now gives v3's measured cost, $0.0152 a call,
+  the mean of the 154 calls of the two v3 runs of 2026-11-06, and the
+  $50 month as about 3,300 judge calls. Its `est_in=1700 est_out=650`
+  stay, marked as v2's measurement, because the golden runner prices a
+  run from them by adding the larger v3 prompt to that base
+  (`tests/judge/run-golden.ts`).
+- **5, option (ii).** Where a revision and its first attempt were judged
+  under different prompt versions, the verdict page shows neither the
+  first scores nor the change, but one line saying why (new copy,
+  `docs/daily-path-copy.md`, "A revision judged by a newer version of the
+  judge", for his ruling), and the share line uses the school's line
+  rather than `{first} → {score}`. `src/lib/verdict-versions.ts`;
+  `src/app/debate/[slug]/[debateId]/page.tsx`;
+  `src/components/debate/Verdict.tsx`. The versions are compared as
+  stored, so a sample's template versions count as versions: three
+  sample revisions judged under `sample-template-2` whose originals were
+  `sample-template-1` (production, read 2026-11-07) lose their table now.
+  Not changed, since the ruling is of what is shown: `/me`, which shows
+  each verdict's own score beside the other's and no change; and the
+  `revision_judged` event, which goes on recording the raw change
+  (`src/app/api/judge/route.ts`, frozen), so an analysis of it across the
+  launch has to split by version. Elo and par are untouched.
+- **6, the criteria at launch.** On the launch checklist
+  (`docs/stage5-plan.md`): the three sections move from the draft file
+  into `src/lib/judge/rubric.ts` unchanged, and the flag-on request
+  fixtures passing unchanged is the proof.
+- **7, the frozen statements.** `content/prompts/judge.v3.md`'s head
+  comment is left exactly as sent. **Its wording is stale by design:** it
+  says v3 "is not the production default" and is "a draft to run the
+  golden set against", that the vocabulary paragraph "lives with the
+  criteria, not in this file", and names `fillOnce`, which `src/` no
+  longer has. All four are untrue or will be at launch, and none is
+  corrected, because the judge reads the comment and it is what holds the
+  strong cases in band (the 06:05 check of 2026-11-06); rewording it
+  would change what the judge receives. Whoever reads it should read it
+  as an instruction to the model, not a description of the code. The
+  draft criteria file's header (frozen `content/**`; this ruling is the
+  authority) now says who reads it on which build and what happens at
+  the launch; only its per-school sections (each headed `## ` and the
+  school's id) reach the judge, and the
+  flag-on request fixtures pass unchanged, so the edit is not one the
+  judge sees. The test that pins its wording
+  (`tests/judge-v3-and-refusal.test.ts`) is updated with it.
+
+Items 8 to 13 follow in their own pull requests; 14 needs nothing; 15
+and 16 come at the launch.
+
