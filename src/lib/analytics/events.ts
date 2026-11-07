@@ -133,8 +133,9 @@ export type AnalyticsEvent =
       props: {
         debate_id: string;
         objection_answered: boolean;
-        score_delta: number;
-        fidelity_delta: number;
+        /** Null where the original was judged under another version (Gate 4 item 5). */
+        score_delta: number | null;
+        fidelity_delta: number | null;
       };
     }
   | { name: "objection_resolved"; props: { parent_debate_id: string; days_open: number } }

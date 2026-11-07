@@ -9,6 +9,7 @@ import { getWeeklyMotion } from "@/lib/weekly-motion";
 import { getCaseStates, type CaseState } from "@/lib/cases";
 import { exchangeLapsed, latestReplyPending } from "@/lib/counterpart";
 import type { ExchangeRow } from "@/components/me/OpenExchanges";
+import { scoresComparable } from "@/lib/verdict-versions";
 import { WelcomeTracker } from "@/components/me/WelcomeTracker";
 import { MeViewTracker } from "@/components/me/MeViewTracker";
 import { ProfilePage } from "@/components/me/ProfilePage";
@@ -35,6 +36,8 @@ interface DebateHistoryRow {
   created_at: string;
   kind: "original" | "revision";
   parent_debate_id: string | null;
+  /** The version it was judged under (src/lib/verdict-versions.ts). */
+  prompt_version: string | null;
 }
 
 export default async function MePage({
@@ -113,7 +116,7 @@ export default async function MePage({
       // slots and never appears detached from the argument it answers.
       admin
         .from("debates")
-        .select("id, topic_slug, score, rejected, created_at, kind, parent_debate_id")
+        .select("id, topic_slug, score, rejected, created_at, kind, parent_debate_id, prompt_version")
         .eq("user_id", user.id)
         .eq("kind", "original")
         .order("created_at", { ascending: false })
@@ -149,7 +152,7 @@ export default async function MePage({
     if (debateHistory.length > 0) {
       const { data: revisions } = await admin
         .from("debates")
-        .select("id, topic_slug, score, rejected, created_at, kind, parent_debate_id")
+        .select("id, topic_slug, score, rejected, created_at, kind, parent_debate_id, prompt_version")
         .eq("user_id", user.id)
         .eq("kind", "revision")
         // Judged revisions only: a failed one is still open to try again.
@@ -269,6 +272,10 @@ export default async function MePage({
                   topicSlug: revision.topic_slug,
                   score: revision.score,
                   rejected: revision.rejected,
+                  // Not shown beside the original's score when the two
+                  // were judged under different versions (Arthur,
+                  // 2026-11-07, Gate 4 item 5, option (ii)).
+                  comparable: scoresComparable(d.prompt_version, revision.prompt_version),
                 }
               : undefined,
           };

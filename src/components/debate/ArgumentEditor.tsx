@@ -126,6 +126,7 @@ export function ArgumentEditor({
   isFirstArgument,
   microBefore,
   readingNotes = [],
+  comparableWithParent = true,
 }: {
   topicSlug: string;
   motion: string;
@@ -140,6 +141,12 @@ export function ArgumentEditor({
   /** The before-lesson, rendered inline as a disclosure. Null on a revision. */
   microBefore?: MicroLessonContent | null;
   readingNotes?: string[];
+  /**
+   * On a revision: whether the original was judged under the version this
+   * one will be (src/lib/verdict-versions.ts). When not, revision_judged
+   * records no score or fidelity change (Arthur, 2026-11-07, Gate 4 item 5).
+   */
+  comparableWithParent?: boolean;
 }) {
   const router = useRouter();
   const isRevision = mode === "revision";
@@ -280,8 +287,8 @@ export function ArgumentEditor({
           props: {
             debate_id: response.debateId,
             objection_answered: response.revision.objectionAnswered,
-            score_delta: response.revision.scoreDelta,
-            fidelity_delta: response.revision.fidelityDelta,
+            score_delta: comparableWithParent ? response.revision.scoreDelta : null,
+            fidelity_delta: comparableWithParent ? response.revision.fidelityDelta : null,
           },
         });
         // A judged revision ends the case whether or not it answered the

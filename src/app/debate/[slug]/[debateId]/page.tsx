@@ -14,6 +14,7 @@ import type { SchoolId } from "@/lib/types";
 import { motionForDebate, shortMotionForShare } from "@/lib/motion-text";
 import { verdictShareLine } from "@/lib/verdict-share";
 import { verdictForViewer } from "@/lib/verdict-privacy";
+import { scoresComparable } from "@/lib/verdict-versions";
 
 // A sample account's verdict says so in the title too, which is what a
 // link preview shows first.
@@ -104,22 +105,36 @@ export default async function VerdictPage({
   // shown the original, so the revision's verdict can quote it.
   let parentPublic: boolean | null = null;
   if (isRevision && publicRow.parent_debate_id) {
-    const { data: parentRow } = await admin
+    // Both rows in one read, for each one's prompt_version column, never
+    // the verdict's copy read through debates_public: that view keeps a
+    // withheld verdict's version only when it reads v<n> (migration 0023),
+    // so a sample's template version would be dropped and two same-version
+    // verdicts would look different. One read, so the two versions are
+    // known together or not at all. Only the original's verdict is used.
+    const { data: rows } = await admin
       .from("debates")
-      .select("id, verdict, argument_public")
-      .eq("id", publicRow.parent_debate_id)
-      .maybeSingle();
+      .select("id, verdict, argument_public, prompt_version")
+      .in("id", [publicRow.parent_debate_id, debateId]);
+    const parentRow = (rows ?? []).find((r) => r.id === publicRow.parent_debate_id);
+    const ownRow = (rows ?? []).find((r) => r.id === debateId);
     parentPublic = Boolean(parentRow?.argument_public);
     const parentVerdict = (parentRow?.verdict ?? null) as VerdictData | null;
     if (parentRow && parentVerdict && !parentVerdict.rejected) {
+      // No score change across two versions of the judge (Arthur,
+      // 2026-11-07, Gate 4 item 5): src/lib/verdict-versions.ts. Across two
+      // the first scores are not handed to the page at all.
+      const comparable = scoresComparable(parentRow.prompt_version, ownRow?.prompt_version);
       comparison = {
         parentDebateId: parentRow.id as string,
-        first: {
-          score: parentVerdict.score,
-          fidelity: parentVerdict.fidelity,
-          rigor: parentVerdict.rigor,
-          engagement: parentVerdict.engagement,
-        },
+        comparable,
+        first: comparable
+          ? {
+              score: parentVerdict.score,
+              fidelity: parentVerdict.fidelity,
+              rigor: parentVerdict.rigor,
+              engagement: parentVerdict.engagement,
+            }
+          : { score: null, fidelity: null, rigor: null, engagement: null },
       };
       parentObjectionSchool = parentVerdict.unanswered_objection?.school ?? null;
     }
@@ -205,7 +220,7 @@ export default async function VerdictPage({
     slug,
     debateId,
     answeredObjection:
-      comparison && parentObjectionSchool && verdict.objection_answered
+      comparison && comparison.comparable && parentObjectionSchool && verdict.objection_answered
         ? { school: parentObjectionSchool, firstScore: comparison.first.score }
         : null,
   });

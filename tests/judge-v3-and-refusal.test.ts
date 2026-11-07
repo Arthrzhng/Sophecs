@@ -356,15 +356,20 @@ describe("the draft fidelity criteria", () => {
     }
   });
 
-  it("says it is approved, and that only the golden runner reads it", () => {
+  it("says it is approved, and who reads it", () => {
     // These assertions used to be that the file said "NOT LOADED BY
     // ANYTHING" and "Pending approval". Both became false on 2026-10-24,
     // when Arthur approved the criteria and had the golden runner read
     // them, and the test went on passing because the file still said
-    // them. A test that checks what a file claims proves only that the
-    // claim is there, so the claim has to be kept true by hand.
+    // them. "NOT LOADED BY ANYTHING IN PRODUCTION" became false on a
+    // SIX_SCHOOLS build at Gate 3, and was corrected by his Gate 4 ruling
+    // of 2026-11-07 (item 7). A test that checks what a file claims proves
+    // only that the claim is there, so the claim has to be kept true by
+    // hand.
     const draft = read(DRAFT);
-    expect(draft).toContain("NOT LOADED BY ANYTHING IN PRODUCTION");
+    expect(draft).toContain("NOT LOADED BY A BUILD WITHOUT SIX_SCHOOLS");
+    expect(draft).not.toContain("NOT LOADED BY ANYTHING");
+    expect(draft).not.toContain("One thing reads this file");
     expect(draft).toContain("Approved 2026-10-24");
     expect(draft).not.toContain("Pending approval");
   });

@@ -300,6 +300,7 @@ export const FIXTURE_DEBATES: ProfileDebate[] = [
       topicSlug: "opaque-benefit",
       score: 78,
       rejected: false,
+      comparable: true,
     },
   },
   {
