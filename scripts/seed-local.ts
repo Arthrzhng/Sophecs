@@ -21,7 +21,7 @@ import { execute, finishValidation, releaseHeld, VALIDATING } from "./seed/engin
 import { validate } from "./seed/validate";
 import { dryRun } from "./seed/dryrun";
 import { getAllTopicFiles } from "../src/lib/topics";
-import { REPORT_DIR, cancelSignal, int, isoFlag, log, main, nowFloored, parseFlags, quizFlag, refuseUnsupported, str, writeReport } from "./seed/cli";
+import { REPORT_DIR, cancelSignal, checkPlanQuiz, int, isoFlag, log, main, nowFloored, parseFlags, quizFlag, refuseUnsupported, str, writeReport } from "./seed/cli";
 
 const MARKER = "sophecs seed-local: disposable database made by scripts/seed-local.ts --create-db";
 
@@ -97,6 +97,7 @@ main(async () => {
   if (plan.target.kind !== "local" || plan.target.database !== target.database)
     throw new GuardError(`the plan is not for local database ${target.database}`);
   if (plan.runId !== runId) throw new GuardError(`--run-id ${runId} is not the plan's run ${plan.runId}`);
+  checkPlanQuiz(f, plan.config.quiz, "local");
   if (comment() !== MARKER) throw new GuardError(`${target.database} was not made by --create-db; refusing to seed it`);
   const dataset = datasetForPlan(plan, contentTopics());
   log(`offline: manifest matches (${plan.manifestHash})`);

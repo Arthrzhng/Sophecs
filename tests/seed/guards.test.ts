@@ -3,7 +3,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { checkLocalUrl, checkProduction, localTarget, parseEnvFile, productionTarget, GuardError } from "../../scripts/seed/env";
-import { parseFlags, quizFlag, refuseUnsupported } from "../../scripts/seed/cli";
+import { checkPlanQuiz, parseFlags, quizFlag, refuseUnsupported } from "../../scripts/seed/cli";
 
 const REF = "tekifezydjlgxgndkxul";
 const jwt = (payload: object) =>
@@ -107,5 +107,13 @@ describe("flags", () => {
     expect(quizFlag({ "six-schools": true })).toBe(2);
     expect(quizFlag({})).toBeUndefined();
     expect(() => refuseUnsupported({ "real-judge": "10" })).toThrow(/disabled/);
+  });
+  it("refuses --six-schools with a plan, and on production a plan the scheduled job could not extend", () => {
+    expect(() => checkPlanQuiz({ "six-schools": true }, 2, "local")).toThrow(/not taken with --plan/);
+    expect(() => checkPlanQuiz({}, 2, "local")).not.toThrow();
+    expect(() => checkPlanQuiz({}, undefined, "local")).not.toThrow();
+    // Before the launch the scheduled job names no quiz (RUN_QUIZ).
+    expect(() => checkPlanQuiz({}, undefined, "production")).not.toThrow();
+    expect(() => checkPlanQuiz({}, 2, "production")).toThrow(/every scheduled extension would refuse/);
   });
 });

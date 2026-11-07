@@ -308,7 +308,10 @@ of the three; Gate 2 is about that.
    - [ ] `RUN_QUIZ` set to 2 in `scripts/seed/generate.ts` in the launch
      merge, after the sample teardown, so the scheduled job's runs cover
      all six schools placed by quiz v2 (Gate 4 item 13;
-     `docs/sample-activity.md`, "At launch").
+     `docs/sample-activity.md`, "At launch"). The same merge updates the
+     two tests that pin today's switch: `RUN_QUIZ` unset
+     (`tests/seed/six-schools.test.ts`) and production refusing
+     `--six-schools` (`tests/seed/guards.test.ts`).
    - [ ] The fresh sample run, canary then full, each on Arthur's word.
    - [ ] The v2 copy below, read and ruled by Arthur in the Gate 4 pack
      (asked for on 2026-11-06).

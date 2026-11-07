@@ -307,22 +307,28 @@ ways only:
   passages. A verdict names a school and its adherent from the full
   registry, with their own article ("an Ubuntu Ethicist"), on any build.
   Two schools with no objection between them argue an exchange from a
-  reason and an example.
+  reason and an example, which among the six is most exchanges: 12 of the
+  15 pairs lack an objection one way or the other on some motion.
+- The six and their order come from `docs/quiz-v2.json`, not the
+  registry's lists, and the run is refused unless every motion's passages,
+  the closings and the verdicts' lines cover the same six.
 - Sample addresses carry the HMAC tag set out under "At launch".
 - The base hash includes the quiz, so such a run is a run of its own,
   and the live run, whose plan names no quiz, cannot be extended as one.
 
 A run that names no quiz is exactly as before: `tests/seed/determinism.test.ts`
-pins its datasets as `main` gave them before any of this. Measured on a
-plan at production volume, base window to 2026-11-10 09:00 UTC, two weeks
-on:
+pins its datasets as `main` gave them before any of this, and a quiz v2
+run's as this code first made them. Measured on a plan at production
+volume, seed `six-check`, base window to 2026-11-10 09:00 UTC, two weeks
+on, counting the weeks as seven-day windows from the base window's end:
 
 | | Target | Measured |
 | --- | --- | --- |
-| Schools, all quiz results | one sixth each | 15.4 to 18.1 |
-| Judged originals a school, in each of the two weeks after the base window | at least 20 (the table's threshold) | 87 to 123, then 74 to 106 |
-| Exact duplicates | under 5% | 0.1% |
-| Exchange turns repeating a sentence | none | 0 of 1,631 |
+| Schools, all quiz results | one sixth each | 15.5 to 17.6 |
+| Judged originals a school, in each of the two weeks after the base window | at least 20 (the table's threshold) | 88 to 111, then 85 to 107 |
+| Exact duplicates | under 5% | 0.2% |
+| Exchange turns repeating a sentence | none | 0 of 1,630 |
+| Exchanges opening with no objection between the two schools | measured | 286 of 492 |
 
 On a disposable local Postgres with every migration (`npm run
 seed:local -- --create-db`), a quiz v2 plan of 600 accounts wrote
@@ -606,6 +612,11 @@ refusal" or "the run failed while writing"), and the detail goes to
   with no commit; a commit, or re-enabling it in the Actions tab, turns
   it back on.
 - Streaks use UTC days, as the app does.
+- A run made with quiz v2 also holds fixed `docs/quiz-v2.json` (its
+  questions, vectors and schools), the registry's names and articles for
+  the six, and the six schools' passages and verdict lines: a change to
+  any of them changes rows it has written. A run made with quiz v1 holds
+  fixed v1's question bank and scorer, which the generator still imports.
 - Exact duplicates rise once a composition list runs out. Measured in
   review on 2026-11-04 at production volumes: 0.02% at the start, 0.28%
   after 90 days, 3.29% after a year and 9.85% after two, so the 5% check

@@ -36,7 +36,6 @@ import { getWeeklyMotion } from "../../src/lib/weekly-motion";
 import { Rng, ID_ALPHABET, ID_LENGTH, CLASS_CODE_ALPHABET, CLASS_CODE_LENGTH } from "./rng";
 import {
   SCHOOLS,
-  BANK_SCHOOLS,
   TOPICS,
   compose,
   fit,
@@ -49,7 +48,7 @@ import {
   type Tier,
   type TopicSlug,
 } from "./banks";
-import { templateVerdict, templateRevisionVerdict, templateRejection, scoreRuleFor, type Verdict, type Rejection } from "./verdicts";
+import { templateVerdict, templateRevisionVerdict, templateRejection, scoreRuleFor, FEATURE_SCHOOLS, type Verdict, type Rejection } from "./verdicts";
 import { Compositions } from "./compositions";
 import { replay } from "./replay";
 import { DAY, HOUR, MINUTE, TIMEZONES, activeTimeOn, dayWeight, iso, startOfUtcDay } from "./time";
@@ -385,8 +384,21 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
   // A run with `quiz: 2` places samples by quiz v2 among all six schools;
   // any other run by quiz v1 among its three, drawing exactly as before.
   const v2 = cfg.quiz === 2;
-  const schools: readonly SchoolId[] = v2 ? BANK_SCHOOLS : SCHOOLS;
-  if (v2) for (const s of schools) if (!QUIZ_V2_DIRECTION.has(s)) throw new Error(`quiz v2 places no one in ${s}`);
+  // Quiz v2's schools in the quiz file's order, not the registry's lists,
+  // which the launch changes when it publishes the three: a quiz v2 run
+  // regenerates its rows from this code, so they must not move under it.
+  const schools: readonly SchoolId[] = v2 ? QUIZ_V2.schools.map((s) => s.id as SchoolId) : SCHOOLS;
+  if (v2) {
+    // And the quiz, the passages, the closings and the verdicts' lines all
+    // cover the same six, or the run is refused before anything is made.
+    const same = (xs: Iterable<string>) => [...xs].sort().join() === [...schools].sort().join();
+    const lacking = [
+      ...TOPICS.filter((t) => !same(Object.keys(banks.fragments[t].schools))).map((t) => `the passages of ${t}`),
+      ...(same(Object.keys(banks.closings)) ? [] : ["the closings"]),
+      ...(same(FEATURE_SCHOOLS) ? [] : ["the template verdicts' lines"]),
+    ];
+    if (lacking.length) throw new Error(`a quiz v2 run needs the same schools in the quiz and in ${lacking.join(", ")}`);
+  }
   const quizRng = root.fork("quiz-calibration");
   // Quiz v1's mix as it was; under quiz v2 an equal share each, so the six
   // are equally active (the ruling: "launch week shows six active schools").

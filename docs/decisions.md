@@ -5348,9 +5348,16 @@ launch step, after the teardown, on his word.
 - **The mix.** Equal, one sixth each, by the same calibration quiz v1's
   40, 35 and 25 use. The ruling asks for six active schools at launch;
   equal shares take no view on which are more popular. Mine, on Arthur's
-  list. At production volume each school has 74 to 123 judged originals
-  in each of the two weeks after the base window, against the table's
-  threshold of 20.
+  list. At production volume (seed `six-check`) each school has 85 to 111
+  judged originals in each of the two seven-day windows after the base
+  window, against the table's threshold of 20.
+- **The six come from the quiz file**, in its order, not from the
+  registry's lists, which the launch changes when it publishes the three:
+  a quiz v2 run regenerates its rows from this code, so they must not move
+  under it. A quiz v2 run is refused unless the quiz, every motion's
+  passages, the closings and the verdicts' lines cover the same six, and
+  `tests/seed/determinism.test.ts` pins a quiz v2 run's datasets and base
+  hash as this code first made them.
 - **Verdicts.** A template verdict names a school and its adherent from
   the full registry, so it reads the same on any build, with the
   adherent's article ("an Ubuntu Ethicist", "an Ubuntu position"). The
@@ -5358,10 +5365,15 @@ launch step, after the teardown, on his word.
   what standing on a new school's own ground looks like (`FEATURE`), from
   the school files and criteria; mine, on Arthur's list. Every verdict of
   a six-school run passes the judge's schema as a six-school build has it.
-- **Exchanges.** Two of the six can have no objection between them in the
-  passages; a turn between them argues from a reason and an example. The
-  old fallback would have said one reason twice. Among quiz v1's three
-  every pair has one, so those turns are unchanged.
+- **Exchanges.** Among the six, two schools often have no objection
+  between them in the passages: 12 of the 15 pairs lack one in at least one
+  direction on some motion, and 6 in both. A turn between them argues from
+  a reason and an example, where the old fallback would have said one
+  reason twice. That is most exchanges of a six-school run: at production
+  volume 286 of 492 open with no objection to raise, and 258 of 440
+  replies have none to answer, so they argue past each other more than the
+  live three's do. Among quiz v1's three every pair has an objection both
+  ways, so those turns are unchanged. On Arthur's list.
 - **Addresses.** A quiz v2 run's sample addresses carry HMAC-SHA256 of
   the run and the user's number, keyed by the seed, which
   `docs/sample-activity.md` had set out for the fresh run.
@@ -5376,9 +5388,16 @@ launch step, after the teardown, on his word.
   stages, every check passed (migration 0027's check on a result's shape
   among the writes), and teardown left nothing.
 - **Left as they are**, because changing them would change rows the live
-  run has written: in about 1 revision in 20, the verdict says the
-  revision now answers an objection and still suggests answering it (4 of
-  81 revisions in the test fixture's three-school run, 10 of 81 in its
-  six-school run); and a name ending in "s" takes "'s" ("Virtue Ethics's",
-  and now "Buddhist Ethics's"). Both could change for the fresh run only,
-  if Arthur wants that.
+  run has written: in about 1 revision in 8, the verdict says the
+  revision now answers an objection and still suggests answering it (at
+  production volume, 71 of 545 revisions in a three-school run and 66 of
+  545 in a six-school one); and a name ending in "s" takes "'s" ("Virtue
+  Ethics's", and now "Buddhist Ethics's"). Both could change for the fresh
+  run only, if Arthur wants that.
+- **Commands.** `--six-schools` is refused with `--plan`, since a plan
+  names its own quiz, and production refuses a plan whose quiz is not
+  `RUN_QUIZ`, which every scheduled extension of that run would refuse.
+- **For Arthur's list**, besides the mix and the `FEATURE` lines: the
+  exchanges above, and that a fresh run's base window still starts on
+  2026-09-18, so its quiz v2 results and the new three's arguments are
+  dated weeks before readers could have made them.

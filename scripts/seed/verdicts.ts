@@ -134,6 +134,9 @@ const FEATURE: Record<SchoolId, string[]> = {
   ],
 };
 
+/** The schools a template verdict can praise on their own ground. */
+export const FEATURE_SCHOOLS: readonly string[] = Object.keys(FEATURE);
+
 export interface Verdict {
   rejected: false;
   score: number;

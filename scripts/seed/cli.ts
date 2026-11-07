@@ -70,6 +70,20 @@ export function refuseUnsupported(f: Flags, target: "local" | "production" = "lo
     );
 }
 
+/**
+ * For a command given a plan. --six-schools only makes a plan, since a plan
+ * names its own quiz, so it is refused with --plan rather than ignored.
+ * And production refuses a plan whose quiz is not the scheduled job's
+ * (RUN_QUIZ): every scheduled extension of that run would be refused.
+ */
+export function checkPlanQuiz(f: Flags, planQuiz: GenConfig["quiz"], target: "local" | "production"): void {
+  if (f["six-schools"]) throw new GuardError("--six-schools makes a plan with quiz v2; a plan names its own quiz, so it is not taken with --plan");
+  if (target === "production" && (planQuiz ?? undefined) !== RUN_QUIZ)
+    throw new GuardError(
+      `the plan ${planQuiz ? "places samples by quiz v2" : "names no quiz"}, but the scheduled job's runs ${RUN_QUIZ ? "place them by quiz v2" : "name none"} (RUN_QUIZ in scripts/seed/generate.ts), so every scheduled extension would refuse this run`
+    );
+}
+
 /** The quiz a run places samples by: quiz v2 and six schools with --six-schools, else what the scheduled job uses. */
 export function quizFlag(f: Flags): GenConfig["quiz"] {
   return f["six-schools"] ? 2 : RUN_QUIZ;

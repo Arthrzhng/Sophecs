@@ -81,7 +81,12 @@ For your next list, from carrying these out:
   which is mine (the live three's 40, 35 and 25 had no counterpart for
   six), and the nine lines a template verdict uses to praise an argument
   for standing on a new school's ground, in `scripts/seed/verdicts.ts`
-  (`FEATURE`), are mine too, for your reading.
+  (`FEATURE`), are mine too, for your reading. Two more: most exchanges
+  between the six open with no objection to raise, since most pairs of
+  schools have none between them in the passages, so they argue past each
+  other more than the live three's do; and a fresh run's base window
+  still starts on 2026-09-18, so its quiz v2 results and the new three's
+  arguments are dated weeks before readers could have made them.
 
 ## Where things stand
 

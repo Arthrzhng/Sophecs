@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { manifestHash } from "../../scripts/seed/plan";
-import { small } from "./fixture";
+import { baseHash, manifestHash } from "../../scripts/seed/plan";
+import { contentTopics } from "../../scripts/seed/topics";
+import { SMALL, small } from "./fixture";
 
 describe("determinism", () => {
   it("the same seed and window give the same rows, ids and hash", () => {
@@ -31,6 +32,18 @@ describe("determinism", () => {
     expect(manifestHash(small({ to: "2026-11-14T12:00:00.000Z" }))).toBe(
       "abac62e4b39ca5b9027bb3445af9d4c585f6e846037d3aac44f749a4c53665e9"
     );
+  });
+
+  // The fresh run at the launch is made with quiz v2, and once it is live it
+  // regenerates its rows from this code just as the run before it does.
+  // Its datasets, as this code first made them (Gate 4 item 13, second
+  // part), for the base window and ten days on, and its base hash.
+  it("gives a quiz v2 run exactly the rows it gave when it was written", () => {
+    expect(manifestHash(small({ quiz: 2 }))).toBe("21397274e160d7bb39af964c7e950a6073ff5b398285cd5163c7f448c08cd6c4");
+    expect(manifestHash(small({ quiz: 2, to: "2026-11-14T12:00:00.000Z" }))).toBe(
+      "1a232cf9cc44bd8f514fc1bc11ba236b2ff305650be3508a86199f76b0185ffe"
+    );
+    expect(baseHash({ ...SMALL, quiz: 2, topics: contentTopics() })).toBe("5cdeac90c6bfadb49435f35b4688ee717ed990b7b3d409dd8ef3c600e1255824");
   });
 
   it("names runs and addresses as documented", () => {

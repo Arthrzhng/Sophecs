@@ -153,6 +153,17 @@ describe("a sample run made with quiz v2", () => {
   });
 });
 
+describe("a quiz v2 run's schools", () => {
+  it("come from the quiz file, and the run is refused unless the passages, closings and verdicts' lines cover the same six", () => {
+    const banks = loadBanks();
+    const gen = { ...SMALL, quiz: 2 as const, topics: contentTopics() };
+    const closings = Object.fromEntries(Object.entries(banks.closings).filter(([s]) => s !== "buddhist"));
+    expect(() => generate(gen, { ...banks, closings: closings as typeof banks.closings })).toThrow(/the closings/);
+    const fragments = { ...banks.fragments, "no-decision": { ...banks.fragments["no-decision"], schools: Object.fromEntries(Object.entries(banks.fragments["no-decision"].schools).filter(([s]) => s !== "ubuntu")) } };
+    expect(() => generate(gen, { ...banks, fragments: fragments as typeof banks.fragments })).toThrow(/the passages of no-decision/);
+  });
+});
+
 describe("a run that names no quiz", () => {
   it("hashes and plans exactly as before: the base hash main gave at 3008b29, and no quiz in its plan", () => {
     expect(baseHash({ ...SMALL, topics: contentTopics() })).toBe("4b7758b789ced500ab02002393f9359689910253775d9ba907c610dfbee1a7be");
