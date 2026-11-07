@@ -128,11 +128,11 @@
       "reasons": [
         "The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results.",
         "Book 13 warns that when names are not correct, what is said stops matching how things are. A system that cannot say why it refused someone issues something that looks like a judgement and is not one, and deploying it teaches everyone to accept the look for the thing.",
-        "Parties to a relationship hold each other to account through what they owe one another. A person refused by a system whose reasons nobody can give cannot hold the decider to anything, however much suffering it prevents on average.",
+        "Parties to a relationship hold each other to account through what they owe one another. A person refused by a system whose reasons nobody can give cannot hold the decider to anything, however much suffering the system prevents on average.",
         "Humaneness is realised in how people are treated within their relationships, not only in how many are spared harm. A benefit delivered with no account to the person it touches treats them as a case to process, not as someone the decider stands in relation to."
       ],
       "examples": [
-        "A hospital lets a model decide who is called back for more tests. A patient left off asks her doctor why, and the doctor can say only that the system said so.",
+        "A hospital lets a model decide who is called back for more tests. A patient not called back asks her doctor why, and the doctor can say only that the system said so.",
         "A council ranks housing applications with a model. A family that drops down the list asks the officer who knew them by name, and she can no longer explain her own office.",
         "A teacher who marks a pupil down owes the pupil a reason, as part of being their teacher. A marking system that cannot give one has not taken the teacher's place."
       ],
@@ -180,7 +180,7 @@
         {
           "rival": "utilitarianism",
           "claim": "the suffering the system prevents is real, and waiting for everyone affected to have a say leaves it in place while the consultations run.",
-          "answer": "The suffering is real, and a say need not wait for everyone: the system can run while the people it decides about are brought into how it is used and can question what it does to them. What it cannot do is run as a verdict nobody answers for, since that falls on the same people the benefit is for.",
+          "answer": "The suffering is real, and the wait has a cost that has to be owned. But a say need not mean everyone agreeing or a long consultation: the people it decides about can be brought into deciding quickly, and until they are, their care stays with people who can answer to them. A benefit run as a verdict nobody answers for falls on the same people it is meant for.",
           "why": "It never says how long the people affected should wait for a say, or what the suffering in the meantime is weighed against."
         }
       ]

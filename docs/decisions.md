@@ -5318,5 +5318,6 @@ seen the samples.
     about one's own judgement but not the one about dissent, and the
     Utilitarian ones now argue as Utilitarians;
   - Buddhist Ethics' best-known objection, the gap between moral teaching
-    and institutions (who audits, how one appeals), appears only obliquely,
-    in a Confucian objection on `no-decision`.
+    and institutions (who audits, how one appeals), appears only obliquely:
+    in a Confucian objection on `no-decision`, and in one on
+    `opaque-benefit` that an account is owed to the person refused.

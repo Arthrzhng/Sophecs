@@ -68,14 +68,17 @@ const SCHOLARS = [
   "Metz", "Menkiti", "Gyekye", "Mhlambi", "Segun", "Matolino", "Kwindingwi", "Shutte", "Louw", "Ramose",
   "Ames", "Rosemont", "Vallor", "Rosenlee", "Legge", "Slingerland", "Lau",
   "Keown", "Goodman", "Hallisey", "Garfield", "Hongladarom", "Hershock", "Harvey", "Sujato", "Müller",
+  // Names a passage could reach for at the start of a sentence, where the
+  // capitalised-word check below does not look.
+  "Mencius", "Xunzi", "Mozi", "Laozi", "Zhuangzi", "Santideva", "Shantideva", "Nagarjuna", "Buddhaghosa",
+  "Dogen", "Tutu", "Mbiti", "Wiredu",
 ];
 // Every other word a passage capitalises in mid-sentence: a school or its
-// adherent, a text, a people. Anything else, a name above all, has to be
+// adherent, or a day. Anything else, a name or a text above all, has to be
 // one the school's own file names.
 const PROPER = new Set([
   "Confucian", "Confucians", "Confucianism", "Ubuntu", "Buddhist", "Buddhists", "Ethicist", "Ethicists", "Ethics",
   "Stoic", "Stoics", "Stoicism", "Utilitarian", "Utilitarians", "Utilitarianism", "Virtue",
-  "Analects", "Book", "Nguni", "Rahula", "Thaddeus", "Sabelo",
   "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
 ]);
 // Words any quotation in the research file shares with a passage, five in a
@@ -103,7 +106,10 @@ describe("the launch schools' passages", () => {
   it("use verified wording only as verified, and only with its source named", () => {
     for (const v of VERIFIED) {
       expect(RESEARCH.toLowerCase(), v.wording).toContain(v.wording.toLowerCase());
-      for (const p of all.filter((x) => v.marker.test(x.text))) {
+      // Any five words of it in a row count as using it, not only its end.
+      const grams = fiveGrams(v.wording);
+      const uses = (t: string) => v.marker.test(t) || [...fiveGrams(t)].some((g) => grams.has(g));
+      for (const p of all.filter((x) => uses(x.text))) {
         expect(p.text.toLowerCase(), p.where).toContain(v.wording.toLowerCase());
         for (const c of v.credit) expect(p.text, p.where).toMatch(c);
       }
@@ -135,10 +141,13 @@ describe("the launch schools' passages", () => {
   });
 
   it("keep the house style: no dashes, no quotation marks, British spelling", () => {
-    const american = /\b(\w*(?:iz(?:e|es|ed|ing|ation|ations))|behaviou?r(?<!our)|honor\w*|favor\w*|labor\w*|center\w*|color\w*|defense|analyz\w*|judgment\w*)\b/gi;
+    const american =
+      /\b(\w*(?:iz(?:e|es|ed|ing|ation|ations))|behavior\w*|neighbor\w*|honor\w*|favor\w*|labor\w*|center\w*|color\w*|defense|offense|skeptic\w*|modeled|modeling|catalog|gray|fulfill|fulfills|fulfillment|analyz\w*|judgment\w*)\b/gi;
     const allowed = new Set(["size", "sizes", "sized", "seize", "seized", "prize", "prizes", "citizen"]);
     for (const p of all) {
-      expect(p.text, p.where).not.toMatch(/[‒-―]/);
+      // Dashes in any form: the dash characters, a minus sign, a spaced
+      // hyphen or a doubled one standing in for a dash, and guillemets.
+      expect(p.text, p.where).not.toMatch(/[\u2012-\u2015\u2212\u00AB\u00BB]|\s-\s|--/);
       expect(p.text, p.where).not.toMatch(/["“”‘‛]/);
       // An apostrophe only inside or at the end of a word: a possessive.
       for (const m of p.text.matchAll(/['’]/g)) expect(p.text[(m.index ?? 0) - 1] ?? "", p.where).toMatch(/[A-Za-z0-9]/);
