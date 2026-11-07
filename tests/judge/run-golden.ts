@@ -370,9 +370,9 @@ async function sampleCase(
 //   priced at v2's figure would understate it. The difference in the size
 //   of what is sent is added at roughly four bytes a token. That is a rule of
 //   thumb rather than a count, which would need an API call.
-// - The COST comment's own est_usd_per_call=0.0098 does not follow from
-//   its est_in and est_out at those rates, which give 0.0099. The frozen
-//   file is left alone and the figure is computed here instead.
+// - The COST comment's est_usd_per_call is v3's measured mean ($0.0152,
+//   since Arthur's Gate 4 ruling of 2026-11-07), not a figure that follows
+//   from its est_in and est_out, so the estimate is computed here instead.
 function estimatedUsdPerCall(): {
   usd: number;
   inputTokens: number;

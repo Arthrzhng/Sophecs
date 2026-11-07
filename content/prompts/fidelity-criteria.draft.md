@@ -1,20 +1,32 @@
 <!--
-Draft fidelity criteria for the three schools that have none.
+Draft fidelity criteria for the three schools that rubric.ts does not hold.
 
-NOT LOADED BY ANYTHING IN PRODUCTION. src/lib/judge/rubric.ts holds the
-criteria the live judge uses, and `hasFidelityCriteria` returns false for
-these three, so /api/judge refuses a submission from them rather than
-judging it. Nothing a reader gets changes because this file exists.
+NOT LOADED BY A BUILD WITHOUT SIX_SCHOOLS, production included until the
+launch. There src/lib/judge/rubric.ts holds every criterion the judge
+uses, `hasFidelityCriteria` returns false for these three, and /api/judge
+refuses a submission from them rather than judging it.
 
 Arthur approved these on 2026-10-24, and ruled that they stay here rather
-than in rubric.ts until he publishes the three schools in Phase 3. One
-thing reads this file: the golden runner, in eval mode only, through
-tests/judge/draft-criteria.ts, so that Tier B can be scored against the
-criteria as approved. Two tests keep that true. tests/draft-criteria.test.ts
-walks src/ for any mention of this file and drives /api/judge to show it
-still refuses all three schools. tests/draft-criteria-reads.test.ts records
-every path the filesystem is asked for while the route runs, which catches
-a read whose path is assembled at runtime and so has no name to search for.
+than in rubric.ts until he publishes the three schools. Two things read
+this file. On a SIX_SCHOOLS build, src/lib/judge/draft-criteria.ts reads
+it once, as the module loads, and the judge is given each school's
+section (his Gate 3 ruling of 2026-11-05). And the golden runner reads it,
+through tests/judge/draft-criteria.ts, so that Tier B is scored against the
+criteria as approved. Only the per-school sections below, each headed
+`##` and the school's id, reach the judge: this header, the paragraph
+under the title and the notes at the end do not. At the launch the sections move into rubric.ts with the same text,
+which the flag-on request fixtures in tests/judge-request/six-schools/
+prove (his Gate 4 ruling of 2026-11-07, item 6). From then nothing in
+this file reaches the judge.
+
+Three tests keep the rest true. tests/draft-criteria.test.ts allows only
+src/lib/judge/draft-criteria.ts to name this file in src/, and drives
+/api/judge to show a build without the flag still refuses all three
+schools. tests/draft-criteria-reads.test.ts records every path the
+filesystem is asked for while the route runs, which catches a read whose
+path is assembled at runtime and so has no name to search for: none
+without the flag, one at load with it. tests/six-schools.test.ts pins
+what a flag-on build sends.
 
 Sourcing, per Arthur's revision of 2026-10-24: quotations come only from
 content/research/non-western-sources.md, and tests/content-quotations.ts
@@ -57,8 +69,8 @@ each, one composite out of a hundred.
 
 # Draft fidelity criteria
 
-Approved 2026-10-24. The live judge does not read this file; the golden
-runner does, in eval mode only. The third paragraph of each section was
+Approved 2026-10-24. The judge reads its sections on a SIX_SCHOOLS build
+only; the golden runner reads them too. The third paragraph of each section was
 added on 2026-10-26, by Arthur's ruling on the 2F golden runs, and the
 fourth on 2026-11-03, by his ruling on the 3 Nov run.
 

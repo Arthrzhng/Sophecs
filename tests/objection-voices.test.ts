@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, it, expect } from "vitest";
 import { PUBLISHED_SCHOOL_IDS } from "../src/lib/school-registry";
 import { DRAFT_SCHOOL_IDS } from "../src/lib/school-registry.drafts";
@@ -57,6 +59,24 @@ describe("objection voices", () => {
       expect(fidelityCriteriaFor(id, "v3").endsWith(`\n\n${sentence}`), id).toBe(true);
       expect(fidelityCriteriaFor(id, "v2"), id).not.toContain("normally voices this objection");
       expect(fidelityCriteriaFor(id, "v1"), id).not.toContain("normally voices this objection");
+    }
+  });
+});
+
+// Arthur, 2026-11-07, Gate 4 item 3: "Count the named voices; widen the
+// fixtures' objection sets to match." Every golden fixture accepts each
+// rival its school's criteria name as voicing the objection.
+describe("the golden fixtures' objection sets", () => {
+  const dir = path.join(process.cwd(), "tests/judge/golden");
+  const fixtures = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith(".json"))
+    .map((f) => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")) as { name: string; school: SchoolId; expected_objection_school: SchoolId[] });
+
+  it("include every named voice for the fixture's school", () => {
+    expect(fixtures).toHaveLength(25);
+    for (const f of fixtures) {
+      for (const { rival } of OBJECTION_VOICES[f.school]) expect(f.expected_objection_school, `${f.name}: ${rival}`).toContain(rival);
     }
   });
 });
