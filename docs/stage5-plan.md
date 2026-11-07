@@ -79,10 +79,12 @@ project key are set for Production only. So on a preview:
 
 - **The judge writes nothing.** `/api/judge` checks the monthly budget
   before it inserts a debate, and the budget fails closed when its
-  ceiling is unset, so the reader is told judging is paused. Behind that
-  there is no key either. A preview can show the arena but not judge an
-  argument in it; step 5 is tested locally, or on a preview only once
-  Gate 3 says how.
+  ceiling is unset, so the reader is told "The judge could not be
+  reached." and, below it, "The spending limit could not be checked, so
+  nothing was sent to the judge." (corrected on 2026-11-07; this said
+  "told judging is paused"). Behind that there is no key either. A
+  preview can show the arena but not judge an argument in it; step 5 is
+  tested locally, or on a preview only once Gate 3 says how.
 - **An arena reply is saved and never screened.**
   `/api/counterpart/turn` inserts the turn as `pending` and only then
   checks the budget, which fails closed, so the turn stays pending and
@@ -91,7 +93,10 @@ project key are set for Production only. So on a preview:
   ways (`src/lib/claim.ts`): a signed-in reader's quiz replaces their
   school (`retakeQuizSchool`), and signing in after an anonymous quiz
   claims the result and gives a new or schoolless account its school
-  (`claimAnonymousResults`).
+  (`claimAnonymousResults`). Since step 4 a quiz v2 result does neither
+  (`docs/decisions.md`, "Stage 5, step 4"): `submitQuizResultV2` never
+  calls `retakeQuizSchool`, and `claimAnonymousResults` takes a school
+  from v1 results only (noted on 2026-11-07).
 - **No analytics are sent:** with no project key the client and the
   server send nothing.
 - **Links leave the preview.** Share and challenge links are written for
