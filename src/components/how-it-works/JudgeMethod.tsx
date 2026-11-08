@@ -14,6 +14,8 @@
  * Rigor and Engagement under "Score in this order of priority", and the
  * response schema adds one composite `score` on top of them.
  */
+import { SAMPLE_EXPLANATION } from "@/lib/sample";
+
 export function JudgeMethod({ sub = false }: { sub?: boolean }) {
   const H = sub ? "h3" : "h2";
   // The pause sentence follows the kill switch (Arthur, 2026-11-08: "make
@@ -87,32 +89,17 @@ export function JudgeMethod({ sub = false }: { sub?: boolean }) {
 }
 
 /**
- * Linked from the school table in any week a sample account's argument is
- * counted there, as `#samples`. Every sentence is what the code does:
- * src/lib/sample.ts, migration 0023, docs/sample-activity.md.
+ * Linked from the line under the school table on /schools, as `#samples`.
+ * Arthur's words (2026-11-08), the same the AI tag opens to
+ * (src/lib/sample.ts). A third sentence, on arguing against a sample when
+ * no one else is free, follows when sample accounts reply.
  */
 export function SampleAccounts() {
   return (
     <section id="samples" className="mt-12 scroll-mt-8">
       <h2 className="text-lg font-extrabold tracking-tight text-ink">Sample accounts</h2>
       <div className="prose-reading mt-4">
-        <p>
-          Sophecs can show sample accounts: illustrative accounts with
-          generated activity, not active members. Each one is labelled Sample
-          wherever it is named, and the label opens to say so.
-        </p>
-        <p>
-          Their arguments count towards the school table like anyone
-          else&apos;s, and the table says so in any week they are part of it.
-          The judge did not read them: each carries a sample assessment
-          written from a template, and is marked as one.
-        </p>
-        <p>
-          A sample account cannot sign in. It does not reply to messages or
-          take up challenges, and nothing it does changes a real
-          reader&apos;s rating or where that rating stands among other
-          readers.
-        </p>
+        <p>{SAMPLE_EXPLANATION}</p>
       </div>
     </section>
   );

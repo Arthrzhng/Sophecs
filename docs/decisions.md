@@ -6078,3 +6078,104 @@ What a build without the flag then does with what the launch left:
 - a browser that followed one of the three permanent redirects keeps
   going to `/schools` or `/how-it-works`, which such a build answers not
   found.
+
+### Sample labels at the minimum (2026-11-08)
+
+Arthur, 2026-11-08: "readers should see 'sample' as little as possible
+across the site. Remove every label except this minimum". What stays:
+- one small, quiet "AI" tag beside a sample's work, on its verdict,
+  result and challenge pages (and on an exchange, once samples reply);
+- one short line on a challenge or exchange with a sample, before the
+  reader writes: "You're arguing with an AI sample account." (with the
+  replies; see the list below);
+- a small "AI sample" mark on a sample page's share and preview images;
+- one line on `/schools`: "Includes sample accounts, run by AI.", linked
+  to the explanation;
+- the explanation on `/how-it-works#samples`: "Sample accounts are run
+  by AI. They show what arguing here looks like." The third sentence
+  follows when samples reply.
+
+Gone: "Sample" in page titles (a sample's verdict, result and challenge
+have plain titles: "Verdict", the school's name, "A challenge"), the
+Sample banner, the "Sample assessment" headings and mark, the note under
+each template verdict, the note under Today's rank, and the old
+paragraphs on `/how-it-works`. `tests/seed/labels.test.ts` renders the
+sample surfaces (a template verdict public, private, rejected, rejected
+and private, and revised; a result with its map; a challenge) and holds
+that each has one tag, in a valid place, and that outside it none says
+"sample" or "AI", speaks of a person, or carries a reader's own wording
+("Write it again", "How the judge scored you"); that the result page
+hands the map both its sample words; and that a reader's own verdict,
+result and challenge carry no tag and keep their wording.
+
+Choices made in carrying this out, for Arthur's list:
+Each item names the file it lives in.
+- **First: nothing on `/schools` says sample marks are not the judge's**
+  (review pass 2, B3; `src/components/table/SchoolTable.tsx`, the
+  description, and `src/lib/sample.ts`, `SAMPLE_EXPLANATION`). Before this change the table's note linked to a
+  paragraph saying the judge did not read sample arguments, which were
+  scored from a template. Arthur's minimum drops that paragraph, and
+  `/schools` still says "Fidelity is the judge's 0–10 mark ... averaged
+  across every judged original argument", an average that includes every
+  sample's template mark. The only place that says otherwise is inside
+  the tag on a single verdict. Shipped as Arthur worded it, since he asked
+  for it without stopping; his to choose among: (a) a judge clause in
+  the table's description, (b) a sentence in the explanation ("The judge
+  does not read their arguments."), (c) leaving template marks out of Avg
+  fidelity, with the ranking floor counted on genuine arguments alone.
+  The line itself sits right under that description, so its subject is
+  the table's arguments and marks (review pass 3; it first sat in the
+  "Joined and left" note, whose subject is people).
+- **"Run by AI", before the replies** (review pass 3;
+  `src/lib/sample.ts`, `SAMPLE_EXPLANATION`). Until the AI writes a
+  sample's replies, a sample's arguments are composed by a scheduled
+  script from hand-written passages and scored from templates
+  (`docs/sample-activity.md`): no model writes them. Arthur's words
+  ship as he wrote them; whether "run by AI" is the description he
+  wants for that is his.
+- **The line before writing comes with the replies**
+  (`src/lib/sample.ts`). Arthur listed "You're
+  arguing with an AI sample account." as staying now and deferred only
+  the explanation's third sentence. Today no reader writes to a sample: a
+  sample's challenge sends the reader to the quiz, and no sample argument
+  seeks a counterpart. So the line ships with the replies, where it has a
+  place to sit; until then it would sit on a page with nothing to write.
+- **The judge did not read it** (`src/components/debate/Verdict.tsx`,
+  `SAMPLE_JUDGE_NOTE` in `src/lib/sample.ts`). A sample's verdict is scored from a
+  template. With the heading and the note gone, nothing on the page would
+  have said so, and the scores sit under the site's footer saying
+  arguments are scored by the judge. So the tag on a template verdict
+  opens to the explanation and then "The judge did not read this
+  argument." (the note's own words), and the scores sit under "Scores",
+  never "How the judge scored you". The alternatives: the judge line shown
+  without opening the tag, or "AI sample" as the tag on verdict pages,
+  since a bare "AI" there could read as "judged by AI".
+- **The image mark reads "AI sample", not "AI"**
+  (`src/components/card/CardLayout.tsx`, `src/components/debate/VerdictCard.tsx`,
+  `SAMPLE_IMAGE_MARK`). An image travels
+  without the tag beside it, and on a verdict image a bare "AI" could be
+  read as "judged by AI", which every verdict is.
+- **Never as a person** (`src/components/share/SharePage.tsx`,
+  `src/components/share/ChallengeInvite.tsx`, `Verdict.tsx`). A sample's result reads "A result", not
+  "Someone shared their result"; its challenge "A challenge", not
+  "Someone challenged you", then "This account came out a utilitarian.
+  Find out what you are." and "What this account argues from", not
+  "They" (review pass 1). On a private sample verdict, "This argument is
+  not published." and the withheld objection "is shown only while the
+  argument is public", where a reader's say "the author" and "the person
+  who wrote it".
+- **The table** (`SchoolTable.tsx`). Arthur's list puts the tag on the table too, beside a
+  sample's name. The table shows schools, not accounts, and no page shows
+  an account's name, so the one line on `/schools` stands for it.
+- **What the tag opens to** (`src/components/sample/SampleLabel.tsx`).
+  The explanation, so "Sample accounts" is in every sample page once the
+  tag is opened. Opened, at any width, it takes a line of its own, so the
+  tag moves down a line when tapped.
+- **A sample's verdict does not address the reader as its author**
+  (review pass 2; `Verdict.tsx`, and `resultMapWords` in `src/lib/sample.ts`). Where a reader's own verdict says "The objection you
+  left standing", "Compared with your first attempt" and "Write it
+  again", a sample's says "The objection left standing", "Compared with
+  the first attempt" and "Argue this motion". The wording follows whether
+  the argument is a sample's, and the judge wording whether it was
+  scored from a template. A sample's result map reads "Where these
+  answers landed", not "Where these answers put them".

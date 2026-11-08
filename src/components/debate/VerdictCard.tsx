@@ -1,4 +1,5 @@
 import { SCHOOL_COLORS } from "@/lib/school-colors";
+import { SAMPLE_IMAGE_MARK } from "@/lib/sample";
 import { OG_INK, OG_INK_MID, OG_INK_SOFT, OG_PAPER } from "@/lib/card-tokens";
 import type { SchoolId } from "@/lib/types";
 
@@ -58,7 +59,7 @@ export function VerdictCard({
               border: `2px solid ${OG_INK_SOFT}`,
             }}
           >
-            Sample assessment
+            {SAMPLE_IMAGE_MARK}
           </div>
         )}
       </div>

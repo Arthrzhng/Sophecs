@@ -97,10 +97,10 @@ export default async function TodayPage() {
     // columns through the same rankSchools, not by a second tally, and
     // through readAll, as the table does, so a week of more than 1,000
     // arguments is counted whole (src/lib/read-all.ts).
-    readAll<{ school: SchoolId; fidelity: unknown; is_sample: boolean }>((from, to) =>
+    readAll<{ school: SchoolId; fidelity: unknown }>((from, to) =>
       admin
         .from("debates")
-        .select("school, fidelity:verdict->fidelity, is_sample", { count: "exact" })
+        .select("school, fidelity:verdict->fidelity", { count: "exact" })
         .eq("kind", "original")
         .eq("rejected", false)
         .not("verdict", "is", null)
@@ -137,9 +137,6 @@ export default async function TodayPage() {
         oneLine={getSchool(school).one_line}
         elo={Number(profile?.elo ?? 1200)}
         rank={ranks.find((r) => r.school === school)?.rank ?? null}
-        // The same disclosure as the table's, when this week's rank counts
-        // a sample account's argument (migration 0023).
-        includesSamples={(judgedRows.rows ?? []).some((row) => row.is_sample)}
       />
       <LessonsCard modules={modules} />
     </>
