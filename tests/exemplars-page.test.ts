@@ -50,17 +50,20 @@ beforeEach(() => {
   filters.length = 0;
   asked.length = 0;
   exemplars = new Map([
-    ["stoicism", [{ id: "11111111-2222-3333-4444-555555555555", school: "stoicism", argument: "Here is my answer. Deploy it. Because.\n\nMore.", opening: "Deploy it." }]],
+    ["stoicism", [{ id: "11111111-2222-3333-4444-555555555555", school: "stoicism", argument: "Here is my answer. Deploy it. Because.\n\nMore.", opening: "Deploy it.", preview: "Deploy it. Because." }]],
   ]);
 });
 
 describe("the exemplars page", () => {
-  it("shows the heading, the line under it, the motion and each opening line, and no id", async () => {
+  it("shows the heading, the line under it, the motion and each card's first two sentences, and no id", async () => {
     const out = await render("opaque-benefit");
     expect(out).toContain("Exemplar ways to argue this motion</h1>");
     expect(out).toContain("Written as examples for Sophecs.");
     expect(out).toContain(MOTION.motion);
-    expect(out).toMatch(/<summary[^>]*>Deploy it\.<\/summary>/);
+    // Closed, the card shows its preview and a drawn chevron; never the
+    // browser's marker or a character a phone can turn into an emoji.
+    expect(out).toMatch(/<summary[^>]*list-none[^>]*><span[^>]*group-open:hidden[^>]*>Deploy it\. Because\.<\/span><span[^>]*>Hide<\/span><svg aria-hidden="true"/);
+    expect(out).not.toMatch(/[\u2190-\u21FF\u25A0-\u25FF\u2700-\u27BF\u2B00-\u2BFF]/);
     expect(out).toContain("<p>Here is my answer. Deploy it. Because.</p><p>More.</p>");
     expect(out).not.toContain("11111111-2222");
     // A sample page to analytics: nothing of it reaches PostHog.

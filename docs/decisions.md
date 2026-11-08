@@ -5480,3 +5480,42 @@ How each is carried out:
   revision verdict that says an objection is now answered and still
   suggests answering it, and "'s" after a name ending in "s". They stay on
   Arthur's list.
+
+### Exemplar cards: a drawn chevron, and two sentences closed (2026-11-08)
+
+Arthur, 2026-11-08:
+
+> The exemplar cards show a ▶️ emoji (iOS renders the disclosure triangle
+> as an emoji). Replace it everywhere with a plain drawn chevron (SVG or
+> CSS, currentColor, rotates when open) or a quiet "Read" / "Hide" text
+> toggle; no Unicode arrows or triangles that a phone can turn into
+> emoji. Also: cards that open "Deploy it." or "A Stoic can accept this
+> motion." read as filler. Show the first two sentences in the collapsed
+> card (cut at a sentence end), so each card reads like an argument.
+
+- **The mark.** `src/components/ui/Chevron.tsx`: an inline SVG drawn in
+  `currentColor`, hidden from assistive technology, that points right
+  while its `<details>` is closed and down while it is open. It is two
+  paths, one shown per state, rather than one path rotated:
+  `design/tokens.md`, section 6, forbids any transform, and a disclosure
+  may animate only its height and opacity. Every `<summary>` in the app
+  now hides the browser's own marker (`list-none` and
+  `::-webkit-details-marker`), which is what iOS drew as an emoji. The
+  three disclosures that showed a mark use the chevron: the exemplar
+  cards, the excerpt under a motion (`BeforeLesson`, which drew the
+  character "▸" and rotated it) and "Show all" on `/me`
+  (`OpenObjections`, which showed the browser's marker). The site
+  header's menus and the sample label already hid the marker and show no
+  mark; they are unchanged.
+- **The closed card.** It shows the argument's first two sentences after
+  any frame sentence (`previewOf` in `src/lib/exemplars.ts`), cut at a
+  sentence end; one sentence when two would run past 360 characters, and
+  a word cut with "…" only for a single sentence longer than that. Open,
+  the card shows "Hide" above the whole argument. The opening line still
+  decides which arguments count as one (one exemplar per opening).
+- **Checked** at 390px in Chromium against the built stylesheet: the
+  closed card, the open card and no sideways scroll. WebKit cannot run in
+  this environment, so for iOS the check is the markup: no character in
+  the arrows, geometric shapes, dingbats or emoji blocks anywhere a page
+  renders (`tests/exemplars-page.test.ts` holds that for the exemplars
+  page), and the marker hidden in both the standard and the WebKit way.

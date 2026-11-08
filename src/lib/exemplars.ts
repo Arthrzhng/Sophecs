@@ -55,8 +55,10 @@ export interface Exemplar {
   id: string;
   school: SchoolId;
   argument: string;
-  /** The line a reader opens it from: its first sentence after any frame. */
+  /** Its first sentence after any frame: how the page tells openings apart. */
   opening: string;
+  /** What its card shows closed: the first two sentences after any frame. */
+  preview: string;
 }
 
 export interface ExemplarCandidate {
@@ -130,7 +132,7 @@ export function selectExemplars(
       if (seen.has(text) || openings.has(openingKey)) continue;
       seen.add(text);
       openings.add(openingKey);
-      pool.push({ id: c.id, school: c.school, argument: c.argument.trim(), opening });
+      pool.push({ id: c.id, school: c.school, argument: c.argument.trim(), opening, preview: previewOf(c.argument) });
     }
     pools.set(school, pool);
   }
@@ -200,6 +202,25 @@ export async function getExemplars(
     bySchool.set(school, (data ?? []) as ExemplarCandidate[]);
   });
   return selectExemplars(bySchool, schools);
+}
+
+/**
+ * What an exemplar's card shows while it is closed: the first two
+ * sentences after any frame sentence, cut at a sentence end (Arthur,
+ * 2026-11-08: cards that open "Deploy it." read as filler; "Show the first
+ * two sentences in the collapsed card (cut at a sentence end), so each card
+ * reads like an argument"). One sentence if two would run past `max`
+ * characters; a single sentence longer than that is cut at a word, as an
+ * opening line is.
+ */
+export function previewOf(argument: string, sentences = 2, max = 360): string {
+  const text = withoutFrame(argument).replace(/\s+/g, " ").trim();
+  const all = text.split(/(?<=[.!?])\s+/);
+  for (let n = Math.min(sentences, all.length); n >= 1; n--) {
+    const preview = all.slice(0, n).join(" ");
+    if (preview.length <= max) return preview;
+  }
+  return openingOf(text, max);
 }
 
 /** The opening of an argument, for the line a reader opens it from. */

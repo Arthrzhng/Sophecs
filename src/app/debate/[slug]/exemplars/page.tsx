@@ -1,3 +1,4 @@
+import { Chevron } from "@/components/ui/Chevron";
 import { notFound } from "next/navigation";
 import { Page } from "@/components/layout/Page";
 import { SamplePageMarker } from "@/components/sample/SamplePageMarker";
@@ -93,9 +94,15 @@ export default async function ExemplarsPage({ params }: { params: Promise<{ slug
             {/* Keyed by position, so no sample debate's id is in the page. */}
             {items.map((item, i) => (
               <li key={i}>
-                <details className="rounded-card border-2 border-rule bg-surface px-4 py-3">
-                  <summary className="cursor-pointer font-serif text-base leading-relaxed text-ink">
-                    {item.opening}
+                {/* Closed, the card shows the argument's first two sentences;
+                    open, the whole argument below a quiet "Hide". */}
+                <details className="group rounded-card border-2 border-rule bg-surface px-4 py-3">
+                  <summary className="flex min-h-11 cursor-pointer list-none items-start gap-3 [&::-webkit-details-marker]:hidden">
+                    <span className="min-w-0 flex-1 font-serif text-base leading-relaxed text-ink group-open:hidden">
+                      {item.preview}
+                    </span>
+                    <span className="hidden min-w-0 flex-1 text-sm font-semibold text-ink-mid group-open:inline">Hide</span>
+                    <Chevron className="mt-1.5 text-ink-soft" />
                   </summary>
                   <div className="prose-reading mt-3 text-ink">
                     {item.argument.split(/\n\s*\n/).map((para, i) => (

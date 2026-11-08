@@ -1,5 +1,6 @@
 "use client";
 
+import { Chevron } from "@/components/ui/Chevron";
 import { useRef } from "react";
 import { track } from "@/lib/analytics/client";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
@@ -29,14 +30,9 @@ export function BeforeLesson({ lesson }: { lesson: MicroLessonContent }) {
   }
 
   return (
-    <details onToggle={onToggle} className="border-y border-rule py-4">
-      <summary className="flex cursor-pointer list-none items-baseline gap-2 text-sm text-ink [&::-webkit-details-marker]:hidden">
-        <span
-          aria-hidden="true"
-          className="text-ink-soft transition-transform [[open]_&]:rotate-90"
-        >
-          ▸
-        </span>
+    <details onToggle={onToggle} className="group border-y border-rule py-4">
+      <summary className="flex cursor-pointer list-none items-center gap-2 text-sm text-ink [&::-webkit-details-marker]:hidden">
+        <Chevron className="text-ink-soft" />
         Read the excerpt again: {lesson.title}
       </summary>
       <div className="prose-reading mt-5">

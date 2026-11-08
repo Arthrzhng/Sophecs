@@ -1,0 +1,33 @@
+/**
+ * The disclosure mark: a drawn chevron, never a character. iOS draws the
+ * browser's own disclosure triangle, and the small triangles and arrows in
+ * Unicode, as emoji (Arthur, 2026-11-08: "a plain drawn chevron (SVG or
+ * CSS, currentColor, rotates when open) ... no Unicode arrows or
+ * triangles that a phone can turn into emoji").
+ *
+ * It points right while its <details> is closed and down while it is
+ * open. The two poses are two paths swapped by state rather than one
+ * rotated, because design/tokens.md, section 6, allows no transform and
+ * no motion here. The <details> needs the `group` class; its <summary>
+ * hides the browser's marker (`list-none [&::-webkit-details-marker]:hidden`).
+ */
+export function Chevron({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      viewBox="0 0 16 16"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`shrink-0 ${className}`}
+    >
+      <path d="M6 3.5 10.5 8 6 12.5" className="group-open:hidden" />
+      <path d="M3.5 6 8 10.5 12.5 6" className="hidden group-open:inline" />
+    </svg>
+  );
+}
