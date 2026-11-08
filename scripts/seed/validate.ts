@@ -28,6 +28,22 @@ const SPOT_COLUMNS: Partial<Record<Table, string[]>> = {
 
 const same = (a: unknown, b: unknown) => (typeof a === "number" || typeof b === "number" ? Number(a) === Number(b) : a === b);
 
+// The quiz v2 point, a `double precision` pair. Production's database
+// prints float8 with extra_float_digits 0, so PostgREST returns 15
+// significant digits: a stored -0.19899999999999998, the plan's to the bit,
+// reads back as -0.199. A local database, at the default of 1, prints the
+// shortest digits that read back to the same double. So a point read back
+// is the plan's exactly, or the plan's rounded to 15 digits (the first
+// canary of the fresh run, 2026-11-08, failed on exactly this read: 38 of
+// 50 points). toPrecision(15) rounds as Postgres's %.15g does on every
+// coordinate the quiz can produce: the two differ only on an exact tie,
+// and the quiz has none.
+const FLOAT8 = new Set(["map_x", "map_y"]);
+const sameFloat8 = (read: unknown, planned: unknown) =>
+  typeof read === "number" && typeof planned === "number"
+    ? read === planned || read === Number(planned.toPrecision(15))
+    : same(read, planned);
+
 export async function validate(
   adapter: Adapter,
   ds: Dataset,
@@ -73,7 +89,7 @@ export async function validate(
       // row has none, and the table's default reads back as version 1.
       const v2 = p.table === "quiz_results" && (s.row as { quiz_version?: number }).quiz_version === 2;
       const cols = [...(SPOT_COLUMNS[p.table] ?? []), ...(v2 ? ["quiz_version", "map_x", "map_y", "vector"] : [])];
-      const diff = r ? cols.find((c) => !same(r[c] ?? null, (s.row as Record<string, unknown>)[c] ?? null)) : "missing";
+      const diff = r ? cols.find((c) => !(FLOAT8.has(c) ? sameFloat8 : same)(r[c] ?? null, (s.row as Record<string, unknown>)[c] ?? null)) : "missing";
       if (diff) {
         bad++;
         firstBad ||= `${s.rowId}: ${diff}`;
