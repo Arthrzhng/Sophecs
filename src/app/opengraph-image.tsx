@@ -8,11 +8,10 @@ export const contentType = "image/png";
 
 // The card for sophecs.com itself. Distinct from /r/[id]'s card, which is a
 // saturated school surface: this one is paper, because it belongs to the
-// site rather than to any one school. The hairline below is the only place
-// on the site where every school's colour appears together (six since the
-// launch, three on a build without the flag): the muted tokens, not the
-// card surfaces, since these sit on paper.
-const SCHOOL_HAIRLINE = SITE_HAIRLINE;
+// site rather than to any one school. The hairline below draws every
+// school's colour together (six since the launch, three on a build without
+// the flag): the muted tokens, not the card surfaces, since these sit on
+// paper.
 
 export default async function SiteOgImage() {
   const [spectral, plexSans] = await loadOgFonts();
@@ -66,7 +65,7 @@ export default async function SiteOgImage() {
         </div>
 
         <div style={{ display: "flex", width: "100%" }}>
-          {SCHOOL_HAIRLINE.map((colour) => (
+          {SITE_HAIRLINE.map((colour) => (
             <div key={colour} style={{ display: "flex", flex: 1, height: 3, backgroundColor: colour }} />
           ))}
         </div>

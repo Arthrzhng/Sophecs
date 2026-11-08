@@ -5,6 +5,8 @@
 // from a database row must answer with the quiz or a not-found, never an
 // error (review pass 1 of #112). With the flag, the same rows render.
 import { renderToStaticMarkup } from "react-dom/server";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 type Row = Record<string, unknown>;
@@ -142,8 +144,13 @@ describe("a build with SIX_SCHOOLS, given the same rows", () => {
   it("draws the site card's hairline in all six colours", async () => {
     vi.resetModules();
     vi.stubEnv("SIX_SCHOOLS", "1");
-    const { SITE_HAIRLINE } = await import("../src/lib/card-tokens");
-    expect(SITE_HAIRLINE).toHaveLength(6);
+    const { SITE_HAIRLINE, SCHOOL_MARKER } = await import("../src/lib/card-tokens");
+    const { SHOWN_SCHOOL_IDS } = await import("../src/lib/school-registry");
+    expect(SHOWN_SCHOOL_IDS).toHaveLength(6);
+    expect(SITE_HAIRLINE).toEqual(SHOWN_SCHOOL_IDS.map((id) => SCHOOL_MARKER[id]));
     expect(new Set(SITE_HAIRLINE).size).toBe(6);
+    // And the site card draws that list as it is (review pass 3).
+    const source = readFileSync(join(process.cwd(), "src/app/opengraph-image.tsx"), "utf8");
+    expect(source).toMatch(/\{SITE_HAIRLINE\.map\(\(colour\) =>/);
   });
 });

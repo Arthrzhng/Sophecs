@@ -54,7 +54,7 @@ list you finish and merge without asking.
   the request fixtures proved byte-identical either side of it.
   **Unchanged fixtures are not on their own enough.** They cover v2 for
   the original three and v3 for all six on a SIX_SCHOOLS build, which
-  production is since the launch; nothing covers v3 on a build without
+  production has been since the launch; nothing covers v3 on a build without
   the flag or the golden runner's own path, so a change there moves no
   fixture and still changes what the judge receives. This condition holds
   even when no fixture moves; `docs/review-charter.md` rule 2 has the

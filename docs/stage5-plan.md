@@ -315,11 +315,11 @@ of the three; Gate 2 is about that.
    - [x] `RUN_QUIZ` set to 2 in `scripts/seed/generate.ts` in the launch
      merge, after the sample teardown, so the scheduled job's runs cover
      all six schools placed by quiz v2 (Gate 4 item 13;
-     `docs/sample-activity.md`, "At launch"). The same merge updates the
-     one test that pins today's switch, "is still what the scheduled job
-     makes" in `tests/seed/six-schools.test.ts`, which expects `RUN_QUIZ`
-     unset. The command checks and the scheduled path are tested with it
-     set either way, so nothing else changes.
+     `docs/sample-activity.md`, "At launch"). The same merge updated the
+     one test that pinned the switch in `tests/seed/six-schools.test.ts`,
+     which expected `RUN_QUIZ` unset and now expects 2. The command checks
+     and the scheduled path were already tested with it set either way, so
+     nothing else changed.
    - [ ] The fresh sample run, canary then full, each on Arthur's word.
    - [ ] The v2 copy below, read and ruled by Arthur in the Gate 4 pack
      (asked for on 2026-11-06).

@@ -32,8 +32,8 @@
  * the launch their ids and names were unreleased product decisions, and
  * the Phase 1B guarantee was that no draft reaches a production page or
  * bundle; a build without the flag, the one a revert deploys, still holds
- * to it. This
- * file ships to the browser; that one cannot. The first attempt at this registry
+ * to it. This file ships to the browser; that one cannot. The first
+ * attempt at this registry
  * held all six entries and put "confucian", "Confucianism", "ubuntu" and
  * "buddhist" into thirteen production client chunks, which is the thing
  * the draft gate exists to prevent.
