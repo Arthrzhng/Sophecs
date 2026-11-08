@@ -335,12 +335,38 @@ export function serialiseBank(bank: BankArgument[]): string {
   return JSON.stringify(bank, null, 2) + "\n";
 }
 
-/** The banks show the fresh run's arguments, so each motion's own closings. */
+/**
+ * A position that opens on a bare stance sentence: "I reject the motion.",
+ * "I accept the motion.", "I support the motion.", "The motion is right.",
+ * "Deploy it." and their like. 35 of the 144 positions did, most of them a
+ * school's second, so on one exemplar page up to five schools' cards
+ * opened on the same sentence (Arthur, 2026-11-08: "repeated sentence
+ * openings ... across sample arguments and exemplars").
+ */
+export const BARE_STANCE =
+  /^(?:I (?:reject|accept|support|oppose|agree with) (?:the|this) motion|The motion is right|(?:Do not )?[Dd]eploy it|Deploying it is wrong as stated)\.\s+/;
+
+/**
+ * The passages a run made with quiz v2 (the fresh run) argues from: each
+ * position without a bare stance sentence in front, so it opens on its own
+ * claim. Everything else is as written. A run that names no quiz reads the
+ * passages as they are, since the live run regenerates its rows from them.
+ */
+export function freshFragments(fr: TopicFragments): TopicFragments {
+  return {
+    ...fr,
+    schools: Object.fromEntries(
+      Object.entries(fr.schools).map(([school, s]) => [school, { ...s, positions: s.positions.map((p) => p.replace(BARE_STANCE, "")) }])
+    ) as TopicFragments["schools"],
+  };
+}
+
+/** The banks show the fresh run's arguments: each motion's own closings, and positions that open on their claim. */
 export function writeBanks(): string[] {
   const closings = loadMotionClosings();
   const written: string[] = [];
   for (const topic of TOPICS) {
-    const fr = loadFragments(topic);
+    const fr = freshFragments(loadFragments(topic));
     for (const school of BANK_SCHOOLS) {
       writeFileSync(bankPath(topic, school), serialiseBank(buildBank(fr, closings[topic], school)));
       written.push(bankPath(topic, school));

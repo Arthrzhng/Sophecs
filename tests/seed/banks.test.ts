@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { loadMotionClosings, loadFragments, buildBank, serialiseBank, bankPath, rivalIntro, BANK_SCHOOLS, LAUNCH_SCHOOLS, SCHOOLS, TOPICS, wordCount, type SchoolId } from "../../scripts/seed/banks";
+import { loadMotionClosings, loadFragments, freshFragments, buildBank, serialiseBank, bankPath, rivalIntro, BANK_SCHOOLS, LAUNCH_SCHOOLS, SCHOOLS, TOPICS, wordCount, type SchoolId } from "../../scripts/seed/banks";
 import { OBJECTION_VOICES } from "../../src/lib/judge/objection-voices";
 
 describe("argument banks", () => {
@@ -10,7 +10,7 @@ describe("argument banks", () => {
       for (const id of BANK_SCHOOLS) {
         const school = id as SchoolId;
         expect(readFileSync(bankPath(topic, school), "utf8"), `${topic}.${school}`).toBe(
-          serialiseBank(buildBank(loadFragments(topic), closings[topic], school))
+          serialiseBank(buildBank(freshFragments(loadFragments(topic)), closings[topic], school))
         );
       }
   });

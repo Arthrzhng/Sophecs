@@ -6,11 +6,11 @@ Three per school, one of each tier the sample run writes, each the first of its 
 
 ## Confucianism
 
-### Strong: Does the model decide? (217 words)
+### Strong: Does the model decide? (213 words)
 
 Motion: It is a mistake to say that a language model decides anything.
 
-> I accept the motion. To say the model decided is to give a role's responsibility to something that holds no role, and the people who do hold it slip out from under it. Responsibility in a role cannot be handed to something that holds no role. A loan officer who says the model decided is still the loan officer; the misnaming lets her stop acting as one.
+> To say the model decided is to give a role's responsibility to something that holds no role, and the people who do hold it slip out from under it. Responsibility in a role cannot be handed to something that holds no role. A loan officer who says the model decided is still the loan officer; the misnaming lets her stop acting as one.
 >
 > The practical cost of the word is in the relationships. People told that a system decided about them have no one to hold to what the position owes them, and that leaves the relationship between institution and person empty. A teacher tells a parent the grading software decided the mark. The parent wants to talk to the teacher, whose job it was.
 >
@@ -72,11 +72,11 @@ Motion: When an AI system causes harm, the people who built it are to blame in p
 >
 > A Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. The builders are still called to attend to the injured, but attending is not the same as being to blame.
 
-### Mid: Does the model decide? (115 words)
+### Mid: Does the model decide? (111 words)
 
 Motion: It is a mistake to say that a language model decides anything.
 
-> I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. Buddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide.
+> A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. Buddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide.
 >
 > A content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform. The model wills nothing, so every output is a trace of human intentions, and those are what the right word keeps in view.
 

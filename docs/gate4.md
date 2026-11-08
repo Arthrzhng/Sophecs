@@ -109,6 +109,13 @@ For your next list, from carrying these out:
   shows the same 72 openings and a different argument in 16 places, each
   the next under the same opening (`docs/decisions.md`, "Gate 4: each
   motion's own closings");
+- from the audit (#110 and this change): the fresh run's positions open
+  on their claim, without a bare stance sentence such as "I reject the
+  motion.", so no two exemplar cards on a page open the same way; one
+  Ubuntu passage is reworded for it. Twelve passages still say "not only
+  ... but" or "not just"; for the fresh run they can change as the
+  openings did (`docs/decisions.md`, "The fresh run's arguments open on
+  their claim");
 - found while checking the click-through: the method page's "Known
   limitations" says "Verdict quality is still being checked against real
   arguments. That is why judging is paused rather than running."

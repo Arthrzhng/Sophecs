@@ -31,15 +31,15 @@
         1,
         2
       ],
-      "example": null,
+      "example": 1,
       "objections": [
         0
       ],
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nSabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
-    "words": 223
+    "text": "People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nSabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered. A village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
+    "words": 249
   },
   {
     "id": "opaque-benefit.ubuntu.03",
@@ -52,15 +52,15 @@
         3,
         2
       ],
-      "example": 1,
+      "example": null,
       "objections": [
-        0
+        1
       ],
-      "closing": 0,
+      "closing": 1,
       "weak": []
     },
-    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nSabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered. A village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
-    "words": 242
+    "text": "How much suffering it removes is one question; whose voices were left out when this was chosen as the way to remove it is another. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nSabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nA Utilitarian will object that the suffering the system prevents is real, and waiting for everyone affected to have a say leaves it in place while the consultations run. The suffering is real, and the wait has a cost that has to be owned. But a say need not mean everyone agreeing or a long consultation: the people it decides about can be brought into deciding quickly, and until they are, their care stays with people who can answer to them. A benefit run as a verdict nobody answers for falls on the same people it is meant for. Bring the people it would judge into the deciding first; a benefit worth having will survive the wait.",
+    "words": 223
   },
   {
     "id": "opaque-benefit.ubuntu.04",
@@ -115,15 +115,15 @@
         0,
         2
       ],
-      "example": null,
+      "example": 1,
       "objections": [
         0
       ],
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nSabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. A benefit people may not question leaves them nothing to say back to whoever runs it, and that is a harm no average shows.",
-    "words": 222
+    "text": "People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nSabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered. A village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. A benefit people may not question leaves them nothing to say back to whoever runs it, and that is a harm no average shows.",
+    "words": 248
   },
   {
     "id": "opaque-benefit.ubuntu.07",
@@ -133,18 +133,18 @@
     "parts": {
       "position": 3,
       "reasons": [
-        3,
-        0
+        2,
+        1
       ],
-      "example": 0,
+      "example": null,
       "objections": [
         0
       ],
       "closing": 0,
       "weak": []
     },
-    "text": "I reject this motion, because harm here is not only a bad outcome but a broken relationship, and an unexplained decision breaks the one between a person and those who govern their care. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nOn Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life. A clinic adopts a model that triages referrals well. The families it turns away cannot ask why, and the elders who once explained such decisions to them no longer can.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
-    "words": 246
+    "text": "I reject this motion, because harm here is not only a bad outcome but a broken relationship, and an unexplained decision breaks the one between a person and those who govern their care. Sabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nYour data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
+    "words": 222
   },
   {
     "id": "opaque-benefit.ubuntu.08",
@@ -154,18 +154,18 @@
     "parts": {
       "position": 2,
       "reasons": [
-        2,
-        0
+        3,
+        1
       ],
-      "example": 1,
+      "example": 0,
       "objections": [
         0
       ],
       "closing": 0,
       "weak": []
     },
-    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. Sabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nOn Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life. A village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
-    "words": 250
+    "text": "How much suffering it removes is one question; whose voices were left out when this was chosen as the way to remove it is another. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nYour data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity. A clinic adopts a model that triages referrals well. The families it turns away cannot ask why, and the elders who once explained such decisions to them no longer can.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
+    "words": 239
   },
   {
     "id": "opaque-benefit.ubuntu.09",
@@ -194,20 +194,20 @@
     "school": "ubuntu",
     "tier": "strong",
     "parts": {
-      "position": 2,
+      "position": 1,
       "reasons": [
         3,
         2
       ],
-      "example": null,
+      "example": 2,
       "objections": [
-        1
+        0
       ],
-      "closing": 1,
+      "closing": 3,
       "weak": []
     },
-    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nSabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nA Utilitarian will object that the suffering the system prevents is real, and waiting for everyone affected to have a say leaves it in place while the consultations run. The suffering is real, and the wait has a cost that has to be owned. But a say need not mean everyone agreeing or a long consultation: the people it decides about can be brought into deciding quickly, and until they are, their care stays with people who can answer to them. A benefit run as a verdict nobody answers for falls on the same people it is meant for. Bring the people it would judge into the deciding first; a benefit worth having will survive the wait.",
-    "words": 230
+    "text": "People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nSabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered. A school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation.\n\nA Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. The test is whether the families and neighbours affected could question the system together, and as it stands they cannot.",
+    "words": 235
   },
   {
     "id": "opaque-benefit.ubuntu.11",
@@ -224,8 +224,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. The test is whether the families and neighbours affected could question the system together, and as it stands they cannot.",
-    "words": 121
+    "text": "People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. The test is whether the families and neighbours affected could question the system together, and as it stands they cannot.",
+    "words": 117
   },
   {
     "id": "opaque-benefit.ubuntu.12",
@@ -242,8 +242,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nA clinic adopts a model that triages referrals well. The families it turns away cannot ask why, and the elders who once explained such decisions to them no longer can. The test is whether the families and neighbours affected could question the system together, and as it stands they cannot.",
-    "words": 129
+    "text": "How much suffering it removes is one question; whose voices were left out when this was chosen as the way to remove it is another. Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nA clinic adopts a model that triages referrals well. The families it turns away cannot ask why, and the elders who once explained such decisions to them no longer can. The test is whether the families and neighbours affected could question the system together, and as it stands they cannot.",
+    "words": 122
   },
   {
     "id": "opaque-benefit.ubuntu.13",
@@ -296,8 +296,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nA village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged. The test is whether the families and neighbours affected could question the system together, and as it stands they cannot.",
-    "words": 120
+    "text": "How much suffering it removes is one question; whose voices were left out when this was chosen as the way to remove it is another. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nA village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged. The test is whether the families and neighbours affected could question the system together, and as it stands they cannot.",
+    "words": 113
   },
   {
     "id": "opaque-benefit.ubuntu.16",
@@ -314,8 +314,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
-    "words": 133
+    "text": "People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
+    "words": 129
   },
   {
     "id": "opaque-benefit.ubuntu.17",
@@ -368,8 +368,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. The test is whether the families and neighbours affected could question the system together, and as it stands they cannot.",
-    "words": 119
+    "text": "How much suffering it removes is one question; whose voices were left out when this was chosen as the way to remove it is another. Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. The test is whether the families and neighbours affected could question the system together, and as it stands they cannot.",
+    "words": 112
   },
   {
     "id": "opaque-benefit.ubuntu.20",
@@ -386,8 +386,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Sabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nA village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
-    "words": 131
+    "text": "People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Sabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nA village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
+    "words": 127
   },
   {
     "id": "opaque-benefit.ubuntu.21",
@@ -458,8 +458,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Sabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
-    "words": 130
+    "text": "People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Sabelo Mhlambi argues that a discriminatory automated decision is a failure of relational personhood, not just an unfair output. An unexplained one fails in the same way even when it is correct, because the person cannot answer it, contest it, or be answered.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
+    "words": 126
   },
   {
     "id": "opaque-benefit.ubuntu.25",
@@ -476,8 +476,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nA clinic adopts a model that triages referrals well. The families it turns away cannot ask why, and the elders who once explained such decisions to them no longer can. Bring the people it would judge into the deciding first; a benefit worth having will survive the wait.",
-    "words": 127
+    "text": "How much suffering it removes is one question; whose voices were left out when this was chosen as the way to remove it is another. Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nA clinic adopts a model that triages referrals well. The families it turns away cannot ask why, and the elders who once explained such decisions to them no longer can. Bring the people it would judge into the deciding first; a benefit worth having will survive the wait.",
+    "words": 120
   },
   {
     "id": "opaque-benefit.ubuntu.26",
@@ -548,8 +548,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nA village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged. Bring the people it would judge into the deciding first; a benefit worth having will survive the wait.",
-    "words": 129
+    "text": "People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve. Your data is rarely only yours. A model trained on a community's records decides about people using what their families and neighbours gave, and none of them can ask what was made of it. A benefit built on a community's information without its voice is not solidarity.\n\nA village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged. Bring the people it would judge into the deciding first; a benefit worth having will survive the wait.",
+    "words": 125
   },
   {
     "id": "opaque-benefit.ubuntu.30",
@@ -566,8 +566,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
-    "words": 131
+    "text": "How much suffering it removes is one question; whose voices were left out when this was chosen as the way to remove it is another. On Thaddeus Metz's relational reading, right action honours capacities for relationships of shared identity and solidarity. An explanation is part of how people keep sharing a life with the institutions that decide about them; withholding it, however well meant, treats them as outside that shared life.\n\nA school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation. People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
+    "words": 124
   },
   {
     "id": "opaque-benefit.ubuntu.31",
@@ -602,8 +602,8 @@
         4
       ]
     },
-    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it.\n\nThe real problem is trust. If people cannot see why something happened they will not trust it, and without trust the whole system falls apart, so we need explanations before anything is deployed. A school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation.",
-    "words": 94
+    "text": "How much suffering it removes is one question; whose voices were left out when this was chosen as the way to remove it is another.\n\nThe real problem is trust. If people cannot see why something happened they will not trust it, and without trust the whole system falls apart, so we need explanations before anything is deployed. A school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation.",
+    "words": 87
   },
   {
     "id": "opaque-benefit.ubuntu.33",
@@ -621,8 +621,8 @@
         2
       ]
     },
-    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve.\n\nThe real problem is trust. If people cannot see why something happened they will not trust it, and without trust the whole system falls apart, so we need explanations before anything is deployed. People should always be told why. It is basic respect and it is unfair otherwise. If I was the person it decided about I would want to know, and I think most people would say the same.",
-    "words": 104
+    "text": "People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve.\n\nThe real problem is trust. If people cannot see why something happened they will not trust it, and without trust the whole system falls apart, so we need explanations before anything is deployed. People should always be told why. It is basic respect and it is unfair otherwise. If I was the person it decided about I would want to know, and I think most people would say the same.",
+    "words": 100
   },
   {
     "id": "opaque-benefit.ubuntu.34",
@@ -694,8 +694,8 @@
         2
       ]
     },
-    "text": "Deploying it is wrong as stated. The question is not only how much suffering it removes but whose voices were left out of deciding that this was the way to remove it.\n\nPeople should always be told why. It is basic respect and it is unfair otherwise. If I was the person it decided about I would want to know, and I think most people would say the same. A village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged.",
-    "words": 99
+    "text": "How much suffering it removes is one question; whose voices were left out when this was chosen as the way to remove it is another.\n\nPeople should always be told why. It is basic respect and it is unfair otherwise. If I was the person it decided about I would want to know, and I think most people would say the same. A village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged.",
+    "words": 92
   },
   {
     "id": "opaque-benefit.ubuntu.38",
@@ -712,8 +712,8 @@
         4
       ]
     },
-    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve.\n\nThe real problem is trust. If people cannot see why something happened they will not trust it, and without trust the whole system falls apart, so we need explanations before anything is deployed. A clinic adopts a model that triages referrals well. The families it turns away cannot ask why, and the elders who once explained such decisions to them no longer can.",
-    "words": 97
+    "text": "People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve.\n\nThe real problem is trust. If people cannot see why something happened they will not trust it, and without trust the whole system falls apart, so we need explanations before anything is deployed. A clinic adopts a model that triages referrals well. The families it turns away cannot ask why, and the elders who once explained such decisions to them no longer can.",
+    "words": 93
   },
   {
     "id": "opaque-benefit.ubuntu.39",
@@ -748,7 +748,7 @@
         4
       ]
     },
-    "text": "I reject the motion. People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve.\n\nThe real problem is trust. If people cannot see why something happened they will not trust it, and without trust the whole system falls apart, so we need explanations before anything is deployed. A village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged.",
-    "words": 97
+    "text": "People become who they are through their relationships with others, and a decision that cannot be explained to them cuts them out of the relationship it is supposed to serve.\n\nThe real problem is trust. If people cannot see why something happened they will not trust it, and without trust the whole system falls apart, so we need explanations before anything is deployed. A village's health records train a screening model sold back to its clinic. Nobody in the village was asked, and nobody can now be told why a neighbour was flagged.",
+    "words": 93
   }
 ]

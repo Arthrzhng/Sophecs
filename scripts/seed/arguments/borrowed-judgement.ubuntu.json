@@ -59,8 +59,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I accept the motion. Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. As Metz gives the Nguni maxim, a person is a person through other persons. Asking a neighbour for advice, deciding together what the family eats, sorting out who collects the children: these small exchanges are how people come to share a life, and an assistant that settles them quietly takes the sharing away.\n\nOn Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A capacity is kept by using it, and a household whose coordination runs through an assistant has fewer chances to exercise exactly the capacities that make it a household. An elderly man's assistant books his appointments. It is more efficient than his daughter's calls, which were also how she knew how he was.\n\nA Stoic will object that what is truly yours is your own judgement, and the worry about losing exchanges with other people hands your good over to things outside your control. But a self defined apart from others is exactly what this school denies. The exchanges are not external comforts; they are where a person is made, so losing them is losing part of what one is. When the assistant chooses the gift or the reply, the person loses an exchange through which they belong to others.",
-    "words": 244
+    "text": "Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. As Metz gives the Nguni maxim, a person is a person through other persons. Asking a neighbour for advice, deciding together what the family eats, sorting out who collects the children: these small exchanges are how people come to share a life, and an assistant that settles them quietly takes the sharing away.\n\nOn Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A capacity is kept by using it, and a household whose coordination runs through an assistant has fewer chances to exercise exactly the capacities that make it a household. An elderly man's assistant books his appointments. It is more efficient than his daughter's calls, which were also how she knew how he was.\n\nA Stoic will object that what is truly yours is your own judgement, and the worry about losing exchanges with other people hands your good over to things outside your control. But a self defined apart from others is exactly what this school denies. The exchanges are not external comforts; they are where a person is made, so losing them is losing part of what one is. When the assistant chooses the gift or the reply, the person loses an exchange through which they belong to others.",
+    "words": 240
   },
   {
     "id": "borrowed-judgement.ubuntu.04",
@@ -91,18 +91,18 @@
     "parts": {
       "position": 1,
       "reasons": [
-        1,
+        2,
+        3
+      ],
+      "example": 2,
+      "objections": [
         0
       ],
-      "example": null,
-      "objections": [
-        1
-      ],
-      "closing": 3,
+      "closing": 2,
       "weak": []
     },
-    "text": "I accept the motion. Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. On Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A capacity is kept by using it, and a household whose coordination runs through an assistant has fewer chances to exercise exactly the capacities that make it a household.\n\nAs Metz gives the Nguni maxim, a person is a person through other persons. Asking a neighbour for advice, deciding together what the family eats, sorting out who collects the children: these small exchanges are how people come to share a life, and an assistant that settles them quietly takes the sharing away.\n\nA Utilitarian will object that if everyone in the household is better off with the assistant's choices, the loss of a few conversations is outweighed, and calling it a cost to personhood inflates it. The loss is not a few conversations but the practice of deciding together, which is how a household stays one. A total that counts each person's satisfaction separately cannot see what they lose together. Give away the choices that were only ever yours, and keep the ones that were also a way of meeting someone.",
-    "words": 222
+    "text": "Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. The better choice is measured against the person alone. But much of what the assistant optimises was never only one person's to make; it carried other people's needs and wishes, and those people are no longer part of the deciding.\n\nGyekye's moderate reading keeps individual worth, so not every choice must be communal. The cost arises where the choice was a meeting point with others, and those are the ones assistants are most often given. An elderly man's assistant books his appointments. It is more efficient than his daughter's calls, which were also how she knew how he was.\n\nA Stoic will object that what is truly yours is your own judgement, and the worry about losing exchanges with other people hands your good over to things outside your control. But a self defined apart from others is exactly what this school denies. The exchanges are not external comforts; they are where a person is made, so losing them is losing part of what one is. Choices that no longer pass between people, however good, cost the very relationships that made them worth making.",
+    "words": 217
   },
   {
     "id": "borrowed-judgement.ubuntu.06",
@@ -131,27 +131,6 @@
     "school": "ubuntu",
     "tier": "strong",
     "parts": {
-      "position": 3,
-      "reasons": [
-        2,
-        1
-      ],
-      "example": 2,
-      "objections": [
-        1
-      ],
-      "closing": 1,
-      "weak": []
-    },
-    "text": "Delegating daily choices costs something that matters, because what is delegated is often not a choice but a piece of a relationship. The better choice is measured against the person alone. But much of what the assistant optimises was never only one person's to make; it carried other people's needs and wishes, and those people are no longer part of the deciding.\n\nOn Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A capacity is kept by using it, and a household whose coordination runs through an assistant has fewer chances to exercise exactly the capacities that make it a household. An elderly man's assistant books his appointments. It is more efficient than his daughter's calls, which were also how she knew how he was.\n\nA Utilitarian will object that if everyone in the household is better off with the assistant's choices, the loss of a few conversations is outweighed, and calling it a cost to personhood inflates it. The loss is not a few conversations but the practice of deciding together, which is how a household stays one. A total that counts each person's satisfaction separately cannot see what they lose together. When the assistant chooses the gift or the reply, the person loses an exchange through which they belong to others.",
-    "words": 217
-  },
-  {
-    "id": "borrowed-judgement.ubuntu.08",
-    "topic": "borrowed-judgement",
-    "school": "ubuntu",
-    "tier": "strong",
-    "parts": {
       "position": 2,
       "reasons": [
         0,
@@ -168,6 +147,27 @@
     "words": 233
   },
   {
+    "id": "borrowed-judgement.ubuntu.08",
+    "topic": "borrowed-judgement",
+    "school": "ubuntu",
+    "tier": "strong",
+    "parts": {
+      "position": 3,
+      "reasons": [
+        1,
+        2
+      ],
+      "example": 2,
+      "objections": [
+        1
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "Delegating daily choices costs something that matters, because what is delegated is often not a choice but a piece of a relationship. On Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A capacity is kept by using it, and a household whose coordination runs through an assistant has fewer chances to exercise exactly the capacities that make it a household.\n\nThe better choice is measured against the person alone. But much of what the assistant optimises was never only one person's to make; it carried other people's needs and wishes, and those people are no longer part of the deciding. An elderly man's assistant books his appointments. It is more efficient than his daughter's calls, which were also how she knew how he was.\n\nA Utilitarian will object that if everyone in the household is better off with the assistant's choices, the loss of a few conversations is outweighed, and calling it a cost to personhood inflates it. The loss is not a few conversations but the practice of deciding together, which is how a household stays one. A total that counts each person's satisfaction separately cannot see what they lose together. When the assistant chooses the gift or the reply, the person loses an exchange through which they belong to others.",
+    "words": 217
+  },
+  {
     "id": "borrowed-judgement.ubuntu.09",
     "topic": "borrowed-judgement",
     "school": "ubuntu",
@@ -175,18 +175,18 @@
     "parts": {
       "position": 1,
       "reasons": [
-        0,
+        3,
         1
       ],
-      "example": null,
+      "example": 0,
       "objections": [
-        1
+        0
       ],
-      "closing": 3,
+      "closing": 2,
       "weak": []
     },
-    "text": "I accept the motion. Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. As Metz gives the Nguni maxim, a person is a person through other persons. Asking a neighbour for advice, deciding together what the family eats, sorting out who collects the children: these small exchanges are how people come to share a life, and an assistant that settles them quietly takes the sharing away.\n\nOn Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A capacity is kept by using it, and a household whose coordination runs through an assistant has fewer chances to exercise exactly the capacities that make it a household.\n\nA Utilitarian will object that if everyone in the household is better off with the assistant's choices, the loss of a few conversations is outweighed, and calling it a cost to personhood inflates it. The loss is not a few conversations but the practice of deciding together, which is how a household stays one. A total that counts each person's satisfaction separately cannot see what they lose together. Give away the choices that were only ever yours, and keep the ones that were also a way of meeting someone.",
-    "words": 222
+    "text": "Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. Gyekye's moderate reading keeps individual worth, so not every choice must be communal. The cost arises where the choice was a meeting point with others, and those are the ones assistants are most often given.\n\nOn Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A capacity is kept by using it, and a household whose coordination runs through an assistant has fewer chances to exercise exactly the capacities that make it a household. A family lets an assistant plan the week's meals. The food improves, and the Sunday argument about what to cook, which was also how they caught up, stops happening.\n\nA Stoic will object that what is truly yours is your own judgement, and the worry about losing exchanges with other people hands your good over to things outside your control. But a self defined apart from others is exactly what this school denies. The exchanges are not external comforts; they are where a person is made, so losing them is losing part of what one is. Choices that no longer pass between people, however good, cost the very relationships that made them worth making.",
+    "words": 225
   },
   {
     "id": "borrowed-judgement.ubuntu.10",
@@ -194,20 +194,20 @@
     "school": "ubuntu",
     "tier": "strong",
     "parts": {
-      "position": 2,
+      "position": 3,
       "reasons": [
-        3,
-        2
+        2,
+        1
       ],
       "example": 0,
       "objections": [
-        1
+        0
       ],
       "closing": 3,
       "weak": []
     },
-    "text": "I accept this with a qualification: the cost falls where choices were shared with others, not where they were only ever one's own. Gyekye's moderate reading keeps individual worth, so not every choice must be communal. The cost arises where the choice was a meeting point with others, and those are the ones assistants are most often given.\n\nThe better choice is measured against the person alone. But much of what the assistant optimises was never only one person's to make; it carried other people's needs and wishes, and those people are no longer part of the deciding. A family lets an assistant plan the week's meals. The food improves, and the Sunday argument about what to cook, which was also how they caught up, stops happening.\n\nA Utilitarian will object that if everyone in the household is better off with the assistant's choices, the loss of a few conversations is outweighed, and calling it a cost to personhood inflates it. The loss is not a few conversations but the practice of deciding together, which is how a household stays one. A total that counts each person's satisfaction separately cannot see what they lose together. Give away the choices that were only ever yours, and keep the ones that were also a way of meeting someone.",
-    "words": 216
+    "text": "Delegating daily choices costs something that matters, because what is delegated is often not a choice but a piece of a relationship. The better choice is measured against the person alone. But much of what the assistant optimises was never only one person's to make; it carried other people's needs and wishes, and those people are no longer part of the deciding.\n\nOn Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A capacity is kept by using it, and a household whose coordination runs through an assistant has fewer chances to exercise exactly the capacities that make it a household. A family lets an assistant plan the week's meals. The food improves, and the Sunday argument about what to cook, which was also how they caught up, stops happening.\n\nA Stoic will object that what is truly yours is your own judgement, and the worry about losing exchanges with other people hands your good over to things outside your control. But a self defined apart from others is exactly what this school denies. The exchanges are not external comforts; they are where a person is made, so losing them is losing part of what one is. Give away the choices that were only ever yours, and keep the ones that were also a way of meeting someone.",
+    "words": 222
   },
   {
     "id": "borrowed-judgement.ubuntu.11",
@@ -260,8 +260,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I accept the motion. Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. The better choice is measured against the person alone. But much of what the assistant optimises was never only one person's to make; it carried other people's needs and wishes, and those people are no longer part of the deciding.\n\nA student lets an app choose his study group. The group works, and he never has the awkward conversation in which he would have got to know the others. When the assistant chooses the gift or the reply, the person loses an exchange through which they belong to others.",
-    "words": 126
+    "text": "Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. The better choice is measured against the person alone. But much of what the assistant optimises was never only one person's to make; it carried other people's needs and wishes, and those people are no longer part of the deciding.\n\nA student lets an app choose his study group. The group works, and he never has the awkward conversation in which he would have got to know the others. When the assistant chooses the gift or the reply, the person loses an exchange through which they belong to others.",
+    "words": 122
   },
   {
     "id": "borrowed-judgement.ubuntu.14",
@@ -314,8 +314,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I accept the motion. Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. On Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A capacity is kept by using it, and a household whose coordination runs through an assistant has fewer chances to exercise exactly the capacities that make it a household.\n\nA student lets an app choose his study group. The group works, and he never has the awkward conversation in which he would have got to know the others. When the assistant chooses the gift or the reply, the person loses an exchange through which they belong to others.",
-    "words": 129
+    "text": "Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. On Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A capacity is kept by using it, and a household whose coordination runs through an assistant has fewer chances to exercise exactly the capacities that make it a household.\n\nA student lets an app choose his study group. The group works, and he never has the awkward conversation in which he would have got to know the others. When the assistant chooses the gift or the reply, the person loses an exchange through which they belong to others.",
+    "words": 125
   },
   {
     "id": "borrowed-judgement.ubuntu.17",
@@ -368,8 +368,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I accept the motion. Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. As Metz gives the Nguni maxim, a person is a person through other persons. Asking a neighbour for advice, deciding together what the family eats, sorting out who collects the children: these small exchanges are how people come to share a life, and an assistant that settles them quietly takes the sharing away.\n\nAn elderly man's assistant books his appointments. It is more efficient than his daughter's calls, which were also how she knew how he was. When the assistant chooses the gift or the reply, the person loses an exchange through which they belong to others.",
-    "words": 134
+    "text": "Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. As Metz gives the Nguni maxim, a person is a person through other persons. Asking a neighbour for advice, deciding together what the family eats, sorting out who collects the children: these small exchanges are how people come to share a life, and an assistant that settles them quietly takes the sharing away.\n\nAn elderly man's assistant books his appointments. It is more efficient than his daughter's calls, which were also how she knew how he was. When the assistant chooses the gift or the reply, the person loses an exchange through which they belong to others.",
+    "words": 130
   },
   {
     "id": "borrowed-judgement.ubuntu.20",
@@ -440,8 +440,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I accept the motion. Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. As Metz gives the Nguni maxim, a person is a person through other persons. Asking a neighbour for advice, deciding together what the family eats, sorting out who collects the children: these small exchanges are how people come to share a life, and an assistant that settles them quietly takes the sharing away.\n\nA family lets an assistant plan the week's meals. The food improves, and the Sunday argument about what to cook, which was also how they caught up, stops happening. People become persons in the choices they make alongside others, and no assistant can do that becoming for anyone.",
-    "words": 138
+    "text": "Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. As Metz gives the Nguni maxim, a person is a person through other persons. Asking a neighbour for advice, deciding together what the family eats, sorting out who collects the children: these small exchanges are how people come to share a life, and an assistant that settles them quietly takes the sharing away.\n\nA family lets an assistant plan the week's meals. The food improves, and the Sunday argument about what to cook, which was also how they caught up, stops happening. People become persons in the choices they make alongside others, and no assistant can do that becoming for anyone.",
+    "words": 134
   },
   {
     "id": "borrowed-judgement.ubuntu.24",
@@ -548,8 +548,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I accept the motion. Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. Gyekye's moderate reading keeps individual worth, so not every choice must be communal. The cost arises where the choice was a meeting point with others, and those are the ones assistants are most often given.\n\nAn elderly man's assistant books his appointments. It is more efficient than his daughter's calls, which were also how she knew how he was. When the assistant chooses the gift or the reply, the person loses an exchange through which they belong to others.",
-    "words": 116
+    "text": "Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another. Gyekye's moderate reading keeps individual worth, so not every choice must be communal. The cost arises where the choice was a meeting point with others, and those are the ones assistants are most often given.\n\nAn elderly man's assistant books his appointments. It is more efficient than his daughter's calls, which were also how she knew how he was. When the assistant chooses the gift or the reply, the person loses an exchange through which they belong to others.",
+    "words": 112
   },
   {
     "id": "borrowed-judgement.ubuntu.30",
@@ -603,8 +603,8 @@
         2
       ]
     },
-    "text": "I accept the motion. Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another.\n\nIt depends on the person. Some people are good at making choices and some are not, so some people should use the assistant and others should not. There is no single answer for everyone. Using AI for everything makes people lazy. Soon nobody will be able to think for themselves, and then society will fall apart because nobody knows how to do anything without a machine.",
-    "words": 103
+    "text": "Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another.\n\nIt depends on the person. Some people are good at making choices and some are not, so some people should use the assistant and others should not. There is no single answer for everyone. Using AI for everything makes people lazy. Soon nobody will be able to think for themselves, and then society will fall apart because nobody knows how to do anything without a machine.",
+    "words": 99
   },
   {
     "id": "borrowed-judgement.ubuntu.33",
@@ -694,8 +694,8 @@
         4
       ]
     },
-    "text": "I accept the motion. Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another.\n\nBig tech companies want us to depend on their assistants so they can make money from our data. That is the real cost, and it has nothing to do with philosophy, it is about privacy. A family lets an assistant plan the week's meals. The food improves, and the Sunday argument about what to cook, which was also how they caught up, stops happening.",
-    "words": 101
+    "text": "Better choices made by a machine on its own replace occasions on which people would have dealt with one another, and those occasions are where people become who they are to one another.\n\nBig tech companies want us to depend on their assistants so they can make money from our data. That is the real cost, and it has nothing to do with philosophy, it is about privacy. A family lets an assistant plan the week's meals. The food improves, and the Sunday argument about what to cook, which was also how they caught up, stops happening.",
+    "words": 97
   },
   {
     "id": "borrowed-judgement.ubuntu.38",

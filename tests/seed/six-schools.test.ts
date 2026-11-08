@@ -6,7 +6,7 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { createHmac } from "node:crypto";
 import { emailTag, generate, RUN_QUIZ, type Dataset } from "../../scripts/seed/generate";
-import { BANK_SCHOOLS, TOPICS, loadBanks, loadClosings, loadMotionClosings } from "../../scripts/seed/banks";
+import { BANK_SCHOOLS, BARE_STANCE, TOPICS, loadBanks, loadClosings, loadMotionClosings } from "../../scripts/seed/banks";
 import { contentTopics } from "../../scripts/seed/topics";
 import { baseHash, datasetForPlan, manifestHash } from "../../scripts/seed/plan";
 import { MemoryAdapter } from "../../scripts/seed/adapter-memory";
@@ -72,7 +72,7 @@ describe("a sample run made with quiz v2", () => {
   it("is the dataset this file was written against, pinned at production volume", () => {
     // Beside the small pins in determinism.test.ts: eight thousand quiz
     // results and every exchange pair reach paths a small run need not.
-    expect(manifestHash(six())).toBe("e8b74c6f7e53c58898779aaeb4ac79ba78529353a5cc255488bf5208dbdb15da");
+    expect(manifestHash(six())).toBe("d18bf4ceb9ca4b835a7a39b86b00509370a2818f1c203d4483a3592fe37ab21f");
   });
 
   it("covers all six schools about equally", () => {
@@ -153,6 +153,11 @@ describe("a sample run made with quiz v2", () => {
       const chosen = [...selectExemplars(bySchool, [...BANK_SCHOOLS] as SchoolId[]).values()].flat();
       const endings = chosen.map((e) => endingOf(e.argument).toLowerCase());
       expect(new Set(endings).size, topic).toBe(endings.length);
+      // Nor do two cards on the page open on the same sentence, now that no
+      // position opens on a bare stance (Arthur, 2026-11-08: "repeated
+      // sentence openings ... across sample arguments and exemplars").
+      const openings = chosen.map((e) => e.opening.toLowerCase());
+      expect(new Set(openings).size, topic).toBe(openings.length);
       for (const school of BANK_SCHOOLS) {
         // The openings it could show: those of arguments without one of the
         // run's deliberate misspellings, which the selection never takes.
@@ -165,6 +170,13 @@ describe("a sample run made with quiz v2", () => {
         expect(chosen.filter((e) => e.school === school), `${topic}.${school}`).toHaveLength(openings.size);
       }
     }
+  });
+
+  it("opens no argument, revision or reply on a bare stance sentence", () => {
+    const ds = six();
+    const texts = [...ds.debates.map((d) => d.row.argument), ...ds.turns.map((t) => t.row.body)].filter((t): t is string => !!t);
+    expect(texts.length).toBeGreaterThan(5000);
+    for (const t of texts) expect(BARE_STANCE.test(withoutFrame(t)), t.slice(0, 60)).toBe(false);
   });
 
   it("never says a revision meets no objection when it says the revision now answers one", () => {
@@ -259,6 +271,8 @@ describe("a run that names no quiz", () => {
     expect(ds.debates.filter((d) => d.row.argument && shared.some((c) => d.row.argument!.includes(c))).length).toBeGreaterThan(100);
     const never = ds.debates.filter((d) => d.row.kind === "revision" && !d.row.verdict.rejected && d.row.verdict.objection_answered && /never meets an objection/.test(d.row.verdict.weakest_move));
     expect(never.length).toBeGreaterThan(0);
+    // And its positions still open as written, bare stance sentences too.
+    expect(ds.debates.filter((d) => d.row.argument && BARE_STANCE.test(withoutFrame(d.row.argument))).length).toBeGreaterThan(0);
   });
 
   it("hashes and plans exactly as before: the base hash main gave at 3008b29, and no quiz in its plan", () => {

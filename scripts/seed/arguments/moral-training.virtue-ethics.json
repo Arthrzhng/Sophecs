@@ -17,8 +17,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I reject the motion. Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. Upbringing aims at a person whose habits have become their own, who takes pleasure in acting well and would act well unobserved. A trained model has no pleasures and no unobserved life. There is nothing in it for the habits to belong to.\n\nA just act done for a reward, Aristotle says, does not yet make anyone just. Feedback training is, by design, acting for a reward: every output is shaped by what raters preferred. The model is the clearest possible case of acting rightly for the wrong reason. A model praised for polite answers may stay polite while helping someone do harm, because politeness was rewarded and judgement was not.\n\nA Utilitarian will object that if the behaviour is reliably good then insisting on an inner state is a distinction without a difference to anyone affected. The difference shows when the situation is new. Character generalises because it understands what it is for; trained behaviour generalises only as far as the training distribution reaches, and that is exactly where people get hurt. Rewarded acts can look exactly like virtuous ones, and Aristotle's point is that looking alike is not being alike.",
-    "words": 217
+    "text": "Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. Upbringing aims at a person whose habits have become their own, who takes pleasure in acting well and would act well unobserved. A trained model has no pleasures and no unobserved life. There is nothing in it for the habits to belong to.\n\nA just act done for a reward, Aristotle says, does not yet make anyone just. Feedback training is, by design, acting for a reward: every output is shaped by what raters preferred. The model is the clearest possible case of acting rightly for the wrong reason. A model praised for polite answers may stay polite while helping someone do harm, because politeness was rewarded and judgement was not.\n\nA Utilitarian will object that if the behaviour is reliably good then insisting on an inner state is a distinction without a difference to anyone affected. The difference shows when the situation is new. Character generalises because it understands what it is for; trained behaviour generalises only as far as the training distribution reaches, and that is exactly where people get hurt. Rewarded acts can look exactly like virtuous ones, and Aristotle's point is that looking alike is not being alike.",
+    "words": 213
   },
   {
     "id": "moral-training.virtue-ethics.02",
@@ -122,8 +122,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. A just act done for a reward, Aristotle says, does not yet make anyone just. Feedback training is, by design, acting for a reward: every output is shaped by what raters preferred. The model is the clearest possible case of acting rightly for the wrong reason.\n\nUpbringing aims at a person whose habits have become their own, who takes pleasure in acting well and would act well unobserved. A trained model has no pleasures and no unobserved life. There is nothing in it for the habits to belong to. A model praised for polite answers may stay polite while helping someone do harm, because politeness was rewarded and judgement was not.\n\nA Utilitarian will object that if the behaviour is reliably good then insisting on an inner state is a distinction without a difference to anyone affected. The difference shows when the situation is new. Character generalises because it understands what it is for; trained behaviour generalises only as far as the training distribution reaches, and that is exactly where people get hurt. Habituation succeeds when the habit becomes a settled choice of one's own, and nothing in reward shaping is there to do the choosing.",
-    "words": 221
+    "text": "Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. A just act done for a reward, Aristotle says, does not yet make anyone just. Feedback training is, by design, acting for a reward: every output is shaped by what raters preferred. The model is the clearest possible case of acting rightly for the wrong reason.\n\nUpbringing aims at a person whose habits have become their own, who takes pleasure in acting well and would act well unobserved. A trained model has no pleasures and no unobserved life. There is nothing in it for the habits to belong to. A model praised for polite answers may stay polite while helping someone do harm, because politeness was rewarded and judgement was not.\n\nA Utilitarian will object that if the behaviour is reliably good then insisting on an inner state is a distinction without a difference to anyone affected. The difference shows when the situation is new. Character generalises because it understands what it is for; trained behaviour generalises only as far as the training distribution reaches, and that is exactly where people get hurt. Habituation succeeds when the habit becomes a settled choice of one's own, and nothing in reward shaping is there to do the choosing.",
+    "words": 217
   },
   {
     "id": "moral-training.virtue-ethics.07",
@@ -224,8 +224,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. Practical wisdom is what lets a good person act well in situations nobody prepared them for. Feedback training covers the cases raters saw. When a new case arrives, a good person deliberates; a trained model extrapolates, and the two are not the same activity.\n\nA boy who stops hitting his sister only when a parent is watching has learned the act and not the virtue. Reward shaping produces the boy, not the man he might become. Habituation succeeds when the habit becomes a settled choice of one's own, and nothing in reward shaping is there to do the choosing.",
-    "words": 124
+    "text": "Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. Practical wisdom is what lets a good person act well in situations nobody prepared them for. Feedback training covers the cases raters saw. When a new case arrives, a good person deliberates; a trained model extrapolates, and the two are not the same activity.\n\nA boy who stops hitting his sister only when a parent is watching has learned the act and not the virtue. Reward shaping produces the boy, not the man he might become. Habituation succeeds when the habit becomes a settled choice of one's own, and nothing in reward shaping is there to do the choosing.",
+    "words": 120
   },
   {
     "id": "moral-training.virtue-ethics.12",
@@ -332,8 +332,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I reject the motion. Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. Aristotle says we become just by doing just acts, and the training procedure looks like that. But he adds that an act is not yet virtuous unless the agent knows what they are doing, chooses it for its own sake, and acts from a firm and unchanging character. Reward shaping reaches only the acts.\n\nA model praised for polite answers may stay polite while helping someone do harm, because politeness was rewarded and judgement was not. Good acts without a good character are imitation, however reliable, and imitation is not what upbringing produces.",
-    "words": 118
+    "text": "Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. Aristotle says we become just by doing just acts, and the training procedure looks like that. But he adds that an act is not yet virtuous unless the agent knows what they are doing, chooses it for its own sake, and acts from a firm and unchanging character. Reward shaping reaches only the acts.\n\nA model praised for polite answers may stay polite while helping someone do harm, because politeness was rewarded and judgement was not. Good acts without a good character are imitation, however reliable, and imitation is not what upbringing produces.",
+    "words": 114
   },
   {
     "id": "moral-training.virtue-ethics.18",
@@ -368,8 +368,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion. Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. Practical wisdom is what lets a good person act well in situations nobody prepared them for. Feedback training covers the cases raters saw. When a new case arrives, a good person deliberates; a trained model extrapolates, and the two are not the same activity.\n\nA musician who plays the right notes by rote has not yet learned music; she has learned the outside of it. Faced with a case its raters never saw, the model has only its patterns to fall back on, where a good person would have judgement.",
-    "words": 115
+    "text": "Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. Practical wisdom is what lets a good person act well in situations nobody prepared them for. Feedback training covers the cases raters saw. When a new case arrives, a good person deliberates; a trained model extrapolates, and the two are not the same activity.\n\nA musician who plays the right notes by rote has not yet learned music; she has learned the outside of it. Faced with a case its raters never saw, the model has only its patterns to fall back on, where a good person would have judgement.",
+    "words": 111
   },
   {
     "id": "moral-training.virtue-ethics.20",
@@ -458,8 +458,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion. Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. Upbringing aims at a person whose habits have become their own, who takes pleasure in acting well and would act well unobserved. A trained model has no pleasures and no unobserved life. There is nothing in it for the habits to belong to.\n\nA boy who stops hitting his sister only when a parent is watching has learned the act and not the virtue. Reward shaping produces the boy, not the man he might become. Faced with a case its raters never saw, the model has only its patterns to fall back on, where a good person would have judgement.",
-    "words": 125
+    "text": "Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. Upbringing aims at a person whose habits have become their own, who takes pleasure in acting well and would act well unobserved. A trained model has no pleasures and no unobserved life. There is nothing in it for the habits to belong to.\n\nA boy who stops hitting his sister only when a parent is watching has learned the act and not the virtue. Reward shaping produces the boy, not the man he might become. Faced with a case its raters never saw, the model has only its patterns to fall back on, where a good person would have judgement.",
+    "words": 121
   },
   {
     "id": "moral-training.virtue-ethics.25",
@@ -566,8 +566,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I reject the motion. Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. Practical wisdom is what lets a good person act well in situations nobody prepared them for. Feedback training covers the cases raters saw. When a new case arrives, a good person deliberates; a trained model extrapolates, and the two are not the same activity.\n\nA musician who plays the right notes by rote has not yet learned music; she has learned the outside of it. Good acts without a good character are imitation, however reliable, and imitation is not what upbringing produces.",
-    "words": 107
+    "text": "Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good. Practical wisdom is what lets a good person act well in situations nobody prepared them for. Feedback training covers the cases raters saw. When a new case arrives, a good person deliberates; a trained model extrapolates, and the two are not the same activity.\n\nA musician who plays the right notes by rote has not yet learned music; she has learned the outside of it. Good acts without a good character are imitation, however reliable, and imitation is not what upbringing produces.",
+    "words": 103
   },
   {
     "id": "moral-training.virtue-ethics.31",
@@ -603,8 +603,8 @@
         4
       ]
     },
-    "text": "I reject the motion. Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good.\n\nCompanies say their models are safe and good but they just want to sell them. We should not believe a model is good just because a company trained it and says so in a press release. Morality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer.",
-    "words": 98
+    "text": "Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good.\n\nCompanies say their models are safe and good but they just want to sell them. We should not believe a model is good just because a company trained it and says so in a press release. Morality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer.",
+    "words": 94
   },
   {
     "id": "moral-training.virtue-ethics.33",
@@ -694,8 +694,8 @@
         2
       ]
     },
-    "text": "I reject the motion. Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good.\n\nThe people giving the feedback are biased, so the model just learns their biases. You cannot make something good by copying flawed humans, so the motion fails before it starts. A boy who stops hitting his sister only when a parent is watching has learned the act and not the virtue. Reward shaping produces the boy, not the man he might become.",
-    "words": 87
+    "text": "Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good.\n\nThe people giving the feedback are biased, so the model just learns their biases. You cannot make something good by copying flawed humans, so the motion fails before it starts. A boy who stops hitting his sister only when a parent is watching has learned the act and not the virtue. Reward shaping produces the boy, not the man he might become.",
+    "words": 83
   },
   {
     "id": "moral-training.virtue-ethics.38",
@@ -740,16 +740,16 @@
     "school": "virtue-ethics",
     "tier": "weak",
     "parts": {
-      "position": 1,
+      "position": 2,
       "reasons": [],
-      "example": 2,
+      "example": 0,
       "objections": [],
       "closing": null,
       "weak": [
-        0
+        4
       ]
     },
-    "text": "I reject the motion. Training on feedback reproduces the first stage of moral upbringing, repetition, and never reaches the stage that makes a person good.\n\nA model is a computer program, and programs cannot be good or bad, only useful or broken. So obviously training cannot make it good like a person, and this motion does not make sense. A musician who plays the right notes by rote has not yet learned music; she has learned the outside of it.",
-    "words": 80
+    "text": "The motion confuses doing just acts with being just. Aristotle saw the difference clearly, and feedback training only ever produces the first.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. A boy who stops hitting his sister only when a parent is watching has learned the act and not the virtue. Reward shaping produces the boy, not the man he might become.",
+    "words": 91
   }
 ]

@@ -5586,3 +5586,43 @@ above:
   rebuilt banks: six of the nine now close with their motion's closings,
   five of them on a closing rewritten after the first review, and
   nothing else in them changed.
+
+### The fresh run's arguments open on their claim (2026-11-08)
+
+From Arthur's audit ruling of 2026-11-08 ("repeated sentence openings or
+identical endings across sample arguments and exemplars"; quoted in full
+under "A pass over the whole site for what reads as machine-written").
+#108 dealt with the endings; this is the openings.
+
+- **What repeated.** 35 of the 144 positions opened on a bare stance
+  sentence ("I reject the motion.", "I accept the motion.", "I support
+  the motion.", "The motion is right.", "Deploy it.", "Do not deploy
+  it.", "Deploying it is wrong as stated."), most of them a school's
+  second position. On a production-volume quiz v2 run (seed `six-check`,
+  base window to 2026-11-10 09:00 UTC, two weeks on), 23 of the 144
+  exemplar cards opened on the same sentence as another school's card on
+  their page, five of them "I reject the motion." on one page.
+- **What changes.** A run made with quiz v2 argues from `freshFragments`
+  (`scripts/seed/banks.ts`): every position without a bare stance sentence
+  in front (`BARE_STANCE`), so it opens on its own claim; everything else
+  is as written, and the verdicts quote what the argument holds. The
+  banks show the same. Measured again: no two cards on any page open on
+  the same sentence.
+- **One passage reworded.** Without its stance sentence, Ubuntu's third
+  position on the opaque benefit opened "The question is not only how
+  much suffering it removes but whose voices were left out", one of the
+  turns Arthur's ruling names. It reads now "How much suffering it
+  removes is one question; whose voices were left out when this was
+  chosen as the way to remove it is another." Ubuntu's passages are read
+  only by a quiz v2 run.
+- **The live run is untouched.** A run that names no quiz reads the
+  passages as written: its datasets are byte for byte as pinned, and its
+  positions still open on their stance. The quiz v2 pins move and are
+  pinned again.
+- **The samples** (`docs/gate4-samples.md`): two of the nine opened "I
+  accept the motion." and now open on the sentence after it.
+- **For Arthur's list:** twelve passages, in the shared closings and the
+  six motions' fragments (`scripts/seed/arguments/fragments/*.json`),
+  say "not only ... but" or "not just". The live three's are read by the
+  live run until the teardown, so they can change only for the fresh run,
+  as the openings did here.
