@@ -63,7 +63,8 @@ describe("the exemplars page", () => {
     // Closed, the card shows its preview and a drawn chevron; never the
     // browser's marker or a character a phone can turn into an emoji.
     expect(out).toMatch(/<summary[^>]*list-none[^>]*><span[^>]*group-open:hidden[^>]*>Deploy it\. Because\.<\/span><span[^>]*>Hide<\/span><svg aria-hidden="true"/);
-    expect(out).not.toMatch(/[\u2190-\u21FF\u2300-\u23FF\u25A0-\u25FF\u2700-\u27BF\u2900-\u297F\u2B00-\u2BFF\uFE0F]|\p{Extended_Pictographic}/u);
+    // The same characters tests/disclosures.test.tsx refuses.
+    expect(out).not.toMatch(/[\u2190-\u21FF\u2300-\u23FF\u25A0-\u25FF\u2600-\u27BF\u2900-\u297F\u2B00-\u2BFF\uFE0F\u20E3]|\p{Extended_Pictographic}|\p{Emoji_Presentation}/u);
     expect(out).toContain("<p>Here is my answer. Deploy it. Because.</p><p>More.</p>");
     expect(out).not.toContain("11111111-2222");
     // A sample page to analytics: nothing of it reaches PostHog.

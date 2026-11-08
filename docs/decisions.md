@@ -5513,8 +5513,8 @@ Arthur, 2026-11-08:
   never a first sentence under 60 characters alone ("Deploy it." is the
   filler the ruling names), and a word cut with "…" only for a single
   sentence longer than 400. The longest two sentences any composition of
-  the passages opens with run to 373 characters, so every real card shows
-  two; at 360, 577 Buddhist compositions on the opaque benefit would have
+  the passages opens with run to 373 characters, so every card the
+  current passages make shows two; at 360, 577 Buddhist compositions on the opaque benefit would have
   shown one. Open, the card shows "Hide" above the whole
   argument. The opening line still decides which arguments count as one
   (one exemplar per opening).
@@ -5530,9 +5530,11 @@ Arthur, 2026-11-08:
   own; every `<details>` that draws the chevron is a `group`; the
   chevron's two poses are the right way round and it is hidden from
   assistive technology; no summary in the source holds a character with
-  an emoji form, written as a literal, an escape or a numeric entity, and
-  none uses a named entity outside a short list of punctuation; and the
-  excerpt toggle and the open objections, rendered, hold none.
+  an emoji form, written as a literal, a JavaScript or CSS escape or a
+  numeric entity, and none uses a named entity outside a short list of
+  punctuation; no stylesheet in `src` and no Tailwind `content-[...]`
+  class draws one as `content`; and the excerpt toggle, the open
+  objections and the sample label, rendered, hold none.
   `tests/exemplars-page.test.ts` checks the rendered exemplars page the
   same way.
 - **Checked** at 390px in Chromium against the built stylesheet: the
@@ -5540,9 +5542,9 @@ Arthur, 2026-11-08:
   least 44px tall. WebKit cannot run in this environment, so for iOS the
   check is the markup above.
 - **For Arthur's list:** some closed cards end on a stock line from the
-  passages (`scripts/seed/arguments/fragments/crash-arithmetic.json`,
-  mine): "Correct names matter." ends 1,637 of the Confucian previews a
-  run can make and "Impartiality is the heart of the view." 1,764 of the
-  Utilitarian ones, and one Stoic preview on borrowed judgement ends on
-  the rival's point ("One might say that trusting the assistant is itself
-  a judgement.").
+  passages (mine). In `scripts/seed/arguments/fragments/crash-arithmetic.json`,
+  "Correct names matter." ends 1,637 of the Confucian previews a run can
+  make and "Impartiality is the heart of the view." 1,764 of the
+  Utilitarian ones; in `borrowed-judgement.json`, two Stoic previews (the
+  strong and the mid argument) end on the rival's point ("One might say
+  that trusting the assistant is itself a judgement.").
