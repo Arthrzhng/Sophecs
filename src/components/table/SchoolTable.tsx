@@ -93,6 +93,14 @@ export function SchoolTable({
             for arguing the way the school reasons, averaged across every judged
             original argument.
           </p>
+          {/* Right under what the table counts, so its subject is the
+              table's arguments and marks, and not the "Joined and left"
+              note, whose subject is people (review pass 3). */}
+          {sampleNote && (
+            <p className="mt-2 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+              <TextLink href={SAMPLES_HREF}>{sampleNote}</TextLink>
+            </p>
+          )}
         </div>
         <span className="rounded-card border-2 border-rule bg-surface px-4 py-2 text-sm font-extrabold text-ink">
           Week <span className="font-mono tabular">{week}</span> &middot; closes Sunday,
@@ -203,11 +211,6 @@ export function SchoolTable({
             Joined and left count people who retook the quiz and changed school. No
             names are shown, here or anywhere else.
           </p>
-          {sampleNote && (
-            <p className="mt-2 text-sm leading-relaxed text-ink-mid">
-              <TextLink href={SAMPLES_HREF}>{sampleNote}</TextLink>
-            </p>
-          )}
         </section>
       </div>
     </div>

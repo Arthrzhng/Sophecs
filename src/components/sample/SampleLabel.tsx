@@ -10,7 +10,7 @@ import { SAMPLE_EXPLANATION, SAMPLE_TAG } from "@/lib/sample";
  * A <details> rather than a tooltip, so it works without JavaScript, by
  * keyboard and by touch, and opens on a tap rather than a hover. It is flow
  * content, so it sits in a flex row beside the thing it tags, never inside
- * a <p>. Opened on a narrow screen, it can take a line of its own.
+ * a <p>. Opened, at any width, it takes a line of its own.
  */
 export function SampleLabel({ note }: { note?: string }) {
   return (

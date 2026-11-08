@@ -96,6 +96,11 @@ describe("labels", () => {
     expect(out).toContain(SCHOOLS_SAMPLE_LINE);
     expect(out).toMatch(/href="\/(method|how-it-works)#samples"/);
     expect(out).not.toContain("What a sample account is");
+    // Under the table's description, whose subject is its arguments and
+    // marks; not in the note about people who changed school (review pass 3).
+    const joined = out.slice(out.indexOf("Joined and left"));
+    expect(joined).not.toContain(SCHOOLS_SAMPLE_LINE);
+    expect(out.indexOf(SCHOOLS_SAMPLE_LINE)).toBeGreaterThan(out.indexOf("original argument."));
     expect(html(createElement(SchoolTable, base))).not.toContain(SCHOOLS_SAMPLE_LINE);
   });
 
@@ -141,11 +146,20 @@ describe("labels", () => {
       expect(outside.replace(/Each person on their own/g, ""), name).not.toMatch(PERSON);
       // The tag's tap target is 44 by 44.
       expect(out, name).toMatch(/<summary class="[^"]*\bmin-h-11\b[^"]*\bmin-w-11\b/);
+      // A reader's own wording, which addresses them as the author or
+      // credits the judge, is never on a sample's page (review pass 3).
+      for (const own of ["Write it again", "How the judge scored you", "verdict is in", "Someone challenged you", "Someone shared their result", "put them"])
+        expect(outside, `${name}: ${own}`).not.toContain(own);
     }
     for (const name of ["template verdict", "template verdict, private", "rejected template verdict", "rejected template verdict, private", "template revision"])
       expect(surfaces[name], name).toContain(`${SAMPLE_EXPLANATION} ${SAMPLE_JUDGE_NOTE}`);
     expect(surfaces["sample result"]).toContain("A filled dot marks where these answers landed.");
-    expect(readFileSync("src/app/r/[id]/page.tsx", "utf8")).toContain("resultMapWords(Boolean(result.is_sample))");
+    // The result page hands the map both its words from resultMapWords.
+    const resultPage = readFileSync("src/app/r/[id]/page.tsx", "utf8");
+    const mapJsx = resultPage.match(/<SchoolMap[\s\S]*?\/>/g) ?? [];
+    expect(mapJsx).toHaveLength(1);
+    expect(mapJsx[0]).toContain("title={resultMapWords(Boolean(result.is_sample)).title}");
+    expect(mapJsx[0]).toContain("whose={resultMapWords(Boolean(result.is_sample)).whose}");
     // Today's rank card takes no sample prop, so it can say nothing of samples.
     const card = readFileSync("src/components/today/TodayCards.tsx", "utf8");
     expect(card).not.toMatch(/includesSamples|RANK_SAMPLE_NOTE|sample/i);
@@ -158,6 +172,30 @@ describe("labels", () => {
     expect(readFileSync("src/components/card/CardLayout.tsx", "utf8")).toContain("{SAMPLE_IMAGE_MARK}");
     expect(readFileSync("src/components/debate/VerdictCard.tsx", "utf8")).toContain("{SAMPLE_IMAGE_MARK}");
     expect(SAMPLE_IMAGE_MARK).toBe("AI sample");
+  });
+
+  // The other side of the guard: a reader's own pages carry no tag and keep
+  // their own wording (review pass 3).
+  it("a reader's verdict, result and challenge carry no tag and keep their wording", async () => {
+    const { SharePage } = await import("../../src/components/share/SharePage");
+    const content = { one_line: "x", name: "Stoicism" } as never;
+    const result = {
+      resultId: "r1", school: "stoicism" as const, oneLine: "A line.", oneLineAttribution: "Epictetus", vector: null, otherVector: null,
+      isOwner: false, isSavedToProfile: false, showDebateThem: false, challengeId: null, isSignedIn: false, shareLine: "s", shareLineIndex: 0,
+    };
+    const comparison = { parentDebateId: "p1", comparable: true, first: { score: 60, fidelity: 6, rigor: 6, engagement: 5 } };
+    const genuine: Record<string, [string, string[]]> = {
+      verdict: [html(createElement(Verdict, props)), ["How the judge scored you", "verdict is in", "The objection you left standing"]],
+      "rejected verdict": [html(createElement(Verdict, { ...props, isOwner: true, verdict: { ...verdict, rejected: true } })), ["Write it again"]],
+      revision: [html(createElement(Verdict, { ...props, comparison } as never)), ["Compared with your first attempt"]],
+      result: [html(createElement(SharePage, result as never)), ["Someone shared their result"]],
+      challenge: [html(createElement(ChallengeInvite, { challengeId: "c1", school: "stoicism", content })), ["Someone challenged you"]],
+    };
+    for (const [name, [out, own]] of Object.entries(genuine)) {
+      expect(out, name).not.toContain("<details");
+      expect(out, name).not.toMatch(/sample/i);
+      for (const words of own) expect(out, `${name}: ${words}`).toContain(words);
+    }
   });
 
   it("a sample verdict sends no view events; a genuine one does", () => {
