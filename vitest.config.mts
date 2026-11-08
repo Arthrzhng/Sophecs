@@ -28,6 +28,11 @@ export default defineConfig({
     // itself (tests/six-schools.test.ts), so a SIX_SCHOOLS=1 left in the
     // shell cannot fail unrelated tests under misleading names.
     env: { SIX_SCHOOLS: "0" },
+    // The seed tests generate whole runs, several taking about 4 s alone.
+    // Vitest's 5 s default failed them under load (a reviewer's build
+    // running beside the suite), so each test has 30 s; one that hangs
+    // still fails.
+    testTimeout: 30_000,
   },
   // tsconfig sets `jsx: "preserve"`, which is right for Next and leaves
   // vitest unable to parse a component on its own. Vite 8 transforms with

@@ -38,8 +38,8 @@
       "closing": null,
       "weak": []
     },
-    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Who was left out of deciding matters here more than anywhere. Pedestrians in poorer districts, cyclists and children will bear most of the risk from whatever rule is chosen, and their voices are the least likely to be heard by the engineers who write it.\n\nSolidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared.\n\nA Utilitarian will object that any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on. The cars can avoid every harm they can while the rule is agreed; what waits is the choice of whose life gives way, which should not be written into cars before the people who share the roads have been asked. A rule some reject after being heard is shared in a way a rule nobody was asked about is not, and that is part of whether people will trust the roads with it.",
-    "words": 235
+    "text": "Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Who was left out of deciding matters here more than anywhere. Pedestrians in poorer districts, cyclists and children will bear most of the risk from whatever rule is chosen, and their voices are the least likely to be heard by the engineers who write it.\n\nSolidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared.\n\nA Utilitarian will object that any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on. The cars can avoid every harm they can while the rule is agreed; what waits is the choice of whose life gives way, which should not be written into cars before the people who share the roads have been asked. A rule some reject after being heard is shared in a way a rule nobody was asked about is not, and that is part of whether people will trust the roads with it.",
+    "words": 229
   },
   {
     "id": "crash-arithmetic.ubuntu.03",
@@ -98,11 +98,11 @@
       "objections": [
         1
       ],
-      "closing": null,
+      "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Solidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared.\n\nPeople live through one another, and road users are bound up with each other: today's passenger is tomorrow's pedestrian. A rule they could all accept, having been asked, honours that; a rule imposed by an optimiser treats them as units.\n\nA Utilitarian will object that any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on. The cars can avoid every harm they can while the rule is agreed; what waits is the choice of whose life gives way, which should not be written into cars before the people who share the roads have been asked. A rule some reject after being heard is shared in a way a rule nobody was asked about is not, and that is part of whether people will trust the roads with it.",
-    "words": 230
+    "text": "Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Solidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared.\n\nPeople live through one another, and road users are bound up with each other: today's passenger is tomorrow's pedestrian. A rule they could all accept, having been asked, honours that; a rule imposed by an optimiser treats them as units.\n\nA Utilitarian will object that any process of deliberation will produce a rule that some reject, and people die in crashes the minimising rule would have prevented while the deliberating goes on. The cars can avoid every harm they can while the rule is agreed; what waits is the choice of whose life gives way, which should not be written into cars before the people who share the roads have been asked. A rule some reject after being heard is shared in a way a rule nobody was asked about is not, and that is part of whether people will trust the roads with it. A town meeting can get the answer wrong and still do right by its people, which no sum worked out without them can do.",
+    "words": 248
   },
   {
     "id": "crash-arithmetic.ubuntu.06",
@@ -260,8 +260,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Metz argues against building systems simply to maximise expected utility. A crash rule is exactly such a system: it decides in advance whose life gives way, and a decision of that kind should answer to the people it binds, not only to a total.\n\nA city holds public meetings on how its autonomous buses should behave in a crash, and the rule they settle on is published at every stop. A town meeting can get the answer wrong and still do right by its people, which no sum worked out without them can do.",
-    "words": 133
+    "text": "Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Metz argues against building systems simply to maximise expected utility. A crash rule is exactly such a system: it decides in advance whose life gives way, and a decision of that kind should answer to the people it binds, not only to a total.\n\nA city holds public meetings on how its autonomous buses should behave in a crash, and the rule they settle on is published at every stop. A town meeting can get the answer wrong and still do right by its people, which no sum worked out without them can do.",
+    "words": 127
   },
   {
     "id": "crash-arithmetic.ubuntu.14",
@@ -314,8 +314,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. People live through one another, and road users are bound up with each other: today's passenger is tomorrow's pedestrian. A rule they could all accept, having been asked, honours that; a rule imposed by an optimiser treats them as units.\n\nA city holds public meetings on how its autonomous buses should behave in a crash, and the rule they settle on is published at every stop. Written without asking those affected, any such rule treats passengers and walkers as numbers, whatever number it saves.",
-    "words": 123
+    "text": "Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. People live through one another, and road users are bound up with each other: today's passenger is tomorrow's pedestrian. A rule they could all accept, having been asked, honours that; a rule imposed by an optimiser treats them as units.\n\nA city holds public meetings on how its autonomous buses should behave in a crash, and the rule they settle on is published at every stop. Written without asking those affected, any such rule treats passengers and walkers as numbers, whatever number it saves.",
+    "words": 117
   },
   {
     "id": "crash-arithmetic.ubuntu.17",
@@ -368,8 +368,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Metz argues against building systems simply to maximise expected utility. A crash rule is exactly such a system: it decides in advance whose life gives way, and a decision of that kind should answer to the people it binds, not only to a total.\n\nA city holds public meetings on how its autonomous buses should behave in a crash, and the rule they settle on is published at every stop. Written without asking those affected, any such rule treats passengers and walkers as numbers, whatever number it saves.",
-    "words": 127
+    "text": "Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Metz argues against building systems simply to maximise expected utility. A crash rule is exactly such a system: it decides in advance whose life gives way, and a decision of that kind should answer to the people it binds, not only to a total.\n\nA city holds public meetings on how its autonomous buses should behave in a crash, and the rule they settle on is published at every stop. Written without asking those affected, any such rule treats passengers and walkers as numbers, whatever number it saves.",
+    "words": 121
   },
   {
     "id": "crash-arithmetic.ubuntu.20",
@@ -458,8 +458,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Solidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared.\n\nA carmaker tests its crash rule on drivers but never asks the cyclists who share the same roads, and is surprised when they refuse to trust the cars. A town meeting can get the answer wrong and still do right by its people, which no sum worked out without them can do.",
-    "words": 137
+    "text": "Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Solidarity cuts both ways. It argues against a car that protects its owner at any cost to others, and against a car its passengers cannot trust. The rule should come out of deliberation among those affected, because that is how a shared life is kept shared.\n\nA carmaker tests its crash rule on drivers but never asks the cyclists who share the same roads, and is surprised when they refuse to trust the cars. A town meeting can get the answer wrong and still do right by its people, which no sum worked out without them can do.",
+    "words": 131
   },
   {
     "id": "crash-arithmetic.ubuntu.25",
@@ -512,8 +512,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Metz argues against building systems simply to maximise expected utility. A crash rule is exactly such a system: it decides in advance whose life gives way, and a decision of that kind should answer to the people it binds, not only to a total.\n\nA neighbourhood where children walk to school asks to be consulted on the cars' rules, and is told the matter is purely technical. Every family on the road will live with whatever rule the cars carry, and each should have had a say in it first.",
-    "words": 129
+    "text": "Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share. Metz argues against building systems simply to maximise expected utility. A crash rule is exactly such a system: it decides in advance whose life gives way, and a decision of that kind should answer to the people it binds, not only to a total.\n\nA neighbourhood where children walk to school asks to be consulted on the cars' rules, and is told the matter is purely technical. Every family on the road will live with whatever rule the cars carry, and each should have had a say in it first.",
+    "words": 123
   },
   {
     "id": "crash-arithmetic.ubuntu.28",
@@ -621,8 +621,8 @@
         0
       ]
     },
-    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share.\n\nNobody would buy a car that might kill them on purpose. So in practice the companies will always protect the passenger, and the debate does not really matter because the market will decide it anyway. A city holds public meetings on how its autonomous buses should behave in a crash, and the rule they settle on is published at every stop.",
-    "words": 100
+    "text": "Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share.\n\nNobody would buy a car that might kill them on purpose. So in practice the companies will always protect the passenger, and the debate does not really matter because the market will decide it anyway. A city holds public meetings on how its autonomous buses should behave in a crash, and the rule they settle on is published at every stop.",
+    "words": 94
   },
   {
     "id": "crash-arithmetic.ubuntu.34",
@@ -713,8 +713,8 @@
         3
       ]
     },
-    "text": "I reject the motion as framed. Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share.\n\nNobody would buy a car that might kill them on purpose. So in practice the companies will always protect the passenger, and the debate does not really matter because the market will decide it anyway. Self-driving cars will crash much less than humans do, so these cases will almost never happen. We should focus on making them safe instead of worrying about rare dilemmas that are mostly in philosophy classes.",
-    "words": 109
+    "text": "Treating the crash as a sum to minimise leaves out the people who would live under the rule, and a rule decided for them rather than with them is not one they share.\n\nNobody would buy a car that might kill them on purpose. So in practice the companies will always protect the passenger, and the debate does not really matter because the market will decide it anyway. Self-driving cars will crash much less than humans do, so these cases will almost never happen. We should focus on making them safe instead of worrying about rare dilemmas that are mostly in philosophy classes.",
+    "words": 103
   },
   {
     "id": "crash-arithmetic.ubuntu.39",

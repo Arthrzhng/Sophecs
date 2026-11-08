@@ -38,8 +38,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.\n\nBook 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nA Utilitarian will object that what makes behaviour good is what it does to people, so a model that reliably helps and does not harm is good in the only sense that matters, whatever its upbringing. Helpful outputs are good to have, but the motion claims more: that the model is good the way a well-raised person is. That sense includes standing in relationships where one can be held to account, and an output profile does not supply it. A model may learn to say the right words, but it has no role in which to practise them and no elder or child to practise them for.",
-    "words": 220
+    "text": "Acceptable behaviour can be trained into a model, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.\n\nBook 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nA Utilitarian will object that what makes behaviour good is what it does to people, so a model that reliably helps and does not harm is good in the only sense that matters, whatever its upbringing. Helpful outputs are good to have, but the motion claims more: that the model is good the way a well-raised person is. That sense includes standing in relationships where one can be held to account, and an output profile does not supply it. A model may learn to say the right words, but it has no role in which to practise them and no elder or child to practise them for.",
+    "words": 221
   },
   {
     "id": "moral-training.confucian.03",
@@ -50,17 +50,17 @@
       "position": 1,
       "reasons": [
         1,
-        0
+        3
       ],
       "example": 2,
       "objections": [
-        1
+        0
       ],
-      "closing": 2,
+      "closing": 3,
       "weak": []
     },
-    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nA child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves. An apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice.\n\nAn Ubuntu Ethicist will object that the Confucian ties goodness to fixed roles, when a person becomes good through relationships of solidarity that need not follow any hierarchy of roles. Relationships of solidarity are not opposed to roles; they are carried in them, as friend, neighbour, colleague. Either way the point stands: the model enters no relationships at all, so neither account makes it good. A model may learn to say the right words, but it has no role in which to practise them and no elder or child to practise them for.",
-    "words": 243
+    "text": "Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nHumaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense. An apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice.\n\nA Utilitarian will object that what makes behaviour good is what it does to people, so a model that reliably helps and does not harm is good in the only sense that matters, whatever its upbringing. Helpful outputs are good to have, but the motion claims more: that the model is good the way a well-raised person is. That sense includes standing in relationships where one can be held to account, and an output profile does not supply it. The exemplary person teaches by example, so that others grow humane by watching them, and nobody grows humane by watching a model reply.",
+    "words": 250
   },
   {
     "id": "moral-training.confucian.04",
@@ -101,8 +101,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nBook 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense. A company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal.\n\nA Utilitarian will object that what makes behaviour good is what it does to people, so a model that reliably helps and does not harm is good in the only sense that matters, whatever its upbringing. Helpful outputs are good to have, but the motion claims more: that the model is good the way a well-raised person is. That sense includes standing in relationships where one can be held to account, and an output profile does not supply it. Humaneness is learned slowly, by years of practice under people one owes, and no score stands in for that education.",
-    "words": 244
+    "text": "Acceptable behaviour can be trained into a model, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nBook 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense. A company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal.\n\nA Utilitarian will object that what makes behaviour good is what it does to people, so a model that reliably helps and does not harm is good in the only sense that matters, whatever its upbringing. Helpful outputs are good to have, but the motion claims more: that the model is good the way a well-raised person is. That sense includes standing in relationships where one can be held to account, and an output profile does not supply it. Humaneness is learned slowly, by years of practice under people one owes, and no score stands in for that education.",
+    "words": 245
   },
   {
     "id": "moral-training.confucian.06",
@@ -122,8 +122,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nA child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves. A child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers.\n\nAn Ubuntu Ethicist will object that the Confucian ties goodness to fixed roles, when a person becomes good through relationships of solidarity that need not follow any hierarchy of roles. Relationships of solidarity are not opposed to roles; they are carried in them, as friend, neighbour, colleague. Either way the point stands: the model enters no relationships at all, so neither account makes it good. Humaneness is learned slowly, by years of practice under people one owes, and no score stands in for that education.",
-    "words": 235
+    "text": "Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nA child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves. A child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers.\n\nAn Ubuntu Ethicist will object that the Confucian ties goodness to fixed roles, when a person becomes good through relationships of solidarity that need not follow any hierarchy of roles. Relationships of solidarity are not opposed to roles; they are carried in them, as friend, neighbour, colleague. Either way the point stands: the model enters no relationships at all, so neither account makes it good. Humaneness is learned slowly, by years of practice under people one owes, and no score stands in for that education.",
+    "words": 231
   },
   {
     "id": "moral-training.confucian.07",
@@ -185,8 +185,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nHumaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense. A child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers.\n\nAn Ubuntu Ethicist will object that the Confucian ties goodness to fixed roles, when a person becomes good through relationships of solidarity that need not follow any hierarchy of roles. Relationships of solidarity are not opposed to roles; they are carried in them, as friend, neighbour, colleague. Either way the point stands: the model enters no relationships at all, so neither account makes it good. A model may learn to say the right words, but it has no role in which to practise them and no elder or child to practise them for.",
-    "words": 239
+    "text": "Acceptable behaviour can be trained into a model, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nHumaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense. A child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers.\n\nAn Ubuntu Ethicist will object that the Confucian ties goodness to fixed roles, when a person becomes good through relationships of solidarity that need not follow any hierarchy of roles. Relationships of solidarity are not opposed to roles; they are carried in them, as friend, neighbour, colleague. Either way the point stands: the model enters no relationships at all, so neither account makes it good. A model may learn to say the right words, but it has no role in which to practise them and no elder or child to practise them for.",
+    "words": 240
   },
   {
     "id": "moral-training.confucian.10",
@@ -194,20 +194,20 @@
     "school": "confucian",
     "tier": "strong",
     "parts": {
-      "position": 1,
+      "position": 0,
       "reasons": [
         1,
-        3
-      ],
-      "example": null,
-      "objections": [
         0
       ],
-      "closing": 3,
+      "example": 1,
+      "objections": [
+        1
+      ],
+      "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nHumaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nA Utilitarian will object that what makes behaviour good is what it does to people, so a model that reliably helps and does not harm is good in the only sense that matters, whatever its upbringing. Helpful outputs are good to have, but the motion claims more: that the model is good the way a well-raised person is. That sense includes standing in relationships where one can be held to account, and an output profile does not supply it. The exemplary person teaches by example, so that others grow humane by watching them, and nobody grows humane by watching a model reply.",
-    "words": 224
+    "text": "Upbringing makes a person humane by forming them inside relationships and their rituals, and a model rewarded for outputs stands in no relationship it could owe anything to. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nA child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves. A company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal.\n\nAn Ubuntu Ethicist will object that the Confucian ties goodness to fixed roles, when a person becomes good through relationships of solidarity that need not follow any hierarchy of roles. Relationships of solidarity are not opposed to roles; they are carried in them, as friend, neighbour, colleague. Either way the point stands: the model enters no relationships at all, so neither account makes it good. A model may learn to say the right words, but it has no role in which to practise them and no elder or child to practise them for.",
+    "words": 240
   },
   {
     "id": "moral-training.confucian.11",
@@ -242,8 +242,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nAn apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice. Humaneness is learned slowly, by years of practice under people one owes, and no score stands in for that education.",
-    "words": 121
+    "text": "Acceptable behaviour can be trained into a model, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nAn apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice. Humaneness is learned slowly, by years of practice under people one owes, and no score stands in for that education.",
+    "words": 122
   },
   {
     "id": "moral-training.confucian.13",
@@ -260,8 +260,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. A model may learn to say the right words, but it has no role in which to practise them and no elder or child to practise them for.",
-    "words": 134
+    "text": "Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. A model may learn to say the right words, but it has no role in which to practise them and no elder or child to practise them for.",
+    "words": 130
   },
   {
     "id": "moral-training.confucian.14",
@@ -296,8 +296,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. A child's goodness begins in reverence for parents who will one day need looking after, and a model has no one it will ever have to care for.",
-    "words": 133
+    "text": "Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. A child's goodness begins in reverence for parents who will one day need looking after, and a model has no one it will ever have to care for.",
+    "words": 129
   },
   {
     "id": "moral-training.confucian.16",
@@ -332,8 +332,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nA child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers. A model may learn to say the right words, but it has no role in which to practise them and no elder or child to practise them for.",
-    "words": 130
+    "text": "Acceptable behaviour can be trained into a model, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nA child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers. A model may learn to say the right words, but it has no role in which to practise them and no elder or child to practise them for.",
+    "words": 131
   },
   {
     "id": "moral-training.confucian.18",
@@ -368,8 +368,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. A child's goodness begins in reverence for parents who will one day need looking after, and a model has no one it will ever have to care for.",
-    "words": 127
+    "text": "Acceptable behaviour can be trained into a model, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. A child's goodness begins in reverence for parents who will one day need looking after, and a model has no one it will ever have to care for.",
+    "words": 128
   },
   {
     "id": "moral-training.confucian.20",
@@ -422,8 +422,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. The exemplary person teaches by example, so that others grow humane by watching them, and nobody grows humane by watching a model reply.",
-    "words": 130
+    "text": "Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Humaneness is realised between people who can hold one another to account. A model can be adjusted when it errs, but it cannot be reproached, forgiven or trusted in the way a person raised well can, so whatever it has is not goodness in that sense.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. The exemplary person teaches by example, so that others grow humane by watching them, and nobody grows humane by watching a model reply.",
+    "words": 126
   },
   {
     "id": "moral-training.confucian.23",
@@ -476,8 +476,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. A child's goodness begins in reverence for parents who will one day need looking after, and a model has no one it will ever have to care for.",
-    "words": 128
+    "text": "Acceptable behaviour can be trained into a model, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nA company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal. A child's goodness begins in reverence for parents who will one day need looking after, and a model has no one it will ever have to care for.",
+    "words": 129
   },
   {
     "id": "moral-training.confucian.26",
@@ -494,8 +494,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nAn apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice. Humaneness is learned slowly, by years of practice under people one owes, and no score stands in for that education.",
-    "words": 125
+    "text": "Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Book 13's concern with correct names applies directly. If we call a tuned model good, the word will slide from describing a person formed in relationships to describing a product that passes evaluation, and people will start judging each other by the second sense.\n\nAn apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice. Humaneness is learned slowly, by years of practice under people one owes, and no score stands in for that education.",
+    "words": 121
   },
   {
     "id": "moral-training.confucian.27",
@@ -512,8 +512,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.\n\nA child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers. A child's goodness begins in reverence for parents who will one day need looking after, and a model has no one it will ever have to care for.",
-    "words": 128
+    "text": "Acceptable behaviour can be trained into a model, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that. A child is raised inside roles: as a son or daughter, a pupil, a younger sibling. What they learn is not a list of approved acts but how to be each of these to particular people, and the learning happens through the relationships themselves.\n\nA child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers. A child's goodness begins in reverence for parents who will one day need looking after, and a model has no one it will ever have to care for.",
+    "words": 129
   },
   {
     "id": "moral-training.confucian.28",
@@ -548,8 +548,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nA child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers. A model may learn to say the right words, but it has no role in which to practise them and no elder or child to practise them for.",
-    "words": 135
+    "text": "Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences. Ritual propriety is learned by taking part in shared forms of conduct with others who also take part. A model that is scored on its replies takes part in nothing; it is shaped from outside by raters it does not stand in any relation to.\n\nA child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers. A model may learn to say the right words, but it has no role in which to practise them and no elder or child to practise them for.",
+    "words": 131
   },
   {
     "id": "moral-training.confucian.30",
@@ -584,8 +584,8 @@
         4
       ]
     },
-    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. A company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal.",
-    "words": 98
+    "text": "Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. A company says its assistant has been raised with good values. The assistant has no parent, no teacher and no one it owes anything to; it has a reward signal.",
+    "words": 94
   },
   {
     "id": "moral-training.confucian.32",
@@ -639,8 +639,8 @@
         3
       ]
     },
-    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that.\n\nCompanies say their models are safe and good but they just want to sell them. We should not believe a model is good just because a company trained it and says so in a press release. An apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice.",
-    "words": 91
+    "text": "Acceptable behaviour can be trained into a model, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that.\n\nCompanies say their models are safe and good but they just want to sell them. We should not believe a model is good just because a company trained it and says so in a press release. An apprentice becomes trustworthy through years of working beside a master who knows him. A model is fine-tuned in a week by contractors who never see the same reply twice.",
+    "words": 92
   },
   {
     "id": "moral-training.confucian.35",
@@ -676,8 +676,8 @@
         4
       ]
     },
-    "text": "I reject the motion. Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences.\n\nCompanies say their models are safe and good but they just want to sell them. We should not believe a model is good just because a company trained it and says so in a press release. Morality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer.",
-    "words": 104
+    "text": "Calling a trained model good in the sense a well-raised child is good is a name that does not fit the thing, and the misnaming has consequences.\n\nCompanies say their models are safe and good but they just want to sell them. We should not believe a model is good just because a company trained it and says so in a press release. Morality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer.",
+    "words": 100
   },
   {
     "id": "moral-training.confucian.37",
@@ -712,8 +712,8 @@
         4
       ]
     },
-    "text": "Training can make a model behave acceptably, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. A child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers.",
-    "words": 93
+    "text": "Acceptable behaviour can be trained into a model, but moral upbringing makes a person someone who owes and is owed, and no feedback signal does that.\n\nMorality is different in every culture, so there is no single good to train a model towards. Whatever the model learns will be good for some people and bad for others, so the question has no answer. A child learns to greet her grandparents properly by doing it, being corrected by them, and seeing her parents do it. A model learns to sound polite from ratings by strangers.",
+    "words": 94
   },
   {
     "id": "moral-training.confucian.39",
