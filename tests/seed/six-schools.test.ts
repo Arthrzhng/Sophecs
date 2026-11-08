@@ -282,6 +282,51 @@ describe("a sample run made with quiz v2", () => {
     const checks = (await validate(wrong, dataset, w.before, { spot: 1000 })).checks;
     expect(checks.find((c) => c.name === "spot check: quiz_results")?.ok).toBe(false);
   });
+
+  // Production's database prints float8 with extra_float_digits 0, so
+  // PostgREST returns the point at 15 significant digits. The fresh run's
+  // first canary (2026-11-08) failed its spot check on that read alone: 38
+  // of 50 points, each stored as planned to the bit.
+  it("validates a point read back at 15 significant digits, as production returns it, and still catches one stored wrong", async () => {
+    class Production15 extends MemoryAdapter {
+      override async selectByIds(table: Parameters<MemoryAdapter["selectByIds"]>[0], ids: string[]) {
+        const rows = await super.selectByIds(table, ids);
+        if (table !== "quiz_results") return rows;
+        const print = (v: unknown) => (typeof v === "number" ? Number(v.toPrecision(15)) : v);
+        return rows.map((r) => ({ ...r, map_x: print(r.map_x), map_y: print(r.map_y) }));
+      }
+    }
+    const { plan, dataset } = smallPlan({ quiz: 2 });
+    const fresh = () => {
+      const db = new Production15();
+      for (const t of plan.topics) db.table("debate_topics").set(t.slug, { id: t.slug, slug: t.slug, motion: t.motion, active: true, par_elo: 1200, par_n: 0 });
+      return db;
+    };
+    // The read changes some planned points, or this test proves nothing.
+    const changed = dataset.quizResults.filter((q) => Number(q.row.map_x!.toPrecision(15)) !== q.row.map_x || Number(q.row.map_y!.toPrecision(15)) !== q.row.map_y);
+    expect(changed.length).toBeGreaterThan(0);
+
+    const db = fresh();
+    const r = await execute({ dataset, plan, adapter: db, retryBaseMs: 1, batchSize: 100 });
+    const spot = (await validate(db, dataset, r.before, { spot: 1000 })).checks.find((c) => c.name === "spot check: quiz_results");
+    expect(spot).toMatchObject({ ok: true });
+
+    // A point one unit off in its fifteenth significant digit is still a
+    // point stored wrong: the comparison is no looser than the read. The
+    // digit moves away from 5, so the point rounds to 14 digits as before
+    // and a comparison at 14 would pass it.
+    const wrong = fresh();
+    const w = await execute({ dataset, plan, adapter: wrong, retryBaseMs: 1, batchSize: 100 });
+    const off15 = (v: number) => {
+      const [, head, last, exp = ""] = v.toPrecision(15).match(/^(.*?)(\d)(e[+-]\d+)?$/)!;
+      const d = Number(last);
+      return Number(`${head}${d === 4 || d === 9 ? d - 1 : d + 1}${exp}`);
+    };
+    for (const row of wrong.table("quiz_results").values()) row.map_y = off15(row.map_y as number);
+    const bad = (await validate(wrong, dataset, w.before, { spot: 1000 })).checks.find((c) => c.name === "spot check: quiz_results");
+    expect(bad?.ok).toBe(false);
+    expect(bad?.detail).toMatch(/: map_y$/);
+  });
 });
 
 describe("a quiz v2 run's schools", () => {

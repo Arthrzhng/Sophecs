@@ -28,6 +28,17 @@ const SPOT_COLUMNS: Partial<Record<Table, string[]>> = {
 
 const same = (a: unknown, b: unknown) => (typeof a === "number" || typeof b === "number" ? Number(a) === Number(b) : a === b);
 
+// The quiz v2 point, a `double precision` pair. Production's database
+// prints float8 with extra_float_digits 0, so PostgREST returns 15
+// significant digits: a stored -0.19899999999999998, the plan's to the bit,
+// reads back as -0.199. A local database prints every digit. So the point
+// is compared at those 15 digits, at which the stored value still has to
+// be the plan's (the first canary of the fresh run, 2026-11-08, failed on
+// exactly this read: 38 of 50 points).
+const FLOAT8 = new Set(["map_x", "map_y"]);
+const same15 = (a: unknown, b: unknown) =>
+  typeof a === "number" && typeof b === "number" ? a.toPrecision(15) === b.toPrecision(15) : same(a, b);
+
 export async function validate(
   adapter: Adapter,
   ds: Dataset,
@@ -73,7 +84,7 @@ export async function validate(
       // row has none, and the table's default reads back as version 1.
       const v2 = p.table === "quiz_results" && (s.row as { quiz_version?: number }).quiz_version === 2;
       const cols = [...(SPOT_COLUMNS[p.table] ?? []), ...(v2 ? ["quiz_version", "map_x", "map_y", "vector"] : [])];
-      const diff = r ? cols.find((c) => !same(r[c] ?? null, (s.row as Record<string, unknown>)[c] ?? null)) : "missing";
+      const diff = r ? cols.find((c) => !(FLOAT8.has(c) ? same15 : same)(r[c] ?? null, (s.row as Record<string, unknown>)[c] ?? null)) : "missing";
       if (diff) {
         bad++;
         firstBad ||= `${s.rowId}: ${diff}`;
