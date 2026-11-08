@@ -335,12 +335,103 @@ export function serialiseBank(bank: BankArgument[]): string {
   return JSON.stringify(bank, null, 2) + "\n";
 }
 
-/** The banks show the fresh run's arguments, so each motion's own closings. */
+/**
+ * A position that opens on a sentence stating only its stance: "I reject
+ * the motion.", "I accept the motion only in part.", "The motion is
+ * right.", "Do not deploy it as it stands.", "A Stoic can accept this
+ * motion.", "I reject the motion's importance." and their like. 50 of the
+ * 144 positions did, most of them a school's second, so on one exemplar
+ * page up to five schools' cards opened on the same sentence (Arthur,
+ * 2026-11-08: "repeated sentence openings ... across sample arguments and
+ * exemplars"; and of "A Stoic can accept this motion.", that it reads as
+ * filler). Where a qualification
+ * carries a condition, the sentence after states it.
+ */
+export const BARE_STANCE =
+  /^(?:I (?:reject|accept|support|oppose|agree with) (?:the|this) motion(?: as stated| as framed| with a condition| only in part)?|I agree that it is a mistake to say a model decides|I reject the motion's importance|It is not a mistake worth correcting|A model does not decide|A Stoic must deny that blame scales with harm|A (?:Stoic|utilitarian) (?:can|must|cannot|should) (?:accept|oppose) (?:this|the) motion|A utilitarian should not care much about this motion|The motion is right|(?:Do not )?[Dd]eploy it(?: as it stands)?|Deploying it is wrong as stated)\.\s+/;
+
+/**
+ * Five of the live three's positions (three Stoic, one Utilitarian, one
+ * Virtue Ethics) the fresh run words differently: four so that no two
+ * exemplar cards on a page open on the same three words, each having
+ * opened as another of the live three's cards on its page did ("The
+ * system should", "The motion is right:", "It is a mistake to say"), and
+ * the Utilitarian one on the opaque benefit because, without "Deploy it."
+ * before it, its "it" pointed at nothing. The live run reads these passages as written
+ * until the teardown, so the change is made here, as the stance
+ * sentences' is. The new three's passages are read only by a quiz v2 run
+ * and are reworded where they stand. Keyed by motion, school and the position's index; `was` is the
+ * passage as written, and a passage that no longer reads so is an error.
+ */
+export const FRESH_POSITIONS: Partial<Record<TopicSlug, Partial<Record<SchoolId, Record<number, { was: string; now: string }>>>>> = {
+  "opaque-benefit": {
+    utilitarianism: {
+      0: {
+        was: "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm.",
+        now: "The suffering the system prevents is real, and an explanation was only ever valuable as a means to preventing harm.",
+      },
+    },
+    "virtue-ethics": {
+      0: {
+        was: "The system should not be deployed on these terms, because justice to the person a decision lands on includes owing them an answer.",
+        now: "On these terms the system should not be deployed, because justice to the person a decision lands on includes owing them an answer.",
+      },
+    },
+    stoicism: {
+      0: {
+        was: "The system should be deployed if the people responsible judged the evidence soundly, because the soundness of a judgement does not depend on whether its reasons can be passed on.",
+        now: "If the people responsible judged the evidence soundly, the system should be deployed, because the soundness of a judgement does not depend on whether its reasons can be passed on.",
+      },
+    },
+  },
+  "no-decision": {
+    stoicism: {
+      0: {
+        was: "The motion is right: a decision is assent given to an impression by a ruling faculty, and a language model has neither, so the word is misapplied.",
+        now: "Assent given to an impression by a ruling faculty is what a decision is, and a language model has neither, so the word is misapplied.",
+      },
+      3: {
+        was: "It is a mistake to say a model decides, because deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents.",
+        now: "A rational soul decides by assenting to how things appear; nothing in the model assents, so it is a mistake to say a model decides.",
+      },
+    },
+  },
+};
+
+/**
+ * The passages a run made with quiz v2 (the fresh run) argues from: each
+ * position without a sentence in front that states only its stance, so it
+ * opens on its own claim, and the five in FRESH_POSITIONS reworded.
+ * Everything else is as written. A run that names no quiz reads the
+ * passages as they are, since the live run regenerates its rows from them.
+ */
+export function freshFragments(fr: TopicFragments): TopicFragments {
+  const fresh = FRESH_POSITIONS[fr.topic] ?? {};
+  return {
+    ...fr,
+    schools: Object.fromEntries(
+      Object.entries(fr.schools).map(([school, s]) => [
+        school,
+        {
+          ...s,
+          positions: s.positions.map((p, i) => {
+            const swap = fresh[school as SchoolId]?.[i];
+            if (!swap) return p.replace(BARE_STANCE, "");
+            if (p !== swap.was) throw new Error(`${fr.topic} ${school} position ${i} no longer reads as FRESH_POSITIONS has it`);
+            return swap.now;
+          }),
+        },
+      ])
+    ) as TopicFragments["schools"],
+  };
+}
+
+/** The banks show the fresh run's arguments: each motion's own closings, and positions that open on their claim. */
 export function writeBanks(): string[] {
   const closings = loadMotionClosings();
   const written: string[] = [];
   for (const topic of TOPICS) {
-    const fr = loadFragments(topic);
+    const fr = freshFragments(loadFragments(topic));
     for (const school of BANK_SCHOOLS) {
       writeFileSync(bankPath(topic, school), serialiseBank(buildBank(fr, closings[topic], school)));
       written.push(bankPath(topic, school));

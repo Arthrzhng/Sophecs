@@ -258,8 +258,9 @@ exact duplicates stay near zero; near duplicates (the same composition with
 another opening, closing or example) are measured and reported. The banks
 (`arguments/<topic>.<school>.json`, forty each) are a reviewable sample of
 the compositions a run made with quiz v2 writes, closing with each
-motion's own closings; a run that names no quiz, the live run among them,
-closes with `closings.json` instead. The launch's three schools have
+motion's own closings and opening its positions on their claim
+(`freshFragments`); a run that names no quiz, the live run among them,
+closes with `closings.json` instead and reads the positions as written. The launch's three schools have
 passages and banks too (Gate 4 item 13), which only a run made with quiz
 v2 reads ("Six schools, placed by quiz v2", below).
 

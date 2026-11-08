@@ -5859,3 +5859,107 @@ For Arthur's list, in files this pass may not change:
 - the preview image and the share card ask "Which school do you think
   in?". Kept: it is an invitation to the reader, which the quiz answers
   for them, not a heading the page answers itself.
+
+### The fresh run's arguments open on their claim (2026-11-08)
+
+From Arthur's audit ruling of 2026-11-08 ("repeated sentence openings or
+identical endings across sample arguments and exemplars"; quoted in full
+under "A pass over the whole site for what reads as machine-written").
+#108 dealt with the endings; this is the openings.
+
+- **What repeated.** 35 of the 144 positions opened on one of nine bare
+  stance sentences ("I reject the motion.", "I accept the motion.", "I
+  support the motion.", "I oppose the motion.", "I agree with the
+  motion.", "The motion is right.", "Deploy it.", "Do not deploy it.",
+  "Deploying it is wrong as stated."), most of them a school's second
+  position. On a production-volume quiz v2 run (seed `six-check`,
+  base window to 2026-11-10 09:00 UTC, two weeks on), 23 of the 144
+  exemplar cards opened on the same sentence as another school's card on
+  their page, five of them "I reject the motion." on each of two pages,
+  and 55 shared their first three words with another card on their page.
+- **The stance sentences.** A run made with quiz v2 argues from
+  `freshFragments` (`scripts/seed/banks.ts`): no position keeps a
+  sentence in front that states only its stance (`BARE_STANCE`), 24
+  sentences in all:
+  - the nine above;
+  - five with a qualification ("I reject the motion as stated.", "I
+    reject the motion as framed.", "I accept the motion with a
+    condition.", "I accept the motion only in part.", "Do not deploy it
+    as it stands."). Where the qualification carries a condition, the
+    sentence after states it;
+  - four on the decide motion that state a stance and nothing else ("I
+    agree that it is a mistake to say a model decides.", "I reject the
+    motion's importance.", "It is not a mistake worth correcting.", "A
+    model does not decide.");
+  - six that name the school ("A Stoic can accept this motion.", which
+    Arthur called filler on 2026-11-08, "A Stoic must accept the
+    motion.", "A Stoic cannot accept this motion.", "A Stoic must deny
+    that blame scales with harm.", "A utilitarian should oppose this
+    motion.", "A utilitarian should not care much about this motion.").
+
+  50 positions in all. Each opens now on the claim that followed. Which
+  sentences state a stance and nothing else is a reading, not a pattern:
+  three reviews and I read the first sentence of every position, and
+  `tests/seed/six-schools.test.ts` holds the 24 found. The shortest left
+  say what is wrong with the motion ("The motion misnames the duty."),
+  or carry a condition ("Deploy it, with the opacity named as a risk to
+  keep watching.").
+- **Openings reworded.** 19 positions, each opening differently now and
+  saying the same thing. 17 opened, with or without the strip, on the
+  same three words as another card on their page ("The motion is
+  right:", "It is a mistake to say", "Training can make a model", "The
+  system should be deployed", "Moral upbringing makes a person good by"
+  and the like); one, the Ubuntu passage below, said "not only ... but";
+  and one, Utilitarianism's first on the opaque benefit, said "it" for
+  the system once "Deploy it." was gone. The Confucian one on the
+  careful builder was reworded again in review pass 3, as it still had
+  the shape of the Virtue Ethics card on its page ("Proportional blame is
+  wrong, yet so is ..."). 14 are the new three's, changed where they stand, since only a
+  quiz v2 run reads them; five are the live three's (three Stoic, one
+  Utilitarian, one Virtue Ethics), changed in `FRESH_POSITIONS`, which a
+  run that names no quiz does not read. Each entry there holds the passage as written, and the
+  run stops if a passage no longer reads so. After the teardown they can
+  go into the passages themselves.
+- **The Ubuntu one** is its third position on the opaque benefit,
+  which opened "The question is not only how much suffering it removes
+  but whose voices were left out", one of the turns Arthur's ruling
+  names. The first version of this change made it "How much suffering it
+  removes is one question; whose voices were left out ... is another",
+  which takes no side and is a stock contrast of its own (review pass
+  1), and pass 2 found "this" and "it" with nothing before them. It
+  reads now "The voices left out when the system was chosen as the way
+  to remove suffering count against deploying it, however much it
+  removes."
+- **Measured again, same run:** no two cards on any page share their
+  first three words. Exact duplicates are 0.2% of arguments, as on main;
+  near duplicates 20.2%, against main's 18.4%.
+- **The live run is untouched.** A run that names no quiz reads the
+  passages as written: its datasets are byte for byte as pinned (the
+  no-quiz pins in `tests/seed/determinism.test.ts` are main's), and its
+  positions still open on their stance. The quiz v2 pins move and are
+  pinned again.
+- **The samples** (`docs/gate4-samples.md`): four of the nine change.
+  Three opened on a stance sentence ("I accept the motion." twice, "I
+  accept the motion with a condition." once) and open now on the
+  sentence after it; Ubuntu's mid argument opens "Feedback can make a
+  model" where it opened "Training can make a model", as two other cards
+  on its page did.
+- **For Arthur's list:**
+  - on every page, two or three cards open by naming their school, most
+    with a reason in the same sentence ("A Confucian rejects this,
+    because ...", "A Buddhist Ethicist can accept deployment here,
+    because ..."): 14 positions, all a school's third or fourth;
+  - on the careful builder's page, five cards open "The motion ..."
+    ("makes blame depend on outcomes", "confuses blame with ...", "asks
+    the wrong question", "gets blame backwards", "misnames the duty");
+  - "Here is my answer." (one of `SAMPLE_FRAMES`, already on the list)
+    opens 364 of the run's 9,922 arguments, against 278 on main. A run
+    deals a tier's plain compositions first and its framed ones once
+    those run out; shorter positions leave fewer weak compositions above
+    the 80-word floor, so the weak tier reaches its frames sooner.
+    Exemplar cards skip it;
+  - twelve passages, in the shared closings and the six motions'
+    fragments (`scripts/seed/arguments/fragments/*.json`), say "not only
+    ... but" or "not just". The live three's are read by the live run
+    until the teardown, so they can change only for the fresh run, as
+    the openings did here.

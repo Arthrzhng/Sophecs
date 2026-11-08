@@ -38,8 +38,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A utilitarian should not care much about this motion. If the word decide helps people predict and control what the system does, using it is no mistake. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nMill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it. Pilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness.\n\nA Virtue Ethicist will object that calling the output a decision quietly moves responsibility off the people who trained and deployed the system, and that shift has consequences of its own. If the word really shifts responsibility, that is a consequence, and a utilitarian takes it seriously. The fix is to assign accountability explicitly in law and practice, which works far better than policing a verb. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
-    "words": 213
+    "text": "If the word decide helps people predict and control what the system does, using it is no mistake. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nMill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it. Pilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness.\n\nA Virtue Ethicist will object that calling the output a decision quietly moves responsibility off the people who trained and deployed the system, and that shift has consequences of its own. If the word really shifts responsibility, that is a consequence, and a utilitarian takes it seriously. The fix is to assign accountability explicitly in law and practice, which works far better than policing a verb. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
+    "words": 204
   },
   {
     "id": "no-decision.utilitarianism.03",
@@ -59,8 +59,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion's importance. Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. What matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was.\n\nThe real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm. If a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses.\n\nA Virtue Ethicist will object that calling the output a decision quietly moves responsibility off the people who trained and deployed the system, and that shift has consequences of its own. If the word really shifts responsibility, that is a consequence, and a utilitarian takes it seriously. The fix is to assign accountability explicitly in law and practice, which works far better than policing a verb. The useful place to put responsibility is wherever it can make the outputs better, and that is with the people who can change the model.",
-    "words": 224
+    "text": "Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. What matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was.\n\nThe real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm. If a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses.\n\nA Virtue Ethicist will object that calling the output a decision quietly moves responsibility off the people who trained and deployed the system, and that shift has consequences of its own. If the word really shifts responsibility, that is a consequence, and a utilitarian takes it seriously. The fix is to assign accountability explicitly in law and practice, which works far better than policing a verb. The useful place to put responsibility is wherever it can make the outputs better, and that is with the people who can change the model.",
+    "words": 219
   },
   {
     "id": "no-decision.utilitarianism.04",
@@ -80,8 +80,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "It is not a mistake worth correcting. A word is good if it helps people act well, and talking about model decisions often does exactly that. Words are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry.\n\nMill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it. Pilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness.\n\nA Stoic will object that deciding is assent by a ruling faculty, so to call the output a decision is simply false, and false beliefs about what happens to us are the root of misjudgement. False beliefs matter when they lead to worse outcomes. Where the word helps people predict and correct the system, its looseness costs nothing, and where it misleads, the remedy is better oversight, not better metaphysics. The argument over the word matters only where the word changes what people do, and that is a question for evidence, not definitions.",
-    "words": 219
+    "text": "A word is good if it helps people act well, and talking about model decisions often does exactly that. Words are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry.\n\nMill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it. Pilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness.\n\nA Stoic will object that deciding is assent by a ruling faculty, so to call the output a decision is simply false, and false beliefs about what happens to us are the root of misjudgement. False beliefs matter when they lead to worse outcomes. Where the word helps people predict and correct the system, its looseness costs nothing, and where it misleads, the remedy is better oversight, not better metaphysics. The argument over the word matters only where the word changes what people do, and that is a question for evidence, not definitions.",
+    "words": 212
   },
   {
     "id": "no-decision.utilitarianism.05",
@@ -101,8 +101,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion's importance. Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. Mill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it.\n\nWords are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry. If a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses.\n\nA Virtue Ethicist will object that calling the output a decision quietly moves responsibility off the people who trained and deployed the system, and that shift has consequences of its own. If the word really shifts responsibility, that is a consequence, and a utilitarian takes it seriously. The fix is to assign accountability explicitly in law and practice, which works far better than policing a verb. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
-    "words": 213
+    "text": "Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. Mill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it.\n\nWords are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry. If a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses.\n\nA Virtue Ethicist will object that calling the output a decision quietly moves responsibility off the people who trained and deployed the system, and that shift has consequences of its own. If the word really shifts responsibility, that is a consequence, and a utilitarian takes it seriously. The fix is to assign accountability explicitly in law and practice, which works far better than policing a verb. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
+    "words": 208
   },
   {
     "id": "no-decision.utilitarianism.06",
@@ -122,8 +122,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "A utilitarian should not care much about this motion. If the word decide helps people predict and control what the system does, using it is no mistake. Words are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry.\n\nWhat matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was. A tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did.\n\nA Virtue Ethicist will object that calling the output a decision quietly moves responsibility off the people who trained and deployed the system, and that shift has consequences of its own. If the word really shifts responsibility, that is a consequence, and a utilitarian takes it seriously. The fix is to assign accountability explicitly in law and practice, which works far better than policing a verb. The argument over the word matters only where the word changes what people do, and that is a question for evidence, not definitions.",
-    "words": 229
+    "text": "If the word decide helps people predict and control what the system does, using it is no mistake. Words are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry.\n\nWhat matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was. A tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did.\n\nA Virtue Ethicist will object that calling the output a decision quietly moves responsibility off the people who trained and deployed the system, and that shift has consequences of its own. If the word really shifts responsibility, that is a consequence, and a utilitarian takes it seriously. The fix is to assign accountability explicitly in law and practice, which works far better than policing a verb. The argument over the word matters only where the word changes what people do, and that is a question for evidence, not definitions.",
+    "words": 220
   },
   {
     "id": "no-decision.utilitarianism.07",
@@ -164,8 +164,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "It is not a mistake worth correcting. A word is good if it helps people act well, and talking about model decisions often does exactly that. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nMill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it. If a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses.\n\nA Stoic will object that deciding is assent by a ruling faculty, so to call the output a decision is simply false, and false beliefs about what happens to us are the root of misjudgement. False beliefs matter when they lead to worse outcomes. Where the word helps people predict and correct the system, its looseness costs nothing, and where it misleads, the remedy is better oversight, not better metaphysics. The useful place to put responsibility is wherever it can make the outputs better, and that is with the people who can change the model.",
-    "words": 216
+    "text": "A word is good if it helps people act well, and talking about model decisions often does exactly that. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nMill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it. If a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses.\n\nA Stoic will object that deciding is assent by a ruling faculty, so to call the output a decision is simply false, and false beliefs about what happens to us are the root of misjudgement. False beliefs matter when they lead to worse outcomes. Where the word helps people predict and correct the system, its looseness costs nothing, and where it misleads, the remedy is better oversight, not better metaphysics. The useful place to put responsibility is wherever it can make the outputs better, and that is with the people who can change the model.",
+    "words": 209
   },
   {
     "id": "no-decision.utilitarianism.09",
@@ -185,8 +185,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "It is not a mistake worth correcting. A word is good if it helps people act well, and talking about model decisions often does exactly that. Mill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it.\n\nThe real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm. A tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did.\n\nA Stoic will object that deciding is assent by a ruling faculty, so to call the output a decision is simply false, and false beliefs about what happens to us are the root of misjudgement. False beliefs matter when they lead to worse outcomes. Where the word helps people predict and correct the system, its looseness costs nothing, and where it misleads, the remedy is better oversight, not better metaphysics. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
-    "words": 219
+    "text": "A word is good if it helps people act well, and talking about model decisions often does exactly that. Mill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it.\n\nThe real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm. A tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did.\n\nA Stoic will object that deciding is assent by a ruling faculty, so to call the output a decision is simply false, and false beliefs about what happens to us are the root of misjudgement. False beliefs matter when they lead to worse outcomes. Where the word helps people predict and correct the system, its looseness costs nothing, and where it misleads, the remedy is better oversight, not better metaphysics. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
+    "words": 212
   },
   {
     "id": "no-decision.utilitarianism.10",
@@ -206,8 +206,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A utilitarian should not care much about this motion. If the word decide helps people predict and control what the system does, using it is no mistake. What matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was.\n\nThe real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm. Pilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness.\n\nA Virtue Ethicist will object that calling the output a decision quietly moves responsibility off the people who trained and deployed the system, and that shift has consequences of its own. If the word really shifts responsibility, that is a consequence, and a utilitarian takes it seriously. The fix is to assign accountability explicitly in law and practice, which works far better than policing a verb. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
-    "words": 223
+    "text": "If the word decide helps people predict and control what the system does, using it is no mistake. What matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was.\n\nThe real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm. Pilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness.\n\nA Virtue Ethicist will object that calling the output a decision quietly moves responsibility off the people who trained and deployed the system, and that shift has consequences of its own. If the word really shifts responsibility, that is a consequence, and a utilitarian takes it seriously. The fix is to assign accountability explicitly in law and practice, which works far better than policing a verb. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
+    "words": 214
   },
   {
     "id": "no-decision.utilitarianism.11",
@@ -224,8 +224,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion's importance. Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. Mill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it.\n\nIf a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses. The useful place to put responsibility is wherever it can make the outputs better, and that is with the people who can change the model.",
-    "words": 106
+    "text": "Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. Mill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it.\n\nIf a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses. The useful place to put responsibility is wherever it can make the outputs better, and that is with the people who can change the model.",
+    "words": 101
   },
   {
     "id": "no-decision.utilitarianism.12",
@@ -242,8 +242,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "It is not a mistake worth correcting. A word is good if it helps people act well, and talking about model decisions often does exactly that. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nA tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did. The argument over the word matters only where the word changes what people do, and that is a question for evidence, not definitions.",
-    "words": 115
+    "text": "A word is good if it helps people act well, and talking about model decisions often does exactly that. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nA tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did. The argument over the word matters only where the word changes what people do, and that is a question for evidence, not definitions.",
+    "words": 108
   },
   {
     "id": "no-decision.utilitarianism.13",
@@ -278,8 +278,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A utilitarian should not care much about this motion. If the word decide helps people predict and control what the system does, using it is no mistake. What matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was.\n\nA tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
-    "words": 118
+    "text": "If the word decide helps people predict and control what the system does, using it is no mistake. What matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was.\n\nA tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
+    "words": 109
   },
   {
     "id": "no-decision.utilitarianism.15",
@@ -296,8 +296,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "It is not a mistake worth correcting. A word is good if it helps people act well, and talking about model decisions often does exactly that. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nIf a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses. Whether anything decided inside the system is a question with no victims either way; the outputs are where the welfare is.",
-    "words": 107
+    "text": "A word is good if it helps people act well, and talking about model decisions often does exactly that. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nIf a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses. Whether anything decided inside the system is a question with no victims either way; the outputs are where the welfare is.",
+    "words": 100
   },
   {
     "id": "no-decision.utilitarianism.16",
@@ -332,8 +332,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion's importance. Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. What matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was.\n\nIf a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses. The useful place to put responsibility is wherever it can make the outputs better, and that is with the people who can change the model.",
-    "words": 116
+    "text": "Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. What matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was.\n\nIf a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses. The useful place to put responsibility is wherever it can make the outputs better, and that is with the people who can change the model.",
+    "words": 111
   },
   {
     "id": "no-decision.utilitarianism.18",
@@ -350,8 +350,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A utilitarian should not care much about this motion. If the word decide helps people predict and control what the system does, using it is no mistake. Words are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry.\n\nPilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
-    "words": 114
+    "text": "If the word decide helps people predict and control what the system does, using it is no mistake. Words are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry.\n\nPilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
+    "words": 105
   },
   {
     "id": "no-decision.utilitarianism.19",
@@ -386,8 +386,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "It is not a mistake worth correcting. A word is good if it helps people act well, and talking about model decisions often does exactly that. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nIf a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses. The argument over the word matters only where the word changes what people do, and that is a question for evidence, not definitions.",
-    "words": 109
+    "text": "A word is good if it helps people act well, and talking about model decisions often does exactly that. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nIf a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses. The argument over the word matters only where the word changes what people do, and that is a question for evidence, not definitions.",
+    "words": 102
   },
   {
     "id": "no-decision.utilitarianism.21",
@@ -404,8 +404,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I reject the motion's importance. Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. Words are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry.\n\nPilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness. The argument over the word matters only where the word changes what people do, and that is a question for evidence, not definitions.",
-    "words": 116
+    "text": "Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. Words are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry.\n\nPilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness. The argument over the word matters only where the word changes what people do, and that is a question for evidence, not definitions.",
+    "words": 111
   },
   {
     "id": "no-decision.utilitarianism.22",
@@ -422,8 +422,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "A utilitarian should not care much about this motion. If the word decide helps people predict and control what the system does, using it is no mistake. What matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was.\n\nA tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did. The useful place to put responsibility is wherever it can make the outputs better, and that is with the people who can change the model.",
-    "words": 121
+    "text": "If the word decide helps people predict and control what the system does, using it is no mistake. What matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was.\n\nA tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did. The useful place to put responsibility is wherever it can make the outputs better, and that is with the people who can change the model.",
+    "words": 112
   },
   {
     "id": "no-decision.utilitarianism.23",
@@ -458,8 +458,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I reject the motion's importance. Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nPilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness. The argument over the word matters only where the word changes what people do, and that is a question for evidence, not definitions.",
-    "words": 114
+    "text": "Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nPilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness. The argument over the word matters only where the word changes what people do, and that is a question for evidence, not definitions.",
+    "words": 109
   },
   {
     "id": "no-decision.utilitarianism.25",
@@ -476,8 +476,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A utilitarian should not care much about this motion. If the word decide helps people predict and control what the system does, using it is no mistake. Mill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it.\n\nA tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
-    "words": 108
+    "text": "If the word decide helps people predict and control what the system does, using it is no mistake. Mill judged rules by their tendency to promote happiness. A rule of speech that bans the word decide would have no measurable effect on anyone's wellbeing, so there is no utilitarian reason to adopt it.\n\nA tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
+    "words": 99
   },
   {
     "id": "no-decision.utilitarianism.26",
@@ -494,8 +494,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "It is not a mistake worth correcting. A word is good if it helps people act well, and talking about model decisions often does exactly that. Words are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry.\n\nPilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness. Whether anything decided inside the system is a question with no victims either way; the outputs are where the welfare is.",
-    "words": 112
+    "text": "A word is good if it helps people act well, and talking about model decisions often does exactly that. Words are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry.\n\nPilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness. Whether anything decided inside the system is a question with no victims either way; the outputs are where the welfare is.",
+    "words": 105
   },
   {
     "id": "no-decision.utilitarianism.27",
@@ -530,8 +530,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "It is not a mistake worth correcting. A word is good if it helps people act well, and talking about model decisions often does exactly that. What matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was.\n\nA tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
-    "words": 117
+    "text": "A word is good if it helps people act well, and talking about model decisions often does exactly that. What matters morally is the effect of an action on welfare. A rejected loan application hurts the applicant in the same way whether we say the model decided or the bank's process produced an output. Arguing about the verb leaves every consequence where it was.\n\nA tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did. Call it deciding or not, the output reaches the same people with the same effects, and those effects are what need weighing.",
+    "words": 110
   },
   {
     "id": "no-decision.utilitarianism.29",
@@ -548,8 +548,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion's importance. Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nPilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness. The useful place to put responsibility is wherever it can make the outputs better, and that is with the people who can change the model.",
-    "words": 116
+    "text": "Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them. The real risk is that people treat model outputs as unquestionable. That risk is reduced by testing, monitoring and appeal routes, all of which can be built whichever word we use. Effort spent on vocabulary is effort not spent on reducing harm.\n\nPilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness. The useful place to put responsibility is wherever it can make the outputs better, and that is with the people who can change the model.",
+    "words": 111
   },
   {
     "id": "no-decision.utilitarianism.30",
@@ -566,29 +566,11 @@
       "closing": 3,
       "weak": []
     },
-    "text": "A utilitarian should not care much about this motion. If the word decide helps people predict and control what the system does, using it is no mistake. Words are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry.\n\nA tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did. Whether anything decided inside the system is a question with no victims either way; the outputs are where the welfare is.",
-    "words": 116
+    "text": "If the word decide helps people predict and control what the system does, using it is no mistake. Words are tools for coordinating what we do. If saying that a model decided helps engineers audit it, helps regulators assign oversight, and helps users know when to check it, then the word is doing useful work, and calling it a mistake is pedantry.\n\nA tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did. Whether anything decided inside the system is a question with no victims either way; the outputs are where the welfare is.",
+    "words": 107
   },
   {
     "id": "no-decision.utilitarianism.31",
-    "topic": "no-decision",
-    "school": "utilitarianism",
-    "tier": "weak",
-    "parts": {
-      "position": 3,
-      "reasons": [],
-      "example": 0,
-      "objections": [],
-      "closing": null,
-      "weak": [
-        3
-      ]
-    },
-    "text": "It is not a mistake worth correcting. A word is good if it helps people act well, and talking about model decisions often does exactly that.\n\nWhether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything. A tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did.",
-    "words": 82
-  },
-  {
-    "id": "no-decision.utilitarianism.32",
     "topic": "no-decision",
     "school": "utilitarianism",
     "tier": "weak",
@@ -603,29 +585,11 @@
         1
       ]
     },
-    "text": "I reject the motion's importance. Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. We say a thermostat decides to turn the heating on and nobody minds. Words like decide are just shortcuts, so it is not a mistake, it is how language works, and the debate is about nothing.",
-    "words": 96
+    "text": "Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. We say a thermostat decides to turn the heating on and nobody minds. Words like decide are just shortcuts, so it is not a mistake, it is how language works, and the debate is about nothing.",
+    "words": 91
   },
   {
-    "id": "no-decision.utilitarianism.33",
-    "topic": "no-decision",
-    "school": "utilitarianism",
-    "tier": "weak",
-    "parts": {
-      "position": 2,
-      "reasons": [],
-      "example": 1,
-      "objections": [],
-      "closing": null,
-      "weak": [
-        2
-      ]
-    },
-    "text": "A utilitarian should not care much about this motion. If the word decide helps people predict and control what the system does, using it is no mistake.\n\nIf a model can choose between options and give an answer, then it decides. I do not see what else deciding could mean. Humans are also just neurons firing, so the difference is not that big. Pilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness.",
-    "words": 84
-  },
-  {
-    "id": "no-decision.utilitarianism.34",
+    "id": "no-decision.utilitarianism.32",
     "topic": "no-decision",
     "school": "utilitarianism",
     "tier": "weak",
@@ -643,80 +607,7 @@
     "words": 82
   },
   {
-    "id": "no-decision.utilitarianism.35",
-    "topic": "no-decision",
-    "school": "utilitarianism",
-    "tier": "weak",
-    "parts": {
-      "position": 3,
-      "reasons": [],
-      "example": 2,
-      "objections": [],
-      "closing": null,
-      "weak": [
-        2
-      ]
-    },
-    "text": "It is not a mistake worth correcting. A word is good if it helps people act well, and talking about model decisions often does exactly that.\n\nIf a model can choose between options and give an answer, then it decides. I do not see what else deciding could mean. Humans are also just neurons firing, so the difference is not that big. If a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses.",
-    "words": 80
-  },
-  {
-    "id": "no-decision.utilitarianism.36",
-    "topic": "no-decision",
-    "school": "utilitarianism",
-    "tier": "weak",
-    "parts": {
-      "position": 1,
-      "reasons": [],
-      "example": null,
-      "objections": [],
-      "closing": null,
-      "weak": [
-        1,
-        4
-      ]
-    },
-    "text": "I reject the motion's importance. Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them.\n\nWe say a thermostat decides to turn the heating on and nobody minds. Words like decide are just shortcuts, so it is not a mistake, it is how language works, and the debate is about nothing. This matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not.",
-    "words": 96
-  },
-  {
-    "id": "no-decision.utilitarianism.37",
-    "topic": "no-decision",
-    "school": "utilitarianism",
-    "tier": "weak",
-    "parts": {
-      "position": 2,
-      "reasons": [],
-      "example": 1,
-      "objections": [],
-      "closing": null,
-      "weak": [
-        3
-      ]
-    },
-    "text": "A utilitarian should not care much about this motion. If the word decide helps people predict and control what the system does, using it is no mistake.\n\nWhether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything. Pilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness.",
-    "words": 80
-  },
-  {
-    "id": "no-decision.utilitarianism.38",
-    "topic": "no-decision",
-    "school": "utilitarianism",
-    "tier": "weak",
-    "parts": {
-      "position": 0,
-      "reasons": [],
-      "example": 0,
-      "objections": [],
-      "closing": null,
-      "weak": [
-        4
-      ]
-    },
-    "text": "Whether there is a decision inside the box changes nothing about what the output does to people, so the motion's mistake, if it is one, does not matter.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. A tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did.",
-    "words": 84
-  },
-  {
-    "id": "no-decision.utilitarianism.39",
+    "id": "no-decision.utilitarianism.33",
     "topic": "no-decision",
     "school": "utilitarianism",
     "tier": "weak",
@@ -731,8 +622,118 @@
         4
       ]
     },
-    "text": "A utilitarian should not care much about this motion. If the word decide helps people predict and control what the system does, using it is no mistake.\n\nIf a model can choose between options and give an answer, then it decides. I do not see what else deciding could mean. Humans are also just neurons firing, so the difference is not that big. This matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not.",
-    "words": 95
+    "text": "If the word decide helps people predict and control what the system does, using it is no mistake.\n\nIf a model can choose between options and give an answer, then it decides. I do not see what else deciding could mean. Humans are also just neurons firing, so the difference is not that big. This matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not.",
+    "words": 86
+  },
+  {
+    "id": "no-decision.utilitarianism.34",
+    "topic": "no-decision",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3
+      ]
+    },
+    "text": "Whether there is a decision inside the box changes nothing about what the output does to people, so the motion's mistake, if it is one, does not matter.\n\nWhether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything. Pilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness.",
+    "words": 81
+  },
+  {
+    "id": "no-decision.utilitarianism.35",
+    "topic": "no-decision",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        1
+      ]
+    },
+    "text": "Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them.\n\nWe say a thermostat decides to turn the heating on and nobody minds. Words like decide are just shortcuts, so it is not a mistake, it is how language works, and the debate is about nothing. A tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did.",
+    "words": 83
+  },
+  {
+    "id": "no-decision.utilitarianism.36",
+    "topic": "no-decision",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        2,
+        3
+      ]
+    },
+    "text": "A word is good if it helps people act well, and talking about model decisions often does exactly that.\n\nIf a model can choose between options and give an answer, then it decides. I do not see what else deciding could mean. Humans are also just neurons firing, so the difference is not that big. Whether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything.",
+    "words": 87
+  },
+  {
+    "id": "no-decision.utilitarianism.37",
+    "topic": "no-decision",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 0,
+      "reasons": [],
+      "example": 1,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        4
+      ]
+    },
+    "text": "Whether there is a decision inside the box changes nothing about what the output does to people, so the motion's mistake, if it is one, does not matter.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. Pilots say the autopilot decided to climb. The phrase helps them react quickly, and nobody is harmed by its philosophical looseness.",
+    "words": 81
+  },
+  {
+    "id": "no-decision.utilitarianism.38",
+    "topic": "no-decision",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 3,
+      "reasons": [],
+      "example": null,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        3,
+        1
+      ]
+    },
+    "text": "A word is good if it helps people act well, and talking about model decisions often does exactly that.\n\nWhether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything. We say a thermostat decides to turn the heating on and nobody minds. Words like decide are just shortcuts, so it is not a mistake, it is how language works, and the debate is about nothing.",
+    "words": 87
+  },
+  {
+    "id": "no-decision.utilitarianism.39",
+    "topic": "no-decision",
+    "school": "utilitarianism",
+    "tier": "weak",
+    "parts": {
+      "position": 1,
+      "reasons": [],
+      "example": 0,
+      "objections": [],
+      "closing": null,
+      "weak": [
+        2
+      ]
+    },
+    "text": "Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them.\n\nIf a model can choose between options and give an answer, then it decides. I do not see what else deciding could mean. Humans are also just neurons firing, so the difference is not that big. A tenant evicted because a screening model scored her badly is equally homeless whether the newspaper says the model decided or the landlord did.",
+    "words": 83
   },
   {
     "id": "no-decision.utilitarianism.40",
@@ -740,16 +741,17 @@
     "school": "utilitarianism",
     "tier": "weak",
     "parts": {
-      "position": 1,
+      "position": 2,
       "reasons": [],
-      "example": 2,
+      "example": null,
       "objections": [],
       "closing": null,
       "weak": [
-        1
+        4,
+        3
       ]
     },
-    "text": "I reject the motion's importance. Saying a model decides may be loose talk, but the morally relevant question is what its outputs cause, not what we call them.\n\nWe say a thermostat decides to turn the heating on and nobody minds. Words like decide are just shortcuts, so it is not a mistake, it is how language works, and the debate is about nothing. If a hospital model misses a tumour, the patient's harm is identical whatever verb the incident report uses.",
+    "text": "If the word decide helps people predict and control what the system does, using it is no mistake.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. Whether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything.",
     "words": 82
   }
 ]

@@ -120,7 +120,7 @@
     "confucian": {
       "direction": "for",
       "positions": [
-        "It is a mistake that matters, because the word decide does work the system has not done, and getting the name right keeps responsibility with the people whose roles the decision belongs to.",
+        "The word decide does work the system has not done, which makes this a mistake that matters: getting the name right keeps responsibility with the people whose roles the decision belongs to.",
         "I accept the motion. To say the model decided is to give a role's responsibility to something that holds no role, and the people who do hold it slip out from under it.",
         "A Confucian accepts this as a case of incorrect names: decide names an act by someone in a position, and the model occupies no position.",
         "The motion is right. Calling the output a decision lets the officer, the manager and the clinician speak as if they had not decided, which is the real harm."
@@ -154,10 +154,10 @@
     "ubuntu": {
       "direction": "for",
       "positions": [
-        "It is a mistake, because a decision belongs to people answerable to the others it affects, and crediting the model hides who decided and who was left out of deciding.",
+        "Decisions belong to people answerable to the others they affect, so crediting the model with one is a mistake that hides who decided and who was left out of deciding.",
         "I accept the motion. To decide is to take part in a shared life by choosing for or with others, and a model takes part in no shared life.",
         "I accept this, because saying the model decided turns a relationship between people into a fact about a machine.",
-        "The motion is right, and the reason is relational: decisions are made among persons, and a language model is not one of them."
+        "The reason the motion is right is relational: decisions are made among persons, and a language model is not one of them."
       ],
       "reasons": [
         "People are bound to one another, and deciding is one of the ways they are bound. A decision binds the decider to those it affects, who may answer, object or forgive. A model's output binds it to nobody.",
@@ -191,7 +191,7 @@
         "An output arises from many conditions, its training data, its prompt and the people who deployed it, with no volition of its own among them, so calling it a decision places an intention where there is none.",
         "I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions.",
         "A Buddhist Ethicist accepts this, because deciding is intending, and to say the model decided moves the intention from the people who have it to a process that does not.",
-        "The motion is right, and it matters: calling the output a decision hides the volitions that actually shaped it, which are the ones that can be examined and changed."
+        "Getting the word right matters: calling the output a decision hides the volitions that actually shaped it, which are the ones that can be examined and changed."
       ],
       "reasons": [
         "In Buddhist ethics an act is weighed by the volition behind it as much as by what follows. A decision is a volition settling on a course, and a language model's output has no volition of its own behind it. Calling it a decision credits an intention that is not there.",
