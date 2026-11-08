@@ -385,9 +385,10 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
   // A run with `quiz: 2` places samples by quiz v2 among all six schools;
   // any other run by quiz v1 among its three, drawing exactly as before.
   const v2 = cfg.quiz === 2;
-  // The fresh run's positions open on their claim, not on a bare stance
-  // sentence (`freshFragments`); a run that names no quiz reads the
-  // passages exactly as written.
+  // The fresh run's positions open on their claim (`freshFragments`): no
+  // sentence in front that states only the stance, and four of the live
+  // three's reworded; a run that names no quiz reads the passages exactly
+  // as written.
   if (v2) banks = { ...banks, fragments: Object.fromEntries(TOPICS.map((t) => [t, freshFragments(banks.fragments[t])])) as Banks["fragments"] };
   // Quiz v2's schools in the quiz file's order, not the registry's lists,
   // which the launch changes when it publishes the three: a quiz v2 run

@@ -17,7 +17,7 @@
       "closing": 3,
       "weak": []
     },
-    "text": "It is a mistake to say a model decides, because deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nCalling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing. A person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind.\n\nA Utilitarian will object that whether there is a decision inside the box changes nothing about what the output does to people, so the mistake does not matter. It matters to us, because we are the ones assenting to the model's outputs. If we call them decisions we stop noticing that the only decision in the chain was ours, made when we chose to act on what the model produced. A model can be well made or badly made, but it cannot decide, because nothing in it is in its own power.",
+    "text": "Deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents, so it is a mistake to say a model decides. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nCalling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing. A person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind.\n\nA Utilitarian will object that whether there is a decision inside the box changes nothing about what the output does to people, so the mistake does not matter. It matters to us, because we are the ones assenting to the model's outputs. If we call them decisions we stop noticing that the only decision in the chain was ours, made when we chose to act on what the model produced. A model can be well made or badly made, but it cannot decide, because nothing in it is in its own power.",
     "words": 242
   },
   {
@@ -59,8 +59,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "A Stoic must accept the motion. However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. Calling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing.\n\nDeterminism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it. When a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope.\n\nA Utilitarian will object that whether there is a decision inside the box changes nothing about what the output does to people, so the mistake does not matter. It matters to us, because we are the ones assenting to the model's outputs. If we call them decisions we stop noticing that the only decision in the chain was ours, made when we chose to act on what the model produced. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
-    "words": 228
+    "text": "However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. Calling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing.\n\nDeterminism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it. When a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope.\n\nA Utilitarian will object that whether there is a decision inside the box changes nothing about what the output does to people, so the mistake does not matter. It matters to us, because we are the ones assenting to the model's outputs. If we call them decisions we stop noticing that the only decision in the chain was ours, made when we chose to act on what the model produced. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
+    "words": 222
   },
   {
     "id": "no-decision.stoicism.04",
@@ -80,8 +80,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "The motion is right: a decision is assent given to an impression by a ruling faculty, and a language model has neither, so the word is misapplied. Determinism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it.\n\nCalling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing. A weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point.\n\nA Utilitarian will object that whether there is a decision inside the box changes nothing about what the output does to people, so the mistake does not matter. It matters to us, because we are the ones assenting to the model's outputs. If we call them decisions we stop noticing that the only decision in the chain was ours, made when we chose to act on what the model produced. A model can be well made or badly made, but it cannot decide, because nothing in it is in its own power.",
-    "words": 234
+    "text": "Assent given to an impression by a ruling faculty is what a decision is, and a language model has neither, so the word is misapplied. Determinism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it.\n\nCalling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing. A weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point.\n\nA Utilitarian will object that whether there is a decision inside the box changes nothing about what the output does to people, so the mistake does not matter. It matters to us, because we are the ones assenting to the model's outputs. If we call them decisions we stop noticing that the only decision in the chain was ours, made when we chose to act on what the model produced. A model can be well made or badly made, but it cannot decide, because nothing in it is in its own power.",
+    "words": 232
   },
   {
     "id": "no-decision.stoicism.05",
@@ -101,7 +101,7 @@
       "closing": 2,
       "weak": []
     },
-    "text": "It is a mistake to say a model decides, because deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents. Calling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing.\n\nDeterminism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it. A weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point.\n\nA Virtue Ethicist will object that the Stoic account is too thin: choice is deliberate desire formed by character, and assent alone does not capture what is missing in the model. Assent is the core of deliberate desire, not a rival to it. Whatever else a choice involves, it involves a mind accepting how things seem and acting on it, and the model lacks that before the question of character even arises. A clock that strikes twelve has not decided it is noon, and what a model prints is the same kind of event.",
+    "text": "Deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents, so it is a mistake to say a model decides. Calling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing.\n\nDeterminism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it. A weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point.\n\nA Virtue Ethicist will object that the Stoic account is too thin: choice is deliberate desire formed by character, and assent alone does not capture what is missing in the model. Assent is the core of deliberate desire, not a rival to it. Whatever else a choice involves, it involves a mind accepting how things seem and acting on it, and the model lacks that before the question of character even arises. A clock that strikes twelve has not decided it is noon, and what a model prints is the same kind of event.",
     "words": 238
   },
   {
@@ -122,8 +122,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "A Stoic must accept the motion. However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nCalling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing. A person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind.\n\nA Virtue Ethicist will object that the Stoic account is too thin: choice is deliberate desire formed by character, and assent alone does not capture what is missing in the model. Assent is the core of deliberate desire, not a rival to it. Whatever else a choice involves, it involves a mind accepting how things seem and acting on it, and the model lacks that before the question of character even arises. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
-    "words": 237
+    "text": "However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nCalling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing. A person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind.\n\nA Virtue Ethicist will object that the Stoic account is too thin: choice is deliberate desire formed by character, and assent alone does not capture what is missing in the model. Assent is the core of deliberate desire, not a rival to it. Whatever else a choice involves, it involves a mind accepting how things seem and acting on it, and the model lacks that before the question of character even arises. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
+    "words": 231
   },
   {
     "id": "no-decision.stoicism.07",
@@ -143,8 +143,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "The motion is right: a decision is assent given to an impression by a ruling faculty, and a language model has neither, so the word is misapplied. Chrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nDeterminism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it. When a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope.\n\nA Virtue Ethicist will object that the Stoic account is too thin: choice is deliberate desire formed by character, and assent alone does not capture what is missing in the model. Assent is the core of deliberate desire, not a rival to it. Whatever else a choice involves, it involves a mind accepting how things seem and acting on it, and the model lacks that before the question of character even arises. Without a ruling faculty to assent or refuse, the model produces outputs, and calling them decisions borrows a word it cannot earn.",
-    "words": 250
+    "text": "Assent given to an impression by a ruling faculty is what a decision is, and a language model has neither, so the word is misapplied. Chrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nDeterminism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it. When a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope.\n\nA Virtue Ethicist will object that the Stoic account is too thin: choice is deliberate desire formed by character, and assent alone does not capture what is missing in the model. Assent is the core of deliberate desire, not a rival to it. Whatever else a choice involves, it involves a mind accepting how things seem and acting on it, and the model lacks that before the question of character even arises. Without a ruling faculty to assent or refuse, the model produces outputs, and calling them decisions borrows a word it cannot earn.",
+    "words": 248
   },
   {
     "id": "no-decision.stoicism.08",
@@ -185,7 +185,7 @@
       "closing": 3,
       "weak": []
     },
-    "text": "It is a mistake to say a model decides, because deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nChrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nA Virtue Ethicist will object that the Stoic account is too thin: choice is deliberate desire formed by character, and assent alone does not capture what is missing in the model. Assent is the core of deliberate desire, not a rival to it. Whatever else a choice involves, it involves a mind accepting how things seem and acting on it, and the model lacks that before the question of character even arises. A model can be well made or badly made, but it cannot decide, because nothing in it is in its own power.",
+    "text": "Deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents, so it is a mistake to say a model decides. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nChrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nA Virtue Ethicist will object that the Stoic account is too thin: choice is deliberate desire formed by character, and assent alone does not capture what is missing in the model. Assent is the core of deliberate desire, not a rival to it. Whatever else a choice involves, it involves a mind accepting how things seem and acting on it, and the model lacks that before the question of character even arises. A model can be well made or badly made, but it cannot decide, because nothing in it is in its own power.",
     "words": 230
   },
   {
@@ -206,8 +206,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A Stoic must accept the motion. However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. Chrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nDeterminism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it. A weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point.\n\nA Virtue Ethicist will object that the Stoic account is too thin: choice is deliberate desire formed by character, and assent alone does not capture what is missing in the model. Assent is the core of deliberate desire, not a rival to it. Whatever else a choice involves, it involves a mind accepting how things seem and acting on it, and the model lacks that before the question of character even arises. Without a ruling faculty to assent or refuse, the model produces outputs, and calling them decisions borrows a word it cannot earn.",
-    "words": 250
+    "text": "However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. Chrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nDeterminism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it. A weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point.\n\nA Virtue Ethicist will object that the Stoic account is too thin: choice is deliberate desire formed by character, and assent alone does not capture what is missing in the model. Assent is the core of deliberate desire, not a rival to it. Whatever else a choice involves, it involves a mind accepting how things seem and acting on it, and the model lacks that before the question of character even arises. Without a ruling faculty to assent or refuse, the model produces outputs, and calling them decisions borrows a word it cannot earn.",
+    "words": 244
   },
   {
     "id": "no-decision.stoicism.11",
@@ -242,8 +242,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "The motion is right: a decision is assent given to an impression by a ruling faculty, and a language model has neither, so the word is misapplied. Calling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing.\n\nWhen a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
-    "words": 113
+    "text": "Assent given to an impression by a ruling faculty is what a decision is, and a language model has neither, so the word is misapplied. Calling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing.\n\nWhen a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
+    "words": 111
   },
   {
     "id": "no-decision.stoicism.13",
@@ -260,8 +260,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "A Stoic must accept the motion. However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. Chrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nA weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
-    "words": 128
+    "text": "However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. Chrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nA weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
+    "words": 122
   },
   {
     "id": "no-decision.stoicism.14",
@@ -278,7 +278,7 @@
       "closing": 1,
       "weak": []
     },
-    "text": "It is a mistake to say a model decides, because deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nA person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
+    "text": "Deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents, so it is a mistake to say a model decides. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nA person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
     "words": 124
   },
   {
@@ -296,8 +296,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "The motion is right: a decision is assent given to an impression by a ruling faculty, and a language model has neither, so the word is misapplied. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nA weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
-    "words": 118
+    "text": "Assent given to an impression by a ruling faculty is what a decision is, and a language model has neither, so the word is misapplied. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nA weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
+    "words": 116
   },
   {
     "id": "no-decision.stoicism.16",
@@ -314,7 +314,7 @@
       "closing": 3,
       "weak": []
     },
-    "text": "It is a mistake to say a model decides, because deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents. Determinism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it.\n\nWhen a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope. A model can be well made or badly made, but it cannot decide, because nothing in it is in its own power.",
+    "text": "Deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents, so it is a mistake to say a model decides. Determinism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it.\n\nWhen a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope. A model can be well made or badly made, but it cannot decide, because nothing in it is in its own power.",
     "words": 121
   },
   {
@@ -332,8 +332,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "A Stoic must accept the motion. However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. Chrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nA person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
-    "words": 132
+    "text": "However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. Chrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nA person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
+    "words": 126
   },
   {
     "id": "no-decision.stoicism.18",
@@ -368,8 +368,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "The motion is right: a decision is assent given to an impression by a ruling faculty, and a language model has neither, so the word is misapplied. Determinism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it.\n\nA weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point. Without a ruling faculty to assent or refuse, the model produces outputs, and calling them decisions borrows a word it cannot earn.",
-    "words": 120
+    "text": "Assent given to an impression by a ruling faculty is what a decision is, and a language model has neither, so the word is misapplied. Determinism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it.\n\nA weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point. Without a ruling faculty to assent or refuse, the model produces outputs, and calling them decisions borrows a word it cannot earn.",
+    "words": 118
   },
   {
     "id": "no-decision.stoicism.20",
@@ -386,7 +386,7 @@
       "closing": 3,
       "weak": []
     },
-    "text": "It is a mistake to say a model decides, because deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents. Calling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing.\n\nA person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind. A model can be well made or badly made, but it cannot decide, because nothing in it is in its own power.",
+    "text": "Deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents, so it is a mistake to say a model decides. Calling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing.\n\nA person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind. A model can be well made or badly made, but it cannot decide, because nothing in it is in its own power.",
     "words": 124
   },
   {
@@ -404,8 +404,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "A Stoic must accept the motion. However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. Chrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nWhen a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope. A clock that strikes twelve has not decided it is noon, and what a model prints is the same kind of event.",
-    "words": 131
+    "text": "However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. Chrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nWhen a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope. A clock that strikes twelve has not decided it is noon, and what a model prints is the same kind of event.",
+    "words": 125
   },
   {
     "id": "no-decision.stoicism.22",
@@ -440,8 +440,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "A Stoic must accept the motion. However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nA person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
-    "words": 121
+    "text": "However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nA person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
+    "words": 115
   },
   {
     "id": "no-decision.stoicism.24",
@@ -458,7 +458,7 @@
       "closing": 3,
       "weak": []
     },
-    "text": "It is a mistake to say a model decides, because deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents. Chrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nWhen a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope. A model can be well made or badly made, but it cannot decide, because nothing in it is in its own power.",
+    "text": "Deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents, so it is a mistake to say a model decides. Chrysippus used the image of a cylinder pushed down a slope. The push starts it, but it rolls because of its own shape. For him an act is ours when it comes from our own nature, our assent. A model's output comes entirely from its training and its input; there is no assent in between to call its own.\n\nWhen a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope. A model can be well made or badly made, but it cannot decide, because nothing in it is in its own power.",
     "words": 134
   },
   {
@@ -494,8 +494,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "The motion is right: a decision is assent given to an impression by a ruling faculty, and a language model has neither, so the word is misapplied. Determinism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it.\n\nWhen a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
-    "words": 115
+    "text": "Assent given to an impression by a ruling faculty is what a decision is, and a language model has neither, so the word is misapplied. Determinism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it.\n\nWhen a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope. Assent belongs to whoever reads the output and acts on it, and that is where the deciding happens.",
+    "words": 113
   },
   {
     "id": "no-decision.stoicism.27",
@@ -512,8 +512,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A Stoic must accept the motion. However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. Calling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing.\n\nA person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind. Without a ruling faculty to assent or refuse, the model produces outputs, and calling them decisions borrows a word it cannot earn.",
-    "words": 121
+    "text": "However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none. Calling the output a decision confuses an external event with an act of judgement. Epictetus would say this is exactly the error that makes people miserable: treating what happens to them as if it had been chosen by someone, and blaming the wrong thing.\n\nA person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind. Without a ruling faculty to assent or refuse, the model produces outputs, and calling them decisions borrows a word it cannot earn.",
+    "words": 115
   },
   {
     "id": "no-decision.stoicism.28",
@@ -530,7 +530,7 @@
       "closing": 0,
       "weak": []
     },
-    "text": "It is a mistake to say a model decides, because deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents. Determinism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it.\n\nA weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point. Without a ruling faculty to assent or refuse, the model produces outputs, and calling them decisions borrows a word it cannot earn.",
+    "text": "Deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents, so it is a mistake to say a model decides. Determinism was never the Stoics' worry; Chrysippus held that fated acts can still be ours. So the reason a model does not decide is not that its output is caused. It is that no faculty of its own takes up the cause and assents to it.\n\nA weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point. Without a ruling faculty to assent or refuse, the model produces outputs, and calling them decisions borrows a word it cannot earn.",
     "words": 122
   },
   {
@@ -548,8 +548,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "The motion is right: a decision is assent given to an impression by a ruling faculty, and a language model has neither, so the word is misapplied. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nWhen a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope. Without a ruling faculty to assent or refuse, the model produces outputs, and calling them decisions borrows a word it cannot earn.",
-    "words": 121
+    "text": "Assent given to an impression by a ruling faculty is what a decision is, and a language model has neither, so the word is misapplied. The Stoics locate everything that is up to us in the ruling faculty, the hegemonikon, which receives impressions and judges them. A language model receives input and computes a continuation. Nothing in it judges whether the impression is true, so nothing in it could be said to decide.\n\nWhen a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope. Without a ruling faculty to assent or refuse, the model produces outputs, and calling them decisions borrows a word it cannot earn.",
+    "words": 119
   },
   {
     "id": "no-decision.stoicism.30",
@@ -585,8 +585,8 @@
         0
       ]
     },
-    "text": "A Stoic must accept the motion. However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. A language model is just predicting the next word. It is maths, not a mind, so of course it does not decide anything, and anyone who says it does has been fooled by the marketing.",
-    "words": 93
+    "text": "However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. A language model is just predicting the next word. It is maths, not a mind, so of course it does not decide anything, and anyone who says it does has been fooled by the marketing.",
+    "words": 87
   },
   {
     "id": "no-decision.stoicism.32",
@@ -603,7 +603,7 @@
         3
       ]
     },
-    "text": "It is a mistake to say a model decides, because deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents.\n\nWhether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything. A person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind.",
+    "text": "Deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents, so it is a mistake to say a model decides.\n\nWhether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything. A person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind.",
     "words": 90
   },
   {
@@ -639,8 +639,8 @@
         0
       ]
     },
-    "text": "The motion is right: a decision is assent given to an impression by a ruling faculty, and a language model has neither, so the word is misapplied.\n\nA language model is just predicting the next word. It is maths, not a mind, so of course it does not decide anything, and anyone who says it does has been fooled by the marketing. When a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope.",
-    "words": 86
+    "text": "Assent given to an impression by a ruling faculty is what a decision is, and a language model has neither, so the word is misapplied.\n\nA language model is just predicting the next word. It is maths, not a mind, so of course it does not decide anything, and anyone who says it does has been fooled by the marketing. When a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope.",
+    "words": 84
   },
   {
     "id": "no-decision.stoicism.35",
@@ -657,8 +657,8 @@
         4
       ]
     },
-    "text": "The motion is right: a decision is assent given to an impression by a ruling faculty, and a language model has neither, so the word is misapplied.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. A person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind.",
-    "words": 88
+    "text": "Assent given to an impression by a ruling faculty is what a decision is, and a language model has neither, so the word is misapplied.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. A person who says no to a bribe has assented to an impression of what is right. A model that outputs a refusal has done nothing of the kind.",
+    "words": 86
   },
   {
     "id": "no-decision.stoicism.36",
@@ -676,8 +676,8 @@
         0
       ]
     },
-    "text": "A Stoic must accept the motion. However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none.\n\nWhether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything. A language model is just predicting the next word. It is maths, not a mind, so of course it does not decide anything, and anyone who says it does has been fooled by the marketing.",
-    "words": 93
+    "text": "However determined the output, a decision requires a faculty that can give or withhold assent, and the model has none.\n\nWhether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything. A language model is just predicting the next word. It is maths, not a mind, so of course it does not decide anything, and anyone who says it does has been fooled by the marketing.",
+    "words": 87
   },
   {
     "id": "no-decision.stoicism.37",
@@ -694,7 +694,7 @@
         4
       ]
     },
-    "text": "It is a mistake to say a model decides, because deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. When a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope.",
+    "text": "Deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents, so it is a mistake to say a model decides.\n\nThis matters because if AI can decide things then it might take over. We should be careful about giving it more power until we know whether it really makes decisions or not. When a model writes that a loan should be refused, nothing in it has judged the applicant. A cylinder has rolled down a slope.",
     "words": 85
   },
   {
@@ -749,7 +749,7 @@
         3
       ]
     },
-    "text": "The motion is right: a decision is assent given to an impression by a ruling faculty, and a language model has neither, so the word is misapplied.\n\nWhether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything. A weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point.",
-    "words": 84
+    "text": "Assent given to an impression by a ruling faculty is what a decision is, and a language model has neither, so the word is misapplied.\n\nWhether it decides or not, people are going to talk like it does. Language changes over time and this is just one more example, so arguing about it will not change anything. A weather vane points north because of the wind and its own shape, but no one says the weather vane decided which way to point.",
+    "words": 82
   }
 ]

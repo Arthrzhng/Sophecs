@@ -110,13 +110,18 @@ For your next list, from carrying these out:
   another under the same opening (the second strongest to the twelfth,
   marked up to 19 points lower), and in 3 of 18 school groups their
   order (`docs/decisions.md`, "Gate 4: each motion's own closings");
-- from the audit (#110 and this change): the fresh run's positions open
-  on their claim, without a bare stance sentence such as "I reject the
-  motion.", so no two exemplar cards on a page open the same way; one
-  Ubuntu passage is reworded for it. Twelve passages still say "not only
-  ... but" or "not just"; for the fresh run they can change as the
-  openings did (`docs/decisions.md`, "The fresh run's arguments open on
-  their claim");
+- from the audit (#110 and this change): no position in the fresh run
+  keeps a sentence in front that states only its stance, such as "I
+  reject the motion." or "A Stoic can accept this motion." (44 of 144
+  did), and 18 are reworded where their first three words were another
+  card's on the same page, so no two exemplar cards on a page share
+  their first three words. Still to rule on: two or three cards on every
+  page open by naming their school ("A Confucian rejects this, because
+  ..."); on the careful builder's page five open "The motion ..."; "Here
+  is my answer." opens 328 of the run's 9,922 arguments; and twelve
+  passages still say "not only ... but" or "not just", which for the
+  fresh run can change as the openings did (`docs/decisions.md`, "The
+  fresh run's arguments open on their claim");
 - found while checking the click-through: the method page's "Known
   limitations" says "Verdict quality is still being checked against real
   arguments. That is why judging is paused rather than running."

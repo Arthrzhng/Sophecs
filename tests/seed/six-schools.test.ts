@@ -6,7 +6,7 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { createHmac } from "node:crypto";
 import { emailTag, generate, RUN_QUIZ, type Dataset } from "../../scripts/seed/generate";
-import { BANK_SCHOOLS, BARE_STANCE, TOPICS, loadBanks, loadClosings, loadMotionClosings } from "../../scripts/seed/banks";
+import { BANK_SCHOOLS, TOPICS, freshFragments, loadBanks, loadClosings, loadFragments, loadMotionClosings } from "../../scripts/seed/banks";
 import { contentTopics } from "../../scripts/seed/topics";
 import { baseHash, datasetForPlan, manifestHash } from "../../scripts/seed/plan";
 import { MemoryAdapter } from "../../scripts/seed/adapter-memory";
@@ -22,6 +22,31 @@ import { SMALL, smallPlan } from "./fixture";
 // Production's volumes, a base window ending on a Monday, and the week
 // after it: what the launch week of a fresh run looks like.
 const LAUNCH_WEEK = { from: "2026-11-09T00:00:00.000Z", to: "2026-11-16T00:00:00.000Z" };
+// The sentences that state only a stance, written out here rather than
+// read from the generator's pattern, so that one the pattern missed fails
+// these tests (review pass 1 of the openings change).
+const STANCE_SENTENCES = [
+  "I reject the motion.",
+  "I reject the motion as stated.",
+  "I reject the motion as framed.",
+  "I accept the motion.",
+  "I accept the motion with a condition.",
+  "I accept the motion only in part.",
+  "I support the motion.",
+  "I oppose the motion.",
+  "I agree with the motion.",
+  "The motion is right.",
+  "Deploy it.",
+  "Do not deploy it.",
+  "Do not deploy it as it stands.",
+  "Deploying it is wrong as stated.",
+  "A Stoic can accept this motion.",
+  "A Stoic must accept the motion.",
+  "A Stoic cannot accept this motion.",
+  "A utilitarian should oppose this motion.",
+];
+const opensOnStance = (t: string) => STANCE_SENTENCES.some((s) => t.startsWith(`${s} `));
+const firstWords = (t: string, n: number) => t.toLowerCase().replace(/[^a-z' ]/g, " ").split(/\s+/).filter(Boolean).slice(0, n).join(" ");
 let cached: Dataset | null = null;
 const six = () =>
   (cached ??= generate(
@@ -72,7 +97,7 @@ describe("a sample run made with quiz v2", () => {
   it("is the dataset this file was written against, pinned at production volume", () => {
     // Beside the small pins in determinism.test.ts: eight thousand quiz
     // results and every exchange pair reach paths a small run need not.
-    expect(manifestHash(six())).toBe("397b6afb5bb68f26178fc9a6f3d4eb98a18b7bf9a82025d3a979372eb8444d3d");
+    expect(manifestHash(six())).toBe("ef71d33ef614c5eb523d8eee07e7d62c31f9ec012a29a6e5ee764af30b08b95f");
   });
 
   it("covers all six schools about equally", () => {
@@ -165,11 +190,12 @@ describe("a sample run made with quiz v2", () => {
       const chosen = [...selectExemplars(bySchool, [...BANK_SCHOOLS] as SchoolId[]).values()].flat();
       const endings = chosen.map((e) => endingOf(e.argument).toLowerCase());
       expect(new Set(endings).size, topic).toBe(endings.length);
-      // Nor do two cards on the page open on the same sentence, now that no
-      // position opens on a bare stance (Arthur, 2026-11-08: "repeated
-      // sentence openings ... across sample arguments and exemplars").
-      const openings = chosen.map((e) => e.opening.toLowerCase());
-      expect(new Set(openings).size, topic).toBe(openings.length);
+      // Nor do two cards on the page open on the same three words, now that
+      // no position opens on a sentence that states only its stance
+      // (Arthur, 2026-11-08: "repeated sentence openings ... across sample
+      // arguments and exemplars").
+      const openings = chosen.map((e) => firstWords(e.opening, 3));
+      expect(new Set(openings).size, `${topic}: ${openings.join(" | ")}`).toBe(openings.length);
       for (const school of BANK_SCHOOLS) {
         // The openings it could show: those of arguments without one of the
         // run's deliberate misspellings, which the selection never takes.
@@ -184,11 +210,17 @@ describe("a sample run made with quiz v2", () => {
     }
   });
 
-  it("opens no argument, revision or reply on a bare stance sentence", () => {
+  it("opens no argument, revision or reply on a sentence that states only its stance", () => {
+    // 44 of the 144 positions open on one as written, and none as the fresh
+    // run reads them.
+    const positions = (read: typeof loadFragments) => TOPICS.flatMap((t) => Object.values(read(t).schools).flatMap((s) => s.positions));
+    expect(positions(loadFragments)).toHaveLength(144);
+    expect(positions(loadFragments).filter(opensOnStance)).toHaveLength(44);
+    expect(positions((t) => freshFragments(loadFragments(t))).filter(opensOnStance)).toEqual([]);
     const ds = six();
     const texts = [...ds.debates.map((d) => d.row.argument), ...ds.turns.map((t) => t.row.body)].filter((t): t is string => !!t);
     expect(texts.length).toBeGreaterThan(5000);
-    for (const t of texts) expect(BARE_STANCE.test(withoutFrame(t)), t.slice(0, 60)).toBe(false);
+    for (const t of texts) expect(opensOnStance(withoutFrame(t)), t.slice(0, 60)).toBe(false);
   });
 
   it("never says a revision meets no objection when it says the revision now answers one", () => {
@@ -283,8 +315,8 @@ describe("a run that names no quiz", () => {
     expect(ds.debates.filter((d) => d.row.argument && shared.some((c) => d.row.argument!.includes(c))).length).toBeGreaterThan(100);
     const never = ds.debates.filter((d) => d.row.kind === "revision" && !d.row.verdict.rejected && d.row.verdict.objection_answered && /never meets an objection/.test(d.row.verdict.weakest_move));
     expect(never.length).toBeGreaterThan(0);
-    // And its positions still open as written, bare stance sentences too.
-    expect(ds.debates.filter((d) => d.row.argument && BARE_STANCE.test(withoutFrame(d.row.argument))).length).toBeGreaterThan(0);
+    // And its positions still open as written, stance sentences too.
+    expect(ds.debates.filter((d) => d.row.argument && opensOnStance(withoutFrame(d.row.argument))).length).toBeGreaterThan(0);
   });
 
   it("hashes and plans exactly as before: the base hash main gave at 3008b29, and no quiz in its plan", () => {
