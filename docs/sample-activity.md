@@ -257,9 +257,11 @@ in time order. No composition is used twice until its list runs out, so
 exact duplicates stay near zero; near duplicates (the same composition with
 another opening, closing or example) are measured and reported. The banks
 (`arguments/<topic>.<school>.json`, forty each) are a reviewable sample of
-the same compositions. The launch's three schools have passages and banks
-too (Gate 4 item 13), which only a run made with quiz v2 reads ("Six
-schools, placed by quiz v2", below).
+the compositions a run made with quiz v2 writes, closing with each
+motion's own closings; a run that names no quiz, the live run among them,
+closes with `closings.json` instead. The launch's three schools have
+passages and banks too (Gate 4 item 13), which only a run made with quiz
+v2 reads ("Six schools, placed by quiz v2", below).
 
 Measured on a plan with the defaults and a test seed, base window to
 2026-11-04 09:00 UTC:
@@ -304,7 +306,11 @@ ways only:
 - The six schools are equally likely, by the same calibration as quiz
   v1's mix, so that each is active in the week of the launch.
 - Arguments, verdicts and exchange turns draw on all six schools'
-  passages. A verdict names a school and its adherent from the full
+  passages, and close with each motion's own closings, four for each
+  school on each motion (Arthur, 2026-11-08), where a run that names no
+  quiz closes with `closings.json`'s four, the same on every motion. A
+  revision verdict that says the revision now answers an objection no
+  longer also says the argument never meets one. A verdict names a school and its adherent from the full
   registry, with their own article ("an Ubuntu Ethicist"), on any build.
   Between two schools with no objection between them, an exchange opens
   from a reason and replies from a reason and an example, which among the
@@ -617,7 +623,8 @@ refusal" or "the run failed while writing"), and the detail goes to
   questions, vectors and schools), its scorer (`scoreQuizV2` and
   `onCircle` in `src/lib/quiz-v2-score.ts`, held to the simulator by
   `tests/quiz-v2-score.test.ts`), the registry's names and articles for
-  the six, and the six schools' passages and verdict lines: a change to
+  the six, and the six schools' passages, each motion's closings
+  (`closings-by-motion.json`) and verdict lines: a change to
   any of them changes rows it has written. A run made with quiz v1 holds
   fixed v1's question bank and scorer, which the generator still imports.
 - Exact duplicates rise once a composition list runs out. Measured in

@@ -30,7 +30,7 @@ Every item below was ruled on 2026-11-07, verbatim in `docs/decisions.md`,
 | 10 | The rubric shows v3's criteria for all six | Done on SIX_SCHOOLS builds (#102) |
 | 11 | An exemplar floor | Done, at 50 (#102) |
 | 12 | A pending reply holds the lapse clock; `/me` label | Done (#102) |
-| 13 | Argument banks for the new three; samples to you first | Done: banks and samples (#104, `docs/gate4-samples.md`); the generator for six schools placed by quiz v2 (#105). The run itself waits for your word on the samples, and for the launch |
+| 13 | Argument banks for the new three; samples to you first | Done: banks and samples (#104, `docs/gate4-samples.md`); the generator for six schools placed by quiz v2 (#105). Samples approved on 2026-11-08 with one fix, done: each motion's own closings, for all six schools (#108). The run itself waits for the launch |
 | 14 | Navigation as built | Nothing to do |
 | 15 | Preview link and click-through when 8 to 13 are done; launch on your word | Sent with the click-through, `docs/gate4-clickthrough.md`; launch waits for your word |
 | 16 | The SQL to you when the time comes | At the launch |
@@ -99,6 +99,17 @@ For your next list, from carrying these out:
   write `` `${NAME(…)}'s` ``). All three are in
   `scripts/seed/verdicts.ts`. **Ruled 2026-11-08:** the first is fixed
   in the fresh run; the other two were not ruled, so they stay;
+- item 13, the samples' fix (#108): the 144 closings, four for each
+  school on each motion, are mine, for your reading
+  (`scripts/seed/arguments/fragments/closings-by-motion.json`; five of
+  the nine samples in `docs/gate4-samples.md` close on one rewritten
+  after review). And so that no exemplar page shows the same ending
+  twice, the page now chooses no two arguments that end on the same line.
+  That reaches the live pages from the merge: on production's rows it
+  shows the same 72 openings and a different argument in 16 places, each
+  another under the same opening (the second strongest to the twelfth,
+  marked up to 19 points lower), and in 3 of 18 school groups their
+  order (`docs/decisions.md`, "Gate 4: each motion's own closings");
 - found while checking the click-through: the method page's "Known
   limitations" says "Verdict quality is still being checked against real
   arguments. That is why judging is paused rather than running."
