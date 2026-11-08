@@ -278,7 +278,7 @@ export function Verdict({
             Score
           </span>
           <span className="font-mono tabular text-xl font-extrabold leading-none">
-            {verdict.score ?? "\u2014"}
+            {verdict.score ?? "–"}
           </span>
         </div>
 
@@ -347,7 +347,7 @@ export function Verdict({
                 {/* Fixed to one decimal so 8.0 and 6.5 line up in the
                     column, which the table this replaces also did. */}
                 <span className="shrink-0 font-mono tabular text-base text-ink">
-                  {value == null ? "\u2014" : value.toFixed(1)}
+                  {value == null ? "–" : value.toFixed(1)}
                   <span className="text-ink-mid"> / {AXIS_MAX}</span>
                 </span>
               </li>
@@ -419,7 +419,7 @@ export function Verdict({
             <div className="mt-6 flex flex-wrap items-center gap-4">
               {hasRevision ? (
                 <TextLink href={`/debate/${topicSlug}/${hasRevision}`} className="text-sm">
-                  Answered in the revision
+                  Read your revision
                 </TextLink>
               ) : (
                 <>
@@ -437,7 +437,7 @@ export function Verdict({
                   </ChunkyLink>
                   {/* A plain sentence, not a tooltip on a question mark. */}
                   <span className="text-sm text-ink-mid">
-                    Answering does not change your ELO. Leave it and it waits on your profile.
+                    Answering does not change your rating. Leave it and it waits on your profile.
                   </span>
                 </>
               )}
