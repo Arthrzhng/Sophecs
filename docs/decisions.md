@@ -5681,3 +5681,181 @@ Arthur, 2026-11-08:
   Utilitarian ones; in `borrowed-judgement.json`, two Stoic previews (the
   strong and the mid argument) end on the rival's point ("One might say
   that trusting the assistant is itself a judgement.").
+
+### A pass over the whole site for what reads as machine-written (2026-11-08)
+
+Arthur, 2026-11-08:
+
+> Audit the whole site for anything that reads as AI-generated, and fix it
+> in UI copy and design (not frozen content files; list content issues for
+> me instead). Look for: any emoji, or Unicode symbols that render as
+> emoji (arrows, triangles, check marks, stars, sparkles); em dashes in UI
+> copy (house rule: none); stock AI phrasing: "delve", "unlock",
+> "elevate", "seamless", "journey", "dive into", "explore", "Here's...",
+> "Let's...", "not just X but Y", rule-of-three lists, rhetorical
+> questions as headings, exclamation marks; generic headings and
+> empty-state copy that could be on any site; repeated sentence openings
+> or identical endings across sample arguments and exemplars (closings per
+> motion, as I asked); sparkle/AI icons, gradient blobs, or decorative
+> effects not in design/tokens.md. Check every route at 390px on iOS
+> Safari rendering as well as Chromium.
+
+How it was read. Every user-visible string in `src/app`, `src/components`
+and `src/lib` was pulled out with the TypeScript parser (JSX text, string
+attributes, and strings in the properties pages use for copy), 615 in all,
+and read; the content folders were searched. That pass read strings as
+written and so missed three em dashes written as `\u2014` escapes; the
+first review found them with its own parser pass, which resolves escapes
+and entities. Every route that renders
+without the database (the landing page, the quiz, the schools and each
+school's page, the lessons, a passage and a module, the method and
+how-it-works pages, the rubric, sign-in, the table and the 404) was
+rendered at 390px in Chromium from a build with the flag off and one
+with it on, and each page's text scanned: no sideways scroll on any, no
+emoji, and no em dash outside the frozen files listed below. Pages that
+read the database (today, the motions, a debate, a verdict, `/me`) cannot
+render here without its credentials; their copy was read from the source,
+and the review rendered their fixtures on `/styleguide/arena` (a
+`SOPHECS_PREVIEW=1` build) at 390px with no sideways scroll. iOS Safari:
+not checked, as no WebKit can run here (`/opt/pw-browsers` holds Chromium
+only).
+
+- **Emoji.** None anywhere. No character with an emoji form is rendered;
+  the disclosure triangle Arthur reported is #109's fix. The arrows that
+  remain ("→" in the verdict's rating line and the share text, "←" and "→"
+  on the six-school map) have no emoji form.
+- **Em dashes in UI copy: all gone.** 19 in prose: in the share page, the quiz
+  result (both versions), the class note on `/me`, the display-name
+  placeholder, the recall note's save error, the verdict's "Answered"
+  link, the empty motion list, four lines of the argument editor, the
+  passage's source line, three lines of the rubric page, the lessons page
+  (its description and its empty state), and the site's preview image
+  text. Each is now a full stop, a comma, a colon or a semicolon, as the
+  sentence wanted. Nine more on the styleguide: it is unlinked and not
+  indexed, but `/styleguide` and `/styleguide/daily-path` are served in
+  production, so the eight on `/styleguide` (the type scale's six samples
+  and two notes) and a reading note on `/styleguide/arena`, which only a
+  preview build serves, take colons too. The arena page's fixture
+  argument keeps its dash: it stands for text a reader writes. A missing number
+  (the school tables' rank and fidelity, the verdict's score circle, its
+  criteria and its revision comparison) showed an em dash; it shows an en
+  dash, since a missing number is not prose and a dash keeps the column.
+  Comments and the code's own error messages keep theirs.
+  `tests/em-dashes.test.ts` now holds every `.tsx` file in `src` to this,
+  with escapes and entities resolved, so a dash written as `\u2014` or
+  `&mdash;` fails it too.
+- **Stock phrasing.** None of the listed words, no exclamation mark, no
+  "Here's" or "Let's", and no question as a page heading except two
+  confirmation dialogs ("Send this to the judge?") and the report form's
+  legend ("What's wrong with it?"), which ask a real question. The quiz's
+  "Answer as you actually think" keeps its "actually", which there does
+  real work: it is the contrast with what you have read. Changed: the rubric's fidelity line ("actually reason ... not
+  merely arrive", now "rather than only arriving"), the word-count hint
+  ("enough room to actually argue the case, not just assert it"), the
+  site's description ("which school of ethics you actually argue from"),
+  the landing page's "Keep your streak alive." (now what a streak day
+  is: a score of 40 or more), and the site's preview text, a three-beat
+  line ("Ten scenarios. Six schools. One result you'll want to argue
+  about."), now "Answer ten scenarios to find which of six schools of
+  ethics you argue from." Arthur accepted that line with the rest of the
+  v2 copy on 2026-11-07 (Gate 4 item 8, `docs/stage5-plan.md`); it is
+  changed under this later ruling, and goes back on his word.
+- **Generic copy.** The 404 page's heading, "Nothing here.", is now "No
+  page at this address." The rest of the empty states already say what is
+  missing and what to do ("No judged arguments yet this week. The table
+  fills in as they arrive."). The landing page's three numbered steps are
+  kept: they are the three things a reader does, in order.
+- **Copy that was not true.** The display-name field said a blank name
+  shows as "A Stoic"; it shows as the reader's own school's adherent, and
+  only in classes. The line now says so, above the field rather than in
+  it, where a phone cut it short. A verdict's link to its revision said
+  "Answered" even when the revision's verdict says the objection still
+  stands; it is now "Read your revision". The verdict called the rating
+  "ELO", where every other screen says "rating". The footer's "15 to 18
+  year olds" takes its hyphens.
+- **Repeated openings and endings.** Endings: #108 (each motion's own
+  closings, and no exemplar page showing an ending twice). Openings: in a
+  quiz v2 run 23 of 144 exemplar cards open on the same first sentence as
+  another school's card on their page, five of them "I reject the
+  motion." on one page, because 35 of the 144 positions open on a bare
+  statement of the stance: "I reject the motion.", "I accept the
+  motion." and the like, and on opaque-benefit "Deploy it." and
+  "Deploying it is wrong as stated." That is the generator's, and goes in
+  its own change after #108.
+- **Decorative effects.** No gradient blob, glow, sparkle or AI icon; the
+  one gradient draws a module's progress ring. The Daily path's motion
+  (a confetti burst after the reading check, the bobbing "Up next", the
+  pulsing ring around the current step, the flame's flicker, the chunky
+  button's press, and in `src/app/globals.css` `.pop`'s scale, `.enter`'s
+  rise on mount, `.sheet`'s slide, and `.reveal` on the lesson's next
+  stretch where section 6 allows it only for the verdict) is not in
+  `design/tokens.md`, whose section 6 forbids any transform. Nor are the
+  5px drop edge on content cards (section 5 allows no other shadow), the
+  18 and 22px container radii, where section 4 sets containers square
+  and calls rounded ones "the shape of every AI-generated landing page",
+  or the 14px control radius and 10px badge radius, where it sets
+  controls at 6px. All came with the Daily path
+  mockups, which the record above says superseded the tokens where they
+  disagree. Left, and put to Arthur.
+- **Tests.** The flag-off markup fixtures (`tests/nav-six-flag-off/`)
+  hold production's pages to main's render; the rubric and school-table
+  fixtures take exactly the same text changes, so they still show nothing
+  else moved.
+
+For Arthur's list, in files this pass may not change:
+- `content/schools/stoicism.md` (3 em dashes), `utilitarianism.md` (3),
+  `virtue-ethics.md` (5, one in a share line: "Apparently I judge an
+  algorithm the same way I judge a person — not by the rule it follows");
+- `content/micro/borrowed-judgement-before.md` and
+  `moral-training-before.md`, one each;
+- `content/quiz/questions.ts`, four in three of quiz v1's questions and
+  answers, which production shows until the launch;
+- "not just X" and "not only X but Y", which Arthur named:
+  `content/schools/utilitarianism.md:46-47`, a share line ("count
+  everyone it touches, not just the person in front of you");
+  `buddhist.md:41`, a share line ("not just what it scored");
+  `ubuntu.md:21` ("not only an unfair output but a failure of relational
+  personhood"); `content/micro/borrowed-judgement-elsewhere.md:29`
+  ("does not merely choose for you"); `content/modules/what-is-up-to-us.md:32`,
+  `greatest-happiness.md:32` and `relational-data.md:57`;
+  `content/quiz/questions.ts:190` ("integrity, not just correct math");
+  `docs/quiz-v2.json:192` ("It is not only my information to give away.");
+- American spellings in content: "behavior" (`virtue-ethics.md:20`),
+  "minimize" (`utilitarianism.md:21`, `questions.ts:184`), "minimizes"
+  (`questions.ts:57`), "Recognize" (`questions.ts:94`) and "math"
+  (`questions.ts:190`);
+- the criterion's label "Rigor" (`src/lib/judge-axes.ts`, the rubric and
+  method pages), taken word for word from `docs/daily-path-copy.md`
+  section 6: "Rigour" in British spelling, or as it is;
+- a missing number shows as an en dash, which a screen reader reads as
+  "en dash" or not at all; a word such as "none" would read on both;
+- the sample arguments' frames "Here is my answer." and "Let me say where
+  I land." (`SAMPLE_FRAMES` in `src/lib/exemplars.ts`), the "Here's" and
+  "Let's" family. In a run at production volume (seed `six-check`,
+  counted by the first review) 99 of the 3,643 published originals open
+  on "Here is my answer." and none on the other, and no exemplar card
+  shows either, as the page strips them.
+  Changing them changes the live run's rows, so they wait for the fresh
+  run's generator;
+- `src/lib/judge/rubric.ts` (frozen under (b)): the fidelity criteria
+  `/debate/rubric` shows in full have two em dashes; "not just the
+  agent's, and not just one favored group's", "not just the act's
+  conformity to a rule" (lines 52 to 53) and "not merely assert a
+  direction" (line 38); "judgments" (lines 19, 23 and 57) where the site
+  writes "judgement"; and the American "maximizes" and "favored". The v3
+  text a flag-on build also shows has "when interests genuinely
+  conflict" (line 160) and "judgment" (lines 126 and 145). Changing any
+  of them changes what the judge receives;
+- `src/lib/judge/objection-voices.ts`, which goes into the judge's v3
+  request, so (b) as well: "justifiable to that person, not only to the
+  total" (line 42) and "judgment" (line 72);
+- `content/prompts/fidelity-criteria.draft.md:114`, "a failure of
+  relationship, not only a bad output", and
+  `content/micro/no-decision-elsewhere.md:15`, "why it is not merely
+  verbal", the same construction as the elsewhere passage above;
+- `src/app/api/counterpart/turn/route.ts` (frozen): the error "Quote a
+  whole sentence — at least 10 characters.";
+- the Daily path's motion above: keep or cut;
+- the preview image and the share card ask "Which school do you think
+  in?". Kept: it is an invitation to the reader, which the quiz answers
+  for them, not a heading the page answers itself.

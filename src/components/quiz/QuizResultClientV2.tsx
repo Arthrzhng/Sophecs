@@ -178,7 +178,7 @@ export function QuizResultClientV2({
           <p className="mt-3 max-w-[54ch] text-sm leading-relaxed text-ink-mid">
             The quiz gives you a starting position. The rest of Sophecs is about
             holding it: take a motion, write a case, and get scored on how
-            faithfully you argue from {school.name} — not on whether anyone agrees.
+            faithfully you argue from {school.name}, not on whether anyone agrees.
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-4">
             <Link

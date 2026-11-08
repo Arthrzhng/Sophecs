@@ -56,7 +56,7 @@ function Row({ row, rank, note }: { row: SixSchoolRow; rank: number | null; note
       <span className="min-w-10 text-center">
         <span className="sr-only">{rank == null ? "Not ranked yet" : `Rank ${rank}`}</span>
         <span aria-hidden="true" className="font-mono tabular text-lg font-extrabold text-ink">
-          {rank ?? "\u2014"}
+          {rank ?? "–"}
         </span>
       </span>
       <span aria-hidden="true" className="size-3 shrink-0 rounded-full" style={{ background: row.colour }} />
@@ -67,7 +67,7 @@ function Row({ row, rank, note }: { row: SixSchoolRow; rank: number | null; note
       <span className="flex flex-col text-right">
         <span className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">Fidelity</span>
         <strong className="font-mono tabular text-base text-ink">
-          {row.fidelity === null ? "—" : row.fidelity.toFixed(1)}
+          {row.fidelity === null ? "–" : row.fidelity.toFixed(1)}
         </strong>
       </span>
     </li>

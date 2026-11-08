@@ -182,7 +182,7 @@ export function SharePage({
               <h2 className="text-lg font-extrabold tracking-tight text-ink">Now defend it</h2>
               <p className="mt-3 max-w-[54ch] text-sm leading-relaxed text-ink-mid">
                 A result is a starting position, not a verdict. Take a motion and
-                defend it — you are scored on how faithfully you argue from{" "}
+                defend it. You are scored on how faithfully you argue from{" "}
                 {name}, not on whether we agree.
               </p>
               <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-4">

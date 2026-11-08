@@ -11,7 +11,7 @@ import "./globals.css";
 import "@six-schools/tokens.css";
 
 const DESCRIPTION =
-  "Ten questions about how you decide what's right. Find out which school of ethics you actually argue from.";
+  "Ten questions about how you decide what's right. Find out which school of ethics you argue from.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sophecs.com"),

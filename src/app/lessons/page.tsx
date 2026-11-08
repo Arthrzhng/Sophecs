@@ -13,7 +13,7 @@ import type { MicroLessonContent } from "@/lib/lesson-chunks";
 export const metadata = {
   title: "Lessons · Sophecs",
   description:
-    "The primary-source passages behind each motion — one that frames the question before you argue, one that puts the strongest objection to you afterwards.",
+    "The primary-source passages behind each motion: one that frames the question before you argue, and one that puts the strongest objection to you afterwards.",
 };
 
 // Static: reads content/micro/, content/topics/ and content/modules/ at
@@ -88,7 +88,7 @@ export default function LessonsPage() {
           <div className="mt-12">
             <EmptyState
               title="The passages are still being written."
-              body="Until they land, the case for each school is the thing worth reading — each one is a few hundred words with its own primary source."
+              body="Until they land, the case for each school is the thing worth reading. Each one is a few hundred words with its own primary source."
               action={
                 <div className="flex flex-wrap items-center gap-6 text-sm">
                   {SHOWN_SCHOOL_IDS.map((school) => (
