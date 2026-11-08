@@ -5613,3 +5613,71 @@ above:
   rebuilt banks: six of the nine now close with their motion's closings,
   all six on a closing rewritten after the first review, and
   nothing else in them changed.
+
+### Exemplar cards: a drawn chevron, and two sentences closed (2026-11-08)
+
+Arthur, 2026-11-08:
+
+> The exemplar cards show a ▶️ emoji (iOS renders the disclosure triangle
+> as an emoji). Replace it everywhere with a plain drawn chevron (SVG or
+> CSS, currentColor, rotates when open) or a quiet "Read" / "Hide" text
+> toggle; no Unicode arrows or triangles that a phone can turn into
+> emoji. Also: cards that open "Deploy it." or "A Stoic can accept this
+> motion." read as filler. Show the first two sentences in the collapsed
+> card (cut at a sentence end), so each card reads like an argument.
+
+- **The mark.** `src/components/ui/Chevron.tsx`: an inline SVG drawn in
+  `currentColor`, hidden from assistive technology, that points right
+  while its `<details>` is closed and down while it is open. It is two
+  paths, one shown per state, rather than one path rotated:
+  `design/tokens.md`, section 6, forbids any transform, and a disclosure
+  may animate only its height and opacity. Every `<summary>` in the app
+  now hides the browser's own marker (`list-none` and
+  `::-webkit-details-marker`), which is what iOS drew as an emoji. The
+  three disclosures that showed a mark use the chevron: the exemplar
+  cards, the excerpt under a motion (`BeforeLesson`, which drew the
+  character "▸" and rotated it) and "Show all" on `/me`
+  (`OpenObjections`, which showed the browser's marker). The site
+  header's menus and the sample label already hid the marker and show no
+  mark; they are unchanged.
+- **The closed card.** It shows the argument's first two sentences after
+  any frame sentence (`previewOf` in `src/lib/exemplars.ts`), cut at a
+  sentence end. Where two would run past 400 characters it shows one, but
+  never a first sentence under 60 characters alone ("Deploy it." is the
+  filler the ruling names), and a word cut with "…" only for a single
+  sentence longer than 400. The longest two sentences any composition of
+  the passages opens with run to 373 characters, so every card the
+  current passages make shows two; at 360, 577 Buddhist compositions on the opaque benefit would have
+  shown one. Open, the card shows "Hide" above the whole
+  argument. The opening line still decides which arguments count as one
+  (one exemplar per opening).
+- **Which characters have an emoji form.** iOS drew the browser's own
+  marker, U+25B6, as an emoji. Some arrows and triangles have an emoji
+  form (U+25B6, U+25C0, U+2194 to U+2199, U+21A9, U+21AA, U+27A1,
+  U+2934, U+2935, U+2B05 to U+2B07, U+23E9 and its neighbours); the ones
+  the app used or uses do not: "▸" (U+25B8, gone now), and "→" and "←"
+  (U+2192, U+2190), which the verdict page's rating line, the share text
+  and the school map on six-school builds still show. Those stay.
+- **Held to** by `tests/disclosures.test.tsx`: every `<summary>` in the
+  app hides the marker both ways; every `<details>` has a summary of its
+  own; every `<details>` that draws the chevron is a `group`; the
+  chevron's two poses are the right way round and it is hidden from
+  assistive technology; no summary in the source holds a character with
+  an emoji form, written as a literal, a JavaScript or CSS escape or a
+  numeric entity, and none uses a named entity outside a short list of
+  punctuation; no stylesheet in `src` and no Tailwind `content-[...]`
+  class draws one as `content`; and the excerpt toggle, the open
+  objections and the sample label, rendered, hold none.
+  `tests/exemplars-page.test.ts` checks the rendered exemplars page the
+  same way.
+- **Checked** at 390px in Chromium against the built stylesheet: the
+  closed card, the open card and no sideways scroll; every summary is at
+  least 44px tall. WebKit cannot run in this environment, so for iOS the
+  check is the markup above.
+- **For Arthur's list:** some closed cards end on a stock line from the
+  passages (mine). In `scripts/seed/arguments/fragments/crash-arithmetic.json`,
+  "Correct names matter." ends 1,637 of the Confucian previews a run can
+  make and "Impartiality is the heart of the view." 1,764 of the
+  Utilitarian ones; in `borrowed-judgement.json`, two Stoic previews (the
+  strong and the mid argument) end on the rival's point ("One might say
+  that trusting the assistant is itself a judgement.").

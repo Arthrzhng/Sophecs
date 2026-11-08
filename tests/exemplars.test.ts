@@ -4,7 +4,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { FRAMES } from "../scripts/seed/banks";
 import { TYPOS } from "../scripts/seed/generate";
-import { EXEMPLAR_CANDIDATES_PER_SCHOOL, EXEMPLAR_FLOOR, EXEMPLARS_PER_MOTION, SAMPLE_FRAMES, SAMPLE_TYPO, endingOf, getExemplars, withoutFrame, openingOf, selectExemplars, type ExemplarCandidate } from "../src/lib/exemplars";
+import { EXEMPLAR_CANDIDATES_PER_SCHOOL, EXEMPLAR_FLOOR, EXEMPLARS_PER_MOTION, SAMPLE_FRAMES, SAMPLE_TYPO, endingOf, getExemplars, withoutFrame, openingOf, previewOf, selectExemplars, type ExemplarCandidate } from "../src/lib/exemplars";
 import type { SchoolId } from "../src/lib/types";
 
 const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
@@ -196,7 +196,7 @@ describe("selectExemplars", () => {
 
   it("returns no score", () => {
     const [first] = selectExemplars(new Map([["stoicism", made("stoicism", 1)]]), ["stoicism"]).get("stoicism")!;
-    expect(Object.keys(first).sort()).toEqual(["argument", "id", "opening", "school"]);
+    expect(Object.keys(first).sort()).toEqual(["argument", "id", "opening", "preview", "school"]);
   });
 });
 
@@ -263,6 +263,33 @@ describe("getExemplars", () => {
     const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
     await expect(getExemplars(admin, "no-decision", "The motion.", SCHOOLS)).rejects.toThrow("no-decision/utilitarianism");
     quiet.mockRestore();
+  });
+});
+
+describe("previewOf", () => {
+  // Arthur, 2026-11-08: "Show the first two sentences in the collapsed card
+  // (cut at a sentence end), so each card reads like an argument."
+  it("is the first two sentences after any frame, across a paragraph break too", () => {
+    expect(previewOf("Here is my answer. Deploy it. The harm it spares is real. And more.")).toBe("Deploy it. The harm it spares is real.");
+    expect(previewOf("Deploy it.\n\nThe harm it spares is real.\n\nMore.")).toBe("Deploy it. The harm it spares is real.");
+    expect(previewOf("Only one sentence here.")).toBe("Only one sentence here.");
+  });
+  it("ends at a sentence end: two up to 400 characters, one past that unless it is under 60, a word cut only for one sentence over 400", () => {
+    // A sentence of exactly n characters, full stop included.
+    const sentence = (n: number) => `${"x".repeat(n - 1)}.`;
+    expect(previewOf(`${sentence(60)} ${sentence(339)} More.`)).toBe(`${sentence(60)} ${sentence(339)}`); // 400
+    expect(previewOf(`${sentence(60)} ${sentence(340)} More.`)).toBe(sentence(60)); // 401
+    // "Deploy it." alone is the filler Arthur named, so a first sentence
+    // under 60 characters keeps its second however long.
+    expect(previewOf(`${sentence(59)} ${sentence(400)} More.`)).toBe(`${sentence(59)} ${sentence(400)}`);
+    expect(previewOf(`${sentence(60)} ${sentence(400)} More.`)).toBe(sentence(60));
+    const longer = `${"word ".repeat(100).trim()}.`;
+    expect(previewOf(longer).endsWith("…")).toBe(true);
+    expect(previewOf(longer).length).toBeLessThanOrEqual(401);
+  });
+  it("is what selectExemplars gives each exemplar", () => {
+    const [first] = selectExemplars(new Map([["stoicism", made("stoicism", 1, { argument: "My position is simple. Do not deploy it. It owes them reasons. Third." })]]), ["stoicism"]).get("stoicism")!;
+    expect(first.preview).toBe("Do not deploy it. It owes them reasons.");
   });
 });
 

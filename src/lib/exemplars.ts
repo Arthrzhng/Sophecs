@@ -56,8 +56,10 @@ export interface Exemplar {
   id: string;
   school: SchoolId;
   argument: string;
-  /** The line a reader opens it from: its first sentence after any frame. */
+  /** Its first sentence after any frame: how the page tells openings apart. */
   opening: string;
+  /** What its card shows closed: the first two sentences after any frame. */
+  preview: string;
 }
 
 export interface ExemplarCandidate {
@@ -73,7 +75,8 @@ export interface ExemplarCandidate {
  * The sentences the sample run puts in front of some arguments before the
  * position (scripts/seed/banks.ts, FRAMES): "Here is my answer." says
  * nothing a reader can choose by, and two arguments that differ only by one
- * open the same way. Skipped for the opening line, never cut from the text.
+ * open the same way. Skipped for the opening line and the closed card's
+ * preview, never cut from the text.
  */
 export const SAMPLE_FRAMES = [
   "Here is my answer.",
@@ -84,7 +87,7 @@ export const SAMPLE_FRAMES = [
   "Let me say where I land.",
 ] as const;
 
-/** An argument without a leading frame sentence, for its opening line. */
+/** An argument without a leading frame sentence, for its opening line and its preview. */
 export function withoutFrame(argument: string): string {
   const text = argument.trim();
   for (const frame of SAMPLE_FRAMES) {
@@ -159,7 +162,7 @@ export function selectExemplars(
       const key = normalise(opening);
       let slot = bySchool.get(key);
       if (!slot) bySchool.set(key, (slot = { school, options: [] }));
-      slot.options.push({ at, ending: normalise(endingOf(c.argument)), exemplar: { id: c.id, school: c.school, argument: c.argument.trim(), opening } });
+      slot.options.push({ at, ending: normalise(endingOf(c.argument)), exemplar: { id: c.id, school: c.school, argument: c.argument.trim(), opening, preview: previewOf(c.argument) } });
     });
     slots.push(...bySchool.values());
   }
@@ -276,7 +279,28 @@ export async function getExemplars(
   return selectExemplars(bySchool, schools);
 }
 
-/** The opening of an argument, for the line a reader opens it from. */
+/**
+ * What an exemplar's card shows while it is closed: the first two
+ * sentences after any frame sentence, cut at a sentence end (Arthur,
+ * 2026-11-08: cards that open "Deploy it." read as filler; "Show the first
+ * two sentences in the collapsed card (cut at a sentence end), so each card
+ * reads like an argument"). Where two would run past `max` characters
+ * (the longest two any composition of the passages gives is 373),
+ * one, but only if that one is at least `alone` characters: a short first
+ * sentence ("Deploy it.") is the filler the ruling names, so it keeps its
+ * second however long. A single sentence longer than `max` is cut at a
+ * word, as an opening line is.
+ */
+export function previewOf(argument: string, sentences = 2, max = 400, alone = 60): string {
+  const text = withoutFrame(argument).replace(/\s+/g, " ").trim();
+  const all = text.split(/(?<=[.!?])\s+/);
+  const two = all.slice(0, Math.min(sentences, all.length)).join(" ");
+  if (two.length <= max) return two;
+  if (all[0].length < alone) return two;
+  return all[0].length <= max ? all[0] : openingOf(text, max);
+}
+
+/** The opening of an argument: its first sentence, which tells one exemplar from another. */
 export function openingOf(argument: string, max = 160): string {
   const text = argument.trim().replace(/\s+/g, " ");
   const sentence = /^.+?[.!?](?=\s|$)/.exec(text)?.[0];
