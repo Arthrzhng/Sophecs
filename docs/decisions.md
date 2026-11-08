@@ -5480,3 +5480,68 @@ How each is carried out:
   revision verdict that says an objection is now answered and still
   suggests answering it, and "'s" after a name ending in "s". They stay on
   Arthur's list.
+
+### The launch merge (2026-11-08)
+
+Arthur, 2026-11-08: "Launch: approved." After the exemplar cards (#109),
+the site pass and the closings (#108), and once both scheduled jobs
+answer 200, the Gate 4 launch steps in order: the preview's v2 results
+cleared (item 16, in the SQL Editor), the launch merge, the sample
+teardown and the fresh six-school run, then production read back. "Stop
+and tell me if any step fails; revert if production errors."
+
+What the merge changes, each item on the checklist in
+`docs/stage5-plan.md`:
+
+- **The flag on for Production.** `next.config.ts` no longer refuses
+  `SIX_SCHOOLS=1` on a production build, and Production's environment
+  carries it. Everything the flag turns on comes with it: quiz v2 and its
+  map, the six on every page that lists schools, v3 for the judge (its
+  cost accepted, Gate 4), the "view from elsewhere" passages, and the live
+  table's 20-argument rule from the launch deploy, over the week in
+  progress.
+- **The navigation's three redirects** (`/table`, `/method`,
+  `/debate/rubric`) are permanent (308), as Arthur asked on 2026-11-06.
+- **The three published.** `content/schools/confucian.md`, `ubuntu.md` and
+  `buddhist.md` lose `status: draft` and take their colour tokens, and
+  the registry marks them published. The flag, not their status, still
+  decides whether a build shows them, so a build without it is the site
+  as it was. The share lines were already rewritten (#102).
+- **Their criteria in `src/lib/judge/rubric.ts`**, moved from
+  `content/prompts/fidelity-criteria.draft.md` word for word (Gate 4 item
+  6). The flag-on request fixtures (`tests/judge-request/six-schools/`)
+  pass unchanged, which is the proof that the judge receives the same
+  text. A build without the flag reads none of the three's criteria: the
+  lookup throws for a school the build does not show, as it threw before
+  for one with none written. v1 and v2 still refuse the three.
+- **The "until launch" rules lifted**, in every file "Stage 5, step 4"
+  lists, by one rule kept in `src/lib/quiz-result.ts`: a result gives a
+  school, names a side and takes up a challenge wherever the build shows
+  it. On a flag-on build that is any v1 or v2 result; on a build without
+  the flag, a v1 result only, as before, since such a build cannot show a
+  v2 result's school. So on production now:
+  - a v2 result gives an account its school on sign-in
+    (`claimAnonymousResults`), and `/me`'s welcome reads the result the
+    school came from;
+  - `submitQuizResultV2` moves a signed-in reader's school
+    (`retakeQuizSchool`, reported as `school_changed`) and takes up any
+    challenger's challenge, v1 or v2;
+  - a challenge with a v2 side counts (`resolveChallengeSide`), is listed
+    on `/me`, and `/r/[id]` offers "Debate them" between any two results;
+  - `src/app/actions.ts` is frozen; this change to it is the one the
+    checklist names, under the launch approval.
+  - v1's quiz is retired on a flag-on build, whose quiz page writes v2
+    results. Its server action still exists, and on a flag-on build it
+    would read a v2 challenger's school like any other; nothing calls it.
+- **`RUN_QUIZ` is 2** (`scripts/seed/generate.ts`), so the scheduled job's
+  runs place samples by quiz v2. The merge goes in after the sample
+  teardown, so no run made with no quiz is left to extend; a plan with no
+  quiz is refused for production from here.
+- **`README.md`** describes six schools, the flag, v3 and where the
+  three's criteria live.
+
+**Reverting.** If production errors after the deploy: remove
+`SIX_SCHOOLS` from Production's environment and revert the merge, which
+together give back the three-school build. Results written as v2 in the
+meantime stay in the table; a build without the flag shows none of them
+and takes nothing from them.

@@ -290,27 +290,29 @@ of the three; Gate 2 is about that.
      rather than deleted, and `debates.challenge_id` set to null where it
      points at a cleared challenge (its foreign key has no on-delete
      action).
-   - [ ] The flag on for Production, with `next.config.ts`'s refusal
-     removed; the live table's 20-argument rule comes with it.
-   - [ ] The navigation's three redirects (`/table` to `/schools`,
+   - [x] The flag on for Production, with `next.config.ts`'s refusal
+     removed; the live table's 20-argument rule comes with it. The
+     launch merge (`docs/decisions.md`, "The launch merge").
+   - [x] The navigation's three redirects (`/table` to `/schools`,
      `/method` to `/how-it-works`, `/debate/rubric` to its `#rubric`)
      made permanent (308) in the launch merge (`sixSchoolsRedirects` in
      `next.config.ts`, and `tests/nav-six.test.tsx`, which pins
      `permanent: false`; Arthur, 2026-11-06).
-   - [ ] The three content files' status and colour tokens (the six
+   - [x] The three content files' status and colour tokens (the six
      "elsewhere" passages keep `status: draft`).
-   - [ ] The share lines and other front matter (`docs/quiz-v2.md`,
-     section 8), in the launch merge itself.
+   - [x] The share lines and other front matter (`docs/quiz-v2.md`,
+     section 8), in the launch merge itself. The share lines were
+     rewritten in #102; the status and colour tokens in the launch merge.
    - [x] The three new schools' stances on the six topics (Arthur,
      2026-11-07, Gate 4 item 9): written in `content/topics/*.md` (#103),
      then seeded into `debate_topics` (a write he approved, (a)) at 06:29
      UTC on 2026-11-07, and read back equal to the hashes `docs/decisions.md`,
      "Gate 4 item 9", gives.
-   - [ ] `README.md`.
-   - [ ] The "until launch" rules of steps 3 and 4 lifted (step 6), in
+   - [x] `README.md`.
+   - [x] The "until launch" rules of steps 3 and 4 lifted (step 6), in
      every file `docs/decisions.md`, "Stage 5, step 4", lists, with the
      tests that pin them.
-   - [ ] `RUN_QUIZ` set to 2 in `scripts/seed/generate.ts` in the launch
+   - [x] `RUN_QUIZ` set to 2 in `scripts/seed/generate.ts` in the launch
      merge, after the sample teardown, so the scheduled job's runs cover
      all six schools placed by quiz v2 (Gate 4 item 13;
      `docs/sample-activity.md`, "At launch"). The same merge updates the
@@ -328,7 +330,7 @@ of the three; Gate 2 is about that.
    - [x] The rubric showing the v3 criteria the judge is given for all
      six, on every page that says they are published in full (Arthur,
      2026-11-07, Gate 4 item 10): a SIX_SCHOOLS build shows them (#102).
-   - [ ] In the launch merge, the three new schools' criteria moved from
+   - [x] In the launch merge, the three new schools' criteria moved from
      `content/prompts/fidelity-criteria.draft.md` into
      `src/lib/judge/rubric.ts` with the same text, shown by the flag-on
      request fixtures (`tests/judge-request/six-schools/`) passing
