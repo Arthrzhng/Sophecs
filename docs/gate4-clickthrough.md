@@ -38,10 +38,9 @@ The preview shares production's database but not its judge
   written or billed. Production judges with v2 until the launch merge
   turns the flag on, then with v3, as you ruled; the flag-on judge was
   tested in the new-schools run of 2026-11-06.
-- **Sign-in** sends its link back to the address you signed in from. It
-  reaches the preview only if Supabase's redirect list allows preview
-  addresses, which is still open with you (Supabase's Site URL and
-  redirect list). If the link opens sophecs.com instead, skip step 6 and
+- **Sign-in** sends its link back to the address you signed in from,
+  which Supabase's redirect list now allows for previews (set by you on
+  2026-11-08). If the link opens sophecs.com instead, skip step 6 and
   the stance line in step 7. On a phone, "Continue with Google" is the
   surer way: an emailed link opened in a mail app's own browser lacks
   the sign-in it started from, and Vercel's.

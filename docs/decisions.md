@@ -5413,12 +5413,79 @@ launch step, after the teardown, on his word.
   on 2026-09-18, so its quiz v2 results and the new three's arguments are
   dated weeks before readers could have made them.
 
+### Gate 4: Arthur's rulings of 2026-11-08
+
+Arthur, 2026-11-08, on the click-through, the samples and the list:
+
+> CRON_SECRET is set in Vercel (Production, sensitive). Pick it up with
+> the next merge, then confirm from the logs that the keep-alive and the
+> re-screening job both return 200 on their next run.
+>
+> Samples (gate4-samples.md): approved, with one fix before the run.
+> Closing lines must fit their motion and not repeat stock phrases across
+> arguments: e.g. Ubuntu's "not the total" closing on Trained to be good
+> doesn't fit, and both Confucian samples end with the same sentence.
+> Write closings per motion (or check each against its motion) for all six
+> schools' banks, so exemplar pages never show the same ending twice.
+>
+> Revision verdicts that say "never meets an objection" while also saying
+> the revision meets one: fix in the fresh run.
+>
+> "That is why judging is paused rather than running" on /method and
+> /how-it-works: make it follow the kill switch, so it is only shown when
+> judging is actually paused.
+>
+> Supabase: Site URL https://sophecs.com, https://sophecs.com/** and the
+> preview pattern are in the redirect list. www redirect: [done.
+
+How each is carried out:
+
+- **The pause sentence.** `JudgeMethod` shows "That is why judging is
+  paused rather than running." only when `KILL_SWITCH_JUDGE` is the exact
+  string "true", the test `/debate` and `/today` already use; the
+  sentence before it stays. Both pages are prerendered, so the switch is
+  read at build, which matches its own rule (set it and redeploy).
+  Allowlisted accounts are not considered: the pages are the same for
+  every reader. `tests/nav-six.test.tsx` holds `/method` byte for byte to
+  main's render with the switch on, and to that render less the one
+  sentence with it unset, empty, "false", "TRUE" or "1".
+- **`CRON_SECRET`.** Vercel refused the value as set: Arthur's redeploy of
+  production at 01:16:35 UTC (`dpl_BGcegwBSDCMAt894edwVitEWUFvC`) ended
+  in `INVALID_CRON_SECRET` within two seconds, because the value holds a
+  character that is not valid in an HTTP header (Vercel allows visible
+  ASCII only). Production is still `dpl_3nPkpSEoLUbvaPGzCaq31qcBGVDu`,
+  which has no secret. Asked of Arthur: the value again, of letters and
+  digits only. Arthur, 2026-11-08: "CRON_SECRET re-entered, letters and
+  digits only, Production-only, sensitive. Go ahead with #107." (the
+  variable's record shows it changed at 01:59:53 UTC). The first
+  production deploy after that, #107's merge, picks it up;
+  confirming both jobs answer 200 comes after their next runs (Hobby
+  fires the keep-alive in the 04:00 hour and the re-screening job in the
+  05:00 hour, UTC), recorded in the progress log with how it was read.
+- **Closings per motion, and the revision verdicts.** In the fresh run
+  only, since the live run regenerates its rows from this code until the
+  teardown: a separate pull request.
+- **Supabase and the www redirect.** Supabase done by Arthur. For www,
+  Vercel's record of the domain has no redirect (`www.sophecs.com`,
+  `redirect: null`, unchanged since 2026-09-11). A request to
+  `https://www.sophecs.com/robots.txt` answered 308 to
+  `https://sophecs.com/robots.txt` (2026-11-08, 01:19 UTC), but that is
+  the app's own rule (`canonicalRedirects` in `next.config.ts`, #83 and
+  #85), which leaves `/api/` and `/_next` on www by design. Asked of
+  Arthur whether "done" means that rule. Arthur, 2026-11-08: "www: the
+  app's own 308 rule is fine. That's what I meant; no Vercel domain
+  redirect needed."
+- **Not ruled, so left as they are:** the other two things the run's
+  verdicts do ("Gate 4 item 13, second part", "Left as they are"): a
+  revision verdict that says an objection is now answered and still
+  suggests answering it, and "'s" after a name ending in "s". They stay on
+  Arthur's list.
+
 ### Gate 4: each motion's own closings, and the fresh run's revision verdicts (2026-11-08)
 
-Arthur, 2026-11-08, quoted in full in "Gate 4: Arthur's rulings of
-2026-11-08":
+Two of Arthur's rulings of 2026-11-08, quoted in full in the section
+above:
 
-> Samples (gate4-samples.md): approved, with one fix before the run.
 > Closing lines must fit their motion and not repeat stock phrases across
 > arguments: e.g. Ubuntu's "not the total" closing on Trained to be good
 > doesn't fit, and both Confucian samples end with the same sentence.
@@ -5432,17 +5499,29 @@ Arthur, 2026-11-08, quoted in full in "Gate 4: Arthur's rulings of
   `scripts/seed/arguments/fragments/closings-by-motion.json`, each written
   to that motion and to the school's stance on it in the passages. Mine,
   for Arthur's reading. `closings.json`, four for each school shared by
-  every motion, stays as it was.
+  every motion, stays as it was. The first review read all 144 against
+  each motion and its school's passages and found about twenty that
+  restated a passage or the stance almost word for word, two schools'
+  closings on one page cut from one template, stock phrases ("keep
+  watching", "Ask ..., and the answer ..."), and some that did not fit:
+  a driver in a self-driving car, "not by fortune" (the Stoics' wording)
+  in a Confucian closing, and readings the passages do not carry
+  ("Nothing permanent is lost", "Ritual shapes the heart"). 65 of the
+  144 are rewritten.
 - **Held to:** `tests/seed/closings.test.ts`:
   - every school, four on every motion, each one sentence of 10 to 30
     words;
   - none repeated, here or from `closings.json`;
   - no five words in a row, and no first three words, in any two of them;
-  - none repeats five words in a row of its own school's passages on its
-    motion, the motion's own words aside, so a closing adds a thought
-    rather than restating the position: a first draft did, 40 times;
-  - the house style. The new three's are held to the quotation guard's
-    rules too (`tests/seed/launch-passages.test.ts`).
+  - by stem, so that "restates" and "restated" count as one word, and
+    counting a run only when two of its words carry content, the
+    motion's own words aside: no four words in a row from the school's
+    passages or its stance on the motion; no three in a row between two
+    schools on one motion, which is one exemplar page; no two within one
+    school's four;
+  - the house style ("program", the British spelling for code, is
+    allowed). The new three's are held to the quotation guard's rules too
+    (`tests/seed/launch-passages.test.ts`).
 - **Who reads them.** A run made with quiz v2 (the fresh run) closes its
   arguments, revisions and exchange turns with its motion's own closings,
   and the banks show them. A run that names no quiz closes with
@@ -5451,25 +5530,53 @@ Arthur, 2026-11-08, quoted in full in "Gate 4: Arthur's rulings of
   The quiz v2 pins move, and are pinned again.
 - **Exemplar pages never show the same ending twice.** Closings alone do
   not do it: a school's four exemplars on a page (one per opening) choose
-  from four closings, and a strong argument whose closing was cut to fit
-  ends on a body sentence. Measured on a production-volume run (seed
-  `six-check`, base window to 2026-11-10 09:00 UTC, two weeks on), the
-  selection as it stood on main showed an ending already on the page 45
-  times across the six motions in a quiz v2 run, and 22 times in a run
-  that names no quiz. So `selectExemplars` (`src/lib/exemplars.ts`) now also
-  drops an argument that ends on the line another kept argument ends on,
-  and takes the next strongest under its opening, as it already did for
-  a repeated text. Measured again: no ending twice, and the same 144 and
-  72 arguments shown, one under every opening. The rule applies to the
-  live run's pages from the merge, not only the fresh run's: on
-  production's pages today a school can show the same closing twice.
+  among four closings, and a strong argument whose closing was cut to fit
+  ends on a body sentence.
+  - `selectExemplars` (`src/lib/exemplars.ts`) keeps no two arguments that
+    end on the same line, in any school. Its first pass is as before,
+    strongest first, with an argument that ends as a stronger kept one
+    does giving way to the next strongest under its opening. Where that
+    leaves an opening with nothing, a kept argument moves to the next
+    strongest under its own opening if that frees an ending the left-out
+    opening can take (an augmenting path, as in Kuhn's matching). So an
+    opening is left out only when no choice of one argument per opening
+    could show it, and where the first pass already shows every opening,
+    nothing moves.
+  - The first pass alone left openings out that a matching shows
+    (review pass 1: 143 or 142 of 144 on five of nine production-volume
+    quiz v2 seeds). With the matching, on 17 configurations (the
+    fixture's plan with quiz v2 and without; with quiz v2, seeds
+    `six-check`, `launch-b`, `launch-c` and `d1` to `d6`; with no quiz,
+    seeds `six-check`, `live-like-a` and `n1` to `n4`), every page shows
+    as many openings as any choice of one argument per opening could, and
+    no ending twice.
+  - Measured at production volume (seed `six-check`, base window to
+    2026-11-10 09:00 UTC, two weeks on): main's selection shows an ending
+    already on the page 40 times across the six motions in a quiz v2 run,
+    and 22 times in a run that names no quiz; this one never, with the
+    same number of arguments shown (144 and 72). It shows a different
+    argument in 46 and 25 of those places, each the next under the same
+    opening.
+- **The live pages change too.** The rule is in the page's selection, so
+  it applies to the live run's rows from the merge, not only the fresh
+  run's. Read from production on 2026-11-08 around 02:20 UTC (one
+  read-only query, returning for each school's opening its candidates'
+  ranks and a hash of each one's ending, with the page's own filters):
+  main's selection shows 72 exemplars across the six pages and repeats an
+  ending 16 times, at least once on every page. With this rule it shows
+  the same 72 openings, repeats none, and shows a different argument in
+  16 places, each the next under the same opening. The opening and ending
+  were computed in SQL to match `openingOf` and `endingOf`, except that a
+  first sentence over 160 characters is compared by its first 160.
 - **The fresh run's revision verdicts.** A revision that answers the
   objection keeps the first attempt's weakest move, which for a middling
   argument opened "The argument never meets an objection." In a run made
   with quiz v2, that move keeps its quoted passage but is described as a
   strong argument's verdict describes one ("... is asserted more than
   shown, and it carries weight the argument never quite earns."). No
-  draw is added. A revision that tried and missed keeps "never meets an
+  draw is added: `tests/seed/verdicts.test.ts` checks over every banked
+  argument that the verdict and the draws after it are otherwise
+  identical. A revision that tried and missed keeps "never meets an
   objection", which is true of it. A run that names no quiz writes what
   it wrote.
 - **Not ruled, so left as they are:** a revision verdict that says an
@@ -5477,4 +5584,5 @@ Arthur, 2026-11-08, quoted in full in "Gate 4: Arthur's rulings of
   after a name ending in "s".
 - **The samples** (`docs/gate4-samples.md`) are regenerated from the
   rebuilt banks: six of the nine now close with their motion's closings,
-  and nothing else in them changed.
+  five of them on a closing rewritten after the first review, and
+  nothing else in them changed.

@@ -257,9 +257,11 @@ in time order. No composition is used twice until its list runs out, so
 exact duplicates stay near zero; near duplicates (the same composition with
 another opening, closing or example) are measured and reported. The banks
 (`arguments/<topic>.<school>.json`, forty each) are a reviewable sample of
-the same compositions. The launch's three schools have passages and banks
-too (Gate 4 item 13), which only a run made with quiz v2 reads ("Six
-schools, placed by quiz v2", below).
+the compositions a run made with quiz v2 writes, closing with each
+motion's own closings; a run that names no quiz, the live run among them,
+closes with `closings.json` instead. The launch's three schools have
+passages and banks too (Gate 4 item 13), which only a run made with quiz
+v2 reads ("Six schools, placed by quiz v2", below).
 
 Measured on a plan with the defaults and a test seed, base window to
 2026-11-04 09:00 UTC:

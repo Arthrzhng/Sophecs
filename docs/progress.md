@@ -918,3 +918,32 @@ deploy below was read from Vercel as Ready.
   before the fresh sample run; the click-through and the word "launch"
   (item 15); `CRON_SECRET`; Supabase Auth's Site URL and redirect list,
   and the Vercel redirect from www to sophecs.com.
+
+## 2026-11-08: Arthur's rulings, the pause sentence, `CRON_SECRET`
+
+- #106 merged as `1e373e8`: the previous entry and the click-through.
+  Three review passes. Deploy `dpl_3nPkpSEoLUbvaPGzCaq31qcBGVDu`, Ready.
+- Arthur's rulings of 2026-11-08 are in `docs/decisions.md`, quoted in
+  full.
+- The method page's pause sentence now follows the kill switch: shown
+  only while `KILL_SWITCH_JUDGE` is "true", on `/method` and
+  `/how-it-works`. With production's switch off, production's `/method`
+  no longer says judging is paused.
+- `CRON_SECRET`: set by Arthur in Production at 01:16 UTC, and refused
+  by Vercel: his redeploy of production at 01:16:35
+  (`dpl_BGcegwBSDCMAt894edwVitEWUFvC`) ended in `INVALID_CRON_SECRET`
+  within two seconds, the value holding a character not valid in an
+  HTTP header. Production is still `dpl_3nPkpSEoLUbvaPGzCaq31qcBGVDu`,
+  without a secret. Set again by Arthur, letters and digits only (its
+  record shows the change at 01:59:53 UTC); this entry's merge is the
+  production deploy that picks it up. Both jobs' first runs with it are
+  read back in the next entry (`docs/gate4.md`, Housekeeping, says how).
+- Supabase Auth's Site URL and redirect list: done by Arthur. The www
+  redirect: `https://www.sophecs.com/robots.txt` answered 308 to
+  `https://sophecs.com/robots.txt` at 01:19 UTC, through the app's own
+  rule; Vercel's record of the domain has no redirect. Arthur: that rule
+  is what he meant.
+- The samples are approved, with closings to be written per motion
+  before the fresh run, and the revision verdicts' "never meets an
+  objection" fixed in it: the next pull request.
+- Waiting on Arthur: the word "launch" (item 15).

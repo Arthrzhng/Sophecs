@@ -1,6 +1,7 @@
 // The argument banks: scripts/seed/arguments/<topic>.<school>.json, forty
 // arguments each, for BANK_SCHOOLS, composed from the hand-written passages in
-// arguments/fragments/<topic>.json and arguments/fragments/closings.json.
+// arguments/fragments/<topic>.json and each motion's own closings,
+// arguments/fragments/closings-by-motion.json.
 //
 // The passages are the reviewable source; the banks are built from them by
 // `npm run seed:banks` and committed, and tests/seed/banks.test.ts fails if
