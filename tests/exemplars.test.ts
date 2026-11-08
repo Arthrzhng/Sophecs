@@ -4,7 +4,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { FRAMES } from "../scripts/seed/banks";
 import { TYPOS } from "../scripts/seed/generate";
-import { EXEMPLAR_CANDIDATES_PER_SCHOOL, EXEMPLAR_FLOOR, EXEMPLARS_PER_MOTION, SAMPLE_FRAMES, SAMPLE_TYPO, getExemplars, withoutFrame, openingOf, selectExemplars, type ExemplarCandidate } from "../src/lib/exemplars";
+import { EXEMPLAR_CANDIDATES_PER_SCHOOL, EXEMPLAR_FLOOR, EXEMPLARS_PER_MOTION, SAMPLE_FRAMES, SAMPLE_TYPO, endingOf, getExemplars, withoutFrame, openingOf, selectExemplars, type ExemplarCandidate } from "../src/lib/exemplars";
 import type { SchoolId } from "../src/lib/types";
 
 const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
@@ -58,6 +58,33 @@ describe("selectExemplars", () => {
     );
     expect(chosen.get("stoicism")!.map((e) => e.id)).toEqual(["s1", "s3"]);
     expect(chosen.get("utilitarianism")!.map((e) => e.id)).toEqual(["u1"]);
+  });
+
+  it("never shows the same ending twice: the next strongest under the opening takes its place, in any school", () => {
+    // Arthur, 2026-11-08: "so exemplar pages never show the same ending twice".
+    const row = (id: string, school: SchoolId, argument: string, score = 80): ExemplarCandidate => ({ id, school, argument, is_sample: true, score });
+    const chosen = selectExemplars(
+      new Map([
+        [
+          "stoicism",
+          [
+            row("s1", "stoicism", "Deploy it. A reason. The judging is what was ours."),
+            row("s2", "stoicism", "Do not deploy it. Another reason.  the judging is WHAT was ours.", 79),
+            row("s3", "stoicism", "Do not deploy it. Another reason. Only assent is ours.", 78),
+            row("s4", "stoicism", "Wait and see. A third reason. Only assent is ours.", 77),
+          ],
+        ],
+        ["utilitarianism", [row("u1", "utilitarianism", "Count it. A sum. The judging is what was ours."), row("u2", "utilitarianism", "Count it. A sum. Then the total decides.", 70)]],
+      ] as [SchoolId, ExemplarCandidate[]][]),
+      ["stoicism", "utilitarianism"]
+    );
+    // s2 ends as s1 does, so s3 is shown under its opening; s4 ends as s3
+    // does and has no other under its own, so that opening is left out.
+    expect(chosen.get("stoicism")!.map((e) => e.id)).toEqual(["s1", "s3"]);
+    // And across schools: u1 ends as s1 does.
+    expect(chosen.get("utilitarianism")!.map((e) => e.id)).toEqual(["u2"]);
+    expect(endingOf("One. Two?  Three!")).toBe("Three!");
+    expect(endingOf("Only one sentence")).toBe("Only one sentence");
   });
 
   it("reads the opening line after a frame sentence, so a frame never passes for a new opening", () => {

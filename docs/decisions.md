@@ -5412,3 +5412,69 @@ launch step, after the teardown, on his word.
   `` `${NAME(…)}'s` ``); and that a fresh run's base window still starts
   on 2026-09-18, so its quiz v2 results and the new three's arguments are
   dated weeks before readers could have made them.
+
+### Gate 4: each motion's own closings, and the fresh run's revision verdicts (2026-11-08)
+
+Arthur, 2026-11-08, quoted in full in "Gate 4: Arthur's rulings of
+2026-11-08":
+
+> Samples (gate4-samples.md): approved, with one fix before the run.
+> Closing lines must fit their motion and not repeat stock phrases across
+> arguments: e.g. Ubuntu's "not the total" closing on Trained to be good
+> doesn't fit, and both Confucian samples end with the same sentence.
+> Write closings per motion (or check each against its motion) for all six
+> schools' banks, so exemplar pages never show the same ending twice.
+>
+> Revision verdicts that say "never meets an objection" while also saying
+> the revision meets one: fix in the fresh run.
+
+- **Closings per motion.** 144, four for each school on each motion, in
+  `scripts/seed/arguments/fragments/closings-by-motion.json`, each written
+  to that motion and to the school's stance on it in the passages. Mine,
+  for Arthur's reading. `closings.json`, four for each school shared by
+  every motion, stays as it was.
+- **Held to:** `tests/seed/closings.test.ts`:
+  - every school, four on every motion, each one sentence of 10 to 30
+    words;
+  - none repeated, here or from `closings.json`;
+  - no five words in a row, and no first three words, in any two of them;
+  - none repeats five words in a row of its own school's passages on its
+    motion, the motion's own words aside, so a closing adds a thought
+    rather than restating the position: a first draft did, 40 times;
+  - the house style. The new three's are held to the quotation guard's
+    rules too (`tests/seed/launch-passages.test.ts`).
+- **Who reads them.** A run made with quiz v2 (the fresh run) closes its
+  arguments, revisions and exchange turns with its motion's own closings,
+  and the banks show them. A run that names no quiz closes with
+  `closings.json` as before, since the live run regenerates its rows from
+  this code until the teardown: its datasets are byte for byte as pinned.
+  The quiz v2 pins move, and are pinned again.
+- **Exemplar pages never show the same ending twice.** Closings alone do
+  not do it: a school's four exemplars on a page (one per opening) choose
+  from four closings, and a strong argument whose closing was cut to fit
+  ends on a body sentence. Measured on a production-volume run (seed
+  `six-check`, base window to 2026-11-10 09:00 UTC, two weeks on), the
+  selection as it stood on main showed an ending already on the page 45
+  times across the six motions in a quiz v2 run, and 22 times in a run
+  that names no quiz. So `selectExemplars` (`src/lib/exemplars.ts`) now also
+  drops an argument that ends on the line another kept argument ends on,
+  and takes the next strongest under its opening, as it already did for
+  a repeated text. Measured again: no ending twice, and the same 144 and
+  72 arguments shown, one under every opening. The rule applies to the
+  live run's pages from the merge, not only the fresh run's: on
+  production's pages today a school can show the same closing twice.
+- **The fresh run's revision verdicts.** A revision that answers the
+  objection keeps the first attempt's weakest move, which for a middling
+  argument opened "The argument never meets an objection." In a run made
+  with quiz v2, that move keeps its quoted passage but is described as a
+  strong argument's verdict describes one ("... is asserted more than
+  shown, and it carries weight the argument never quite earns."). No
+  draw is added. A revision that tried and missed keeps "never meets an
+  objection", which is true of it. A run that names no quiz writes what
+  it wrote.
+- **Not ruled, so left as they are:** a revision verdict that says an
+  objection is now answered and still suggests answering it, and "'s"
+  after a name ending in "s".
+- **The samples** (`docs/gate4-samples.md`) are regenerated from the
+  rebuilt banks: six of the nine now close with their motion's closings,
+  and nothing else in them changed.

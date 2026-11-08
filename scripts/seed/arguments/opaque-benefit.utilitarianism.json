@@ -17,7 +17,7 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nMill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort. If a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses.\n\nA Virtue Ethicist will object that an opaque optimiser is cleverness without practical wisdom, and deploying it hands the judgement about the target to something that cannot judge targets. The target here is not hidden: it is fewer people suffering, and that is checked from outside by counting outcomes. Monitoring the results is how we notice if the mark drifts, and that does not need the system to explain itself. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
+    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nMill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort. If a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses.\n\nA Virtue Ethicist will object that an opaque optimiser is cleverness without practical wisdom, and deploying it hands the judgement about the target to something that cannot judge targets. The target here is not hidden: it is fewer people suffering, and that is checked from outside by counting outcomes. Monitoring the results is how we notice if the mark drifts, and that does not need the system to explain itself. Every month the system waits for an explanation nobody can give is a month of suffering it could have prevented.",
     "words": 229
   },
   {
@@ -38,8 +38,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nCount everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population. Nobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 215
+    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nCount everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population. Nobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. If the benefit is as reliable as the motion says, those it reaches are better off with it than without it, told or not.",
+    "words": 223
   },
   {
     "id": "opaque-benefit.utilitarianism.03",
@@ -59,7 +59,7 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nCount everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population. A fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted.\n\nA Virtue Ethicist will object that an opaque optimiser is cleverness without practical wisdom, and deploying it hands the judgement about the target to something that cannot judge targets. The target here is not hidden: it is fewer people suffering, and that is checked from outside by counting outcomes. Monitoring the results is how we notice if the mark drifts, and that does not need the system to explain itself. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
+    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nCount everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population. A fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted.\n\nA Virtue Ethicist will object that an opaque optimiser is cleverness without practical wisdom, and deploying it hands the judgement about the target to something that cannot judge targets. The target here is not hidden: it is fewer people suffering, and that is checked from outside by counting outcomes. Monitoring the results is how we notice if the mark drifts, and that does not need the system to explain itself. Every month the system waits for an explanation nobody can give is a month of suffering it could have prevented.",
     "words": 223
   },
   {
@@ -80,8 +80,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nCount everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population. Nobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
-    "words": 208
+    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nCount everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population. Nobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Holding back a remedy that works, for want of a reason it can give, puts a principle above the people who are hurting.",
+    "words": 215
   },
   {
     "id": "opaque-benefit.utilitarianism.05",
@@ -101,7 +101,7 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nExplanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason. A fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nExplanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason. A fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
     "words": 215
   },
   {
@@ -122,7 +122,7 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nExplanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason. If a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
+    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nExplanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason. If a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Every month the system waits for an explanation nobody can give is a month of suffering it could have prevented.",
     "words": 214
   },
   {
@@ -143,7 +143,7 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nBeing told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy. Nobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nBeing told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy. Nobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
     "words": 212
   },
   {
@@ -164,8 +164,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nBeing told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy. If a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
-    "words": 210
+    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nBeing told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy. If a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Holding back a remedy that works, for want of a reason it can give, puts a principle above the people who are hurting.",
+    "words": 217
   },
   {
     "id": "opaque-benefit.utilitarianism.09",
@@ -185,8 +185,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nExplanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason. A fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
-    "words": 218
+    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nExplanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason. A fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Holding back a remedy that works, for want of a reason it can give, puts a principle above the people who are hurting.",
+    "words": 225
   },
   {
     "id": "opaque-benefit.utilitarianism.10",
@@ -206,7 +206,7 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nBeing told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy. Nobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
+    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nBeing told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy. Nobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Every month the system waits for an explanation nobody can give is a month of suffering it could have prevented.",
     "words": 215
   },
   {
@@ -224,8 +224,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nIf a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 102
+    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nIf a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses. If the benefit is as reliable as the motion says, those it reaches are better off with it than without it, told or not.",
+    "words": 110
   },
   {
     "id": "opaque-benefit.utilitarianism.12",
@@ -242,7 +242,7 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
     "words": 114
   },
   {
@@ -260,7 +260,7 @@
       "closing": 1,
       "weak": []
     },
-    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
     "words": 114
   },
   {
@@ -278,8 +278,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
-    "words": 111
+    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. Holding back a remedy that works, for want of a reason it can give, puts a principle above the people who are hurting.",
+    "words": 118
   },
   {
     "id": "opaque-benefit.utilitarianism.15",
@@ -296,8 +296,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
-    "words": 106
+    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. Holding back a remedy that works, for want of a reason it can give, puts a principle above the people who are hurting.",
+    "words": 113
   },
   {
     "id": "opaque-benefit.utilitarianism.16",
@@ -314,8 +314,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nIf a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 106
+    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nIf a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses. If the benefit is as reliable as the motion says, those it reaches are better off with it than without it, told or not.",
+    "words": 114
   },
   {
     "id": "opaque-benefit.utilitarianism.17",
@@ -332,8 +332,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 107
+    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. If the benefit is as reliable as the motion says, those it reaches are better off with it than without it, told or not.",
+    "words": 115
   },
   {
     "id": "opaque-benefit.utilitarianism.18",
@@ -350,7 +350,7 @@
       "closing": 1,
       "weak": []
     },
-    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
     "words": 114
   },
   {
@@ -368,8 +368,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nIf a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 105
+    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nIf a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses. If the benefit is as reliable as the motion says, those it reaches are better off with it than without it, told or not.",
+    "words": 113
   },
   {
     "id": "opaque-benefit.utilitarianism.20",
@@ -386,8 +386,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
-    "words": 116
+    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. Holding back a remedy that works, for want of a reason it can give, puts a principle above the people who are hurting.",
+    "words": 123
   },
   {
     "id": "opaque-benefit.utilitarianism.21",
@@ -404,7 +404,7 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
     "words": 104
   },
   {
@@ -422,8 +422,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nIf a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 109
+    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nIf a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses. If the benefit is as reliable as the motion says, those it reaches are better off with it than without it, told or not.",
+    "words": 117
   },
   {
     "id": "opaque-benefit.utilitarianism.23",
@@ -440,8 +440,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 116
+    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. If the benefit is as reliable as the motion says, those it reaches are better off with it than without it, told or not.",
+    "words": 124
   },
   {
     "id": "opaque-benefit.utilitarianism.24",
@@ -458,8 +458,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nIf a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
-    "words": 102
+    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nIf a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses. Holding back a remedy that works, for want of a reason it can give, puts a principle above the people who are hurting.",
+    "words": 109
   },
   {
     "id": "opaque-benefit.utilitarianism.25",
@@ -476,8 +476,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 104
+    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. If the benefit is as reliable as the motion says, those it reaches are better off with it than without it, told or not.",
+    "words": 112
   },
   {
     "id": "opaque-benefit.utilitarianism.26",
@@ -494,8 +494,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
-    "words": 108
+    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. Holding back a remedy that works, for want of a reason it can give, puts a principle above the people who are hurting.",
+    "words": 115
   },
   {
     "id": "opaque-benefit.utilitarianism.27",
@@ -512,8 +512,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 111
+    "text": "I support the motion. If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. If the benefit is as reliable as the motion says, those it reaches are better off with it than without it, told or not.",
+    "words": 119
   },
   {
     "id": "opaque-benefit.utilitarianism.28",
@@ -530,7 +530,7 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nIf a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
+    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nIf a screening model catches two hundred more cancers a year than the explainable one, the explainable one costs two hundred late diagnoses. Every month the system waits for an explanation nobody can give is a month of suffering it could have prevented.",
     "words": 113
   },
   {
@@ -548,7 +548,7 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
+    "text": "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
     "words": 108
   },
   {
@@ -566,7 +566,7 @@
       "closing": 0,
       "weak": []
     },
-    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
+    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. Every month the system waits for an explanation nobody can give is a month of suffering it could have prevented.",
     "words": 114
   },
   {

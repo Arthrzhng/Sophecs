@@ -13,7 +13,7 @@
 // already given (generate.ts). Exact duplicates come only from a list
 // running out, which the plan measures (exactDuplicateArgumentsPct).
 
-import { candidates, fit, partsWords, FRAMES, MIN_WORDS, MAX_WORDS, type Banks, type Parts, type SchoolId, type Tier, type TopicSlug } from "./banks";
+import { candidates, fit, partsWords, FRAMES, MIN_WORDS, MAX_WORDS, type Banks, type Closings, type Parts, type SchoolId, type Tier, type TopicSlug } from "./banks";
 import type { Rng } from "./rng";
 
 // Built once per process for each set of passages: the key is the passages
@@ -54,7 +54,9 @@ export class Compositions {
   private given = new Map<string, number>();
   constructor(
     private banks: Banks,
-    private rng: Rng
+    private rng: Rng,
+    /** The closings of each motion, for a run that closes per motion; `banks.closings` otherwise. */
+    private closingsOf?: (topic: TopicSlug) => Closings
   ) {}
 
   /** The next composition for this motion, school and tier, in the run's own order. */
@@ -65,7 +67,7 @@ export class Compositions {
       // Without an opening sentence first, then each opening in turn: an
       // argument and the same one with an opening added differ by one
       // sentence, so those wait until every plain composition is used.
-      const all = allCompositions(this.banks, topic, school, tier);
+      const all = allCompositions(this.closingsOf ? { ...this.banks, closings: this.closingsOf(topic) } : this.banks, topic, school, tier);
       const r = this.rng.fork(key);
       const rounds = [undefined, ...FRAMES.map((_, i) => i)].map((f) => r.shuffle(all.filter((p) => p.frame === f)));
       list = rounds.flat();

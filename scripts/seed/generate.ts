@@ -394,7 +394,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     const same = (xs: Iterable<string>) => [...xs].sort().join() === [...schools].sort().join();
     const lacking = [
       ...TOPICS.filter((t) => !same(Object.keys(banks.fragments[t].schools))).map((t) => `the passages of ${t}`),
-      ...(same(Object.keys(banks.closings)) ? [] : ["the closings"]),
+      ...TOPICS.filter((t) => !same(Object.keys(banks.motionClosings[t] ?? {}))).map((t) => `the closings of ${t}`),
       ...(same(FEATURE_SCHOOLS) ? [] : ["the template verdicts' lines"]),
     ];
     if (lacking.length) throw new Error(`a quiz v2 run needs the same schools in the quiz and in ${lacking.join(", ")}`);
@@ -717,7 +717,10 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
   }
   slots.sort((a, b) => a.t - b.t || a.u.n - b.u.n || a.k - b.k);
 
-  const compositions = new Compositions(banks, root.fork("compositions"));
+  // A quiz v2 run closes with each motion's own closings (Arthur,
+  // 2026-11-08); a run that names no quiz with closings.json, as before.
+  const closingsOf = (topic: TopicSlug) => (v2 ? banks.motionClosings[topic] : banks.closings);
+  const compositions = new Compositions(banks, root.fork("compositions"), v2 ? closingsOf : undefined);
   const debates: WorkingDebate[] = [];
   const revisionsOf: { parent: WorkingDebate; slot: Slot }[] = [];
   for (const slot of slots) {
@@ -734,7 +737,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
       topic_slug: topic,
       challenge_id: null,
       school,
-      argument: withTypos(compose(fr, banks.closings, school, parts), verdict, r),
+      argument: withTypos(compose(fr, closingsOf(topic), school, parts), verdict, r),
       rejected: slot.rejected,
       rejection_reason: rejection ? rejection.rejection_reason : null,
       verdict: verdict ?? rejection!,
@@ -766,18 +769,18 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     const fr = banks.fragments[parent.row.topic_slug as TopicSlug];
     const s = fr.schools[parent.row.school];
     const answeredIdx = s.objections.findIndex((o) => o.rival === parent.verdict!.unanswered_objection!.school);
-    const revisedParts = fit(fr, banks.closings, parent.row.school, {
+    const revisedParts = fit(fr, closingsOf(parent.row.topic_slug as TopicSlug), parent.row.school, {
       ...parent.parts,
       objections: [...parent.parts.objections, answeredIdx],
     });
-    const verdict = templateRevisionVerdict(fr, parent.row.school, parent.tier, parent.verdict, revisedParts, answeredIdx, slot.revise!.answered, r, scoreRuleFor(rt, to));
+    const verdict = templateRevisionVerdict(fr, parent.row.school, parent.tier, parent.verdict, revisedParts, answeredIdx, slot.revise!.answered, r, scoreRuleFor(rt, to), { freshRun: v2 });
     const rid = id(r);
     debates.push({
       row: {
         ...parent.row,
         id: rid,
         challenge_id: null,
-        argument: compose(fr, banks.closings, parent.row.school, revisedParts),
+        argument: compose(fr, closingsOf(parent.row.topic_slug as TopicSlug), parent.row.school, revisedParts),
         rejected: false,
         rejection_reason: null,
         verdict,
@@ -1014,7 +1017,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
       const other = author === a ? b : a;
       const source =
         quoteSourceForSeq(seq) === "argument" ? (other === a ? textA : textB) : exTurns[seq - 2].body;
-      const turn = writeTurn(banks, author, other, seq, source, r);
+      const turn = writeTurn({ ...banks, closings: closingsOf(author.row.topic_slug as TopicSlug) }, author, other, seq, source, r);
       exTurns.push({
         id: id(r),
         exchange_id: exId,

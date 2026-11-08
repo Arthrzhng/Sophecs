@@ -17,8 +17,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nIf blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall. If an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands.\n\nA Virtue Ethicist will object that treating blame as a pure incentive misses that a good person acknowledges harm they caused, and a culture that only manages incentives breeds builders who shrug. Acknowledging harm can itself be encouraged, and it should be, because it helps victims and keeps builders attentive. But acknowledgement is not proportional blame, and confusing the two would make the practice worse at preventing the next harm. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
-    "words": 230
+    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nIf blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall. If an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands.\n\nA Virtue Ethicist will object that treating blame as a pure incentive misses that a good person acknowledges harm they caused, and a culture that only manages incentives breeds builders who shrug. Acknowledging harm can itself be encouraged, and it should be, because it helps victims and keeps builders attentive. But acknowledgement is not proportional blame, and confusing the two would make the practice worse at preventing the next harm. Aim blame where it can change what happens next, and the careful builder is the wrong target.",
+    "words": 231
   },
   {
     "id": "careful-builder.utilitarianism.02",
@@ -38,8 +38,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nIf blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall. A pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful.\n\nA Virtue Ethicist will object that treating blame as a pure incentive misses that a good person acknowledges harm they caused, and a culture that only manages incentives breeds builders who shrug. Acknowledging harm can itself be encouraged, and it should be, because it helps victims and keeps builders attentive. But acknowledgement is not proportional blame, and confusing the two would make the practice worse at preventing the next harm. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 214
+    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nIf blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall. A pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful.\n\nA Virtue Ethicist will object that treating blame as a pure incentive misses that a good person acknowledges harm they caused, and a culture that only manages incentives breeds builders who shrug. Acknowledging harm can itself be encouraged, and it should be, because it helps victims and keeps builders attentive. But acknowledgement is not proportional blame, and confusing the two would make the practice worse at preventing the next harm. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 216
   },
   {
     "id": "careful-builder.utilitarianism.03",
@@ -59,8 +59,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nWhat should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery. Vaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die.\n\nA Stoic will object that blame belongs to faulty judgement and nothing else, so its usefulness is irrelevant: a careful builder is blameless whether or not blaming her would deter anyone. In ordinary cases the two views agree, since faulty judgement is what we want to deter. Where they come apart, the question is what the practice of blame is for, and a practice that helps nobody has no claim on us. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
-    "words": 220
+    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nWhat should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery. Vaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die.\n\nA Stoic will object that blame belongs to faulty judgement and nothing else, so its usefulness is irrelevant: a careful builder is blameless whether or not blaming her would deter anyone. In ordinary cases the two views agree, since faulty judgement is what we want to deter. Where they come apart, the question is what the practice of blame is for, and a practice that helps nobody has no claim on us. Blame is worth assigning only where it changes future behaviour, and punishing careful builders changes nothing for the better.",
+    "words": 219
   },
   {
     "id": "careful-builder.utilitarianism.04",
@@ -80,8 +80,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nWhat should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery. Vaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die.\n\nA Stoic will object that blame belongs to faulty judgement and nothing else, so its usefulness is irrelevant: a careful builder is blameless whether or not blaming her would deter anyone. In ordinary cases the two views agree, since faulty judgement is what we want to deter. Where they come apart, the question is what the practice of blame is for, and a practice that helps nobody has no claim on us. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
-    "words": 209
+    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nWhat should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery. Vaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die.\n\nA Stoic will object that blame belongs to faulty judgement and nothing else, so its usefulness is irrelevant: a careful builder is blameless whether or not blaming her would deter anyone. In ordinary cases the two views agree, since faulty judgement is what we want to deter. Where they come apart, the question is what the practice of blame is for, and a practice that helps nobody has no claim on us. Aim blame where it can change what happens next, and the careful builder is the wrong target.",
+    "words": 210
   },
   {
     "id": "careful-builder.utilitarianism.05",
@@ -101,8 +101,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nThere are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time. A pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful.\n\nA Virtue Ethicist will object that treating blame as a pure incentive misses that a good person acknowledges harm they caused, and a culture that only manages incentives breeds builders who shrug. Acknowledging harm can itself be encouraged, and it should be, because it helps victims and keeps builders attentive. But acknowledgement is not proportional blame, and confusing the two would make the practice worse at preventing the next harm. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
-    "words": 214
+    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nThere are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time. A pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful.\n\nA Virtue Ethicist will object that treating blame as a pure incentive misses that a good person acknowledges harm they caused, and a culture that only manages incentives breeds builders who shrug. Acknowledging harm can itself be encouraged, and it should be, because it helps victims and keeps builders attentive. But acknowledgement is not proportional blame, and confusing the two would make the practice worse at preventing the next harm. Aim blame where it can change what happens next, and the careful builder is the wrong target.",
+    "words": 215
   },
   {
     "id": "careful-builder.utilitarianism.06",
@@ -122,8 +122,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nIf blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall. If an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands.\n\nA Virtue Ethicist will object that treating blame as a pure incentive misses that a good person acknowledges harm they caused, and a culture that only manages incentives breeds builders who shrug. Acknowledging harm can itself be encouraged, and it should be, because it helps victims and keeps builders attentive. But acknowledgement is not proportional blame, and confusing the two would make the practice worse at preventing the next harm. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 223
+    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nIf blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall. If an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands.\n\nA Virtue Ethicist will object that treating blame as a pure incentive misses that a good person acknowledges harm they caused, and a culture that only manages incentives breeds builders who shrug. Acknowledging harm can itself be encouraged, and it should be, because it helps victims and keeps builders attentive. But acknowledgement is not proportional blame, and confusing the two would make the practice worse at preventing the next harm. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 225
   },
   {
     "id": "careful-builder.utilitarianism.07",
@@ -143,8 +143,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nBlame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all. If an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands.\n\nA Virtue Ethicist will object that treating blame as a pure incentive misses that a good person acknowledges harm they caused, and a culture that only manages incentives breeds builders who shrug. Acknowledging harm can itself be encouraged, and it should be, because it helps victims and keeps builders attentive. But acknowledgement is not proportional blame, and confusing the two would make the practice worse at preventing the next harm. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
-    "words": 233
+    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nBlame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all. If an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands.\n\nA Virtue Ethicist will object that treating blame as a pure incentive misses that a good person acknowledges harm they caused, and a culture that only manages incentives breeds builders who shrug. Acknowledging harm can itself be encouraged, and it should be, because it helps victims and keeps builders attentive. But acknowledgement is not proportional blame, and confusing the two would make the practice worse at preventing the next harm. Proportional blame would teach builders that care does not pay, and less care means more harm next time.",
+    "words": 232
   },
   {
     "id": "careful-builder.utilitarianism.08",
@@ -164,8 +164,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nIf blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall. A pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful.\n\nA Stoic will object that blame belongs to faulty judgement and nothing else, so its usefulness is irrelevant: a careful builder is blameless whether or not blaming her would deter anyone. In ordinary cases the two views agree, since faulty judgement is what we want to deter. Where they come apart, the question is what the practice of blame is for, and a practice that helps nobody has no claim on us. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
-    "words": 220
+    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nIf blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall. A pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful.\n\nA Stoic will object that blame belongs to faulty judgement and nothing else, so its usefulness is irrelevant: a careful builder is blameless whether or not blaming her would deter anyone. In ordinary cases the two views agree, since faulty judgement is what we want to deter. Where they come apart, the question is what the practice of blame is for, and a practice that helps nobody has no claim on us. Aim blame where it can change what happens next, and the careful builder is the wrong target.",
+    "words": 221
   },
   {
     "id": "careful-builder.utilitarianism.09",
@@ -185,8 +185,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nIf blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall. Vaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die.\n\nA Stoic will object that blame belongs to faulty judgement and nothing else, so its usefulness is irrelevant: a careful builder is blameless whether or not blaming her would deter anyone. In ordinary cases the two views agree, since faulty judgement is what we want to deter. Where they come apart, the question is what the practice of blame is for, and a practice that helps nobody has no claim on us. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 213
+    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nIf blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall. Vaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die.\n\nA Stoic will object that blame belongs to faulty judgement and nothing else, so its usefulness is irrelevant: a careful builder is blameless whether or not blaming her would deter anyone. In ordinary cases the two views agree, since faulty judgement is what we want to deter. Where they come apart, the question is what the practice of blame is for, and a practice that helps nobody has no claim on us. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 215
   },
   {
     "id": "careful-builder.utilitarianism.10",
@@ -206,8 +206,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nWhat should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery. Vaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die.\n\nA Virtue Ethicist will object that treating blame as a pure incentive misses that a good person acknowledges harm they caused, and a culture that only manages incentives breeds builders who shrug. Acknowledging harm can itself be encouraged, and it should be, because it helps victims and keeps builders attentive. But acknowledgement is not proportional blame, and confusing the two would make the practice worse at preventing the next harm. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
-    "words": 225
+    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nWhat should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery. Vaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die.\n\nA Virtue Ethicist will object that treating blame as a pure incentive misses that a good person acknowledges harm they caused, and a culture that only manages incentives breeds builders who shrug. Acknowledging harm can itself be encouraged, and it should be, because it helps victims and keeps builders attentive. But acknowledgement is not proportional blame, and confusing the two would make the practice worse at preventing the next harm. Blame is worth assigning only where it changes future behaviour, and punishing careful builders changes nothing for the better.",
+    "words": 224
   },
   {
     "id": "careful-builder.utilitarianism.11",
@@ -224,8 +224,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
-    "words": 110
+    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. Proportional blame would teach builders that care does not pay, and less care means more harm next time.",
+    "words": 109
   },
   {
     "id": "careful-builder.utilitarianism.12",
@@ -242,8 +242,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nIf an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 112
+    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nIf an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 114
   },
   {
     "id": "careful-builder.utilitarianism.13",
@@ -260,8 +260,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 103
+    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 105
   },
   {
     "id": "careful-builder.utilitarianism.14",
@@ -278,8 +278,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
-    "words": 111
+    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. Blame is worth assigning only where it changes future behaviour, and punishing careful builders changes nothing for the better.",
+    "words": 110
   },
   {
     "id": "careful-builder.utilitarianism.15",
@@ -296,8 +296,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
-    "words": 118
+    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. Blame is worth assigning only where it changes future behaviour, and punishing careful builders changes nothing for the better.",
+    "words": 117
   },
   {
     "id": "careful-builder.utilitarianism.16",
@@ -314,8 +314,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nIf an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 101
+    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nIf an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 103
   },
   {
     "id": "careful-builder.utilitarianism.17",
@@ -332,8 +332,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
-    "words": 110
+    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. Proportional blame would teach builders that care does not pay, and less care means more harm next time.",
+    "words": 109
   },
   {
     "id": "careful-builder.utilitarianism.18",
@@ -350,8 +350,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nIf an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 112
+    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nIf an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 114
   },
   {
     "id": "careful-builder.utilitarianism.19",
@@ -368,8 +368,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. Everything else is a means. What matters is the suffering prevented and the happiness made possible.",
-    "words": 107
+    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. Aim blame where it can change what happens next, and the careful builder is the wrong target.",
+    "words": 108
   },
   {
     "id": "careful-builder.utilitarianism.20",
@@ -386,8 +386,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 114
+    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 116
   },
   {
     "id": "careful-builder.utilitarianism.21",
@@ -404,8 +404,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
-    "words": 104
+    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. Blame is worth assigning only where it changes future behaviour, and punishing careful builders changes nothing for the better.",
+    "words": 103
   },
   {
     "id": "careful-builder.utilitarianism.22",
@@ -422,8 +422,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nIf an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
-    "words": 111
+    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nIf an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands. Proportional blame would teach builders that care does not pay, and less care means more harm next time.",
+    "words": 110
   },
   {
     "id": "careful-builder.utilitarianism.23",
@@ -440,8 +440,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 114
+    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 116
   },
   {
     "id": "careful-builder.utilitarianism.24",
@@ -458,8 +458,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 100
+    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 102
   },
   {
     "id": "careful-builder.utilitarianism.25",
@@ -476,8 +476,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nIf an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands. In the end the question is which choice leaves people better off, and on that measure the answer is clear.",
-    "words": 116
+    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nIf an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands. Blame is worth assigning only where it changes future behaviour, and punishing careful builders changes nothing for the better.",
+    "words": 115
   },
   {
     "id": "careful-builder.utilitarianism.26",
@@ -494,8 +494,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 103
+    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 105
   },
   {
     "id": "careful-builder.utilitarianism.27",
@@ -512,8 +512,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 103
+    "text": "The motion gets blame backwards. We should blame in whatever way best prevents future harm, and that means rewarding care, not punishing it when luck runs out. What should be blamed is what could have been done better: skipped tests, ignored warnings, rushed releases. Tracking those failures directly gives builders a clear reason to avoid them, while blame by outcome gives them a lottery.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 105
   },
   {
     "id": "careful-builder.utilitarianism.28",
@@ -530,8 +530,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nIf an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands. Count everyone affected, give each the same weight, and the right policy is the one with the better total.",
-    "words": 108
+    "text": "I reject the motion. Blame proportional to harm punishes careful builders for bad luck and gives everyone the wrong incentives. If blame scaled with harm regardless of care, the rational response for builders would be to avoid high-stakes uses altogether. That would withdraw useful systems from medicine and transport, where the expected benefits are large, and make people worse off overall.\n\nIf an audited diagnostic model makes one fatal error in a million cases, blaming its builders fully might stop the next team building a model that saves thousands. Proportional blame would teach builders that care does not pay, and less care means more harm next time.",
+    "words": 107
   },
   {
     "id": "careful-builder.utilitarianism.29",
@@ -548,8 +548,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 107
+    "text": "A utilitarian should oppose this motion, because blame is justified by its effects, and blaming careful people in proportion to harm produces worse effects than the alternatives. There are better tools for the harm itself. Compensation schemes and insurance can make victims whole without pretending the builders were at fault. Separating compensation from blame lets us help the injured and keep the incentives right at the same time.\n\nA pilot who followed every procedure in a freak storm is not grounded for life, because that would teach other pilots nothing useful. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 109
   },
   {
     "id": "careful-builder.utilitarianism.30",
@@ -566,8 +566,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. That is why the utilitarian answer follows the consequences, wherever they lead and whoever they favour.",
-    "words": 114
+    "text": "Blame is a tool for changing future behaviour, so it should track what would have prevented the harm, and punishing care that failed by chance prevents nothing. Blame, punishment and praise are practices, and practices are justified by their consequences. Their job is to make people more careful in future. Blaming a team that did everything right teaches the industry that care does not protect you, which weakens the incentive to take care at all.\n\nVaccine makers are shielded by compensation schemes because blaming them for rare reactions would make vaccines scarcer, and far more people would die. The useful question is which incentives reduce future harm, and blaming bad luck is not one of them.",
+    "words": 116
   },
   {
     "id": "careful-builder.utilitarianism.31",

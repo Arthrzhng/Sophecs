@@ -102,13 +102,26 @@ export const SAMPLE_TYPO = /\b(?:becuase|definately|thier|wich|arguement|realy|d
 const normalise = (text: string) => text.trim().replace(/\s+/g, " ").toLowerCase();
 
 /**
+ * The line an argument ends on: its last sentence. A sample argument ends
+ * on its closing when it has one, and the sample run gives each school four
+ * closings on a motion, so without this rule two of a school's exemplars
+ * could end the same way (Arthur, 2026-11-08: "so exemplar pages never
+ * show the same ending twice").
+ */
+export function endingOf(argument: string): string {
+  const sentences = argument.trim().split(/(?<=[.!?])\s+/);
+  return sentences[sentences.length - 1];
+}
+
+/**
  * From each school's candidates, strongest first, keep the first under each
  * opening line (its first sentence after any frame), then choose up to `total` between the schools: an even
  * share each, the remainder to the schools listed first, and any share a
  * school cannot fill passed to the others. An exact repeat of a text
- * already kept, in any school, is dropped too, and so is any argument with
- * one of the sample run's deliberate misspellings or marked under
- * EXEMPLAR_FLOOR. As the candidates come strongest first, an opening whose
+ * already kept, in any school, is dropped too, and so is one that ends on
+ * the line another kept argument ends on (`endingOf`): the next strongest
+ * under its opening takes its place. So is any argument with one of the
+ * sample run's deliberate misspellings or marked under EXEMPLAR_FLOOR. As the candidates come strongest first, an opening whose
  * strongest argument is under the floor is left out.
  */
 export function selectExemplars(
@@ -117,6 +130,7 @@ export function selectExemplars(
   total: number = EXEMPLARS_PER_MOTION
 ): Map<SchoolId, Exemplar[]> {
   const seen = new Set<string>();
+  const endings = new Set<string>();
   const pools = new Map<SchoolId, Exemplar[]>();
   for (const school of schools) {
     const pool: Exemplar[] = [];
@@ -127,9 +141,11 @@ export function selectExemplars(
       const text = normalise(c.argument);
       const opening = openingOf(withoutFrame(c.argument));
       const openingKey = normalise(opening);
-      if (seen.has(text) || openings.has(openingKey)) continue;
+      const endingKey = normalise(endingOf(c.argument));
+      if (seen.has(text) || openings.has(openingKey) || endings.has(endingKey)) continue;
       seen.add(text);
       openings.add(openingKey);
+      endings.add(endingKey);
       pool.push({ id: c.id, school: c.school, argument: c.argument.trim(), opening });
     }
     pools.set(school, pool);

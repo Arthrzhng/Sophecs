@@ -17,11 +17,74 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nBlame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nA Stoic will object that fortune is not up to the builders, so any weight they carry for it is a false judgement that something bad happened to them, and the wise builder would set it down. The Stoic is right that guilt here would be false, but wrong that every response to unintended harm is a mistake. Agent-regret is not a false belief about fault; it is an accurate recognition that this harm came through my hands. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
-    "words": 221
+    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nBlame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nA Stoic will object that fortune is not up to the builders, so any weight they carry for it is a false judgement that something bad happened to them, and the wise builder would set it down. The Stoic is right that guilt here would be false, but wrong that every response to unintended harm is a mistake. Agent-regret is not a false belief about fault; it is an accurate recognition that this harm came through my hands. Proportional blame confuses regret, which the careful builder rightly feels, with fault, which they do not bear.",
+    "words": 222
   },
   {
     "id": "careful-builder.virtue-ethics.02",
+    "topic": "careful-builder",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2,
+        1
+      ],
+      "example": 2,
+      "objections": [
+        0
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nBlame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here. A surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened.\n\nA Utilitarian will object that if the builders are not to blame then their feelings are their own business, and what matters is compensating victims and preventing future harm. Feelings are not private ornaments; they shape what people attend to. Builders who feel the weight of past harm look harder for the next one, and an institution that treats regret as irrelevant gradually stops noticing who it hurts. The builder who shrugs at the harm shows a flaw of character; the one who was careful and grieves does not.",
+    "words": 243
+  },
+  {
+    "id": "careful-builder.virtue-ethics.03",
+    "topic": "careful-builder",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        3,
+        2
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nAristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect. Imagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong.\n\nA Utilitarian will object that if the builders are not to blame then their feelings are their own business, and what matters is compensating victims and preventing future harm. Feelings are not private ornaments; they shape what people attend to. Builders who feel the weight of past harm look harder for the next one, and an institution that treats regret as irrelevant gradually stops noticing who it hurts. Proportional blame confuses regret, which the careful builder rightly feels, with fault, which they do not bear.",
+    "words": 244
+  },
+  {
+    "id": "careful-builder.virtue-ethics.04",
+    "topic": "careful-builder",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        1,
+        0
+      ],
+      "example": 1,
+      "objections": [
+        0
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nBernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong. A driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not.\n\nA Utilitarian will object that if the builders are not to blame then their feelings are their own business, and what matters is compensating victims and preventing future harm. Feelings are not private ornaments; they shape what people attend to. Builders who feel the weight of past harm look harder for the next one, and an institution that treats regret as irrelevant gradually stops noticing who it hurts. The builder who shrugs at the harm shows a flaw of character; the one who was careful and grieves does not.",
+    "words": 246
+  },
+  {
+    "id": "careful-builder.virtue-ethics.05",
     "topic": "careful-builder",
     "school": "virtue-ethics",
     "tier": "strong",
@@ -31,77 +94,14 @@
         2,
         3
       ],
-      "example": 2,
+      "example": null,
       "objections": [
         1
       ],
       "closing": 2,
       "weak": []
     },
-    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nCharacter shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to. A surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened.\n\nA Stoic will object that fortune is not up to the builders, so any weight they carry for it is a false judgement that something bad happened to them, and the wise builder would set it down. The Stoic is right that guilt here would be false, but wrong that every response to unintended harm is a mistake. Agent-regret is not a false belief about fault; it is an accurate recognition that this harm came through my hands. A good answer has to come from good character, and good character cannot be replaced by a formula.",
-    "words": 249
-  },
-  {
-    "id": "careful-builder.virtue-ethics.03",
-    "topic": "careful-builder",
-    "school": "virtue-ethics",
-    "tier": "strong",
-    "parts": {
-      "position": 1,
-      "reasons": [
-        3,
-        1
-      ],
-      "example": 0,
-      "objections": [
-        0
-      ],
-      "closing": 0,
-      "weak": []
-    },
-    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nBlame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here. Imagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong.\n\nA Utilitarian will object that if the builders are not to blame then their feelings are their own business, and what matters is compensating victims and preventing future harm. Feelings are not private ornaments; they shape what people attend to. Builders who feel the weight of past harm look harder for the next one, and an institution that treats regret as irrelevant gradually stops noticing who it hurts. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
-    "words": 245
-  },
-  {
-    "id": "careful-builder.virtue-ethics.04",
-    "topic": "careful-builder",
-    "school": "virtue-ethics",
-    "tier": "strong",
-    "parts": {
-      "position": 2,
-      "reasons": [
-        1,
-        0
-      ],
-      "example": 1,
-      "objections": [
-        0
-      ],
-      "closing": 1,
-      "weak": []
-    },
-    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nBernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong. A driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not.\n\nA Utilitarian will object that if the builders are not to blame then their feelings are their own business, and what matters is compensating victims and preventing future harm. Feelings are not private ornaments; they shape what people attend to. Builders who feel the weight of past harm look harder for the next one, and an institution that treats regret as irrelevant gradually stops noticing who it hurts. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
-    "words": 245
-  },
-  {
-    "id": "careful-builder.virtue-ethics.05",
-    "topic": "careful-builder",
-    "school": "virtue-ethics",
-    "tier": "strong",
-    "parts": {
-      "position": 1,
-      "reasons": [
-        3,
-        2
-      ],
-      "example": null,
-      "objections": [
-        1
-      ],
-      "closing": 0,
-      "weak": []
-    },
-    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nAristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nA Stoic will object that fortune is not up to the builders, so any weight they carry for it is a false judgement that something bad happened to them, and the wise builder would set it down. The Stoic is right that guilt here would be false, but wrong that every response to unintended harm is a mistake. Agent-regret is not a false belief about fault; it is an accurate recognition that this harm came through my hands. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nCharacter shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nA Stoic will object that fortune is not up to the builders, so any weight they carry for it is a false judgement that something bad happened to them, and the wise builder would set it down. The Stoic is right that guilt here would be false, but wrong that every response to unintended harm is a mistake. Agent-regret is not a false belief about fault; it is an accurate recognition that this harm came through my hands. The builder who shrugs at the harm shows a flaw of character; the one who was careful and grieves does not.",
     "words": 228
   },
   {
@@ -110,69 +110,6 @@
     "school": "virtue-ethics",
     "tier": "strong",
     "parts": {
-      "position": 2,
-      "reasons": [
-        2,
-        1
-      ],
-      "example": 2,
-      "objections": [
-        0
-      ],
-      "closing": 2,
-      "weak": []
-    },
-    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nBlame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here. A surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened.\n\nA Utilitarian will object that if the builders are not to blame then their feelings are their own business, and what matters is compensating victims and preventing future harm. Feelings are not private ornaments; they shape what people attend to. Builders who feel the weight of past harm look harder for the next one, and an institution that treats regret as irrelevant gradually stops noticing who it hurts. A good answer has to come from good character, and good character cannot be replaced by a formula.",
-    "words": 240
-  },
-  {
-    "id": "careful-builder.virtue-ethics.07",
-    "topic": "careful-builder",
-    "school": "virtue-ethics",
-    "tier": "strong",
-    "parts": {
-      "position": 3,
-      "reasons": [
-        0,
-        1
-      ],
-      "example": 1,
-      "objections": [
-        0
-      ],
-      "closing": 0,
-      "weak": []
-    },
-    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nBlame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here. A driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not.\n\nA Utilitarian will object that if the builders are not to blame then their feelings are their own business, and what matters is compensating victims and preventing future harm. Feelings are not private ornaments; they shape what people attend to. Builders who feel the weight of past harm look harder for the next one, and an institution that treats regret as irrelevant gradually stops noticing who it hurts. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
-    "words": 249
-  },
-  {
-    "id": "careful-builder.virtue-ethics.08",
-    "topic": "careful-builder",
-    "school": "virtue-ethics",
-    "tier": "strong",
-    "parts": {
-      "position": 0,
-      "reasons": [
-        1,
-        3
-      ],
-      "example": 0,
-      "objections": [
-        1
-      ],
-      "closing": 1,
-      "weak": []
-    },
-    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nCharacter shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to. Imagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong.\n\nA Stoic will object that fortune is not up to the builders, so any weight they carry for it is a false judgement that something bad happened to them, and the wise builder would set it down. The Stoic is right that guilt here would be false, but wrong that every response to unintended harm is a mistake. Agent-regret is not a false belief about fault; it is an accurate recognition that this harm came through my hands. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
-    "words": 250
-  },
-  {
-    "id": "careful-builder.virtue-ethics.09",
-    "topic": "careful-builder",
-    "school": "virtue-ethics",
-    "tier": "strong",
-    "parts": {
       "position": 3,
       "reasons": [
         3,
@@ -185,19 +122,61 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nAristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect. A surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened.\n\nA Utilitarian will object that if the builders are not to blame then their feelings are their own business, and what matters is compensating victims and preventing future harm. Feelings are not private ornaments; they shape what people attend to. Builders who feel the weight of past harm look harder for the next one, and an institution that treats regret as irrelevant gradually stops noticing who it hurts. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
-    "words": 238
+    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nAristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect. A surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened.\n\nA Utilitarian will object that if the builders are not to blame then their feelings are their own business, and what matters is compensating victims and preventing future harm. Feelings are not private ornaments; they shape what people attend to. Builders who feel the weight of past harm look harder for the next one, and an institution that treats regret as irrelevant gradually stops noticing who it hurts. Proportional blame confuses regret, which the careful builder rightly feels, with fault, which they do not bear.",
+    "words": 239
   },
   {
-    "id": "careful-builder.virtue-ethics.10",
+    "id": "careful-builder.virtue-ethics.07",
+    "topic": "careful-builder",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        0,
+        3
+      ],
+      "example": 1,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nCharacter shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to. A driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not.\n\nA Utilitarian will object that if the builders are not to blame then their feelings are their own business, and what matters is compensating victims and preventing future harm. Feelings are not private ornaments; they shape what people attend to. Builders who feel the weight of past harm look harder for the next one, and an institution that treats regret as irrelevant gradually stops noticing who it hurts. Proportional blame confuses regret, which the careful builder rightly feels, with fault, which they do not bear.",
+    "words": 248
+  },
+  {
+    "id": "careful-builder.virtue-ethics.08",
     "topic": "careful-builder",
     "school": "virtue-ethics",
     "tier": "strong",
     "parts": {
       "position": 1,
       "reasons": [
-        2,
+        1,
         3
+      ],
+      "example": 0,
+      "objections": [
+        0
+      ],
+      "closing": 2,
+      "weak": []
+    },
+    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nCharacter shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to. Imagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong.\n\nA Utilitarian will object that if the builders are not to blame then their feelings are their own business, and what matters is compensating victims and preventing future harm. Feelings are not private ornaments; they shape what people attend to. Builders who feel the weight of past harm look harder for the next one, and an institution that treats regret as irrelevant gradually stops noticing who it hurts. The builder who shrugs at the harm shows a flaw of character; the one who was careful and grieves does not.",
+    "words": 244
+  },
+  {
+    "id": "careful-builder.virtue-ethics.09",
+    "topic": "careful-builder",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 1,
+      "reasons": [
+        3,
+        2
       ],
       "example": null,
       "objections": [
@@ -206,8 +185,29 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nCharacter shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nA Stoic will object that fortune is not up to the builders, so any weight they carry for it is a false judgement that something bad happened to them, and the wise builder would set it down. The Stoic is right that guilt here would be false, but wrong that every response to unintended harm is a mistake. Agent-regret is not a false belief about fault; it is an accurate recognition that this harm came through my hands. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nAristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nA Stoic will object that fortune is not up to the builders, so any weight they carry for it is a false judgement that something bad happened to them, and the wise builder would set it down. The Stoic is right that guilt here would be false, but wrong that every response to unintended harm is a mistake. Agent-regret is not a false belief about fault; it is an accurate recognition that this harm came through my hands. A good builder will grieve the harm and work to repair it, but grief owed is a different thing from blame earned.",
     "words": 228
+  },
+  {
+    "id": "careful-builder.virtue-ethics.10",
+    "topic": "careful-builder",
+    "school": "virtue-ethics",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        2,
+        1
+      ],
+      "example": 1,
+      "objections": [
+        0
+      ],
+      "closing": 1,
+      "weak": []
+    },
+    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nBlame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here. A driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not.\n\nA Utilitarian will object that if the builders are not to blame then their feelings are their own business, and what matters is compensating victims and preventing future harm. Feelings are not private ornaments; they shape what people attend to. Builders who feel the weight of past harm look harder for the next one, and an institution that treats regret as irrelevant gradually stops noticing who it hurts. Proportional blame confuses regret, which the careful builder rightly feels, with fault, which they do not bear.",
+    "words": 244
   },
   {
     "id": "careful-builder.virtue-ethics.11",
@@ -224,8 +224,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nA driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not. A good answer has to come from good character, and good character cannot be replaced by a formula.",
-    "words": 132
+    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nA driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not. The builder who shrugs at the harm shows a flaw of character; the one who was careful and grieves does not.",
+    "words": 135
   },
   {
     "id": "careful-builder.virtue-ethics.12",
@@ -242,8 +242,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. That is why the virtue ethicist asks not only what happens next but who we become by doing it.",
-    "words": 125
+    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. Judge the builder by how they built and how they respond, and the size of the damage is not the measure.",
+    "words": 127
   },
   {
     "id": "careful-builder.virtue-ethics.13",
@@ -260,8 +260,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. That is why the virtue ethicist asks not only what happens next but who we become by doing it.",
-    "words": 120
+    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. Judge the builder by how they built and how they respond, and the size of the damage is not the measure.",
+    "words": 122
   },
   {
     "id": "careful-builder.virtue-ethics.14",
@@ -278,7 +278,7 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. A good builder will grieve the harm and work to repair it, but grief owed is a different thing from blame earned.",
     "words": 125
   },
   {
@@ -296,8 +296,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nA driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not. That is why the virtue ethicist asks not only what happens next but who we become by doing it.",
-    "words": 130
+    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nA driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not. Judge the builder by how they built and how they respond, and the size of the damage is not the measure.",
+    "words": 132
   },
   {
     "id": "careful-builder.virtue-ethics.16",
@@ -314,7 +314,7 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. A good builder will grieve the harm and work to repair it, but grief owed is a different thing from blame earned.",
     "words": 131
   },
   {
@@ -332,8 +332,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. That is why the virtue ethicist asks not only what happens next but who we become by doing it.",
-    "words": 122
+    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. Judge the builder by how they built and how they respond, and the size of the damage is not the measure.",
+    "words": 124
   },
   {
     "id": "careful-builder.virtue-ethics.18",
@@ -350,7 +350,7 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nA driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not. So the real question is what a person of practical wisdom would do here, and what doing otherwise would make of us.",
+    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nA driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not. A good builder will grieve the harm and work to repair it, but grief owed is a different thing from blame earned.",
     "words": 131
   },
   {
@@ -368,8 +368,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
-    "words": 128
+    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. Proportional blame confuses regret, which the careful builder rightly feels, with fault, which they do not bear.",
+    "words": 129
   },
   {
     "id": "careful-builder.virtue-ethics.20",
@@ -386,8 +386,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
-    "words": 118
+    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. Proportional blame confuses regret, which the careful builder rightly feels, with fault, which they do not bear.",
+    "words": 119
   },
   {
     "id": "careful-builder.virtue-ethics.21",
@@ -404,8 +404,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. That is why the virtue ethicist asks not only what happens next but who we become by doing it.",
-    "words": 126
+    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. Judge the builder by how they built and how they respond, and the size of the damage is not the measure.",
+    "words": 128
   },
   {
     "id": "careful-builder.virtue-ethics.22",
@@ -422,8 +422,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nA driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not. That is why the virtue ethicist asks not only what happens next but who we become by doing it.",
-    "words": 128
+    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nA driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not. Judge the builder by how they built and how they respond, and the size of the damage is not the measure.",
+    "words": 130
   },
   {
     "id": "careful-builder.virtue-ethics.23",
@@ -440,8 +440,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
-    "words": 118
+    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. Proportional blame confuses regret, which the careful builder rightly feels, with fault, which they do not bear.",
+    "words": 119
   },
   {
     "id": "careful-builder.virtue-ethics.24",
@@ -458,8 +458,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. That is why the virtue ethicist asks not only what happens next but who we become by doing it.",
-    "words": 127
+    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. Judge the builder by how they built and how they respond, and the size of the damage is not the measure.",
+    "words": 129
   },
   {
     "id": "careful-builder.virtue-ethics.25",
@@ -476,8 +476,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nA driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not. A good answer has to come from good character, and good character cannot be replaced by a formula.",
-    "words": 131
+    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nA driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not. The builder who shrugs at the harm shows a flaw of character; the one who was careful and grieves does not.",
+    "words": 134
   },
   {
     "id": "careful-builder.virtue-ethics.26",
@@ -494,8 +494,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nA driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
-    "words": 125
+    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nA driver who hits a child who ran into the road is not prosecuted, but we expect him to visit the family, and we think less of him if he does not. Proportional blame confuses regret, which the careful builder rightly feels, with fault, which they do not bear.",
+    "words": 126
   },
   {
     "id": "careful-builder.virtue-ethics.27",
@@ -512,8 +512,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. Outcomes matter, but the deeper question is what kind of people this practice turns us into.",
-    "words": 119
+    "text": "The motion confuses blame with what Williams called agent-regret. Careful builders are not to blame in proportion to harm, but they cannot treat the harm as nothing to do with them. Blame tracks fault, and the careful builders were not at fault, so the motion is false. But virtue is not just avoiding fault. A good person responds to having caused harm with grief, a wish to repair it, and changed attention, and those responses are owed even here.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. Proportional blame confuses regret, which the careful builder rightly feels, with fault, which they do not bear.",
+    "words": 120
   },
   {
     "id": "careful-builder.virtue-ethics.28",
@@ -530,8 +530,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. A good answer has to come from good character, and good character cannot be replaced by a formula.",
-    "words": 127
+    "text": "A good person carries the weight of harm they caused even when blameless, so proportional blame is mistaken, while a builder who shrugs reveals a defect of character. Aristotle thought the right feeling at the right time towards the right people is part of virtue. The right feeling for a builder whose system killed someone is not guilt, which would be false, but neither is it the calm of someone who checked the boxes. The calm is the defect.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. The builder who shrugs at the harm shows a flaw of character; the one who was careful and grieves does not.",
+    "words": 130
   },
   {
     "id": "careful-builder.virtue-ethics.29",
@@ -548,8 +548,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. A good answer has to come from good character, and good character cannot be replaced by a formula.",
-    "words": 125
+    "text": "I reject the motion as stated, because blame tracks fault, but I reject the careless alternative too: the builders still owe the harm something blame cannot measure. Bernard Williams described a lorry driver who, through no fault of his own, kills a child. He is not to blame, yet we would think less of him if he felt nothing more than a bystander. That feeling, agent-regret, attaches to what you did, not to what you did wrong.\n\nImagine an engineer who learns her model contributed to a death and says only that the audit was passed. Nothing she said is false, and something is still badly wrong. The builder who shrugs at the harm shows a flaw of character; the one who was careful and grieves does not.",
+    "words": 128
   },
   {
     "id": "careful-builder.virtue-ethics.30",
@@ -566,8 +566,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. A good answer has to come from good character, and good character cannot be replaced by a formula.",
-    "words": 121
+    "text": "Proportional blame is wrong, yet so is a clean conscience. A virtuous builder feels the weight of what their system did, and that feeling is part of being good. Character shows in how we carry what we did not intend. A team that says it followed procedure and moves on teaches its juniors that the procedure is the whole of responsibility. A team that sits with the harm teaches them that people, not procedures, are what they answer to.\n\nA surgeon who loses a patient despite perfect technique does not blame herself, but she does not go to lunch as if nothing happened. The builder who shrugs at the harm shows a flaw of character; the one who was careful and grieves does not.",
+    "words": 124
   },
   {
     "id": "careful-builder.virtue-ethics.31",

@@ -30,7 +30,7 @@ Every item below was ruled on 2026-11-07, verbatim in `docs/decisions.md`,
 | 10 | The rubric shows v3's criteria for all six | Done on SIX_SCHOOLS builds (#102) |
 | 11 | An exemplar floor | Done, at 50 (#102) |
 | 12 | A pending reply holds the lapse clock; `/me` label | Done (#102) |
-| 13 | Argument banks for the new three; samples to you first | Done: banks and samples (#104, `docs/gate4-samples.md`); the generator for six schools placed by quiz v2 (#105). The run itself waits for your word on the samples, and for the launch |
+| 13 | Argument banks for the new three; samples to you first | Done: banks and samples (#104, `docs/gate4-samples.md`); the generator for six schools placed by quiz v2 (#105). Samples approved on 2026-11-08 with one fix, done: each motion's own closings, for all six schools (#108). The run itself waits for the launch |
 | 14 | Navigation as built | Nothing to do |
 | 15 | Preview link and click-through when 8 to 13 are done; launch on your word | Sent with the click-through, `docs/gate4-clickthrough.md`; launch waits for your word |
 | 16 | The SQL to you when the time comes | At the launch |
