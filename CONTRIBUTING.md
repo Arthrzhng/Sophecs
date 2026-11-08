@@ -51,10 +51,11 @@ list you finish and merge without asking.
 - **(b) Changes to what the judge receives.** The system prompt, the
   fidelity criteria, the motion, the stance, the argument. Judging is live
   and no production verdict may change, so any of these needs his yes, and
-  the six request fixtures proved byte-identical either side of it.
-  **Unchanged fixtures are not on their own enough.** They cover the v2
-  path for the three live schools, so a change to `judge.v3.md`, to
-  `src/lib/judge/rubric.ts`, or to a draft school's criteria moves no
+  the request fixtures proved byte-identical either side of it.
+  **Unchanged fixtures are not on their own enough.** They cover v2 for
+  the original three and v3 for all six on a SIX_SCHOOLS build, which
+  production is since the launch; nothing covers v3 on a build without
+  the flag or the golden runner's own path, so a change there moves no
   fixture and still changes what the judge receives. This condition holds
   even when no fixture moves; `docs/review-charter.md` rule 2 has the
   detail.

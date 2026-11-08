@@ -5955,9 +5955,20 @@ Before anyone is in one of the three, a rollback serves as well.
 What a build without the flag then does with what the launch left:
 - results written as v2 stay in the table; it shows none of them and
   takes nothing from them;
-- a profile in one of the three keeps its school: `/me` and the class
-  pages show the school's id where its name would be, and the judge
-  refuses that reader as it refused the three before the launch;
+- a profile in one of the three keeps its school. Pages that print a
+  reader's school print its id where its name would be: `/me`, the class
+  pages, `/table` ("You argued once for confucian this week"),
+  `/debate/[slug]` ("Arguing as a confucian") and `/counterpart/[id]`.
+  Such a reader can still write an argument, and the judge refuses it
+  (`no_criteria`) as it refused the three before the launch. The
+  counterpart queue can still pair a reader with a seeker in one of the
+  three;
+- a reader of the original three whose verdict carries an objection the
+  v3 judge gave one of the three's voice sees that school's id beside it,
+  on the verdict page, the revision page and `/me`;
+- a reader in one of the three whom `/today` sends to the quiz, and who
+  takes it signed in, moves to one of the original three; turning the
+  flag back on does not move them back;
 - the scheduled sample job goes on extending the fresh run, in all six
   schools; the build shows the original three's rows;
 - a browser that followed one of the three permanent redirects keeps

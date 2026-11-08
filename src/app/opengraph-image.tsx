@@ -1,7 +1,6 @@
 import { ImageResponse } from "next/og";
 import { loadOgFonts } from "@/lib/og-fonts";
-import { OG_INK, OG_INK_MID, OG_PAPER, SCHOOL_MARKER } from "@/lib/card-tokens";
-import { SHOWN_SCHOOL_IDS } from "@/lib/school-registry";
+import { OG_INK, OG_INK_MID, OG_PAPER, SITE_HAIRLINE } from "@/lib/card-tokens";
 
 export const alt = "Sophecs: which school do you think in?";
 export const size = { width: 1200, height: 630 };
@@ -13,7 +12,7 @@ export const contentType = "image/png";
 // on the site where every school's colour appears together (six since the
 // launch, three on a build without the flag): the muted tokens, not the
 // card surfaces, since these sit on paper.
-const SCHOOL_HAIRLINE = SHOWN_SCHOOL_IDS.map((id) => SCHOOL_MARKER[id]);
+const SCHOOL_HAIRLINE = SITE_HAIRLINE;
 
 export default async function SiteOgImage() {
   const [spectral, plexSans] = await loadOgFonts();

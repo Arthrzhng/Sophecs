@@ -102,12 +102,22 @@ describe("a build without SIX_SCHOOLS, given rows in one of the three", () => {
     }
   });
 
-  it("still renders the verdict page for one of the original three", async () => {
+  it("still renders the verdict page, its image and its revision page for one of the original three", async () => {
     rows("stoicism");
+    let p = await pages("0");
+    expect((await p.image({ params })).status).toBe(200);
+    await expect(p.revise({ params })).resolves.toBeTruthy();
     db.user = null; // a reader, not the author, so no owner-only controls
-    const p = await pages("0");
+    p = await pages("0");
     const html = renderToStaticMarkup(await p.verdict({ params, searchParams: Promise.resolve({}) }));
     expect(html).toContain("A line.");
+  });
+
+  it("draws the site card's hairline in the original three's colours only", async () => {
+    vi.resetModules();
+    vi.stubEnv("SIX_SCHOOLS", "0");
+    const { SITE_HAIRLINE, SCHOOL_MARKER } = await import("../src/lib/card-tokens");
+    expect(SITE_HAIRLINE).toEqual([SCHOOL_MARKER.stoicism, SCHOOL_MARKER.utilitarianism, SCHOOL_MARKER["virtue-ethics"]]);
   });
 });
 
@@ -124,5 +134,16 @@ describe("a build with SIX_SCHOOLS, given the same rows", () => {
       (e: Error) => e.message
     );
     expect(today).not.toMatch(/NEXT_REDIRECT \/quiz/);
+    // The image and the revision page too.
+    expect((await p.image({ params })).status).toBe(200);
+    await expect(p.revise({ params })).resolves.toBeTruthy();
+  });
+
+  it("draws the site card's hairline in all six colours", async () => {
+    vi.resetModules();
+    vi.stubEnv("SIX_SCHOOLS", "1");
+    const { SITE_HAIRLINE } = await import("../src/lib/card-tokens");
+    expect(SITE_HAIRLINE).toHaveLength(6);
+    expect(new Set(SITE_HAIRLINE).size).toBe(6);
   });
 });

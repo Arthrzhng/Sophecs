@@ -297,7 +297,7 @@ of the three; Gate 2 is about that.
      `/method` to `/how-it-works`, `/debate/rubric` to its `#rubric`)
      made permanent (308) in the launch merge (`sixSchoolsRedirects` in
      `next.config.ts`, and `tests/nav-six.test.tsx`, which pins
-     `permanent: false`; Arthur, 2026-11-06).
+     `permanent: true`; Arthur, 2026-11-06).
    - [x] The three content files' status and colour tokens (the six
      "elsewhere" passages keep `status: draft`).
    - [x] The share lines and other front matter (`docs/quiz-v2.md`,

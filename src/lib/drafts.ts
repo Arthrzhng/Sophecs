@@ -49,15 +49,15 @@ export function isDraft(data: DraftStatus): boolean {
 }
 
 /**
- * The schools this build shows without publishing: the three, on a
- * `SIX_SCHOOLS` build, and none on any other.
+ * The schools this build shows beyond `PUBLISHED_SCHOOL_IDS`: the three
+ * published at the launch, on a `SIX_SCHOOLS` build, and none on any other.
  */
 export const SHOWN_DRAFT_SCHOOL_IDS: readonly SchoolId[] = SHOWN_SCHOOL_IDS.filter(
   (id) => !PUBLISHED_SCHOOL_IDS.includes(id)
 );
 
 /**
- * Whether a draft belongs to a school this build shows without publishing.
+ * Whether a draft belongs to one of the schools above.
  * `school` is the file's own school: a school file's `id`, a module's
  * `school`. Anything that is not one of those strings belongs to none.
  */

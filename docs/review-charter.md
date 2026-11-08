@@ -64,12 +64,13 @@ So: when a suite's numbers move, find out why before reading the result.
 ## 2. The judge request fixtures are byte-identical
 
 `tests/judge-request/` holds six fixtures: the exact request
-`src/lib/anthropic.ts` sends for each live school, as an original and as a
-revision. **Judging is live and no production verdict may change**, so a
-diff in any of those six is a change to how a real student's argument would
-be scored. Its `six-schools/` folder holds twelve more, what a SIX_SCHOOLS
-build sends for all six schools (Gate 3); a diff there changes what the
-judge receives on flag-on builds, and so at launch, which is (b) too.
+`src/lib/anthropic.ts` sends under v2 for each of the original three, as an
+original and as a revision, which is what a build without the flag sends.
+Its `six-schools/` folder holds twelve more, what a SIX_SCHOOLS build sends
+under v3 for all six schools (Gate 3), which since the launch (2026-11-08)
+is production. **Judging is live and no production verdict may change**,
+so a diff in any of the eighteen is a change to how a real student's
+argument would be scored, or would be on a revert, which is (b).
 
 The check is
 
@@ -150,8 +151,8 @@ A review that touches the registry, a school map, or anything imported by a
 client component checks the grep output, not the reasoning about why it
 should be fine.
 
-Since the launch (2026-11-08) production is built with the flag, so the
-three are drafts only on a build without it. `npm run check:bundle` now
+Since the launch (2026-11-08) production is built with the flag, and a
+build without it hides the three as it hid them before. `npm run check:bundle` now
 holds that build, the one a revert deploys, to the site as it was, and
 `npm run check:bundle:six` holds production's.
 

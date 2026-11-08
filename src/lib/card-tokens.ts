@@ -1,4 +1,4 @@
-import { shownLookup, type SchoolId } from "./school-registry";
+import { SHOWN_SCHOOL_IDS, shownLookup, type SchoolId } from "./school-registry";
 
 /**
  * Design tokens as literals, for every surface that renders through Satori.
@@ -264,3 +264,10 @@ export const SCHOOL_MARKER: Record<SchoolId, string> = shownLookup(
   SCHOOL_MARKER_BY_SCHOOL,
   () => SCHOOL_MARKER_NEUTRAL
 );
+
+/**
+ * The site card's hairline (src/app/opengraph-image.tsx): every school this
+ * build shows, in registry order, in its marker colour. Six on production
+ * since the launch, three on a build without the flag.
+ */
+export const SITE_HAIRLINE: readonly string[] = SHOWN_SCHOOL_IDS.map((id) => SCHOOL_MARKER[id]);

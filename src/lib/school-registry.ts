@@ -26,11 +26,13 @@
  * public surface moves to it in Stage 5; every lookup keyed by school
  * already answers for it. Without the flag it is `PUBLISHED_SCHOOLS`.
  *
- * **Draft schools are not here**, except on a `SIX_SCHOOLS` build, behind
- * a constant a build without the flag drops. They are in
- * `school-registry.drafts.ts`, which is `server-only`, because a draft
- * school's id and name are unreleased product decisions and the Phase 1B
- * guarantee is that no draft reaches a production page or bundle. This
+ * **The three published at the launch are not here**, except on a
+ * `SIX_SCHOOLS` build, behind a constant a build without the flag drops.
+ * They are in `school-registry.drafts.ts`, which is `server-only`: until
+ * the launch their ids and names were unreleased product decisions, and
+ * the Phase 1B guarantee was that no draft reaches a production page or
+ * bundle; a build without the flag, the one a revert deploys, still holds
+ * to it. This
  * file ships to the browser; that one cannot. The first attempt at this registry
  * held all six entries and put "confucian", "Confucianism", "ubuntu" and
  * "buddhist" into thirteen production client chunks, which is the thing
@@ -284,8 +286,9 @@ export function schoolShadeVar(id: SchoolId): string {
  * so a name can fall back to the id while a colour falls back to ink.
  *
  * A plain object cannot do this job. To answer for every `SchoolId` it
- * would need a key per school, and a draft school's key is an unreleased
- * product decision sitting in the production client bundle. That is
+ * would need a key per school, and a key for one of the three would sit
+ * in the client bundle of a build without the flag, which must not carry
+ * them. That is
  * exactly the regression this replaced:
  * `scripts/check-client-bundle.ts` is the test that it stays replaced.
  *

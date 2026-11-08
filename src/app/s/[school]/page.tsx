@@ -7,8 +7,8 @@ import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
 import { SHOWN_SCHOOL_IDS, type SchoolId } from "@/lib/types";
 import { countWord } from "@/lib/count-word";
 
-// Every school this build shows: the published three, and on a
-// SIX_SCHOOLS build the three drafts as well (docs/stage5-plan.md, step 2).
+// Every school this build shows: the original three, and on a SIX_SCHOOLS
+// build the three published at the launch as well (docs/stage5-plan.md).
 export function generateStaticParams() {
   return SHOWN_SCHOOL_IDS.map((school) => ({ school }));
 }
