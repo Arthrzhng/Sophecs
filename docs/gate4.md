@@ -392,28 +392,18 @@ the new-schools run 16 or 23 of 25, depending on item 3.
     points at a cleared challenge. The SQL comes to you for the SQL
     Editor.
 
-## New, and waiting on you
-
-- **`CRON_SECRET`, again.** Set by you on 2026-11-08, but Vercel refuses
-  the value: your redeploy at 01:16:35 UTC failed on
-  `INVALID_CRON_SECRET`, as the value holds a character that is not valid
-  in an HTTP header. Production is still the deploy before it, with no
-  secret, so both cron jobs still answer 401. Please set it again with
-  letters and digits only (`openssl rand -hex 32` gives such a value),
-  Production, sensitive. The first production deploy after that picks it
-  up, and both jobs' next runs are read back in `docs/progress.md`. It
-  turns the re-screening job on, which pays for screening whenever a
-  reply is pending, as you approved under (d) 4.
-- **The www redirect.** Vercel's record of `www.sophecs.com` has no
-  redirect. www answers 308 to `sophecs.com` through the app's own rule
-  (`canonicalRedirects` in `next.config.ts`, #83 and #85), which leaves
-  `/api/` and `/_next` on www by design. Does "done" mean that rule, or a
-  domain redirect still to be set?
-
 ## Done on 2026-11-08
 
 - Supabase Auth's Site URL (`https://sophecs.com`) and redirect list
   (`https://sophecs.com/**` and the preview pattern).
+- The www redirect: the app's own 308 rule (`canonicalRedirects` in
+  `next.config.ts`), as you confirmed; no Vercel domain redirect.
+- `CRON_SECRET`, set again by you in letters and digits after Vercel
+  refused the first value (your redeploy at 01:16:35 UTC failed on
+  `INVALID_CRON_SECRET`). #107's merge is the production deploy that
+  picks it up; both jobs' next runs are read back in `docs/progress.md`.
+  It turns the re-screening job on, which pays for screening whenever a
+  reply is pending, as you approved under (d) 4.
 
 ## Housekeeping
 

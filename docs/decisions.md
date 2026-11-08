@@ -5455,7 +5455,10 @@ How each is carried out:
   character that is not valid in an HTTP header (Vercel allows visible
   ASCII only). Production is still `dpl_3nPkpSEoLUbvaPGzCaq31qcBGVDu`,
   which has no secret. Asked of Arthur: the value again, of letters and
-  digits only. The first production deploy after that picks it up;
+  digits only. Arthur, 2026-11-08: "CRON_SECRET re-entered, letters and
+  digits only, Production-only, sensitive. Go ahead with #107." (the
+  variable's record shows it changed at 01:59:53 UTC). The first
+  production deploy after that, #107's merge, picks it up;
   confirming both jobs answer 200 comes after their next runs (Hobby
   fires the keep-alive in the 04:00 hour and the re-screening job in the
   05:00 hour, UTC), recorded in the progress log with how it was read.
@@ -5469,7 +5472,9 @@ How each is carried out:
   `https://sophecs.com/robots.txt` (2026-11-08, 01:19 UTC), but that is
   the app's own rule (`canonicalRedirects` in `next.config.ts`, #83 and
   #85), which leaves `/api/` and `/_next` on www by design. Asked of
-  Arthur: whether "done" means that rule.
+  Arthur whether "done" means that rule. Arthur, 2026-11-08: "www: the
+  app's own 308 rule is fine. That's what I meant; no Vercel domain
+  redirect needed."
 - **Not ruled, so left as they are:** the other two things the run's
   verdicts do ("Gate 4 item 13, second part", "Left as they are"): a
   revision verdict that says an objection is now answered and still
