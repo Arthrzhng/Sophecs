@@ -14,7 +14,7 @@ import { SAMPLE_EXPLANATION, SAMPLE_TAG } from "@/lib/sample";
  */
 export function SampleLabel({ note }: { note?: string }) {
   return (
-    <details className="group">
+    <details className="group open:basis-full">
       <summary className="inline-flex min-h-11 min-w-11 cursor-pointer list-none items-center justify-center [&::-webkit-details-marker]:hidden">
         <span className="rounded-control border border-rule px-1.5 text-xs font-semibold text-ink-mid group-open:text-ink">
           {SAMPLE_TAG}

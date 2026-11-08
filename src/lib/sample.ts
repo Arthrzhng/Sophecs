@@ -29,6 +29,18 @@ export const SCHOOLS_SAMPLE_LINE = "Includes sample accounts, run by AI.";
 export const SAMPLE_IMAGE_MARK = "AI sample";
 
 /**
+ * The words around a result's point on the map of the schools. A sample's
+ * are about the answers, not a person (Arthur, 2026-11-08: "Never present a
+ * sample as a person"); anyone else's result, seen by someone other than its
+ * owner, is about them.
+ */
+export function resultMapWords(isSample: boolean): { title: string; whose: "their" | "these answers" } {
+  return isSample
+    ? { title: "Where these answers landed, on the map of the schools", whose: "these answers" }
+    : { title: "Where these answers put them, on the map of the schools", whose: "their" };
+}
+
+/**
  * A page showing a sample passes no referrer to the next page (Arthur,
  * 2026-11-05: "no-referrer policy on sample pages"; docs/decisions.md,
  * "Arthur's rulings of 2026-11-05 on Checkpoint A", 18). Without it, a page

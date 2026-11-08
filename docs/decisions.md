@@ -6086,8 +6086,8 @@ across the site. Remove every label except this minimum". What stays:
 - one small, quiet "AI" tag beside a sample's work, on its verdict,
   result and challenge pages (and on an exchange, once samples reply);
 - one short line on a challenge or exchange with a sample, before the
-  reader writes: "You're arguing with an AI sample account." This comes
-  with the replies, since until then a reader writes nothing to a sample;
+  reader writes: "You're arguing with an AI sample account." (with the
+  replies; see the list below);
 - a small "AI sample" mark on a sample page's share and preview images;
 - one line on `/schools`: "Includes sample accounts, run by AI.", linked
   to the explanation;
@@ -6104,6 +6104,24 @@ surface and holds that, outside its one tag, none says "sample" or speaks
 of a person.
 
 Choices made in carrying this out, for Arthur's list:
+- **First: nothing on `/schools` says sample marks are not the judge's**
+  (review pass 2, B3). Before this change the table's note linked to a
+  paragraph saying the judge did not read sample arguments, which were
+  scored from a template. Arthur's minimum drops that paragraph, and
+  `/schools` still says "Fidelity is the judge's 0–10 mark ... averaged
+  across every judged original argument", an average that includes every
+  sample's template mark. The only place that says otherwise is inside
+  the tag on a single verdict. Shipped as Arthur worded it, since he asked
+  for it without stopping; his to choose among: (a) a judge clause in
+  the table's description, (b) a sentence in the explanation ("The judge
+  does not read their arguments."), (c) leaving template marks out of Avg
+  fidelity, with the ranking floor counted on genuine arguments alone.
+- **The line before writing comes with the replies.** Arthur listed "You're
+  arguing with an AI sample account." as staying now and deferred only
+  the explanation's third sentence. Today no reader writes to a sample: a
+  sample's challenge sends the reader to the quiz, and no sample argument
+  seeks a counterpart. So the line ships with the replies, where it has a
+  place to sit; until then it would sit on a page with nothing to write.
 - **The judge did not read it.** A sample's verdict is scored from a
   template. With the heading and the note gone, nothing on the page would
   have said so, and the scores sit under the site's footer saying
@@ -6130,3 +6148,11 @@ Choices made in carrying this out, for Arthur's list:
 - **What the tag opens to.** The explanation, so "Sample accounts" is
   in every sample page once the tag is opened.
 - **On a narrow screen**, the opened tag takes a line of its own.
+- **A sample's verdict does not address the reader as its author**
+  (review pass 2). Where a reader's own verdict says "The objection you
+  left standing", "Compared with your first attempt" and "Write it
+  again", a sample's says "The objection left standing", "Compared with
+  the first attempt" and "Argue this motion". The wording follows whether
+  the argument is a sample's, and the judge wording whether it was
+  scored from a template. A sample's result map reads "Where these
+  answers landed", not "Where these answers put them".

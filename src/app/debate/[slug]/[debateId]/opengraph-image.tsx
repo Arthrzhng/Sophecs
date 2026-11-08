@@ -21,7 +21,7 @@ export default async function VerdictOGImage({
   // As on the result card (src/app/r/[id]/opengraph-image.tsx): without a
   // database the card falls back to a default; with one, a verdict the
   // lookup does not return gets no image and is not cached, rather than a
-  // default card cached for a year that would carry no Sample mark.
+  // default card cached for a year that would carry no sample mark.
   let school: SchoolId = "stoicism";
   let motion = "Sophecs";
   let score = 0;

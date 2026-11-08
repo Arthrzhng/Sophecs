@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { SamplePageMarker } from "@/components/sample/SamplePageMarker";
-import { SAMPLE_PAGE_REFERRER } from "@/lib/sample";
+import { SAMPLE_PAGE_REFERRER, resultMapWords } from "@/lib/sample";
 import { cookies, headers } from "next/headers";
 import { CardViewTracker } from "@/components/card/CardViewTracker";
 import { SharePage } from "@/components/share/SharePage";
@@ -162,12 +162,12 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
   const figure =
     QUIZ_V2_ON && quizVersionOf(result) === 2 && typeof result.map_x === "number" && typeof result.map_y === "number" ? (
       <SchoolMap
-        title="Where these answers put them, on the map of the schools"
+        title={resultMapWords(Boolean(result.is_sample)).title}
         schools={quizV2MapSchools()}
         axes={quizV2().axes}
         reader={{ x: result.map_x, y: result.map_y }}
         caption="Where these answers landed"
-        whose="their"
+        whose={resultMapWords(Boolean(result.is_sample)).whose}
       />
     ) : null;
 

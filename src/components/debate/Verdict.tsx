@@ -62,8 +62,8 @@ const WITHHELD_REJECTED_TEMPLATE =
 // The article is the adherent noun's: every school's name begins with the
 // same sound as its noun ("an Ubuntu objection", "an Ubuntu Ethicist"),
 // which tests/six-schools.test.ts checks for all six.
-function withheldObjection(school: SchoolId, template = false): string {
-  const tail = template ? "so it is shown only while the argument is public." : "so only the person who wrote it can read it.";
+function withheldObjection(school: SchoolId, impersonal = false): string {
+  const tail = impersonal ? "so it is shown only while the argument is public." : "so only the person who wrote it can read it.";
   return `The argument left ${SCHOOL_ARTICLE[school]} ${SCHOOL_COLORS[school].name} objection standing. Its wording can quote the argument, ${tail}`;
 }
 
@@ -248,7 +248,7 @@ export function Verdict({
             title="This was not judged."
             body={
               textWithheld
-                ? template
+                ? sample
                   ? WITHHELD_REJECTED_TEMPLATE
                   : WITHHELD_REJECTED
                 : (verdict.rejection_reason ??
@@ -256,7 +256,7 @@ export function Verdict({
             }
             action={
               <div className="flex flex-wrap items-center gap-6 text-sm">
-                <TextLink href={`/debate/${topicSlug}`}>Write it again</TextLink>
+                <TextLink href={`/debate/${topicSlug}`}>{sample ? "Argue this motion" : "Write it again"}</TextLink>
                 <TextLink href={RUBRIC_HREF}>What the judge is looking for</TextLink>
               </div>
             }
@@ -379,7 +379,7 @@ export function Verdict({
           {template ? "Notes on the argument" : <>The judge&apos;s note</>}
         </h2>
         {textWithheld ? (
-          <p className="prose-reading mt-6">{template ? WITHHELD_NOTE_TEMPLATE : WITHHELD_NOTE}</p>
+          <p className="prose-reading mt-6">{sample ? WITHHELD_NOTE_TEMPLATE : WITHHELD_NOTE}</p>
         ) : (
           <div className="mt-6 space-y-6">
             <Reading label="Strongest move" body={verdict.strongest_move} />
@@ -391,7 +391,7 @@ export function Verdict({
 
       {objection && (
         <div className="mt-10 max-w-[60ch] border-t border-rule pt-8">
-          <p className="text-sm text-ink-soft">The objection you left standing</p>
+          <p className="text-sm text-ink-soft">{sample ? "The objection left standing" : "The objection you left standing"}</p>
           {/* The rival school's colour, on the rival school's objection —
               the one place on this screen a tribal marker means something. */}
           <div
@@ -401,7 +401,7 @@ export function Verdict({
             <p className="text-sm text-ink-mid">{SCHOOL_COLORS[objection.school].name}</p>
             {textWithheld ? (
               <p className="mt-2 text-sm leading-relaxed text-ink-mid">
-                {withheldObjection(objection.school, template)}
+                {withheldObjection(objection.school, Boolean(sample))}
               </p>
             ) : (
               <>
@@ -505,7 +505,7 @@ export function Verdict({
         <div className="mt-10 max-w-[34rem] border-t border-rule pt-8">
           {comparison.comparable ? (
             <>
-              <p className="text-sm text-ink-soft">Compared with your first attempt</p>
+              <p className="text-sm text-ink-soft">{sample ? "Compared with the first attempt" : "Compared with your first attempt"}</p>
 
               {/* The same four axes as the verdict above, read against the
                   original. Lost its rows in the Phase 3 rewrite and rendered an

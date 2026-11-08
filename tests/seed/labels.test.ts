@@ -100,33 +100,55 @@ describe("labels", () => {
   });
 
   // Each surface a sample's work is shown on, rendered: outside its one tag
-  // the page says nothing of samples, and the tag sits in a valid place.
-  it("each sample surface carries exactly one tag, outside any <p>, and says nothing else of samples", async () => {
+  // the page says nothing of samples or AI, speaks of no person, and the tag
+  // sits only where flow content may.
+  it("each sample surface carries exactly one tag, in a valid place, and says nothing else of samples or of a person", async () => {
     const { SharePage } = await import("../../src/components/share/SharePage");
     const { SchoolCard } = await import("../../src/components/today/TodayCards");
+    const { SchoolMap } = await import("../../src/components/phase3/SchoolMap");
+    const { resultMapWords } = await import("../../src/lib/sample");
     const content = { one_line: "x", name: "Stoicism" } as never;
     const result = {
       resultId: "r1", school: "stoicism" as const, oneLine: "A line.", oneLineAttribution: "Epictetus", vector: null, otherVector: null,
       isOwner: false, isSavedToProfile: false, showDebateThem: false, challengeId: null, isSignedIn: false, shareLine: "s", shareLineIndex: 0,
     };
+    const words = resultMapWords(true);
+    const map = createElement(SchoolMap, {
+      title: words.title, whose: words.whose, caption: "Where these answers landed",
+      schools: [{ id: "stoicism", name: "Stoicism", angle: 0 }, { id: "ubuntu", name: "Ubuntu", angle: 180 }],
+      axes: { x: ["Each person on their own", "People through each other"], y: ["a", "b"] }, reader: { x: 0.2, y: 0.1 },
+    } as never);
+    const comparison = { parentDebateId: "p1", comparable: true, first: { score: 60, fidelity: 6, rigor: 6, engagement: 5 } };
     const surfaces: Record<string, string> = {
       "template verdict": html(createElement(Verdict, { ...props, sample: { template: true } })),
       "template verdict, private": html(createElement(Verdict, { ...props, argument: null, argumentPublic: false, textWithheld: true, sample: { template: true } } as never)),
       "rejected template verdict": html(createElement(Verdict, { ...props, verdict: { ...verdict, rejected: true }, sample: { template: true } })),
-      "sample result": html(createElement(SharePage, { ...result, isSample: true } as never)),
+      "rejected template verdict, private": html(createElement(Verdict, { ...props, verdict: { ...verdict, rejected: true }, argument: null, argumentPublic: false, textWithheld: true, sample: { template: true } } as never)),
+      "template revision": html(createElement(Verdict, { ...props, comparison, sample: { template: true } } as never)),
+      "sample result": html(createElement(SharePage, { ...result, isSample: true, figure: map } as never)),
       "sample challenge": html(createElement(ChallengeInvite, { challengeId: "c1", school: "stoicism", content, isSample: true })),
     };
+    const PERSON = /\b(someone|their|them|author|person|who wrote)\b|\bthey (came|argue|stand|wrote)\b|\byou left\b|\byour first\b/i;
     for (const [name, out] of Object.entries(surfaces)) {
       expect(out.match(/<details/g)?.length ?? 0, name).toBe(1);
-      expect(out, name).not.toMatch(/<p\b[^>]*>(?:(?!<\/p>)[\s\S])*<details/);
+      // No <details> inside an element that may hold phrasing content only.
+      expect(out, name).not.toMatch(/<(p|h[1-6]|span|a|button|label)\b[^>]*>(?:(?!<\/\1>)[\s\S])*<details/);
       const outside = out.replace(/<details[\s\S]*?<\/details>/g, "");
       expect(outside, name).not.toMatch(/sample/i);
-      // Nor as a person: no author, no one, no "they".
-      expect(outside, name).not.toMatch(/\b(Someone|They came out|What they argue|The author|the person who wrote)\b/);
+      expect(outside, name).not.toMatch(/\bAI\b/);
+      // The one place a person is spoken of is a school's own words, the
+      // axis labels of the map ("Each person on their own").
+      expect(outside.replace(/Each person on their own/g, ""), name).not.toMatch(PERSON);
+      // The tag's tap target is 44 by 44.
+      expect(out, name).toMatch(/<summary class="[^"]*\bmin-h-11\b[^"]*\bmin-w-11\b/);
     }
-    for (const name of ["template verdict", "template verdict, private", "rejected template verdict"])
+    for (const name of ["template verdict", "template verdict, private", "rejected template verdict", "rejected template verdict, private", "template revision"])
       expect(surfaces[name], name).toContain(`${SAMPLE_EXPLANATION} ${SAMPLE_JUDGE_NOTE}`);
-    // Today's rank card says nothing of samples whatever the week holds.
+    expect(surfaces["sample result"]).toContain("A filled dot marks where these answers landed.");
+    expect(readFileSync("src/app/r/[id]/page.tsx", "utf8")).toContain("resultMapWords(Boolean(result.is_sample))");
+    // Today's rank card takes no sample prop, so it can say nothing of samples.
+    const card = readFileSync("src/components/today/TodayCards.tsx", "utf8");
+    expect(card).not.toMatch(/includesSamples|RANK_SAMPLE_NOTE|sample/i);
     expect(html(createElement(SchoolCard, { school: "stoicism", oneLine: "x", elo: 1200, rank: 2 } as never))).not.toMatch(/sample/i);
     // The page titles and the images' marks.
     for (const f of ["src/app/r/[id]/page.tsx", "src/app/c/[id]/page.tsx", "src/app/debate/[slug]/[debateId]/page.tsx"]) {
