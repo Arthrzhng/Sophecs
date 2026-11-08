@@ -107,8 +107,9 @@ For your next list, from carrying these out:
   twice, the page now chooses no two arguments that end on the same line.
   That reaches the live pages from the merge: on production's rows it
   shows the same 72 openings and a different argument in 16 places, each
-  the next under the same opening (`docs/decisions.md`, "Gate 4: each
-  motion's own closings");
+  another under the same opening (the second strongest to the twelfth,
+  marked up to 19 points lower), and in 3 of 18 school groups their
+  order (`docs/decisions.md`, "Gate 4: each motion's own closings");
 - from the audit (#110 and this change): the fresh run's positions open
   on their claim, without a bare stance sentence such as "I reject the
   motion.", so no two exemplar cards on a page open the same way; one

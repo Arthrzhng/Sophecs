@@ -88,9 +88,16 @@ describe("each motion's closings", () => {
   // motion's own words (its text, its title and its slug) are its
   // vocabulary, so a run made only of them is not a repeat.
   const STOP = new Set("the a an of to and is in it that its as for be by on or not but this what who whom which their they them there was were are with from at so if one any no has have had can".split(" "));
+  // "owes" and "owe", "decide", "decides" and "decided" are each one stem.
   const stem = (w: string) => {
-    for (const suffix of ["ing", "es", "ed", "s"]) if (w.length > suffix.length + 3 && w.endsWith(suffix)) return w.slice(0, -suffix.length);
-    return w;
+    let s = w;
+    for (const suffix of ["ing", "es", "ed", "s"]) {
+      if (s.length > suffix.length + (suffix === "s" ? 2 : 3) && s.endsWith(suffix)) {
+        s = s.slice(0, -suffix.length);
+        break;
+      }
+    }
+    return s.length > 4 && s.endsWith("e") ? s.slice(0, -1) : s;
   };
   const runs = (text: string, n: number, vocabulary: ReadonlySet<string>) => {
     const w = words(text).map(stem);
@@ -114,7 +121,7 @@ describe("each motion's closings", () => {
       const vocabulary = vocabularyOf(topic);
       for (const school of BANK_SCHOOLS) {
         const s = fr.schools[school];
-        const passages = [...s.positions, ...s.reasons, ...s.examples, ...s.objections.flatMap((o) => [o.claim, o.answer, o.why]), topicOf(topic).stances[school]];
+        const passages = [...s.positions, ...s.reasons, ...s.examples, ...s.objections.flatMap((o) => [o.claim, o.answer, o.why]), ...fr.weak, topicOf(topic).stances[school]];
         const theirs = new Set(passages.flatMap((p) => [...runs(p, 4, vocabulary)]));
         byMotion[topic][school].forEach((c, i) => {
           for (const run of runs(c, 4, vocabulary)) if (theirs.has(run)) expect.fail(`${topic}.${school}[${i}] restates "${run}"`);

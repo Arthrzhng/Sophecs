@@ -110,20 +110,20 @@
     "school": "confucian",
     "tier": "strong",
     "parts": {
-      "position": 3,
+      "position": 1,
       "reasons": [
         3,
         0
       ],
       "example": 1,
       "objections": [
-        1
+        0
       ],
-      "closing": 0,
+      "closing": 1,
       "weak": []
     },
-    "text": "Whoever takes the place of the one who decides takes on what that place requires, and giving reasons to the people beneath it is part of the role. Humaneness is realised in how people are treated within their relationships, not only in how many are spared harm. A benefit delivered with no account to the person it touches treats them as a case to process, not as someone the decider stands in relation to.\n\nThe Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results. A council ranks housing applications with a model. A family that drops down the list asks the officer who knew them by name, and she can no longer explain her own office.\n\nAn Ubuntu Ethicist will object that the Confucian frames the duty as running down a hierarchy from decider to decided, when what the people affected need is a say in whether the system is used at all. That is a fair warning about role ethics settling into deference. But a position that owes an account to those beneath it is checked by that duty, not licensed by it, and being owed reasons is where a say begins. Whoever decides about a person owes that person an account, and a benefit that cannot be accounted for leaves the relationship unpaid.",
-    "words": 249
+    "text": "Reducing suffering is not the whole of what a deployer owes; they owe the people they decide about an account fitting the position they hold over them. Humaneness is realised in how people are treated within their relationships, not only in how many are spared harm. A benefit delivered with no account to the person it touches treats them as a case to process, not as someone the decider stands in relation to.\n\nThe Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results. A council ranks housing applications with a model. A family that drops down the list asks the officer who knew them by name, and she can no longer explain her own office.\n\nA Utilitarian will object that the people decided about are far better off with the suffering prevented than with an explanation, so insisting on reasons trades real welfare for a formality. An explanation is not a formality between people in a relationship; it is how the one with power is held to what the position requires. A gain counted in aggregate cannot say whether that relationship still works for the person refused. Doing good that no one can question is not yet governing well, because governing well includes being answerable to the governed.",
+    "words": 242
   },
   {
     "id": "opaque-benefit.confucian.07",
@@ -131,19 +131,19 @@
     "school": "confucian",
     "tier": "strong",
     "parts": {
-      "position": 1,
+      "position": 3,
       "reasons": [
-        0,
-        1
+        1,
+        2
       ],
       "example": 2,
       "objections": [
         0
       ],
-      "closing": 3,
+      "closing": 0,
       "weak": []
     },
-    "text": "Reducing suffering is not the whole of what a deployer owes; they owe the people they decide about an account fitting the position they hold over them. The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results.\n\nBook 13 warns that when names are not correct, what is said stops matching how things are. A system that cannot say why it refused someone issues something that looks like a judgement and is not one, and deploying it teaches everyone to accept the look for the thing. A teacher who marks a pupil down owes the pupil a reason, as part of being their teacher. A marking system that cannot give one has not taken the teacher's place.\n\nA Utilitarian will object that the people decided about are far better off with the suffering prevented than with an explanation, so insisting on reasons trades real welfare for a formality. An explanation is not a formality between people in a relationship; it is how the one with power is held to what the position requires. A gain counted in aggregate cannot say whether that relationship still works for the person refused. Good done through a hidden mechanism teaches nobody how to do good, and that is a loss the relief does not repay.",
+    "text": "Whoever takes the place of the one who decides takes on what that place requires, and giving reasons to the people beneath it is part of the role. Book 13 warns that when names are not correct, what is said stops matching how things are. A system that cannot say why it refused someone issues something that looks like a judgement and is not one, and deploying it teaches everyone to accept the look for the thing.\n\nParties to a relationship hold each other to account through what they owe one another. A person refused by a system whose reasons nobody can give cannot hold the decider to anything, however much suffering the system prevents on average. A teacher who marks a pupil down owes the pupil a reason, as part of being their teacher. A marking system that cannot give one has not taken the teacher's place.\n\nA Utilitarian will object that the people decided about are far better off with the suffering prevented than with an explanation, so insisting on reasons trades real welfare for a formality. An explanation is not a formality between people in a relationship; it is how the one with power is held to what the position requires. A gain counted in aggregate cannot say whether that relationship still works for the person refused. A minister who could not explain his decrees would soon stop being trusted to issue them, and the system's keepers stand where that minister stood.",
     "words": 245
   },
   {
@@ -154,17 +154,17 @@
     "parts": {
       "position": 2,
       "reasons": [
-        1,
+        0,
         2
       ],
       "example": 0,
       "objections": [
-        0
+        1
       ],
       "closing": 1,
       "weak": []
     },
-    "text": "A Confucian cannot accept this motion, because calling an unexplained verdict a decision lets a word do work the system has not done, and the people decided about pay for the misnaming. Book 13 warns that when names are not correct, what is said stops matching how things are. A system that cannot say why it refused someone issues something that looks like a judgement and is not one, and deploying it teaches everyone to accept the look for the thing.\n\nParties to a relationship hold each other to account through what they owe one another. A person refused by a system whose reasons nobody can give cannot hold the decider to anything, however much suffering the system prevents on average. A hospital lets a model decide who is called back for more tests. A patient not called back asks her doctor why, and the doctor can say only that the system said so.\n\nA Utilitarian will object that the people decided about are far better off with the suffering prevented than with an explanation, so insisting on reasons trades real welfare for a formality. An explanation is not a formality between people in a relationship; it is how the one with power is held to what the position requires. A gain counted in aggregate cannot say whether that relationship still works for the person refused. Doing good that no one can question is not yet governing well, because governing well includes being answerable to the governed.",
+    "text": "A Confucian cannot accept this motion, because calling an unexplained verdict a decision lets a word do work the system has not done, and the people decided about pay for the misnaming. The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results.\n\nParties to a relationship hold each other to account through what they owe one another. A person refused by a system whose reasons nobody can give cannot hold the decider to anything, however much suffering the system prevents on average. A hospital lets a model decide who is called back for more tests. A patient not called back asks her doctor why, and the doctor can say only that the system said so.\n\nAn Ubuntu Ethicist will object that the Confucian frames the duty as running down a hierarchy from decider to decided, when what the people affected need is a say in whether the system is used at all. That is a fair warning about role ethics settling into deference. But a position that owes an account to those beneath it is checked by that duty, not licensed by it, and being owed reasons is where a say begins. Doing good that no one can question is not yet governing well, because governing well includes being answerable to the governed.",
     "words": 247
   },
   {
@@ -242,8 +242,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A Confucian cannot accept this motion, because calling an unexplained verdict a decision lets a word do work the system has not done, and the people decided about pay for the misnaming. The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results.\n\nA council ranks housing applications with a model. A family that drops down the list asks the officer who knew them by name, and she can no longer explain her own office. Whoever decides about a person owes that person an account, and a benefit that cannot be accounted for leaves the relationship unpaid.",
-    "words": 130
+    "text": "A Confucian cannot accept this motion, because calling an unexplained verdict a decision lets a word do work the system has not done, and the people decided about pay for the misnaming. The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results.\n\nA council ranks housing applications with a model. A family that drops down the list asks the officer who knew them by name, and she can no longer explain her own office. A minister who could not explain his decrees would soon stop being trusted to issue them, and the system's keepers stand where that minister stood.",
+    "words": 133
   },
   {
     "id": "opaque-benefit.confucian.13",
@@ -260,8 +260,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Whoever takes the place of the one who decides takes on what that place requires, and giving reasons to the people beneath it is part of the role. Book 13 warns that when names are not correct, what is said stops matching how things are. A system that cannot say why it refused someone issues something that looks like a judgement and is not one, and deploying it teaches everyone to accept the look for the thing.\n\nA teacher who marks a pupil down owes the pupil a reason, as part of being their teacher. A marking system that cannot give one has not taken the teacher's place. Whoever decides about a person owes that person an account, and a benefit that cannot be accounted for leaves the relationship unpaid.",
-    "words": 130
+    "text": "Whoever takes the place of the one who decides takes on what that place requires, and giving reasons to the people beneath it is part of the role. Book 13 warns that when names are not correct, what is said stops matching how things are. A system that cannot say why it refused someone issues something that looks like a judgement and is not one, and deploying it teaches everyone to accept the look for the thing.\n\nA teacher who marks a pupil down owes the pupil a reason, as part of being their teacher. A marking system that cannot give one has not taken the teacher's place. A minister who could not explain his decrees would soon stop being trusted to issue them, and the system's keepers stand where that minister stood.",
+    "words": 133
   },
   {
     "id": "opaque-benefit.confucian.14",
@@ -296,8 +296,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Do not deploy it as it stands. The person a decision lands on stands in a relationship with whoever decides, and a decision nobody can account for leaves that relationship empty. The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results.\n\nA teacher who marks a pupil down owes the pupil a reason, as part of being their teacher. A marking system that cannot give one has not taken the teacher's place. Whoever decides about a person owes that person an account, and a benefit that cannot be accounted for leaves the relationship unpaid.",
-    "words": 128
+    "text": "Do not deploy it as it stands. The person a decision lands on stands in a relationship with whoever decides, and a decision nobody can account for leaves that relationship empty. The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results.\n\nA teacher who marks a pupil down owes the pupil a reason, as part of being their teacher. A marking system that cannot give one has not taken the teacher's place. A minister who could not explain his decrees would soon stop being trusted to issue them, and the system's keepers stand where that minister stood.",
+    "words": 131
   },
   {
     "id": "opaque-benefit.confucian.16",
@@ -350,8 +350,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Whoever takes the place of the one who decides takes on what that place requires, and giving reasons to the people beneath it is part of the role. Humaneness is realised in how people are treated within their relationships, not only in how many are spared harm. A benefit delivered with no account to the person it touches treats them as a case to process, not as someone the decider stands in relation to.\n\nA teacher who marks a pupil down owes the pupil a reason, as part of being their teacher. A marking system that cannot give one has not taken the teacher's place. Whoever decides about a person owes that person an account, and a benefit that cannot be accounted for leaves the relationship unpaid.",
-    "words": 127
+    "text": "Whoever takes the place of the one who decides takes on what that place requires, and giving reasons to the people beneath it is part of the role. Humaneness is realised in how people are treated within their relationships, not only in how many are spared harm. A benefit delivered with no account to the person it touches treats them as a case to process, not as someone the decider stands in relation to.\n\nA teacher who marks a pupil down owes the pupil a reason, as part of being their teacher. A marking system that cannot give one has not taken the teacher's place. A minister who could not explain his decrees would soon stop being trusted to issue them, and the system's keepers stand where that minister stood.",
+    "words": 130
   },
   {
     "id": "opaque-benefit.confucian.19",
@@ -368,8 +368,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A Confucian cannot accept this motion, because calling an unexplained verdict a decision lets a word do work the system has not done, and the people decided about pay for the misnaming. Parties to a relationship hold each other to account through what they owe one another. A person refused by a system whose reasons nobody can give cannot hold the decider to anything, however much suffering the system prevents on average.\n\nA hospital lets a model decide who is called back for more tests. A patient not called back asks her doctor why, and the doctor can say only that the system said so. Whoever decides about a person owes that person an account, and a benefit that cannot be accounted for leaves the relationship unpaid.",
-    "words": 127
+    "text": "A Confucian cannot accept this motion, because calling an unexplained verdict a decision lets a word do work the system has not done, and the people decided about pay for the misnaming. Parties to a relationship hold each other to account through what they owe one another. A person refused by a system whose reasons nobody can give cannot hold the decider to anything, however much suffering the system prevents on average.\n\nA hospital lets a model decide who is called back for more tests. A patient not called back asks her doctor why, and the doctor can say only that the system said so. A minister who could not explain his decrees would soon stop being trusted to issue them, and the system's keepers stand where that minister stood.",
+    "words": 130
   },
   {
     "id": "opaque-benefit.confucian.20",
@@ -386,8 +386,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Whoever takes the place of the one who decides takes on what that place requires, and giving reasons to the people beneath it is part of the role. The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results.\n\nA council ranks housing applications with a model. A family that drops down the list asks the officer who knew them by name, and she can no longer explain her own office. Whoever decides about a person owes that person an account, and a benefit that cannot be accounted for leaves the relationship unpaid.",
-    "words": 126
+    "text": "Whoever takes the place of the one who decides takes on what that place requires, and giving reasons to the people beneath it is part of the role. The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results.\n\nA council ranks housing applications with a model. A family that drops down the list asks the officer who knew them by name, and she can no longer explain her own office. A minister who could not explain his decrees would soon stop being trusted to issue them, and the system's keepers stand where that minister stood.",
+    "words": 129
   },
   {
     "id": "opaque-benefit.confucian.21",
@@ -404,8 +404,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Do not deploy it as it stands. The person a decision lands on stands in a relationship with whoever decides, and a decision nobody can account for leaves that relationship empty. Book 13 warns that when names are not correct, what is said stops matching how things are. A system that cannot say why it refused someone issues something that looks like a judgement and is not one, and deploying it teaches everyone to accept the look for the thing.\n\nA teacher who marks a pupil down owes the pupil a reason, as part of being their teacher. A marking system that cannot give one has not taken the teacher's place. Whoever decides about a person owes that person an account, and a benefit that cannot be accounted for leaves the relationship unpaid.",
-    "words": 133
+    "text": "Do not deploy it as it stands. The person a decision lands on stands in a relationship with whoever decides, and a decision nobody can account for leaves that relationship empty. Book 13 warns that when names are not correct, what is said stops matching how things are. A system that cannot say why it refused someone issues something that looks like a judgement and is not one, and deploying it teaches everyone to accept the look for the thing.\n\nA teacher who marks a pupil down owes the pupil a reason, as part of being their teacher. A marking system that cannot give one has not taken the teacher's place. A minister who could not explain his decrees would soon stop being trusted to issue them, and the system's keepers stand where that minister stood.",
+    "words": 136
   },
   {
     "id": "opaque-benefit.confucian.22",
@@ -458,8 +458,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A Confucian cannot accept this motion, because calling an unexplained verdict a decision lets a word do work the system has not done, and the people decided about pay for the misnaming. Humaneness is realised in how people are treated within their relationships, not only in how many are spared harm. A benefit delivered with no account to the person it touches treats them as a case to process, not as someone the decider stands in relation to.\n\nA hospital lets a model decide who is called back for more tests. A patient not called back asks her doctor why, and the doctor can say only that the system said so. Whoever decides about a person owes that person an account, and a benefit that cannot be accounted for leaves the relationship unpaid.",
-    "words": 133
+    "text": "A Confucian cannot accept this motion, because calling an unexplained verdict a decision lets a word do work the system has not done, and the people decided about pay for the misnaming. Humaneness is realised in how people are treated within their relationships, not only in how many are spared harm. A benefit delivered with no account to the person it touches treats them as a case to process, not as someone the decider stands in relation to.\n\nA hospital lets a model decide who is called back for more tests. A patient not called back asks her doctor why, and the doctor can say only that the system said so. A minister who could not explain his decrees would soon stop being trusted to issue them, and the system's keepers stand where that minister stood.",
+    "words": 136
   },
   {
     "id": "opaque-benefit.confucian.25",
@@ -476,8 +476,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Do not deploy it as it stands. The person a decision lands on stands in a relationship with whoever decides, and a decision nobody can account for leaves that relationship empty. The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results.\n\nA council ranks housing applications with a model. A family that drops down the list asks the officer who knew them by name, and she can no longer explain her own office. Whoever decides about a person owes that person an account, and a benefit that cannot be accounted for leaves the relationship unpaid.",
-    "words": 129
+    "text": "Do not deploy it as it stands. The person a decision lands on stands in a relationship with whoever decides, and a decision nobody can account for leaves that relationship empty. The Analects describes government through relations rather than principles: the ruler is to be a ruler and the minister a minister. A deployer deciding about patients or applicants holds such a position, and it carries duties to the people under it, not only results.\n\nA council ranks housing applications with a model. A family that drops down the list asks the officer who knew them by name, and she can no longer explain her own office. A minister who could not explain his decrees would soon stop being trusted to issue them, and the system's keepers stand where that minister stood.",
+    "words": 132
   },
   {
     "id": "opaque-benefit.confucian.26",
@@ -512,8 +512,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Whoever takes the place of the one who decides takes on what that place requires, and giving reasons to the people beneath it is part of the role. Parties to a relationship hold each other to account through what they owe one another. A person refused by a system whose reasons nobody can give cannot hold the decider to anything, however much suffering the system prevents on average.\n\nA hospital lets a model decide who is called back for more tests. A patient not called back asks her doctor why, and the doctor can say only that the system said so. Whoever decides about a person owes that person an account, and a benefit that cannot be accounted for leaves the relationship unpaid.",
-    "words": 123
+    "text": "Whoever takes the place of the one who decides takes on what that place requires, and giving reasons to the people beneath it is part of the role. Parties to a relationship hold each other to account through what they owe one another. A person refused by a system whose reasons nobody can give cannot hold the decider to anything, however much suffering the system prevents on average.\n\nA hospital lets a model decide who is called back for more tests. A patient not called back asks her doctor why, and the doctor can say only that the system said so. A minister who could not explain his decrees would soon stop being trusted to issue them, and the system's keepers stand where that minister stood.",
+    "words": 126
   },
   {
     "id": "opaque-benefit.confucian.28",

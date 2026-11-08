@@ -101,8 +101,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nExplanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason. A fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
-    "words": 213
+    "text": "The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nExplanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason. A fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. The unease of an unexplained decision is real, but set beside the pain the system removes it is far the lighter.",
+    "words": 215
   },
   {
     "id": "opaque-benefit.utilitarianism.06",
@@ -143,8 +143,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nBeing told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy. Nobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
-    "words": 208
+    "text": "If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nBeing told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy. Nobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough.\n\nA Stoic will object that what matters is whether the deployers judged well, and a good outcome reached on careless judgement is not a right action. Careful judgement matters because it tends to produce better outcomes, which is why we should want it. But if we must choose between a careful refusal and a deployment that prevents suffering, the suffering decides. The unease of an unexplained decision is real, but set beside the pain the system removes it is far the lighter.",
+    "words": 210
   },
   {
     "id": "opaque-benefit.utilitarianism.08",
@@ -242,8 +242,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
-    "words": 110
+    "text": "If a system reliably reduces suffering, withholding it until it can explain itself means choosing more suffering for the sake of a reassurance. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. The unease of an unexplained decision is real, but set beside the pain the system removes it is far the lighter.",
+    "words": 112
   },
   {
     "id": "opaque-benefit.utilitarianism.13",
@@ -260,8 +260,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
-    "words": 114
+    "text": "A utilitarian has to accept this motion: reliable reduction of suffering outweighs the cost of people not being told why a decision went the way it did. Explanations are not free. A model forced to be explainable is often less accurate, and the people it would then misclassify carry the difference. Choosing the less accurate system means choosing which people suffer so that others can read a reason.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. The unease of an unexplained decision is real, but set beside the pain the system removes it is far the lighter.",
+    "words": 116
   },
   {
     "id": "opaque-benefit.utilitarianism.14",
@@ -350,8 +350,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
-    "words": 114
+    "text": "The system should be deployed, because what matters morally is how much better or worse people's lives go, and this system makes them go better. Count everyone affected. The patients the system helps are many and their gains are large. The cost to each person of not being told why is real but small, and it does not come close to the suffering prevented across the whole population.\n\nA fraud model that cannot say why it flags a payment still saves thousands of people from losing their savings, most of whom never learn it acted. The unease of an unexplained decision is real, but set beside the pain the system removes it is far the lighter.",
+    "words": 116
   },
   {
     "id": "opaque-benefit.utilitarianism.19",
@@ -404,8 +404,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
-    "words": 102
+    "text": "The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Being told why a decision was made has value, but it is the value of feeling informed, and it should be weighed like any other preference. Where it is outweighed by the prevention of serious harm, the impartial answer is to deploy.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. The unease of an unexplained decision is real, but set beside the pain the system removes it is far the lighter.",
+    "words": 104
   },
   {
     "id": "opaque-benefit.utilitarianism.22",
@@ -548,8 +548,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. Set the unease of an unexplained decision beside the pain the system removes, and the second is far heavier.",
-    "words": 106
+    "text": "The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm. Mill says actions are right in proportion as they tend to promote happiness. Explanations matter only because they usually help: they let errors be caught and let people plan. When a system is reliably better without them, insisting on them costs lives in exchange for comfort.\n\nNobody asks a vaccine to explain how it works before it is given, because the evidence that it prevents disease is enough. The unease of an unexplained decision is real, but set beside the pain the system removes it is far the lighter.",
+    "words": 108
   },
   {
     "id": "opaque-benefit.utilitarianism.30",

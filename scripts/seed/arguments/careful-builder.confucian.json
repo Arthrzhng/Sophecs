@@ -10,15 +10,15 @@
         2,
         3
       ],
-      "example": 2,
+      "example": null,
       "objections": [
         1
       ],
       "closing": 3,
       "weak": []
     },
-    "text": "The motion misnames the duty. A builder is not answerable for the harm as such but for whether they did what the position of builder requires towards the people who rely on the system. Roles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right.\n\nHumaneness is shown in how one responds to those one's work has affected. A builder who points only to the audit has misunderstood the relationship; one who meets the injured, explains and repairs is being what a builder should be. A firm's lawyer says the careful team has no liability. The team's lead visits the family anyway, because whatever the law says, they are the people who built it.\n\nAn Ubuntu Ethicist will object that the Confucian measures the builder's duty from inside the role, when the people harmed were never asked what the builders owed them in the first place. That is a real gap in letting roles define duties: the people on the other end of a role may never have agreed to its terms. The answer is that a role's duties include listening to those it serves, and a builder who never asked has not met them. Not culpable does not mean finished: the builder still owes the injured a visit, a true account and a hand in the repair.",
-    "words": 249
+    "text": "The motion misnames the duty. A builder is not answerable for the harm as such but for whether they did what the position of builder requires towards the people who rely on the system. Roles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right.\n\nHumaneness is shown in how one responds to those one's work has affected. A builder who points only to the audit has misunderstood the relationship; one who meets the injured, explains and repairs is being what a builder should be.\n\nAn Ubuntu Ethicist will object that the Confucian measures the builder's duty from inside the role, when the people harmed were never asked what the builders owed them in the first place. That is a real gap in letting roles define duties: the people on the other end of a role may never have agreed to its terms. The answer is that a role's duties include listening to those it serves, and a builder who never asked has not met them. Builders ruled by penalties learn to escape blame, while builders who keep their role with a sense of shame learn to avoid the failure itself.",
+    "words": 222
   },
   {
     "id": "careful-builder.confucian.02",
@@ -26,20 +26,20 @@
     "school": "confucian",
     "tier": "strong",
     "parts": {
-      "position": 0,
+      "position": 1,
       "reasons": [
         0,
-        2
+        3
       ],
-      "example": null,
+      "example": 2,
       "objections": [
         1
       ],
-      "closing": 0,
+      "closing": 1,
       "weak": []
     },
-    "text": "A builder's blame is measured by what the position of builder owed the people the system serves, so a careful builder who met those duties is not to blame in proportion to the harm. What you owe attaches to a position, not to the world at large. A builder owes the people their system touches care in making it, honesty about its limits, and an answer when it fails. A builder who did all of that has done what the position requires.\n\nRoles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right.\n\nAn Ubuntu Ethicist will object that the Confucian measures the builder's duty from inside the role, when the people harmed were never asked what the builders owed them in the first place. That is a real gap in letting roles define duties: the people on the other end of a role may never have agreed to its terms. The answer is that a role's duties include listening to those it serves, and a builder who never asked has not met them. A builder answers for what the position asked of them, and the position asks for repair after a failure as well as care before it.",
-    "words": 230
+    "text": "Blame attaches to failing what one's role requires, not to the size of what went wrong, though the role still requires an account and repair. What you owe attaches to a position, not to the world at large. A builder owes the people their system touches care in making it, honesty about its limits, and an answer when it fails. A builder who did all of that has done what the position requires.\n\nHumaneness is shown in how one responds to those one's work has affected. A builder who points only to the audit has misunderstood the relationship; one who meets the injured, explains and repairs is being what a builder should be. A firm's lawyer says the careful team has no liability. The team's lead visits the family anyway, because whatever the law says, they are the people who built it.\n\nAn Ubuntu Ethicist will object that the Confucian measures the builder's duty from inside the role, when the people harmed were never asked what the builders owed them in the first place. That is a real gap in letting roles define duties: the people on the other end of a role may never have agreed to its terms. The answer is that a role's duties include listening to those it serves, and a builder who never asked has not met them. If the builders did what their position required, the harm alone cannot make them guilty.",
+    "words": 238
   },
   {
     "id": "careful-builder.confucian.03",
@@ -47,7 +47,7 @@
     "school": "confucian",
     "tier": "strong",
     "parts": {
-      "position": 3,
+      "position": 0,
       "reasons": [
         3,
         2
@@ -56,11 +56,11 @@
       "objections": [
         0
       ],
-      "closing": 1,
+      "closing": 3,
       "weak": []
     },
-    "text": "Proportional blame is wrong, but so is walking away. The careful builder owes the injured an account and a share in repairing things, because that is part of the role too. Humaneness is shown in how one responds to those one's work has affected. A builder who points only to the audit has misunderstood the relationship; one who meets the injured, explains and repairs is being what a builder should be.\n\nRoles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right. A team that tested its model carefully learns it misread one group's medical scans. They are not culpable, but they contact the clinics, explain what happened, and fund the follow-up scans.\n\nA Utilitarian will object that talk of what the role requires is beside the point, because blame exists to change future behaviour and should be assigned wherever it prevents the most harm. Blame used only as a lever stops tracking what anyone did, and people who cannot see why they are blamed stop trusting the roles that hold them together. The role tells you what to change; blaming the careful does not. If the builders did what their position required, the harm alone cannot make them guilty.",
-    "words": 231
+    "text": "A builder's blame is measured by what the position of builder owed the people the system serves, so a careful builder who met those duties is not to blame in proportion to the harm. Humaneness is shown in how one responds to those one's work has affected. A builder who points only to the audit has misunderstood the relationship; one who meets the injured, explains and repairs is being what a builder should be.\n\nRoles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right. A team that tested its model carefully learns it misread one group's medical scans. They are not culpable, but they contact the clinics, explain what happened, and fund the follow-up scans.\n\nA Utilitarian will object that talk of what the role requires is beside the point, because blame exists to change future behaviour and should be assigned wherever it prevents the most harm. Blame used only as a lever stops tracking what anyone did, and people who cannot see why they are blamed stop trusting the roles that hold them together. The role tells you what to change; blaming the careful does not. Builders ruled by penalties learn to escape blame, while builders who keep their role with a sense of shame learn to avoid the failure itself.",
+    "words": 244
   },
   {
     "id": "careful-builder.confucian.04",
@@ -68,10 +68,10 @@
     "school": "confucian",
     "tier": "strong",
     "parts": {
-      "position": 1,
+      "position": 3,
       "reasons": [
         1,
-        0
+        2
       ],
       "example": 1,
       "objections": [
@@ -80,7 +80,7 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Blame attaches to failing what one's role requires, not to the size of what went wrong, though the role still requires an account and repair. Getting names right matters. To call a careful builder culpable in proportion to the harm is to use blame for something that is not fault, and once the word means that, it no longer distinguishes the builders who cut corners from those who did not.\n\nWhat you owe attaches to a position, not to the world at large. A builder owes the people their system touches care in making it, honesty about its limits, and an answer when it fails. A builder who did all of that has done what the position requires. An apprentice builder follows every check her master taught and still a joint fails. The master does not blame her, but both go to the house to make it good.\n\nA Utilitarian will object that talk of what the role requires is beside the point, because blame exists to change future behaviour and should be assigned wherever it prevents the most harm. Blame used only as a lever stops tracking what anyone did, and people who cannot see why they are blamed stop trusting the roles that hold them together. The role tells you what to change; blaming the careful does not. A builder answers for what the position asked of them, and the position asks for repair after a failure as well as care before it.",
+    "text": "Proportional blame is wrong, but so is walking away. The careful builder owes the injured an account and a share in repairing things, because that is part of the role too. Getting names right matters. To call a careful builder culpable in proportion to the harm is to use blame for something that is not fault, and once the word means that, it no longer distinguishes the builders who cut corners from those who did not.\n\nRoles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right. An apprentice builder follows every check her master taught and still a joint fails. The master does not blame her, but both go to the house to make it good.\n\nA Utilitarian will object that talk of what the role requires is beside the point, because blame exists to change future behaviour and should be assigned wherever it prevents the most harm. Blame used only as a lever stops tracking what anyone did, and people who cannot see why they are blamed stop trusting the roles that hold them together. The role tells you what to change; blaming the careful does not. A builder answers for what the position asked of them, and the position asks for repair after a failure as well as care before it.",
     "words": 245
   },
   {
@@ -101,8 +101,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "The motion misnames the duty. A builder is not answerable for the harm as such but for whether they did what the position of builder requires towards the people who rely on the system. What you owe attaches to a position, not to the world at large. A builder owes the people their system touches care in making it, honesty about its limits, and an answer when it fails. A builder who did all of that has done what the position requires.\n\nHumaneness is shown in how one responds to those one's work has affected. A builder who points only to the audit has misunderstood the relationship; one who meets the injured, explains and repairs is being what a builder should be. A team that tested its model carefully learns it misread one group's medical scans. They are not culpable, but they contact the clinics, explain what happened, and fund the follow-up scans.\n\nA Utilitarian will object that talk of what the role requires is beside the point, because blame exists to change future behaviour and should be assigned wherever it prevents the most harm. Blame used only as a lever stops tracking what anyone did, and people who cannot see why they are blamed stop trusting the roles that hold them together. The role tells you what to change; blaming the careful does not. Not culpable does not mean finished: the builder still owes the injured a visit, a true account and a hand in the repair.",
-    "words": 248
+    "text": "The motion misnames the duty. A builder is not answerable for the harm as such but for whether they did what the position of builder requires towards the people who rely on the system. What you owe attaches to a position, not to the world at large. A builder owes the people their system touches care in making it, honesty about its limits, and an answer when it fails. A builder who did all of that has done what the position requires.\n\nHumaneness is shown in how one responds to those one's work has affected. A builder who points only to the audit has misunderstood the relationship; one who meets the injured, explains and repairs is being what a builder should be. A team that tested its model carefully learns it misread one group's medical scans. They are not culpable, but they contact the clinics, explain what happened, and fund the follow-up scans.\n\nA Utilitarian will object that talk of what the role requires is beside the point, because blame exists to change future behaviour and should be assigned wherever it prevents the most harm. Blame used only as a lever stops tracking what anyone did, and people who cannot see why they are blamed stop trusting the roles that hold them together. The role tells you what to change; blaming the careful does not. Builders ruled by penalties learn to escape blame, while builders who keep their role with a sense of shame learn to avoid the failure itself.",
+    "words": 250
   },
   {
     "id": "careful-builder.confucian.06",
@@ -122,8 +122,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Blame attaches to failing what one's role requires, not to the size of what went wrong, though the role still requires an account and repair. Getting names right matters. To call a careful builder culpable in proportion to the harm is to use blame for something that is not fault, and once the word means that, it no longer distinguishes the builders who cut corners from those who did not.\n\nRoles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right. A firm's lawyer says the careful team has no liability. The team's lead visits the family anyway, because whatever the law says, they are the people who built it.\n\nA Utilitarian will object that talk of what the role requires is beside the point, because blame exists to change future behaviour and should be assigned wherever it prevents the most harm. Blame used only as a lever stops tracking what anyone did, and people who cannot see why they are blamed stop trusting the roles that hold them together. The role tells you what to change; blaming the careful does not. Not culpable does not mean finished: the builder still owes the injured a visit, a true account and a hand in the repair.",
-    "words": 236
+    "text": "Blame attaches to failing what one's role requires, not to the size of what went wrong, though the role still requires an account and repair. Getting names right matters. To call a careful builder culpable in proportion to the harm is to use blame for something that is not fault, and once the word means that, it no longer distinguishes the builders who cut corners from those who did not.\n\nRoles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right. A firm's lawyer says the careful team has no liability. The team's lead visits the family anyway, because whatever the law says, they are the people who built it.\n\nA Utilitarian will object that talk of what the role requires is beside the point, because blame exists to change future behaviour and should be assigned wherever it prevents the most harm. Blame used only as a lever stops tracking what anyone did, and people who cannot see why they are blamed stop trusting the roles that hold them together. The role tells you what to change; blaming the careful does not. Builders ruled by penalties learn to escape blame, while builders who keep their role with a sense of shame learn to avoid the failure itself.",
+    "words": 238
   },
   {
     "id": "careful-builder.confucian.07",
@@ -173,27 +173,6 @@
     "school": "confucian",
     "tier": "strong",
     "parts": {
-      "position": 1,
-      "reasons": [
-        0,
-        3
-      ],
-      "example": 2,
-      "objections": [
-        1
-      ],
-      "closing": 1,
-      "weak": []
-    },
-    "text": "Blame attaches to failing what one's role requires, not to the size of what went wrong, though the role still requires an account and repair. What you owe attaches to a position, not to the world at large. A builder owes the people their system touches care in making it, honesty about its limits, and an answer when it fails. A builder who did all of that has done what the position requires.\n\nHumaneness is shown in how one responds to those one's work has affected. A builder who points only to the audit has misunderstood the relationship; one who meets the injured, explains and repairs is being what a builder should be. A firm's lawyer says the careful team has no liability. The team's lead visits the family anyway, because whatever the law says, they are the people who built it.\n\nAn Ubuntu Ethicist will object that the Confucian measures the builder's duty from inside the role, when the people harmed were never asked what the builders owed them in the first place. That is a real gap in letting roles define duties: the people on the other end of a role may never have agreed to its terms. The answer is that a role's duties include listening to those it serves, and a builder who never asked has not met them. If the builders did what their position required, the harm alone cannot make them guilty.",
-    "words": 238
-  },
-  {
-    "id": "careful-builder.confucian.10",
-    "topic": "careful-builder",
-    "school": "confucian",
-    "tier": "strong",
-    "parts": {
       "position": 2,
       "reasons": [
         2,
@@ -208,6 +187,27 @@
     },
     "text": "The motion misnames the duty. A builder is not answerable for the harm as such but for whether they did what the position of builder requires towards the people who rely on the system. Roles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right.\n\nHumaneness is shown in how one responds to those one's work has affected. A builder who points only to the audit has misunderstood the relationship; one who meets the injured, explains and repairs is being what a builder should be. A team that tested its model carefully learns it misread one group's medical scans. They are not culpable, but they contact the clinics, explain what happened, and fund the follow-up scans.\n\nAn Ubuntu Ethicist will object that the Confucian measures the builder's duty from inside the role, when the people harmed were never asked what the builders owed them in the first place. That is a real gap in letting roles define duties: the people on the other end of a role may never have agreed to its terms. The answer is that a role's duties include listening to those it serves, and a builder who never asked has not met them. If the builders did what their position required, the harm alone cannot make them guilty.",
     "words": 243
+  },
+  {
+    "id": "careful-builder.confucian.10",
+    "topic": "careful-builder",
+    "school": "confucian",
+    "tier": "strong",
+    "parts": {
+      "position": 0,
+      "reasons": [
+        0,
+        2
+      ],
+      "example": null,
+      "objections": [
+        1
+      ],
+      "closing": 0,
+      "weak": []
+    },
+    "text": "A builder's blame is measured by what the position of builder owed the people the system serves, so a careful builder who met those duties is not to blame in proportion to the harm. What you owe attaches to a position, not to the world at large. A builder owes the people their system touches care in making it, honesty about its limits, and an answer when it fails. A builder who did all of that has done what the position requires.\n\nRoles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right.\n\nAn Ubuntu Ethicist will object that the Confucian measures the builder's duty from inside the role, when the people harmed were never asked what the builders owed them in the first place. That is a real gap in letting roles define duties: the people on the other end of a role may never have agreed to its terms. The answer is that a role's duties include listening to those it serves, and a builder who never asked has not met them. A builder answers for what the position asked of them, and the position asks for repair after a failure as well as care before it.",
+    "words": 230
   },
   {
     "id": "careful-builder.confucian.11",
@@ -278,8 +278,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Proportional blame is wrong, but so is walking away. The careful builder owes the injured an account and a share in repairing things, because that is part of the role too. Roles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right.\n\nA team that tested its model carefully learns it misread one group's medical scans. They are not culpable, but they contact the clinics, explain what happened, and fund the follow-up scans. Not culpable does not mean finished: the builder still owes the injured a visit, a true account and a hand in the repair.",
-    "words": 127
+    "text": "Proportional blame is wrong, but so is walking away. The careful builder owes the injured an account and a share in repairing things, because that is part of the role too. Roles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right.\n\nA team that tested its model carefully learns it misread one group's medical scans. They are not culpable, but they contact the clinics, explain what happened, and fund the follow-up scans. Builders ruled by penalties learn to escape blame, while builders who keep their role with a sense of shame learn to avoid the failure itself.",
+    "words": 129
   },
   {
     "id": "careful-builder.confucian.15",
@@ -332,8 +332,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Blame attaches to failing what one's role requires, not to the size of what went wrong, though the role still requires an account and repair. Roles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right.\n\nA firm's lawyer says the careful team has no liability. The team's lead visits the family anyway, because whatever the law says, they are the people who built it. Not culpable does not mean finished: the builder still owes the injured a visit, a true account and a hand in the repair.",
-    "words": 119
+    "text": "Blame attaches to failing what one's role requires, not to the size of what went wrong, though the role still requires an account and repair. Roles carry duties after the fact as well as before. The relationship between builder and user does not end at the release, so a careful builder whose system harmed someone still owes them acknowledgement, an explanation, and help in making it right.\n\nA firm's lawyer says the careful team has no liability. The team's lead visits the family anyway, because whatever the law says, they are the people who built it. Builders ruled by penalties learn to escape blame, while builders who keep their role with a sense of shame learn to avoid the failure itself.",
+    "words": 121
   },
   {
     "id": "careful-builder.confucian.18",
@@ -368,8 +368,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "The motion misnames the duty. A builder is not answerable for the harm as such but for whether they did what the position of builder requires towards the people who rely on the system. Getting names right matters. To call a careful builder culpable in proportion to the harm is to use blame for something that is not fault, and once the word means that, it no longer distinguishes the builders who cut corners from those who did not.\n\nAn apprentice builder follows every check her master taught and still a joint fails. The master does not blame her, but both go to the house to make it good. Not culpable does not mean finished: the builder still owes the injured a visit, a true account and a hand in the repair.",
-    "words": 132
+    "text": "The motion misnames the duty. A builder is not answerable for the harm as such but for whether they did what the position of builder requires towards the people who rely on the system. Getting names right matters. To call a careful builder culpable in proportion to the harm is to use blame for something that is not fault, and once the word means that, it no longer distinguishes the builders who cut corners from those who did not.\n\nAn apprentice builder follows every check her master taught and still a joint fails. The master does not blame her, but both go to the house to make it good. Builders ruled by penalties learn to escape blame, while builders who keep their role with a sense of shame learn to avoid the failure itself.",
+    "words": 134
   },
   {
     "id": "careful-builder.confucian.20",
@@ -404,8 +404,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "A builder's blame is measured by what the position of builder owed the people the system serves, so a careful builder who met those duties is not to blame in proportion to the harm. What you owe attaches to a position, not to the world at large. A builder owes the people their system touches care in making it, honesty about its limits, and an answer when it fails. A builder who did all of that has done what the position requires.\n\nAn apprentice builder follows every check her master taught and still a joint fails. The master does not blame her, but both go to the house to make it good. Not culpable does not mean finished: the builder still owes the injured a visit, a true account and a hand in the repair.",
-    "words": 135
+    "text": "A builder's blame is measured by what the position of builder owed the people the system serves, so a careful builder who met those duties is not to blame in proportion to the harm. What you owe attaches to a position, not to the world at large. A builder owes the people their system touches care in making it, honesty about its limits, and an answer when it fails. A builder who did all of that has done what the position requires.\n\nAn apprentice builder follows every check her master taught and still a joint fails. The master does not blame her, but both go to the house to make it good. Builders ruled by penalties learn to escape blame, while builders who keep their role with a sense of shame learn to avoid the failure itself.",
+    "words": 137
   },
   {
     "id": "careful-builder.confucian.22",
@@ -512,8 +512,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "A builder's blame is measured by what the position of builder owed the people the system serves, so a careful builder who met those duties is not to blame in proportion to the harm. Getting names right matters. To call a careful builder culpable in proportion to the harm is to use blame for something that is not fault, and once the word means that, it no longer distinguishes the builders who cut corners from those who did not.\n\nA firm's lawyer says the careful team has no liability. The team's lead visits the family anyway, because whatever the law says, they are the people who built it. Not culpable does not mean finished: the builder still owes the injured a visit, a true account and a hand in the repair.",
-    "words": 131
+    "text": "A builder's blame is measured by what the position of builder owed the people the system serves, so a careful builder who met those duties is not to blame in proportion to the harm. Getting names right matters. To call a careful builder culpable in proportion to the harm is to use blame for something that is not fault, and once the word means that, it no longer distinguishes the builders who cut corners from those who did not.\n\nA firm's lawyer says the careful team has no liability. The team's lead visits the family anyway, because whatever the law says, they are the people who built it. Builders ruled by penalties learn to escape blame, while builders who keep their role with a sense of shame learn to avoid the failure itself.",
+    "words": 133
   },
   {
     "id": "careful-builder.confucian.28",
@@ -566,8 +566,8 @@
       "closing": 3,
       "weak": []
     },
-    "text": "Blame attaches to failing what one's role requires, not to the size of what went wrong, though the role still requires an account and repair. What you owe attaches to a position, not to the world at large. A builder owes the people their system touches care in making it, honesty about its limits, and an answer when it fails. A builder who did all of that has done what the position requires.\n\nAn apprentice builder follows every check her master taught and still a joint fails. The master does not blame her, but both go to the house to make it good. Not culpable does not mean finished: the builder still owes the injured a visit, a true account and a hand in the repair.",
-    "words": 126
+    "text": "Blame attaches to failing what one's role requires, not to the size of what went wrong, though the role still requires an account and repair. What you owe attaches to a position, not to the world at large. A builder owes the people their system touches care in making it, honesty about its limits, and an answer when it fails. A builder who did all of that has done what the position requires.\n\nAn apprentice builder follows every check her master taught and still a joint fails. The master does not blame her, but both go to the house to make it good. Builders ruled by penalties learn to escape blame, while builders who keep their role with a sense of shame learn to avoid the failure itself.",
+    "words": 128
   },
   {
     "id": "careful-builder.confucian.31",
