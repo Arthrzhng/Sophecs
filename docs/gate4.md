@@ -112,13 +112,13 @@ For your next list, from carrying these out:
   order (`docs/decisions.md`, "Gate 4: each motion's own closings");
 - from the audit (#110 and this change): no position in the fresh run
   keeps a sentence in front that states only its stance, such as "I
-  reject the motion." or "A Stoic can accept this motion." (44 of 144
+  reject the motion." or "A Stoic can accept this motion." (47 of 144
   did), and 18 are reworded where their first three words were another
   card's on the same page, so no two exemplar cards on a page share
   their first three words. Still to rule on: two or three cards on every
   page open by naming their school ("A Confucian rejects this, because
   ..."); on the careful builder's page five open "The motion ..."; "Here
-  is my answer." opens 328 of the run's 9,922 arguments; and twelve
+  is my answer." opens 342 of the run's 9,922 arguments; and twelve
   passages still say "not only ... but" or "not just", which for the
   fresh run can change as the openings did (`docs/decisions.md`, "The
   fresh run's arguments open on their claim");

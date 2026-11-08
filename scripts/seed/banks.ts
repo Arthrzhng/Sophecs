@@ -339,25 +339,26 @@ export function serialiseBank(bank: BankArgument[]): string {
  * A position that opens on a sentence stating only its stance: "I reject
  * the motion.", "I accept the motion only in part.", "The motion is
  * right.", "Do not deploy it as it stands.", "A Stoic can accept this
- * motion." and their like. 44 of the 144 positions did, most of them a
- * school's second, so on one exemplar page up to five schools' cards
- * opened on the same sentence (Arthur, 2026-11-08: "repeated sentence
- * openings ... across sample arguments and exemplars"; and of "A Stoic can
- * accept this motion.", that it reads as filler). Where the stance had a
- * qualification, the sentence after says it again.
+ * motion.", "I reject the motion's importance." and their like. 47 of the
+ * 144 positions did, most of them a school's second, so on one exemplar
+ * page up to five schools' cards opened on the same sentence (Arthur,
+ * 2026-11-08: "repeated sentence openings ... across sample arguments and
+ * exemplars"; and of "A Stoic can accept this motion.", that it reads as
+ * filler). Where a qualification
+ * carries a condition, the sentence after states it.
  */
 export const BARE_STANCE =
-  /^(?:I (?:reject|accept|support|oppose|agree with) (?:the|this) motion(?: as stated| as framed| with a condition| only in part)?|A (?:Stoic|utilitarian) (?:can|must|cannot|should) (?:accept|oppose) (?:this|the) motion|The motion is right|(?:Do not )?[Dd]eploy it(?: as it stands)?|Deploying it is wrong as stated)\.\s+/;
+  /^(?:I (?:reject|accept|support|oppose|agree with) (?:the|this) motion(?: as stated| as framed| with a condition| only in part)?|I agree that it is a mistake to say a model decides|I reject the motion's importance|A (?:Stoic|utilitarian) (?:can|must|cannot|should) (?:accept|oppose) (?:this|the) motion|A utilitarian should not care much about this motion|The motion is right|(?:Do not )?[Dd]eploy it(?: as it stands)?|Deploying it is wrong as stated)\.\s+/;
 
 /**
- * Three Stoic positions the fresh run words differently, so that no two
- * exemplar cards on a page open on the same four words: each opened as
- * another of the live three's cards on its page did ("The system should
- * be deployed", "The motion is right:", "It is a mistake to say"). The live
- * run reads the Stoic passages as written until the teardown, so the
- * change is made here, as the stance sentences' is. The new three's
- * passages are read only by a quiz v2 run and are reworded where they
- * stand. Keyed by motion, school and the position's index; `was` is the
+ * Four of the live three's positions (three Stoic, one Virtue Ethics) the
+ * fresh run words differently, so that no two exemplar cards on a page
+ * open on the same three words: each opened as another of the live three's
+ * cards on its page did ("The system should", "The motion is right:", "It
+ * is a mistake to say"). The live run reads these passages as written
+ * until the teardown, so the change is made here, as the stance
+ * sentences' is. The new three's passages are read only by a quiz v2 run
+ * and are reworded where they stand. Keyed by motion, school and the position's index; `was` is the
  * passage as written, and a passage that no longer reads so is an error.
  */
 export const FRESH_POSITIONS: Partial<Record<TopicSlug, Partial<Record<SchoolId, Record<number, { was: string; now: string }>>>>> = {
@@ -392,7 +393,7 @@ export const FRESH_POSITIONS: Partial<Record<TopicSlug, Partial<Record<SchoolId,
 /**
  * The passages a run made with quiz v2 (the fresh run) argues from: each
  * position without a sentence in front that states only its stance, so it
- * opens on its own claim, and the three in FRESH_POSITIONS reworded.
+ * opens on its own claim, and the four in FRESH_POSITIONS reworded.
  * Everything else is as written. A run that names no quiz reads the
  * passages as they are, since the live run regenerates its rows from them.
  */

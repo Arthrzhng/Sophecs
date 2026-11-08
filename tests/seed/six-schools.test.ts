@@ -35,6 +35,8 @@ const STANCE_SENTENCES = [
   "I support the motion.",
   "I oppose the motion.",
   "I agree with the motion.",
+  "I agree that it is a mistake to say a model decides.",
+  "I reject the motion's importance.",
   "The motion is right.",
   "Deploy it.",
   "Do not deploy it.",
@@ -44,6 +46,7 @@ const STANCE_SENTENCES = [
   "A Stoic must accept the motion.",
   "A Stoic cannot accept this motion.",
   "A utilitarian should oppose this motion.",
+  "A utilitarian should not care much about this motion.",
 ];
 const opensOnStance = (t: string) => STANCE_SENTENCES.some((s) => t.startsWith(`${s} `));
 const firstWords = (t: string, n: number) => t.toLowerCase().replace(/[^a-z' ]/g, " ").split(/\s+/).filter(Boolean).slice(0, n).join(" ");
@@ -97,7 +100,7 @@ describe("a sample run made with quiz v2", () => {
   it("is the dataset this file was written against, pinned at production volume", () => {
     // Beside the small pins in determinism.test.ts: eight thousand quiz
     // results and every exchange pair reach paths a small run need not.
-    expect(manifestHash(six())).toBe("ef71d33ef614c5eb523d8eee07e7d62c31f9ec012a29a6e5ee764af30b08b95f");
+    expect(manifestHash(six())).toBe("1ea74c30f28a81e21a3c0dc4a47a60c0b81f0840f65dc998e7b1ff6c7aa84690");
   });
 
   it("covers all six schools about equally", () => {
@@ -211,11 +214,11 @@ describe("a sample run made with quiz v2", () => {
   });
 
   it("opens no argument, revision or reply on a sentence that states only its stance", () => {
-    // 44 of the 144 positions open on one as written, and none as the fresh
+    // 47 of the 144 positions open on one as written, and none as the fresh
     // run reads them.
     const positions = (read: typeof loadFragments) => TOPICS.flatMap((t) => Object.values(read(t).schools).flatMap((s) => s.positions));
     expect(positions(loadFragments)).toHaveLength(144);
-    expect(positions(loadFragments).filter(opensOnStance)).toHaveLength(44);
+    expect(positions(loadFragments).filter(opensOnStance)).toHaveLength(47);
     expect(positions((t) => freshFragments(loadFragments(t))).filter(opensOnStance)).toEqual([]);
     const ds = six();
     const texts = [...ds.debates.map((d) => d.row.argument), ...ds.turns.map((t) => t.row.body)].filter((t): t is string => !!t);
