@@ -85,7 +85,7 @@ export async function getOpenObjections(
 }
 
 // The judged revision for an original, if one exists. Used by the verdict
-// page to swap "Answer it" for "Answered — read the revision", and by the
+// page to swap "Answer it" for "Read your revision", and by the
 // revise page to close itself. Only a judged one: a revision whose judging
 // failed leaves an unjudged row, the reader is told to try again, and
 // /api/judge reuses that row when they do.

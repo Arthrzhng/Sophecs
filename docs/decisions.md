@@ -5593,23 +5593,30 @@ only).
   on the six-school map) have no emoji form.
 - **Em dashes in UI copy: all gone.** 19 in prose: in the share page, the quiz
   result (both versions), the class note on `/me`, the display-name
-  placeholder, the reading-check save error, the verdict's "Answered"
+  placeholder, the recall note's save error, the verdict's "Answered"
   link, the empty motion list, four lines of the argument editor, the
   passage's source line, three lines of the rubric page, the lessons page
   (its description and its empty state), and the site's preview image
   text. Each is now a full stop, a comma, a colon or a semicolon, as the
   sentence wanted. Nine more on the styleguide: it is unlinked and not
   indexed, but `/styleguide` and `/styleguide/daily-path` are served in
-  production, so the type scale's samples and two notes there, and a
-  reading note on `/styleguide/arena`, take colons too. A missing number
+  production, so the eight on `/styleguide` (the type scale's six samples
+  and two notes) and a reading note on `/styleguide/arena`, which only a
+  preview build serves, take colons too. The arena page's fixture
+  argument keeps its dash: it stands for text a reader writes. A missing number
   (the school tables' rank and fidelity, the verdict's score circle, its
   criteria and its revision comparison) showed an em dash; it shows an en
   dash, since a missing number is not prose and a dash keeps the column.
   Comments and the code's own error messages keep theirs.
+  `tests/em-dashes.test.ts` now holds every `.tsx` file in `src` to this,
+  with escapes and entities resolved, so a dash written as `\u2014` or
+  `&mdash;` fails it too.
 - **Stock phrasing.** None of the listed words, no exclamation mark, no
   "Here's" or "Let's", and no question as a page heading except two
-  confirmation dialogs ("Send this to the judge?"), which ask a real
-  question. Changed: the rubric's fidelity line ("actually reason ... not
+  confirmation dialogs ("Send this to the judge?") and the report form's
+  legend ("What's wrong with it?"), which ask a real question. The quiz's
+  "Answer as you actually think" keeps its "actually", which there does
+  real work: it is the contrast with what you have read. Changed: the rubric's fidelity line ("actually reason ... not
   merely arrive", now "rather than only arriving"), the word-count hint
   ("enough room to actually argue the case, not just assert it"), the
   site's description ("which school of ethics you actually argue from"),
@@ -5627,7 +5634,7 @@ only).
   kept: they are the three things a reader does, in order.
 - **Copy that was not true.** The display-name field said a blank name
   shows as "A Stoic"; it shows as the reader's own school's adherent, and
-  only in classes. The line now says so, under the field rather than in
+  only in classes. The line now says so, above the field rather than in
   it, where a phone cut it short. A verdict's link to its revision said
   "Answered" even when the revision's verdict says the objection still
   stands; it is now "Read your revision". The verdict called the rating
@@ -5650,9 +5657,11 @@ only).
   rise on mount, `.sheet`'s slide, and `.reveal` on the lesson's next
   stretch where section 6 allows it only for the verdict) is not in
   `design/tokens.md`, whose section 6 forbids any transform. Nor are the
-  5px drop edge on content cards (section 5 allows no other shadow) or
-  the 14, 18 and 22px container radii, which section 4 calls "the shape
-  of every AI-generated landing page". All came with the Daily path
+  5px drop edge on content cards (section 5 allows no other shadow), the
+  18 and 22px container radii, where section 4 sets containers square
+  and calls rounded ones "the shape of every AI-generated landing page",
+  or the 14px control radius and 10px badge radius, where it sets
+  controls at 6px. All came with the Daily path
   mockups, which the record above says superseded the tokens where they
   disagree. Left, and put to Arthur.
 - **Tests.** The flag-off markup fixtures (`tests/nav-six-flag-off/`)
@@ -5689,16 +5698,28 @@ For Arthur's list, in files this pass may not change:
   "en dash" or not at all; a word such as "none" would read on both;
 - the sample arguments' frames "Here is my answer." and "Let me say where
   I land." (`SAMPLE_FRAMES` in `src/lib/exemplars.ts`), the "Here's" and
-  "Let's" family, which open 99 of 3,643 sample originals in a run at
-  production volume (seed `six-check`, counted by the first review) and
-  no exemplar card, as the page strips them.
+  "Let's" family. In a run at production volume (seed `six-check`,
+  counted by the first review) 99 of the 3,643 published originals open
+  on "Here is my answer." and none on the other, and no exemplar card
+  shows either, as the page strips them.
   Changing them changes the live run's rows, so they wait for the fresh
   run's generator;
 - `src/lib/judge/rubric.ts` (frozen under (b)): the fidelity criteria
-  `/debate/rubric` shows in full have two em dashes, "not just the
-  agent's, and not just one favored group's", and the American
-  "maximizes" and "favored". Changing them changes what the judge
-  receives;
+  `/debate/rubric` shows in full have two em dashes; "not just the
+  agent's, and not just one favored group's", "not just the act's
+  conformity to a rule" (lines 52 to 53) and "not merely assert a
+  direction" (line 38); "judgments" (lines 19, 23 and 57) where the site
+  writes "judgement"; and the American "maximizes" and "favored". The v3
+  text a flag-on build also shows has "when interests genuinely
+  conflict" (line 160) and "judgment" (lines 126 and 145). Changing any
+  of them changes what the judge receives;
+- `src/lib/judge/objection-voices.ts`, which goes into the judge's v3
+  request, so (b) as well: "justifiable to that person, not only to the
+  total" (line 42) and "judgment" (line 72);
+- `content/prompts/fidelity-criteria.draft.md:114`, "a failure of
+  relationship, not only a bad output", and
+  `content/micro/no-decision-elsewhere.md:15`, "why it is not merely
+  verbal", the same construction as the elsewhere passage above;
 - `src/app/api/counterpart/turn/route.ts` (frozen): the error "Quote a
   whole sentence — at least 10 characters.";
 - the Daily path's motion above: keep or cut;
