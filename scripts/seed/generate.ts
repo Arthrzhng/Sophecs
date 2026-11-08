@@ -91,15 +91,15 @@ export interface GenConfig {
 }
 
 /**
- * The quiz the scheduled job's runs place samples by: none named, so quiz
- * v1, until the launch merge sets it to 2, after the sample teardown, so
- * that the fresh run and every extension of it cover all six schools
- * (docs/sample-activity.md, "At launch"). A run's base hash includes the
- * quiz when one is named, so the live run, whose plan names none, cannot be
- * extended under quiz v2: the dry run refuses a plan whose base hash is not
- * the run's.
+ * The quiz the scheduled job's runs place samples by: 2, set by the launch
+ * merge after the sample teardown, so that the fresh run and every
+ * extension of it cover all six schools placed by quiz v2
+ * (docs/sample-activity.md, "At launch"). Before the launch it was unset,
+ * so quiz v1. A run's base hash includes the quiz when one is named, so a
+ * run whose plan names none cannot be extended under quiz v2: the dry run
+ * refuses a plan whose base hash is not the run's.
  */
-export const RUN_QUIZ: GenConfig["quiz"] = undefined;
+export const RUN_QUIZ: GenConfig["quiz"] = 2;
 
 // 3,278 accounts, Arthur's ruling of 2026-11-04, and the other volumes
 // scaled from the brief's 4,000 by the same factor.

@@ -46,7 +46,10 @@ export default async function TodayPage() {
     .maybeSingle();
 
   const school = (profile?.school as SchoolId | null) ?? null;
-  if (!school) redirect("/quiz?next=/today");
+  // A school this build does not show has no card or content to draw here:
+  // one of the three, on a build without SIX_SCHOOLS deployed to revert the
+  // launch. The reader takes this build's quiz, as one with no school does.
+  if (!school || !SHOWN_SCHOOL_IDS.includes(school)) redirect("/quiz?next=/today");
 
   // The same read /api/judge makes, so the locks lift on their own when the
   // switch comes off rather than needing a second place to be updated.

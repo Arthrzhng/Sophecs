@@ -1,7 +1,8 @@
-/* The three schools that are not yet published, on a SIX_SCHOOLS build
-   only (docs/stage5-plan.md). A build without the flag imports
-   six-schools.off.css in this file's place (next.config.ts), so none of
-   these names or hexes reaches a stylesheet production serves, and
+/* The three schools published at the launch, on a SIX_SCHOOLS build only
+   (production's since 2026-11-08; docs/stage5-plan.md). A build without
+   the flag imports six-schools.off.css in this file's place
+   (next.config.ts), so none of these names or hexes reaches a stylesheet
+   that build serves, and
    `npm run check:bundle` fails if one does.
 
    The same three kinds of token as each live school's in globals.css, and

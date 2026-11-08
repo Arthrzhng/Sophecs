@@ -394,9 +394,9 @@ describe("a build with SIX_SCHOOLS=1", () => {
   it("redirects the old addresses, keeping every one working", async () => {
     const { config } = await load("1");
     expect(config.sixSchoolsRedirects("1")).toEqual([
-      { source: "/table", destination: "/schools", permanent: false },
-      { source: "/method", destination: "/how-it-works", permanent: false },
-      { source: "/debate/rubric", destination: "/how-it-works#rubric", permanent: false },
+      { source: "/table", destination: "/schools", permanent: true },
+      { source: "/method", destination: "/how-it-works", permanent: true },
+      { source: "/debate/rubric", destination: "/how-it-works#rubric", permanent: true },
     ]);
     // And the config the build reads carries them, and rewrites nothing.
     expect(await config.default.redirects!()).toEqual(config.sixSchoolsRedirects("1"));

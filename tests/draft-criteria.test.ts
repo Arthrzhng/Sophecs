@@ -199,9 +199,26 @@ describe("nothing in src/ but the flag-on loader reads the draft criteria", () =
     ).toEqual([]);
   });
 
-  it("leaves rubric.ts holding the three live schools and nothing else", () => {
+  it("has rubric.ts hold all six since the launch, the three's text word for word the draft file's", async () => {
+    // Arthur, 2026-11-07, Gate 4 item 6: the three's criteria into rubric.ts at launch.
+    // A build without the flag still reads none of the three's.
     for (const id of PUBLISHED_SCHOOL_IDS) expect(() => FIDELITY_CRITERIA[id]).not.toThrow();
-    for (const id of DRAFT_SCHOOL_IDS) expect(() => FIDELITY_CRITERIA[id]).toThrow();
+    for (const id of DRAFT_SCHOOL_IDS) expect(() => FIDELITY_CRITERIA[id], id).toThrow(/no fidelity criteria/);
+    vi.stubEnv("SIX_SCHOOLS", "1");
+    vi.resetModules();
+    try {
+      const rubric = await import("../src/lib/judge/rubric");
+      const draft = readDraftCriteria();
+      for (const id of DRAFT_SCHOOL_IDS) {
+        const [first, second] = draft[id]!.split("\n\n");
+        expect(rubric.FIDELITY_CRITERIA[id], id).toBe(`${first}\n\n${second}`);
+        // v1 and v2 count the schools as three, so the three are judged under v3 only.
+        expect(() => rubric.fidelityCriteriaFor(id, "v2"), id).toThrow(/can only be judged under a prompt that lists its rivals/);
+      }
+    } finally {
+      vi.unstubAllEnvs();
+      vi.resetModules();
+    }
   });
 });
 
@@ -303,7 +320,9 @@ describe("callJudgeModel's draftCriteria", () => {
     expect(sdkCalls).toEqual([]);
   });
 
-  it("still throws for a draft school given no draft text, exactly as before", async () => {
+  it("still throws for one of the three on a build without the flag, before any call", async () => {
+    // Its criteria are in rubric.ts since the launch, and a build without
+    // SIX_SCHOOLS reads none of them.
     await expect(callJudgeModel("A motion.", "buddhist", "An argument.")).rejects.toThrow(
       /no fidelity criteria for school "buddhist"/
     );

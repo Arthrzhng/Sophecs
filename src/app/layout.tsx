@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/nav/SiteHeader";
 import { SiteFooter } from "@/components/nav/SiteFooter";
 import { AUTH_HINT_SCRIPT } from "@/components/nav/auth-hint";
 import "./globals.css";
-// The three unpublished schools' colour tokens on a SIX_SCHOOLS build, and
+// The three published at the launch: their colour tokens on a SIX_SCHOOLS build, and
 // an empty stylesheet on any other (next.config.ts resolves the name).
 import "@six-schools/tokens.css";
 

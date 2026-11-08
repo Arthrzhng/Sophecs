@@ -28,8 +28,9 @@ import type { SchoolId } from "@/lib/types";
  * the row. If the server's result differs, the page takes the server's
  * school and point.
  *
- * Saving a v2 result does not move a profile's school (Gate 2, option (i)),
- * so "Start my path" leads to the school the account already has, if any.
+ * Saving a v2 result moves a signed-in reader's school to the result's, as
+ * v1 does, and the page reports the move (`school_changed`). Until launch
+ * it did not (Gate 2, option (i)).
  */
 export function QuizResultClientV2({
   schools,
@@ -76,6 +77,9 @@ export function QuizResultClientV2({
           name: "challenge_accepted",
           props: { challenge_id: p.challengeId, challenger_school: result.challengerSchool, challengee_school: result.primary },
         });
+      }
+      if (result.schoolChanged) {
+        track({ name: "school_changed", props: result.schoolChanged });
       }
       try {
         sessionStorage.removeItem(PENDING_RESULT_KEY_V2);

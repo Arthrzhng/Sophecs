@@ -10,7 +10,7 @@ import { countsOnTable } from "@/lib/school-table";
 import { getRevisionId } from "@/lib/objections";
 import { getSchool } from "@/lib/schools";
 import { Page } from "@/components/layout/Page";
-import type { SchoolId } from "@/lib/types";
+import { SHOWN_SCHOOL_IDS, type SchoolId } from "@/lib/types";
 import { motionForDebate, shortMotionForShare } from "@/lib/motion-text";
 import { verdictShareLine } from "@/lib/verdict-share";
 import { verdictForViewer } from "@/lib/verdict-privacy";
@@ -48,6 +48,10 @@ export default async function VerdictPage({
     .eq("id", debateId)
     .maybeSingle();
   if (!publicRow || publicRow.topic_slug !== slug) notFound();
+  // A debate argued in a school this build does not show: one of the three,
+  // on a build without SIX_SCHOOLS deployed to revert the launch. That build
+  // shows none of them and holds no content to draw this page with.
+  if (!SHOWN_SCHOOL_IDS.includes(publicRow.school as SchoolId)) notFound();
 
   // `motion_text`, the motion as it was worded when the argument was
   // written, comes from `debates_public` with everything else public on

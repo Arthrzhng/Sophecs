@@ -11,23 +11,29 @@
  * - `QUIZ_SCHOOLS` is what the quiz can sort somebody into. It stays the
  *   original three until there is a quiz v2, so the result triangle has
  *   three corners and the question bank's vectors keep their three keys.
- * - `PUBLISHED_SCHOOLS` is what production publishes. It moves only when a
- *   school is published, under Arthur's (c). The judge read it until Gate
- *   3; it now reads `SHOWN_SCHOOLS` (the rival schools in its prompt, the
- *   schools its reply may name), which is this list without the flag.
+ * - `PUBLISHED_SCHOOLS` is the three published before Stage 5, which every
+ *   build shows. The other three were published at the launch
+ *   (2026-11-08, under Arthur's (c)) by building production with
+ *   `SIX_SCHOOLS=1`, not by moving them here, so that a build without the
+ *   flag is still the site as it was and can revert the launch. Every
+ *   public surface reads `SHOWN_SCHOOLS`. The judge read this list until
+ *   Gate 3; it now reads `SHOWN_SCHOOLS` too (the rival schools in its
+ *   prompt, the schools its reply may name).
  *
  * And a third, `SHOWN_SCHOOLS`, which is what this build shows a reader:
  * the published schools, and on a build made with `SIX_SCHOOLS=1` the
- * three that are not yet published as well (docs/stage5-plan.md). Every
+ * three published at the launch as well (docs/stage5-plan.md). Every
  * public surface moves to it in Stage 5; every lookup keyed by school
  * already answers for it. Without the flag it is `PUBLISHED_SCHOOLS`.
  *
- * **Draft schools are not here**, except on a `SIX_SCHOOLS` build, behind
- * a constant a build without the flag drops. They are in
- * `school-registry.drafts.ts`, which is `server-only`, because a draft
- * school's id and name are unreleased product decisions and the Phase 1B
- * guarantee is that no draft reaches a production page or bundle. This
- * file ships to the browser; that one cannot. The first attempt at this registry
+ * **The three published at the launch are not here**, except on a
+ * `SIX_SCHOOLS` build, behind a constant a build without the flag drops.
+ * They are in `school-registry.drafts.ts`, which is `server-only`: until
+ * the launch their ids and names were unreleased product decisions, and
+ * the Phase 1B guarantee was that no draft reaches a production page or
+ * bundle; a build without the flag, the one a revert deploys, still holds
+ * to it. This file ships to the browser; that one cannot. The first
+ * attempt at this registry
  * held all six entries and put "confucian", "Confucianism", "ubuntu" and
  * "buddhist" into thirteen production client chunks, which is the thing
  * the draft gate exists to prevent.
@@ -119,7 +125,7 @@ export const QUIZ_SCHOOLS: readonly QuizSchoolId[] = [
   "virtue-ethics",
 ];
 
-/** The schools production publishes. */
+/** The three published before Stage 5, which every build shows. */
 export const PUBLISHED_SCHOOL_IDS: readonly SchoolId[] = PUBLISHED_SCHOOLS.map((s) => s.id);
 
 const PUBLISHED_BY_ID = new Map<SchoolId, SchoolEntry>(
@@ -127,8 +133,8 @@ const PUBLISHED_BY_ID = new Map<SchoolId, SchoolEntry>(
 );
 
 /**
- * The three schools that are not yet published, on a `SIX_SCHOOLS` build
- * and an empty list on any other.
+ * The three published at the launch, on a `SIX_SCHOOLS` build (production's
+ * since 2026-11-08), and an empty list on any other.
  *
  * `process.env.SIX_SCHOOLS` is written into the code as a constant when the
  * build starts (next.config.ts), so on a build without the flag the test
@@ -141,9 +147,11 @@ const PUBLISHED_BY_ID = new Map<SchoolId, SchoolEntry>(
  * `card-tokens.ts` for its colours and `school-colors.ts` for its text
  * classes. Everything else reads these entries through the lists below.
  *
- * Still `status: "draft"`: they are drafts that this build shows, and
- * `content/schools/*.md`, which is frozen, says so. Their names match the
- * drafts module and their content files (`tests/six-schools.test.ts`).
+ * Published at the launch (Arthur, 2026-11-08), as their content files now
+ * say; the flag, not their status, decides whether a build shows them, so
+ * a build without it is the three-school product as before. Their names
+ * match the drafts module and their content files
+ * (`tests/six-schools.test.ts`).
  *
  * The adherent nouns are Arthur's, ruled at Checkpoint B (e) 1 on
  * 2026-11-05: "accept Confucian, Ubuntu Ethicist, Buddhist Ethicist; fix
@@ -156,7 +164,7 @@ const SHOWN_DRAFTS: readonly SchoolEntry[] =
     ? [
         {
           id: "confucian",
-          status: "draft",
+          status: "published",
           name: "Confucianism",
           adherent: "Confucian",
           adherentPlural: "Confucians",
@@ -164,7 +172,7 @@ const SHOWN_DRAFTS: readonly SchoolEntry[] =
         },
         {
           id: "ubuntu",
-          status: "draft",
+          status: "published",
           name: "Ubuntu",
           adherent: "Ubuntu Ethicist",
           adherentPlural: "Ubuntu Ethicists",
@@ -173,7 +181,7 @@ const SHOWN_DRAFTS: readonly SchoolEntry[] =
         },
         {
           id: "buddhist",
-          status: "draft",
+          status: "published",
           name: "Buddhist Ethics",
           adherent: "Buddhist Ethicist",
           adherentPlural: "Buddhist Ethicists",
@@ -278,8 +286,9 @@ export function schoolShadeVar(id: SchoolId): string {
  * so a name can fall back to the id while a colour falls back to ink.
  *
  * A plain object cannot do this job. To answer for every `SchoolId` it
- * would need a key per school, and a draft school's key is an unreleased
- * product decision sitting in the production client bundle. That is
+ * would need a key per school, and a key for one of the three would sit
+ * in the client bundle of a build without the flag, which must not carry
+ * them. That is
  * exactly the regression this replaced:
  * `scripts/check-client-bundle.ts` is the test that it stays replaced.
  *

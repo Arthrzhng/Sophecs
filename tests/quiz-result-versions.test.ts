@@ -1,9 +1,11 @@
 // Every reader of a quiz result knows its version (Stage 5, step 3;
 // migration 0027; src/lib/quiz-result.ts). A v2 result is not found on a
-// build without SIX_SCHOOLS, gives nothing a school on any build, and is
-// never compared weight for weight with a v1 result.
+// build without SIX_SCHOOLS and gives nothing a school there, and is never
+// compared weight for weight with a v1 result. From the launch, on a
+// SIX_SCHOOLS build, it gives a school and takes a side as a v1 result
+// does (docs/decisions.md, "Stage 5, step 4", "To undo at launch").
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { comparable, quizVersionOf, schoolFromResult, shownOnThisBuild, PUBLIC_RESULT_COLUMNS } from "../src/lib/quiz-result";
+import { comparable, quizVersionOf, schoolFromResult, shownOnThisBuild, shownVersions, PUBLIC_RESULT_COLUMNS } from "../src/lib/quiz-result";
 
 type Row = Record<string, unknown>;
 const tables: Record<string, Row[]> = {};
@@ -101,13 +103,21 @@ describe("the version rules", () => {
     expect(shownOnThisBuild({ quiz_version: 3 })).toBe(false);
   });
 
-  it("takes a school from a v1 result only, on every build", () => {
+  it("takes a school from a result the build shows: v1 on every build, v2 only with SIX_SCHOOLS", () => {
     for (const f of ["0", "1"]) {
       process.env.SIX_SCHOOLS = f;
       expect(schoolFromResult({ quiz_version: 1, school: "stoicism" })).toBe("stoicism");
-      expect(schoolFromResult({ quiz_version: 2, school: "ubuntu" })).toBeNull();
+      expect(schoolFromResult({ quiz_version: 2, school: "ubuntu" })).toBe(f === "1" ? "ubuntu" : null);
       expect(schoolFromResult({ school: "stoicism" })).toBeNull();
+      expect(schoolFromResult({ quiz_version: 3, school: "stoicism" })).toBeNull();
     }
+  });
+
+  it("filters queries to the versions the build shows", () => {
+    process.env.SIX_SCHOOLS = "0";
+    expect(shownVersions()).toEqual([1]);
+    process.env.SIX_SCHOOLS = "1";
+    expect(shownVersions()).toEqual([1, 2]);
   });
 
   it("compares two v1 results only", () => {
@@ -159,7 +169,8 @@ describe("the claim on sign-in", () => {
     tables.profiles = [];
   });
 
-  it("gives a new account the school of its newest v1 result, passing over a newer v2 one", async () => {
+  it("without SIX_SCHOOLS, gives a new account the school of its newest v1 result, passing over a newer v2 one", async () => {
+    process.env.SIX_SCHOOLS = "0";
     tables.quiz_results = [v1("a", "utilitarianism", "2026-11-01", { anon_id: "me" }), v2("b", "ubuntu", "2026-11-03", { anon_id: "me" })];
     const res = await claimAnonymousResults("u1", "me");
     expect(res).toEqual({ claimed: true, school: "utilitarianism" });
@@ -167,16 +178,32 @@ describe("the claim on sign-in", () => {
     expect(tables.quiz_results.every((r) => r.user_id === "u1")).toBe(true);
   });
 
-  it("claims a v2-only reader's result but gives the account no school", async () => {
+  it("without SIX_SCHOOLS, claims a v2-only reader's result but gives the account no school", async () => {
+    process.env.SIX_SCHOOLS = "0";
     tables.quiz_results = [v2("b", "ubuntu", "2026-11-03", { anon_id: "me" })];
     const res = await claimAnonymousResults("u1", "me");
     expect(res).toEqual({ claimed: true, school: null });
     expect(tables.profiles).toEqual([{ id: "u1", school: null }]);
   });
+
+  it("on a SIX_SCHOOLS build, gives a new account the school of its newest result, v2 included", async () => {
+    process.env.SIX_SCHOOLS = "1";
+    tables.quiz_results = [v1("a", "utilitarianism", "2026-11-01", { anon_id: "me" }), v2("b", "ubuntu", "2026-11-03", { anon_id: "me" })];
+    expect(await claimAnonymousResults("u1", "me")).toEqual({ claimed: true, school: "ubuntu" });
+    expect(tables.profiles).toEqual([{ id: "u1", school: "ubuntu" }]);
+  });
+
+  it("on a SIX_SCHOOLS build, gives a v2-only reader's account its school", async () => {
+    process.env.SIX_SCHOOLS = "1";
+    tables.quiz_results = [v2("b", "buddhist", "2026-11-03", { anon_id: "me" })];
+    expect(await claimAnonymousResults("u1", "me")).toEqual({ claimed: true, school: "buddhist" });
+    expect(tables.profiles).toEqual([{ id: "u1", school: "buddhist" }]);
+  });
 });
 
 describe("pending challenges on /me", () => {
-  it("names the other side's school from a v1 result only", async () => {
+  it("without SIX_SCHOOLS, names the other side's school from a v1 result only", async () => {
+    process.env.SIX_SCHOOLS = "0";
     tables.quiz_results = [
       v1("mine", "stoicism", "2026-11-01", { user_id: "u1" }),
       v1("theirs-v1", "virtue-ethics", "2026-11-01"),
@@ -193,7 +220,8 @@ describe("pending challenges on /me", () => {
     ]);
   });
 
-  it("lists no challenge on the reader's own v2 result (step 4)", async () => {
+  it("without SIX_SCHOOLS, lists no challenge on the reader's own v2 result", async () => {
+    process.env.SIX_SCHOOLS = "0";
     tables.quiz_results = [
       v1("mine-v1", "stoicism", "2026-11-01", { user_id: "u1" }),
       v2("mine-v2", "buddhist", "2026-11-02", { user_id: "u1" }),
@@ -205,6 +233,27 @@ describe("pending challenges on /me", () => {
     ];
     const pending = await getPendingChallenges({ from: query } as never, "u1");
     expect(pending.map((p) => p.challengeId)).toEqual(["c-v1"]);
+  });
+
+  it("on a SIX_SCHOOLS build, lists challenges on the reader's v2 results and names a v2 side's school", async () => {
+    process.env.SIX_SCHOOLS = "1";
+    tables.quiz_results = [
+      v1("mine-v1", "stoicism", "2026-11-01", { user_id: "u1" }),
+      v2("mine-v2", "buddhist", "2026-11-02", { user_id: "u1" }),
+      v1("theirs-v1", "virtue-ethics", "2026-11-01"),
+      v2("theirs-v2", "ubuntu", "2026-11-02"),
+    ];
+    tables.challenges = [
+      { id: "c1", topic_slug: null, status: "accepted", challenger_result_id: "mine-v1", challengee_result_id: "theirs-v2" },
+      { id: "c2", topic_slug: null, status: "accepted", challenger_result_id: "mine-v2", challengee_result_id: "theirs-v1" },
+      { id: "c3", topic_slug: null, status: "open", challenger_result_id: "mine-v2", challengee_result_id: null },
+    ];
+    const pending = await getPendingChallenges({ from: query } as never, "u1");
+    expect(pending).toEqual([
+      { challengeId: "c1", topicSlug: null, otherSchool: "ubuntu" },
+      { challengeId: "c2", topicSlug: null, otherSchool: "virtue-ethics" },
+      { challengeId: "c3", topicSlug: null, otherSchool: null },
+    ]);
   });
 });
 
@@ -259,19 +308,23 @@ describe("the wiring the render tests cannot see", () => {
     expect(page).toContain("hasOtherResult={otherResult !== null}");
   });
 
-  it("/r/[id] offers Debate them between two v1 results only (step 4)", async () => {
+  it("/r/[id] offers Debate them between any two results the build shows", async () => {
+    // getResult answers a result the build does not show as null, so a
+    // v2 other side is offered only on a SIX_SCHOOLS build.
     const { readFileSync } = await import("node:fs");
     const page = readFileSync("src/app/r/[id]/page.tsx", "utf8").replace(/\s+/g, " ");
+    expect(page).toContain("return row && shownOnThisBuild(row) ? row : null;");
+    expect(page).toContain("const challengeOther = challengeInfo ? await getResult(challengeInfo.otherResultId) : null;");
     expect(page).toContain(
-      "const showDebateThem = Boolean( challengeInfo && challengeInfo.status !== \"complete\" && viewerIsParty && challengeOther && comparable(result, challengeOther) );"
+      "const showDebateThem = Boolean( challengeInfo && challengeInfo.status !== \"complete\" && viewerIsParty && challengeOther );"
     );
   });
 
-  it("/me's result_claimed event takes the newest v1 result, the one the profile's school came from", async () => {
+  it("/me's result_claimed event takes the newest result the build shows, the one the profile's school came from", async () => {
     const { readFileSync } = await import("node:fs");
     const me = readFileSync("src/app/me/page.tsx", "utf8");
     const start = me.indexOf('if (welcome === "1" && school) {');
     expect(start).toBeGreaterThan(-1);
-    expect(me.slice(start, me.indexOf("claimedResultId =", start))).toContain('.eq("quiz_version", 1)');
+    expect(me.slice(start, me.indexOf("claimedResultId =", start))).toContain('.in("quiz_version", shownVersions())');
   });
 });

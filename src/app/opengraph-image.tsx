@@ -1,7 +1,6 @@
 import { ImageResponse } from "next/og";
 import { loadOgFonts } from "@/lib/og-fonts";
-import { OG_INK, OG_INK_MID, OG_PAPER, SCHOOL_MARKER } from "@/lib/card-tokens";
-import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
+import { OG_INK, OG_INK_MID, OG_PAPER, SITE_HAIRLINE } from "@/lib/card-tokens";
 
 export const alt = "Sophecs: which school do you think in?";
 export const size = { width: 1200, height: 630 };
@@ -9,10 +8,10 @@ export const contentType = "image/png";
 
 // The card for sophecs.com itself. Distinct from /r/[id]'s card, which is a
 // saturated school surface: this one is paper, because it belongs to the
-// site rather than to any one school. The hairline below is the only place
-// on the site where all three school colours appear together — the muted
-// tokens, not the card surfaces, since these sit on paper.
-const SCHOOL_HAIRLINE = PUBLISHED_SCHOOL_IDS.map((id) => SCHOOL_MARKER[id]);
+// site rather than to any one school. The hairline below draws every
+// school's colour together (six since the launch, three on a build without
+// the flag): the muted tokens, not the card surfaces, since these sit on
+// paper.
 
 export default async function SiteOgImage() {
   const [spectral, plexSans] = await loadOgFonts();
@@ -66,7 +65,7 @@ export default async function SiteOgImage() {
         </div>
 
         <div style={{ display: "flex", width: "100%" }}>
-          {SCHOOL_HAIRLINE.map((colour) => (
+          {SITE_HAIRLINE.map((colour) => (
             <div key={colour} style={{ display: "flex", flex: 1, height: 3, backgroundColor: colour }} />
           ))}
         </div>

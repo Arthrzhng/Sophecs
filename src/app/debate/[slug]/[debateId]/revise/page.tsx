@@ -8,7 +8,7 @@ import { ObjectionBrief } from "@/components/debate/ObjectionBrief";
 import { Page } from "@/components/layout/Page";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { TextLink } from "@/components/ui/TextLink";
-import type { SchoolId } from "@/lib/types";
+import { SHOWN_SCHOOL_IDS, type SchoolId } from "@/lib/types";
 import { motionForDebate } from "@/lib/motion-text";
 import { PROMPT_VERSION } from "@/lib/judge/schema";
 import { scoresComparable } from "@/lib/verdict-versions";
@@ -52,7 +52,9 @@ export default async function RevisePage({
     parent.kind !== "original" ||
     parent.rejected ||
     !parent.verdict ||
-    parent.topic_slug !== slug
+    parent.topic_slug !== slug ||
+    // As on the verdict page: a school this build does not show.
+    !SHOWN_SCHOOL_IDS.includes(parent.school as SchoolId)
   ) {
     notFound();
   }

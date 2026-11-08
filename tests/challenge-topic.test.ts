@@ -2,7 +2,12 @@
 // parties: the owner of the challenger's result or of the challengee's.
 // A signed-in stranger gets the answer a missing challenge gets, and the
 // row is not written.
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// Tests that set SIX_SCHOOLS leave it as they found it.
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 type Row = Record<string, unknown>;
 const tables: Record<string, Row[]> = {};
@@ -110,13 +115,21 @@ describe("assignChallengeTopic", () => {
     expect(await assignChallengeTopic("c1")).toEqual({ ok: false, error: "Challenge not found." });
   });
 
-  it("refuses a challenge with a v2 side, on any build, until launch (step 4)", async () => {
+  it("without SIX_SCHOOLS, refuses a challenge with a v2 side", async () => {
+    vi.stubEnv("SIX_SCHOOLS", "0");
     tables.quiz_results[1].quiz_version = 2;
     signedIn = "challenger";
     expect(await assignChallengeTopic("c1")).toEqual({ ok: false, error: "Challenge not found." });
     tables.challenges[0].topic_slug = "crash-arithmetic";
     expect(await assignChallengeTopic("c1")).toEqual({ ok: false, error: "Challenge not found." });
     expect(updates).toEqual([]);
+  });
+
+  it("on a SIX_SCHOOLS build, takes a challenge with a v2 side as any other", async () => {
+    vi.stubEnv("SIX_SCHOOLS", "1");
+    tables.quiz_results[1].quiz_version = 2;
+    signedIn = "challengee";
+    expect(await assignChallengeTopic("c1")).toMatchObject({ ok: true });
   });
 
   // With no rows no side can match, so this describes the behaviour rather
@@ -169,10 +182,20 @@ describe("resolveChallengeSide", () => {
     expect(await resolveChallengeSide(admin, { ...challenge, challengee_result_id: null }, "challenger")).toBe("challenger");
   });
 
-  it("gives no side on a challenge with a v2 result, until launch, so /api/judge records no debate on it (step 4)", async () => {
+  it("without SIX_SCHOOLS, gives no side on a challenge with a v2 result, so /api/judge records no debate on it", async () => {
+    vi.stubEnv("SIX_SCHOOLS", "0");
     tables.quiz_results[0].quiz_version = 2;
     expect(await resolveChallengeSide(admin, challenge, "challenger")).toBeNull();
     expect(await resolveChallengeSide(admin, challenge, "challengee")).toBeNull();
+  });
+
+  it("on a SIX_SCHOOLS build, finds both sides of a challenge with a v2 result", async () => {
+    vi.stubEnv("SIX_SCHOOLS", "1");
+    tables.quiz_results[0].quiz_version = 2;
+    expect(await resolveChallengeSide(admin, challenge, "challenger")).toBe("challenger");
+    expect(await resolveChallengeSide(admin, challenge, "challengee")).toBe("challengee");
+    tables.quiz_results[0].quiz_version = 3;
+    expect(await resolveChallengeSide(admin, challenge, "challenger")).toBeNull();
   });
 
   it("puts a user who owns both results on the challenger's side", async () => {

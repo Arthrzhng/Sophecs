@@ -4,6 +4,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { pickShareLineFrom } from "./share-line";
 import { excluded, type LoadOptions } from "./drafts";
+import { isShown } from "./school-registry";
 import type { SchoolId } from "./types";
 
 export interface SchoolContent {
@@ -44,7 +45,11 @@ export function getAllSchools(options: LoadOptions = {}): Record<SchoolId, Schoo
   for (const school of loadAll()) {
     // A school file belongs to itself: on a SIX_SCHOOLS build the three
     // drafts load as the schools that build shows (src/lib/drafts.ts).
+    // Since the launch the three's files are published, and the flag, not
+    // their status, decides whether a build shows them: a build without it
+    // loads the original three only, as before.
     if (excluded(school, options, school.id)) continue;
+    if (!options.includeDrafts && !isShown(school.id)) continue;
     result[school.id] = school;
   }
   return result;

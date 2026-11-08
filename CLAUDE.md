@@ -1,7 +1,7 @@
 # Sophecs
 
 Philosophy × AI, taught through allegiance: a diagnostic quiz sorts you into
-one of three schools, an async arena makes you defend that school on
+one of six schools, an async arena makes you defend that school on
 AI-related motions, and a lessons library teaches each school from its
 primary sources.
 

@@ -76,7 +76,8 @@ describe("a build with SIX_SCHOOLS=1", () => {
   it("shows the three after the published schools, in the registry's order", async () => {
     const { registry } = await load("1");
     expect(registry.SHOWN_SCHOOL_IDS).toEqual([...LIVE_THREE, ...NEW_THREE]);
-    for (const entry of registry.SHOWN_SCHOOLS.slice(3)) expect(entry.status).toBe("draft");
+    // Published since the launch (2026-11-08); the flag decides that a build shows them.
+    for (const entry of registry.SHOWN_SCHOOLS.slice(3)) expect(entry.status).toBe("published");
   });
 
   it("names each of the three as the drafts module does", async () => {
@@ -84,7 +85,7 @@ describe("a build with SIX_SCHOOLS=1", () => {
     for (const draft of drafts.DRAFT_SCHOOLS) {
       const shown = registry.shownEntry(draft.id);
       expect(shown, draft.id).not.toBeNull();
-      expect({ ...shown, colourToken: null }).toEqual(draft);
+      expect(shown).toEqual(draft);
     }
   });
 
@@ -258,10 +259,10 @@ describe("the judge on a SIX_SCHOOLS build (Gate 3)", () => {
     expect(anthropic.PROMPT_VERSION).toBe("v3");
   });
 
-  it("still publishes the original three, and rubric.ts still holds only theirs", async () => {
+  it("keeps the original three as the registry's base list, and reads the three's criteria from rubric.ts", async () => {
     const { registry, rubric } = await load("1");
     expect(registry.PUBLISHED_SCHOOL_IDS).toEqual([...LIVE_THREE]);
-    for (const id of NEW_THREE) expect(() => rubric.FIDELITY_CRITERIA[id]).toThrowError(/no fidelity criteria/);
+    for (const id of NEW_THREE) expect(() => rubric.FIDELITY_CRITERIA[id]).not.toThrow();
   });
 
   it("can judge all six, each against five rivals", async () => {

@@ -5963,3 +5963,118 @@ under "A pass over the whole site for what reads as machine-written").
     ... but" or "not just". The live three's are read by the live run
     until the teardown, so they can change only for the fresh run, as
     the openings did here.
+
+### The launch merge (2026-11-08)
+
+Arthur, 2026-11-08: "Launch: approved." After the exemplar cards (#109),
+the site pass and the closings (#108), and once both scheduled jobs
+answer 200, the Gate 4 launch steps: the preview's v2 results cleared
+(item 16, in the SQL Editor), the launch merge, the sample teardown and
+the fresh six-school run, then production read back. "Stop and tell me
+if any step fails; revert if production errors." They run in the order
+`docs/sample-activity.md` ("At launch") gives, with the teardown before
+the merge: the merge sets `RUN_QUIZ` to 2, and after it every scheduled
+extend of the live run, made with no quiz, would be refused and turn the
+job red every six hours. So: item 16, read back again just before the
+merge; the teardown; the merge; the fresh run's canary, then its full
+stage; production read back.
+
+What the merge changes, each item on the checklist in
+`docs/stage5-plan.md`:
+
+- **The flag on for Production.** `next.config.ts` no longer refuses
+  `SIX_SCHOOLS=1` on a production build, and Production's environment
+  carries it. Everything the flag turns on comes with it: quiz v2 and its
+  map, the six on every page that lists schools, v3 for the judge (its
+  cost accepted, Gate 4), the "view from elsewhere" passages, and the live
+  table's 20-argument rule from the launch deploy, over the week in
+  progress.
+- **The navigation's three redirects** (`/table`, `/method`,
+  `/debate/rubric`) are permanent (308), as Arthur asked on 2026-11-06.
+- **The three published.** `content/schools/confucian.md`, `ubuntu.md` and
+  `buddhist.md` lose `status: draft` and take their colour tokens, and
+  the registry marks them published. The flag, not their status, still
+  decides whether a build shows them, so a build without it is the site
+  as it was. The share lines were already rewritten (#102).
+- **Their criteria in `src/lib/judge/rubric.ts`**, copied from
+  `content/prompts/fidelity-criteria.draft.md` word for word (Gate 4 item
+  6). The draft file stays: the golden runner reads it, and
+  `tests/six-schools.test.ts` holds the two texts equal. The flag-on request fixtures (`tests/judge-request/six-schools/`)
+  pass unchanged, which is the proof that the judge receives the same
+  text. A build without the flag reads none of the three's criteria: the
+  lookup throws for a school the build does not show, as it threw before
+  for one with none written. v1 and v2 still refuse the three.
+- **The "until launch" rules lifted**, in every file "Stage 5, step 4"
+  lists, by one rule kept in `src/lib/quiz-result.ts`: a result gives a
+  school, names a side and takes up a challenge wherever the build shows
+  it. On a flag-on build that is any v1 or v2 result; on a build without
+  the flag, a v1 result only, as before, since such a build cannot show a
+  v2 result's school. So on production now:
+  - a v2 result gives an account its school on sign-in
+    (`claimAnonymousResults`), and `/me`'s welcome reads the result the
+    school came from;
+  - `submitQuizResultV2` moves a signed-in reader's school
+    (`retakeQuizSchool`, reported as `school_changed`) and takes up any
+    challenger's challenge, v1 or v2;
+  - a challenge with a v2 side counts (`resolveChallengeSide`), is listed
+    on `/me`, and `/r/[id]` offers "Debate them" between any two results;
+  - `src/app/actions.ts` is frozen; this change to it is the one the
+    checklist names, under the launch approval.
+  - v1's quiz is retired on a flag-on build, whose quiz page writes v2
+    results. Its server action still exists and its id is still in the
+    result page's client code, so a request made by hand can write a v1
+    result, move a signed-in reader's school by it, and take up a v2
+    challenger's challenge. Each is a state the site already handles; no
+    page calls it.
+- **`RUN_QUIZ` is 2** (`scripts/seed/generate.ts`), so the scheduled job's
+  runs place samples by quiz v2. The merge goes in after the sample
+  teardown, so no run made with no quiz is left to extend; a plan with no
+  quiz is refused for production from here.
+- **`README.md`** describes six schools, the flag, v3 and where the
+  three's criteria live.
+- **The sitemap and the site's sharing image** list every school the build
+  shows (`SHOWN_SCHOOL_IDS`): six on production, three on a build without
+  the flag. The sitemap still leaves out the "elsewhere" passages, which a
+  flag-on build serves but whose files still mark them drafts.
+  `PUBLISHED_SCHOOL_IDS` stays the original three, which every build
+  shows, and `src/lib/school-registry.ts` now says so rather than calling
+  it what production publishes (review pass 1).
+
+**Reverting.** If production errors after the deploy, the way back is
+the merged code built without the flag: remove `SIX_SCHOOLS` from
+Production's environment and redeploy, which rebuilds with the
+environment as it then is. That build is the three-school site, as the
+first review compared page by page.
+
+Not an instant rollback to the deployment before the merge, and not a
+revert of the merge commit, once anyone is in one of the three, which is
+from the fresh run's canary and the first reader's v2 quiz. Those builds
+hold no content for the three, so `/today` for a reader in one of them,
+and the verdict page of a debate argued in one, would error (review pass
+1). The merged code answers those pages on a build without the flag:
+`/today` sends such a reader to the quiz, and the verdict page, its image
+and its revision page are not found (`tests/launch-revert.test.tsx`).
+Before anyone is in one of the three, a rollback serves as well.
+
+What a build without the flag then does with what the launch left:
+- results written as v2 stay in the table; it shows none of them and
+  takes nothing from them;
+- a profile in one of the three keeps its school. Pages that print a
+  reader's school print its id where its name would be: `/me`, the class
+  pages, `/table` ("You argued once for confucian this week"),
+  `/debate/[slug]` ("Arguing as a confucian") and `/counterpart/[id]`.
+  Such a reader can still write an argument, and the judge refuses it
+  (`no_criteria`) as it refused the three before the launch. The
+  counterpart queue can still pair a reader with a seeker in one of the
+  three;
+- a reader of the original three whose verdict carries an objection the
+  v3 judge gave one of the three's voice sees that school's id beside it,
+  on the verdict page, the revision page and `/me`;
+- a reader in one of the three whom `/today` sends to the quiz, and who
+  takes it signed in, moves to one of the original three; turning the
+  flag back on does not move them back;
+- the scheduled sample job goes on extending the fresh run, in all six
+  schools; the build shows the original three's rows;
+- a browser that followed one of the three permanent redirects keeps
+  going to `/schools` or `/how-it-works`, which such a build answers not
+  found.

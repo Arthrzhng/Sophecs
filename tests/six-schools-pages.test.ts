@@ -49,7 +49,8 @@ describe("with SIX_SCHOOLS=1", () => {
     for (const id of NEW) {
       const content = schools.getSchool(id as never);
       expect(content.id).toBe(id);
-      expect(content.status).toBe("draft");
+      // Published at the launch: no status in its front matter.
+      expect(content.status).toBeUndefined();
       expect(content.one_line.length).toBeGreaterThan(10);
     }
   });
@@ -85,12 +86,18 @@ describe("with SIX_SCHOOLS=1", () => {
     }
   });
 
-  it("keeps the sitemap to sophecs.com's own pages: no elsewhere passage, no new school", async () => {
+  it("lists every school the build shows in the sitemap, and no elsewhere passage", async () => {
+    // Production's sitemap since the launch (review pass 1 of #112): the
+    // three's pages are sophecs.com's own now. An elsewhere passage's file
+    // still marks it a draft, so it stays out.
     await load("1");
     const { default: sitemap } = await import("../src/app/sitemap");
     const urls = sitemap().map((e) => e.url);
     expect(urls.filter((u) => u.includes("elsewhere"))).toEqual([]);
-    for (const id of NEW) expect(urls).not.toContain(`https://sophecs.com/s/${id}`);
+    for (const id of NEW) expect(urls).toContain(`https://sophecs.com/s/${id}`);
+    await load("0");
+    const { default: three } = await import("../src/app/sitemap");
+    for (const id of NEW) expect(three().map((e) => e.url)).not.toContain(`https://sophecs.com/s/${id}`);
   });
 
   it("gives the school table six rows, the three new ones unranked with no average", async () => {

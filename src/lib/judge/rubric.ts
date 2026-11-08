@@ -57,7 +57,56 @@ good" without reference to character or virtue (utilitarian bleed); reduces
 to "externals don't matter, only my judgments do" (Stoic bleed); or asserts
 "a good person would do X" without naming the virtue at stake or the excess
 and deficiency it sits between.`,
+
+  // The three published at the launch (Arthur, 2026-11-07, Gate 4 item 6:
+  // the criteria into rubric.ts at launch): each one's first two
+  // paragraphs of the draft criteria file, word for word.
+  confucian: `A faithful Confucian argument grounds its claim in roles and the
+relationships that constitute them: you do not enter a relationship as a
+finished individual, and what you owe attaches to a position rather than
+being owed in the abstract. Its central terms are ren, the humaneness a
+relationship realises, and li, the ritual propriety through which conduct is
+done and learned. Cultivating oneself is native here, and proceeds through
+roles and ritual rather than apart from them. Holding a name to its work,
+after Book 13, is a strength where it appears.
+
+Score fidelity down when the argument: reduces to what the system maximises
+(utilitarian bleed); treats virtue as detached from roles, relationships and
+ritual (virtue-ethics bleed); or asserts that relationships matter without
+naming the relation, who owes what to whom, or what the position requires.`,
+
+  ubuntu: `A faithful Ubuntu argument grounds its claim in relational personhood: a
+person is a person through other persons, so the stake is what people become
+through one another, not what an agent gets alone. Metz's principle is that
+right action honours capacities for relationships of shared identity and
+solidarity. Menkiti's achieved personhood and Gyekye's moderate reading,
+which keeps individual worth, are both faithful. A harm reads as a failure of
+relationship, not only a bad output.
+
+Score fidelity down when the argument: maximises expected utility
+(utilitarian bleed); treats the community as a single stakeholder; or asserts
+that community matters without naming whose relationships are at stake or who
+was left out. Leaning on communal expectation is faithful; ignoring the charge
+that it pressures dissenters costs engagement, not fidelity.`,
+
+  buddhist: `A faithful Buddhist argument grounds its claim in non-harm,
+intention, compassion and liberation, weighing suffering, dukkha, as what is
+at stake. Volition weighs as much as what follows, and non-harm covers what
+one incites as well as what one does. Two commitments shape it: anatta, no
+fixed, bounded self, and dependent origination, what arises coming from
+conditions, not one cause. The discourse to Rahula asks, before acting, while
+acting and after, whether it tends to harm oneself, another, or both. A
+later tradition's inference, such as the Mahayana argument from anatta to
+impartial compassion, is faithful when argued.
+
+Score fidelity down when the argument: maximises aggregate welfare, ignoring
+intention and non-harm (consequentialist bleed); uses a good intention to
+excuse damage a careless actor would be blamed for; or asserts non-harm
+without naming who is still hurt.`,
 };
+
+/** The schools published at the launch, judged under v3 only. */
+const V3_ONLY: ReadonlySet<SchoolId> = new Set<SchoolId>(["confucian", "ubuntu", "buddhist"]);
 
 /**
  * The criteria the judge prompt interpolates, keyed by school.
@@ -69,18 +118,18 @@ and deficiency it sits between.`,
  * string "undefined" and send to the model: a verdict produced against no
  * criteria at all, and nothing to show it had happened.
  *
- * Throwing is the safe failure here. A draft school cannot reach the judge
- * today, because `profiles.school` is constrained to the published three,
- * so this guards the window between 2C widening that constraint and a new
- * school's criteria being written. `/api/judge` would answer 500 rather
- * than judging; it should learn to refuse gracefully before any new school
- * is published, which is a 2E question and is not in this branch.
+ * Throwing is the safe failure here. It also throws for a school this
+ * build does not show: since the launch the three new schools' criteria
+ * are written here on every build, and a build without SIX_SCHOOLS must
+ * still judge none of them, as before. `/api/judge` asks
+ * `hasFidelityCriteria` first and refuses such a school cleanly, so this is
+ * the backstop.
  */
 export const FIDELITY_CRITERIA: Record<SchoolId, string> = new Proxy(
   CRITERIA_BY_SCHOOL as Record<SchoolId, string>,
   {
     get(target, key: string) {
-      const criteria = target[key as SchoolId];
+      const criteria = SHOWN_SCHOOL_IDS.includes(key as SchoolId) ? target[key as SchoolId] : undefined;
       if (criteria === undefined) {
         throw new Error(
           `judge/rubric: no fidelity criteria for school "${key}". ` +
@@ -129,6 +178,27 @@ over time is reasoning from practical wisdom, the mean and flourishing
 whether or not it uses the words phronesis, eudaimonia or mean. Naming the
 virtue at stake in plain words, such as courage or honesty, is naming it.
 Never mark fidelity down for missing vocabulary alone.`,
+
+  // The three published at the launch: each one's third paragraph of the
+  // draft criteria file, word for word.
+  confucian: `Credit the concept, not the vocabulary. An argument that reasons from what a
+role requires, what the parties to a relationship owe one another, the
+humaneness a relationship realises, and the propriety through which conduct
+in it is done is reasoning from ren and li whether or not either word
+appears. Never mark fidelity down for missing vocabulary alone.`,
+
+  ubuntu: `Credit the concept, not the vocabulary. An argument that reasons from what
+people become through one another, and reads a harm as a failure of
+relationship and solidarity, is reasoning from relational personhood whether
+or not it uses the word ubuntu, quotes the maxim, or names Metz, Menkiti or
+Gyekye. Never mark fidelity down for missing vocabulary alone.`,
+
+  buddhist: `Credit the concept, not the vocabulary. An argument that weighs suffering,
+intention and non-harm, declines to treat the self as fixed and bounded,
+and treats what happens as arising from many conditions rather than one
+cause is reasoning from dukkha, anatta and dependent origination whether or
+not it uses those terms. Never mark fidelity down for missing vocabulary
+alone.`,
 };
 
 // v3 only. Arthur's ruling of 2026-11-03, after the 3 Nov golden run: in
@@ -160,6 +230,29 @@ policy saves more lives, and what a good person would do goes quiet exactly
 when interests genuinely conflict. Engagement should check whether the
 argument meets this objection, and ignoring it costs engagement, not
 fidelity.`,
+
+  // The three published at the launch (2026-11-08): each one's fourth
+  // paragraph of the draft criteria file, word for word.
+  confucian: `The best-known objection to Confucianism is that role ethics is too ready
+to authorise hierarchy: mutual duties do not make unequal parties equals,
+and a system can honour every expectation attaching to a role while leaving
+the power between the parties where it found it. Engagement should check
+whether the argument meets this objection, and ignoring it costs
+engagement, not fidelity.`,
+
+  ubuntu: `The best-known objection to Ubuntu is that a community is not one voice:
+somebody decides what communal welfare means and who counts as inside, and
+an appeal to communal expectation can make a dissenter the problem.
+Engagement should check whether the argument meets this objection, and
+ignoring it costs engagement, not fidelity.`,
+
+  buddhist: `The best-known objection to Buddhist ethics is that it has much moral
+teaching and little systematic moral philosophy of the kind the West built:
+compassion and non-harm do not say who owns a dataset, who audits a model,
+or how somebody appeals its decisions. That gap is a challenge for
+reconstruction, not proof the tradition is deficient. Engagement should
+check whether the argument meets this objection, and ignoring it costs
+engagement, not fidelity.`,
 };
 
 /**
@@ -188,7 +281,12 @@ export function fidelityCriteriaFor(school: SchoolId, version: PromptVersion | "
     return `${draft.trimEnd()}\n\n${objectionVoiceFor(school, rivalsOf(school))}`;
   }
   const base = FIDELITY_CRITERIA[school];
-  if (version === "v1" || version === "v2") return base;
+  if (version === "v1" || version === "v2") {
+    // The three published at the launch were only ever judged under v3,
+    // whose prompt lists their rivals; v1 and v2 count the schools as three.
+    if (V3_ONLY.has(school)) throw new Error(`judge/rubric: "${school}" can only be judged under a prompt that lists its rivals.`);
+    return base;
+  }
   const rule = VOCABULARY_RULE_V3[school];
   if (rule === undefined) {
     throw new Error(`judge/rubric: no v3 vocabulary paragraph for school "${school}".`);
@@ -210,6 +308,10 @@ export function fidelityCriteriaFor(school: SchoolId, version: PromptVersion | "
  * failing.
  */
 export function hasFidelityCriteria(id: SchoolId): boolean {
+  // A school this build does not show has none to give: since the launch
+  // the three's criteria live here on every build, and a build without
+  // SIX_SCHOOLS still refuses them, as before.
+  if (!SHOWN_SCHOOL_IDS.includes(id)) return false;
   return CRITERIA_BY_SCHOOL[id] !== undefined || DRAFT_CRITERIA_ON_THIS_BUILD[id] !== undefined;
 }
 

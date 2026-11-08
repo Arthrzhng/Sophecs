@@ -1,10 +1,10 @@
 import path from "node:path";
 import type { NextConfig } from "next";
 
-// SIX_SCHOOLS=1 builds the six-school product: the three schools that are
-// not yet published are shown on that build, and on no other
-// (docs/stage5-plan.md). It is meant for Vercel's Preview environment
-// only, until launch.
+// SIX_SCHOOLS=1 builds the six-school product: all six schools, quiz v2
+// and the navigation built around them (docs/stage5-plan.md). Set for
+// Production and Preview in Vercel since the launch (Gate 4, 2026-11-08);
+// a build without it is the three-school product as it was before.
 //
 // It is read here, once, when the build starts, and handed to the code
 // through `env`, which writes the value into server and client code alike
@@ -22,25 +22,10 @@ import type { NextConfig } from "next";
 // constant at all.
 const SIX_SCHOOLS = process.env.SIX_SCHOOLS === "1" ? "1" : "0";
 
-// Vercel's production build is a plain `next build`, which runs no bundle
-// check, so a flag ticked for Production by mistake would publish the
-// three with every gate green. That is Arthur's decision (c), taken at
-// launch, and the launch merge removes this refusal; until then a
-// production deploy with the flag fails to build and the live one stays.
-//
-// It fails closed: a build on Vercel (`VERCEL=1`) that cannot say which
-// environment it is for is refused as well, rather than let through. It
-// covers builds only. Promoting a flag-on preview deployment to Production
-// does not rebuild, so it would publish the three without passing here;
-// docs/review-charter.md, rule 4, counts that as publishing.
-const onVercelUnsure = process.env.VERCEL === "1" && !process.env.VERCEL_ENV;
-if (SIX_SCHOOLS === "1" && (process.env.VERCEL_ENV === "production" || onVercelUnsure)) {
-  throw new Error(
-    "SIX_SCHOOLS is set for a production build, or for a Vercel build that does not say " +
-      "which environment it is for. The six schools are not published: unset it for " +
-      "Production in Vercel (docs/stage5-plan.md)."
-  );
-}
+// Until the launch a production build with the flag was refused here, so
+// a flag ticked for Production by mistake could not publish the three.
+// Arthur's decision (c) was taken on 2026-11-08 ("Launch: approved"), and
+// the launch merge removed the refusal (docs/stage5-plan.md, step 6).
 
 // The new schools' colour tokens are a stylesheet of their own, and a
 // build without the flag gets an empty one in its place, so their names
@@ -124,15 +109,15 @@ export function canonicalRedirects(env: NodeJS.ProcessEnv) {
 // schools' cards at /schools; /method and /debate/rubric are one page,
 // /how-it-works. A browser keeps a URL's anchor across a redirect whose
 // destination has none, so /method#samples lands on /how-it-works#samples;
-// /debate/rubric is sent to the rubric's own section. Not permanent until
-// the launch makes them so: a browser keeps a permanent redirect, and a
-// preview's addresses may still change.
+// /debate/rubric is sent to the rubric's own section. Permanent (308)
+// since the launch, as Arthur asked on 2026-11-06: until then a preview's
+// addresses could still change, and a browser keeps a permanent redirect.
 export function sixSchoolsRedirects(sixSchools: string) {
   if (sixSchools !== "1") return [];
   return [
-    { source: "/table", destination: "/schools", permanent: false },
-    { source: "/method", destination: "/how-it-works", permanent: false },
-    { source: "/debate/rubric", destination: "/how-it-works#rubric", permanent: false },
+    { source: "/table", destination: "/schools", permanent: true },
+    { source: "/method", destination: "/how-it-works", permanent: true },
+    { source: "/debate/rubric", destination: "/how-it-works#rubric", permanent: true },
   ];
 }
 
