@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllTopicFiles } from "@/lib/topics";
 import { getAllMicroLessons } from "@/lib/micro-lessons";
-import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
+import { SHOWN_SCHOOL_IDS } from "@/lib/school-registry";
 
 const BASE = "https://sophecs.com";
 
@@ -15,8 +15,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .sort((a, b) => a.sort - b.sort)
     .map((topic) => ({ url: `${BASE}/debate/${topic.slug}`, priority: 0.7 }));
 
-  // The before and after passages only: an "elsewhere" passage loads on a
-  // SIX_SCHOOLS build, and has no page at the sophecs.com address below.
+  // The before and after passages only. An "elsewhere" passage loads on a
+  // SIX_SCHOOLS build, which serves its page, but its file still marks it a
+  // draft, so it is not offered to search engines.
   const lessons = getAllMicroLessons()
     .filter((lesson) => lesson.position !== "elsewhere")
     .map((lesson) => ({
@@ -27,9 +28,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: BASE, priority: 1 },
     { url: `${BASE}/quiz`, priority: 0.9 },
-    // Every published school, in registry order, which is the order
-    // /s/[school] generates its static params in.
-    ...PUBLISHED_SCHOOL_IDS.map((school) => ({
+    // Every school this build shows, in registry order, which is the order
+    // /s/[school] generates its static params in: production's six since
+    // the launch, and the original three on a build without the flag.
+    ...SHOWN_SCHOOL_IDS.map((school) => ({
       url: `${BASE}/s/${school}`,
       priority: 0.8,
     })),

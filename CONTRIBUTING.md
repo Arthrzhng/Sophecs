@@ -112,7 +112,9 @@ and fails if one is there, which is the Phase 1B guarantee that no draft
 reaches a page or a production bundle. It was added after a registry that
 enumerated every school put three unreleased school names into thirteen
 production client chunks; the other four gates were all green at the
-time.
+time. Since the launch (2026-11-08) production is built with
+`SIX_SCHOOLS=1`, so this gate holds the build without the flag, the one a
+revert deploys, and `npm run check:bundle:six` holds production's.
 
 While Stage 5 builds the new schools behind `SIX_SCHOOLS`
 (`docs/stage5-plan.md`), a change to the registry, a school map,

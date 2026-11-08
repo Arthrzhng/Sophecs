@@ -46,7 +46,7 @@ import { shownLookup, type SchoolId } from "./school-registry";
  *   --color-utilitarian          #8a6320
  *   --color-virtue               #7a3540
  *
- * And, on a SIX_SCHOOLS build only, the three unpublished schools' tokens
+ * And, on a SIX_SCHOOLS build only, the tokens of the three published at the launch
  * from src/app/six-schools.css: each surface and marker below is behind
  * the same build-time constant as the registry's entries for them
  * (SHOWN_DRAFTS in school-registry.ts), so a build without the flag drops

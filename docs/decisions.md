@@ -5864,10 +5864,16 @@ For Arthur's list, in files this pass may not change:
 
 Arthur, 2026-11-08: "Launch: approved." After the exemplar cards (#109),
 the site pass and the closings (#108), and once both scheduled jobs
-answer 200, the Gate 4 launch steps in order: the preview's v2 results
-cleared (item 16, in the SQL Editor), the launch merge, the sample
-teardown and the fresh six-school run, then production read back. "Stop
-and tell me if any step fails; revert if production errors."
+answer 200, the Gate 4 launch steps: the preview's v2 results cleared
+(item 16, in the SQL Editor), the launch merge, the sample teardown and
+the fresh six-school run, then production read back. "Stop and tell me
+if any step fails; revert if production errors." They run in the order
+`docs/sample-activity.md` ("At launch") gives, with the teardown before
+the merge: the merge sets `RUN_QUIZ` to 2, and after it every scheduled
+extend of the live run, made with no quiz, would be refused and turn the
+job red every six hours. So: item 16, read back again just before the
+merge; the teardown; the merge; the fresh run's canary, then its full
+stage; production read back.
 
 What the merge changes, each item on the checklist in
 `docs/stage5-plan.md`:
@@ -5886,9 +5892,10 @@ What the merge changes, each item on the checklist in
   the registry marks them published. The flag, not their status, still
   decides whether a build shows them, so a build without it is the site
   as it was. The share lines were already rewritten (#102).
-- **Their criteria in `src/lib/judge/rubric.ts`**, moved from
+- **Their criteria in `src/lib/judge/rubric.ts`**, copied from
   `content/prompts/fidelity-criteria.draft.md` word for word (Gate 4 item
-  6). The flag-on request fixtures (`tests/judge-request/six-schools/`)
+  6). The draft file stays: the golden runner reads it, and
+  `tests/six-schools.test.ts` holds the two texts equal. The flag-on request fixtures (`tests/judge-request/six-schools/`)
   pass unchanged, which is the proof that the judge receives the same
   text. A build without the flag reads none of the three's criteria: the
   lookup throws for a school the build does not show, as it threw before
@@ -5910,17 +5917,49 @@ What the merge changes, each item on the checklist in
   - `src/app/actions.ts` is frozen; this change to it is the one the
     checklist names, under the launch approval.
   - v1's quiz is retired on a flag-on build, whose quiz page writes v2
-    results. Its server action still exists, and on a flag-on build it
-    would read a v2 challenger's school like any other; nothing calls it.
+    results. Its server action still exists and its id is still in the
+    result page's client code, so a request made by hand can write a v1
+    result, move a signed-in reader's school by it, and take up a v2
+    challenger's challenge. Each is a state the site already handles; no
+    page calls it.
 - **`RUN_QUIZ` is 2** (`scripts/seed/generate.ts`), so the scheduled job's
   runs place samples by quiz v2. The merge goes in after the sample
   teardown, so no run made with no quiz is left to extend; a plan with no
   quiz is refused for production from here.
 - **`README.md`** describes six schools, the flag, v3 and where the
   three's criteria live.
+- **The sitemap and the site's sharing image** list every school the build
+  shows (`SHOWN_SCHOOL_IDS`): six on production, three on a build without
+  the flag. The sitemap still leaves out the "elsewhere" passages, which a
+  flag-on build serves but whose files still mark them drafts.
+  `PUBLISHED_SCHOOL_IDS` stays the original three, which every build
+  shows, and `src/lib/school-registry.ts` now says so rather than calling
+  it what production publishes (review pass 1).
 
-**Reverting.** If production errors after the deploy: remove
-`SIX_SCHOOLS` from Production's environment and revert the merge, which
-together give back the three-school build. Results written as v2 in the
-meantime stay in the table; a build without the flag shows none of them
-and takes nothing from them.
+**Reverting.** If production errors after the deploy, the way back is
+the merged code built without the flag: remove `SIX_SCHOOLS` from
+Production's environment and redeploy, which rebuilds with the
+environment as it then is. That build is the three-school site, as the
+first review compared page by page.
+
+Not an instant rollback to the deployment before the merge, and not a
+revert of the merge commit, once anyone is in one of the three, which is
+from the fresh run's canary and the first reader's v2 quiz. Those builds
+hold no content for the three, so `/today` for a reader in one of them,
+and the verdict page of a debate argued in one, would error (review pass
+1). The merged code answers those pages on a build without the flag:
+`/today` sends such a reader to the quiz, and the verdict page, its image
+and its revision page are not found (`tests/launch-revert.test.tsx`).
+Before anyone is in one of the three, a rollback serves as well.
+
+What a build without the flag then does with what the launch left:
+- results written as v2 stay in the table; it shows none of them and
+  takes nothing from them;
+- a profile in one of the three keeps its school: `/me` and the class
+  pages show the school's id where its name would be, and the judge
+  refuses that reader as it refused the three before the launch;
+- the scheduled sample job goes on extending the fresh run, in all six
+  schools; the build shows the original three's rows;
+- a browser that followed one of the three permanent redirects keeps
+  going to `/schools` or `/how-it-works`, which such a build answers not
+  found.

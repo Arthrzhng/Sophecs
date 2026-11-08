@@ -91,8 +91,11 @@ then the approval is quoted in the pull request body.
 
 **The fixtures are narrower than the rule.** The six cover the v2 path for
 the three live schools; the twelve under `six-schools/` cover v3 on a
-flag-on build, so a change to `judge.v3.md`, to `src/lib/judge/rubric.ts`
-or to `content/prompts/fidelity-criteria.draft.md` now moves those. Nothing
+flag-on build, so a change to `judge.v3.md` or to `src/lib/judge/rubric.ts`
+moves those. Since the launch the three's criteria are read from
+`rubric.ts`, so a change to `content/prompts/fidelity-criteria.draft.md`
+moves no fixture; `tests/six-schools.test.ts` fails instead, as it holds
+the two texts equal. Nothing
 covers v3 on a build without the flag, which only a golden run sends, or
 the golden runner's own path for a draft school without the flag, so a
 change there moves no fixture and passes this rule while still changing
@@ -147,6 +150,11 @@ A review that touches the registry, a school map, or anything imported by a
 client component checks the grep output, not the reasoning about why it
 should be fine.
 
+Since the launch (2026-11-08) production is built with the flag, so the
+three are drafts only on a build without it. `npm run check:bundle` now
+holds that build, the one a revert deploys, to the site as it was, and
+`npm run check:bundle:six` holds production's.
+
 ## 4. Publishing a draft is Arthur's decision, and rule 3 goes green on one
 
 A school, lesson or motion becoming visible is stop condition (c). It is
@@ -165,8 +173,10 @@ builds only, behind `process.env.SIX_SCHOOLS === "1"`; an entry added to
 `PUBLISHED_SCHOOLS`, or a `SHOWN_DRAFTS` entry moved out from behind that
 test, is publishing, and so is setting `SIX_SCHOOLS` for Production, and
 so is promoting a flag-on preview deployment to Production, which does
-not rebuild and so passes no check at all. `next.config.ts` refuses a
-flag-on production build; it cannot see a promotion. Note the shape of that
+not rebuild and so passes no check at all. Until the launch,
+`next.config.ts` refused a flag-on production build (it could not see a
+promotion); the launch took the refusal out, under Arthur's approval.
+Note the shape of that
 front-matter diff: only the drafts carry a `status:` field at all, so
 publishing shows up as a **removed** line rather than a changed value.
 

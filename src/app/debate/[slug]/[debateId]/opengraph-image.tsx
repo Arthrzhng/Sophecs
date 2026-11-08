@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { VerdictCard } from "@/components/debate/VerdictCard";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { loadOgFonts } from "@/lib/og-fonts";
-import type { SchoolId } from "@/lib/types";
+import { SHOWN_SCHOOL_IDS, type SchoolId } from "@/lib/types";
 import { motionForDebate } from "@/lib/motion-text";
 
 // Node runtime (not edge) — see docs/decisions.md and r/[id]/opengraph-image.tsx:
@@ -35,6 +35,10 @@ export default async function VerdictOGImage({
       .eq("id", debateId)
       .maybeSingle();
     if (!data) return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+    // As on the page: no card for a debate in a school this build does not
+    // show (one of the three, on a build reverting the launch).
+    if (!SHOWN_SCHOOL_IDS.includes(data.school as SchoolId))
+      return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
     school = data.school as SchoolId;
     score = Number(data.score ?? 0);
     sample = Boolean(data.is_sample);

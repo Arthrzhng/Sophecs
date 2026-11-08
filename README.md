@@ -72,8 +72,9 @@ production is (`judge.v2.md` on a build without the flag), to
 `claude-sonnet-5`. Each school's fidelity criteria are in
 `src/lib/judge/rubric.ts`. It scores three criteria, in this order of weight:
 Fidelity, Rigor and Engagement. It returns a combined score out of 100
-alongside them. The criteria are published at `/debate/rubric`, and what the
-score does and does not mean is at `/method`.
+alongside them. The criteria, and what the score does and does not mean,
+are published at `/how-it-works` (on a build without the flag,
+`/debate/rubric` and `/method`).
 
 ## Where things live
 
@@ -112,9 +113,10 @@ No dark mode. The written plan is in `design/tokens.md` and
 
 No real-time features, notifications, payments, or moderation queue beyond
 the counterpart reply screening. There is no evidence yet that any of this
-improves anyone's reasoning, and the site makes no such claim. A fourth
-school is a content change rather than a code change: everything is keyed by
-school id.
+improves anyone's reasoning, and the site makes no such claim. A further
+school is mostly a content change, since everything is keyed by school id;
+the three added at the launch also needed their criteria approved and a
+place on quiz v2's map.
 
 Contributor rules, including the frozen paths and the review loop, are in
 `CONTRIBUTING.md`. The standard a step of work is reviewed against is

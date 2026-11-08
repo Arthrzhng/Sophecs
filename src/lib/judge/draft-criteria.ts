@@ -4,15 +4,17 @@ import { join } from "node:path";
 import { PUBLISHED_SCHOOL_IDS, SHOWN_SCHOOL_IDS, type SchoolId } from "@/lib/school-registry";
 
 /**
- * The approved fidelity criteria of the three schools not yet published,
- * for the judge on a SIX_SCHOOLS build only (Gate 3, Arthur at Checkpoint
- * B, 2026-11-05: "The new schools' fidelity criteria go into what the judge
- * receives on flag-on builds only, and the three join the rival list on
- * flag-on builds").
+ * The approved fidelity criteria of the three schools published at the
+ * launch, as `content/prompts/fidelity-criteria.draft.md` holds them (Gate
+ * 3, Arthur at Checkpoint B, 2026-11-05: "The new schools' fidelity
+ * criteria go into what the judge receives on flag-on builds only, and the
+ * three join the rival list on flag-on builds").
  *
- * Arthur's ruling of 2026-10-24 keeps these criteria out of
- * `src/lib/judge/rubric.ts` until he publishes the schools, so they stay in
- * `content/prompts/fidelity-criteria.draft.md` and are read from there. On
+ * Arthur's ruling of 2026-10-24 kept these criteria out of
+ * `src/lib/judge/rubric.ts` until he published the schools. The launch
+ * (2026-11-08) copied them into rubric.ts, which the judge reads first, so
+ * a shown school no longer reaches the map below; tests/six-schools.test.ts
+ * holds the two texts equal, and the golden runner still reads the file. On
  * a build without the flag `process.env.SIX_SCHOOLS` is the constant "0"
  * (next.config.ts), the file is never read, and the map is empty:
  * `/api/judge` refuses the three exactly as before, which

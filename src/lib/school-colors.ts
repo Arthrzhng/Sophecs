@@ -87,7 +87,7 @@ export const SCHOOL_ADHERENT_PLURAL: Record<SchoolId, string> = shownLookup(
 // `text-${token}` built at runtime would compile and then render with no
 // colour at all. A school with no class of its own gets `text-ink`.
 //
-// The three unpublished schools' classes are written by hand in
+// The classes of the three published at the launch are written by hand in
 // src/app/six-schools.css, which only a SIX_SCHOOLS build includes, and
 // are named here behind the same build-time constant as the registry's
 // entries (see SHOWN_DRAFTS there), so a build without the flag drops them.

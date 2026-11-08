@@ -12,7 +12,7 @@ import type { SchoolId } from "@/lib/types";
  * docs/quiz-v2.json, the file Arthur accepted at Checkpoint A (item 15) and
  * scripts/simulate-quiz-v2.mjs reads, so the quiz and its simulation cannot
  * drift apart. It is read here, on the server, and handed to client
- * components as props: the file names the three unpublished schools, and a
+ * components as props: the file names the three published at the launch, and a
  * client module that imported it would carry them into every build's
  * bundle. Only a SIX_SCHOOLS build renders anything from it, so only that
  * build's pages carry it at all.
