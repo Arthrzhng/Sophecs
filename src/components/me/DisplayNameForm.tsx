@@ -26,7 +26,7 @@ export function DisplayNameForm({ initial }: { initial: string | null }) {
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="Skippable — otherwise shown as “A Stoic”"
+          placeholder="Optional. Left blank, you appear as “A Stoic”"
           maxLength={60}
           className="min-h-14 flex-1 rounded-chunky border-2 border-rule-strong bg-surface px-4 text-base text-ink placeholder:text-ink-soft"
         />

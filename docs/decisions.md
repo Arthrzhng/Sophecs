@@ -5480,3 +5480,104 @@ How each is carried out:
   revision verdict that says an objection is now answered and still
   suggests answering it, and "'s" after a name ending in "s". They stay on
   Arthur's list.
+
+### A pass over the whole site for what reads as machine-written (2026-11-08)
+
+Arthur, 2026-11-08:
+
+> Audit the whole site for anything that reads as AI-generated, and fix it
+> in UI copy and design (not frozen content files; list content issues for
+> me instead). Look for: any emoji, or Unicode symbols that render as
+> emoji (arrows, triangles, check marks, stars, sparkles); em dashes in UI
+> copy (house rule: none); stock AI phrasing: "delve", "unlock",
+> "elevate", "seamless", "journey", "dive into", "explore", "Here's...",
+> "Let's...", "not just X but Y", rule-of-three lists, rhetorical
+> questions as headings, exclamation marks; generic headings and
+> empty-state copy that could be on any site; repeated sentence openings
+> or identical endings across sample arguments and exemplars (closings per
+> motion, as I asked); sparkle/AI icons, gradient blobs, or decorative
+> effects not in design/tokens.md. Check every route at 390px on iOS
+> Safari rendering as well as Chromium.
+
+How it was read. Every user-visible string in `src/app`, `src/components`
+and `src/lib` was pulled out with the TypeScript parser (JSX text, string
+attributes, and strings in the properties pages use for copy), 615 in all,
+and read; the content folders were searched. Every route that renders
+without the database (the landing page, the quiz, the schools and each
+school's page, the lessons, a passage and a module, the method and
+how-it-works pages, the rubric, sign-in, the table and the 404) was
+rendered at 390px in Chromium from a build with the flag off and one
+with it on, and each page's text scanned: no sideways scroll on any, no
+emoji, and no em dash outside the frozen files listed below. Pages that
+read the database (today, the motions, a debate, a verdict, `/me`) cannot
+render here without its credentials; their copy was read from the source,
+and WebKit cannot run here, so iOS is covered by the markup.
+
+- **Emoji.** None anywhere. No character with an emoji form is rendered;
+  the disclosure triangle Arthur reported is #109's fix. The arrows that
+  remain ("→" in the verdict's rating line and the share text, "←" and "→"
+  on the six-school map) have no emoji form.
+- **Em dashes in UI copy: 19, all gone.** In the share page, the quiz
+  result (both versions), the class note on `/me`, the display-name
+  placeholder, the reading-check save error, the verdict's "Answered"
+  link, the empty motion list, four lines of the argument editor, the
+  passage's source line, three lines of the rubric page, the lessons page
+  (its description and its empty state), and the site's preview image
+  text. Each is now a full stop, a comma, a colon or a semicolon, as the
+  sentence wanted. A missing number in a table (the school table's rank
+  and fidelity, the verdict's criteria) showed an em dash; it shows an en
+  dash, the table convention. Comments, the styleguide (not served in
+  production) and the code's own error messages keep theirs.
+- **Stock phrasing.** None of the listed words, no exclamation mark, no
+  "Here's" or "Let's", and no question as a page heading except two
+  confirmation dialogs ("Send this to the judge?"), which ask a real
+  question. Changed: the rubric's fidelity line ("actually reason ... not
+  merely arrive"), the word-count hint ("enough room to actually argue the
+  case, not just assert it"), and the site's preview text, a three-beat
+  line ("Ten scenarios. Six schools. One result you'll want to argue
+  about."), now "Answer ten scenarios to find which of six schools of
+  ethics you argue from."
+- **Generic copy.** The 404 page's heading, "Nothing here.", is now "No
+  page at this address." The rest of the empty states already say what is
+  missing and what to do ("No judged arguments yet this week. The table
+  fills in as they arrive.").
+- **Repeated openings and endings.** Endings: #108 (each motion's own
+  closings, and no exemplar page showing an ending twice). Openings: in a
+  quiz v2 run 23 of 144 exemplar cards open on the same first sentence as
+  another school's card on their page, five of them "I reject the
+  motion." on one page, because 26 of the 144 positions open on a bare
+  stance sentence ("I reject the motion.", "I accept the motion.", "I
+  support the motion."). That is the generator's, and goes in its own
+  change after #108.
+- **Decorative effects.** No gradient blob, glow, sparkle or AI icon; the
+  one gradient draws a module's progress ring. The Daily path's motion
+  (a confetti burst after the reading check, the bobbing "Up next", the
+  pulsing ring around the current step, the flame's flicker, the chunky
+  button's press) is not in `design/tokens.md`, whose section 6 forbids
+  any transform; it came with the Daily path mockups, which the record
+  above says superseded the tokens where they disagree. Left, and put to
+  Arthur.
+- **Tests.** The flag-off markup fixtures (`tests/nav-six-flag-off/`)
+  hold production's pages to main's render; the rubric and school-table
+  fixtures take exactly the same text changes, so they still show nothing
+  else moved.
+
+For Arthur's list, in files this pass may not change:
+- `content/schools/stoicism.md` (3 em dashes), `utilitarianism.md` (3),
+  `virtue-ethics.md` (4, one in a share line: "Apparently I judge an
+  algorithm the same way I judge a person — not by the rule it follows");
+- `content/micro/borrowed-judgement-before.md` and
+  `moral-training-before.md`, one each;
+- `content/quiz/questions.ts`, three in quiz v1's questions and answers,
+  which production shows until the launch;
+- `src/lib/judge/rubric.ts` (frozen under (b)): the fidelity criteria
+  `/debate/rubric` shows in full have two em dashes, "not just the
+  agent's, and not just one favored group's", and the American
+  "maximizes" and "favored". Changing them changes what the judge
+  receives;
+- `src/app/api/counterpart/turn/route.ts` (frozen): the error "Quote a
+  whole sentence — at least 10 characters.";
+- the Daily path's motion above: keep or cut;
+- the preview image and the share card ask "Which school do you think
+  in?". Kept: it is an invitation to the reader, which the quiz answers
+  for them, not a heading the page answers itself.

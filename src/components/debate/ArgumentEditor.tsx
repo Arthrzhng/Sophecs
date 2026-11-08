@@ -330,7 +330,7 @@ export function ArgumentEditor({
       <div className="border-t border-rule py-16">
         <p className="font-serif text-md text-ink">The judge is reading your argument.</p>
         <p className="mt-2 max-w-[54ch] text-sm leading-relaxed text-ink-mid">
-          It takes about half a minute. Leaving this page cancels nothing — the
+          It takes about half a minute. Leaving this page cancels nothing; the
           verdict will be on your profile either way.
         </p>
       </div>
@@ -401,7 +401,7 @@ export function ArgumentEditor({
               school, and the case is where that reason is written down. */}
           <li>
             Give the reason your school gives. The excerpt above sets up the
-            question, not your answer to it — your reason comes from{" "}
+            question, not your answer to it. Your reason comes from{" "}
             <TextLink href={`/s/${school}`}>
               the case for {SCHOOL_COLORS[school].name}
             </TextLink>
@@ -447,7 +447,7 @@ export function ArgumentEditor({
           placeholder={
             showScaffold
               ? "Eighty words is enough for all three. Most first arguments take about ten minutes."
-              : `At least ${MIN_ARGUMENT_WORDS} words — enough room to actually argue the case, not just assert it.`
+              : `At least ${MIN_ARGUMENT_WORDS} words: room to argue the case rather than assert it.`
           }
         />
         </div>
@@ -510,7 +510,7 @@ export function ArgumentEditor({
         title={isRevision ? "Submit this revision?" : "Send this to the judge?"}
         description={
           isRevision
-            ? "It goes to the judge now. A revision is the last word on this argument — there is no second one."
+            ? "It goes to the judge now. A revision is the last word on this argument; there is no second one."
             : `It goes to the judge now. You get one verdict and one revision. This motion locks for ${TOPIC_LOCK_DAYS} days afterwards.`
         }
         confirmLabel={isRevision ? "Submit revision" : "Send to the judge"}

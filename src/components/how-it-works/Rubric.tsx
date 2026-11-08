@@ -31,7 +31,7 @@ const AXES = [
   {
     weight: "Heaviest",
     name: "Fidelity",
-    body: "Does the argument actually reason the way this school reasons, using its real commitments — not merely arrive at a position the school happens to hold? This is the criterion that decides most of the score.",
+    body: "Does the argument reason the way this school reasons, from its real commitments, rather than arriving at a position the school happens to hold? This is the criterion that decides most of the score.",
   },
   {
     weight: "Second",
@@ -78,7 +78,7 @@ export function RubricCriteria({ sub = false }: { sub?: boolean }) {
           What counts as faithful
         </H2>
         <p className="prose-reading mt-3">
-          These are the criteria the judge is given for each school, in full —
+          These are the criteria the judge is given for each school, in full:
           the same text, not a summary of it.
         </p>
         {/* A 4px edge in each school's colour, the marker rule's own form
@@ -122,7 +122,7 @@ export function CounterpartRules({ id }: { id?: string }) {
         <li>Quote the sentence you&apos;re answering.</li>
         <li>Between 150 and 1,200 characters a reply.</li>
         <li>Two replies each, then it closes. Neither of you has to concede.</li>
-        <li>No names, schools, locations or links — yours or theirs.</li>
+        <li>No names, schools, locations or links, yours or theirs.</li>
         <li>Replies are checked before they are delivered.</li>
         <li>Report or block from any reply.</li>
       </ul>

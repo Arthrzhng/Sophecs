@@ -113,7 +113,7 @@ function DeltaRow({
   after: number | null;
 }) {
   const delta = before != null && after != null ? after - before : null;
-  const fmt = (n: number | null) => (n == null ? "—" : Number.isInteger(n) ? String(n) : n.toFixed(1));
+  const fmt = (n: number | null) => (n == null ? "–" : Number.isInteger(n) ? String(n) : n.toFixed(1));
   return (
     <tr className="border-b border-rule last:border-b-0">
       <th scope="row" className="py-3 text-left text-sm font-normal text-ink-mid">
@@ -124,7 +124,7 @@ function DeltaRow({
       </td>
       <td className="py-3 pl-4 text-right font-mono text-sm tabular text-ink">{fmt(after)}</td>
       <td className="py-3 pl-6 text-right font-mono text-sm tabular text-ink-mid">
-        {delta == null ? "—" : signed(Number(delta.toFixed(1)))}
+        {delta == null ? "–" : signed(Number(delta.toFixed(1)))}
       </td>
     </tr>
   );
@@ -419,7 +419,7 @@ export function Verdict({
             <div className="mt-6 flex flex-wrap items-center gap-4">
               {hasRevision ? (
                 <TextLink href={`/debate/${topicSlug}/${hasRevision}`} className="text-sm">
-                  Answered — read the revision
+                  Answered in the revision
                 </TextLink>
               ) : (
                 <>

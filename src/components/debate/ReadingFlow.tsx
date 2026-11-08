@@ -82,7 +82,7 @@ export function ReadingFlow({
       {revealed >= chunks.length && (
         <>
           <p className="mt-4 font-mono text-xs text-ink-soft">
-            — {lesson.source.author}, {lesson.source.work}, {lesson.source.section}
+            {lesson.source.author}, {lesson.source.work}, {lesson.source.section}
           </p>
           {action && <div className="mt-10">{action}</div>}
         </>

@@ -67,7 +67,7 @@ function Row({ row, rank, note }: { row: SixSchoolRow; rank: number | null; note
       <span className="flex flex-col text-right">
         <span className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">Fidelity</span>
         <strong className="font-mono tabular text-base text-ink">
-          {row.fidelity === null ? "—" : row.fidelity.toFixed(1)}
+          {row.fidelity === null ? "–" : row.fidelity.toFixed(1)}
         </strong>
       </span>
     </li>
