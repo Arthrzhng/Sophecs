@@ -9,7 +9,7 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { GuardError } from "./env";
 import { StopError } from "./engine";
-import { RUN_QUIZ, type GenConfig } from "./generate";
+import { RUN_QUIZ, RUN_WEEKLY, type GenConfig } from "./generate";
 
 export const REPORT_DIR = join(process.cwd(), "scripts", "seed", "reports");
 
@@ -82,6 +82,20 @@ export function checkPlanQuiz(f: Flags, planQuiz: GenConfig["quiz"], target: "lo
     throw new GuardError(
       `the plan ${planQuiz ? "places samples by quiz v2" : "names no quiz"}, but the scheduled job's runs ${RUN_QUIZ ? "place them by quiz v2" : "name none"} (RUN_QUIZ in scripts/seed/generate.ts), so every scheduled extension would refuse this run`
     );
+}
+
+/**
+ * And a plan's weekly shape (`weekly`) must be the scheduled job's
+ * (RUN_WEEKLY), for the same reason: it is part of the base hash.
+ */
+export function checkPlanWeekly(planWeekly: GenConfig["weekly"], target: "local" | "production"): void {
+  if (target === "production" && JSON.stringify(planWeekly ?? null) !== JSON.stringify(RUN_WEEKLY ?? null))
+    throw new GuardError("the plan's weekly shape is not the scheduled job's (RUN_WEEKLY in scripts/seed/generate.ts), so every scheduled extension would refuse this run");
+}
+
+/** The weekly shape a quiz v2 run grows by: the scheduled job's. */
+export function weeklyFor(quiz: GenConfig["quiz"]): Pick<GenConfig, "weekly"> {
+  return quiz === 2 && RUN_WEEKLY ? { weekly: RUN_WEEKLY } : {};
 }
 
 /** The quiz a run places samples by: quiz v2 and six schools with --six-schools, else what the scheduled job uses. */

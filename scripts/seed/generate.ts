@@ -87,6 +87,17 @@ export interface GenConfig {
    * the launch: quiz v1 and its three, every row exactly as before.
    */
   quiz?: 2;
+  /**
+   * A run shaped as a site on course for about 4,000 accounts over three
+   * years (Arthur, 2026-11-08): from the base window's end on, each week
+   * brings about `newcomers` new accounts and exactly its own number of
+   * active accounts, about `active` and never a multiple of ten, and every
+   * school at least `minPerSchool` judged originals. Each week is drawn from
+   * its own stream and from the weeks before it, so a later `to` only
+   * appends. Quiz v2 runs only. Absent, as in every run before it: the base
+   * window's own streams carry on past it, every row exactly as before.
+   */
+  weekly?: { newcomers: number; active: number; minPerSchool: number };
   topics: { slug: string; title: string; motion: string; sort: number; microBefore: string }[];
 }
 
@@ -103,14 +114,23 @@ export const RUN_QUIZ: GenConfig["quiz"] = 2;
 
 // 3,278 accounts, Arthur's ruling of 2026-11-04, and the other volumes
 // scaled from the brief's 4,000 by the same factor.
+// The run's size at its start (Arthur, 2026-11-08: "total accounts about
+// 700-800 now"), the rest in proportion to the run before it (3,278
+// accounts, 4,917 anonymous results, 328 challenges, 492 exchanges, 10
+// classes).
 export const DEFAULTS = {
-  users: 3278,
-  anonResults: 4917,
-  challenges: 328,
-  exchanges: 492,
-  classes: 10,
+  users: 738,
+  anonResults: 1107,
+  challenges: 74,
+  exchanges: 111,
+  classes: 3,
   from: "2026-09-18T00:00:00.000Z",
 };
+
+// What the scheduled job's runs grow by, week to week (Arthur, 2026-11-08:
+// "roughly 200 active accounts in any week ... growing by about 25 a week.
+// Every school still gets at least 20 judged originals a week").
+export const RUN_WEEKLY: GenConfig["weekly"] = { newcomers: 25, active: 200, minPerSchool: 20 };
 
 // ---- rows, in the database's own column names ----
 
@@ -488,8 +508,8 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
   take(Math.round(cfg.users * 0.25), () => 1, "light");
 
   const usedHandles = new Set<string>();
-  const users: User[] = rawUsers.map((u, n) => {
-    const r = u.r;
+  // One account, drawing in the order the base window's always have.
+  const makeUser = (n: number, r: Rng, signup: number, tz: string, c: ActivityClass): User => {
     const given = r.pick(GIVEN_NAMES);
     const initial = r.pick(INITIALS.split(""));
     let handle = `${given.toLowerCase()}_${initial.toLowerCase()}${r.int(10, 9999)}`;
@@ -500,9 +520,9 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
       n,
       id: r.uuid(),
       rng: r,
-      signup: u.signup,
-      tz: u.tz,
-      cls: cls[n],
+      signup,
+      tz,
+      cls: c,
       skill: Math.min(1, Math.max(0, r.normal(0.5, 0.2))),
       defaultPublic: r.chance(0.35),
       displayName: `${given} ${initial}.`,
@@ -512,14 +532,17 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
       schoolAt: [],
       history: [],
     };
-  });
+  };
+  const users: User[] = rawUsers.map((u, n) => makeUser(n, u.r, u.signup, u.tz, cls[n]));
+  if (cfg.weekly && !v2) throw new Error("a weekly run is a quiz v2 run");
 
-  const authUsers: Item<AuthUserRow>[] = users.map((u) => ({
+  const authUserItem = (u: User): Item<AuthUserRow> => ({
     logicalId: `user:${u.n}`,
     rowId: u.id,
     cohort: u.n,
     row: { id: u.id, email: emailFor(runId, u.n, v2 ? emailTag(cfg.seed, runId, u.n) : root.fork(`email/${u.n}`).token("abcdefghijklmnopqrstuvwxyz0123456789", 12)) },
-  }));
+  });
+  const authUsers: Item<AuthUserRow>[] = users.map(authUserItem);
 
   // Cohort for rows that belong to no user: the number of users who had
   // arrived by then, so a canary of the first K users takes the anonymous
@@ -655,6 +678,9 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
   };
 
   const slots: Slot[] = [];
+  // A weekly run's own streams stop at the base window's end; the weeks
+  // after it are drawn whole, below.
+  const streamEnd = cfg.weekly ? to : horizon;
   for (const u of users) {
     if (u.cls === "quiz") continue;
     const r = debateRng.fork(`u${u.n}`);
@@ -682,7 +708,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     let t = u.signup + r.int(3, 45) * MINUTE;
     let k = 0;
     let guard = 0;
-    while (k < budget && t < end && t <= horizon && guard++ < 1_000_000) {
+    while (k < budget && t < end && t <= streamEnd && guard++ < 1_000_000) {
       // Five a day, as /api/judge counts them: within any 24 hours.
       while (recent.length && recent[0] <= t - DAY) recent.shift();
       if (recent.length >= 5) {
@@ -720,6 +746,221 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         t = next ?? end + 1;
       }
     }
+  }
+
+  // ---- 5w. the weeks after the base window (`weekly`) ----
+  // Each week from the one the base window ends in: about `newcomers` new
+  // accounts, each taking the quiz as they join; then returning accounts,
+  // drawn by how engaged each is and how long ago they joined, until the
+  // week holds exactly its number of active accounts; then, for any school
+  // short of `minPerSchool` judged originals, more from its active members.
+  // A week is drawn whole from its own stream and the weeks before it, and
+  // only what falls by `to` is kept, so a later `to` only appends.
+  const weeklyUsers: User[] = [];
+  const lateResults: Item<QuizResultRow>[] = [];
+  // Their results join the run's after the base window's challenges,
+  // exchanges and classes are drawn, which belong to the base window alone.
+  const weeklyResults: Item<QuizResultRow>[] = [];
+  if (cfg.weekly) {
+    const W = cfg.weekly;
+    const WEEK = 7 * DAY;
+    const wkRng = root.fork("weekly");
+    const CLASS_WEIGHT: Record<ActivityClass, number> = { quiz: 0.3, light: 1, regular: 3, heavy: 7 };
+    const HALF_LIFE_WEEKS: Record<ActivityClass, number> = { quiz: 3, light: 5, regular: 16, heavy: 70 };
+    const NEW_CLASS = [["quiz", 0.6], ["light", 0.25], ["regular", 0.12], ["heavy", 0.03]] as const;
+    interface Carry { k: number; results: number; locked: Map<TopicSlug, number>; recent: number[]; reviseChance: number }
+    const carry = new Map<User, Carry>();
+    const carryOf = (u: User): Carry => {
+      let c = carry.get(u);
+      if (!c) {
+        const tr = u.rng.fork("weekly");
+        const reviser = tr.chance(u.cls === "heavy" ? 0.5 : 0.125);
+        c = {
+          k: 0,
+          results: 1 + u.history.length,
+          locked: new Map(),
+          recent: [],
+          reviseChance: !reviser ? 0 : u.cls === "light" ? 0.6 : u.cls === "regular" ? 0.3 : 0.15,
+        };
+        carry.set(u, c);
+      }
+      return c;
+    };
+    // What the base window leaves each account with.
+    for (const slot of [...slots].sort((a, b) => a.t - b.t)) {
+      const c = carryOf(slot.u);
+      c.k = Math.max(c.k, slot.k + 1);
+      c.locked.set(slot.topic, slot.t + 7 * DAY + MINUTE);
+      c.recent.push(slot.t);
+    }
+    const retake = (u: User, at: number, r: Rng) => {
+      const current = schoolOf(u, at);
+      let q = null;
+      for (let tries = 0; tries < 30 && !q; tries++) {
+        const t = takeQuiz(r, r.pick(schools.filter((x) => x !== current)));
+        if (t.school !== current) q = t;
+      }
+      if (!q) return false;
+      const c = carryOf(u);
+      const rid = id(r);
+      lateResults.push({
+        logicalId: `result:user:${u.n}:${c.results++}`,
+        rowId: rid,
+        cohort: u.n,
+        row: { id: rid, anon_id: r.uuid(), user_id: u.id, ...q, challenge_from: null, referrer: null, created_at: iso(at), is_sample: true },
+      });
+      u.schoolAt.push({ at, school: q.school });
+      u.history.push({ from: current, to: q.school, at: iso(at) });
+      return true;
+    };
+    // One original at or after `t`, inside the week, by the rules the base
+    // window's streams keep: five within any 24 hours, seven days between
+    // two on one motion. Returns its time, or null if none fits.
+    const original = (u: User, t: number, latest: number, r: Rng, out: Slot[], forceKept = false): number | null => {
+      const c = carryOf(u);
+      for (let guard = 0; guard < 40; guard++) {
+        if (t > latest) return null;
+        while (c.recent.length && c.recent[0] <= t - DAY) c.recent.shift();
+        if (c.recent.length >= 5) {
+          t = c.recent[0] + DAY + r.int(5, 120) * MINUTE;
+          continue;
+        }
+        const open = TOPICS.filter((x) => (c.locked.get(x) ?? 0) <= t);
+        if (open.length === 0) {
+          t = Math.min(...[...c.locked.values()]) + r.int(30, 600) * MINUTE;
+          continue;
+        }
+        const weekly = getWeeklyMotion(weeklyTopics, new Date(t))!.slug as TopicSlug;
+        const topic = open.includes(weekly) && r.chance(0.6) ? weekly : r.pick(open);
+        const school = schoolOf(u, t);
+        const tier = pickTier(r, Math.min(1, u.skill + (u.cls === "heavy" ? 0.15 : 0)));
+        const rejected = !forceKept && r.chance(tier === "weak" ? 0.06 : tier === "mid" ? 0.024 : 0.01);
+        const argumentPublic = r.chance(0.1) ? !u.defaultPublic : u.defaultPublic;
+        // A revision lands in the same week, so a week's active accounts are
+        // exactly the ones drawn for it.
+        let revise: Slot["revise"] = null;
+        if (!rejected && r.chance(c.reviseChance)) {
+          const delay = Math.min(Math.max(10 * MINUTE, Math.min(6 * DAY, r.exponential(DAY))), latest - t);
+          if (delay >= 10 * MINUTE) revise = { delay, answered: r.chance(0.85) };
+        }
+        out.push({ u, k: c.k++, t, topic, school, tier, rejected, argumentPublic, revise });
+        c.locked.set(topic, t + 7 * DAY + MINUTE);
+        c.recent.push(t);
+        return t;
+      }
+      return null;
+    };
+    const dayOf = (r: Rng, from: number, until: number) => {
+      const days: (readonly [number, number])[] = [];
+      for (let d = startOfUtcDay(from); d < until; d += DAY) days.push([d, dayWeight(d)] as const);
+      return days.length ? r.weighted(days) : null;
+    };
+    const timeIn = (r: Rng, u: User, from: number, until: number): number | null => {
+      for (let tries = 0; tries < 8; tries++) {
+        const day = dayOf(r, from, until);
+        if (day === null) return null;
+        const t = activeTimeOn(r, u.tz, day, from, until);
+        if (t !== null) return t;
+      }
+      return null;
+    };
+    const monday = (t: number) => startOfUtcDay(t) - ((new Date(startOfUtcDay(t)).getUTCDay() + 6) % 7) * DAY;
+    const weekSlots: Slot[] = [];
+    for (let ws = monday(to); ws <= horizon; ws += WEEK) {
+      const we = ws + WEEK;
+      const start = Math.max(ws, to);
+      const latest = we - 10 * MINUTE;
+      const r = wkRng.fork(iso(ws).slice(0, 10));
+      const thisWeek: Slot[] = [];
+
+      // Newcomers, each with their quiz as they join.
+      const arrivals: { r: Rng; tz: string; t: number }[] = [];
+      const want = Math.max(0, Math.round(r.normal(W.newcomers, W.newcomers * 0.2)));
+      for (let i = 0; i < want; i++) {
+        const ar = r.fork(`newcomer/${i}`);
+        const tz = ar.weighted(TIMEZONES);
+        // Far enough in that the quiz they take first falls in this week too.
+        const t = timeIn(ar, { tz } as User, start + 45 * MINUTE, latest);
+        if (t !== null) arrivals.push({ r: ar, tz, t });
+      }
+      arrivals.sort((a, b) => a.t - b.t);
+      const actives = new Set<User>();
+      for (const a of arrivals) {
+        const u = makeUser(users.length + weeklyUsers.length, a.r.fork("user"), a.t, a.tz, a.r.weighted(NEW_CLASS));
+        weeklyUsers.push(u);
+        const qr = u.rng.fork("quiz");
+        const quiz = takeQuiz(qr, u.leaning);
+        const rid = id(qr);
+        u.firstResultId = rid;
+        u.schoolAt.push({ at: u.signup, school: quiz.school });
+        lateResults.push({
+          logicalId: `result:user:${u.n}:0`,
+          rowId: rid,
+          cohort: u.n,
+          row: { id: rid, anon_id: qr.uuid(), user_id: u.id, ...quiz, challenge_from: null, referrer: null, created_at: iso(Math.max(start, u.signup - qr.int(2, 40) * MINUTE)), is_sample: true },
+        });
+        actives.add(u);
+        const nr = r.fork(`newcomer-activity/${u.n}`);
+        const n =
+          u.cls === "quiz" ? 0 : u.cls === "light" ? nr.weighted([[0, 0.15], [1, 0.55], [2, 0.3]] as const) : u.cls === "regular" ? nr.int(1, 3) : nr.int(2, 4);
+        let t: number | null = u.signup + nr.int(3, 45) * MINUTE;
+        for (let k = 0; k < n && t !== null; k++) {
+          t = original(u, t, latest, nr, thisWeek);
+          if (t !== null) t += nr.int(4, 40) * MINUTE;
+        }
+      }
+
+      // Returning accounts, until the week holds its number. Never a
+      // multiple of ten (Arthur: "e.g. 183, 207, 196, never a round number").
+      let target = Math.round(r.normal(W.active, W.active * 0.045));
+      if (target % 10 === 0) target += r.chance(0.5) ? 1 : -1;
+      const pool = [...users, ...weeklyUsers].filter((u) => u.signup < start && !actives.has(u));
+      const keyed = pool
+        .map((u) => {
+          const age = Math.max(0, (ws - u.signup) / WEEK);
+          const w = CLASS_WEIGHT[u.cls] * (0.25 + 0.75 * 2 ** (-age / HALF_LIFE_WEEKS[u.cls]));
+          return { u, key: Math.log(Math.max(1e-12, r.float(0, 1))) / w };
+        })
+        .sort((a, b) => b.key - a.key || a.u.n - b.u.n);
+      for (const { u } of keyed) {
+        if (actives.size >= target) break;
+        const ar = r.fork(`active/${u.n}`);
+        const n = u.cls === "heavy" ? ar.int(2, 6) : u.cls === "regular" ? ar.int(1, 3) : u.cls === "light" ? ar.weighted([[1, 0.7], [2, 0.3]] as const) : ar.chance(0.5) ? 1 : 0;
+        let t = timeIn(ar, u, start, latest);
+        if (t === null) continue;
+        let did = false;
+        // A returning account that writes nothing retakes the quiz; a few
+        // others do too, as a reader might.
+        if (n === 0 || ar.chance(0.03)) did = retake(u, t, ar) || did;
+        for (let k = 0; k < n; k++) {
+          const made = original(u, t + (did ? ar.int(5, 30) * MINUTE : 0), latest, ar, thisWeek);
+          if (made === null) break;
+          did = true;
+          t = ar.chance(0.45) ? made + ar.int(4, 30) * MINUTE : (timeIn(ar, u, made + 2 * HOUR, latest) ?? made + ar.int(4, 30) * MINUTE);
+        }
+        if (did) actives.add(u);
+      }
+
+      // Every school at least `minPerSchool` judged originals, with two to
+      // spare: more from its members already active this week.
+      const counted = new Map<SchoolId, number>();
+      for (const sl of [...slots, ...thisWeek]) if (sl.t >= ws && sl.t < we && !sl.rejected) counted.set(sl.school, (counted.get(sl.school) ?? 0) + 1);
+      for (const school of schools) {
+        const tr = r.fork(`top-up/${school}`);
+        const members = [...actives].filter((u) => schoolOf(u, start) === schoolOf(u, latest) && schoolOf(u, latest) === school).sort((a, b) => a.n - b.n);
+        for (let guard = 0; (counted.get(school) ?? 0) < W.minPerSchool + 2 && members.length && guard < 400; guard++) {
+          const u = tr.pick(members);
+          const t = timeIn(tr, u, Math.max(start, u.signup + 5 * MINUTE), latest);
+          if (t !== null && original(u, t, latest, tr, thisWeek, true) !== null) counted.set(school, (counted.get(school) ?? 0) + 1);
+        }
+      }
+      weekSlots.push(...thisWeek);
+    }
+    // Only what has happened by `to`.
+    for (const sl of weekSlots) if (sl.t <= horizon) slots.push(sl);
+    for (const u of weeklyUsers) if (u.signup <= horizon) authUsers.push(authUserItem(u));
+    const signupOf = new Map([...users, ...weeklyUsers].map((u) => [u.id, u.signup]));
+    for (const item of lateResults) if (Date.parse(item.row.created_at) <= horizon && signupOf.get(item.row.user_id!)! <= horizon) weeklyResults.push(item);
   }
   slots.sort((a, b) => a.t - b.t || a.u.n - b.u.n || a.k - b.k);
 
@@ -1158,7 +1399,11 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
   }
 
   // ---- 11. profiles, with what the replay ended on ----
-  const profiles: Item<ProfileRow>[] = users.map((u) => {
+  for (const item of weeklyResults) pushResult(item);
+  // A weekly run's accounts joined by `to`, each as it stood then: a week is
+  // drawn whole, so a retake later in the week is not yet theirs.
+  const profileUsers = cfg.weekly ? [...users, ...weeklyUsers.filter((u) => u.signup <= horizon)] : users;
+  const profiles: Item<ProfileRow>[] = profileUsers.map((u) => {
     const end = replayed.profiles.get(u.id);
     return {
       logicalId: `profile:${u.n}`,
@@ -1169,12 +1414,12 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         handle: u.handle,
         display_name: u.displayName,
         created_at: iso(u.signup),
-        school: u.schoolAt[u.schoolAt.length - 1].school,
+        school: cfg.weekly ? schoolOf(u, horizon) : u.schoolAt[u.schoolAt.length - 1].school,
         elo: end?.elo ?? 1200,
         streak: end?.streak ?? 0,
         streak_updated_on: end?.streakUpdatedOn ?? null,
         argument_default_public: u.defaultPublic,
-        school_history: u.history,
+        school_history: cfg.weekly ? u.history.filter((h) => Date.parse(h.at) <= horizon) : u.history,
         tz: u.tz,
         is_sample: true,
       },

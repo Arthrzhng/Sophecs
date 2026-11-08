@@ -6078,3 +6078,49 @@ What a build without the flag then does with what the launch left:
 - a browser that followed one of the three permanent redirects keeps
   going to `/schools` or `/how-it-works`, which such a build answers not
   found.
+
+### The sample run scaled down, and grown week by week (2026-11-08)
+
+Arthur, 2026-11-08: "Scale down. Tear down the current sample run and
+start a new one that looks like a site on course for about 4,000 users
+over three years: roughly 200 active accounts in any week, varying
+naturally week to week (e.g. 183, 207, 196), never a round number; total
+accounts about 700-800 now, growing by about 25 a week. Every school
+still gets at least 20 judged originals a week so all six stay ranked.
+Keep every existing realism rule (no round scores, no duplicate endings,
+exemplar floor) and the six-hourly extension."
+
+The run before it could not do this by size alone: its accounts all
+joined in the base window, and with 750 of them a week after the base
+window held about 23 active accounts and some schools none. So:
+- **The base window** keeps its model, at 738 accounts and the rest in
+  proportion (`DEFAULTS`), and its streams stop at its end.
+- **Each week after it** (`weekly`, `RUN_WEEKLY`) is drawn whole from its
+  own stream and the weeks before it:
+  - about 25 newcomers, each with a quiz;
+  - returning accounts, by engagement and how long ago they joined,
+    until the week holds exactly its number of active accounts, about 200
+    and moved by one off a multiple of ten;
+  - more originals for any school short of 22 judged ones.
+
+  A later end only appends, so the six-hourly extension carries on.
+- **Challenges, exchanges, reading answers and classes** stay the base
+  window's.
+- **A run that names no quiz** is drawn exactly as before, every pin
+  unchanged.
+
+Measured on three seeds over twelve weeks:
+- active accounts in each full week were 181 to 217, none a multiple of
+  ten;
+- 16 to 41 newcomers a week, about 28 on average;
+- 28 or more judged originals per school per week;
+- exact duplicate arguments at 0.05%;
+- no two exemplar cards on a page sharing their first three words.
+
+For Arthur's list:
+- **Thinner exemplar pages at the start.** At the start, four of the six
+  motions' exemplar pages have a school with two or three cards rather
+  than four, all above the floor. They fill within about three weeks.
+- **Visible newcomers.** About 25 newcomers a week sit beside about 200
+  active, so new accounts are a visible part of each week. "Joined /
+  left" on the table counts school changes, not sign-ups, as before.

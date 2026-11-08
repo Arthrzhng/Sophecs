@@ -68,6 +68,7 @@ export function baseHash(gen: GenConfig): string {
       exchanges: gen.exchanges,
       classes: gen.classes,
       ...(gen.quiz ? { quiz: gen.quiz } : {}),
+      ...(gen.weekly ? { weekly: gen.weekly } : {}),
     },
     topics: gen.topics.map((t) => [t.slug, t.motion]),
   };
@@ -238,6 +239,7 @@ export function buildPlan(input: PlanInput, banks: Banks = loadBanks()): { plan:
       exchanges: input.gen.exchanges,
       classes: input.gen.classes,
       ...(input.gen.quiz ? { quiz: input.gen.quiz } : {}),
+      ...(input.gen.weekly ? { weekly: input.gen.weekly } : {}),
     },
     topics: input.gen.topics.map((t) => ({ slug: t.slug, motion: t.motion })),
     baseHash: baseHash(input.gen),

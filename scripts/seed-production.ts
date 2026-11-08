@@ -25,7 +25,7 @@ import { contentTopics } from "./seed/topics";
 import { execute, finishValidation, releaseHeld, VALIDATING } from "./seed/engine";
 import { validate } from "./seed/validate";
 import { dryRun } from "./seed/dryrun";
-import { cancelSignal, checkPlanQuiz, int, isoFlag, log, main, nowFloored, parseFlags, quizFlag, refuseUnsupported, str, writeReport } from "./seed/cli";
+import { cancelSignal, checkPlanQuiz, checkPlanWeekly, int, isoFlag, log, main, nowFloored, parseFlags, quizFlag, refuseUnsupported, str, weeklyFor, writeReport } from "./seed/cli";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
@@ -62,6 +62,7 @@ main(async () => {
       exchanges: int(f, "exchanges", DEFAULTS.exchanges, 0, 5000),
       classes: int(f, "classes", DEFAULTS.classes, 0, 100),
       ...(quizFlag(f) ? { quiz: quizFlag(f) } : {}),
+      ...weeklyFor(quizFlag(f)),
       topics: contentTopics(),
     };
     const measured = str(f, "rows-per-second")
@@ -88,6 +89,7 @@ main(async () => {
     throw new GuardError(`the plan is for ${plan.target.kind === "production" ? plan.target.projectRef : "a local target"}, not ${ref}`);
   if (plan.runId !== runId) throw new GuardError(`--run-id ${runId} is not the plan's run ${plan.runId}`);
   checkPlanQuiz(f, plan.config.quiz, "production");
+  checkPlanWeekly(plan.config.weekly, "production");
   if (f.execute && f.validate) throw new GuardError("--execute and --validate are separate steps");
 
   log(`offline: regenerating ${plan.runId} from the plan`);
