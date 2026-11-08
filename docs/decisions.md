@@ -5536,7 +5536,9 @@ and WebKit cannot run here, so iOS is covered by the markup.
   case, not just assert it"), and the site's preview text, a three-beat
   line ("Ten scenarios. Six schools. One result you'll want to argue
   about."), now "Answer ten scenarios to find which of six schools of
-  ethics you argue from."
+  ethics you argue from." Arthur accepted that line with the rest of the
+  v2 copy on 2026-11-07 (Gate 4 item 8, `docs/stage5-plan.md`); it is
+  changed under this later ruling, and goes back on his word.
 - **Generic copy.** The 404 page's heading, "Nothing here.", is now "No
   page at this address." The rest of the empty states already say what is
   missing and what to do ("No judged arguments yet this week. The table
