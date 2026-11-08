@@ -283,13 +283,18 @@ of the three; Gate 2 is about that.
    - [ ] The content judgements listed for Checkpoint B
      (`docs/quiz-v2.md`, section 8, and `docs/decisions.md`) and the
      adherent nouns, as ruled.
-   - [ ] The sample teardown.
-   - [ ] The preview's v2 results cleared before the launch merge, an (a)
+   - [x] The sample teardown, run from Actions on 2026-11-08 (run
+     42519224152, green at 20:52 UTC): `sample-202611050327` torn down,
+     its 3,278 accounts and every row it wrote deleted and proven gone
+     by id, the genuine rows untouched.
+   - [x] The preview's v2 results cleared before the launch merge, an (a)
      write: `challenge_from` set to null where a genuine row points at
      one, a real reader's challenge with a v2 challengee reopened
      rather than deleted, and `debates.challenge_id` set to null where it
      points at a cleared challenge (its foreign key has no on-delete
-     action).
+     action). Run by Arthur in the SQL Editor on 2026-11-08: one
+     anonymous v2 result cleared, nothing else pointed at it; read back
+     at 20:15 UTC with no v2 result left and no reference dangling.
    - [x] The flag on for Production, with `next.config.ts`'s refusal
      removed; the live table's 20-argument rule comes with it. The
      launch merge (`docs/decisions.md`, "The launch merge").
