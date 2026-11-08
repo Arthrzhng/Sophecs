@@ -67,7 +67,7 @@ export function TopicList({
     return (
       <EmptyState
         title="No motions are open yet."
-        body="The motions are still being written. Until one lands, the case for your school and the lessons are the useful things to read — an argument is easier to write when you have read the source it comes from."
+        body="The motions are still being written. Until one lands, the case for your school and the lessons are the useful things to read: an argument is easier to write when you have read the source it comes from."
         action={
           <div className="flex flex-wrap items-center gap-6 text-sm">
             <TextLink href={school ? `/s/${school}` : "/quiz"}>

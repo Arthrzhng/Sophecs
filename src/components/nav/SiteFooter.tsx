@@ -63,7 +63,7 @@ export function SiteFooter() {
     <footer className="mt-auto border-t-2 border-rule" data-print="hide">
       <div className="mx-auto max-w-ui px-6 py-12">
         <p className="max-w-[54ch] text-sm leading-relaxed text-ink-mid">
-          Sophecs is a philosophy tool for 15 to 18 year olds. Ten questions
+          Sophecs is a philosophy tool for 15- to 18-year-olds. Ten questions
           place you in a school of ethics, then you argue a motion from it and
           a judge scores how faithfully you argued, not whether it agrees.
         </p>

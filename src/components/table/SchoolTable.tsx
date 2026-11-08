@@ -12,7 +12,7 @@ import { TextLink } from "@/components/ui/TextLink";
 import { SAMPLES_HREF } from "@/lib/nav-routes";
 
 /** A value the week has not produced. Same marker the verdict uses. */
-const NOTHING = "—";
+const NOTHING = "–";
 
 export interface SchoolTableProps {
   week: number;

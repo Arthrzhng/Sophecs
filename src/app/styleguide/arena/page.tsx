@@ -192,7 +192,7 @@ export default function ArenaPreviewPage() {
           microBefore={lesson}
           readingNotes={[
             "That what is up to me is the assent, not the outcome.",
-            "Chrysippus's cylinder — the push is external, the shape is mine.",
+            "Chrysippus's cylinder: the push is external, the shape is mine.",
           ]}
         />
       </Section>
