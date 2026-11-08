@@ -339,7 +339,7 @@ export function serialiseBank(bank: BankArgument[]): string {
  * A position that opens on a sentence stating only its stance: "I reject
  * the motion.", "I accept the motion only in part.", "The motion is
  * right.", "Do not deploy it as it stands.", "A Stoic can accept this
- * motion.", "I reject the motion's importance." and their like. 47 of the
+ * motion.", "I reject the motion's importance." and their like. 50 of the
  * 144 positions did, most of them a school's second, so on one exemplar
  * page up to five schools' cards opened on the same sentence (Arthur,
  * 2026-11-08: "repeated sentence openings ... across sample arguments and
@@ -348,14 +348,16 @@ export function serialiseBank(bank: BankArgument[]): string {
  * carries a condition, the sentence after states it.
  */
 export const BARE_STANCE =
-  /^(?:I (?:reject|accept|support|oppose|agree with) (?:the|this) motion(?: as stated| as framed| with a condition| only in part)?|I agree that it is a mistake to say a model decides|I reject the motion's importance|A (?:Stoic|utilitarian) (?:can|must|cannot|should) (?:accept|oppose) (?:this|the) motion|A utilitarian should not care much about this motion|The motion is right|(?:Do not )?[Dd]eploy it(?: as it stands)?|Deploying it is wrong as stated)\.\s+/;
+  /^(?:I (?:reject|accept|support|oppose|agree with) (?:the|this) motion(?: as stated| as framed| with a condition| only in part)?|I agree that it is a mistake to say a model decides|I reject the motion's importance|It is not a mistake worth correcting|A model does not decide|A Stoic must deny that blame scales with harm|A (?:Stoic|utilitarian) (?:can|must|cannot|should) (?:accept|oppose) (?:this|the) motion|A utilitarian should not care much about this motion|The motion is right|(?:Do not )?[Dd]eploy it(?: as it stands)?|Deploying it is wrong as stated)\.\s+/;
 
 /**
- * Four of the live three's positions (three Stoic, one Virtue Ethics) the
- * fresh run words differently, so that no two exemplar cards on a page
- * open on the same three words: each opened as another of the live three's
- * cards on its page did ("The system should", "The motion is right:", "It
- * is a mistake to say"). The live run reads these passages as written
+ * Five of the live three's positions (three Stoic, one Utilitarian, one
+ * Virtue Ethics) the fresh run words differently: four so that no two
+ * exemplar cards on a page open on the same three words, each having
+ * opened as another of the live three's cards on its page did ("The
+ * system should", "The motion is right:", "It is a mistake to say"), and
+ * the Utilitarian one on the opaque benefit because, without "Deploy it."
+ * before it, its "it" pointed at nothing. The live run reads these passages as written
  * until the teardown, so the change is made here, as the stance
  * sentences' is. The new three's passages are read only by a quiz v2 run
  * and are reworded where they stand. Keyed by motion, school and the position's index; `was` is the
@@ -363,6 +365,12 @@ export const BARE_STANCE =
  */
 export const FRESH_POSITIONS: Partial<Record<TopicSlug, Partial<Record<SchoolId, Record<number, { was: string; now: string }>>>>> = {
   "opaque-benefit": {
+    utilitarianism: {
+      0: {
+        was: "Deploy it. The suffering it prevents is real, and an explanation was only ever valuable as a means to preventing harm.",
+        now: "The suffering the system prevents is real, and an explanation was only ever valuable as a means to preventing harm.",
+      },
+    },
     "virtue-ethics": {
       0: {
         was: "The system should not be deployed on these terms, because justice to the person a decision lands on includes owing them an answer.",
@@ -384,7 +392,7 @@ export const FRESH_POSITIONS: Partial<Record<TopicSlug, Partial<Record<SchoolId,
       },
       3: {
         was: "It is a mistake to say a model decides, because deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents.",
-        now: "Deciding is something done by a rational soul assenting to how things appear, and nothing in the model assents, so it is a mistake to say a model decides.",
+        now: "A rational soul decides by assenting to how things appear; nothing in the model assents, so it is a mistake to say a model decides.",
       },
     },
   },
@@ -393,7 +401,7 @@ export const FRESH_POSITIONS: Partial<Record<TopicSlug, Partial<Record<SchoolId,
 /**
  * The passages a run made with quiz v2 (the fresh run) argues from: each
  * position without a sentence in front that states only its stance, so it
- * opens on its own claim, and the four in FRESH_POSITIONS reworded.
+ * opens on its own claim, and the five in FRESH_POSITIONS reworded.
  * Everything else is as written. A run that names no quiz reads the
  * passages as they are, since the live run regenerates its rows from them.
  */

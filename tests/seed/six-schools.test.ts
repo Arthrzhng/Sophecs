@@ -37,6 +37,9 @@ const STANCE_SENTENCES = [
   "I agree with the motion.",
   "I agree that it is a mistake to say a model decides.",
   "I reject the motion's importance.",
+  "It is not a mistake worth correcting.",
+  "A model does not decide.",
+  "A Stoic must deny that blame scales with harm.",
   "The motion is right.",
   "Deploy it.",
   "Do not deploy it.",
@@ -100,7 +103,7 @@ describe("a sample run made with quiz v2", () => {
   it("is the dataset this file was written against, pinned at production volume", () => {
     // Beside the small pins in determinism.test.ts: eight thousand quiz
     // results and every exchange pair reach paths a small run need not.
-    expect(manifestHash(six())).toBe("1ea74c30f28a81e21a3c0dc4a47a60c0b81f0840f65dc998e7b1ff6c7aa84690");
+    expect(manifestHash(six())).toBe("51cbe38ef9279de76817919e9a7fc019e018e44222ba15e2e755fad23968528b");
   });
 
   it("covers all six schools about equally", () => {
@@ -214,11 +217,11 @@ describe("a sample run made with quiz v2", () => {
   });
 
   it("opens no argument, revision or reply on a sentence that states only its stance", () => {
-    // 47 of the 144 positions open on one as written, and none as the fresh
+    // 50 of the 144 positions open on one as written, and none as the fresh
     // run reads them.
     const positions = (read: typeof loadFragments) => TOPICS.flatMap((t) => Object.values(read(t).schools).flatMap((s) => s.positions));
     expect(positions(loadFragments)).toHaveLength(144);
-    expect(positions(loadFragments).filter(opensOnStance)).toHaveLength(47);
+    expect(positions(loadFragments).filter(opensOnStance)).toHaveLength(50);
     expect(positions((t) => freshFragments(loadFragments(t))).filter(opensOnStance)).toEqual([]);
     const ds = six();
     const texts = [...ds.debates.map((d) => d.row.argument), ...ds.turns.map((t) => t.row.body)].filter((t): t is string => !!t);
