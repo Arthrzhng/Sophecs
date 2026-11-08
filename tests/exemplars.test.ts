@@ -215,15 +215,18 @@ describe("previewOf", () => {
     expect(previewOf("Deploy it.\n\nThe harm it spares is real.\n\nMore.")).toBe("Deploy it. The harm it spares is real.");
     expect(previewOf("Only one sentence here.")).toBe("Only one sentence here.");
   });
-  it("ends at a sentence end: one sentence when two would run long, never a short one alone, a word cut only for one sentence longer than that", () => {
-    const long = `${"word ".repeat(70).trim()}.`;
-    // "Deploy it." alone is the filler Arthur named, so it keeps its second.
-    expect(previewOf(`Deploy it. ${long} More.`)).toBe(`Deploy it. ${long}`);
-    const first = "A deployer who cannot say why owes the people decided about an account all the same.";
-    expect(previewOf(`${first} ${long} More.`)).toBe(first);
+  it("ends at a sentence end: two up to 400 characters, one past that unless it is under 60, a word cut only for one sentence over 400", () => {
+    // A sentence of exactly n characters, full stop included.
+    const sentence = (n: number) => `${"x".repeat(n - 1)}.`;
+    expect(previewOf(`${sentence(60)} ${sentence(339)} More.`)).toBe(`${sentence(60)} ${sentence(339)}`); // 400
+    expect(previewOf(`${sentence(60)} ${sentence(340)} More.`)).toBe(sentence(60)); // 401
+    // "Deploy it." alone is the filler Arthur named, so a first sentence
+    // under 60 characters keeps its second however long.
+    expect(previewOf(`${sentence(59)} ${sentence(400)} More.`)).toBe(`${sentence(59)} ${sentence(400)}`);
+    expect(previewOf(`${sentence(60)} ${sentence(400)} More.`)).toBe(sentence(60));
     const longer = `${"word ".repeat(100).trim()}.`;
     expect(previewOf(longer).endsWith("…")).toBe(true);
-    expect(previewOf(longer).length).toBeLessThanOrEqual(361);
+    expect(previewOf(longer).length).toBeLessThanOrEqual(401);
   });
   it("is what selectExemplars gives each exemplar", () => {
     const [first] = selectExemplars(new Map([["stoicism", made("stoicism", 1, { argument: "My position is simple. Do not deploy it. It owes them reasons. Third." })]]), ["stoicism"]).get("stoicism")!;

@@ -31,9 +31,12 @@ export function BeforeLesson({ lesson }: { lesson: MicroLessonContent }) {
 
   return (
     <details onToggle={onToggle} className="group border-y border-rule py-4">
-      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm text-ink [&::-webkit-details-marker]:hidden">
-        <Chevron className="text-ink-soft" />
-        Read the excerpt again: {lesson.title}
+      <summary className="flex min-h-11 cursor-pointer list-none items-center text-sm text-ink [&::-webkit-details-marker]:hidden">
+        {/* The chevron sits on the first line when the title wraps. */}
+        <span className="flex items-start gap-2">
+          <Chevron className="mt-0.5 text-ink-soft" />
+          <span>Read the excerpt again: {lesson.title}</span>
+        </span>
       </summary>
       <div className="prose-reading mt-5">
         {lesson.body.split("\n\n").map((paragraph, i) => (

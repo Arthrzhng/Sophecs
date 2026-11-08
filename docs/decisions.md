@@ -5509,10 +5509,13 @@ Arthur, 2026-11-08:
   mark; they are unchanged.
 - **The closed card.** It shows the argument's first two sentences after
   any frame sentence (`previewOf` in `src/lib/exemplars.ts`), cut at a
-  sentence end. Where two would run past 360 characters it shows one, but
+  sentence end. Where two would run past 400 characters it shows one, but
   never a first sentence under 60 characters alone ("Deploy it." is the
   filler the ruling names), and a word cut with "…" only for a single
-  sentence longer than 360. Open, the card shows "Hide" above the whole
+  sentence longer than 400. The longest two sentences any composition of
+  the passages opens with run to 373 characters, so every real card shows
+  two; at 360, 577 Buddhist compositions on the opaque benefit would have
+  shown one. Open, the card shows "Hide" above the whole
   argument. The opening line still decides which arguments count as one
   (one exemplar per opening).
 - **Which characters have an emoji form.** iOS drew the browser's own
@@ -5523,12 +5526,23 @@ Arthur, 2026-11-08:
   (U+2192, U+2190), which the verdict page's rating line, the share text
   and the school map on six-school builds still show. Those stay.
 - **Held to** by `tests/disclosures.test.tsx`: every `<summary>` in the
-  app hides the marker both ways, every `<details>` that draws the
-  chevron is a `group`, the chevron's two poses are the right way round
-  and it is hidden from assistive technology, and no summary holds a
-  character with an emoji form. `tests/exemplars-page.test.ts` checks the
-  rendered exemplars page for any such character.
+  app hides the marker both ways; every `<details>` has a summary of its
+  own; every `<details>` that draws the chevron is a `group`; the
+  chevron's two poses are the right way round and it is hidden from
+  assistive technology; no summary in the source holds a character with
+  an emoji form, written as a literal, an escape or a numeric entity, and
+  none uses a named entity outside a short list of punctuation; and the
+  excerpt toggle and the open objections, rendered, hold none.
+  `tests/exemplars-page.test.ts` checks the rendered exemplars page the
+  same way.
 - **Checked** at 390px in Chromium against the built stylesheet: the
   closed card, the open card and no sideways scroll; every summary is at
   least 44px tall. WebKit cannot run in this environment, so for iOS the
   check is the markup above.
+- **For Arthur's list:** some closed cards end on a stock line from the
+  passages (`scripts/seed/arguments/fragments/crash-arithmetic.json`,
+  mine): "Correct names matter." ends 1,637 of the Confucian previews a
+  run can make and "Impartiality is the heart of the view." 1,764 of the
+  Utilitarian ones, and one Stoic preview on borrowed judgement ends on
+  the rival's point ("One might say that trusting the assistant is itself
+  a judgement.").
