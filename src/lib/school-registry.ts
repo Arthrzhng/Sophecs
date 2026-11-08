@@ -141,9 +141,11 @@ const PUBLISHED_BY_ID = new Map<SchoolId, SchoolEntry>(
  * `card-tokens.ts` for its colours and `school-colors.ts` for its text
  * classes. Everything else reads these entries through the lists below.
  *
- * Still `status: "draft"`: they are drafts that this build shows, and
- * `content/schools/*.md`, which is frozen, says so. Their names match the
- * drafts module and their content files (`tests/six-schools.test.ts`).
+ * Published at the launch (Arthur, 2026-11-08), as their content files now
+ * say; the flag, not their status, decides whether a build shows them, so
+ * a build without it is the three-school product as before. Their names
+ * match the drafts module and their content files
+ * (`tests/six-schools.test.ts`).
  *
  * The adherent nouns are Arthur's, ruled at Checkpoint B (e) 1 on
  * 2026-11-05: "accept Confucian, Ubuntu Ethicist, Buddhist Ethicist; fix
@@ -156,7 +158,7 @@ const SHOWN_DRAFTS: readonly SchoolEntry[] =
     ? [
         {
           id: "confucian",
-          status: "draft",
+          status: "published",
           name: "Confucianism",
           adherent: "Confucian",
           adherentPlural: "Confucians",
@@ -164,7 +166,7 @@ const SHOWN_DRAFTS: readonly SchoolEntry[] =
         },
         {
           id: "ubuntu",
-          status: "draft",
+          status: "published",
           name: "Ubuntu",
           adherent: "Ubuntu Ethicist",
           adherentPlural: "Ubuntu Ethicists",
@@ -173,7 +175,7 @@ const SHOWN_DRAFTS: readonly SchoolEntry[] =
         },
         {
           id: "buddhist",
-          status: "draft",
+          status: "published",
           name: "Buddhist Ethics",
           adherent: "Buddhist Ethicist",
           adherentPlural: "Buddhist Ethicists",

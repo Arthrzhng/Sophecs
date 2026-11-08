@@ -194,7 +194,7 @@ describe("a run that names no quiz", () => {
     expect("quiz" in smallPlan().plan.config).toBe(false);
   });
 
-  it("is still what the scheduled job makes, until the launch merge sets RUN_QUIZ to 2 after the teardown", () => {
-    expect(RUN_QUIZ).toBeUndefined();
+  it("is no longer what the scheduled job makes: the launch merge set RUN_QUIZ to 2, after the teardown", () => {
+    expect(RUN_QUIZ).toBe(2);
   });
 });

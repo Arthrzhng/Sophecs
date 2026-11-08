@@ -1,11 +1,11 @@
 ---
 id: buddhist
 name: Buddhist Ethics
+colour_token: --color-buddhist
 one_line: >-
   Treating others like oneself, neither kill nor incite to kill.
 one_line_attribution: >-
   Dhammapada, verses 129 to 130 (trans. Bhikkhu Sujato)
-status: draft
 read: |-
   The passages Sophecs uses are Pali, from the Theravada canon, and passed
   through long oral and editorial transmission before being written down,

@@ -13,6 +13,7 @@ import { scoresComparable } from "@/lib/verdict-versions";
 import { WelcomeTracker } from "@/components/me/WelcomeTracker";
 import { MeViewTracker } from "@/components/me/MeViewTracker";
 import { ProfilePage } from "@/components/me/ProfilePage";
+import { shownVersions } from "@/lib/quiz-result";
 import { todayUTC } from "@/lib/streak";
 import type { SchoolId } from "@/lib/types";
 
@@ -98,9 +99,9 @@ export default async function MePage({
         .from("quiz_results")
         .select("id")
         .eq("user_id", user.id)
-        // The result the profile's school came from: a v1 one, until
-        // launch (src/lib/quiz-result.ts).
-        .eq("quiz_version", 1)
+        // The result the profile's school came from: the newest this build
+        // shows (src/lib/quiz-result.ts, claimAnonymousResults).
+        .in("quiz_version", shownVersions())
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();

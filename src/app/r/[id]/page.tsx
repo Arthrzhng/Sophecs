@@ -146,18 +146,15 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
       { anon_id: ownerAnonId, user_id: ownerUserId },
       await getResultOwners(challengeInfo.otherResultId),
     ]);
-  // Only between two v1 results, on every build, until launch, so that a
-  // challenge made on a SIX_SCHOOLS preview is not recorded, completed or
-  // pairwise-rated in production (Gate 2, option (i)). resolveChallengeSide
-  // refuses the same for assignChallengeTopic and /api/judge. A side this
-  // build does not show reads as null here, so without SIX_SCHOOLS a v2
-  // other side is never offered either.
+  // Between any two results this build shows. A side it does not show
+  // reads as null here, so without SIX_SCHOOLS a v2 other side is never
+  // offered, and resolveChallengeSide refuses the same for
+  // assignChallengeTopic and /api/judge. Until launch it was two v1
+  // results on every build (Gate 2, option (i)), so that a challenge made
+  // on a preview was not recorded, completed or pairwise-rated in
+  // production.
   const showDebateThem = Boolean(
-    challengeInfo &&
-      challengeInfo.status !== "complete" &&
-      viewerIsParty &&
-      challengeOther &&
-      comparable(result, challengeOther)
+    challengeInfo && challengeInfo.status !== "complete" && viewerIsParty && challengeOther
   );
 
   // A v2 result's point on the map, which only a SIX_SCHOOLS build shows.

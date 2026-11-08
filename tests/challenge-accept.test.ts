@@ -3,7 +3,12 @@
 // (supabase/migrations/0001_phase1.sql); the fake below enforces that
 // foreign key as Postgres does, so writing a challenge's own id there
 // fails the insert, as it did in production before 2026-11-04.
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// Tests that set SIX_SCHOOLS leave it as they found it.
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 import { QUIZ_QUESTIONS } from "../content/quiz/questions";
 import { scoreQuiz } from "../src/lib/scoring";
 
@@ -126,7 +131,8 @@ describe("submitQuizResult from a challenge link", () => {
     );
   });
 
-  it("treats a v2 challenger's challenge as no challenge, and never reads its school", async () => {
+  it("without SIX_SCHOOLS, treats a v2 challenger's challenge as no challenge, and never reads its school", async () => {
+    vi.stubEnv("SIX_SCHOOLS", "0");
     Object.assign(tables.quiz_results[0], { quiz_version: 2, vector: null, map_x: 0.2, map_y: -0.3, school: "ubuntu" });
     const res = await submitQuizResult({ ...answers, challengeId: "c1" });
     expect(res).toMatchObject({ ok: true });

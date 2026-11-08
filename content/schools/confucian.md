@@ -1,12 +1,12 @@
 ---
 id: confucian
 name: Confucianism
+colour_token: --color-confucian
 one_line: >-
   When the prince is prince, and the minister is minister; when the father
   is father, and the son is son.
 one_line_attribution: >-
   The Analects, 12.11 (trans. James Legge, 1893, p. 165)
-status: draft
 read: |-
   The Analects was assembled by several hands, so this is the book's
   position, not one man's. Sophecs reads it as role ethics, after Roger Ames and Henry Rosemont,

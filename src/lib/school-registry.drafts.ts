@@ -7,59 +7,49 @@ import {
 } from "./school-registry";
 
 /**
- * The schools that are in the repository and reach no reader.
+ * The three schools only a `SIX_SCHOOLS` build shows: drafts until the
+ * launch, published since (Arthur, 2026-11-08, "Launch: approved"), with
+ * the flag set for Production and Preview. The name of the list is from
+ * before the launch.
  *
- * `server-only`, and that is the whole point of the file. A draft
- * school's id and name are unreleased product decisions, and the Phase 1B
- * guarantee is that no draft reaches a page or a bundle. Importing this
- * from a client component fails the build rather than shipping
- * "Confucianism" to a browser.
+ * `server-only`, and that is still the point of the file: a build without
+ * the flag must carry none of these ids, names or colours to a browser,
+ * and importing this from a client component fails the build. The content
+ * loaders read it to skip the three on such a build, `npm run
+ * check:bundle` takes its strings from it (so the check never runs on an
+ * empty list), and the tests check it and `school-registry.ts` against
+ * `content/schools/*.md` between them.
  *
- * Three things legitimately need to see a draft: `/styleguide/drafts`,
- * which is the preview-only review route; the content loaders, which have
- * to recognise a draft school in order to skip it; and the tests, which
- * check this file and `school-registry.ts` against `content/schools/*.md`
- * between them.
- *
- * The same list whether or not the build has `SIX_SCHOOLS`: a draft that
- * a flag-on build shows is still a draft, and `npm run check:bundle` takes
- * its strings from here, so the check never runs on an empty list. The
- * adherent nouns, accepted by Arthur at Checkpoint B (e) 1, are the same
- * as the registry's `SHOWN_DRAFTS`, which shows them on flag-on builds;
- * here they are what the bundle check looks for. The colour tokens stay null,
- * as the content files have none; a flag-on build's tokens are the
- * registry's.
- *
- * Every entry here carries `status: "draft"`, and nothing published
- * belongs in it. `tests/school-registry.test.ts` fails if the two files
- * overlap, if either disagrees with the content files, or if a draft here
- * has a colour token.
+ * The same list whether or not the build has the flag. The adherent nouns,
+ * accepted by Arthur at Checkpoint B (e) 1, and the colour tokens are the
+ * same as the registry's `SHOWN_DRAFTS`, which a flag-on build shows, and
+ * the same as the content files'.
  */
 export const DRAFT_SCHOOLS: readonly SchoolEntry[] = [
   {
     id: "confucian",
-    status: "draft",
+    status: "published",
     name: "Confucianism",
     adherent: "Confucian",
     adherentPlural: "Confucians",
-    colourToken: null,
+    colourToken: "--color-confucian",
   },
   {
     id: "ubuntu",
-    status: "draft",
+    status: "published",
     name: "Ubuntu",
     adherent: "Ubuntu Ethicist",
     adherentPlural: "Ubuntu Ethicists",
     adherentArticle: "an",
-    colourToken: null,
+    colourToken: "--color-ubuntu",
   },
   {
     id: "buddhist",
-    status: "draft",
+    status: "published",
     name: "Buddhist Ethics",
     adherent: "Buddhist Ethicist",
     adherentPlural: "Buddhist Ethicists",
-    colourToken: null,
+    colourToken: "--color-buddhist",
   },
 ];
 

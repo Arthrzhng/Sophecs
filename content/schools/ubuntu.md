@@ -1,12 +1,12 @@
 ---
 id: ubuntu
 name: Ubuntu
+colour_token: --color-ubuntu
 one_line: >-
   A person is a person through other persons.
 one_line_attribution: >-
   Nguni maxim, English as given in Thaddeus Metz, Toward an African Moral
   Theory, 2007, p. 322
-status: draft
 read: |-
   Ubuntu is not one doctrine and not the ethics of a continent, but a
   family of Southern and sub-Saharan African relational traditions. The line above is

@@ -5,7 +5,7 @@ import { newId } from "@/lib/ids";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { retakeQuizSchool } from "@/lib/claim";
-import { quizVersionOf, schoolFromResult } from "@/lib/quiz-result";
+import { schoolFromResult } from "@/lib/quiz-result";
 import { quizV2, QUIZ_V2_ON } from "@/lib/quiz-v2";
 import { scoreQuizV2, type MapPoint, type QuizV2Option } from "@/lib/quiz-v2-score";
 import { scoreQuiz } from "@/lib/scoring";
@@ -104,10 +104,11 @@ export async function submitQuizResult(
     // its page sends readers to the quiz without it, and a link made by hand
     // is treated as no challenge.
     //
-    // This writes a v1 result, so only a v1 challenger's challenge is taken
-    // up (Stage 5, Gate 1; src/lib/quiz-result.ts): a v2 challenger made on
-    // a SIX_SCHOOLS preview is treated as no challenge, and its school is
-    // never read into a v1 reader's result.
+    // A challenger's school is read only from a result this build shows
+    // (src/lib/quiz-result.ts): on a build without the flag a v2 challenger
+    // is treated as no challenge, and its school is never read into a v1
+    // reader's result. From the launch this quiz is retired: a SIX_SCHOOLS
+    // build's quiz page writes v2 results, and nothing there calls this.
     if (c && !c.is_sample) {
       const { data: challenger } = await admin
         .from("quiz_results")
@@ -182,6 +183,7 @@ export type SubmitQuizResultV2Output =
       secondary: SchoolId;
       point: MapPoint;
       challengerSchool?: SchoolId;
+      schoolChanged?: { from: SchoolId; to: SchoolId };
     }
   | { ok: false; error: string };
 
@@ -195,14 +197,13 @@ export type SubmitQuizResultV2Output =
 // option it chose for each question, never a school or a point. The row is
 // v2 in shape, as 0027's check requires: a point, no vector.
 //
-// Two things v1 does are not done, until launch:
-// - the result never moves a profile's school. A preview writes into
-//   production's tables, and production would then place the account in a
-//   school it does not publish;
-// - it takes up a challenge only from a v2 challenger. A v1 challenger is
-//   a production reader, and a preview's result would close their
-//   challenge with a side production cannot show. The rule mirrors v1's,
-//   which takes up a v1 challenger's only (src/lib/quiz-result.ts).
+// From the launch it does what v1 does: a signed-in reader's school moves
+// to the result's (retakeQuizSchool), and it takes up any challenger's
+// challenge, v1 or v2. Until launch it did neither (docs/decisions.md,
+// "Stage 5, step 4", "To undo at launch"): a preview wrote into
+// production's tables, and production would then have placed an account
+// in a school it did not publish, or closed a production reader's
+// challenge with a side it could not show.
 export async function submitQuizResultV2(
   input: SubmitQuizResultV2Input
 ): Promise<SubmitQuizResultV2Output> {
@@ -250,11 +251,9 @@ export async function submitQuizResultV2(
         .eq("id", c.challenger_result_id)
         .maybeSingle();
       const own = Boolean(challenger && (challenger.anon_id === anonId || (user && challenger.user_id === user.id)));
-      if (challenger && !own && quizVersionOf(challenger) === 2 && typeof challenger.school === "string")
-        challenge = {
-          challengerResultId: c.challenger_result_id as string,
-          challengerSchool: challenger.school as SchoolId,
-        };
+      const challengerSchool = challenger ? schoolFromResult(challenger) : null;
+      if (challenger && !own && challengerSchool)
+        challenge = { challengerResultId: c.challenger_result_id as string, challengerSchool };
     }
   }
 
@@ -274,6 +273,12 @@ export async function submitQuizResultV2(
   });
   if (error) return { ok: false, error: error.message };
 
+  let schoolChanged: { from: SchoolId; to: SchoolId } | undefined;
+  if (user) {
+    const result = await retakeQuizSchool(admin, user.id, primary);
+    if (result.changed && result.from) schoolChanged = { from: result.from, to: result.to };
+  }
+
   let challengerSchool: SchoolId | undefined;
   if (input.challengeId && challenge) {
     // Accepted once, by the first reader to finish, as v1's is.
@@ -287,7 +292,7 @@ export async function submitQuizResultV2(
     if (accepted?.length) challengerSchool = challenge.challengerSchool;
   }
 
-  return { ok: true, id, primary, secondary, point: scored.point, challengerSchool };
+  return { ok: true, id, primary, secondary, point: scored.point, challengerSchool, schoolChanged };
 }
 
 export interface CreateChallengeOutput {

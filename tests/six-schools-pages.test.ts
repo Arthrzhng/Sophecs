@@ -49,7 +49,8 @@ describe("with SIX_SCHOOLS=1", () => {
     for (const id of NEW) {
       const content = schools.getSchool(id as never);
       expect(content.id).toBe(id);
-      expect(content.status).toBe("draft");
+      // Published at the launch: no status in its front matter.
+      expect(content.status).toBeUndefined();
       expect(content.one_line.length).toBeGreaterThan(10);
     }
   });

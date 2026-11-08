@@ -53,7 +53,8 @@ describe("the two halves of the registry", () => {
 
   it("are each internally consistent about status", () => {
     for (const entry of PUBLISHED_SCHOOLS) expect(entry.status, entry.id).toBe("published");
-    for (const entry of DRAFT_SCHOOLS) expect(entry.status, entry.id).toBe("draft");
+    // The flag's three: published at the launch (2026-11-08), and shown only by a SIX_SCHOOLS build.
+    for (const entry of DRAFT_SCHOOLS) expect(entry.status, entry.id).toBe("published");
   });
 
   it("together list exactly the schools in content/schools", () => {
@@ -77,8 +78,8 @@ describe("the two halves of the registry", () => {
     }
   });
 
-  it("gives no draft school a colour token", () => {
-    for (const entry of DRAFT_SCHOOLS) expect(entry.colourToken, entry.id).toBeNull();
+  it("gives each of the flag's three its colour token, as its content file does", () => {
+    for (const entry of DRAFT_SCHOOLS) expect(entry.colourToken, entry.id).toBe(`--color-${entry.id}`);
   });
 
   it("orders all schools published first", () => {

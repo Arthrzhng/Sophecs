@@ -1,8 +1,8 @@
-// submitQuizResultV2 (src/app/actions.ts), Stage 5 step 4 under Gate 2,
-// option (i): on a SIX_SCHOOLS build it scores the answers itself and
-// writes a v2 row; it never moves a profile's school, and it takes up a
-// challenge only from a v2 challenger. On any other build it writes
-// nothing. The fake database is the one tests/challenge-accept.test.ts
+// submitQuizResultV2 (src/app/actions.ts): on a SIX_SCHOOLS build it
+// scores the answers itself and writes a v2 row, and from the launch it
+// moves a signed-in reader's school and takes up any challenger's
+// challenge, as v1 does (docs/decisions.md, "Stage 5, step 4", "To undo at
+// launch"). On any other build it writes nothing. The fake database is the one tests/challenge-accept.test.ts
 // uses, with 0027's shape check added.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { loadQuizV2ForTest } from "../src/lib/quiz-v2";
@@ -114,11 +114,19 @@ describe("submitQuizResultV2 on a SIX_SCHOOLS build", () => {
     expect(row.answers).toEqual(answers);
   });
 
-  it("never moves a signed-in reader's school", async () => {
+  it("moves a signed-in reader's school to the result's, and says so", async () => {
     user = { id: "u1" };
     const res = await (await action("1"))({ answers });
-    expect(res).toMatchObject({ ok: true });
+    expect(res).toMatchObject({ ok: true, schoolChanged: { from: "stoicism", to: "confucian" } });
     expect(saved((res as { id: string }).id)).toMatchObject({ user_id: "u1" });
+    expect(retakes).toHaveLength(1);
+    expect((retakes[0] as unknown[]).slice(1)).toEqual(["u1", (res as { primary: string }).primary]);
+  });
+
+  it("moves no school for a reader who is not signed in", async () => {
+    const res = await (await action("1"))({ answers });
+    expect(res).toMatchObject({ ok: true });
+    expect((res as { schoolChanged?: unknown }).schoolChanged).toBeUndefined();
     expect(retakes).toEqual([]);
   });
 
@@ -140,12 +148,12 @@ describe("submitQuizResultV2 on a SIX_SCHOOLS build", () => {
     expect(tables.challenges.find((c) => c.id === "c-v2")).toMatchObject({ challengee_result_id: id, status: "accepted" });
   });
 
-  it("leaves a v1 challenger's challenge alone: a production reader's", async () => {
+  it("takes up a v1 challenger's challenge too", async () => {
     const res = await (await action("1"))({ answers, challengeId: "c-v1" });
-    expect(res).toMatchObject({ ok: true });
-    expect((res as { challengerSchool?: string }).challengerSchool).toBeUndefined();
-    expect(saved((res as { id: string }).id)).toMatchObject({ challenge_from: null });
-    expect(tables.challenges.find((c) => c.id === "c-v1")).toMatchObject({ challengee_result_id: null, status: "open" });
+    expect(res).toMatchObject({ ok: true, challengerSchool: "utilitarianism" });
+    const id = (res as { id: string }).id;
+    expect(saved(id)).toMatchObject({ challenge_from: "r-v1" });
+    expect(tables.challenges.find((c) => c.id === "c-v1")).toMatchObject({ challengee_result_id: id, status: "accepted" });
   });
 
   it("does not let a reader take up their own challenge", async () => {

@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { pairwiseElo } from "@/lib/elo";
-import { quizVersionOf, schoolFromResult } from "@/lib/quiz-result";
+import { schoolFromResult, shownOnThisBuild, shownVersions } from "@/lib/quiz-result";
 import type { SchoolId } from "@/lib/types";
 
 // The active topic with the lowest sort that neither known participant has
@@ -60,13 +60,15 @@ export function viewerIsChallengeParty(
  * /api/judge records the debate on the challenge and runs the pairwise
  * rating once both sides have one.
  *
- * Until launch a challenge counts only between two v1 results, on every
- * build (Gate 2, option (i); docs/decisions.md, "Stage 5, step 4"): one
- * made on a SIX_SCHOOLS preview, with a v2 side, must not be recorded,
- * completed or pairwise-rated in production. So a challenge with a v2 side
- * has no side for anyone, and a read that fails gives none either. (A
- * debate posted with such a challenge's id is still judged and rated as a
- * solo debate.)
+ * A challenge counts only between two results this build shows: any two
+ * on a SIX_SCHOOLS build, which production is from the launch, and two v1
+ * results on a build without the flag (src/lib/quiz-result.ts). Until
+ * launch it was two v1 results on every build (Gate 2, option (i);
+ * docs/decisions.md, "Stage 5, step 4"), so that a challenge made on a
+ * preview was not recorded, completed or pairwise-rated in production.
+ * A challenge with a side this build does not show has no side for anyone,
+ * and a read that fails gives none either. (A debate posted with such a
+ * challenge's id is still judged and rated as a solo debate.)
  */
 export async function resolveChallengeSide(
   admin: SupabaseClient,
@@ -76,7 +78,7 @@ export async function resolveChallengeSide(
   const ids = [challenge.challenger_result_id, challenge.challengee_result_id].filter((id): id is string => Boolean(id));
   const { data: sides, error } = await admin.from("quiz_results").select("id, user_id, quiz_version").in("id", ids);
   if (error || !sides) return null;
-  if (sides.some((r) => quizVersionOf(r) !== 1)) return null;
+  if (sides.some((r) => !shownOnThisBuild(r))) return null;
   const owner = (id: string | null) => (id ? sides.find((r) => r.id === id)?.user_id : undefined);
   if (owner(challenge.challenger_result_id) === userId) return "challenger";
   if (owner(challenge.challengee_result_id) === userId) return "challengee";
@@ -98,14 +100,14 @@ export async function getPendingChallenges(
   admin: SupabaseClient,
   userId: string
 ): Promise<PendingChallenge[]> {
-  // The reader's own v1 results only, on every build, until launch: a
-  // challenge on a v2 result has no debate to offer ("Debate them" and
-  // resolveChallengeSide take two v1 results only; Gate 2, option (i)).
+  // The reader's own results this build shows: a challenge on any other
+  // has no debate to offer ("Debate them" and resolveChallengeSide take
+  // only results this build shows).
   const { data: ownResults } = await admin
     .from("quiz_results")
     .select("id")
     .eq("user_id", userId)
-    .eq("quiz_version", 1);
+    .in("quiz_version", shownVersions());
   const ownResultIds = (ownResults ?? []).map((r) => r.id as string);
   if (ownResultIds.length === 0) return [];
 
@@ -134,8 +136,8 @@ export async function getPendingChallenges(
         .select("school, quiz_version")
         .eq("id", otherResultId)
         .maybeSingle();
-      // Named only from a v1 result (src/lib/quiz-result.ts); a v2 one
-      // reads as a side whose school is not shown.
+      // Named only from a result this build shows (src/lib/quiz-result.ts);
+      // any other reads as a side whose school is not shown.
       otherSchool = otherResult ? schoolFromResult(otherResult) : null;
     }
     pending.push({ challengeId: c.id, topicSlug: c.topic_slug, otherSchool });
