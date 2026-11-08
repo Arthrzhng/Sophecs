@@ -303,7 +303,7 @@ export function templateVerdict(
         `Reasons as ${AN_ADHERENT(arg.school)} reasons, and answers a hard reply.`,
       ]);
     } else {
-      weakest = `The argument never meets an objection. "${wq}" is left to stand alone where a rival school would push hardest.`;
+      weakest = `${NEVER_MEETS} "${wq}" is left to stand alone where a rival school would push hardest.`;
       stronger = `take on the ${rivalName} objection directly. ${rivalIntro(open.rival)} would say that ${open.claim} The argument needs an answer to that.`;
       line = rng.pick([
         `A sound ${NAME(arg.school)} case that leaves its strongest objection unanswered.`,
@@ -327,10 +327,22 @@ export function templateVerdict(
   };
 }
 
+/** How a middling argument's weakest move opens: it meets no objection. */
+const NEVER_MEETS = "The argument never meets an objection.";
+
 /**
  * A revision's verdict: the revision adds the answer to the objection the
  * original's verdict named, so engagement rises and the objection is
  * marked answered. `answered` false is a revision that tried and missed.
+ *
+ * `freshRun`, for a run made with quiz v2 (Arthur, 2026-11-08: revision
+ * verdicts that say "never meets an objection" while also saying the
+ * revision meets one, "fix in the fresh run"): a revision that answers the
+ * objection keeps the first attempt's quoted passage for its weakest move,
+ * but described as a strong argument's verdict describes it, not as
+ * meeting no objection. No draw is added, so nothing else moves. A run
+ * that names no quiz writes what it wrote, since the live run regenerates
+ * its rows from this code.
  */
 export function templateRevisionVerdict(
   fr: TopicFragments,
@@ -341,7 +353,8 @@ export function templateRevisionVerdict(
   answeredIdx: number,
   answered: boolean,
   rng: Rng,
-  rule: ScoreRule = 1
+  rule: ScoreRule = 1,
+  { freshRun = false }: { freshRun?: boolean } = {}
 ): Verdict {
   const s = fr.schools[school];
   // As in templateVerdict: rule 1's draws first, under either rule.
@@ -363,8 +376,14 @@ export function templateRevisionVerdict(
         why_it_stands: `The reply to it is stated rather than argued, so a determined ${ADHERENT(s.objections[revisedParts.objections[0]].rival)} could press it again.`,
       };
   const base = templateVerdict(fr, { school, tier }, revisedParts, 0.5, rng);
+  const quoted = /"([^"]+)"/.exec(base.weakest_move)?.[1];
+  const weakest =
+    freshRun && answered && quoted && base.weakest_move.startsWith(NEVER_MEETS)
+      ? `"${quoted}" is asserted more than shown, and it carries weight the argument never quite earns.`
+      : base.weakest_move;
   return {
     ...base,
+    weakest_move: weakest,
     score,
     fidelity: f,
     rigor: r,

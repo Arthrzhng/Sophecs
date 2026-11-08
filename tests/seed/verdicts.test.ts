@@ -14,6 +14,7 @@ import {
   SCORE_RULE_2_FROM,
 } from "../../scripts/seed/verdicts";
 import { Rng } from "../../scripts/seed/rng";
+import type { SchoolId } from "../../src/lib/types";
 import { small } from "./fixture";
 
 const banks = loadBanks();
@@ -107,6 +108,43 @@ describe("template verdicts, score rule 2", () => {
             expect(strip(two)).toEqual(strip(one));
           }
         }
+  });
+
+  it("in the fresh run, a revision that answers its objection drops \"never meets an objection\", and nothing else moves", () => {
+    // Arthur, 2026-11-08: "fix in the fresh run". Same draws either way, so
+    // the rest of the verdict, and every draw after it, is as before.
+    let fixed = 0;
+    let kept = 0;
+    for (const topic of TOPICS) {
+      const fr = banks.fragments[topic];
+      for (const school of Object.keys(fr.schools) as SchoolId[]) {
+        for (const arg of banks.arguments[`${topic}.${school}`] ?? []) {
+          const parent = templateVerdict(fr, arg, arg.parts, 0.5, new Rng(`p/${arg.id}`));
+          const idx = fr.schools[school].objections.findIndex((o) => o.rival === parent.unanswered_objection!.school);
+          if (idx < 0) continue;
+          const parts = { ...arg.parts, objections: [...arg.parts.objections, idx] };
+          for (const answered of [true, false]) {
+            const [ra, rb] = [new Rng(`r/${arg.id}`), new Rng(`r/${arg.id}`)];
+            const before = templateRevisionVerdict(fr, school, arg.tier, parent, parts, idx, answered, ra, 1);
+            const fresh = templateRevisionVerdict(fr, school, arg.tier, parent, parts, idx, answered, rb, 1, { freshRun: true });
+            expect(ra.float(0, 1)).toBe(rb.float(0, 1));
+            expect({ ...fresh, weakest_move: "" }).toEqual({ ...before, weakest_move: "" });
+            const never = before.weakest_move.startsWith("The argument never meets an objection.");
+            if (answered && never) {
+              fixed++;
+              expect(fresh.weakest_move).not.toMatch(/never meets an objection/);
+              expect(fresh.weakest_move).toContain(/"[^"]+"/.exec(before.weakest_move)![0]);
+            } else {
+              if (never) kept++;
+              expect(fresh.weakest_move).toBe(before.weakest_move);
+            }
+          }
+        }
+      }
+    }
+    // A revision that tried and missed still meets no objection, and says so.
+    expect(fixed).toBeGreaterThan(20);
+    expect(kept).toBeGreaterThan(20);
   });
 
   it("a revision under rule 2 lowers no criterion, raises engagement when answered, and keeps its text", () => {

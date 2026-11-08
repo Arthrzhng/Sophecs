@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { LAUNCH_SCHOOLS, TOPICS, loadClosings, loadFragments, type SchoolId } from "../../scripts/seed/banks";
+import { LAUNCH_SCHOOLS, TOPICS, loadClosings, loadFragments, loadMotionClosings, type SchoolId } from "../../scripts/seed/banks";
 
 /**
  * The launch schools' passages (Arthur, 2026-11-07, Gate 4 item 13), held
@@ -41,6 +41,10 @@ function passages(): Passage[] {
   const closings = loadClosings();
   for (const id of LAUNCH_SCHOOLS)
     closings[id as unknown as SchoolId].forEach((t, i) => out.push({ where: `closings.${id}[${i}]`, school: id, text: t }));
+  const byMotion = loadMotionClosings();
+  for (const topic of TOPICS)
+    for (const id of LAUNCH_SCHOOLS)
+      byMotion[topic][id as unknown as SchoolId].forEach((t, i) => out.push({ where: `closings-by-motion.${topic}.${id}[${i}]`, school: id, text: t }));
   return out;
 }
 
@@ -97,10 +101,11 @@ const QUOTED_GRAMS = new Set(QUOTED.flatMap((q) => [...fiveGrams(q)]));
 describe("the launch schools' passages", () => {
   const all = passages();
 
-  it("are all read: six topics, three schools, four positions, four reasons, three examples and two objections of three parts each, and the closings", () => {
+  it("are all read: six topics, three schools, four positions, four reasons, three examples and two objections of three parts each, the closings, and each motion's four closings", () => {
     expect(LAUNCH_SCHOOLS).toHaveLength(3);
-    // 4 positions, 4 reasons, 3 examples, and 2 objections of 3 parts.
-    expect(all.length).toBe(6 * 3 * (4 + 4 + 3 + 2 * 3) + 3 * 4);
+    // 4 positions, 4 reasons, 3 examples, 2 objections of 3 parts, and 4
+    // closings of the motion's own; then the 4 closings each school shares.
+    expect(all.length).toBe(6 * 3 * (4 + 4 + 3 + 2 * 3 + 4) + 3 * 4);
   });
 
   it("use verified wording only as verified, and only with its source named", () => {
