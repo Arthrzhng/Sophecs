@@ -918,3 +918,24 @@ deploy below was read from Vercel as Ready.
   before the fresh sample run; the click-through and the word "launch"
   (item 15); `CRON_SECRET`; Supabase Auth's Site URL and redirect list,
   and the Vercel redirect from www to sophecs.com.
+
+## 2026-11-08: Arthur's rulings, the pause sentence, `CRON_SECRET`
+
+- #106 merged as `1e373e8`: the previous entry and the click-through.
+  Three review passes. Deploy `dpl_3nPkpSEoLUbvaPGzCaq31qcBGVDu`, Ready.
+- Arthur's rulings of 2026-11-08 are in `docs/decisions.md`, quoted in
+  full.
+- The method page's pause sentence now follows the kill switch: shown
+  only while `KILL_SWITCH_JUDGE` is "true", on `/method` and
+  `/how-it-works`. With production's switch off, production's `/method`
+  no longer says judging is paused.
+- `CRON_SECRET`: set by Arthur in Production. This entry's merge is the
+  redeploy that picks it up; both jobs' first runs with it are read back
+  in the next entry (`docs/gate4.md`, Housekeeping, says how).
+- Supabase Auth's Site URL and redirect list, and the www redirect: done
+  by Arthur. `https://www.sophecs.com/robots.txt` answered 308 to
+  `https://sophecs.com/robots.txt` at 01:19 UTC.
+- The samples are approved, with closings to be written per motion
+  before the fresh run, and the revision verdicts' "never meets an
+  objection" fixed in it: the next pull request.
+- Waiting on Arthur: the word "launch" (item 15).

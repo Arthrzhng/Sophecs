@@ -117,6 +117,9 @@ describe("a build without SIX_SCHOOLS", () => {
 
   // Rendered from main's components before the change (tests/nav-six-flag-off).
   it("renders the pages and components it touches byte for byte as main did", async () => {
+    // The fixture was taken with judging paused; with the switch off the
+    // method page drops one sentence (the next test).
+    vi.stubEnv("KILL_SWITCH_JUDGE", "true");
     const { method, rubric, footer, topics, table, cards } = await load("0");
     const fixture = (n: string) =>
       fs.readFileSync(path.join(process.cwd(), "tests", "nav-six-flag-off", `${n}.html`), "utf8");
@@ -133,6 +136,26 @@ describe("a build without SIX_SCHOOLS", () => {
     // (901e3a4), less React's empty text separators, which a static render
     // does not write.
     expect(`${renderToStaticMarkup(createElement(cards.SchoolCards))}\n`).toBe(fixture("school-cards"));
+  });
+
+  it("says judging is paused on /method and /how-it-works only while the kill switch is on", async () => {
+    const PAUSED = " That is why judging is paused rather than running.";
+    const fixture = fs.readFileSync(path.join(process.cwd(), "tests", "nav-six-flag-off", "method.html"), "utf8");
+    expect(fixture.split(PAUSED)).toHaveLength(2);
+    for (const value of [undefined, "", "false", "TRUE", "1"]) {
+      vi.unstubAllEnvs();
+      if (value !== undefined) vi.stubEnv("KILL_SWITCH_JUDGE", value);
+      const { method } = await load("0");
+      expect(`${renderToStaticMarkup(method.default())}\n`, String(value)).toBe(fixture.replace(PAUSED, ""));
+    }
+    for (const [value, shown] of [["true", true], ["false", false]] as const) {
+      vi.unstubAllEnvs();
+      vi.stubEnv("KILL_SWITCH_JUDGE", value);
+      const { howItWorks } = await load("1");
+      const html = renderToStaticMarkup(await howItWorks.default());
+      expect(html.includes("Verdict quality is still being checked against real arguments."), value).toBe(true);
+      expect(html.includes(PAUSED.trim()), value).toBe(shown);
+    }
   });
 
   it("keeps /table's own heading, and the landing page's cards at theirs", async () => {

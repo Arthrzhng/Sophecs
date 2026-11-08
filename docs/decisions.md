@@ -5412,3 +5412,56 @@ launch step, after the teardown, on his word.
   `` `${NAME(…)}'s` ``); and that a fresh run's base window still starts
   on 2026-09-18, so its quiz v2 results and the new three's arguments are
   dated weeks before readers could have made them.
+
+### Gate 4: Arthur's rulings of 2026-11-08
+
+Arthur, 2026-11-08, on the click-through, the samples and the list:
+
+> CRON_SECRET is set in Vercel (Production, sensitive). Pick it up with
+> the next merge, then confirm from the logs that the keep-alive and the
+> re-screening job both return 200 on their next run.
+>
+> Samples (gate4-samples.md): approved, with one fix before the run.
+> Closing lines must fit their motion and not repeat stock phrases across
+> arguments: e.g. Ubuntu's "not the total" closing on Trained to be good
+> doesn't fit, and both Confucian samples end with the same sentence.
+> Write closings per motion (or check each against its motion) for all six
+> schools' banks, so exemplar pages never show the same ending twice.
+>
+> Revision verdicts that say "never meets an objection" while also saying
+> the revision meets one: fix in the fresh run.
+>
+> "That is why judging is paused rather than running" on /method and
+> /how-it-works: make it follow the kill switch, so it is only shown when
+> judging is actually paused.
+>
+> Supabase: Site URL https://sophecs.com, https://sophecs.com/** and the
+> preview pattern are in the redirect list. www redirect: [done.
+
+How each is carried out:
+
+- **The pause sentence.** `JudgeMethod` shows "That is why judging is
+  paused rather than running." only when `KILL_SWITCH_JUDGE` is the exact
+  string "true", the test `/debate` and `/today` already use; the
+  sentence before it stays. Both pages are prerendered, so the switch is
+  read at build, which matches its own rule (set it and redeploy).
+  Allowlisted accounts are not considered: the pages are the same for
+  every reader. `tests/nav-six.test.tsx` holds `/method` byte for byte to
+  main's render with the switch on, and to that render less the one
+  sentence with it off, unset, empty or any other value.
+- **`CRON_SECRET`.** The merge of that change is the redeploy that picks
+  the secret up. Confirming both jobs answer 200 comes after their next
+  runs (Hobby fires the keep-alive in the 04:00 hour and the re-screening
+  job in the 05:00 hour, UTC), recorded in the progress log with how it
+  was read.
+- **Closings per motion, and the revision verdicts.** In the fresh run
+  only, since the live run regenerates its rows from this code until the
+  teardown: a separate pull request.
+- **Supabase and the www redirect.** Done by Arthur. Read here: a
+  request to `https://www.sophecs.com/robots.txt` answered 308 with
+  `location: https://sophecs.com/robots.txt` (2026-11-08, 01:19 UTC).
+- **Not ruled, so left as they are:** the other two things the run's
+  verdicts do ("Gate 4 item 13, second part", "Left as they are"): a
+  revision verdict that says an objection is now answered and still
+  suggests answering it, and "'s" after a name ending in "s". They stay on
+  Arthur's list.

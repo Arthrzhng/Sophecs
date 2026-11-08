@@ -97,7 +97,8 @@ For your next list, from carrying these out:
   whose name ends in "s" takes "'s", so a fresh run writes "Buddhist
   Ethics's" as the live run writes "Virtue Ethics's" (the templates that
   write `` `${NAME(…)}'s` ``). All three are in
-  `scripts/seed/verdicts.ts`;
+  `scripts/seed/verdicts.ts`. **Ruled 2026-11-08:** the first is fixed
+  in the fresh run; the other two were not ruled, so they stay;
 - found while checking the click-through: the method page's "Known
   limitations" says "Verdict quality is still being checked against real
   arguments. That is why judging is paused rather than running."
@@ -107,7 +108,9 @@ For your next list, from carrying these out:
   `/method` today, and on `/how-it-works` after the launch. The judge's
   other paused copy reads the kill switch (`docs/daily-path-copy.md`, Q2);
   this line does not. Whether to cut the sentence, or have it read the
-  switch as the others do, is yours.
+  switch as the others do, is yours. **Ruled 2026-11-08:** it follows the
+  kill switch, shown only while judging is paused (`docs/decisions.md`,
+  "Gate 4: Arthur's rulings of 2026-11-08").
 
 ## Where things stand
 
@@ -391,30 +394,31 @@ the new-schools run 16 or 23 of 25, depending on item 3.
 
 ## New, and waiting on you
 
-- **`CRON_SECRET`.** The project has none, so both cron jobs, the
-  keep-alive and the re-screening job, probably answer 401 and do
-  nothing (`docs/progress.md`, 2026-11-07). Vercel's settings,
-  Environment Variables: `CRON_SECRET`, sensitive, Production only, a
-  random value of 32 characters or more, then a redeploy. Yours rather
-  than mine, so the value never passes through an agent's transcript.
-  It turns the re-screening job on, which pays for screening whenever a
-  reply is pending, as you approved under (d) 4. Then trigger the
-  keep-alive once (`vercel crons run /api/cron/keepalive`, or the
-  project's cron settings) and look for a 200 in its request log: it
-  reads six rows, writes nothing and costs nothing. Until then the
-  arena's "A check that could not run is tried again once a day." is
-  not true, though no reader sees it today.
+- **`CRON_SECRET`.** Set by you on 2026-11-08 (Production, sensitive).
+  The project had none, so both cron jobs, the keep-alive and the
+  re-screening job, probably answered 401 and did nothing
+  (`docs/progress.md`, 2026-11-07). The next merge's redeploy picks it
+  up, and both jobs' next runs are read back in `docs/progress.md`. It
+  turns the re-screening job on, which pays for screening whenever a
+  reply is pending, as you approved under (d) 4.
 
-## Still waiting on you from before
+## Done on 2026-11-08
 
-- Supabase Auth's Site URL and redirect list, and the Vercel redirect
-  from `www.sophecs.com` to `sophecs.com`.
+- Supabase Auth's Site URL (`https://sophecs.com`) and redirect list
+  (`https://sophecs.com/**` and the preview pattern), and the Vercel
+  redirect from `www.sophecs.com` to `sophecs.com`, which answers 308.
 
 ## Housekeeping
 
 Mine, and not waiting on anyone:
 
-- Once `CRON_SECRET` is set and the keep-alive answers 200, the next
-  pending reply's re-screening is read in its exchange: the log read I
-  have returns no request statuses, and the route writes a line only
-  when the budget or a screening call's record cannot be read.
+- Both cron jobs' first runs with `CRON_SECRET`, read back. The log read
+  I have from Vercel returns no request statuses, the per-status
+  metrics need Observability Plus, and the routes are frozen, so no line
+  can be added to them. What can be read: each job reaches Supabase
+  only after its secret check passes, and Supabase's API logs keep each
+  request with its status. The keep-alive's one read of `debate_topics`
+  answered is its 200, since that read's error is its only other path;
+  the re-screening job's call of `ai_spend_since` and its read of
+  pending replies in `turns`, with none pending and no `[budget]` line
+  in Vercel's runtime log, are its 200.
