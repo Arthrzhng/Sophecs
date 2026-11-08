@@ -43,9 +43,8 @@ export const SAMPLE_IMAGE_MARK = "AI sample";
 export const SAMPLE_PAGE_REFERRER = "no-referrer" as const;
 
 /**
- * Metadata for a page that shows a sample: the title a genuine page of the
- * kind has (Arthur, 2026-11-08: no "Sample" in page titles), with no
- * referrer passed on. The page's preview image, its own opengraph-image or
+ * Metadata for a page that shows a sample: a plain title, with no "Sample"
+ * in it (Arthur, 2026-11-08), and no referrer passed on. The page's preview image, its own opengraph-image or
  * the one named here, carries the sample mark.
  */
 export function sampleMetadata(title: string, image?: { url: string; alt: string }) {

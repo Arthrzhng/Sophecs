@@ -33,7 +33,7 @@ describe("share images", () => {
 });
 
 describe("link previews of sample pages", () => {
-  it("have the plain title a genuine page of the kind has, in the tab and the previews, and no referrer", async () => {
+  it("have a plain title, with no Sample in it, in the tab and the previews", async () => {
     const { sampleMetadata } = await import("../../src/lib/sample");
     const m = sampleMetadata("Verdict · Sophecs");
     expect(m.openGraph.title).toBe("Verdict · Sophecs");

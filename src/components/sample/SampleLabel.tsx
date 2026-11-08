@@ -8,14 +8,14 @@ import { SAMPLE_EXPLANATION, SAMPLE_TAG } from "@/lib/sample";
  * more: no banner, no modal.
  *
  * A <details> rather than a tooltip, so it works without JavaScript, by
- * keyboard and by touch, and the explanation is in the page for a screen
- * reader rather than hidden behind a hover. It is flow content, so it sits
- * in a flex row beside the thing it tags, never inside a <p>.
+ * keyboard and by touch, and opens on a tap rather than a hover. It is flow
+ * content, so it sits in a flex row beside the thing it tags, never inside
+ * a <p>. Opened on a narrow screen, it can take a line of its own.
  */
-export function SampleLabel({ note, className = "" }: { note?: string; className?: string }) {
+export function SampleLabel({ note }: { note?: string }) {
   return (
-    <details className={`group ${className}`}>
-      <summary className="inline-flex min-h-11 cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden">
+    <details className="group">
+      <summary className="inline-flex min-h-11 min-w-11 cursor-pointer list-none items-center justify-center [&::-webkit-details-marker]:hidden">
         <span className="rounded-control border border-rule px-1.5 text-xs font-semibold text-ink-mid group-open:text-ink">
           {SAMPLE_TAG}
         </span>

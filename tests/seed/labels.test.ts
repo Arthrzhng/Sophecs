@@ -88,11 +88,6 @@ describe("labels", () => {
     expect(html(createElement(ChallengeInvite, { challengeId: "c1", school: "stoicism", content }))).toContain("/quiz?c=c1");
   });
 
-  it("a sample result is tagged and never presented as someone's", () => {
-    const src = readFileSync("src/components/share/SharePage.tsx", "utf8");
-    expect(src).toContain('{isSample ? "A result" : isOwner ? "Your school" : "Someone shared their result"}');
-    expect(src).toContain("{isSample && <SampleLabel />}");
-  });
 
   it("the school table has the one line on /schools, linked to the explanation, only in a week with samples", () => {
     expect(SCHOOLS_SAMPLE_LINE).toBe("Includes sample accounts, run by AI.");
@@ -104,16 +99,39 @@ describe("labels", () => {
     expect(html(createElement(SchoolTable, base))).not.toContain(SCHOOLS_SAMPLE_LINE);
   });
 
-  it("no page title, banner, heading or note names a sample beyond the minimum", () => {
-    const files = [
-      "src/app/r/[id]/page.tsx", "src/app/c/[id]/page.tsx", "src/app/debate/[slug]/[debateId]/page.tsx",
-      "src/components/debate/Verdict.tsx", "src/components/share/SharePage.tsx", "src/components/share/ChallengeInvite.tsx",
-      "src/components/today/TodayCards.tsx", "src/components/table/SchoolTable.tsx",
-    ];
-    for (const f of files) {
-      const code = readFileSync(f, "utf8").replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\{\/\*[\s\S]*?\*\/\}/g, "");
-      expect(code, f).not.toMatch(/"[^"]*\bSample\b[^"]*"|>[^<{]*\bSample\b[^<]*</);
-      expect(code, f).not.toMatch(/sample account'?s? (result|challenge)|Sample verdict|· Sample ·|What a sample account is/i);
+  // Each surface a sample's work is shown on, rendered: outside its one tag
+  // the page says nothing of samples, and the tag sits in a valid place.
+  it("each sample surface carries exactly one tag, outside any <p>, and says nothing else of samples", async () => {
+    const { SharePage } = await import("../../src/components/share/SharePage");
+    const { SchoolCard } = await import("../../src/components/today/TodayCards");
+    const content = { one_line: "x", name: "Stoicism" } as never;
+    const result = {
+      resultId: "r1", school: "stoicism" as const, oneLine: "A line.", oneLineAttribution: "Epictetus", vector: null, otherVector: null,
+      isOwner: false, isSavedToProfile: false, showDebateThem: false, challengeId: null, isSignedIn: false, shareLine: "s", shareLineIndex: 0,
+    };
+    const surfaces: Record<string, string> = {
+      "template verdict": html(createElement(Verdict, { ...props, sample: { template: true } })),
+      "template verdict, private": html(createElement(Verdict, { ...props, argument: null, argumentPublic: false, textWithheld: true, sample: { template: true } } as never)),
+      "rejected template verdict": html(createElement(Verdict, { ...props, verdict: { ...verdict, rejected: true }, sample: { template: true } })),
+      "sample result": html(createElement(SharePage, { ...result, isSample: true } as never)),
+      "sample challenge": html(createElement(ChallengeInvite, { challengeId: "c1", school: "stoicism", content, isSample: true })),
+    };
+    for (const [name, out] of Object.entries(surfaces)) {
+      expect(out.match(/<details/g)?.length ?? 0, name).toBe(1);
+      expect(out, name).not.toMatch(/<p\b[^>]*>(?:(?!<\/p>)[\s\S])*<details/);
+      const outside = out.replace(/<details[\s\S]*?<\/details>/g, "");
+      expect(outside, name).not.toMatch(/sample/i);
+      // Nor as a person: no author, no one, no "they".
+      expect(outside, name).not.toMatch(/\b(Someone|They came out|What they argue|The author|the person who wrote)\b/);
+    }
+    for (const name of ["template verdict", "template verdict, private", "rejected template verdict"])
+      expect(surfaces[name], name).toContain(`${SAMPLE_EXPLANATION} ${SAMPLE_JUDGE_NOTE}`);
+    // Today's rank card says nothing of samples whatever the week holds.
+    expect(html(createElement(SchoolCard, { school: "stoicism", oneLine: "x", elo: 1200, rank: 2 } as never))).not.toMatch(/sample/i);
+    // The page titles and the images' marks.
+    for (const f of ["src/app/r/[id]/page.tsx", "src/app/c/[id]/page.tsx", "src/app/debate/[slug]/[debateId]/page.tsx"]) {
+      const code = readFileSync(f, "utf8").replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
+      expect(code, f).not.toMatch(/"[^"]*\bSample\b[^"]*"|`[^`]*\bSample\b[^`]*`/);
     }
     expect(readFileSync("src/components/card/CardLayout.tsx", "utf8")).toContain("{SAMPLE_IMAGE_MARK}");
     expect(readFileSync("src/components/debate/VerdictCard.tsx", "utf8")).toContain("{SAMPLE_IMAGE_MARK}");

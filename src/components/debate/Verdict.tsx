@@ -62,8 +62,9 @@ const WITHHELD_REJECTED_TEMPLATE =
 // The article is the adherent noun's: every school's name begins with the
 // same sound as its noun ("an Ubuntu objection", "an Ubuntu Ethicist"),
 // which tests/six-schools.test.ts checks for all six.
-function withheldObjection(school: SchoolId): string {
-  return `The argument left ${SCHOOL_ARTICLE[school]} ${SCHOOL_COLORS[school].name} objection standing. Its wording can quote the argument, so only the person who wrote it can read it.`;
+function withheldObjection(school: SchoolId, template = false): string {
+  const tail = template ? "so it is shown only while the argument is public." : "so only the person who wrote it can read it.";
+  return `The argument left ${SCHOOL_ARTICLE[school]} ${SCHOOL_COLORS[school].name} objection standing. Its wording can quote the argument, ${tail}`;
 }
 
 // The parent's four marks, so a revision can be read against its original.
@@ -400,7 +401,7 @@ export function Verdict({
             <p className="text-sm text-ink-mid">{SCHOOL_COLORS[objection.school].name}</p>
             {textWithheld ? (
               <p className="mt-2 text-sm leading-relaxed text-ink-mid">
-                {withheldObjection(objection.school)}
+                {withheldObjection(objection.school, template)}
               </p>
             ) : (
               <>
@@ -472,7 +473,9 @@ export function Verdict({
             <p className="font-serif text-base leading-relaxed whitespace-pre-wrap">{argument}</p>
           </div>
         ) : (
-          <p className="text-sm text-ink-soft">The author has not published this argument.</p>
+          <p className="text-sm text-ink-soft">
+            {sample ? "This argument is not published." : "The author has not published this argument."}
+          </p>
         )}
       </div>
 

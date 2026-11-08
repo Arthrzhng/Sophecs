@@ -6096,9 +6096,12 @@ across the site. Remove every label except this minimum". What stays:
   follows when samples reply.
 
 Gone: "Sample" in page titles (a sample's verdict, result and challenge
-have the titles anyone's have), the Sample banner, the "Sample
-assessment" headings and mark, the note under each template verdict, the
-note under Today's rank, and the old paragraphs on `/how-it-works`.
+have plain titles: "Verdict", the school's name, "A challenge"), the
+Sample banner, the "Sample assessment" headings and mark, the note under
+each template verdict, the note under Today's rank, and the old
+paragraphs on `/how-it-works`. `tests/seed/labels.test.ts` renders each
+surface and holds that, outside its one tag, none says "sample" or speaks
+of a person.
 
 Choices made in carrying this out, for Arthur's list:
 - **The judge did not read it.** A sample's verdict is scored from a
@@ -6107,10 +6110,23 @@ Choices made in carrying this out, for Arthur's list:
   arguments are scored by the judge. So the tag on a template verdict
   opens to the explanation and then "The judge did not read this
   argument." (the note's own words), and the scores sit under "Scores",
-  never "How the judge scored you".
+  never "How the judge scored you". The alternatives: the judge line shown
+  without opening the tag, or "AI sample" as the tag on verdict pages,
+  since a bare "AI" there could read as "judged by AI".
 - **The image mark reads "AI sample", not "AI".** An image travels
   without the tag beside it, and on a verdict image a bare "AI" could be
   read as "judged by AI", which every verdict is.
-- A sample is never presented as a person: its result reads "A result",
-  not "Someone shared their result", and its challenge "A challenge", not
-  "Someone challenged you".
+- **Never as a person.** A sample's result reads "A result", not
+  "Someone shared their result"; its challenge "A challenge", not
+  "Someone challenged you", then "This account came out a utilitarian.
+  Find out what you are." and "What this account argues from", not
+  "They" (review pass 1). On a private sample verdict, "This argument is
+  not published." and the withheld objection "is shown only while the
+  argument is public", where a reader's say "the author" and "the person
+  who wrote it".
+- **The table.** Arthur's list puts the tag on the table too, beside a
+  sample's name. The table shows schools, not accounts, and no page shows
+  an account's name, so the one line on `/schools` stands for it.
+- **What the tag opens to.** The explanation, so "Sample accounts" is
+  in every sample page once the tag is opened.
+- **On a narrow screen**, the opened tag takes a line of its own.
