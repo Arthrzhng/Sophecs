@@ -87,6 +87,38 @@ describe("selectExemplars", () => {
     expect(endingOf("Only one sentence")).toBe("Only one sentence");
   });
 
+  it("moves a kept argument to the next under its opening when that is the only way to show another opening", () => {
+    // Shaped like the case review pass 1 found (seed launch-c, careful-builder,
+    // Virtue Ethics): the strongest under "Deploy it." takes the ending the
+    // only argument under "Do not deploy it." has, and a weaker one under
+    // "Deploy it." has an ending of its own.
+    const row = (id: string, argument: string, score: number): ExemplarCandidate => ({ id, school: "virtue-ethics", argument, is_sample: true, score });
+    const rows = [
+      row("a1", "Deploy it. A reason. Blame is owed.", 90),
+      row("b1", "Do not deploy it. Another reason. Blame is owed.", 80),
+      row("a2", "Deploy it. A third reason. A clean conscience is not earned.", 70),
+      row("c1", "Wait and see. A fourth reason. Repair comes first.", 60),
+    ];
+    const chosen = selectExemplars(new Map([["virtue-ethics", rows]]), ["virtue-ethics"]).get("virtue-ethics")!;
+    expect(chosen.map((e) => e.id)).toEqual(["b1", "a2", "c1"]);
+    // Where every opening finds an ending of its own, nothing moves.
+    const easy = [rows[0], row("b2", "Do not deploy it. Another reason. Repair is owed.", 80), rows[2], rows[3]];
+    expect(selectExemplars(new Map([["virtue-ethics", easy]]), ["virtue-ethics"]).get("virtue-ethics")!.map((e) => e.id)).toEqual(["a1", "b2", "c1"]);
+  });
+
+  it("moves arguments across schools too, as the endings are shared between them", () => {
+    const row = (id: string, school: SchoolId, argument: string, score: number): ExemplarCandidate => ({ id, school, argument, is_sample: true, score });
+    const chosen = selectExemplars(
+      new Map([
+        ["stoicism", [row("s1", "stoicism", "Deploy it. A. The judging is ours.", 90), row("s2", "stoicism", "Deploy it. B. Only assent is ours.", 70)]],
+        ["utilitarianism", [row("u1", "utilitarianism", "Count it. C. The judging is ours.", 85)]],
+      ] as [SchoolId, ExemplarCandidate[]][]),
+      ["stoicism", "utilitarianism"]
+    );
+    expect(chosen.get("stoicism")!.map((e) => e.id)).toEqual(["s2"]);
+    expect(chosen.get("utilitarianism")!.map((e) => e.id)).toEqual(["u1"]);
+  });
+
   it("reads the opening line after a frame sentence, so a frame never passes for a new opening", () => {
     expect([...SAMPLE_FRAMES]).toEqual(FRAMES);
     const row = (id: string, argument: string): ExemplarCandidate => ({ id, school: "stoicism", argument, is_sample: true, score: 80 });

@@ -115,41 +115,93 @@ export function endingOf(argument: string): string {
 
 /**
  * From each school's candidates, strongest first, keep the first under each
- * opening line (its first sentence after any frame), then choose up to `total` between the schools: an even
- * share each, the remainder to the schools listed first, and any share a
- * school cannot fill passed to the others. An exact repeat of a text
- * already kept, in any school, is dropped too, and so is one that ends on
- * the line another kept argument ends on (`endingOf`): the next strongest
- * under its opening takes its place. So is any argument with one of the
- * sample run's deliberate misspellings or marked under EXEMPLAR_FLOOR. As the candidates come strongest first, an opening whose
- * strongest argument is under the floor is left out.
+ * opening line (its first sentence after any frame), then choose up to
+ * `total` between the schools: an even share each, the remainder to the
+ * schools listed first, and any share a school cannot fill passed to the
+ * others. Any argument with one of the sample run's deliberate misspellings
+ * or marked under EXEMPLAR_FLOOR is left out, so an opening whose strongest
+ * argument is under the floor is left out too.
+ *
+ * No two kept arguments, in any school, end on the same line (`endingOf`;
+ * Arthur, 2026-11-08: "so exemplar pages never show the same ending
+ * twice"), so none repeats another's text either. Where the strongest under
+ * an opening ends as a stronger kept argument does, the next strongest
+ * under it takes its place. Where none under an opening is left, a kept
+ * argument moves to the next strongest under its own opening when that
+ * frees an ending the left-out opening can take (an augmenting path, as in
+ * Kuhn's matching), so an opening is left out only when no choice of one
+ * argument per opening could show it. Where every opening finds an ending
+ * at once, nothing moves.
  */
 export function selectExemplars(
   candidatesBySchool: ReadonlyMap<SchoolId, readonly ExemplarCandidate[]>,
   schools: readonly SchoolId[],
   total: number = EXEMPLARS_PER_MOTION
 ): Map<SchoolId, Exemplar[]> {
-  const seen = new Set<string>();
-  const endings = new Set<string>();
-  const pools = new Map<SchoolId, Exemplar[]>();
-  for (const school of schools) {
-    const pool: Exemplar[] = [];
-    const openings = new Set<string>();
-    for (const c of candidatesBySchool.get(school) ?? []) {
-      if (!c.is_sample || c.school !== school || !c.argument?.trim() || SAMPLE_TYPO.test(c.argument)) continue;
-      if (typeof c.score !== "number" || c.score < EXEMPLAR_FLOOR) continue;
-      const text = normalise(c.argument);
-      const opening = openingOf(withoutFrame(c.argument));
-      const openingKey = normalise(opening);
-      const endingKey = normalise(endingOf(c.argument));
-      if (seen.has(text) || openings.has(openingKey) || endings.has(endingKey)) continue;
-      seen.add(text);
-      openings.add(openingKey);
-      endings.add(endingKey);
-      pool.push({ id: c.id, school: c.school, argument: c.argument.trim(), opening });
-    }
-    pools.set(school, pool);
+  /** One opening line in one school, and the arguments under it, strongest first. */
+  interface Slot {
+    school: SchoolId;
+    options: { at: number; exemplar: Exemplar; ending: string }[];
+    taken?: number;
   }
+  const slots: Slot[] = [];
+  for (const school of schools) {
+    const bySchool = new Map<string, Slot>();
+    (candidatesBySchool.get(school) ?? []).forEach((c, at) => {
+      if (!c.is_sample || c.school !== school || !c.argument?.trim() || SAMPLE_TYPO.test(c.argument)) return;
+      if (typeof c.score !== "number" || c.score < EXEMPLAR_FLOOR) return;
+      const opening = openingOf(withoutFrame(c.argument));
+      const key = normalise(opening);
+      let slot = bySchool.get(key);
+      if (!slot) bySchool.set(key, (slot = { school, options: [] }));
+      slot.options.push({ at, ending: normalise(endingOf(c.argument)), exemplar: { id: c.id, school: c.school, argument: c.argument.trim(), opening } });
+    });
+    slots.push(...bySchool.values());
+  }
+
+  // First pass, as the candidates come: each opening takes its strongest
+  // argument whose ending no stronger kept argument has taken.
+  const holder = new Map<string, Slot>();
+  const order = slots
+    .flatMap((slot) => slot.options.map((option, i) => ({ slot, i, school: schools.indexOf(slot.school), at: option.at })))
+    .sort((a, b) => a.school - b.school || a.at - b.at);
+  for (const { slot, i } of order) {
+    const { ending } = slot.options[i];
+    if (slot.taken !== undefined || holder.has(ending)) continue;
+    slot.taken = i;
+    holder.set(ending, slot);
+  }
+
+  // Then each opening left out tries to free an ending: an argument
+  // holding one moves to the next strongest under its own opening.
+  const free = (slot: Slot, tried: Set<string>): boolean => {
+    for (let i = 0; i < slot.options.length; i++) {
+      const { ending } = slot.options[i];
+      if (tried.has(ending)) continue;
+      tried.add(ending);
+      const current = holder.get(ending);
+      if (current === slot) continue;
+      if (current === undefined || free(current, tried)) {
+        if (slot.taken !== undefined) holder.delete(slot.options[slot.taken].ending);
+        slot.taken = i;
+        holder.set(ending, slot);
+        return true;
+      }
+    }
+    return false;
+  };
+  for (const slot of slots) if (slot.taken === undefined) free(slot, new Set());
+
+  const pools = new Map<SchoolId, Exemplar[]>(
+    schools.map((school) => [
+      school,
+      slots
+        .filter((slot) => slot.school === school && slot.taken !== undefined)
+        .map((slot) => slot.options[slot.taken!])
+        .sort((a, b) => a.at - b.at)
+        .map((option) => option.exemplar),
+    ])
+  );
 
   const chosen = new Map<SchoolId, Exemplar[]>(schools.map((s) => [s, []]));
   let left = total;

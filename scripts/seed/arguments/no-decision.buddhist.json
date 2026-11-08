@@ -31,15 +31,15 @@
         0,
         3
       ],
-      "example": 1,
+      "example": null,
       "objections": [
         1
       ],
       "closing": 2,
       "weak": []
     },
-    "text": "An output arises from many conditions, its training data, its prompt and the people who deployed it, with no volition of its own among them, so calling it a decision places an intention where there is none. In Buddhist ethics an act is weighed by the volition behind it as much as by what follows. A decision is a volition settling on a course, and a language model's output has no volition of its own behind it. Calling it a decision credits an intention that is not there.\n\nThe practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model. A recruiter says the screening tool decided against a candidate. The tool's output arose from years of past hiring choices, every one of them made by someone.\n\nA Confucian will object that the issue is not hidden volitions but misnamed roles, and dissolving responsibility into many conditions makes it harder, not easier, to hold a particular person to account. Many conditions does not mean no one. It means the account must name each person whose intention shaped the outcome, rather than one scapegoat or the model, and for each of them the duty to examine and change their part is real. Naming an output a decision invents an agent and lets the real intentions go unexamined.",
-    "words": 247
+    "text": "An output arises from many conditions, its training data, its prompt and the people who deployed it, with no volition of its own among them, so calling it a decision places an intention where there is none. In Buddhist ethics an act is weighed by the volition behind it as much as by what follows. A decision is a volition settling on a course, and a language model's output has no volition of its own behind it. Calling it a decision credits an intention that is not there.\n\nThe practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model.\n\nA Confucian will object that the issue is not hidden volitions but misnamed roles, and dissolving responsibility into many conditions makes it harder, not easier, to hold a particular person to account. Many conditions does not mean no one. It means the account must name each person whose intention shaped the outcome, rather than one scapegoat or the model, and for each of them the duty to examine and change their part is real. The model wills nothing, so every output is a trace of human intentions, and those are what the right word keeps in view.",
+    "words": 228
   },
   {
     "id": "no-decision.buddhist.03",
@@ -91,18 +91,18 @@
     "parts": {
       "position": 0,
       "reasons": [
-        2,
+        3,
+        2
+      ],
+      "example": 1,
+      "objections": [
         0
       ],
-      "example": null,
-      "objections": [
-        1
-      ],
-      "closing": 3,
+      "closing": 1,
       "weak": []
     },
-    "text": "An output arises from many conditions, its training data, its prompt and the people who deployed it, with no volition of its own among them, so calling it a decision places an intention where there is none. Buddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide.\n\nIn Buddhist ethics an act is weighed by the volition behind it as much as by what follows. A decision is a volition settling on a course, and a language model's output has no volition of its own behind it. Calling it a decision credits an intention that is not there.\n\nA Confucian will object that the issue is not hidden volitions but misnamed roles, and dissolving responsibility into many conditions makes it harder, not easier, to hold a particular person to account. Many conditions does not mean no one. It means the account must name each person whose intention shaped the outcome, rather than one scapegoat or the model, and for each of them the duty to examine and change their part is real. Look for the will behind the act and it is found in the people who built and used the system, never in the model.",
-    "words": 225
+    "text": "An output arises from many conditions, its training data, its prompt and the people who deployed it, with no volition of its own among them, so calling it a decision places an intention where there is none. The practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model.\n\nBuddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide. A recruiter says the screening tool decided against a candidate. The tool's output arose from years of past hiring choices, every one of them made by someone.\n\nA Utilitarian will object that whether we call it a decision changes nothing about what the output does to people, so the stress on volition is a distraction from the harms. The stress on volition is how the harms get addressed. If no one intended anything, no one examines anything, and harm left unexamined keeps arising from the same conditions. The intention lies with those who trained and deployed the model, so that is where the moral weight of each output rests.",
+    "words": 228
   },
   {
     "id": "no-decision.buddhist.06",
@@ -122,8 +122,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. What arises comes from many conditions, not one cause. The output arises from data, training, prompt and deployment, and among those conditions the only volitions are human: those of the builders, the deployers and the users.\n\nBuddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide. A content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform.\n\nA Confucian will object that the issue is not hidden volitions but misnamed roles, and dissolving responsibility into many conditions makes it harder, not easier, to hold a particular person to account. Many conditions does not mean no one. It means the account must name each person whose intention shaped the outcome, rather than one scapegoat or the model, and for each of them the duty to examine and change their part is real. Naming an output a decision invents an agent and lets the real intentions go unexamined.",
-    "words": 217
+    "text": "I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. What arises comes from many conditions, not one cause. The output arises from data, training, prompt and deployment, and among those conditions the only volitions are human: those of the builders, the deployers and the users.\n\nBuddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide. A content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform.\n\nA Confucian will object that the issue is not hidden volitions but misnamed roles, and dissolving responsibility into many conditions makes it harder, not easier, to hold a particular person to account. Many conditions does not mean no one. It means the account must name each person whose intention shaped the outcome, rather than one scapegoat or the model, and for each of them the duty to examine and change their part is real. The model wills nothing, so every output is a trace of human intentions, and those are what the right word keeps in view.",
+    "words": 225
   },
   {
     "id": "no-decision.buddhist.07",
@@ -133,8 +133,8 @@
     "parts": {
       "position": 2,
       "reasons": [
-        0,
-        3
+        2,
+        1
       ],
       "example": 0,
       "objections": [
@@ -143,8 +143,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "A Buddhist Ethicist accepts this, because deciding is intending, and to say the model decided moves the intention from the people who have it to a process that does not. In Buddhist ethics an act is weighed by the volition behind it as much as by what follows. A decision is a volition settling on a course, and a language model's output has no volition of its own behind it. Calling it a decision credits an intention that is not there.\n\nThe practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model. A clinic says its model decided to discharge a patient early. The decision to trust that output without review was a nurse's, and so was the chance to look again.\n\nA Utilitarian will object that whether we call it a decision changes nothing about what the output does to people, so the stress on volition is a distraction from the harms. The stress on volition is how the harms get addressed. If no one intended anything, no one examines anything, and harm left unexamined keeps arising from the same conditions. Naming an output a decision invents an agent and lets the real intentions go unexamined.",
-    "words": 229
+    "text": "A Buddhist Ethicist accepts this, because deciding is intending, and to say the model decided moves the intention from the people who have it to a process that does not. Buddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide.\n\nWhat arises comes from many conditions, not one cause. The output arises from data, training, prompt and deployment, and among those conditions the only volitions are human: those of the builders, the deployers and the users. A clinic says its model decided to discharge a patient early. The decision to trust that output without review was a nurse's, and so was the chance to look again.\n\nA Utilitarian will object that whether we call it a decision changes nothing about what the output does to people, so the stress on volition is a distraction from the harms. The stress on volition is how the harms get addressed. If no one intended anything, no one examines anything, and harm left unexamined keeps arising from the same conditions. The model wills nothing, so every output is a trace of human intentions, and those are what the right word keeps in view.",
+    "words": 218
   },
   {
     "id": "no-decision.buddhist.08",
@@ -154,8 +154,8 @@
     "parts": {
       "position": 3,
       "reasons": [
-        3,
-        0
+        0,
+        3
       ],
       "example": null,
       "objections": [
@@ -164,32 +164,11 @@
       "closing": 3,
       "weak": []
     },
-    "text": "The motion is right, and it matters: calling the output a decision hides the volitions that actually shaped it, which are the ones that can be examined and changed. The practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model.\n\nIn Buddhist ethics an act is weighed by the volition behind it as much as by what follows. A decision is a volition settling on a course, and a language model's output has no volition of its own behind it. Calling it a decision credits an intention that is not there.\n\nA Confucian will object that the issue is not hidden volitions but misnamed roles, and dissolving responsibility into many conditions makes it harder, not easier, to hold a particular person to account. Many conditions does not mean no one. It means the account must name each person whose intention shaped the outcome, rather than one scapegoat or the model, and for each of them the duty to examine and change their part is real. Look for the will behind the act and it is found in the people who built and used the system, never in the model.",
+    "text": "The motion is right, and it matters: calling the output a decision hides the volitions that actually shaped it, which are the ones that can be examined and changed. In Buddhist ethics an act is weighed by the volition behind it as much as by what follows. A decision is a volition settling on a course, and a language model's output has no volition of its own behind it. Calling it a decision credits an intention that is not there.\n\nThe practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model.\n\nA Confucian will object that the issue is not hidden volitions but misnamed roles, and dissolving responsibility into many conditions makes it harder, not easier, to hold a particular person to account. Many conditions does not mean no one. It means the account must name each person whose intention shaped the outcome, rather than one scapegoat or the model, and for each of them the duty to examine and change their part is real. Look for the will behind the act and it is found in the people who built and used the system, never in the model.",
     "words": 221
   },
   {
     "id": "no-decision.buddhist.09",
-    "topic": "no-decision",
-    "school": "buddhist",
-    "tier": "strong",
-    "parts": {
-      "position": 0,
-      "reasons": [
-        3,
-        2
-      ],
-      "example": 1,
-      "objections": [
-        0
-      ],
-      "closing": 1,
-      "weak": []
-    },
-    "text": "An output arises from many conditions, its training data, its prompt and the people who deployed it, with no volition of its own among them, so calling it a decision places an intention where there is none. The practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model.\n\nBuddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide. A recruiter says the screening tool decided against a candidate. The tool's output arose from years of past hiring choices, every one of them made by someone.\n\nA Utilitarian will object that whether we call it a decision changes nothing about what the output does to people, so the stress on volition is a distraction from the harms. The stress on volition is how the harms get addressed. If no one intended anything, no one examines anything, and harm left unexamined keeps arising from the same conditions. The intention lies with those who trained and deployed the model, so that is where the moral weight of each output rests.",
-    "words": 228
-  },
-  {
-    "id": "no-decision.buddhist.10",
     "topic": "no-decision",
     "school": "buddhist",
     "tier": "strong",
@@ -206,8 +185,29 @@
       "closing": 0,
       "weak": []
     },
-    "text": "The motion is right, and it matters: calling the output a decision hides the volitions that actually shaped it, which are the ones that can be examined and changed. What arises comes from many conditions, not one cause. The output arises from data, training, prompt and deployment, and among those conditions the only volitions are human: those of the builders, the deployers and the users.\n\nThe practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model. A content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform.\n\nA Confucian will object that the issue is not hidden volitions but misnamed roles, and dissolving responsibility into many conditions makes it harder, not easier, to hold a particular person to account. Many conditions does not mean no one. It means the account must name each person whose intention shaped the outcome, rather than one scapegoat or the model, and for each of them the duty to examine and change their part is real. Where there is no volition there is no deciding, only a result arising from conditions the deployers set.",
-    "words": 225
+    "text": "The motion is right, and it matters: calling the output a decision hides the volitions that actually shaped it, which are the ones that can be examined and changed. What arises comes from many conditions, not one cause. The output arises from data, training, prompt and deployment, and among those conditions the only volitions are human: those of the builders, the deployers and the users.\n\nThe practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model. A content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform.\n\nA Confucian will object that the issue is not hidden volitions but misnamed roles, and dissolving responsibility into many conditions makes it harder, not easier, to hold a particular person to account. Many conditions does not mean no one. It means the account must name each person whose intention shaped the outcome, rather than one scapegoat or the model, and for each of them the duty to examine and change their part is real. Where there is no volition there is no deciding, only an output produced by data, prompts and whoever put it to use.",
+    "words": 229
+  },
+  {
+    "id": "no-decision.buddhist.10",
+    "topic": "no-decision",
+    "school": "buddhist",
+    "tier": "strong",
+    "parts": {
+      "position": 2,
+      "reasons": [
+        2,
+        1
+      ],
+      "example": 1,
+      "objections": [
+        1
+      ],
+      "closing": 3,
+      "weak": []
+    },
+    "text": "A Buddhist Ethicist accepts this, because deciding is intending, and to say the model decided moves the intention from the people who have it to a process that does not. Buddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide.\n\nWhat arises comes from many conditions, not one cause. The output arises from data, training, prompt and deployment, and among those conditions the only volitions are human: those of the builders, the deployers and the users. A recruiter says the screening tool decided against a candidate. The tool's output arose from years of past hiring choices, every one of them made by someone.\n\nA Confucian will object that the issue is not hidden volitions but misnamed roles, and dissolving responsibility into many conditions makes it harder, not easier, to hold a particular person to account. Many conditions does not mean no one. It means the account must name each person whose intention shaped the outcome, rather than one scapegoat or the model, and for each of them the duty to examine and change their part is real. Look for the will behind the act and it is found in the people who built and used the system, never in the model.",
+    "words": 230
   },
   {
     "id": "no-decision.buddhist.11",
@@ -224,8 +224,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. Buddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide.\n\nA content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform. Naming an output a decision invents an agent and lets the real intentions go unexamined.",
-    "words": 107
+    "text": "I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. Buddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide.\n\nA content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform. The model wills nothing, so every output is a trace of human intentions, and those are what the right word keeps in view.",
+    "words": 115
   },
   {
     "id": "no-decision.buddhist.12",
@@ -242,8 +242,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "The motion is right, and it matters: calling the output a decision hides the volitions that actually shaped it, which are the ones that can be examined and changed. What arises comes from many conditions, not one cause. The output arises from data, training, prompt and deployment, and among those conditions the only volitions are human: those of the builders, the deployers and the users.\n\nA recruiter says the screening tool decided against a candidate. The tool's output arose from years of past hiring choices, every one of them made by someone. Where there is no volition there is no deciding, only a result arising from conditions the deployers set.",
-    "words": 110
+    "text": "The motion is right, and it matters: calling the output a decision hides the volitions that actually shaped it, which are the ones that can be examined and changed. What arises comes from many conditions, not one cause. The output arises from data, training, prompt and deployment, and among those conditions the only volitions are human: those of the builders, the deployers and the users.\n\nA recruiter says the screening tool decided against a candidate. The tool's output arose from years of past hiring choices, every one of them made by someone. Where there is no volition there is no deciding, only an output produced by data, prompts and whoever put it to use.",
+    "words": 114
   },
   {
     "id": "no-decision.buddhist.13",
@@ -260,8 +260,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A Buddhist Ethicist accepts this, because deciding is intending, and to say the model decided moves the intention from the people who have it to a process that does not. The practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model.\n\nA clinic says its model decided to discharge a patient early. The decision to trust that output without review was a nurse's, and so was the chance to look again. Where there is no volition there is no deciding, only a result arising from conditions the deployers set.",
-    "words": 121
+    "text": "A Buddhist Ethicist accepts this, because deciding is intending, and to say the model decided moves the intention from the people who have it to a process that does not. The practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model.\n\nA clinic says its model decided to discharge a patient early. The decision to trust that output without review was a nurse's, and so was the chance to look again. Where there is no volition there is no deciding, only an output produced by data, prompts and whoever put it to use.",
+    "words": 125
   },
   {
     "id": "no-decision.buddhist.14",
@@ -332,8 +332,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. In Buddhist ethics an act is weighed by the volition behind it as much as by what follows. A decision is a volition settling on a course, and a language model's output has no volition of its own behind it. Calling it a decision credits an intention that is not there.\n\nA content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform. Where there is no volition there is no deciding, only a result arising from conditions the deployers set.",
-    "words": 122
+    "text": "I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. In Buddhist ethics an act is weighed by the volition behind it as much as by what follows. A decision is a volition settling on a course, and a language model's output has no volition of its own behind it. Calling it a decision credits an intention that is not there.\n\nA content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform. Where there is no volition there is no deciding, only an output produced by data, prompts and whoever put it to use.",
+    "words": 126
   },
   {
     "id": "no-decision.buddhist.18",
@@ -350,8 +350,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "An output arises from many conditions, its training data, its prompt and the people who deployed it, with no volition of its own among them, so calling it a decision places an intention where there is none. The practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model.\n\nA recruiter says the screening tool decided against a candidate. The tool's output arose from years of past hiring choices, every one of them made by someone. Where there is no volition there is no deciding, only a result arising from conditions the deployers set.",
-    "words": 125
+    "text": "An output arises from many conditions, its training data, its prompt and the people who deployed it, with no volition of its own among them, so calling it a decision places an intention where there is none. The practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model.\n\nA recruiter says the screening tool decided against a candidate. The tool's output arose from years of past hiring choices, every one of them made by someone. Where there is no volition there is no deciding, only an output produced by data, prompts and whoever put it to use.",
+    "words": 129
   },
   {
     "id": "no-decision.buddhist.19",
@@ -386,8 +386,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "An output arises from many conditions, its training data, its prompt and the people who deployed it, with no volition of its own among them, so calling it a decision places an intention where there is none. Buddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide.\n\nA content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform. Where there is no volition there is no deciding, only a result arising from conditions the deployers set.",
-    "words": 119
+    "text": "An output arises from many conditions, its training data, its prompt and the people who deployed it, with no volition of its own among them, so calling it a decision places an intention where there is none. Buddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide.\n\nA content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform. Where there is no volition there is no deciding, only an output produced by data, prompts and whoever put it to use.",
+    "words": 123
   },
   {
     "id": "no-decision.buddhist.21",
@@ -404,8 +404,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "The motion is right, and it matters: calling the output a decision hides the volitions that actually shaped it, which are the ones that can be examined and changed. In Buddhist ethics an act is weighed by the volition behind it as much as by what follows. A decision is a volition settling on a course, and a language model's output has no volition of its own behind it. Calling it a decision credits an intention that is not there.\n\nA clinic says its model decided to discharge a patient early. The decision to trust that output without review was a nurse's, and so was the chance to look again. Naming an output a decision invents an agent and lets the real intentions go unexamined.",
-    "words": 125
+    "text": "The motion is right, and it matters: calling the output a decision hides the volitions that actually shaped it, which are the ones that can be examined and changed. In Buddhist ethics an act is weighed by the volition behind it as much as by what follows. A decision is a volition settling on a course, and a language model's output has no volition of its own behind it. Calling it a decision credits an intention that is not there.\n\nA clinic says its model decided to discharge a patient early. The decision to trust that output without review was a nurse's, and so was the chance to look again. The model wills nothing, so every output is a trace of human intentions, and those are what the right word keeps in view.",
+    "words": 133
   },
   {
     "id": "no-decision.buddhist.22",
@@ -476,8 +476,8 @@
       "closing": 2,
       "weak": []
     },
-    "text": "I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. The practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model.\n\nA clinic says its model decided to discharge a patient early. The decision to trust that output without review was a nurse's, and so was the chance to look again. Naming an output a decision invents an agent and lets the real intentions go unexamined.",
-    "words": 116
+    "text": "I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. The practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model.\n\nA clinic says its model decided to discharge a patient early. The decision to trust that output without review was a nurse's, and so was the chance to look again. The model wills nothing, so every output is a trace of human intentions, and those are what the right word keeps in view.",
+    "words": 124
   },
   {
     "id": "no-decision.buddhist.26",
@@ -512,8 +512,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "The motion is right, and it matters: calling the output a decision hides the volitions that actually shaped it, which are the ones that can be examined and changed. What arises comes from many conditions, not one cause. The output arises from data, training, prompt and deployment, and among those conditions the only volitions are human: those of the builders, the deployers and the users.\n\nA clinic says its model decided to discharge a patient early. The decision to trust that output without review was a nurse's, and so was the chance to look again. Where there is no volition there is no deciding, only a result arising from conditions the deployers set.",
-    "words": 113
+    "text": "The motion is right, and it matters: calling the output a decision hides the volitions that actually shaped it, which are the ones that can be examined and changed. What arises comes from many conditions, not one cause. The output arises from data, training, prompt and deployment, and among those conditions the only volitions are human: those of the builders, the deployers and the users.\n\nA clinic says its model decided to discharge a patient early. The decision to trust that output without review was a nurse's, and so was the chance to look again. Where there is no volition there is no deciding, only an output produced by data, prompts and whoever put it to use.",
+    "words": 117
   },
   {
     "id": "no-decision.buddhist.28",
@@ -548,8 +548,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. Buddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide.\n\nA content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform. Where there is no volition there is no deciding, only a result arising from conditions the deployers set.",
-    "words": 110
+    "text": "I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. Buddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide.\n\nA content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform. Where there is no volition there is no deciding, only an output produced by data, prompts and whoever put it to use.",
+    "words": 114
   },
   {
     "id": "no-decision.buddhist.30",
@@ -566,8 +566,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "An output arises from many conditions, its training data, its prompt and the people who deployed it, with no volition of its own among them, so calling it a decision places an intention where there is none. The practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model.\n\nA clinic says its model decided to discharge a patient early. The decision to trust that output without review was a nurse's, and so was the chance to look again. Where there is no volition there is no deciding, only a result arising from conditions the deployers set.",
-    "words": 128
+    "text": "An output arises from many conditions, its training data, its prompt and the people who deployed it, with no volition of its own among them, so calling it a decision places an intention where there is none. The practical point is non-harm. If an output harms someone, the volitions that can be examined and changed belong to people, and the discourse to Rahula asks those people to look at what their acts are doing, not to point at the model.\n\nA clinic says its model decided to discharge a patient early. The decision to trust that output without review was a nurse's, and so was the chance to look again. Where there is no volition there is no deciding, only an output produced by data, prompts and whoever put it to use.",
+    "words": 132
   },
   {
     "id": "no-decision.buddhist.31",

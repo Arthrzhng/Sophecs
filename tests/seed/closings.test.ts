@@ -80,9 +80,73 @@ describe("each motion's closings", () => {
     }
   });
 
+  // Review pass 1 (2026-11-08) found closings that restated a passage
+  // with one word inflected differently, and pairs on one page cut from
+  // the same template, which five exact words in a row let through. These
+  // compare stems ("restates", "restating" and "restated" are one word)
+  // and count a run of words only when two of them carry content. The
+  // motion's own words (its text, its title and its slug) are its
+  // vocabulary, so a run made only of them is not a repeat.
+  const STOP = new Set("the a an of to and is in it that its as for be by on or not but this what who whom which their they them there was were are with from at so if one any no has have had can".split(" "));
+  const stem = (w: string) => {
+    for (const suffix of ["ing", "es", "ed", "s"]) if (w.length > suffix.length + 3 && w.endsWith(suffix)) return w.slice(0, -suffix.length);
+    return w;
+  };
+  const runs = (text: string, n: number, vocabulary: ReadonlySet<string>) => {
+    const w = words(text).map(stem);
+    const out = new Set<string>();
+    for (let i = 0; i + n <= w.length; i++) {
+      const run = w.slice(i, i + n);
+      const content = run.filter((x) => !STOP.has(x));
+      if (content.length >= 2 && content.some((x) => !vocabulary.has(x))) out.add(run.join(" "));
+    }
+    return out;
+  };
+  const topicOf = (topic: string) => matter(readFileSync(join(process.cwd(), "content", "topics", `${topic}.md`), "utf8")).data as { motion: string; title: string; stances: Record<string, string> };
+  const vocabularyOf = (topic: string) => {
+    const t = topicOf(topic);
+    return new Set(words(`${t.motion} ${t.title} ${topic.replace(/-/g, " ")}`).map(stem));
+  };
+
+  it("restate none of their school's passages or its stance on the motion, by stem: no four words in a row", () => {
+    for (const topic of TOPICS) {
+      const fr = loadFragments(topic);
+      const vocabulary = vocabularyOf(topic);
+      for (const school of BANK_SCHOOLS) {
+        const s = fr.schools[school];
+        const passages = [...s.positions, ...s.reasons, ...s.examples, ...s.objections.flatMap((o) => [o.claim, o.answer, o.why]), topicOf(topic).stances[school]];
+        const theirs = new Set(passages.flatMap((p) => [...runs(p, 4, vocabulary)]));
+        byMotion[topic][school].forEach((c, i) => {
+          for (const run of runs(c, 4, vocabulary)) if (theirs.has(run)) expect.fail(`${topic}.${school}[${i}] restates "${run}"`);
+        });
+      }
+    }
+  });
+
+  it("share no phrase on one exemplar page, by stem: no three words in a row between schools, no two within one", () => {
+    for (const topic of TOPICS) {
+      const vocabulary = vocabularyOf(topic);
+      const seen = new Map<string, string>();
+      for (const school of BANK_SCHOOLS) {
+        const within = new Map<string, number>();
+        byMotion[topic][school].forEach((c, i) => {
+          for (const run of runs(c, 3, vocabulary)) {
+            const other = seen.get(run);
+            if (other && !other.startsWith(`${school}[`)) expect.fail(`${topic}: "${run}" is in ${other} and ${school}[${i}]`);
+            seen.set(run, `${school}[${i}]`);
+          }
+          for (const run of runs(c, 2, vocabulary)) {
+            if (within.has(run) && within.get(run) !== i) expect.fail(`${topic}.${school}: "${run}" is in [${within.get(run)}] and [${i}]`);
+            within.set(run, i);
+          }
+        });
+      }
+    }
+  });
+
   it("keep the house style: no dashes, no quotation marks, British spelling", () => {
     const american =
-      /\b(\w*(?:iz(?:e|es|ed|ing|ation|ations))|behavior\w*|neighbor\w*|honor\w*|favor\w*|labor\w*|center\w*|color\w*|defense|offense|skeptic\w*|modeled|modeling|catalog|gray|fulfill|fulfills|fulfillment|analyz\w*|judgment\w*|program|programs)\b/gi;
+      /\b(\w*(?:iz(?:e|es|ed|ing|ation|ations))|behavior\w*|neighbor\w*|honor\w*|favor\w*|labor\w*|center\w*|color\w*|defense|offense|skeptic\w*|modeled|modeling|catalog|gray|fulfill|fulfills|fulfillment|analyz\w*|judgment\w*)\b/gi;
     const allowed = new Set(["size", "sizes", "sized", "seize", "seized", "prize", "prizes", "citizen"]);
     for (const c of all) {
       expect(c.text, c.where).not.toMatch(/[‒-―−«»]|\s-\s|--/);

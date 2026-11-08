@@ -72,7 +72,7 @@ describe("a sample run made with quiz v2", () => {
   it("is the dataset this file was written against, pinned at production volume", () => {
     // Beside the small pins in determinism.test.ts: eight thousand quiz
     // results and every exchange pair reach paths a small run need not.
-    expect(manifestHash(six())).toBe("cd5b7d554e62859feec156efb81a37d7deff1e3382c25b6ea616fc06bfb792a6");
+    expect(manifestHash(six())).toBe("e8b74c6f7e53c58898779aaeb4ac79ba78529353a5cc255488bf5208dbdb15da");
   });
 
   it("covers all six schools about equally", () => {
@@ -173,6 +173,8 @@ describe("a sample run made with quiz v2", () => {
     expect(revisions.filter((v) => v.objection_answered).length).toBeGreaterThan(200);
     for (const v of revisions)
       if (v.objection_answered) expect(v.weakest_move).not.toMatch(/never meets an objection/);
+    // One that tried and missed still says so.
+    expect(revisions.filter((v) => !v.objection_answered && v.weakest_move.startsWith("The argument never meets an objection.")).length).toBeGreaterThan(0);
   });
 
   it("argues every exchange turn without saying a sentence twice, among schools with no objection between them too", () => {
