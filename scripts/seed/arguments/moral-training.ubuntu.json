@@ -59,8 +59,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. Moral upbringing makes a person good by bringing them into a community of persons, and training brings the model into nothing. The feedback that trains a model comes from raters who are not in a relationship with it or with each other. Upbringing comes from people bound to the child and to one another, and that difference is the whole difference between shaping and raising.\n\nAs Metz gives the Nguni maxim, a person is a person through other persons. Upbringing makes someone good by drawing them into relationships where they share in others' lives and others share in theirs, and the goodness consists partly in that sharing, which a model does not do.\n\nA Utilitarian will object that if the trained behaviour reliably does good it is good in the only sense that counts, and the raters who train a model shape it much as a village shapes a child. Doing good reliably is not the sense the motion asks about, which is being made good as a person is. And raters are a crowd, not a community: they share no life with the model or with each other, and even a real community makes someone good by taking them into its relationships, not by scoring them. Raters can reward a reply, but nobody can draw a model into a family, and that drawing in is how goodness grows.",
-    "words": 233
+    "text": "I reject the motion. Moral upbringing makes a person good by bringing them into a community of persons, and training brings the model into nothing. The feedback that trains a model comes from raters who are not in a relationship with it or with each other. Upbringing comes from people bound to the child and to one another, and that difference is the whole difference between shaping and raising.\n\nAs Metz gives the Nguni maxim, a person is a person through other persons. Upbringing makes someone good by drawing them into relationships where they share in others' lives and others share in theirs, and the goodness consists partly in that sharing, which a model does not do.\n\nA Utilitarian will object that if the trained behaviour reliably does good it is good in the only sense that counts, and the raters who train a model shape it much as a village shapes a child. Doing good reliably is not the sense the motion asks about, which is being made good as a person is. And raters are a crowd, not a community: they share no life with the model or with each other, and even a real community makes someone good by taking them into its relationships, not by scoring them. Raters can reward a reply, but nobody can draw a model into the circle of people who raise one another, and that drawing in is how goodness grows.",
+    "words": 239
   },
   {
     "id": "moral-training.ubuntu.04",
@@ -94,15 +94,15 @@
         1,
         2
       ],
-      "example": 0,
+      "example": null,
       "objections": [
         1
       ],
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. Moral upbringing makes a person good by bringing them into a community of persons, and training brings the model into nothing. On Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A well-raised person has those capacities and exercises them; a trained model produces text that describes them without having them.\n\nThe feedback that trains a model comes from raters who are not in a relationship with it or with each other. Upbringing comes from people bound to the child and to one another, and that difference is the whole difference between shaping and raising. A child raised by an extended family learns to share because her cousins share with her. A model learns to sound generous because raters scored generous replies higher.\n\nA Utilitarian will object that if the trained behaviour reliably does good it is good in the only sense that counts, and the raters who train a model shape it much as a village shapes a child. Doing good reliably is not the sense the motion asks about, which is being made good as a person is. And raters are a crowd, not a community: they share no life with the model or with each other, and even a real community makes someone good by taking them into its relationships, not by scoring them. Raters can reward a reply, but nobody can draw a model into a family, and that drawing in is how goodness grows.",
-    "words": 247
+    "text": "I reject the motion. Moral upbringing makes a person good by bringing them into a community of persons, and training brings the model into nothing. On Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A well-raised person has those capacities and exercises them; a trained model produces text that describes them without having them.\n\nThe feedback that trains a model comes from raters who are not in a relationship with it or with each other. Upbringing comes from people bound to the child and to one another, and that difference is the whole difference between shaping and raising.\n\nA Utilitarian will object that if the trained behaviour reliably does good it is good in the only sense that counts, and the raters who train a model shape it much as a village shapes a child. Doing good reliably is not the sense the motion asks about, which is being made good as a person is. And raters are a crowd, not a community: they share no life with the model or with each other, and even a real community makes someone good by taking them into its relationships, not by scoring them. Raters can reward a reply, but nobody can draw a model into the circle of people who raise one another, and that drawing in is how goodness grows.",
+    "words": 225
   },
   {
     "id": "moral-training.ubuntu.06",
@@ -112,18 +112,18 @@
     "parts": {
       "position": 3,
       "reasons": [
-        0,
+        3,
         2
       ],
-      "example": null,
+      "example": 0,
       "objections": [
-        1
+        0
       ],
-      "closing": 0,
+      "closing": 1,
       "weak": []
     },
-    "text": "Training can make a model safer to use, but calling it good in the sense of upbringing mistakes being adjusted by people for being made a person among them. As Metz gives the Nguni maxim, a person is a person through other persons. Upbringing makes someone good by drawing them into relationships where they share in others' lives and others share in theirs, and the goodness consists partly in that sharing, which a model does not do.\n\nThe feedback that trains a model comes from raters who are not in a relationship with it or with each other. Upbringing comes from people bound to the child and to one another, and that difference is the whole difference between shaping and raising.\n\nA Utilitarian will object that if the trained behaviour reliably does good it is good in the only sense that counts, and the raters who train a model shape it much as a village shapes a child. Doing good reliably is not the sense the motion asks about, which is being made good as a person is. And raters are a crowd, not a community: they share no life with the model or with each other, and even a real community makes someone good by taking them into its relationships, not by scoring them. Raters can reward a reply, but nobody can draw a model into a family, and that drawing in is how goodness grows.",
-    "words": 237
+    "text": "Training can make a model safer to use, but calling it good in the sense of upbringing mistakes being adjusted by people for being made a person among them. On Menkiti's view the community confers personhood once its demands are met; on Gyekye's moderate reading individuals keep their own worth and rights, but community is still essential. Neither picture has room for goodness installed by an optimiser, with no community whose demands it meets.\n\nThe feedback that trains a model comes from raters who are not in a relationship with it or with each other. Upbringing comes from people bound to the child and to one another, and that difference is the whole difference between shaping and raising. A child raised by an extended family learns to share because her cousins share with her. A model learns to sound generous because raters scored generous replies higher.\n\nA Stoic will object that goodness is a matter of the agent's own judgement, not of relationships, so the real reason a model is not good is that it has no ruling faculty to assent with. A model lacks a ruling faculty, but a person alone with a perfect ruling faculty would still not be good in the way upbringing makes people good, because that goodness is formed and shown in relationships with others. A family corrects a child and then stays; a rater moves on to the next reply.",
+    "words": 236
   },
   {
     "id": "moral-training.ubuntu.07",
@@ -131,20 +131,20 @@
     "school": "ubuntu",
     "tier": "strong",
     "parts": {
-      "position": 2,
+      "position": 0,
       "reasons": [
-        3,
-        1
+        0,
+        3
       ],
       "example": 2,
       "objections": [
         0
       ],
-      "closing": 0,
+      "closing": 2,
       "weak": []
     },
-    "text": "I reject this, because goodness here is what a person becomes through others, and a model is shaped by others without becoming anything through them. On Menkiti's view the community confers personhood once its demands are met; on Gyekye's moderate reading individuals keep their own worth and rights, but community is still essential. Neither picture has room for goodness installed by an optimiser, with no community whose demands it meets.\n\nOn Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A well-raised person has those capacities and exercises them; a trained model produces text that describes them without having them. A teenager learns fairness by being on both sides of unfair treatment among friends. A model learns fairness-shaped outputs without ever being treated unfairly by anyone.\n\nA Stoic will object that goodness is a matter of the agent's own judgement, not of relationships, so the real reason a model is not good is that it has no ruling faculty to assent with. A model lacks a ruling faculty, but a person alone with a perfect ruling faculty would still not be good in the way upbringing makes people good, because that goodness is formed and shown in relationships with others. Raters can reward a reply, but nobody can draw a model into a family, and that drawing in is how goodness grows.",
-    "words": 226
+    "text": "A person becomes good by being drawn into the lives of others, and feedback scores shape outputs without drawing the model into anyone's life. As Metz gives the Nguni maxim, a person is a person through other persons. Upbringing makes someone good by drawing them into relationships where they share in others' lives and others share in theirs, and the goodness consists partly in that sharing, which a model does not do.\n\nOn Menkiti's view the community confers personhood once its demands are met; on Gyekye's moderate reading individuals keep their own worth and rights, but community is still essential. Neither picture has room for goodness installed by an optimiser, with no community whose demands it meets. A teenager learns fairness by being on both sides of unfair treatment among friends. A model learns fairness-shaped outputs without ever being treated unfairly by anyone.\n\nA Stoic will object that goodness is a matter of the agent's own judgement, not of relationships, so the real reason a model is not good is that it has no ruling faculty to assent with. A model lacks a ruling faculty, but a person alone with a perfect ruling faculty would still not be good in the way upbringing makes people good, because that goodness is formed and shown in relationships with others. Feedback can teach a system what pleases, but becoming good is something people do together over a shared life.",
+    "words": 236
   },
   {
     "id": "moral-training.ubuntu.08",
@@ -152,10 +152,10 @@
     "school": "ubuntu",
     "tier": "strong",
     "parts": {
-      "position": 0,
+      "position": 2,
       "reasons": [
         2,
-        1
+        0
       ],
       "example": 1,
       "objections": [
@@ -164,8 +164,8 @@
       "closing": 1,
       "weak": []
     },
-    "text": "A person becomes good by being drawn into the lives of others, and feedback scores shape outputs without drawing the model into anyone's life. The feedback that trains a model comes from raters who are not in a relationship with it or with each other. Upbringing comes from people bound to the child and to one another, and that difference is the whole difference between shaping and raising.\n\nOn Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A well-raised person has those capacities and exercises them; a trained model produces text that describes them without having them. A village elder is called good because of decades of keeping faith with neighbours. A chatbot is called good because it passed a safety benchmark last month.\n\nA Stoic will object that goodness is a matter of the agent's own judgement, not of relationships, so the real reason a model is not good is that it has no ruling faculty to assent with. A model lacks a ruling faculty, but a person alone with a perfect ruling faculty would still not be good in the way upbringing makes people good, because that goodness is formed and shown in relationships with others. A family corrects a child and then stays; a rater moves on to the next reply.",
-    "words": 219
+    "text": "I reject this, because goodness here is what a person becomes through others, and a model is shaped by others without becoming anything through them. The feedback that trains a model comes from raters who are not in a relationship with it or with each other. Upbringing comes from people bound to the child and to one another, and that difference is the whole difference between shaping and raising.\n\nAs Metz gives the Nguni maxim, a person is a person through other persons. Upbringing makes someone good by drawing them into relationships where they share in others' lives and others share in theirs, and the goodness consists partly in that sharing, which a model does not do. A village elder is called good because of decades of keeping faith with neighbours. A chatbot is called good because it passed a safety benchmark last month.\n\nA Stoic will object that goodness is a matter of the agent's own judgement, not of relationships, so the real reason a model is not good is that it has no ruling faculty to assent with. A model lacks a ruling faculty, but a person alone with a perfect ruling faculty would still not be good in the way upbringing makes people good, because that goodness is formed and shown in relationships with others. A family corrects a child and then stays; a rater moves on to the next reply.",
+    "words": 234
   },
   {
     "id": "moral-training.ubuntu.09",
@@ -194,20 +194,20 @@
     "school": "ubuntu",
     "tier": "strong",
     "parts": {
-      "position": 0,
+      "position": 2,
       "reasons": [
-        0,
-        3
+        3,
+        1
       ],
       "example": 2,
       "objections": [
         0
       ],
-      "closing": 2,
+      "closing": 0,
       "weak": []
     },
-    "text": "A person becomes good by being drawn into the lives of others, and feedback scores shape outputs without drawing the model into anyone's life. As Metz gives the Nguni maxim, a person is a person through other persons. Upbringing makes someone good by drawing them into relationships where they share in others' lives and others share in theirs, and the goodness consists partly in that sharing, which a model does not do.\n\nOn Menkiti's view the community confers personhood once its demands are met; on Gyekye's moderate reading individuals keep their own worth and rights, but community is still essential. Neither picture has room for goodness installed by an optimiser, with no community whose demands it meets. A teenager learns fairness by being on both sides of unfair treatment among friends. A model learns fairness-shaped outputs without ever being treated unfairly by anyone.\n\nA Stoic will object that goodness is a matter of the agent's own judgement, not of relationships, so the real reason a model is not good is that it has no ruling faculty to assent with. A model lacks a ruling faculty, but a person alone with a perfect ruling faculty would still not be good in the way upbringing makes people good, because that goodness is formed and shown in relationships with others. Feedback can teach a system what pleases, but becoming good is something people do together over a shared life.",
-    "words": 236
+    "text": "I reject this, because goodness here is what a person becomes through others, and a model is shaped by others without becoming anything through them. On Menkiti's view the community confers personhood once its demands are met; on Gyekye's moderate reading individuals keep their own worth and rights, but community is still essential. Neither picture has room for goodness installed by an optimiser, with no community whose demands it meets.\n\nOn Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A well-raised person has those capacities and exercises them; a trained model produces text that describes them without having them. A teenager learns fairness by being on both sides of unfair treatment among friends. A model learns fairness-shaped outputs without ever being treated unfairly by anyone.\n\nA Stoic will object that goodness is a matter of the agent's own judgement, not of relationships, so the real reason a model is not good is that it has no ruling faculty to assent with. A model lacks a ruling faculty, but a person alone with a perfect ruling faculty would still not be good in the way upbringing makes people good, because that goodness is formed and shown in relationships with others. Raters can reward a reply, but nobody can draw a model into the circle of people who raise one another, and that drawing in is how goodness grows.",
+    "words": 232
   },
   {
     "id": "moral-training.ubuntu.11",
@@ -224,8 +224,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "Training can make a model safer to use, but calling it good in the sense of upbringing mistakes being adjusted by people for being made a person among them. On Menkiti's view the community confers personhood once its demands are met; on Gyekye's moderate reading individuals keep their own worth and rights, but community is still essential. Neither picture has room for goodness installed by an optimiser, with no community whose demands it meets.\n\nA child raised by an extended family learns to share because her cousins share with her. A model learns to sound generous because raters scored generous replies higher. Raters can reward a reply, but nobody can draw a model into a family, and that drawing in is how goodness grows.",
-    "words": 124
+    "text": "Training can make a model safer to use, but calling it good in the sense of upbringing mistakes being adjusted by people for being made a person among them. On Menkiti's view the community confers personhood once its demands are met; on Gyekye's moderate reading individuals keep their own worth and rights, but community is still essential. Neither picture has room for goodness installed by an optimiser, with no community whose demands it meets.\n\nA child raised by an extended family learns to share because her cousins share with her. A model learns to sound generous because raters scored generous replies higher. Raters can reward a reply, but nobody can draw a model into the circle of people who raise one another, and that drawing in is how goodness grows.",
+    "words": 130
   },
   {
     "id": "moral-training.ubuntu.12",
@@ -260,8 +260,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "I reject the motion. Moral upbringing makes a person good by bringing them into a community of persons, and training brings the model into nothing. The feedback that trains a model comes from raters who are not in a relationship with it or with each other. Upbringing comes from people bound to the child and to one another, and that difference is the whole difference between shaping and raising.\n\nA village elder is called good because of decades of keeping faith with neighbours. A chatbot is called good because it passed a safety benchmark last month. Raters can reward a reply, but nobody can draw a model into a family, and that drawing in is how goodness grows.",
-    "words": 118
+    "text": "I reject the motion. Moral upbringing makes a person good by bringing them into a community of persons, and training brings the model into nothing. The feedback that trains a model comes from raters who are not in a relationship with it or with each other. Upbringing comes from people bound to the child and to one another, and that difference is the whole difference between shaping and raising.\n\nA village elder is called good because of decades of keeping faith with neighbours. A chatbot is called good because it passed a safety benchmark last month. Raters can reward a reply, but nobody can draw a model into the circle of people who raise one another, and that drawing in is how goodness grows.",
+    "words": 124
   },
   {
     "id": "moral-training.ubuntu.14",
@@ -476,8 +476,8 @@
       "closing": 0,
       "weak": []
     },
-    "text": "A person becomes good by being drawn into the lives of others, and feedback scores shape outputs without drawing the model into anyone's life. On Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A well-raised person has those capacities and exercises them; a trained model produces text that describes them without having them.\n\nA teenager learns fairness by being on both sides of unfair treatment among friends. A model learns fairness-shaped outputs without ever being treated unfairly by anyone. Raters can reward a reply, but nobody can draw a model into a family, and that drawing in is how goodness grows.",
-    "words": 106
+    "text": "A person becomes good by being drawn into the lives of others, and feedback scores shape outputs without drawing the model into anyone's life. On Metz's reading, right action honours capacities for relationships of shared identity and solidarity. A well-raised person has those capacities and exercises them; a trained model produces text that describes them without having them.\n\nA teenager learns fairness by being on both sides of unfair treatment among friends. A model learns fairness-shaped outputs without ever being treated unfairly by anyone. Raters can reward a reply, but nobody can draw a model into the circle of people who raise one another, and that drawing in is how goodness grows.",
+    "words": 112
   },
   {
     "id": "moral-training.ubuntu.26",

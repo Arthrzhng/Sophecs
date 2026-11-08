@@ -5508,8 +5508,14 @@ above:
   in a Confucian closing, and readings the passages do not carry
   ("Nothing permanent is lost", "Ritual shapes the heart"). The second
   review found more of the same that the first round's checks let
-  through, mostly a passage restated with its words inflected. 72 of
-  the 144 are rewritten in all.
+  through, mostly a passage restated with its words inflected. The
+  third, which read each page's 24 closings together (on a page every
+  school shows all four of its closings), found that many of the second
+  round's rewrites had brought the same faults back in new words: a
+  passage paraphrased, a phrase or a sentence shape shared by two
+  schools on one page or by two of one school's four, and a few lines
+  that did not parse. Those were rewritten again, reading each page as a
+  whole. 87 of the 144 are rewritten in all.
 - **Held to:** `tests/seed/closings.test.ts`:
   - every school, four on every motion, each one sentence of 10 to 30
     words;
@@ -5520,7 +5526,10 @@ above:
     motion's own words aside: no four words in a row from the school's
     passages or its stance on the motion; no three in a row between two
     schools on one motion, which is one exemplar page; no two within one
-    school's four;
+    school's four. These catch a passage or another closing repeated
+    word for word or with its words inflected. They do not catch a
+    paraphrase, or a template whose shared words are mostly short ones
+    or the motion's own, which only reading finds;
   - the house style ("program", the British spelling for code, is
     allowed). The new three's are held to the quotation guard's rules too
     (`tests/seed/launch-passages.test.ts`).
@@ -5555,14 +5564,14 @@ above:
     no ending twice.
   - Measured at production volume (seed `six-check`, base window to
     2026-11-10 09:00 UTC, two weeks on): main's selection shows an ending
-    already on the page 47 times across the six motions in a quiz v2 run,
+    already on the page 48 times across the six motions in a quiz v2 run,
     and 22 times in a run that names no quiz; this one never, with the
     same number of arguments shown (144 and 72). It shows a different
-    argument in 53 and 25 of those places: another under the same
+    argument in 51 and 25 of those places: another under the same
     opening, the strongest whose ending is not already on the page, which
-    is the second strongest under it in 28 and 8 of them and as far down
+    is the second strongest under it in 26 and 8 of them and as far down
     as the fourteenth and thirteenth in others. On the fixture's small plan (quiz v2) it
-    shows 130 openings to main's 135, which is as many as any choice could
+    shows 129 openings to main's 135 (main allows a repeated ending), which is as many as any choice could
     show there.
   - Not handled, as it cannot arise today: where a school has more
     openings than its share of `EXEMPLARS_PER_MOTION`, the matching could
@@ -5586,9 +5595,10 @@ above:
   were computed in SQL to match `openingOf` and `endingOf`, except that a
   first sentence over 160 characters is compared by its first 160.
 - **The fresh run's revision verdicts.** A revision that answers the
-  objection keeps the first attempt's weakest move, which for a middling
+  objection takes the first attempt's weakest move, which for a middling
   argument opened "The argument never meets an objection." In a run made
-  with quiz v2, that move keeps its quoted passage but is described as a
+  with quiz v2, that move quotes the same passage (not always the same
+  words, since the quote is drawn again) but is described as a
   strong argument's verdict describes one ("... is asserted more than
   shown, and it carries weight the argument never quite earns."). No
   draw is added: `tests/seed/verdicts.test.ts` checks over every banked
@@ -5601,5 +5611,5 @@ above:
   after a name ending in "s".
 - **The samples** (`docs/gate4-samples.md`) are regenerated from the
   rebuilt banks: six of the nine now close with their motion's closings,
-  five of them on a closing rewritten after the first review, and
+  all six on a closing rewritten after the first review, and
   nothing else in them changed.

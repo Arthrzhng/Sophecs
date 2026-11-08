@@ -34,7 +34,7 @@ Motion: Handing daily choices to an AI assistant costs something that matters, e
 
 ## Ubuntu
 
-### Strong: The opaque benefit (239 words)
+### Strong: The opaque benefit (240 words)
 
 Motion: An AI system that reliably reduces suffering should be deployed even where the people it decides about cannot be told why.
 
@@ -42,15 +42,15 @@ Motion: An AI system that reliably reduces suffering should be deployed even whe
 >
 > Metz argues against building systems simply to maximise expected utility. Suffering reduced on average is real, but a community that accepts verdicts nobody can account for has taught its members that they are managed rather than related to. A school uses a model to place pupils in sets. Parents who come to talk it over find there is no one on the other side of the conversation.
 >
-> A Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. Bring the people it would judge into the deciding first; a benefit worth having will survive the wait.
+> A Stoic will object that a person's good never depended on being told why, so the demand for explanations mistakes a feeling of being included for something that matters. But what is at stake is not a feeling inside one person; it is the relationship between people and those who decide about them. A person cut out of every account of their own treatment is diminished in the relationships that make them who they are. A benefit worth having will survive the wait while the people it would judge are brought into the deciding.
 
-### Mid: Trained to be good (124 words)
+### Mid: Trained to be good (130 words)
 
 Motion: Training a model on human feedback can make it good in the same sense that moral upbringing makes a person good.
 
 > Training can make a model safer to use, but calling it good in the sense of upbringing mistakes being adjusted by people for being made a person among them. On Menkiti's view the community confers personhood once its demands are met; on Gyekye's moderate reading individuals keep their own worth and rights, but community is still essential. Neither picture has room for goodness installed by an optimiser, with no community whose demands it meets.
 >
-> A child raised by an extended family learns to share because her cousins share with her. A model learns to sound generous because raters scored generous replies higher. Raters can reward a reply, but nobody can draw a model into a family, and that drawing in is how goodness grows.
+> A child raised by an extended family learns to share because her cousins share with her. A model learns to sound generous because raters scored generous replies higher. Raters can reward a reply, but nobody can draw a model into the circle of people who raise one another, and that drawing in is how goodness grows.
 
 ### Weak: Crash arithmetic (81 words)
 
@@ -62,7 +62,7 @@ Motion: A self-driving car should be programmed to minimise total deaths in an u
 
 ## Buddhist Ethics
 
-### Strong: The careful builder (228 words)
+### Strong: The careful builder (235 words)
 
 Motion: When an AI system causes harm, the people who built it are to blame in proportion to the harm, however careful they were.
 
@@ -70,7 +70,7 @@ Motion: When an AI system causes harm, the people who built it are to blame in p
 >
 > Good intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not. A team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week.
 >
-> A Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. Blamelessness is no reason to look away, since looking is how the next harm is caught.
+> A Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. The injured need care before anyone decides who is at fault, and the argument over blame should never be allowed to delay it.
 
 ### Mid: Does the model decide? (113 words)
 

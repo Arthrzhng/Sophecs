@@ -115,8 +115,9 @@ export function endingOf(argument: string): string {
 }
 
 /**
- * From each school's candidates, strongest first, keep the first under each
- * opening line (its first sentence after any frame), then choose up to
+ * From each school's candidates, strongest first, keep one under each
+ * opening line (its first sentence after any frame), normally the first
+ * (see below for when it is not), then choose up to
  * `total` between the schools: an even share each, the remainder to the
  * schools listed first, and any share a school cannot fill passed to the
  * others. Any argument with one of the sample run's deliberate misspellings
@@ -130,10 +131,10 @@ export function endingOf(argument: string): string {
  * strongest under an opening ends as an argument already kept does (a
  * stronger one in its school, or any in a school listed before it), the
  * strongest under it whose ending is free takes its place. Where none
- * under an opening is left, a kept
- * argument moves to the next strongest under its own opening when that
- * frees an ending the left-out opening can take (an augmenting path, as in
- * Kuhn's matching), so an opening is left out only when no choice of one
+ * under an opening is left, a kept argument gives way to another under its
+ * own opening whose ending is free, or can be freed the same way along a
+ * chain of such moves, when that frees an ending the left-out opening can
+ * take (an augmenting path, as in Kuhn's matching), so an opening is left out only when no choice of one
  * argument per opening could show it. Where every opening finds an ending
  * at once, nothing moves.
  */
@@ -177,7 +178,8 @@ export function selectExemplars(
   }
 
   // Then each opening left out tries to free an ending: an argument
-  // holding one moves to the next strongest under its own opening.
+  // holding one moves to the strongest other under its own opening whose
+  // ending is free, or can itself be freed, along a chain if need be.
   const free = (slot: Slot, tried: Set<string>): boolean => {
     for (let i = 0; i < slot.options.length; i++) {
       const { ending } = slot.options[i];

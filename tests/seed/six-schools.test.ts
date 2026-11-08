@@ -72,7 +72,7 @@ describe("a sample run made with quiz v2", () => {
   it("is the dataset this file was written against, pinned at production volume", () => {
     // Beside the small pins in determinism.test.ts: eight thousand quiz
     // results and every exchange pair reach paths a small run need not.
-    expect(manifestHash(six())).toBe("028894e688092c75819f6eb103563e35b75764eebace7714bfd3f6c4f57c18b3");
+    expect(manifestHash(six())).toBe("83af34d654774b846658930f4b9ab328526e639b8e70f1b931764e305d4d64d2");
   });
 
   it("covers all six schools about equally", () => {
@@ -130,7 +130,19 @@ describe("a sample run made with quiz v2", () => {
       for (const c of [...others, ...shared]) expect(row.argument.includes(c), row.id).toBe(false);
     }
     expect(closed).toBeGreaterThan(1000);
-    for (const { row } of ds.turns) for (const c of shared) expect(row.body.includes(c), row.id).toBe(false);
+    // Exchange turns too: each closes with its author's school's closings
+    // for the exchange's motion, never another motion's (review pass 3).
+    const exchangeOf = new Map(ds.exchanges.map(({ row }) => [row.id, row]));
+    let turnsClosed = 0;
+    for (const { row } of ds.turns) {
+      const ex = exchangeOf.get(row.exchange_id)!;
+      const school = row.author_id === ex.user_a ? ex.school_a : ex.school_b;
+      const own = byMotion[ex.topic_slug as keyof typeof byMotion][school as SchoolId];
+      const others = TOPICS.filter((t) => t !== ex.topic_slug).flatMap((t) => byMotion[t][school as SchoolId]);
+      if (own.some((c) => row.body.includes(c))) turnsClosed++;
+      for (const c of [...others, ...shared]) expect(row.body.includes(c), row.id).toBe(false);
+    }
+    expect(turnsClosed).toBeGreaterThan(100);
   });
 
   it("gives exemplar pages that never show the same ending twice, and still one argument under each opening", () => {
