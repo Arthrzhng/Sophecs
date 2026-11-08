@@ -312,9 +312,9 @@ describe("a sample run made with quiz v2", () => {
     expect(spot).toMatchObject({ ok: true });
 
     // A point one unit off in its fifteenth significant digit is still a
-    // point stored wrong: the comparison is no looser than the read. The
-    // digit moves away from 5, so the point rounds to 14 digits as before
-    // and a comparison at 14 would pass it.
+    // point stored wrong: the comparison is no looser than production's
+    // read. The digit stays on its side of 5, so the point rounds to 14
+    // digits as before and a comparison at 14 would pass it.
     const wrong = fresh();
     const w = await execute({ dataset, plan, adapter: wrong, retryBaseMs: 1, batchSize: 100 });
     const off15 = (v: number) => {
@@ -326,6 +326,26 @@ describe("a sample run made with quiz v2", () => {
     const bad = (await validate(wrong, dataset, w.before, { spot: 1000 })).checks.find((c) => c.name === "spot check: quiz_results");
     expect(bad?.ok).toBe(false);
     expect(bad?.detail).toMatch(/: map_y$/);
+
+    // Read in full, as a local database returns it, a point that rounds to
+    // the plan's 15 digits but is neither the plan's nor that rounding is
+    // still caught: the 15-digit allowance is for production's read only.
+    const near = new MemoryAdapter();
+    for (const t of plan.topics) near.table("debate_topics").set(t.slug, { id: t.slug, slug: t.slug, motion: t.motion, active: true, par_elo: 1200, par_n: 0 });
+    const n = await execute({ dataset, plan, adapter: near, retryBaseMs: 1, batchSize: 100 });
+    let moved = 0;
+    for (const row of near.table("quiz_results").values()) {
+      const x = row.map_x as number;
+      const r15 = Number(x.toPrecision(15));
+      const other = 2 * x - r15; // across the plan's point from its rounding
+      if (other === x || other === r15 || other.toPrecision(15) !== x.toPrecision(15)) continue;
+      row.map_x = other;
+      moved++;
+    }
+    expect(moved).toBeGreaterThan(0);
+    const close = (await validate(near, dataset, n.before, { spot: 1000 })).checks.find((c) => c.name === "spot check: quiz_results");
+    expect(close?.ok).toBe(false);
+    expect(close?.detail).toMatch(/: map_x$/);
   });
 });
 
