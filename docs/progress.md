@@ -929,13 +929,22 @@ deploy below was read from Vercel as Ready.
   only while `KILL_SWITCH_JUDGE` is "true", on `/method` and
   `/how-it-works`. With production's switch off, production's `/method`
   no longer says judging is paused.
-- `CRON_SECRET`: set by Arthur in Production. This entry's merge is the
-  redeploy that picks it up; both jobs' first runs with it are read back
+- `CRON_SECRET`: set by Arthur in Production at 01:16 UTC, and refused
+  by Vercel: his redeploy of production at 01:16:35
+  (`dpl_BGcegwBSDCMAt894edwVitEWUFvC`) ended in `INVALID_CRON_SECRET`
+  within two seconds, the value holding a character not valid in an
+  HTTP header. Production is still `dpl_3nPkpSEoLUbvaPGzCaq31qcBGVDu`,
+  without a secret. Arthur is asked to set it again with letters and
+  digits only; this entry's merge waits for that, so that its deploy is
+  the one that picks it up. Both jobs' first runs with it are read back
   in the next entry (`docs/gate4.md`, Housekeeping, says how).
-- Supabase Auth's Site URL and redirect list, and the www redirect: done
-  by Arthur. `https://www.sophecs.com/robots.txt` answered 308 to
-  `https://sophecs.com/robots.txt` at 01:19 UTC.
+- Supabase Auth's Site URL and redirect list: done by Arthur. The www
+  redirect: `https://www.sophecs.com/robots.txt` answered 308 to
+  `https://sophecs.com/robots.txt` at 01:19 UTC, through the app's own
+  rule; Vercel's record of the domain has no redirect. Arthur is asked
+  whether that is what he meant.
 - The samples are approved, with closings to be written per motion
   before the fresh run, and the revision verdicts' "never meets an
   objection" fixed in it: the next pull request.
-- Waiting on Arthur: the word "launch" (item 15).
+- Waiting on Arthur: `CRON_SECRET` again, letters and digits only; the
+  www redirect's meaning; the word "launch" (item 15).

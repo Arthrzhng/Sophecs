@@ -5448,18 +5448,28 @@ How each is carried out:
   Allowlisted accounts are not considered: the pages are the same for
   every reader. `tests/nav-six.test.tsx` holds `/method` byte for byte to
   main's render with the switch on, and to that render less the one
-  sentence with it off, unset, empty or any other value.
-- **`CRON_SECRET`.** The merge of that change is the redeploy that picks
-  the secret up. Confirming both jobs answer 200 comes after their next
-  runs (Hobby fires the keep-alive in the 04:00 hour and the re-screening
-  job in the 05:00 hour, UTC), recorded in the progress log with how it
-  was read.
+  sentence with it unset, empty, "false", "TRUE" or "1".
+- **`CRON_SECRET`.** Vercel refused the value as set: Arthur's redeploy of
+  production at 01:16:35 UTC (`dpl_BGcegwBSDCMAt894edwVitEWUFvC`) ended
+  in `INVALID_CRON_SECRET` within two seconds, because the value holds a
+  character that is not valid in an HTTP header (Vercel allows visible
+  ASCII only). Production is still `dpl_3nPkpSEoLUbvaPGzCaq31qcBGVDu`,
+  which has no secret. Asked of Arthur: the value again, of letters and
+  digits only. The first production deploy after that picks it up;
+  confirming both jobs answer 200 comes after their next runs (Hobby
+  fires the keep-alive in the 04:00 hour and the re-screening job in the
+  05:00 hour, UTC), recorded in the progress log with how it was read.
 - **Closings per motion, and the revision verdicts.** In the fresh run
   only, since the live run regenerates its rows from this code until the
   teardown: a separate pull request.
-- **Supabase and the www redirect.** Done by Arthur. Read here: a
-  request to `https://www.sophecs.com/robots.txt` answered 308 with
-  `location: https://sophecs.com/robots.txt` (2026-11-08, 01:19 UTC).
+- **Supabase and the www redirect.** Supabase done by Arthur. For www,
+  Vercel's record of the domain has no redirect (`www.sophecs.com`,
+  `redirect: null`, unchanged since 2026-09-11). A request to
+  `https://www.sophecs.com/robots.txt` answered 308 to
+  `https://sophecs.com/robots.txt` (2026-11-08, 01:19 UTC), but that is
+  the app's own rule (`canonicalRedirects` in `next.config.ts`, #83 and
+  #85), which leaves `/api/` and `/_next` on www by design. Asked of
+  Arthur: whether "done" means that rule.
 - **Not ruled, so left as they are:** the other two things the run's
   verdicts do ("Gate 4 item 13, second part", "Left as they are"): a
   revision verdict that says an objection is now answered and still

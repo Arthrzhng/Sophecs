@@ -117,8 +117,9 @@ describe("a build without SIX_SCHOOLS", () => {
 
   // Rendered from main's components before the change (tests/nav-six-flag-off).
   it("renders the pages and components it touches byte for byte as main did", async () => {
-    // The fixture was taken with judging paused; with the switch off the
-    // method page drops one sentence (the next test).
+    // The fixture is main's render, which always had the sentence: the
+    // switch on gives it exactly. With it off the page drops that one
+    // sentence (the next test).
     vi.stubEnv("KILL_SWITCH_JUDGE", "true");
     const { method, rubric, footer, topics, table, cards } = await load("0");
     const fixture = (n: string) =>
@@ -144,7 +145,7 @@ describe("a build without SIX_SCHOOLS", () => {
     expect(fixture.split(PAUSED)).toHaveLength(2);
     for (const value of [undefined, "", "false", "TRUE", "1"]) {
       vi.unstubAllEnvs();
-      if (value !== undefined) vi.stubEnv("KILL_SWITCH_JUDGE", value);
+      vi.stubEnv("KILL_SWITCH_JUDGE", value);
       const { method } = await load("0");
       expect(`${renderToStaticMarkup(method.default())}\n`, String(value)).toBe(fixture.replace(PAUSED, ""));
     }

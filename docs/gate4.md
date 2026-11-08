@@ -394,31 +394,43 @@ the new-schools run 16 or 23 of 25, depending on item 3.
 
 ## New, and waiting on you
 
-- **`CRON_SECRET`.** Set by you on 2026-11-08 (Production, sensitive).
-  The project had none, so both cron jobs, the keep-alive and the
-  re-screening job, probably answered 401 and did nothing
-  (`docs/progress.md`, 2026-11-07). The next merge's redeploy picks it
+- **`CRON_SECRET`, again.** Set by you on 2026-11-08, but Vercel refuses
+  the value: your redeploy at 01:16:35 UTC failed on
+  `INVALID_CRON_SECRET`, as the value holds a character that is not valid
+  in an HTTP header. Production is still the deploy before it, with no
+  secret, so both cron jobs still answer 401. Please set it again with
+  letters and digits only (`openssl rand -hex 32` gives such a value),
+  Production, sensitive. The first production deploy after that picks it
   up, and both jobs' next runs are read back in `docs/progress.md`. It
   turns the re-screening job on, which pays for screening whenever a
   reply is pending, as you approved under (d) 4.
+- **The www redirect.** Vercel's record of `www.sophecs.com` has no
+  redirect. www answers 308 to `sophecs.com` through the app's own rule
+  (`canonicalRedirects` in `next.config.ts`, #83 and #85), which leaves
+  `/api/` and `/_next` on www by design. Does "done" mean that rule, or a
+  domain redirect still to be set?
 
 ## Done on 2026-11-08
 
 - Supabase Auth's Site URL (`https://sophecs.com`) and redirect list
-  (`https://sophecs.com/**` and the preview pattern), and the Vercel
-  redirect from `www.sophecs.com` to `sophecs.com`, which answers 308.
+  (`https://sophecs.com/**` and the preview pattern).
 
 ## Housekeeping
 
 Mine, and not waiting on anyone:
 
 - Both cron jobs' first runs with `CRON_SECRET`, read back. The log read
-  I have from Vercel returns no request statuses, the per-status
-  metrics need Observability Plus, and the routes are frozen, so no line
-  can be added to them. What can be read: each job reaches Supabase
-  only after its secret check passes, and Supabase's API logs keep each
-  request with its status. The keep-alive's one read of `debate_topics`
-  answered is its 200, since that read's error is its only other path;
-  the re-screening job's call of `ai_spend_since` and its read of
-  pending replies in `turns`, with none pending and no `[budget]` line
-  in Vercel's runtime log, are its 200.
+  I have from Vercel returns no request statuses (`vercel logs` and the
+  dashboard do; this container has neither), the per-status metrics need
+  Observability Plus, and the routes are frozen, so no line can be added
+  to them. What can be read: each job reaches Supabase only after its
+  secret check passes, and Supabase's API logs keep each request with
+  its status for about a day. From those I infer each 200:
+  - the keep-alive's HEAD read of `debate_topics`, answered: that read
+    failing is its only path to anything but a 200;
+  - the re-screening job's read of `turns` for pending replies (with
+    `screen_result=eq.pending` and the `exchanges!inner` embed, which no
+    other route makes), answered. With nothing pending it then reads and
+    writes nothing more and answers 200; if replies were pending, the
+    `ai_calls` and `turns` requests after it, and their statuses, are
+    read too.
