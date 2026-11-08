@@ -13,13 +13,13 @@
       "If the benefit is as reliable as the motion says, those it reaches are better off with it than without it, told or not."
     ],
     "virtue-ethics": [
-      "A just institution owes everyone it rules on an account, and a good outcome does not discharge that debt.",
+      "Kindness that cannot explain itself is still kindness, but justice that cannot explain itself is not yet justice.",
       "Deploying what nobody can explain trains its keepers out of the habit of answering for what they do.",
       "The fair official explains a decision even when it is kind, because being owed reasons is part of being treated as a person.",
       "Relief that arrives without reasons may be welcome, but accepting it as normal would make us careless about justice."
     ],
     "confucian": [
-      "Whoever decides about a person owes that person an account, and a benefit that cannot be accounted for leaves the relationship unpaid.",
+      "A minister who could not explain a decree would soon stop being trusted to issue them, and the system's keepers stand where that minister stood.",
       "Doing good that no one can question is not yet governing well, because governing well includes being answerable to the governed.",
       "Let it wait until those who run it can say why it decides as it does, and the people it serves can hold them to that.",
       "Good done through a hidden mechanism teaches nobody how to do good, and that is a loss the relief does not repay."
@@ -27,12 +27,12 @@
     "ubuntu": [
       "People spared harm by a system they had no say in are still left outside the decision, and that exclusion is itself a harm.",
       "Bring the people it would judge into the deciding first; a benefit worth having will survive the wait.",
-      "A benefit people may not question leaves them nothing to say back to whoever runs it, and that is a harm no average shows.",
+      "Asked who decided and why, a family should be able to name a person and hear a reason, and here they could do neither.",
       "The test is whether the families and neighbours affected could question the system together, and as it stands they cannot."
     ],
     "buddhist": [
-      "Run it, and count the people it fails as one's own concern, since sparing most of them suffering does not excuse what is done to the rest.",
-      "The intention to relieve suffering is sound, and it stays sound only while its operators stand ready to stop it.",
+      "Run it, and count the people it fails as one's own concern, since sparing most people suffering does not excuse what is done to the rest.",
+      "Each person the system misjudges is a harm someone can still find and end, and the relief makes that work possible rather than unnecessary.",
       "Because no one can explain it, no one can say in advance where it will fail, so the deployers' care has to reach every case it touches.",
       "Compassion here means deploying it and then attending, case by case, to the person on the far side of each verdict."
     ]
@@ -48,11 +48,11 @@
       "One death is fewer than two, and a car built to choose the lesser loss saves lives in every crash it cannot avoid.",
       "Give the passenger and the pedestrians equal weight, and the arithmetic leaves only one rule worth writing.",
       "A car that protects its owner at the cost of more lives is selling safety to one person by spending it on others.",
-      "Not knowing whether you will be the one in the seat or the one in the road, the rule you would pick for yourself is the one that kills fewest."
+      "If you did not know whether you would be the one in the seat or the one in the road, you would pick the rule that kills fewest."
     ],
     "virtue-ethics": [
       "Wisdom here lies in how carefully the choice was weighed by the people who made it, not in whether their rule wins a count.",
-      "A rule fixed in advance cannot see the particular crash, which is why the engineers' real work is building cars that rarely meet one.",
+      "A wise driver does not decide in the showroom whom to sacrifice, and a carmaker has no better right to.",
       "Treating the crash as a sum lets the builders feel they have decided well without ever having weighed the case.",
       "The car will do what it was told, so the virtue that counts is in the telling, in how honestly and carefully the makers chose."
     ],
@@ -63,16 +63,16 @@
       "Name the duties correctly, the maker's to its passenger and to everyone on the street, and the rule has to honour both."
     ],
     "ubuntu": [
-      "The rule should be one that passengers and the people on the street could agree on together, not a sum worked out for them.",
-      "Who is in this crash is a matter of people sharing a road, and they, not a formula, should settle what the car does.",
+      "A town meeting can get the answer wrong and still do right by its people, while an engineer's sum can get it right and still leave them out.",
+      "Trust on a shared road comes from people who can see the rule and say they had a part in it, and a car cannot earn it any other way.",
       "Written without asking those affected, any such rule treats passengers and walkers as numbers, whatever number it saves.",
-      "Only the people walking and cycling beside these cars can say which rule is fit to be built into them."
+      "A rule built into every car will be lived with by every family on the road, riding or walking, and each should have had a say in it first."
     ],
     "buddhist": [
       "Fixed in code, the rule is an intention, and only one formed with every road user in view is compassionate.",
       "Impartial compassion does not rank the passenger above the child crossing, so fewer deaths is the intention to build in.",
       "The makers cannot hand this choice to the car; whatever it does in the crash was willed by them long before.",
-      "Building in the smallest loss is right only if the makers accept that choice as theirs and answer for whoever the rule still harms."
+      "The family of a passenger the rule gave up is owed the makers' honest account of why, and a rule that cannot bear that telling is the wrong rule."
     ]
   },
   "no-decision": {
@@ -91,7 +91,7 @@
     "virtue-ethics": [
       "Only a settled character can choose well or badly, and the model has a training history where a character would be.",
       "Deliberation belongs to someone who could have wanted otherwise, and nothing in the model wants anything.",
-      "A person's choice shows who they are, while an output shows only patterns in data, and only the first is a decision.",
+      "Praise and blame need someone to land on, and an output gives them nowhere to land but the people who put it to work.",
       "To say the model decided is to excuse the people whose deliberation, good or bad, stands behind each output."
     ],
     "confucian": [
@@ -107,10 +107,10 @@
       "The word also buries a second question, which voices were never heard when the system was set to work."
     ],
     "buddhist": [
-      "Where there is no volition there is no deciding, only an output produced by data, prompts and whoever put it to use.",
+      "A deployer who blames the model has stopped asking what their own part was, the one question the practice of examining acts cannot do without.",
       "The intention lies with those who trained and deployed the model, so that is where the moral weight of each output rests.",
-      "The model wills nothing, so every output is a trace of human intentions, and those are what the right word keeps in view.",
-      "Look for the will behind the act and it is found in the people who built and used the system, never in the model."
+      "Someone hurt by an output deserves to be told whose purpose it served, and pointing at the machine tells them nothing.",
+      "Calling it the model's choice also takes the deployers off the list of conditions that could be changed, which is where change is easiest."
     ]
   },
   "moral-training": {
@@ -128,19 +128,19 @@
     ],
     "virtue-ethics": [
       "Habituation succeeds when the habit becomes a settled choice of one's own, and nothing in reward shaping is there to do the choosing.",
-      "Rewarded acts can look exactly like virtuous ones, and Aristotle's point is that looking alike is not being alike.",
-      "Faced with a case its raters never saw, the model has only its patterns to fall back on, where a good person would have judgement.",
+      "The difference between doing good and being good shows across a whole life, and a model has a training run, not a life.",
+      "Asked why it acted well, a good person can give a reason they hold; asked the same, a model can only give the reason it was rewarded for.",
       "Good acts without a good character are imitation, however reliable, and imitation is not what upbringing produces."
     ],
     "confucian": [
-      "Scores can tell a model which replies are wanted, but they cannot give it a household whose ways it would learn.",
+      "Rites are learned by doing them with others season after season, and a score handed back after each reply is no rite.",
       "Humaneness is learned from parents, teachers and elders over years, and no score stands in for that slow education.",
       "A model may learn to say the right words, but it has no role in which to practise them and no elder or child to practise them for.",
-      "A name that fits both a tuned model and a well-raised daughter has stopped telling us anything about either."
+      "If a tuned model counts as good, the word stops asking anything of the people who still have to be raised well."
     ],
     "ubuntu": [
       "Raters can reward a reply, but nobody can draw a model into a family, and that drawing in is how goodness grows.",
-      "The people who score a model are strangers to it and to each other, which is the opposite of a family.",
+      "A family corrects a child and then stays; a rater moves on to the next reply.",
       "Feedback can teach a system what pleases, but becoming good is something people do together over a shared life.",
       "Training adjusts outputs one score at a time, while upbringing makes someone a member of a community, and that is the difference."
     ],
@@ -159,41 +159,41 @@
       "Proportion to the harm would blame people for what happened to them rather than for what they did."
     ],
     "utilitarianism": [
-      "Blame is worth assigning only where it changes future behaviour, and punishing careful builders changes nothing for the better.",
+      "Count the builders who would leave the field rather than answer for accidents they could not prevent, and this rule starts to look expensive.",
       "Proportional blame would teach builders that care is wasted effort, and less care means more harm next time.",
       "Aim blame where it can change what happens next, and the careful builder is the wrong target.",
       "The useful question is which incentives reduce future harm, and blaming bad luck is not one of them."
     ],
     "virtue-ethics": [
       "A good builder will grieve the harm and work to repair it, but grief owed is a different thing from blame earned.",
-      "To blame by proportion is to confuse regret, which the careful builder rightly feels, with fault, which they do not bear.",
-      "Blame sized to the damage would turn a decent builder's sorrow into a confession of fault, which misdescribes what happened.",
+      "Character shows less in the incident than in the month after it: who returned the calls, who changed the process, who went to the funeral.",
+      "A courtroom measures fault, but the question here is what kind of builders the harm makes of them, and blame by size cannot answer it.",
       "Judge the builder by how they built and how they respond, and the size of the damage is not the measure."
     ],
     "confucian": [
       "A builder answers for what the position asked of them, and the position asks for repair after a failure as well as care before it.",
       "If the builders did what their position required, the harm alone cannot make them guilty.",
       "Duty done is duty done; the builder who did it has no fault to carry, only an obligation to the people the harm reached.",
-      "Not culpable does not mean finished: the builder still owes the injured a visit, a true account and a hand in the repair."
+      "A builder's position does not lapse when the system ships; it carries on to the day someone is hurt, and past it."
     ],
     "ubuntu": [
       "The harm asks the makers to come back to those it fell on and help set things right, which no amount of blame achieves.",
-      "Careful builders still owe the injured their presence and their help, because the harm damaged a bond they share.",
+      "Those the harm fell on are not a file to close but neighbours to face, careful builders included.",
       "A verdict of guilt closes a file, but restoring the people harmed to the life they share with others is the work that matters.",
       "Whatever share of blame is set, those harmed are still waiting for the makers to sit down with them."
     ],
     "buddhist": [
-      "An act done carefully and meaning well is weighed by its intention too, so measuring blame by the damage alone misjudges it.",
-      "The builders are still called to attend to the injured, but attending is not the same as being to blame.",
-      "Many conditions met in the failure, and putting its whole weight on the builders mistakes one condition for the cause.",
-      "Their intention lessens the blame, and it stays lessened only while they own up to the harm and stop it recurring."
+      "An act done carefully and meaning well is weighed by its intention too, so a verdict read off the damage alone misjudges it.",
+      "Blamelessness is no reason to look away, since looking is how the next harm is caught.",
+      "Compassion reaches the builders too: they acted well, and the harm that followed asks for their attention, not their ruin.",
+      "A good intention is shown again each time the builders look at what their system did and say so plainly."
     ]
   },
   "borrowed-judgement": {
     "stoicism": [
       "A day arranged well by an assistant is a set of indifferents in good order, and a person's good never lay in that order.",
       "Better choices made for you are still made for you, and what went missing was the reasoning that would have been yours.",
-      "A machine can supply the answer but never the assent, and assent was the whole of what a person had to give.",
+      "A machine can supply the answer but never the assent, and without assent a person has stopped taking part in their own life.",
       "Outcomes were never yours to secure; the judging was, and that is exactly what the assistant takes."
     ],
     "utilitarianism": [
@@ -210,7 +210,7 @@
     ],
     "confucian": [
       "A role carried out by proxy is never practised, and a friend who never practises friendship is a friend in name only.",
-      "A child whose presents for a grandparent are picked by an assistant has given something, but has not yet learned to give.",
+      "Choosing badly for one's mother and being forgiven teaches more about being a son than choosing well by proxy ever could.",
       "Conduct grows through practice inside one's relationships, so outsourcing the practice thins the relationships themselves.",
       "Trading the practice of one's roles for better choices is a poor exchange."
     ],
@@ -218,13 +218,13 @@
       "People become persons in the choices they make alongside others, and no assistant can do that becoming for anyone.",
       "When the assistant chooses the gift or the reply, the person loses an exchange through which they belong to others.",
       "Choices that no longer pass between people, however good, cost the very relationships that made them worth making.",
-      "Give away the choices that were only ever yours, and keep the ones that were also a way of meeting someone."
+      "A household that lets a machine settle its small arguments may find it has lost the way it talked to itself."
     ],
     "buddhist": [
-      "Let the assistant do the shopping if it must, but someone still has to know whose labour the shopping pays for.",
+      "Convenience is not the danger; forgetting to ask what one's choices do to others is, and an assistant makes forgetting easy.",
       "What suffers is not an owner of choices but the practice of noticing, choice by choice, what one intends and whom it hurts.",
-      "A better choice made without attention trains no compassion, and attention is what each daily choice could have trained.",
-      "Time the assistant saves can go to reflecting on what one's acts have done, and then little that matters is lost."
+      "A good choice reached without attention trains no compassion, and attention is what each daily choice could have trained.",
+      "The practice was never in the choosing itself but in the looking, and the looking can survive the handover if someone keeps it up."
     ]
   }
 }

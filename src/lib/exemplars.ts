@@ -16,8 +16,9 @@ import type { SchoolId } from "@/lib/types";
  * shows only those.
  *
  * One per opening line in each school: the sample run writes four positions
- * per school on a motion, so the strongest argument under each is the one
- * shown and the page never lists the same line to open twice in a school
+ * per school on a motion, so one argument under each is shown (the
+ * strongest, unless its ending is taken; see selectExemplars) and the page
+ * never lists the same line to open twice in a school
  * (Arthur, 2026-11-06, accepting that in place of 50 that repeat). Highest template mark first, shared out evenly
  * across the schools up to EXEMPLARS_PER_MOTION, which today's data never
  * reaches. Nothing marked under EXEMPLAR_FLOOR is shown. No mark is
@@ -124,9 +125,12 @@ export function endingOf(argument: string): string {
  *
  * No two kept arguments, in any school, end on the same line (`endingOf`;
  * Arthur, 2026-11-08: "so exemplar pages never show the same ending
- * twice"), so none repeats another's text either. Where the strongest under
- * an opening ends as a stronger kept argument does, the next strongest
- * under it takes its place. Where none under an opening is left, a kept
+ * twice"), so none repeats another's text either. The first pass takes
+ * schools in order and each school's candidates strongest first: where the
+ * strongest under an opening ends as an argument already kept does (a
+ * stronger one in its school, or any in a school listed before it), the
+ * strongest under it whose ending is free takes its place. Where none
+ * under an opening is left, a kept
  * argument moves to the next strongest under its own opening when that
  * frees an ending the left-out opening can take (an augmenting path, as in
  * Kuhn's matching), so an opening is left out only when no choice of one
@@ -160,7 +164,7 @@ export function selectExemplars(
   }
 
   // First pass, as the candidates come: each opening takes its strongest
-  // argument whose ending no stronger kept argument has taken.
+  // argument whose ending no argument kept before it has taken.
   const holder = new Map<string, Slot>();
   const order = slots
     .flatMap((slot) => slot.options.map((option, i) => ({ slot, i, school: schools.indexOf(slot.school), at: option.at })))

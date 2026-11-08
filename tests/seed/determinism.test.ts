@@ -39,9 +39,9 @@ describe("determinism", () => {
   // Its datasets, as this code first made them (Gate 4 item 13, second
   // part), for the base window and ten days on, and its base hash.
   it("gives a quiz v2 run exactly the rows it gave when it was written", () => {
-    expect(manifestHash(small({ quiz: 2 }))).toBe("9a81aadf0976909021246a42e91e72a3862bd30225748410a5f8f6aeed508d82");
+    expect(manifestHash(small({ quiz: 2 }))).toBe("690e7de79c76a3a3693654919ff61e366ec9b1131c17c3c4b7e201c301969de9");
     expect(manifestHash(small({ quiz: 2, to: "2026-11-14T12:00:00.000Z" }))).toBe(
-      "c9a83cac83382b56a4072e71abc7cb3df384cb6ebc276b26daf70bb54b5481e7"
+      "5bef366f82eb7640d1462abc8067bd717780989f8eb292f12ef814f215c58a35"
     );
     expect(baseHash({ ...SMALL, quiz: 2, topics: contentTopics() })).toBe("5cdeac90c6bfadb49435f35b4688ee717ed990b7b3d409dd8ef3c600e1255824");
   });

@@ -5506,8 +5506,10 @@ above:
   watching", "Ask ..., and the answer ..."), and some that did not fit:
   a driver in a self-driving car, "not by fortune" (the Stoics' wording)
   in a Confucian closing, and readings the passages do not carry
-  ("Nothing permanent is lost", "Ritual shapes the heart"). 65 of the
-  144 are rewritten.
+  ("Nothing permanent is lost", "Ritual shapes the heart"). The second
+  review found more of the same that the first round's checks let
+  through, mostly a passage restated with its words inflected. 72 of
+  the 144 are rewritten in all.
 - **Held to:** `tests/seed/closings.test.ts`:
   - every school, four on every motion, each one sentence of 10 to 30
     words;
@@ -5534,8 +5536,9 @@ above:
   ends on a body sentence.
   - `selectExemplars` (`src/lib/exemplars.ts`) keeps no two arguments that
     end on the same line, in any school. Its first pass is as before,
-    strongest first, with an argument that ends as a stronger kept one
-    does giving way to the next strongest under its opening. Where that
+    schools in their order and strongest first within each, with an
+    argument whose ending is already taken giving way to the strongest
+    under its opening whose ending is not. Where that
     leaves an opening with nothing, a kept argument moves to the next
     strongest under its own opening if that frees an ending the left-out
     opening can take (an augmenting path, as in Kuhn's matching). So an
@@ -5552,11 +5555,20 @@ above:
     no ending twice.
   - Measured at production volume (seed `six-check`, base window to
     2026-11-10 09:00 UTC, two weeks on): main's selection shows an ending
-    already on the page 40 times across the six motions in a quiz v2 run,
+    already on the page 47 times across the six motions in a quiz v2 run,
     and 22 times in a run that names no quiz; this one never, with the
     same number of arguments shown (144 and 72). It shows a different
-    argument in 46 and 25 of those places, each the next under the same
-    opening.
+    argument in 53 and 25 of those places: another under the same
+    opening, the strongest whose ending is not already on the page, which
+    is the second strongest under it in 28 and 8 of them and as far down
+    as the fourteenth and thirteenth in others. On the fixture's small plan (quiz v2) it
+    shows 130 openings to main's 135, which is as many as any choice could
+    show there.
+  - Not handled, as it cannot arise today: where a school has more
+    openings than its share of `EXEMPLARS_PER_MOTION`, the matching could
+    move a shown opening to a weaker argument to free an ending for one
+    the share then leaves out. A page has at most 24 openings against a
+    share total of 50.
 - **The live pages change too.** The rule is in the page's selection, so
   it applies to the live run's rows from the merge, not only the fresh
   run's. Read from production on 2026-11-08 around 02:20 UTC (one
@@ -5565,7 +5577,12 @@ above:
   main's selection shows 72 exemplars across the six pages and repeats an
   ending 16 times, at least once on every page. With this rule it shows
   the same 72 openings, repeats none, and shows a different argument in
-  16 places, each the next under the same opening. The opening and ending
+  16 places, each another under the same opening: the second strongest
+  under it in 4 of them, and down to the twelfth in the rest, marked 0 to
+  19 points lower than the one it replaces (review pass 2 measured this
+  from production's ranks and marks, read-only). In 3 of the 18 school
+  groups the order of the openings on the page changes with it, as a
+  school's cards come strongest first. The opening and ending
   were computed in SQL to match `openingOf` and `endingOf`, except that a
   first sentence over 160 characters is compared by its first 160.
 - **The fresh run's revision verdicts.** A revision that answers the

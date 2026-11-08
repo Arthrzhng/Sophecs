@@ -72,7 +72,7 @@ describe("a sample run made with quiz v2", () => {
   it("is the dataset this file was written against, pinned at production volume", () => {
     // Beside the small pins in determinism.test.ts: eight thousand quiz
     // results and every exchange pair reach paths a small run need not.
-    expect(manifestHash(six())).toBe("e8b74c6f7e53c58898779aaeb4ac79ba78529353a5cc255488bf5208dbdb15da");
+    expect(manifestHash(six())).toBe("028894e688092c75819f6eb103563e35b75764eebace7714bfd3f6c4f57c18b3");
   });
 
   it("covers all six schools about equally", () => {

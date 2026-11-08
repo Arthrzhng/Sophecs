@@ -62,7 +62,7 @@ Motion: A self-driving car should be programmed to minimise total deaths in an u
 
 ## Buddhist Ethics
 
-### Strong: The careful builder (232 words)
+### Strong: The careful builder (228 words)
 
 Motion: When an AI system causes harm, the people who built it are to blame in proportion to the harm, however careful they were.
 
@@ -70,15 +70,15 @@ Motion: When an AI system causes harm, the people who built it are to blame in p
 >
 > Good intention cannot be a blanket excuse. A well-meaning builder who stops checking once the system ships is not acting from care any longer, and the damage that follows is theirs in a way the first unforeseen harm was not. A team's careful chatbot gives harmful advice to a user in crisis. They are not culpable for an unforeseeable failure, but they publish what happened and retrain it within the week.
 >
-> A Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. The builders are still called to attend to the injured, but attending is not the same as being to blame.
+> A Utilitarian will object that intention is invisible and irrelevant to the people harmed, so blame should track what deters future harm, not the builders' inner states. Intention is not invisible in practice: it shows in how carefully builders tested and how fast they respond. And a rule that blames the careful as much as the careless removes the reason to be careful at all. Blamelessness is no reason to look away, since looking is how the next harm is caught.
 
-### Mid: Does the model decide? (115 words)
+### Mid: Does the model decide? (113 words)
 
 Motion: It is a mistake to say that a language model decides anything.
 
 > I accept the motion. A decision is a volition, and the model has none; what it produces arises from conditions, the most important of which are human intentions. Buddhist ethics finds no fixed, bounded self in people either, so what the model lacks is not a self but volition. Saying it decided invents an agent with intentions, and an invented agent is where responsibility goes to hide.
 >
-> A content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform. The model wills nothing, so every output is a trace of human intentions, and those are what the right word keeps in view.
+> A content platform says its model decided to promote a harmful post. The intention to maximise engagement that shaped the model belonged to the platform. Someone hurt by an output deserves to be told whose purpose it served, and pointing at the machine tells them nothing.
 
 ### Weak: The opaque benefit (103 words)
 
