@@ -1,4 +1,4 @@
-// The share and link-preview images say "Sample" for a sample account's
+// The share and link-preview images carry the "AI sample" mark for a sample account's
 // verdict or result (Arthur, 2026-11-04: on every surface a sample
 // appears), and nothing extra for a reader's.
 import { describe, expect, it } from "vitest";
@@ -12,14 +12,14 @@ const fonts = { serif: "Spectral", sans: "IBM Plex Sans", mono: "IBM Plex Mono" 
 describe("share images", () => {
   it("mark a sample verdict, and only a sample one", () => {
     const html = (sample: boolean) => renderToStaticMarkup(createElement(VerdictCard, { school: "stoicism", motion: "A motion.", score: 61, width: 1200, height: 630, fonts, sample }));
-    expect(html(true)).toContain("Sample assessment");
-    expect(html(false)).not.toMatch(/Sample/);
+    expect(html(true)).toContain(">AI sample<");
+    expect(html(false)).not.toMatch(/sample/i);
   });
   it("mark a sample result card, landscape and portrait, and only a sample one", () => {
     for (const [width, height] of [[1200, 630], [1080, 1350]]) {
       const html = (sample: boolean) => renderToStaticMarkup(createElement(CardLayout, { school: "stoicism", oneLine: "A line.", oneLineAttribution: "Someone", width, height, fonts, sample }));
-      expect(html(true)).toContain(">Sample<");
-      expect(html(false)).not.toMatch(/Sample/);
+      expect(html(true)).toContain(">AI sample<");
+      expect(html(false)).not.toMatch(/sample/i);
     }
   });
   it("are asked for the marker by every image route", async () => {
@@ -33,21 +33,21 @@ describe("share images", () => {
 });
 
 describe("link previews of sample pages", () => {
-  it("say Sample in the Open Graph and Twitter titles, not only the tab", async () => {
+  it("have the plain title a genuine page of the kind has, in the tab and the previews, and no referrer", async () => {
     const { sampleMetadata } = await import("../../src/lib/sample");
-    const m = sampleMetadata("Sample verdict · Sophecs");
-    expect(m.openGraph.title).toBe("Sample verdict · Sophecs");
-    expect(m.twitter.title).toBe("Sample verdict · Sophecs");
+    const m = sampleMetadata("Verdict · Sophecs");
+    expect(m.openGraph.title).toBe("Verdict · Sophecs");
+    expect(m.twitter.title).toBe("Verdict · Sophecs");
     const { readFileSync } = await import("node:fs");
-    expect(readFileSync("src/app/debate/[slug]/[debateId]/page.tsx", "utf8")).toContain('sampleMetadata("Sample verdict · Sophecs")');
-    expect(readFileSync("src/app/c/[id]/page.tsx", "utf8")).toMatch(/sampleMetadata\(\s*"A sample account's challenge · Sophecs"/);
+    expect(readFileSync("src/app/debate/[slug]/[debateId]/page.tsx", "utf8")).toContain('sampleMetadata("Verdict · Sophecs")');
+    expect(readFileSync("src/app/c/[id]/page.tsx", "utf8")).toMatch(/sampleMetadata\(\s*"A challenge · Sophecs"/);
     expect(readFileSync("src/app/r/[id]/page.tsx", "utf8")).toMatch(/twitter: \{ card: "summary_large_image", title \}/);
   });
 
   it("give a sample challenge a preview image that carries the mark", async () => {
     const { sampleMetadata } = await import("../../src/lib/sample");
-    const m = sampleMetadata("A sample account's challenge · Sophecs", { url: "/r/R1/opengraph-image", alt: "A sample account's result card" });
-    expect(m.openGraph.images?.[0]).toMatchObject({ url: "/r/R1/opengraph-image", alt: "A sample account's result card", width: 1200, height: 630 });
+    const m = sampleMetadata("A challenge · Sophecs", { url: "/r/R1/opengraph-image", alt: "A result card, marked as an AI sample" });
+    expect(m.openGraph.images?.[0]).toMatchObject({ url: "/r/R1/opengraph-image", alt: "A result card, marked as an AI sample", width: 1200, height: 630 });
     expect(m.twitter.images?.[0].url).toBe("/r/R1/opengraph-image");
     // Without one, no images key at all: Next.js skips a segment's own
     // opengraph-image whenever the key is present, even as undefined, which

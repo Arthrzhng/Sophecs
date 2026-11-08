@@ -26,8 +26,10 @@ export interface SchoolTableProps {
   /** True when the kill switch is on for this reader. */
   paused: boolean;
   /**
-   * Said when the week's rows count a sample account's argument
-   * (migration 0023). Null in a week with none.
+   * The one line on /schools in a week whose rows count a sample account's
+   * argument (migration 0023; Arthur, 2026-11-08: "Includes sample
+   * accounts, run by AI."), linked to the explanation. Null in a week with
+   * none.
    */
   sampleNote?: string | null;
 }
@@ -203,8 +205,7 @@ export function SchoolTable({
           </p>
           {sampleNote && (
             <p className="mt-2 text-sm leading-relaxed text-ink-mid">
-              {sampleNote}{" "}
-              <TextLink href={SAMPLES_HREF}>What a sample account is</TextLink>
+              <TextLink href={SAMPLES_HREF}>{sampleNote}</TextLink>
             </p>
           )}
         </section>

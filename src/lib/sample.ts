@@ -1,27 +1,32 @@
 // Sample accounts: the words the site uses for them, in one place.
 //
-// A sample account is one scripts/seed-production.ts created, marked
+// A sample account is one the sample activity workflow created, marked
 // `is_sample` in the database (migration 0023). Its activity renders
-// through the ordinary pages, and wherever one is identified it carries
-// the label below. docs/sample-activity.md has the design.
+// through the ordinary pages, and wherever its work is shown it carries the
+// tag below. docs/sample-activity.md has the design.
 
-export const SAMPLE_LABEL = "Sample";
+// Arthur, 2026-11-08: readers see "sample" as little as possible. What
+// stays is the minimum below; nothing else on the site names a sample.
 
-// The brief's wording, verbatim. Shown when the label is opened.
-export const SAMPLE_EXPLANATION =
-  "An illustrative account with generated activity, not an active member. It does not respond to messages or challenges.";
+// The one tag beside a sample's work wherever it is shown: a verdict, a
+// result, a challenge, an exchange. Small and quiet (SampleLabel).
+export const SAMPLE_TAG = "AI";
 
-// On a verdict written from a template rather than by the judge.
-export const SAMPLE_ASSESSMENT = "Sample assessment";
-export const SAMPLE_ASSESSMENT_NOTE =
-  "Written from a template for a sample account. The judge did not read this argument.";
+// The explanation on /how-it-works#samples, Arthur's words, which the tag
+// also opens to.
+export const SAMPLE_EXPLANATION = "Sample accounts are run by AI. They show what arguing here looks like.";
 
-// Under the school table, in a week whose arguments or school changes count
-// a sample account.
-export const TABLE_SAMPLE_NOTE = "This week's table includes sample accounts.";
+// On a sample's verdict, inside the tag: its scores come from a template,
+// and the page must not let them pass for the judge's.
+export const SAMPLE_JUDGE_NOTE = "The judge did not read this argument.";
 
-// Under Today's school rank, in a week whose ranked arguments include one.
-export const RANK_SAMPLE_NOTE = "This week's ranks include sample accounts.";
+// The one line on /schools, under the table, in a week sample accounts
+// count in.
+export const SCHOOLS_SAMPLE_LINE = "Includes sample accounts, run by AI.";
+
+// The small mark on a sample page's share and preview images, which travel
+// without the tag beside them.
+export const SAMPLE_IMAGE_MARK = "AI sample";
 
 /**
  * A page showing a sample passes no referrer to the next page (Arthur,
@@ -38,14 +43,14 @@ export const RANK_SAMPLE_NOTE = "This week's ranks include sample accounts.";
 export const SAMPLE_PAGE_REFERRER = "no-referrer" as const;
 
 /**
- * Metadata for a page that shows a sample, so the link preview says so
- * too: a page that sets only `title` inherits the root layout's Open Graph
- * and Twitter titles ("Sophecs"), which is what most previews show. The
- * page's own opengraph-image, where it has one, still supplies the image.
+ * Metadata for a page that shows a sample: the title a genuine page of the
+ * kind has (Arthur, 2026-11-08: no "Sample" in page titles), with no
+ * referrer passed on. The page's preview image, its own opengraph-image or
+ * the one named here, carries the sample mark.
  */
 export function sampleMetadata(title: string, image?: { url: string; alt: string }) {
   // A page whose own segment has no opengraph-image names one here; it
-  // must be a 1200 by 630 image that carries the Sample mark itself.
+  // must be a 1200 by 630 image that carries the sample mark itself.
   const images = image ? [{ url: image.url, width: 1200, height: 630, alt: image.alt }] : undefined;
   return {
     title,

@@ -1,22 +1,29 @@
-import { SAMPLE_EXPLANATION, SAMPLE_LABEL } from "@/lib/sample";
+import { SAMPLE_EXPLANATION, SAMPLE_TAG } from "@/lib/sample";
 
 /**
- * The small "Sample" label on anything a sample account made. It opens to
- * say what a sample account is, and nothing more: no banner, no modal.
+ * The small "AI" tag beside a sample account's work (Arthur, 2026-11-08:
+ * "one small, quiet 'AI' tag beside a sample's name where it appears").
+ * It opens to the explanation /how-it-works gives, and on a verdict scored
+ * from a template to the line saying the judge did not read it. Nothing
+ * more: no banner, no modal.
  *
  * A <details> rather than a tooltip, so it works without JavaScript, by
  * keyboard and by touch, and the explanation is in the page for a screen
- * reader rather than hidden behind a hover.
+ * reader rather than hidden behind a hover. It is flow content, so it sits
+ * in a flex row beside the thing it tags, never inside a <p>.
  */
-export function SampleLabel({ className = "" }: { className?: string }) {
+export function SampleLabel({ note, className = "" }: { note?: string; className?: string }) {
   return (
     <details className={`group ${className}`}>
       <summary className="inline-flex min-h-11 cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden">
-        <span className="rounded-control border-2 border-rule-strong bg-surface px-2 py-0.5 text-xs font-extrabold tracking-widest text-ink-mid uppercase group-open:text-ink">
-          {SAMPLE_LABEL}
+        <span className="rounded-control border border-rule px-1.5 text-xs font-semibold text-ink-mid group-open:text-ink">
+          {SAMPLE_TAG}
         </span>
       </summary>
-      <p className="mt-1 max-w-[44ch] text-sm leading-relaxed text-ink-mid">{SAMPLE_EXPLANATION}</p>
+      <p className="mb-2 max-w-[44ch] text-sm leading-relaxed text-ink-mid">
+        {SAMPLE_EXPLANATION}
+        {note && ` ${note}`}
+      </p>
     </details>
   );
 }

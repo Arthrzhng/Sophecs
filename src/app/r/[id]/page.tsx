@@ -83,8 +83,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const result = await getResult(id);
   if (!result) return { title: "Sophecs" };
   const school = getSchool(result.school);
-  // A sample account's result says so in the title and the link preview.
-  const title = result.is_sample ? `${school.name} · Sample · Sophecs` : `${school.name} · Sophecs`;
+  // A sample's result has the same title as anyone's (Arthur, 2026-11-08);
+  // its preview image carries the sample mark.
+  const title = `${school.name} · Sophecs`;
   return {
     title,
     description: school.one_line,

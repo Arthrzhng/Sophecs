@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { RANK_SAMPLE_NOTE } from "@/lib/sample";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import { schoolColourVar } from "@/lib/school-registry";
 import { streakLine, STREAK_PAUSED_LINE } from "@/lib/streak-copy";
 import { liveStreak, streakDayLabel, streakWeek } from "@/lib/streak-week";
 import type { SchoolId } from "@/lib/types";
-import { SAMPLES_HREF, TABLE_HREF } from "@/lib/nav-routes";
+import { TABLE_HREF } from "@/lib/nav-routes";
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
@@ -131,7 +130,6 @@ export function SchoolCard({
   oneLine,
   elo,
   rank,
-  includesSamples = false,
 }: {
   school: SchoolId;
   oneLine: string;
@@ -144,8 +142,6 @@ export function SchoolCard({
    * (src/lib/school-table.ts).
    */
   rank: number | null;
-  /** This week's ranks count a sample account's argument (migration 0023). */
-  includesSamples?: boolean;
 }) {
   const place = rank != null ? PLACES[rank - 1] : null;
   return (
@@ -170,14 +166,6 @@ export function SchoolCard({
       <p className="mt-1 text-sm text-ink-mid">
         {place ? `${place} on the table this week` : "Not ranked yet this week"}
       </p>
-      {includesSamples && (
-        <p className="mt-1 text-sm text-ink-mid">
-          {RANK_SAMPLE_NOTE}{" "}
-          <Link href={SAMPLES_HREF} className="text-ink underline underline-offset-4">
-            What a sample account is
-          </Link>
-        </p>
-      )}
       <p className="mt-3">
         <Link
           href={TABLE_HREF}

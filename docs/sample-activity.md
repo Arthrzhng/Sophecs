@@ -1,6 +1,6 @@
 # Sample activity
 
-3,278 labelled sample accounts, with quiz results, arguments, revisions,
+3,278 sample accounts, with quiz results, arguments, revisions,
 challenges, counterpart exchanges, reading answers and classes from
 2026-09-18 on, rendered through the ordinary pages, and new arguments every
 six hours for as long as the run lasts. Nothing here is a demo page: the
@@ -29,14 +29,14 @@ messaging, so a sample account is seen in fewer places than the word
 
 | Surface | Who can see it | What a sample shows |
 | --- | --- | --- |
-| `/table` (school table) | anyone | Counted like anyone else in the week it falls in. In any week with a sample argument or school change the table says "This week's table includes sample accounts." and links here. |
-| `/today` school rank | signed-in readers | The school's place on the same table, with "This week's ranks include sample accounts." and the same link. |
-| `/debate/<slug>/<id>` (verdict) | anyone with the link | The Sample label; "Sample assessment" in place of "How the judge scored you", and a line saying the judge did not read it. No share row. Page title "Sample verdict". |
-| its link preview (`opengraph-image`) | anyone shown the link | A "Sample assessment" mark beside the score. |
-| `/r/<id>` (result) | anyone with the link | The Sample label, "A sample account's result", the stranger's view only. Page title "<School> · Sample". |
-| its card (`opengraph-image`, `card.png`) | anyone shown the link | A "Sample" mark above the quotation. |
-| `/c/<id>` (challenge) | anyone with the link | The Sample label, "A sample account's challenge"; "Take the quiz" goes to `/quiz` without accepting it. Page title "A sample account's challenge". |
-| its link preview | anyone shown the link | The challenger's result card (`/r/<id>/opengraph-image`) with its "Sample" mark; no image if the challenger's result is not a sample, or if the card's lookup fails. |
+| `/schools` (school table) | anyone | Counted like anyone else in the week it falls in. In any week with a sample argument or school change, one line under the table: "Includes sample accounts, run by AI.", linked here. |
+| `/today` school rank | signed-in readers | The school's place on the same table, with nothing more. |
+| `/debate/<slug>/<id>` (verdict) | anyone with the link | The AI tag beside the week; on a template verdict the tag also opens to "The judge did not read this argument.", and the scores sit under "Scores", never "How the judge scored you". No share row. Page title "Verdict", as anyone's. |
+| its link preview (`opengraph-image`) | anyone shown the link | An "AI sample" mark beside the score. |
+| `/r/<id>` (result) | anyone with the link | "A result" with the AI tag, the stranger's view only, never "Someone shared their result". Page title "<School>", as anyone's. |
+| its card (`opengraph-image`, `card.png`) | anyone shown the link | An "AI sample" mark above the quotation. |
+| `/c/<id>` (challenge) | anyone with the link | "A challenge" with the AI tag, never "Someone challenged you"; "Take the quiz" goes to `/quiz` without accepting it. Page title "A challenge". |
+| its link preview | anyone shown the link | The challenger's result card (`/r/<id>/opengraph-image`) with its "AI sample" mark; no image if the challenger's result is not a sample, or if the card's lookup fails. |
 | `/debate/<slug>/exemplars` | anyone; linked from the landing page's motion and from a reader's own verdict | The strongest published sample argument under each opening line, per school, under the heading "Exemplar ways to argue this motion" and the line "Written as examples for Sophecs.", with no label on each (Arthur, 2026-11-06: "without having an obvious sample label"). No deliberate misspellings, no scores, no link to a sample's verdict. A sample page to analytics: `SamplePageMarker`, no referrer. |
 | `/class/<code>` | the class owner only | Never a sample: a reader's class cannot hold one, and the page leaves out any sample member whatever the data says. |
 | `/counterpart/<id>` | the two participants only | Sample exchanges are between sample accounts only. |
@@ -47,10 +47,15 @@ the sitemap. The table and Today count the current ISO week, and the
 workflow adds the activity since its last run every six hours, so samples
 are part of every week's table, not only the first.
 
-The label (`src/components/sample/SampleLabel.tsx`) is a `<details>`: it
-reads "Sample" and opens to "An illustrative account with generated
-activity, not an active member. It does not respond to messages or
-challenges." `/method#samples` explains the rest.
+Arthur, 2026-11-08: readers see "sample" as little as possible. What
+stays is the minimum: the AI tag beside a sample's work, the "AI sample"
+mark on its images, the one line on `/schools`, and the explanation at
+`/how-it-works#samples`; and, once samples reply, one line before a
+reader writes to one. The tag (`src/components/sample/SampleLabel.tsx`)
+is a small `<details>`: it reads "AI" and opens to the explanation,
+"Sample accounts are run by AI. They show what arguing here looks
+like.", with "The judge did not read this argument." after it on a
+template verdict. The words are in `src/lib/sample.ts`.
 
 ## What a sample can never touch
 

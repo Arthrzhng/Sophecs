@@ -15,7 +15,7 @@ import {
 } from "@/lib/school-table";
 import type { SchoolId } from "@/lib/types";
 import { readAll } from "@/lib/read-all";
-import { TABLE_SAMPLE_NOTE } from "@/lib/sample";
+import { SCHOOLS_SAMPLE_LINE } from "@/lib/sample";
 
 // Empty rather than a zero per school: the counts are sparse, and
 // rankSchools reads a missing school as nothing joined and nothing left.
@@ -130,6 +130,6 @@ export async function loadSchoolTable(): Promise<SchoolTableProps> {
     emptyWeek: judged.length === 0,
     paused:
       process.env.KILL_SWITCH_JUDGE === "true" && !(userId && isJudgeAllowlisted(userId)),
-    sampleNote: includesSamples ? TABLE_SAMPLE_NOTE : null,
+    sampleNote: includesSamples ? SCHOOLS_SAMPLE_LINE : null,
   };
 }

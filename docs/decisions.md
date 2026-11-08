@@ -6078,3 +6078,39 @@ What a build without the flag then does with what the launch left:
 - a browser that followed one of the three permanent redirects keeps
   going to `/schools` or `/how-it-works`, which such a build answers not
   found.
+
+### Sample labels at the minimum (2026-11-08)
+
+Arthur, 2026-11-08: "readers should see 'sample' as little as possible
+across the site. Remove every label except this minimum". What stays:
+- one small, quiet "AI" tag beside a sample's work, on its verdict,
+  result and challenge pages (and on an exchange, once samples reply);
+- one short line on a challenge or exchange with a sample, before the
+  reader writes: "You're arguing with an AI sample account." This comes
+  with the replies, since until then a reader writes nothing to a sample;
+- a small "AI sample" mark on a sample page's share and preview images;
+- one line on `/schools`: "Includes sample accounts, run by AI.", linked
+  to the explanation;
+- the explanation on `/how-it-works#samples`: "Sample accounts are run
+  by AI. They show what arguing here looks like." The third sentence
+  follows when samples reply.
+
+Gone: "Sample" in page titles (a sample's verdict, result and challenge
+have the titles anyone's have), the Sample banner, the "Sample
+assessment" headings and mark, the note under each template verdict, the
+note under Today's rank, and the old paragraphs on `/how-it-works`.
+
+Choices made in carrying this out, for Arthur's list:
+- **The judge did not read it.** A sample's verdict is scored from a
+  template. With the heading and the note gone, nothing on the page would
+  have said so, and the scores sit under the site's footer saying
+  arguments are scored by the judge. So the tag on a template verdict
+  opens to the explanation and then "The judge did not read this
+  argument." (the note's own words), and the scores sit under "Scores",
+  never "How the judge scored you".
+- **The image mark reads "AI sample", not "AI".** An image travels
+  without the tag beside it, and on a verdict image a bare "AI" could be
+  read as "judged by AI", which every verdict is.
+- A sample is never presented as a person: its result reads "A result",
+  not "Someone shared their result", and its challenge "A challenge", not
+  "Someone challenged you".

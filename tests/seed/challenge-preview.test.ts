@@ -1,5 +1,5 @@
 // A sample challenge's link preview (src/app/c/[id]/page.tsx) is the
-// challenger's result card, which draws the Sample mark, and only when
+// challenger's result card, which draws the sample mark, and only when
 // that result is itself a sample. The card routes draw the mark from the
 // row's own marker, and give no image at all, uncached, for a row they
 // cannot read, rather than a default card that would carry no mark.
@@ -74,13 +74,13 @@ describe("a challenge's link preview", () => {
       openGraph?: { images?: { url: string; alt: string }[] };
       twitter?: { images?: { url: string }[] };
     };
-    expect(m.openGraph?.images?.[0]).toMatchObject({ url: "/r/r-sample/opengraph-image", alt: "A sample account's result card" });
+    expect(m.openGraph?.images?.[0]).toMatchObject({ url: "/r/r-sample/opengraph-image", alt: "A result card, marked as an AI sample" });
     expect(m.twitter?.images?.[0].url).toBe("/r/r-sample/opengraph-image");
   });
 
   it("has no image for a sample challenge whose challenger's result is not a sample", async () => {
     const m = (await generateMetadata(params("c-sample-genuine-challenger"))) as { title: string; openGraph?: object; twitter?: object };
-    expect(m.title).toBe("A sample account's challenge · Sophecs");
+    expect(m.title).toBe("A challenge · Sophecs");
     expect(m.openGraph).not.toHaveProperty("images");
     expect(m.twitter).not.toHaveProperty("images");
   });

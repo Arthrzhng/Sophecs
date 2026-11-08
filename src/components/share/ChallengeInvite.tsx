@@ -38,10 +38,12 @@ export function ChallengeInvite({
 
   return (
     <>
-      {isSample && <SampleLabel />}
-      <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
-        {isSample ? "A sample account's challenge" : "Someone challenged you"}
-      </p>
+      <div className="flex flex-wrap items-center gap-x-3">
+        <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
+          {isSample ? "A challenge" : "Someone challenged you"}
+        </p>
+        {isSample && <SampleLabel />}
+      </div>
       <h1 className="mt-2 max-w-[24ch] text-xl font-extrabold leading-tight tracking-tight text-ink">
         They came out {SCHOOL_ARTICLE[school]} {adherent}. Find out what you are.
       </h1>

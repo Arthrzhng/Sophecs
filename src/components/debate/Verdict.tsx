@@ -14,7 +14,7 @@ import { SCHOOL_ADHERENT_PLURAL, SCHOOL_ARTICLE, SCHOOL_COLORS } from "@/lib/sch
 import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
 import { JUDGE_AXES, AXIS_MAX } from "@/lib/judge-axes";
 import { SampleLabel } from "@/components/sample/SampleLabel";
-import { SAMPLE_ASSESSMENT, SAMPLE_ASSESSMENT_NOTE } from "@/lib/sample";
+import { SAMPLE_JUDGE_NOTE } from "@/lib/sample";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
 import type { SchoolId } from "@/lib/types";
 import { RUBRIC_HREF, TABLE_HREF } from "@/lib/nav-routes";
@@ -191,9 +191,9 @@ export function Verdict({
   textWithheld?: boolean;
   /**
    * Set on an argument a sample account made (migration 0023). It gets the
-   * Sample label, no share row, and no view events. `template` is a
-   * verdict written from a template rather than by the judge: it says so,
-   * and nothing on the page claims the judge read it.
+   * AI tag, no share row, and no view events. `template` is a verdict
+   * written from a template rather than by the judge: the tag says so, and
+   * nothing on the page claims the judge read it.
    */
   sample?: { template: boolean } | null;
 }) {
@@ -235,8 +235,10 @@ export function Verdict({
   if (verdict.rejected) {
     return (
       <div>
-        {sample && <SampleLabel />}
-        <p className="text-sm text-ink-soft">{template ? SAMPLE_ASSESSMENT : "Verdict"}</p>
+        <div className="flex flex-wrap items-center gap-x-3">
+          <p className="text-sm text-ink-soft">Verdict</p>
+          {sample && <SampleLabel note={template ? SAMPLE_JUDGE_NOTE : undefined} />}
+        </div>
         <h1 className="mt-1 max-w-[60ch] font-serif text-lg font-medium leading-snug text-ink">
           {motion}
         </h1>
@@ -265,7 +267,6 @@ export function Verdict({
 
   return (
     <div>
-      {sample && <SampleLabel className="mb-4" />}
       <div className="flex flex-wrap items-center gap-6">
         {/* The composite out of 100. It is not one of the three criteria,
             which is why it sits apart from them rather than as a fourth
@@ -283,10 +284,16 @@ export function Verdict({
         </div>
 
         <div className="min-w-0 flex-1">
-          {weekNumber != null && (
-            <p className="text-sm text-ink-mid">
-              Week {weekNumber} &middot; {template ? SAMPLE_ASSESSMENT.toLowerCase() : "verdict is in"}
-            </p>
+          {(weekNumber != null || sample) && (
+            <div className="flex flex-wrap items-center gap-x-3">
+              {weekNumber != null && (
+                <p className="text-sm text-ink-mid">
+                  Week {weekNumber}
+                  {!template && <> &middot; verdict is in</>}
+                </p>
+              )}
+              {sample && <SampleLabel note={template ? SAMPLE_JUDGE_NOTE : undefined} />}
+            </div>
           )}
           <h1 className="mt-1 max-w-[34ch] text-xl font-extrabold leading-tight tracking-tight text-ink">
             {textWithheld ? WITHHELD_HEADING : verdict.verdict_line}
@@ -330,11 +337,8 @@ export function Verdict({
           composite, and the composite is the circle above. */}
       <section className="mt-10 border-t-2 border-rule pt-8">
         <h2 className="text-lg font-extrabold tracking-tight text-ink">
-          {template ? SAMPLE_ASSESSMENT : "How the judge scored you"}
+          {template ? "Scores" : "How the judge scored you"}
         </h2>
-        {template && (
-          <p className="mt-2 max-w-[60ch] text-sm text-ink-mid">{SAMPLE_ASSESSMENT_NOTE}</p>
-        )}
         <ul className="mt-5 max-w-[40rem] space-y-4">
           {JUDGE_AXES.map((axis) => {
             const value = verdict[axis.key];
