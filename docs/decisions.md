@@ -5412,3 +5412,71 @@ launch step, after the teardown, on his word.
   `` `${NAME(…)}'s` ``); and that a fresh run's base window still starts
   on 2026-09-18, so its quiz v2 results and the new three's arguments are
   dated weeks before readers could have made them.
+
+### Gate 4: Arthur's rulings of 2026-11-08
+
+Arthur, 2026-11-08, on the click-through, the samples and the list:
+
+> CRON_SECRET is set in Vercel (Production, sensitive). Pick it up with
+> the next merge, then confirm from the logs that the keep-alive and the
+> re-screening job both return 200 on their next run.
+>
+> Samples (gate4-samples.md): approved, with one fix before the run.
+> Closing lines must fit their motion and not repeat stock phrases across
+> arguments: e.g. Ubuntu's "not the total" closing on Trained to be good
+> doesn't fit, and both Confucian samples end with the same sentence.
+> Write closings per motion (or check each against its motion) for all six
+> schools' banks, so exemplar pages never show the same ending twice.
+>
+> Revision verdicts that say "never meets an objection" while also saying
+> the revision meets one: fix in the fresh run.
+>
+> "That is why judging is paused rather than running" on /method and
+> /how-it-works: make it follow the kill switch, so it is only shown when
+> judging is actually paused.
+>
+> Supabase: Site URL https://sophecs.com, https://sophecs.com/** and the
+> preview pattern are in the redirect list. www redirect: [done.
+
+How each is carried out:
+
+- **The pause sentence.** `JudgeMethod` shows "That is why judging is
+  paused rather than running." only when `KILL_SWITCH_JUDGE` is the exact
+  string "true", the test `/debate` and `/today` already use; the
+  sentence before it stays. Both pages are prerendered, so the switch is
+  read at build, which matches its own rule (set it and redeploy).
+  Allowlisted accounts are not considered: the pages are the same for
+  every reader. `tests/nav-six.test.tsx` holds `/method` byte for byte to
+  main's render with the switch on, and to that render less the one
+  sentence with it unset, empty, "false", "TRUE" or "1".
+- **`CRON_SECRET`.** Vercel refused the value as set: Arthur's redeploy of
+  production at 01:16:35 UTC (`dpl_BGcegwBSDCMAt894edwVitEWUFvC`) ended
+  in `INVALID_CRON_SECRET` within two seconds, because the value holds a
+  character that is not valid in an HTTP header (Vercel allows visible
+  ASCII only). Production is still `dpl_3nPkpSEoLUbvaPGzCaq31qcBGVDu`,
+  which has no secret. Asked of Arthur: the value again, of letters and
+  digits only. Arthur, 2026-11-08: "CRON_SECRET re-entered, letters and
+  digits only, Production-only, sensitive. Go ahead with #107." (the
+  variable's record shows it changed at 01:59:53 UTC). The first
+  production deploy after that, #107's merge, picks it up;
+  confirming both jobs answer 200 comes after their next runs (Hobby
+  fires the keep-alive in the 04:00 hour and the re-screening job in the
+  05:00 hour, UTC), recorded in the progress log with how it was read.
+- **Closings per motion, and the revision verdicts.** In the fresh run
+  only, since the live run regenerates its rows from this code until the
+  teardown: a separate pull request.
+- **Supabase and the www redirect.** Supabase done by Arthur. For www,
+  Vercel's record of the domain has no redirect (`www.sophecs.com`,
+  `redirect: null`, unchanged since 2026-09-11). A request to
+  `https://www.sophecs.com/robots.txt` answered 308 to
+  `https://sophecs.com/robots.txt` (2026-11-08, 01:19 UTC), but that is
+  the app's own rule (`canonicalRedirects` in `next.config.ts`, #83 and
+  #85), which leaves `/api/` and `/_next` on www by design. Asked of
+  Arthur whether "done" means that rule. Arthur, 2026-11-08: "www: the
+  app's own 308 rule is fine. That's what I meant; no Vercel domain
+  redirect needed."
+- **Not ruled, so left as they are:** the other two things the run's
+  verdicts do ("Gate 4 item 13, second part", "Left as they are"): a
+  revision verdict that says an objection is now answered and still
+  suggests answering it, and "'s" after a name ending in "s". They stay on
+  Arthur's list.

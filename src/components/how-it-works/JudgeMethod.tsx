@@ -16,6 +16,13 @@
  */
 export function JudgeMethod({ sub = false }: { sub?: boolean }) {
   const H = sub ? "h3" : "h2";
+  // The pause sentence follows the kill switch (Arthur, 2026-11-08: "make
+  // it follow the kill switch, so it is only shown when judging is
+  // actually paused"). Read here, as /debate and /today read it, for
+  // display only: /api/judge owns the switch and decides. Both pages are
+  // prerendered, so this is read at build, which matches the switch's own
+  // rule: set it and redeploy.
+  const judgingPaused = process.env.KILL_SWITCH_JUDGE === "true";
   return (
     <>
       <div className="prose-reading mt-6">
@@ -65,8 +72,9 @@ export function JudgeMethod({ sub = false }: { sub?: boolean }) {
             wrong about your argument.
           </li>
           <li>
-            Verdict quality is still being checked against real arguments. That
-            is why judging is paused rather than running.
+            {judgingPaused
+              ? "Verdict quality is still being checked against real arguments. That is why judging is paused rather than running."
+              : "Verdict quality is still being checked against real arguments."}
           </li>
           <li>
             Sophecs is early stage. There is no evidence yet that it improves
