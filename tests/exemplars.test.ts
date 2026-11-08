@@ -215,9 +215,12 @@ describe("previewOf", () => {
     expect(previewOf("Deploy it.\n\nThe harm it spares is real.\n\nMore.")).toBe("Deploy it. The harm it spares is real.");
     expect(previewOf("Only one sentence here.")).toBe("Only one sentence here.");
   });
-  it("ends at a sentence end: one sentence when two would run long, a word cut only for one sentence longer than that", () => {
+  it("ends at a sentence end: one sentence when two would run long, never a short one alone, a word cut only for one sentence longer than that", () => {
     const long = `${"word ".repeat(70).trim()}.`;
-    expect(previewOf(`Deploy it. ${long} More.`)).toBe("Deploy it.");
+    // "Deploy it." alone is the filler Arthur named, so it keeps its second.
+    expect(previewOf(`Deploy it. ${long} More.`)).toBe(`Deploy it. ${long}`);
+    const first = "A deployer who cannot say why owes the people decided about an account all the same.";
+    expect(previewOf(`${first} ${long} More.`)).toBe(first);
     const longer = `${"word ".repeat(100).trim()}.`;
     expect(previewOf(longer).endsWith("…")).toBe(true);
     expect(previewOf(longer).length).toBeLessThanOrEqual(361);

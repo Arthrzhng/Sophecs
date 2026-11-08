@@ -31,7 +31,7 @@ export function BeforeLesson({ lesson }: { lesson: MicroLessonContent }) {
 
   return (
     <details onToggle={onToggle} className="group border-y border-rule py-4">
-      <summary className="flex cursor-pointer list-none items-center gap-2 text-sm text-ink [&::-webkit-details-marker]:hidden">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm text-ink [&::-webkit-details-marker]:hidden">
         <Chevron className="text-ink-soft" />
         Read the excerpt again: {lesson.title}
       </summary>

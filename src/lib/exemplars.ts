@@ -209,21 +209,22 @@ export async function getExemplars(
  * sentences after any frame sentence, cut at a sentence end (Arthur,
  * 2026-11-08: cards that open "Deploy it." read as filler; "Show the first
  * two sentences in the collapsed card (cut at a sentence end), so each card
- * reads like an argument"). One sentence if two would run past `max`
- * characters; a single sentence longer than that is cut at a word, as an
- * opening line is.
+ * reads like an argument"). Where two would run past `max` characters,
+ * one, but only if that one is at least `alone` characters: a short first
+ * sentence ("Deploy it.") is the filler the ruling names, so it keeps its
+ * second however long. A single sentence longer than `max` is cut at a
+ * word, as an opening line is.
  */
-export function previewOf(argument: string, sentences = 2, max = 360): string {
+export function previewOf(argument: string, sentences = 2, max = 360, alone = 60): string {
   const text = withoutFrame(argument).replace(/\s+/g, " ").trim();
   const all = text.split(/(?<=[.!?])\s+/);
-  for (let n = Math.min(sentences, all.length); n >= 1; n--) {
-    const preview = all.slice(0, n).join(" ");
-    if (preview.length <= max) return preview;
-  }
-  return openingOf(text, max);
+  const two = all.slice(0, Math.min(sentences, all.length)).join(" ");
+  if (two.length <= max) return two;
+  if (all[0].length < alone) return two;
+  return all[0].length <= max ? all[0] : openingOf(text, max);
 }
 
-/** The opening of an argument, for the line a reader opens it from. */
+/** The opening of an argument: its first sentence, which tells one exemplar from another. */
 export function openingOf(argument: string, max = 160): string {
   const text = argument.trim().replace(/\s+/g, " ");
   const sentence = /^.+?[.!?](?=\s|$)/.exec(text)?.[0];

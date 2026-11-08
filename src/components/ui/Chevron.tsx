@@ -1,7 +1,9 @@
 /**
- * The disclosure mark: a drawn chevron, never a character. iOS draws the
- * browser's own disclosure triangle, and the small triangles and arrows in
- * Unicode, as emoji (Arthur, 2026-11-08: "a plain drawn chevron (SVG or
+ * The disclosure mark: a drawn chevron, never a character. iOS drew the
+ * browser's own disclosure triangle (U+25B6) as an emoji, and several
+ * arrows and triangles in Unicode have an emoji form; the small ones the
+ * app used (U+25B8, U+2192) do not, but no character is used here at all
+ * (Arthur, 2026-11-08: "a plain drawn chevron (SVG or
  * CSS, currentColor, rotates when open) ... no Unicode arrows or
  * triangles that a phone can turn into emoji").
  *
