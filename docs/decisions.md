@@ -5481,6 +5481,385 @@ How each is carried out:
   suggests answering it, and "'s" after a name ending in "s". They stay on
   Arthur's list.
 
+### Gate 4: each motion's own closings, and the fresh run's revision verdicts (2026-11-08)
+
+Two of Arthur's rulings of 2026-11-08, quoted in full in the section
+above:
+
+> Closing lines must fit their motion and not repeat stock phrases across
+> arguments: e.g. Ubuntu's "not the total" closing on Trained to be good
+> doesn't fit, and both Confucian samples end with the same sentence.
+> Write closings per motion (or check each against its motion) for all six
+> schools' banks, so exemplar pages never show the same ending twice.
+>
+> Revision verdicts that say "never meets an objection" while also saying
+> the revision meets one: fix in the fresh run.
+
+- **Closings per motion.** 144, four for each school on each motion, in
+  `scripts/seed/arguments/fragments/closings-by-motion.json`, each written
+  to that motion and to the school's stance on it in the passages. Mine,
+  for Arthur's reading. `closings.json`, four for each school shared by
+  every motion, stays as it was. The first review read all 144 against
+  each motion and its school's passages and found about twenty that
+  restated a passage or the stance almost word for word, two schools'
+  closings on one page cut from one template, stock phrases ("keep
+  watching", "Ask ..., and the answer ..."), and some that did not fit:
+  a driver in a self-driving car, "not by fortune" (the Stoics' wording)
+  in a Confucian closing, and readings the passages do not carry
+  ("Nothing permanent is lost", "Ritual shapes the heart"). The second
+  review found more of the same that the first round's checks let
+  through, mostly a passage restated with its words inflected. The
+  third, which read each page's 24 closings together (on a page every
+  school shows all four of its closings), found that many of the second
+  round's rewrites had brought the same faults back in new words: a
+  passage paraphrased, a phrase or a sentence shape shared by two
+  schools on one page or by two of one school's four, and a few lines
+  that did not parse. Those were rewritten again, reading each page as a
+  whole. 87 of the 144 are rewritten in all.
+- **Held to:** `tests/seed/closings.test.ts`:
+  - every school, four on every motion, each one sentence of 10 to 30
+    words;
+  - none repeated, here or from `closings.json`;
+  - no five words in a row, and no first three words, in any two of them;
+  - by stem, so that "restates" and "restated" count as one word, and
+    counting a run only when two of its words carry content, the
+    motion's own words aside: no four words in a row from the school's
+    passages or its stance on the motion; no three in a row between two
+    schools on one motion, which is one exemplar page; no two within one
+    school's four. These catch a passage or another closing repeated
+    word for word or with its words inflected. They do not catch a
+    paraphrase, or a template whose shared words are mostly short ones
+    or the motion's own, which only reading finds;
+  - the house style ("program", the British spelling for code, is
+    allowed). The new three's are held to the quotation guard's rules too
+    (`tests/seed/launch-passages.test.ts`).
+- **Who reads them.** A run made with quiz v2 (the fresh run) closes its
+  arguments, revisions and exchange turns with its motion's own closings,
+  and the banks show them. A run that names no quiz closes with
+  `closings.json` as before, since the live run regenerates its rows from
+  this code until the teardown: its datasets are byte for byte as pinned.
+  The quiz v2 pins move, and are pinned again.
+- **Exemplar pages never show the same ending twice.** Closings alone do
+  not do it: a school's four exemplars on a page (one per opening) choose
+  among four closings, and a strong argument whose closing was cut to fit
+  ends on a body sentence.
+  - `selectExemplars` (`src/lib/exemplars.ts`) keeps no two arguments that
+    end on the same line, in any school. Its first pass is as before,
+    schools in their order and strongest first within each, with an
+    argument whose ending is already taken giving way to the strongest
+    under its opening whose ending is not. Where that
+    leaves an opening with nothing, a kept argument moves to the next
+    strongest under its own opening if that frees an ending the left-out
+    opening can take (an augmenting path, as in Kuhn's matching). So an
+    opening is left out only when no choice of one argument per opening
+    could show it, and where the first pass already shows every opening,
+    nothing moves.
+  - The first pass alone left openings out that a matching shows
+    (review pass 1: 143 or 142 of 144 on five of nine production-volume
+    quiz v2 seeds). With the matching, on 17 configurations (the
+    fixture's plan with quiz v2 and without; with quiz v2, seeds
+    `six-check`, `launch-b`, `launch-c` and `d1` to `d6`; with no quiz,
+    seeds `six-check`, `live-like-a` and `n1` to `n4`), every page shows
+    as many openings as any choice of one argument per opening could, and
+    no ending twice.
+  - Measured at production volume (seed `six-check`, base window to
+    2026-11-10 09:00 UTC, two weeks on): main's selection shows an ending
+    already on the page 48 times across the six motions in a quiz v2 run,
+    and 22 times in a run that names no quiz; this one never, with the
+    same number of arguments shown (144 and 72). It shows a different
+    argument in 51 and 25 of those places: another under the same
+    opening, the strongest whose ending is not already on the page, which
+    is the second strongest under it in 26 and 8 of them and as far down
+    as the fourteenth and thirteenth in others. On the fixture's small plan (quiz v2) it
+    shows 129 openings to main's 135 (main allows a repeated ending), which is as many as any choice could
+    show there.
+  - Not handled, as it cannot arise today: where a school has more
+    openings than its share of `EXEMPLARS_PER_MOTION`, the matching could
+    move a shown opening to a weaker argument to free an ending for one
+    the share then leaves out. A page has at most 24 openings against a
+    share total of 50.
+- **The live pages change too.** The rule is in the page's selection, so
+  it applies to the live run's rows from the merge, not only the fresh
+  run's. Read from production on 2026-11-08 around 02:20 UTC (one
+  read-only query, returning for each school's opening its candidates'
+  ranks and a hash of each one's ending, with the page's own filters):
+  main's selection shows 72 exemplars across the six pages and repeats an
+  ending 16 times, at least once on every page. With this rule it shows
+  the same 72 openings, repeats none, and shows a different argument in
+  16 places, each another under the same opening: the second strongest
+  under it in 4 of them, and down to the twelfth in the rest, marked 0 to
+  19 points lower than the one it replaces (review pass 2 measured this
+  from production's ranks and marks, read-only). In 3 of the 18 school
+  groups the order of the openings on the page changes with it, as a
+  school's cards come strongest first. The opening and ending
+  were computed in SQL to match `openingOf` and `endingOf`, except that a
+  first sentence over 160 characters is compared by its first 160.
+- **The fresh run's revision verdicts.** A revision that answers the
+  objection takes the first attempt's weakest move, which for a middling
+  argument opened "The argument never meets an objection." In a run made
+  with quiz v2, that move quotes the same passage (not always the same
+  words, since the quote is drawn again) but is described as a
+  strong argument's verdict describes one ("... is asserted more than
+  shown, and it carries weight the argument never quite earns."). No
+  draw is added: `tests/seed/verdicts.test.ts` checks over every banked
+  argument that the verdict and the draws after it are otherwise
+  identical. A revision that tried and missed keeps "never meets an
+  objection", which is true of it. A run that names no quiz writes what
+  it wrote.
+- **Not ruled, so left as they are:** a revision verdict that says an
+  objection is now answered and still suggests answering it, and "'s"
+  after a name ending in "s".
+- **The samples** (`docs/gate4-samples.md`) are regenerated from the
+  rebuilt banks: six of the nine now close with their motion's closings,
+  all six on a closing rewritten after the first review, and
+  nothing else in them changed.
+
+### Exemplar cards: a drawn chevron, and two sentences closed (2026-11-08)
+
+Arthur, 2026-11-08:
+
+> The exemplar cards show a ▶️ emoji (iOS renders the disclosure triangle
+> as an emoji). Replace it everywhere with a plain drawn chevron (SVG or
+> CSS, currentColor, rotates when open) or a quiet "Read" / "Hide" text
+> toggle; no Unicode arrows or triangles that a phone can turn into
+> emoji. Also: cards that open "Deploy it." or "A Stoic can accept this
+> motion." read as filler. Show the first two sentences in the collapsed
+> card (cut at a sentence end), so each card reads like an argument.
+
+- **The mark.** `src/components/ui/Chevron.tsx`: an inline SVG drawn in
+  `currentColor`, hidden from assistive technology, that points right
+  while its `<details>` is closed and down while it is open. It is two
+  paths, one shown per state, rather than one path rotated:
+  `design/tokens.md`, section 6, forbids any transform, and a disclosure
+  may animate only its height and opacity. Every `<summary>` in the app
+  now hides the browser's own marker (`list-none` and
+  `::-webkit-details-marker`), which is what iOS drew as an emoji. The
+  three disclosures that showed a mark use the chevron: the exemplar
+  cards, the excerpt under a motion (`BeforeLesson`, which drew the
+  character "▸" and rotated it) and "Show all" on `/me`
+  (`OpenObjections`, which showed the browser's marker). The site
+  header's menus and the sample label already hid the marker and show no
+  mark; they are unchanged.
+- **The closed card.** It shows the argument's first two sentences after
+  any frame sentence (`previewOf` in `src/lib/exemplars.ts`), cut at a
+  sentence end. Where two would run past 400 characters it shows one, but
+  never a first sentence under 60 characters alone ("Deploy it." is the
+  filler the ruling names), and a word cut with "…" only for a single
+  sentence longer than 400. The longest two sentences any composition of
+  the passages opens with run to 373 characters, so every card the
+  current passages make shows two; at 360, 577 Buddhist compositions on the opaque benefit would have
+  shown one. Open, the card shows "Hide" above the whole
+  argument. The opening line still decides which arguments count as one
+  (one exemplar per opening).
+- **Which characters have an emoji form.** iOS drew the browser's own
+  marker, U+25B6, as an emoji. Some arrows and triangles have an emoji
+  form (U+25B6, U+25C0, U+2194 to U+2199, U+21A9, U+21AA, U+27A1,
+  U+2934, U+2935, U+2B05 to U+2B07, U+23E9 and its neighbours); the ones
+  the app used or uses do not: "▸" (U+25B8, gone now), and "→" and "←"
+  (U+2192, U+2190), which the verdict page's rating line, the share text
+  and the school map on six-school builds still show. Those stay.
+- **Held to** by `tests/disclosures.test.tsx`: every `<summary>` in the
+  app hides the marker both ways; every `<details>` has a summary of its
+  own; every `<details>` that draws the chevron is a `group`; the
+  chevron's two poses are the right way round and it is hidden from
+  assistive technology; no summary in the source holds a character with
+  an emoji form, written as a literal, a JavaScript or CSS escape or a
+  numeric entity, and none uses a named entity outside a short list of
+  punctuation; no stylesheet in `src` and no Tailwind `content-[...]`
+  class draws one as `content`; and the excerpt toggle, the open
+  objections and the sample label, rendered, hold none.
+  `tests/exemplars-page.test.ts` checks the rendered exemplars page the
+  same way.
+- **Checked** at 390px in Chromium against the built stylesheet: the
+  closed card, the open card and no sideways scroll; every summary is at
+  least 44px tall. WebKit cannot run in this environment, so for iOS the
+  check is the markup above.
+- **For Arthur's list:** some closed cards end on a stock line from the
+  passages (mine). In `scripts/seed/arguments/fragments/crash-arithmetic.json`,
+  "Correct names matter." ends 1,637 of the Confucian previews a run can
+  make and "Impartiality is the heart of the view." 1,764 of the
+  Utilitarian ones; in `borrowed-judgement.json`, two Stoic previews (the
+  strong and the mid argument) end on the rival's point ("One might say
+  that trusting the assistant is itself a judgement.").
+
+### A pass over the whole site for what reads as machine-written (2026-11-08)
+
+Arthur, 2026-11-08:
+
+> Audit the whole site for anything that reads as AI-generated, and fix it
+> in UI copy and design (not frozen content files; list content issues for
+> me instead). Look for: any emoji, or Unicode symbols that render as
+> emoji (arrows, triangles, check marks, stars, sparkles); em dashes in UI
+> copy (house rule: none); stock AI phrasing: "delve", "unlock",
+> "elevate", "seamless", "journey", "dive into", "explore", "Here's...",
+> "Let's...", "not just X but Y", rule-of-three lists, rhetorical
+> questions as headings, exclamation marks; generic headings and
+> empty-state copy that could be on any site; repeated sentence openings
+> or identical endings across sample arguments and exemplars (closings per
+> motion, as I asked); sparkle/AI icons, gradient blobs, or decorative
+> effects not in design/tokens.md. Check every route at 390px on iOS
+> Safari rendering as well as Chromium.
+
+How it was read. Every user-visible string in `src/app`, `src/components`
+and `src/lib` was pulled out with the TypeScript parser (JSX text, string
+attributes, and strings in the properties pages use for copy), 615 in all,
+and read; the content folders were searched. That pass read strings as
+written and so missed three em dashes written as `\u2014` escapes; the
+first review found them with its own parser pass, which resolves escapes
+and entities. Every route that renders
+without the database (the landing page, the quiz, the schools and each
+school's page, the lessons, a passage and a module, the method and
+how-it-works pages, the rubric, sign-in, the table and the 404) was
+rendered at 390px in Chromium from a build with the flag off and one
+with it on, and each page's text scanned: no sideways scroll on any, no
+emoji, and no em dash outside the frozen files listed below. Pages that
+read the database (today, the motions, a debate, a verdict, `/me`) cannot
+render here without its credentials; their copy was read from the source,
+and the review rendered their fixtures on `/styleguide/arena` (a
+`SOPHECS_PREVIEW=1` build) at 390px with no sideways scroll. iOS Safari:
+not checked, as no WebKit can run here (`/opt/pw-browsers` holds Chromium
+only).
+
+- **Emoji.** None anywhere. No character with an emoji form is rendered;
+  the disclosure triangle Arthur reported is #109's fix. The arrows that
+  remain ("→" in the verdict's rating line and the share text, "←" and "→"
+  on the six-school map) have no emoji form.
+- **Em dashes in UI copy: all gone.** 19 in prose: in the share page, the quiz
+  result (both versions), the class note on `/me`, the display-name
+  placeholder, the recall note's save error, the verdict's "Answered"
+  link, the empty motion list, four lines of the argument editor, the
+  passage's source line, three lines of the rubric page, the lessons page
+  (its description and its empty state), and the site's preview image
+  text. Each is now a full stop, a comma, a colon or a semicolon, as the
+  sentence wanted. Nine more on the styleguide: it is unlinked and not
+  indexed, but `/styleguide` and `/styleguide/daily-path` are served in
+  production, so the eight on `/styleguide` (the type scale's six samples
+  and two notes) and a reading note on `/styleguide/arena`, which only a
+  preview build serves, take colons too. The arena page's fixture
+  argument keeps its dash: it stands for text a reader writes. A missing number
+  (the school tables' rank and fidelity, the verdict's score circle, its
+  criteria and its revision comparison) showed an em dash; it shows an en
+  dash, since a missing number is not prose and a dash keeps the column.
+  Comments and the code's own error messages keep theirs.
+  `tests/em-dashes.test.ts` now holds every `.tsx` file in `src` to this,
+  with escapes and entities resolved, so a dash written as `\u2014` or
+  `&mdash;` fails it too.
+- **Stock phrasing.** None of the listed words, no exclamation mark, no
+  "Here's" or "Let's", and no question as a page heading except two
+  confirmation dialogs ("Send this to the judge?") and the report form's
+  legend ("What's wrong with it?"), which ask a real question. The quiz's
+  "Answer as you actually think" keeps its "actually", which there does
+  real work: it is the contrast with what you have read. Changed: the rubric's fidelity line ("actually reason ... not
+  merely arrive", now "rather than only arriving"), the word-count hint
+  ("enough room to actually argue the case, not just assert it"), the
+  site's description ("which school of ethics you actually argue from"),
+  the landing page's "Keep your streak alive." (now what a streak day
+  is: a score of 40 or more), and the site's preview text, a three-beat
+  line ("Ten scenarios. Six schools. One result you'll want to argue
+  about."), now "Answer ten scenarios to find which of six schools of
+  ethics you argue from." Arthur accepted that line with the rest of the
+  v2 copy on 2026-11-07 (Gate 4 item 8, `docs/stage5-plan.md`); it is
+  changed under this later ruling, and goes back on his word.
+- **Generic copy.** The 404 page's heading, "Nothing here.", is now "No
+  page at this address." The rest of the empty states already say what is
+  missing and what to do ("No judged arguments yet this week. The table
+  fills in as they arrive."). The landing page's three numbered steps are
+  kept: they are the three things a reader does, in order.
+- **Copy that was not true.** The display-name field said a blank name
+  shows as "A Stoic"; it shows as the reader's own school's adherent, and
+  only in classes. The line now says so, above the field rather than in
+  it, where a phone cut it short. A verdict's link to its revision said
+  "Answered" even when the revision's verdict says the objection still
+  stands; it is now "Read your revision". The verdict called the rating
+  "ELO", where every other screen says "rating". The footer's "15 to 18
+  year olds" takes its hyphens.
+- **Repeated openings and endings.** Endings: #108 (each motion's own
+  closings, and no exemplar page showing an ending twice). Openings: in a
+  quiz v2 run 23 of 144 exemplar cards open on the same first sentence as
+  another school's card on their page, five of them "I reject the
+  motion." on one page, because 35 of the 144 positions open on a bare
+  statement of the stance: "I reject the motion.", "I accept the
+  motion." and the like, and on opaque-benefit "Deploy it." and
+  "Deploying it is wrong as stated." That is the generator's, and goes in
+  its own change after #108.
+- **Decorative effects.** No gradient blob, glow, sparkle or AI icon; the
+  one gradient draws a module's progress ring. The Daily path's motion
+  (a confetti burst after the reading check, the bobbing "Up next", the
+  pulsing ring around the current step, the flame's flicker, the chunky
+  button's press, and in `src/app/globals.css` `.pop`'s scale, `.enter`'s
+  rise on mount, `.sheet`'s slide, and `.reveal` on the lesson's next
+  stretch where section 6 allows it only for the verdict) is not in
+  `design/tokens.md`, whose section 6 forbids any transform. Nor are the
+  5px drop edge on content cards (section 5 allows no other shadow), the
+  18 and 22px container radii, where section 4 sets containers square
+  and calls rounded ones "the shape of every AI-generated landing page",
+  or the 14px control radius and 10px badge radius, where it sets
+  controls at 6px. All came with the Daily path
+  mockups, which the record above says superseded the tokens where they
+  disagree. Left, and put to Arthur.
+- **Tests.** The flag-off markup fixtures (`tests/nav-six-flag-off/`)
+  hold production's pages to main's render; the rubric and school-table
+  fixtures take exactly the same text changes, so they still show nothing
+  else moved.
+
+For Arthur's list, in files this pass may not change:
+- `content/schools/stoicism.md` (3 em dashes), `utilitarianism.md` (3),
+  `virtue-ethics.md` (5, one in a share line: "Apparently I judge an
+  algorithm the same way I judge a person — not by the rule it follows");
+- `content/micro/borrowed-judgement-before.md` and
+  `moral-training-before.md`, one each;
+- `content/quiz/questions.ts`, four in three of quiz v1's questions and
+  answers, which production shows until the launch;
+- "not just X" and "not only X but Y", which Arthur named:
+  `content/schools/utilitarianism.md:46-47`, a share line ("count
+  everyone it touches, not just the person in front of you");
+  `buddhist.md:41`, a share line ("not just what it scored");
+  `ubuntu.md:21` ("not only an unfair output but a failure of relational
+  personhood"); `content/micro/borrowed-judgement-elsewhere.md:29`
+  ("does not merely choose for you"); `content/modules/what-is-up-to-us.md:32`,
+  `greatest-happiness.md:32` and `relational-data.md:57`;
+  `content/quiz/questions.ts:190` ("integrity, not just correct math");
+  `docs/quiz-v2.json:192` ("It is not only my information to give away.");
+- American spellings in content: "behavior" (`virtue-ethics.md:20`),
+  "minimize" (`utilitarianism.md:21`, `questions.ts:184`), "minimizes"
+  (`questions.ts:57`), "Recognize" (`questions.ts:94`) and "math"
+  (`questions.ts:190`);
+- the criterion's label "Rigor" (`src/lib/judge-axes.ts`, the rubric and
+  method pages), taken word for word from `docs/daily-path-copy.md`
+  section 6: "Rigour" in British spelling, or as it is;
+- a missing number shows as an en dash, which a screen reader reads as
+  "en dash" or not at all; a word such as "none" would read on both;
+- the sample arguments' frames "Here is my answer." and "Let me say where
+  I land." (`SAMPLE_FRAMES` in `src/lib/exemplars.ts`), the "Here's" and
+  "Let's" family. In a run at production volume (seed `six-check`,
+  counted by the first review) 99 of the 3,643 published originals open
+  on "Here is my answer." and none on the other, and no exemplar card
+  shows either, as the page strips them.
+  Changing them changes the live run's rows, so they wait for the fresh
+  run's generator;
+- `src/lib/judge/rubric.ts` (frozen under (b)): the fidelity criteria
+  `/debate/rubric` shows in full have two em dashes; "not just the
+  agent's, and not just one favored group's", "not just the act's
+  conformity to a rule" (lines 52 to 53) and "not merely assert a
+  direction" (line 38); "judgments" (lines 19, 23 and 57) where the site
+  writes "judgement"; and the American "maximizes" and "favored". The v3
+  text a flag-on build also shows has "when interests genuinely
+  conflict" (line 160) and "judgment" (lines 126 and 145). Changing any
+  of them changes what the judge receives;
+- `src/lib/judge/objection-voices.ts`, which goes into the judge's v3
+  request, so (b) as well: "justifiable to that person, not only to the
+  total" (line 42) and "judgment" (line 72);
+- `content/prompts/fidelity-criteria.draft.md:114`, "a failure of
+  relationship, not only a bad output", and
+  `content/micro/no-decision-elsewhere.md:15`, "why it is not merely
+  verbal", the same construction as the elsewhere passage above;
+- `src/app/api/counterpart/turn/route.ts` (frozen): the error "Quote a
+  whole sentence — at least 10 characters.";
+- the Daily path's motion above: keep or cut;
+- the preview image and the share card ask "Which school do you think
+  in?". Kept: it is an invitation to the reader, which the quiz answers
+  for them, not a heading the page answers itself.
+
 ### The launch merge (2026-11-08)
 
 Arthur, 2026-11-08: "Launch: approved." After the exemplar cards (#109),

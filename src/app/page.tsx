@@ -199,7 +199,7 @@ const STEPS = [
   },
   {
     title: "Get the verdict",
-    body: "Scored on three axes, including fidelity to your school. Keep your streak alive.",
+    body: "Scored on three axes, including fidelity to your school. A score of 40 out of 100 or more counts that day towards your streak.",
     badge: "var(--color-correct)",
     badgeInk: "#ffffff",
   },

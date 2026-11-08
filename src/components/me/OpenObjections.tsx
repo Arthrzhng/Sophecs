@@ -1,3 +1,4 @@
+import { Chevron } from "@/components/ui/Chevron";
 import { SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { OpenObjection } from "@/lib/objections";
 import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
@@ -90,9 +91,10 @@ export function OpenObjections({
       </ul>
 
       {rest > 0 && (
-        <details className="mt-5">
-          <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-ink underline underline-offset-4">
-            Show all ({objections.length})
+        <details className="group mt-5">
+          <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-ink [&::-webkit-details-marker]:hidden">
+            <Chevron className="text-ink-soft" />
+            <span className="underline underline-offset-4">Show all ({objections.length})</span>
           </summary>
           <ul className="mt-4 flex flex-col gap-4">
             {objections.slice(VISIBLE).map((o) => (

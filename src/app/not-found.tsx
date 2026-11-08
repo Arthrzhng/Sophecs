@@ -13,7 +13,7 @@ export default function NotFound() {
   return (
     <Page width="read" rhythm="path">
       <h1 className="text-xl font-extrabold leading-tight tracking-tight text-ink">
-        Nothing here.
+        No page at this address.
       </h1>
       <p className="mt-4 max-w-[48ch] text-base leading-relaxed text-ink-mid">
         The page you followed doesn&apos;t exist, or it moved.

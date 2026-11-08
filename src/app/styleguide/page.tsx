@@ -72,12 +72,12 @@ const SATURATED = [
 ];
 
 const TYPE_STEPS: { step: string; px: string; sample: string; cls: string }[] = [
-  { step: "xl", px: "34px", sample: "Serif 500 — page titles and motions", cls: "font-serif text-xl font-medium" },
-  { step: "lg", px: "24px", sample: "Serif 500 — section headings", cls: "font-serif text-lg font-medium" },
-  { step: "md", px: "19px", sample: "Serif 400 — reading body, the only step with one family", cls: "font-serif text-md" },
-  { step: "base", px: "16px", sample: "Sans 400 — interface body", cls: "font-sans text-base" },
-  { step: "sm", px: "14px", sample: "Sans 400 — labels, secondary prose", cls: "font-sans text-sm" },
-  { step: "xs", px: "12px", sample: "Sans 400 — metadata and captions", cls: "font-sans text-xs" },
+  { step: "xl", px: "34px", sample: "Serif 500: page titles and motions", cls: "font-serif text-xl font-medium" },
+  { step: "lg", px: "24px", sample: "Serif 500: section headings", cls: "font-serif text-lg font-medium" },
+  { step: "md", px: "19px", sample: "Serif 400: reading body, the only step with one family", cls: "font-serif text-md" },
+  { step: "base", px: "16px", sample: "Sans 400: interface body", cls: "font-sans text-base" },
+  { step: "sm", px: "14px", sample: "Sans 400: labels, secondary prose", cls: "font-sans text-sm" },
+  { step: "xs", px: "12px", sample: "Sans 400: metadata and captions", cls: "font-sans text-xs" },
 ];
 
 export default function StyleguidePage() {
@@ -210,7 +210,7 @@ export default function StyleguidePage() {
             </div>
           ))}
           <p className="text-sm text-ink-mid">
-            Hover and focus are live — tab through the row above. There is no
+            Hover and focus are live: tab through the row above. There is no
             hover transition: a 180ms fade between intent and acknowledgement
             buys nothing.
           </p>
@@ -264,7 +264,7 @@ export default function StyleguidePage() {
         </div>
       </Section>
 
-      <Section title="Dialog and toast" note="Dialog is the native element — the browser supplies the focus trap, Escape and top-layer stacking. Both are allowed a shadow because they genuinely float. The confirm is coloured for whoever is acting: the reader's school here, error when the act is destructive, ink only where the reader has no school.">
+      <Section title="Dialog and toast" note="Dialog is the native element: the browser supplies the focus trap, Escape and top-layer stacking. Both are allowed a shadow because they float above the page. The confirm is coloured for whoever is acting: the reader's school here, error when the act is destructive, ink only where the reader has no school.">
         <InteractiveSection />
       </Section>
 

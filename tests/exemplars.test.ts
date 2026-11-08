@@ -4,7 +4,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { FRAMES } from "../scripts/seed/banks";
 import { TYPOS } from "../scripts/seed/generate";
-import { EXEMPLAR_CANDIDATES_PER_SCHOOL, EXEMPLAR_FLOOR, EXEMPLARS_PER_MOTION, SAMPLE_FRAMES, SAMPLE_TYPO, getExemplars, withoutFrame, openingOf, selectExemplars, type ExemplarCandidate } from "../src/lib/exemplars";
+import { EXEMPLAR_CANDIDATES_PER_SCHOOL, EXEMPLAR_FLOOR, EXEMPLARS_PER_MOTION, SAMPLE_FRAMES, SAMPLE_TYPO, endingOf, getExemplars, withoutFrame, openingOf, previewOf, selectExemplars, type ExemplarCandidate } from "../src/lib/exemplars";
 import type { SchoolId } from "../src/lib/types";
 
 const SCHOOLS: SchoolId[] = ["stoicism", "utilitarianism", "virtue-ethics"];
@@ -57,6 +57,65 @@ describe("selectExemplars", () => {
       ["stoicism", "utilitarianism"]
     );
     expect(chosen.get("stoicism")!.map((e) => e.id)).toEqual(["s1", "s3"]);
+    expect(chosen.get("utilitarianism")!.map((e) => e.id)).toEqual(["u1"]);
+  });
+
+  it("never shows the same ending twice: the next strongest under the opening takes its place, in any school", () => {
+    // Arthur, 2026-11-08: "so exemplar pages never show the same ending twice".
+    const row = (id: string, school: SchoolId, argument: string, score = 80): ExemplarCandidate => ({ id, school, argument, is_sample: true, score });
+    const chosen = selectExemplars(
+      new Map([
+        [
+          "stoicism",
+          [
+            row("s1", "stoicism", "Deploy it. A reason. The judging is what was ours."),
+            row("s2", "stoicism", "Do not deploy it. Another reason.  the judging is WHAT was ours.", 79),
+            row("s3", "stoicism", "Do not deploy it. Another reason. Only assent is ours.", 78),
+            row("s4", "stoicism", "Wait and see. A third reason. Only assent is ours.", 77),
+          ],
+        ],
+        ["utilitarianism", [row("u1", "utilitarianism", "Count it. A sum. The judging is what was ours."), row("u2", "utilitarianism", "Count it. A sum. Then the total decides.", 70)]],
+      ] as [SchoolId, ExemplarCandidate[]][]),
+      ["stoicism", "utilitarianism"]
+    );
+    // s2 ends as s1 does, so s3 is shown under its opening; s4 ends as s3
+    // does and has no other under its own, so that opening is left out.
+    expect(chosen.get("stoicism")!.map((e) => e.id)).toEqual(["s1", "s3"]);
+    // And across schools: u1 ends as s1 does.
+    expect(chosen.get("utilitarianism")!.map((e) => e.id)).toEqual(["u2"]);
+    expect(endingOf("One. Two?  Three!")).toBe("Three!");
+    expect(endingOf("Only one sentence")).toBe("Only one sentence");
+  });
+
+  it("moves a kept argument to the next under its opening when that is the only way to show another opening", () => {
+    // Shaped like the case review pass 1 found (seed launch-c, careful-builder,
+    // Virtue Ethics): the strongest under "Deploy it." takes the ending the
+    // only argument under "Do not deploy it." has, and a weaker one under
+    // "Deploy it." has an ending of its own.
+    const row = (id: string, argument: string, score: number): ExemplarCandidate => ({ id, school: "virtue-ethics", argument, is_sample: true, score });
+    const rows = [
+      row("a1", "Deploy it. A reason. Blame is owed.", 90),
+      row("b1", "Do not deploy it. Another reason. Blame is owed.", 80),
+      row("a2", "Deploy it. A third reason. A clean conscience is not earned.", 70),
+      row("c1", "Wait and see. A fourth reason. Repair comes first.", 60),
+    ];
+    const chosen = selectExemplars(new Map([["virtue-ethics", rows]]), ["virtue-ethics"]).get("virtue-ethics")!;
+    expect(chosen.map((e) => e.id)).toEqual(["b1", "a2", "c1"]);
+    // Where every opening finds an ending of its own, nothing moves.
+    const easy = [rows[0], row("b2", "Do not deploy it. Another reason. Repair is owed.", 80), rows[2], rows[3]];
+    expect(selectExemplars(new Map([["virtue-ethics", easy]]), ["virtue-ethics"]).get("virtue-ethics")!.map((e) => e.id)).toEqual(["a1", "b2", "c1"]);
+  });
+
+  it("moves arguments across schools too, as the endings are shared between them", () => {
+    const row = (id: string, school: SchoolId, argument: string, score: number): ExemplarCandidate => ({ id, school, argument, is_sample: true, score });
+    const chosen = selectExemplars(
+      new Map([
+        ["stoicism", [row("s1", "stoicism", "Deploy it. A. The judging is ours.", 90), row("s2", "stoicism", "Deploy it. B. Only assent is ours.", 70)]],
+        ["utilitarianism", [row("u1", "utilitarianism", "Count it. C. The judging is ours.", 85)]],
+      ] as [SchoolId, ExemplarCandidate[]][]),
+      ["stoicism", "utilitarianism"]
+    );
+    expect(chosen.get("stoicism")!.map((e) => e.id)).toEqual(["s2"]);
     expect(chosen.get("utilitarianism")!.map((e) => e.id)).toEqual(["u1"]);
   });
 
@@ -137,7 +196,7 @@ describe("selectExemplars", () => {
 
   it("returns no score", () => {
     const [first] = selectExemplars(new Map([["stoicism", made("stoicism", 1)]]), ["stoicism"]).get("stoicism")!;
-    expect(Object.keys(first).sort()).toEqual(["argument", "id", "opening", "school"]);
+    expect(Object.keys(first).sort()).toEqual(["argument", "id", "opening", "preview", "school"]);
   });
 });
 
@@ -204,6 +263,33 @@ describe("getExemplars", () => {
     const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
     await expect(getExemplars(admin, "no-decision", "The motion.", SCHOOLS)).rejects.toThrow("no-decision/utilitarianism");
     quiet.mockRestore();
+  });
+});
+
+describe("previewOf", () => {
+  // Arthur, 2026-11-08: "Show the first two sentences in the collapsed card
+  // (cut at a sentence end), so each card reads like an argument."
+  it("is the first two sentences after any frame, across a paragraph break too", () => {
+    expect(previewOf("Here is my answer. Deploy it. The harm it spares is real. And more.")).toBe("Deploy it. The harm it spares is real.");
+    expect(previewOf("Deploy it.\n\nThe harm it spares is real.\n\nMore.")).toBe("Deploy it. The harm it spares is real.");
+    expect(previewOf("Only one sentence here.")).toBe("Only one sentence here.");
+  });
+  it("ends at a sentence end: two up to 400 characters, one past that unless it is under 60, a word cut only for one sentence over 400", () => {
+    // A sentence of exactly n characters, full stop included.
+    const sentence = (n: number) => `${"x".repeat(n - 1)}.`;
+    expect(previewOf(`${sentence(60)} ${sentence(339)} More.`)).toBe(`${sentence(60)} ${sentence(339)}`); // 400
+    expect(previewOf(`${sentence(60)} ${sentence(340)} More.`)).toBe(sentence(60)); // 401
+    // "Deploy it." alone is the filler Arthur named, so a first sentence
+    // under 60 characters keeps its second however long.
+    expect(previewOf(`${sentence(59)} ${sentence(400)} More.`)).toBe(`${sentence(59)} ${sentence(400)}`);
+    expect(previewOf(`${sentence(60)} ${sentence(400)} More.`)).toBe(sentence(60));
+    const longer = `${"word ".repeat(100).trim()}.`;
+    expect(previewOf(longer).endsWith("…")).toBe(true);
+    expect(previewOf(longer).length).toBeLessThanOrEqual(401);
+  });
+  it("is what selectExemplars gives each exemplar", () => {
+    const [first] = selectExemplars(new Map([["stoicism", made("stoicism", 1, { argument: "My position is simple. Do not deploy it. It owes them reasons. Third." })]]), ["stoicism"]).get("stoicism")!;
+    expect(first.preview).toBe("Do not deploy it. It owes them reasons.");
   });
 });
 

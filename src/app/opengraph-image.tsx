@@ -3,7 +3,7 @@ import { loadOgFonts } from "@/lib/og-fonts";
 import { OG_INK, OG_INK_MID, OG_PAPER, SCHOOL_MARKER } from "@/lib/card-tokens";
 import { PUBLISHED_SCHOOL_IDS } from "@/lib/school-registry";
 
-export const alt = "Sophecs — which school do you think in?";
+export const alt = "Sophecs: which school do you think in?";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -60,8 +60,8 @@ export default async function SiteOgImage() {
             }}
           >
             {process.env.SIX_SCHOOLS === "1"
-              ? "Ten scenarios. Six schools. One result you'll want to argue about."
-              : "Ten scenarios. Three schools. One result you'll want to argue about."}
+              ? "Answer ten scenarios to find which of six schools of ethics you argue from."
+              : "Answer ten scenarios to find which of three schools of ethics you argue from."}
           </div>
         </div>
 

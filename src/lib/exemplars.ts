@@ -16,8 +16,9 @@ import type { SchoolId } from "@/lib/types";
  * shows only those.
  *
  * One per opening line in each school: the sample run writes four positions
- * per school on a motion, so the strongest argument under each is the one
- * shown and the page never lists the same line to open twice in a school
+ * per school on a motion, so one argument under each is shown (the
+ * strongest, unless its ending is taken; see selectExemplars) and the page
+ * never lists the same line to open twice in a school
  * (Arthur, 2026-11-06, accepting that in place of 50 that repeat). Highest template mark first, shared out evenly
  * across the schools up to EXEMPLARS_PER_MOTION, which today's data never
  * reaches. Nothing marked under EXEMPLAR_FLOOR is shown. No mark is
@@ -55,8 +56,10 @@ export interface Exemplar {
   id: string;
   school: SchoolId;
   argument: string;
-  /** The line a reader opens it from: its first sentence after any frame. */
+  /** Its first sentence after any frame: how the page tells openings apart. */
   opening: string;
+  /** What its card shows closed: the first two sentences after any frame. */
+  preview: string;
 }
 
 export interface ExemplarCandidate {
@@ -72,7 +75,8 @@ export interface ExemplarCandidate {
  * The sentences the sample run puts in front of some arguments before the
  * position (scripts/seed/banks.ts, FRAMES): "Here is my answer." says
  * nothing a reader can choose by, and two arguments that differ only by one
- * open the same way. Skipped for the opening line, never cut from the text.
+ * open the same way. Skipped for the opening line and the closed card's
+ * preview, never cut from the text.
  */
 export const SAMPLE_FRAMES = [
   "Here is my answer.",
@@ -83,7 +87,7 @@ export const SAMPLE_FRAMES = [
   "Let me say where I land.",
 ] as const;
 
-/** An argument without a leading frame sentence, for its opening line. */
+/** An argument without a leading frame sentence, for its opening line and its preview. */
 export function withoutFrame(argument: string): string {
   const text = argument.trim();
   for (const frame of SAMPLE_FRAMES) {
@@ -102,38 +106,111 @@ export const SAMPLE_TYPO = /\b(?:becuase|definately|thier|wich|arguement|realy|d
 const normalise = (text: string) => text.trim().replace(/\s+/g, " ").toLowerCase();
 
 /**
- * From each school's candidates, strongest first, keep the first under each
- * opening line (its first sentence after any frame), then choose up to `total` between the schools: an even
- * share each, the remainder to the schools listed first, and any share a
- * school cannot fill passed to the others. An exact repeat of a text
- * already kept, in any school, is dropped too, and so is any argument with
- * one of the sample run's deliberate misspellings or marked under
- * EXEMPLAR_FLOOR. As the candidates come strongest first, an opening whose
- * strongest argument is under the floor is left out.
+ * The line an argument ends on: its last sentence. A sample argument ends
+ * on its closing when it has one, and the sample run gives each school four
+ * closings on a motion, so without this rule two of a school's exemplars
+ * could end the same way (Arthur, 2026-11-08: "so exemplar pages never
+ * show the same ending twice").
+ */
+export function endingOf(argument: string): string {
+  const sentences = argument.trim().split(/(?<=[.!?])\s+/);
+  return sentences[sentences.length - 1];
+}
+
+/**
+ * From each school's candidates, strongest first, keep one under each
+ * opening line (its first sentence after any frame), normally the first
+ * (see below for when it is not), then choose up to
+ * `total` between the schools: an even share each, the remainder to the
+ * schools listed first, and any share a school cannot fill passed to the
+ * others. Any argument with one of the sample run's deliberate misspellings
+ * or marked under EXEMPLAR_FLOOR is left out, so an opening whose strongest
+ * argument is under the floor is left out too.
+ *
+ * No two kept arguments, in any school, end on the same line (`endingOf`;
+ * Arthur, 2026-11-08: "so exemplar pages never show the same ending
+ * twice"), so none repeats another's text either. The first pass takes
+ * schools in order and each school's candidates strongest first: where the
+ * strongest under an opening ends as an argument already kept does (a
+ * stronger one in its school, or any in a school listed before it), the
+ * strongest under it whose ending is free takes its place. Where none
+ * under an opening is left, a kept argument gives way to another under its
+ * own opening whose ending is free, or can be freed the same way along a
+ * chain of such moves, when that frees an ending the left-out opening can
+ * take (an augmenting path, as in Kuhn's matching), so an opening is left out only when no choice of one
+ * argument per opening could show it. Where every opening finds an ending
+ * at once, nothing moves.
  */
 export function selectExemplars(
   candidatesBySchool: ReadonlyMap<SchoolId, readonly ExemplarCandidate[]>,
   schools: readonly SchoolId[],
   total: number = EXEMPLARS_PER_MOTION
 ): Map<SchoolId, Exemplar[]> {
-  const seen = new Set<string>();
-  const pools = new Map<SchoolId, Exemplar[]>();
-  for (const school of schools) {
-    const pool: Exemplar[] = [];
-    const openings = new Set<string>();
-    for (const c of candidatesBySchool.get(school) ?? []) {
-      if (!c.is_sample || c.school !== school || !c.argument?.trim() || SAMPLE_TYPO.test(c.argument)) continue;
-      if (typeof c.score !== "number" || c.score < EXEMPLAR_FLOOR) continue;
-      const text = normalise(c.argument);
-      const opening = openingOf(withoutFrame(c.argument));
-      const openingKey = normalise(opening);
-      if (seen.has(text) || openings.has(openingKey)) continue;
-      seen.add(text);
-      openings.add(openingKey);
-      pool.push({ id: c.id, school: c.school, argument: c.argument.trim(), opening });
-    }
-    pools.set(school, pool);
+  /** One opening line in one school, and the arguments under it, strongest first. */
+  interface Slot {
+    school: SchoolId;
+    options: { at: number; exemplar: Exemplar; ending: string }[];
+    taken?: number;
   }
+  const slots: Slot[] = [];
+  for (const school of schools) {
+    const bySchool = new Map<string, Slot>();
+    (candidatesBySchool.get(school) ?? []).forEach((c, at) => {
+      if (!c.is_sample || c.school !== school || !c.argument?.trim() || SAMPLE_TYPO.test(c.argument)) return;
+      if (typeof c.score !== "number" || c.score < EXEMPLAR_FLOOR) return;
+      const opening = openingOf(withoutFrame(c.argument));
+      const key = normalise(opening);
+      let slot = bySchool.get(key);
+      if (!slot) bySchool.set(key, (slot = { school, options: [] }));
+      slot.options.push({ at, ending: normalise(endingOf(c.argument)), exemplar: { id: c.id, school: c.school, argument: c.argument.trim(), opening, preview: previewOf(c.argument) } });
+    });
+    slots.push(...bySchool.values());
+  }
+
+  // First pass, as the candidates come: each opening takes its strongest
+  // argument whose ending no argument kept before it has taken.
+  const holder = new Map<string, Slot>();
+  const order = slots
+    .flatMap((slot) => slot.options.map((option, i) => ({ slot, i, school: schools.indexOf(slot.school), at: option.at })))
+    .sort((a, b) => a.school - b.school || a.at - b.at);
+  for (const { slot, i } of order) {
+    const { ending } = slot.options[i];
+    if (slot.taken !== undefined || holder.has(ending)) continue;
+    slot.taken = i;
+    holder.set(ending, slot);
+  }
+
+  // Then each opening left out tries to free an ending: an argument
+  // holding one moves to the strongest other under its own opening whose
+  // ending is free, or can itself be freed, along a chain if need be.
+  const free = (slot: Slot, tried: Set<string>): boolean => {
+    for (let i = 0; i < slot.options.length; i++) {
+      const { ending } = slot.options[i];
+      if (tried.has(ending)) continue;
+      tried.add(ending);
+      const current = holder.get(ending);
+      if (current === slot) continue;
+      if (current === undefined || free(current, tried)) {
+        if (slot.taken !== undefined) holder.delete(slot.options[slot.taken].ending);
+        slot.taken = i;
+        holder.set(ending, slot);
+        return true;
+      }
+    }
+    return false;
+  };
+  for (const slot of slots) if (slot.taken === undefined) free(slot, new Set());
+
+  const pools = new Map<SchoolId, Exemplar[]>(
+    schools.map((school) => [
+      school,
+      slots
+        .filter((slot) => slot.school === school && slot.taken !== undefined)
+        .map((slot) => slot.options[slot.taken!])
+        .sort((a, b) => a.at - b.at)
+        .map((option) => option.exemplar),
+    ])
+  );
 
   const chosen = new Map<SchoolId, Exemplar[]>(schools.map((s) => [s, []]));
   let left = total;
@@ -202,7 +279,28 @@ export async function getExemplars(
   return selectExemplars(bySchool, schools);
 }
 
-/** The opening of an argument, for the line a reader opens it from. */
+/**
+ * What an exemplar's card shows while it is closed: the first two
+ * sentences after any frame sentence, cut at a sentence end (Arthur,
+ * 2026-11-08: cards that open "Deploy it." read as filler; "Show the first
+ * two sentences in the collapsed card (cut at a sentence end), so each card
+ * reads like an argument"). Where two would run past `max` characters
+ * (the longest two any composition of the passages gives is 373),
+ * one, but only if that one is at least `alone` characters: a short first
+ * sentence ("Deploy it.") is the filler the ruling names, so it keeps its
+ * second however long. A single sentence longer than `max` is cut at a
+ * word, as an opening line is.
+ */
+export function previewOf(argument: string, sentences = 2, max = 400, alone = 60): string {
+  const text = withoutFrame(argument).replace(/\s+/g, " ").trim();
+  const all = text.split(/(?<=[.!?])\s+/);
+  const two = all.slice(0, Math.min(sentences, all.length)).join(" ");
+  if (two.length <= max) return two;
+  if (all[0].length < alone) return two;
+  return all[0].length <= max ? all[0] : openingOf(text, max);
+}
+
+/** The opening of an argument: its first sentence, which tells one exemplar from another. */
 export function openingOf(argument: string, max = 160): string {
   const text = argument.trim().replace(/\s+/g, " ");
   const sentence = /^.+?[.!?](?=\s|$)/.exec(text)?.[0];

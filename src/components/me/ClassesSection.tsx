@@ -165,8 +165,8 @@ export function ClassesSection({
           </ChunkyButton>
         </div>
         <p className="mt-3 max-w-[54ch] text-sm leading-relaxed text-ink-soft">
-          Your teacher will see which motions you&apos;ve read, argued and answered — not your
-          arguments, scores or rating.
+          Your teacher will see which motions you&apos;ve read, argued and answered. They will
+          not see your arguments, scores or rating.
         </p>
       </div>
 

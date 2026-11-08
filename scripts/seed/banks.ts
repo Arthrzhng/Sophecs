@@ -1,6 +1,7 @@
 // The argument banks: scripts/seed/arguments/<topic>.<school>.json, forty
 // arguments each, for BANK_SCHOOLS, composed from the hand-written passages in
-// arguments/fragments/<topic>.json and arguments/fragments/closings.json.
+// arguments/fragments/<topic>.json and each motion's own closings,
+// arguments/fragments/closings-by-motion.json.
 //
 // The passages are the reviewable source; the banks are built from them by
 // `npm run seed:banks` and committed, and tests/seed/banks.test.ts fails if
@@ -83,6 +84,20 @@ export interface TopicFragments {
 
 export type Closings = Record<SchoolId, string[]>;
 
+/**
+ * Closings written for each motion (Arthur, 2026-11-08: "Closing lines
+ * must fit their motion and not repeat stock phrases across arguments ...
+ * Write closings per motion ... for all six schools' banks, so exemplar
+ * pages never show the same ending twice"), in
+ * arguments/fragments/closings-by-motion.json: four for each school on
+ * each motion, as `closings.json` has four for each school. A run made
+ * with quiz v2 (the fresh run) closes its arguments and exchange turns
+ * with these, and the banks show them; a run that names no quiz keeps
+ * `closings.json`, since the live run regenerates its rows from this code
+ * until the teardown.
+ */
+export type MotionClosings = Record<TopicSlug, Closings>;
+
 /** Which passages an argument is made of. Indices into the fragments. */
 export interface Parts {
   position: number;
@@ -137,6 +152,10 @@ export function loadFragments(topic: TopicSlug): TopicFragments {
 
 export function loadClosings(): Closings {
   return JSON.parse(readFileSync(join(ARGUMENT_DIR, "fragments", "closings.json"), "utf8"));
+}
+
+export function loadMotionClosings(): MotionClosings {
+  return JSON.parse(readFileSync(join(ARGUMENT_DIR, "fragments", "closings-by-motion.json"), "utf8"));
 }
 
 export function objectionSentence(o: Objection): string {
@@ -316,13 +335,14 @@ export function serialiseBank(bank: BankArgument[]): string {
   return JSON.stringify(bank, null, 2) + "\n";
 }
 
+/** The banks show the fresh run's arguments, so each motion's own closings. */
 export function writeBanks(): string[] {
-  const closings = loadClosings();
+  const closings = loadMotionClosings();
   const written: string[] = [];
   for (const topic of TOPICS) {
     const fr = loadFragments(topic);
     for (const school of BANK_SCHOOLS) {
-      writeFileSync(bankPath(topic, school), serialiseBank(buildBank(fr, closings, school)));
+      writeFileSync(bankPath(topic, school), serialiseBank(buildBank(fr, closings[topic], school)));
       written.push(bankPath(topic, school));
     }
   }
@@ -331,7 +351,10 @@ export function writeBanks(): string[] {
 
 export interface Banks {
   fragments: Record<TopicSlug, TopicFragments>;
+  /** A run that names no quiz closes with these. */
   closings: Closings;
+  /** A run made with quiz v2 closes with these, each motion's own. */
+  motionClosings: MotionClosings;
   arguments: Record<string, BankArgument[]>; // key: `${topic}.${school}`
 }
 
@@ -342,7 +365,7 @@ export function loadBanks(schools: readonly SchoolId[] = SCHOOLS): Banks {
   for (const topic of TOPICS)
     for (const school of schools)
       args[`${topic}.${school}`] = JSON.parse(readFileSync(bankPath(topic, school), "utf8"));
-  return { fragments, closings: loadClosings(), arguments: args };
+  return { fragments, closings: loadClosings(), motionClosings: loadMotionClosings(), arguments: args };
 }
 
 /**

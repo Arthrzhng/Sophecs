@@ -113,7 +113,7 @@ function DeltaRow({
   after: number | null;
 }) {
   const delta = before != null && after != null ? after - before : null;
-  const fmt = (n: number | null) => (n == null ? "—" : Number.isInteger(n) ? String(n) : n.toFixed(1));
+  const fmt = (n: number | null) => (n == null ? "–" : Number.isInteger(n) ? String(n) : n.toFixed(1));
   return (
     <tr className="border-b border-rule last:border-b-0">
       <th scope="row" className="py-3 text-left text-sm font-normal text-ink-mid">
@@ -124,7 +124,7 @@ function DeltaRow({
       </td>
       <td className="py-3 pl-4 text-right font-mono text-sm tabular text-ink">{fmt(after)}</td>
       <td className="py-3 pl-6 text-right font-mono text-sm tabular text-ink-mid">
-        {delta == null ? "—" : signed(Number(delta.toFixed(1)))}
+        {delta == null ? "–" : signed(Number(delta.toFixed(1)))}
       </td>
     </tr>
   );
@@ -278,7 +278,7 @@ export function Verdict({
             Score
           </span>
           <span className="font-mono tabular text-xl font-extrabold leading-none">
-            {verdict.score ?? "\u2014"}
+            {verdict.score ?? "–"}
           </span>
         </div>
 
@@ -347,7 +347,7 @@ export function Verdict({
                 {/* Fixed to one decimal so 8.0 and 6.5 line up in the
                     column, which the table this replaces also did. */}
                 <span className="shrink-0 font-mono tabular text-base text-ink">
-                  {value == null ? "\u2014" : value.toFixed(1)}
+                  {value == null ? "–" : value.toFixed(1)}
                   <span className="text-ink-mid"> / {AXIS_MAX}</span>
                 </span>
               </li>
@@ -419,7 +419,7 @@ export function Verdict({
             <div className="mt-6 flex flex-wrap items-center gap-4">
               {hasRevision ? (
                 <TextLink href={`/debate/${topicSlug}/${hasRevision}`} className="text-sm">
-                  Answered — read the revision
+                  Read your revision
                 </TextLink>
               ) : (
                 <>
@@ -437,7 +437,7 @@ export function Verdict({
                   </ChunkyLink>
                   {/* A plain sentence, not a tooltip on a question mark. */}
                   <span className="text-sm text-ink-mid">
-                    Answering does not change your ELO. Leave it and it waits on your profile.
+                    Answering does not change your rating. Leave it and it waits on your profile.
                   </span>
                 </>
               )}

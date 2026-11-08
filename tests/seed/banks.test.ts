@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { loadClosings, loadFragments, buildBank, serialiseBank, bankPath, rivalIntro, BANK_SCHOOLS, LAUNCH_SCHOOLS, SCHOOLS, TOPICS, wordCount, type SchoolId } from "../../scripts/seed/banks";
+import { loadMotionClosings, loadFragments, buildBank, serialiseBank, bankPath, rivalIntro, BANK_SCHOOLS, LAUNCH_SCHOOLS, SCHOOLS, TOPICS, wordCount, type SchoolId } from "../../scripts/seed/banks";
 import { OBJECTION_VOICES } from "../../src/lib/judge/objection-voices";
 
 describe("argument banks", () => {
-  it("are exactly what the passages build (rerun npm run seed:banks after editing one)", () => {
-    const closings = loadClosings();
+  it("are exactly what the passages build, with each motion's own closings (rerun npm run seed:banks after editing one)", () => {
+    const closings = loadMotionClosings();
     for (const topic of TOPICS)
       for (const id of BANK_SCHOOLS) {
         const school = id as SchoolId;
         expect(readFileSync(bankPath(topic, school), "utf8"), `${topic}.${school}`).toBe(
-          serialiseBank(buildBank(loadFragments(topic), closings, school))
+          serialiseBank(buildBank(loadFragments(topic), closings[topic], school))
         );
       }
   });

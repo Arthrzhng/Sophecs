@@ -6,7 +6,7 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { createHmac } from "node:crypto";
 import { emailTag, generate, RUN_QUIZ, type Dataset } from "../../scripts/seed/generate";
-import { BANK_SCHOOLS, loadBanks } from "../../scripts/seed/banks";
+import { BANK_SCHOOLS, TOPICS, loadBanks, loadClosings, loadMotionClosings } from "../../scripts/seed/banks";
 import { contentTopics } from "../../scripts/seed/topics";
 import { baseHash, datasetForPlan, manifestHash } from "../../scripts/seed/plan";
 import { MemoryAdapter } from "../../scripts/seed/adapter-memory";
@@ -15,6 +15,8 @@ import { validate } from "../../scripts/seed/validate";
 import { scoreQuizV2 } from "../../src/lib/quiz-v2-score";
 import { loadQuizV2ForTest } from "../../src/lib/quiz-v2";
 import { RANK_MIN_ARGUMENTS } from "../../src/lib/school-table";
+import { EXEMPLAR_FLOOR, SAMPLE_TYPO, endingOf, openingOf, selectExemplars, withoutFrame, type ExemplarCandidate } from "../../src/lib/exemplars";
+import type { SchoolId } from "../../src/lib/types";
 import { SMALL, smallPlan } from "./fixture";
 
 // Production's volumes, a base window ending on a Monday, and the week
@@ -70,7 +72,7 @@ describe("a sample run made with quiz v2", () => {
   it("is the dataset this file was written against, pinned at production volume", () => {
     // Beside the small pins in determinism.test.ts: eight thousand quiz
     // results and every exchange pair reach paths a small run need not.
-    expect(manifestHash(six())).toBe("1edf1643d68dfd6b9b7085892c892159403d45b2d8e89c9fb97a7fe93fc5f9dc");
+    expect(manifestHash(six())).toBe("83af34d654774b846658930f4b9ab328526e639b8e70f1b931764e305d4d64d2");
   });
 
   it("covers all six schools about equally", () => {
@@ -112,6 +114,79 @@ describe("a sample run made with quiz v2", () => {
     // best-known objection, all among the six, the new three included.
     for (const school of named) expect(BANK_SCHOOLS).toContain(school);
     expect(named.has("ubuntu") && named.has("confucian")).toBe(true);
+  });
+
+  it("closes with its motion's own closings, never another motion's or the ones every motion shares", () => {
+    // Arthur, 2026-11-08: "Closing lines must fit their motion".
+    const byMotion = loadMotionClosings();
+    const shared = Object.values(loadClosings()).flat();
+    const ds = six();
+    let closed = 0;
+    for (const { row } of ds.debates) {
+      if (!row.argument) continue;
+      const own = byMotion[row.topic_slug as keyof typeof byMotion][row.school];
+      const others = TOPICS.filter((t) => t !== row.topic_slug).flatMap((t) => byMotion[t][row.school]);
+      if (own.some((c) => row.argument!.includes(c))) closed++;
+      for (const c of [...others, ...shared]) expect(row.argument.includes(c), row.id).toBe(false);
+    }
+    expect(closed).toBeGreaterThan(1000);
+    // Exchange turns too: each closes with its author's school's closings
+    // for the exchange's motion, never another motion's (review pass 3).
+    const exchangeOf = new Map(ds.exchanges.map(({ row }) => [row.id, row]));
+    let turnsClosed = 0;
+    for (const { row } of ds.turns) {
+      const ex = exchangeOf.get(row.exchange_id)!;
+      const school = row.author_id === ex.user_a ? ex.school_a : ex.school_b;
+      const own = byMotion[ex.topic_slug as keyof typeof byMotion][school as SchoolId];
+      const others = TOPICS.filter((t) => t !== ex.topic_slug).flatMap((t) => byMotion[t][school as SchoolId]);
+      if (own.some((c) => row.body.includes(c))) turnsClosed++;
+      for (const c of [...others, ...shared]) expect(row.body.includes(c), row.id).toBe(false);
+    }
+    expect(turnsClosed).toBeGreaterThan(100);
+  });
+
+  it("gives exemplar pages that never show the same ending twice, and still one argument under each opening", () => {
+    // As getExemplars reads them: published, judged originals at the floor
+    // or above, strongest first; then the app's own selection.
+    const ds = six();
+    const rows = ds.debates
+      .map((d) => d.row)
+      .filter((d) => d.argument_public && d.kind === "original" && !d.rejected && d.verdict && d.argument && (d.score ?? 0) >= EXEMPLAR_FLOOR);
+    for (const topic of TOPICS) {
+      const bySchool = new Map<SchoolId, ExemplarCandidate[]>(
+        BANK_SCHOOLS.map((school) => [
+          school as SchoolId,
+          rows
+            .filter((r) => r.topic_slug === topic && r.school === school)
+            .sort((a, b) => b.score! - a.score! || (a.created_at < b.created_at ? 1 : -1))
+            .map((r) => ({ id: r.id, school: r.school as SchoolId, argument: r.argument!, is_sample: true, score: r.score })),
+        ])
+      );
+      const chosen = [...selectExemplars(bySchool, [...BANK_SCHOOLS] as SchoolId[]).values()].flat();
+      const endings = chosen.map((e) => endingOf(e.argument).toLowerCase());
+      expect(new Set(endings).size, topic).toBe(endings.length);
+      for (const school of BANK_SCHOOLS) {
+        // The openings it could show: those of arguments without one of the
+        // run's deliberate misspellings, which the selection never takes.
+        const openings = new Set(
+          bySchool
+            .get(school as SchoolId)!
+            .filter((c) => !SAMPLE_TYPO.test(c.argument))
+            .map((c) => openingOf(withoutFrame(c.argument)).trim().replace(/\s+/g, " ").toLowerCase())
+        );
+        expect(chosen.filter((e) => e.school === school), `${topic}.${school}`).toHaveLength(openings.size);
+      }
+    }
+  });
+
+  it("never says a revision meets no objection when it says the revision now answers one", () => {
+    // Arthur, 2026-11-08: "fix in the fresh run".
+    const revisions = six().debates.flatMap((d) => (d.row.kind === "revision" && !d.row.verdict.rejected ? [d.row.verdict] : []));
+    expect(revisions.filter((v) => v.objection_answered).length).toBeGreaterThan(200);
+    for (const v of revisions)
+      if (v.objection_answered) expect(v.weakest_move).not.toMatch(/never meets an objection/);
+    // One that tried and missed still says so.
+    expect(revisions.filter((v) => !v.objection_answered && v.weakest_move.startsWith("The argument never meets an objection.")).length).toBeGreaterThan(0);
   });
 
   it("argues every exchange turn without saying a sentence twice, among schools with no objection between them too", () => {
@@ -163,8 +238,8 @@ describe("a quiz v2 run's schools", () => {
   it("come from the quiz file, and the run is refused unless the passages, closings and verdicts' lines cover the same six", () => {
     const banks = loadBanks();
     const gen = { ...SMALL, quiz: 2 as const, topics: contentTopics() };
-    const closings = Object.fromEntries(Object.entries(banks.closings).filter(([s]) => s !== "buddhist"));
-    expect(() => generate(gen, { ...banks, closings: closings as typeof banks.closings })).toThrow(/the closings/);
+    const motionClosings = { ...banks.motionClosings, "moral-training": Object.fromEntries(Object.entries(banks.motionClosings["moral-training"]).filter(([s]) => s !== "buddhist")) };
+    expect(() => generate(gen, { ...banks, motionClosings: motionClosings as typeof banks.motionClosings })).toThrow(/the closings of moral-training/);
     const fragments = { ...banks.fragments, "no-decision": { ...banks.fragments["no-decision"], schools: Object.fromEntries(Object.entries(banks.fragments["no-decision"].schools).filter(([s]) => s !== "ubuntu")) } };
     expect(() => generate(gen, { ...banks, fragments: fragments as typeof banks.fragments })).toThrow(/the passages of no-decision/);
   });
@@ -189,6 +264,15 @@ describe("a quiz v2 run's verdicts", () => {
 });
 
 describe("a run that names no quiz", () => {
+  it("still closes with the closings every motion shares, and still writes its revision verdicts as before", () => {
+    // The live run regenerates its rows from this code until the teardown.
+    const shared = Object.values(loadClosings()).flat();
+    const ds = smallPlan().dataset;
+    expect(ds.debates.filter((d) => d.row.argument && shared.some((c) => d.row.argument!.includes(c))).length).toBeGreaterThan(100);
+    const never = ds.debates.filter((d) => d.row.kind === "revision" && !d.row.verdict.rejected && d.row.verdict.objection_answered && /never meets an objection/.test(d.row.verdict.weakest_move));
+    expect(never.length).toBeGreaterThan(0);
+  });
+
   it("hashes and plans exactly as before: the base hash main gave at 3008b29, and no quiz in its plan", () => {
     expect(baseHash({ ...SMALL, topics: contentTopics() })).toBe("4b7758b789ced500ab02002393f9359689910253775d9ba907c610dfbee1a7be");
     expect("quiz" in smallPlan().plan.config).toBe(false);
