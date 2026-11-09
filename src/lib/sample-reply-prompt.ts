@@ -124,24 +124,44 @@ export type SampleReplyParse =
   | { ok: false; problem: string };
 
 /**
- * Whether a reply speaks as a person: "I", "me", "my", "mine" or "myself"
- * outside quotation marks, or, since item 17 of 2026-11-09 ("never claim
- * or imply to be a person"), "we", "us", "our", "ours" or "ourselves",
- * which count the writer among people. Arthur, 2026-11-08: "Never present
- * a sample as a person." A cheap check behind the prompt's own rule, so a
- * reply that slips, or that a reader's text talked into it, is written
- * again.
+ * Whether a reply speaks as a person: "I", "me", "my", "mine" or "myself",
+ * or, since item 17 of 2026-11-09 ("never claim or imply to be a person"),
+ * "we", "us", "our", "ours" or "ourselves", which count the writer among
+ * people, or a sentence opening "As someone who". Arthur, 2026-11-08: "Never present a sample
+ * as a person." A cheap check behind the prompt's own rule, so a reply
+ * that slips, or that a reader's text talked into it, is written again.
+ *
+ * Words in quotation marks are the other side's, or a case, and pass; with
+ * `material`, only those the material has (review pass 1, O2), so a
+ * quotation marked round a first person of the reply's own does not. "US"
+ * the country and the numeral in "World War I" are not first person (O1).
  */
-export function speaksAsPerson(reply: string): boolean {
-  const unquoted = unquotedText(reply);
-  return /\bI\b/.test(unquoted) || /\b(?:me|my|mine|myself|we|us|our|ours|ourselves)\b/i.test(unquoted);
+export function speaksAsPerson(reply: string, material?: string): boolean {
+  const unquoted = unquotedText(reply, material);
+  return (
+    /(?<!\b(?:War|Part|Act|Phase|Book|Chapter|Volume|Type|Stage|Level|Article|Section|Title|Class|Tier|Category|Henry|Elizabeth|Charles|James|Richard|Edward|George|William|Mary)\s)\bI\b/.test(unquoted) ||
+    /\b(?:me|my|mine|myself|we|our|ours|ourselves)\b/i.test(unquoted) ||
+    /\b(?:us|Us)\b/.test(unquoted) ||
+    // Opening a sentence, or "speaking as": "as someone who" inside one is
+    // as often the reader's ("treats the applicant as someone who ...").
+    /(?:^|[.!?]\s+)As (?:someone|somebody|a person) who\b/.test(unquoted) ||
+    /\bspeaking as\b/i.test(unquoted)
+  );
 }
 
-// Text in quotation marks, double or single. A single opening mark counts
-// only after a space or a bracket, so an apostrophe never opens one.
-const QUOTED = /\u201C([^\u201D]*)\u201D|"([^"]*)"|(?:^|(?<=[\s(\[]))\u2018([^\u2019]*)\u2019/g;
-function unquotedText(text: string): string {
-  return text.replace(QUOTED, " ");
+// Text in quotation marks: double, curly single, or straight single, which
+// is British style and what a model writing JSON reaches for (review pass
+// 1, B4). A single mark opens only after the start, a space or a bracket,
+// and a straight one closes only before a space, punctuation or the end,
+// so an apostrophe ("the reader's claim") neither opens nor closes one.
+const QUOTED = /“([^”]*)”|"([^"]*)"|(?:^|(?<=[\s(\[—-]))‘([^’]*)’|(?:^|(?<=[\s(\[—-]))'((?:[^']|'(?=\w))*)'(?=[\s.,;:!?)\]—-]|$)/g;
+const quotedSpan = (m: RegExpMatchArray) => m[1] ?? m[2] ?? m[3] ?? m[4] ?? "";
+function unquotedText(text: string, material?: string): string {
+  const known = material === undefined ? null : plain(material);
+  return text.replace(QUOTED, (...args) => {
+    const span = quotedSpan(args as unknown as RegExpMatchArray);
+    return known === null || known.includes(plain(span)) ? " " : ` ${span} `;
+  });
 }
 
 // Letters and digits only, lower case, single spaces: how a reply's words
@@ -150,36 +170,57 @@ function plain(text: string): string {
   return ` ${text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim()} `;
 }
 
+// "%", "per cent" and "percent" are one word, so a figure is compared
+// whichever way either side writes it (review pass 1, B3).
+const percentAsWord = (t: string) => t.replace(/%/g, " percent ").replace(/\bper\s?cent\b/gi, " percent ");
+
 const NUMBER_WORD = "(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|a hundred|a thousand|\\d+)";
 const PROPORTION = new RegExp(`\\b${NUMBER_WORD}\\s+(?:in|out of)\\s+(?:every\\s+)?${NUMBER_WORD}\\b`, "gi");
+// Shares and multitudes, which state a figure in words (review pass 1, O3).
+// "Thousands of chances" is as often a figure of speech, and passes.
+const SHARE = /\b(?:half of all|a third of|two thirds of|a quarter of|three quarters of|the majority of|a majority of|(?:millions|billions) of|twice as (?:likely|many|much)|(?:three|four|five|ten) times (?:as|more))\b/gi;
 
 /**
  * Figures in a reply that the material does not have: a number written in
- * digits, a percentage ("per cent", "percent", "%"), or a proportion ("one
- * in three", "9 out of 10"). Item 17: "forbid invented ... statistics".
- * A figure the reader's own text gives may be answered.
+ * digits, a percentage, a proportion ("one in three", "9 out of 10"), or a
+ * share or multitude in words ("a third of", "millions of"). Item 17:
+ * "forbid invented ... statistics". A figure the reader's own text gives
+ * may be answered, however either side writes its per cent.
  */
 export function inventedFigures(reply: string, material: string): string[] {
-  const known = plain(material);
-  const found = [
-    ...(reply.match(/\d[\d,.]*\s*%?/g) ?? []),
-    ...(reply.match(/\b(?:per\s?cent|percent)\b|%/gi) ?? []),
-    ...(reply.match(PROPORTION) ?? []),
-  ];
-  return [...new Set(found.map((f) => f.trim()).filter((f) => f && !known.includes(plain(f))))];
+  const known = plain(percentAsWord(material));
+  const text = percentAsWord(reply);
+  const found = [...(text.match(/\d[\d,.]*(?:\s+percent\b)?/g) ?? []), ...(text.match(PROPORTION) ?? []), ...(text.match(SHARE) ?? [])];
+  if (/\bpercent\b/i.test(text.replace(/\d[\d,.]*\s+percent\b/gi, " "))) found.push("percent");
+  return [...new Set(found.map((f) => f.replace(/\s+/g, " ").trim()).filter((f) => f && !known.includes(plain(f))))];
 }
 
-const STUDY_WORDS = /\b(?:a|an|one|recent|new|many|several|some|numerous)\s+(?:large\s+|recent\s+|major\s+|famous\s+|well-known\s+)?(?:study|studies|survey|surveys|poll|polls)\b|\b(?:studies|research|surveys|polls|statistics|figures|data|evidence|experiments|scientists|researchers|experts)\s+(?:show|shows|showed|suggest|suggests|suggested|find|finds|found|indicate|indicates|indicated|prove|proves|proved|reveal|reveals|revealed|confirm|confirms|confirmed|have\s+shown|has\s+shown)\b|\baccording\s+to\s+(?:a|an|the|one|recent)\s+(?:study|survey|poll|report|research|researchers|experts?|scientists?|statistics|figures|data)\b/gi;
+const CITED = "(?:study|studies|survey|surveys|poll|polls|paper|papers|report|reports|research|researchers|scientists|experts|psychologists|economists|statistics|evidence|experiments|trials)";
+const CITING = "(?:show|shows|showed|shown|suggest|suggests|suggested|find|finds|found|indicate|indicates|indicated|prove|proves|proved|proven|reveal|reveals|revealed|confirm|confirms|confirmed|demonstrate|demonstrates|demonstrated|published)";
+const STUDY_WORDS = new RegExp(
+  [
+    // "a study", "several large surveys"
+    `\\b(?:a|an|one|recent|new|many|several|some|numerous|landmark)\\s+(?:large\\s+|recent\\s+|major\\s+|famous\\s+|well-known\\s+|landmark\\s+)?(?:study|studies|survey|surveys|poll|polls)\\b`,
+    // "research shows", "psychologists have found", "the study found"
+    `\\b${CITED}\\s+(?:\\w+\\s+){0,2}?${CITING}\\b`,
+    // "according to a survey"
+    `\\baccording\\s+to\\s+(?:a|an|the|one|recent)\\s+(?:\\w+\\s+)?(?:study|survey|poll|report|paper|research|researchers|experts?|scientists?|statistics|figures|data)\\b`,
+  ].join("|"),
+  "gi"
+);
+// "A Stanford study", "the MIT survey": a name before it, so case counts.
+const NAMED_STUDY = /\b(?:[Aa]n?|[Oo]ne|[Tt]he)\s+[A-Z][\w-]*\s+(?:study|studies|survey|surveys|poll|polls|paper|report)\b/g;
 
 /**
- * Studies, surveys, polls or research a reply cites that the material does
- * not: "a study", "research shows", "according to a survey". Item 17:
- * "forbid invented ... studies". "Evidence" and "data" on their own are
- * the words of an argument about AI, and pass.
+ * Studies, surveys, polls, papers or research a reply cites that the
+ * material does not: "a study", "research has found", "according to a
+ * survey". Item 17: "forbid invented ... studies". "Evidence" and "data"
+ * on their own are the words of an argument about AI, and pass.
  */
 export function inventedStudies(reply: string, material: string): string[] {
   const known = plain(material);
-  return [...new Set((reply.match(STUDY_WORDS) ?? []).map((m) => m.trim()).filter((m) => !known.includes(plain(m))))];
+  const found = [...(reply.match(STUDY_WORDS) ?? []), ...(reply.match(NAMED_STUDY) ?? [])];
+  return [...new Set(found.map((m) => m.trim()).filter((m) => !known.includes(plain(m))))];
 }
 
 /**
@@ -193,8 +234,7 @@ export function inventedQuotations(reply: string, material: string): string[] {
   const known = plain(material);
   const out: string[] = [];
   for (const m of reply.matchAll(QUOTED)) {
-    const quoted = (m[1] ?? m[2] ?? m[3] ?? "").trim();
-    for (const part of quoted.split(/\.\.\.|\u2026/)) {
+    for (const part of quotedSpan(m).trim().split(/\.\.\.|…/)) {
       const words = plain(part).trim();
       if (words.split(" ").filter(Boolean).length >= 4 && !known.includes(` ${words} `)) out.push(part.trim());
     }
@@ -250,7 +290,7 @@ export function parseSampleReply(raw: string, source: string, material: string):
   const bodyProblem = checkBody(reply);
   if (bodyProblem === "too_short") return { ok: false, problem: `reply was shorter than ${MIN_TURN_CHARS} characters` };
   if (bodyProblem === "too_long") return { ok: false, problem: `reply was longer than ${MAX_TURN_CHARS} characters` };
-  if (speaksAsPerson(reply)) {
+  if (speaksAsPerson(reply, material)) {
     return { ok: false, problem: "reply spoke as a person (I, me, my, we, us, our) outside a quotation; the sample account is not a person and argues as the argument" };
   }
   const figures = inventedFigures(reply, material);

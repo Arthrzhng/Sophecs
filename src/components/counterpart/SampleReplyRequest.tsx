@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { requestSampleReply } from "@/app/counterpart/actions";
 
 const FAILED = "The sample account's reply could not be written this time. Try again in a minute.";
-// While another request holds the turn (a reload, a second tab), ask again
-// this often, for longer than a claim can last (src/lib/sample-reply.ts,
-// CLAIM_MS and CLAIM_SKEW_MS, 130 seconds together).
+// While another request holds the reader's claim (a reload, a second tab,
+// a reply being written in another of the reader's exchanges), ask again
+// this often, for longer than a claim can last: 150 seconds against
+// CLAIM_SECONDS, 120 (src/lib/sample-reply.ts, migration 0030).
 const WRITING_WAIT_MS = 15_000;
 const WRITING_TRIES = 10;
 // After a reply is in, one more ask once the page has had time to read it

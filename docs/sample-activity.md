@@ -48,9 +48,10 @@ messaging, so a sample account is seen in fewer places than the word
 | `/debate/<slug>/<id>` (the reader's own verdict) | the reader | With `SAMPLE_REPLIES` on, while they wait for a counterpart: "No one else is free on this motion right now. You can wait for someone, or argue now against an AI sample account." and "Argue now". |
 
 No page links to a sample's verdict, result or challenge, and none is in
-the sitemap. The table and Today count the current ISO week, and the
-workflow adds the activity since its last run every hour, so samples
-are part of every week's table, not only the first.
+the sitemap. The table and Today count the last seven days
+(`tableWindow`; Arthur, 2026-11-09, item 9), and the workflow adds the
+activity since its last run every hour, so samples are part of the
+table every day, not only at the start.
 
 Arthur, 2026-11-08: readers see "sample" as little as possible. What
 stays is the minimum: the AI tag beside a sample's work, the "AI sample"
@@ -86,12 +87,13 @@ Behind `SAMPLE_REPLIES=1` (Vercel, read when the build starts:
   (`SampleReplyRequest`, `requestSampleReply`), and `replyAsSample`
   (`src/lib/sample-reply.ts`) checks the flag; then that the exchange is
   the reader's, with a sample (`profiles.is_sample`), open and the
-  sample's turn after a delivered reply of the reader's, and that no
-  other reply is being written for the reader; then `KILL_SWITCH_JUDGE`
-  (one switch stops all AI, Arthur, 2026-11-09, item 23; the judge's
-  allowlist does not let samples through), `KILL_SWITCH_SCREEN`, the $50
-  budget, the $15 ceiling and the reader's daily room, enough for a
-  whole reply with its retry; then
+  sample's turn after a delivered reply of the reader's; then
+  `KILL_SWITCH_JUDGE` (one switch stops all AI, Arthur, 2026-11-09, item
+  23; the judge's allowlist does not let samples through) and
+  `KILL_SWITCH_SCREEN`; then that no other reply is being written for
+  the reader, and, under the reader's claim, that the exchange is still
+  as it was read; then the $50 budget, the $15 ceiling and the reader's
+  daily room, enough for a whole reply with its retry; then
   writes the reply with the judge's model, holds it to a reader's rules
   (a sentence quoted word for word from what it answers, 150 to 1,200
   characters; one more try if not), screens it with the screen a
@@ -105,10 +107,13 @@ Behind `SAMPLE_REPLIES=1` (Vercel, read when the build starts:
   database's clock. A second request for the same reader, for the same
   exchange or another (a reload, a second tab, a second exchange), finds
   it held, says so before reading the budget or the month's spend,
-  makes no call, and the page asks again every 15 seconds. The claim is
-  given back on every way out, delivery included, only with its own
-  token (`release_sample_reply`); one whose request died runs out after
-  two minutes, longer than the page's 60-second function. Nothing on the
+  makes no call, and the page asks again every 15 seconds. Under the
+  claim the exchange is read again, so a request that read it before
+  another delivered and gave the claim back finds the reply written and
+  makes no call either. The claim is given back on every way out,
+  delivery included, only with its own token (`release_sample_reply`);
+  one whose request died runs out after two minutes, longer than the
+  page's 60-second function. Nothing on the
   exchange moves, so the lapse clock is untouched.
 - **The lapse clock** (Arthur, 2026-11-09, item 27). While it is a
   sample's turn the exchange does not lapse (`exchangeLapsed` in
@@ -512,8 +517,8 @@ scheduled job late, or not at all, when it is busy; from 2026-11-07 to
 never (`docs/decisions.md`, "The sample job runs hourly").
 Each run extends to now, so a skipped or late run only means the next
 one adds more. A sample row is never dated in the future, and the table
-shows only the current week, so the more often it runs the closer the
-week's table is to now. The fallback, and only that: if nothing has run
+counts the last seven days up to now, so the more often it runs the
+closer the table's samples are to now. The fallback, and only that: if nothing has run
 for six hours, run `extend` by hand from the Actions tab.
 
 A `full` or `teardown` run by hand while a job is running waits behind
@@ -784,13 +789,13 @@ within the hour.
 
 ## Limits
 
-- A week partly written is partly full: the table's counts for the
-  current week grow through it, and at about 25 to 50 judged originals a
-  school a week, spread across it, a school reaches its 20 late in the
-  week. Measured in review on 3 seeds and 8 whole weeks, at 12:00 UTC:
-  no school ranked on Monday or Tuesday, up to three on Wednesday, one
-  to six on Thursday and Friday, all six on Sunday; all six from 82 to
-  157 hours into each week. On Arthur's list.
+- The table used to count the ISO week, so a school reached its 20 late
+  in each week: measured in review on 3 seeds and 8 whole weeks, no
+  school ranked on Monday or Tuesday, and all six only from 82 to 157
+  hours into each week. Arthur ruled (d) on 2026-11-09 (item 9): the
+  table counts the last seven days. The run's side, every school 20 in
+  every seven days rather than in every ISO week, comes with the next
+  run.
 - Exemplar pages start thinner than the old run's: at the start, five or
   six of the six motions have a school with fewer than four cards, all
   above the floor; at three weeks none to four, at six to eight weeks

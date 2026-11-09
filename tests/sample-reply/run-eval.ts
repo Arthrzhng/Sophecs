@@ -192,8 +192,8 @@ async function main() {
       cost += s.costUsd;
       screen = s.result;
     }
-    const person = reply ? speaksAsPerson(reply.body) : null;
     const material = sampleReplyMaterial(c.input);
+    const person = reply ? speaksAsPerson(reply.body, material) : null;
     // Each is held by the parse, so a delivered reply has none; listed so
     // the report says so rather than leaving it to be assumed.
     const item17 = reply

@@ -202,7 +202,8 @@ Rows 2 to 4 are the existing `StreakBlock` wording; reuse it, do not copy it.
 #### The week strip
 
 Seven circles under the number, Monday to Sunday of the current ISO week in
-UTC, the same week the school table and the weekly motion use. Lit is a
+UTC, the same week the weekly motion uses. (The school table counts the
+last seven days instead, since Arthur's item 9 of 2026-11-09.) Lit is a
 filled disc, unlit an open ring, so the two differ in shape before they
 differ in colour.
 

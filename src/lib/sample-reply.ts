@@ -107,6 +107,15 @@ export async function sampleReplySpend(admin: SupabaseClient): Promise<number | 
 }
 
 /**
+ * The kill switches: the judge's, since one switch stops all AI (Arthur,
+ * 2026-11-09, item 23), read as the judge route reads it, with no
+ * allowlist for samples; and the screen's, since every reply is screened.
+ */
+function switchedOff(): boolean {
+  return process.env.KILL_SWITCH_JUDGE === "true" || process.env.KILL_SWITCH_SCREEN === "true";
+}
+
+/**
  * Why a sample cannot reply now, or null when it can, as far as anything
  * but the reader is concerned. Fails closed: a budget or ceiling that
  * cannot be read stops replies as one that is reached does.
@@ -114,10 +123,7 @@ export async function sampleReplySpend(admin: SupabaseClient): Promise<number | 
 export type Unavailable = "off" | "paused" | "budget" | "ceiling" | "unread";
 export async function samplesUnavailable(admin: SupabaseClient): Promise<Unavailable | null> {
   if (!sampleRepliesOn()) return "off";
-  // One switch stops all AI (Arthur, 2026-11-09, item 23): the judge's,
-  // read as the judge route reads it, with no allowlist for samples.
-  if (process.env.KILL_SWITCH_JUDGE === "true") return "paused";
-  if (process.env.KILL_SWITCH_SCREEN === "true") return "paused";
+  if (switchedOff()) return "paused";
   const budget = await budgetState();
   if (budget === "over") return "budget";
   if (budget === "unread") return "unread";
@@ -235,19 +241,22 @@ export function sampleReplyDue(params: {
  * exchange with a reader, when it is the sample's turn.
  *
  * Order of checks: the flag; the exchange is the reader's, with a sample,
- * open and the sample's turn, the reader's last reply delivered; then the
- * reader's claim, one reply in progress per reader; then the kill
- * switches, the budget, the ceiling and the reader's daily room (room for
- * a whole reply, retry included); then the writing call, its reply held to
- * a reader's rules, the screen, and delivery. Nothing is written to
+ * open and the sample's turn, the reader's last reply delivered; the kill
+ * switches; then the reader's claim, one reply in progress per reader, and
+ * under it the exchange read again, still the sample's turn with no reply
+ * written since; then the budget, the ceiling and the reader's daily room
+ * (room for a whole reply, retry included); then the writing call, its
+ * reply held to a reader's rules, the screen, and delivery. Nothing is written to
  * `turns` until the screen has passed, so a reply that fails anywhere
  * leaves the exchange as it was and the sample's turn still due, and the
  * next request tries again within the same caps. The claim is given back
  * on every way out, delivery included.
  *
  * A second request while one is writing, for this exchange or another of
- * the reader's, finds the claim held and makes no call ("writing"): a
- * reload, a second tab or a second exchange costs nothing.
+ * the reader's, finds the claim held and makes no call ("writing"); one
+ * that takes the claim after the first gave it back finds the reply
+ * written and makes none either ("not_due"): a reload, a second tab or a
+ * second exchange costs nothing.
  */
 export async function replyAsSample(
   admin: SupabaseClient,
@@ -300,17 +309,41 @@ export async function replyAsSample(
     return { ok: false, reason: "not_due" };
   }
 
+  // The switches cost no round trip: a view while they are on writes no
+  // claim (review pass 1, O7).
+  if (switchedOff()) return { ok: false, reason: "paused" };
   // One sample reply in progress per reader (Arthur, 2026-11-09, item 24),
   // claimed before the budget, the ceiling or the model is reached.
   const claim = await claimReader(admin, readerId, exchange.id);
   if (claim === "unread") return { ok: false, reason: "unread" };
   if (claim === null) return { ok: false, reason: "writing" };
   try {
+    // What was read before the claim may be stale: another request may
+    // have delivered and given the claim back in between. Read again under
+    // the claim, so a reply already written is never paid for twice
+    // (review pass 1, B2).
+    const still = await stillDue(admin, exchange.id, sampleId, seq);
+    if (still !== "due") return { ok: false, reason: still };
     return await replyClaimed(admin, { exchange, sampleId, readerId, readerIsA, seq, last, turns, now });
   } finally {
     // Given back on every way out, delivery and an exception included.
     await releaseReader(admin, readerId, claim);
   }
+}
+
+/**
+ * Under the claim: the exchange still open, still the sample's turn, and
+ * no reply written since the turns were read. "unread" when it could not
+ * be read (fail closed: no call).
+ */
+async function stillDue(admin: SupabaseClient, exchangeId: string, sampleId: string, seq: number): Promise<"due" | "not_due" | "unread"> {
+  const [row, count] = await Promise.all([
+    admin.from("exchanges").select("status, next_turn").eq("id", exchangeId).maybeSingle(),
+    admin.from("turns").select("id", { count: "exact", head: true }).eq("exchange_id", exchangeId),
+  ]);
+  if (row.error || count.error || count.count === null || count.count === undefined) return "unread";
+  const ex = row.data as { status: string; next_turn: string | null } | null;
+  return ex && ex.status === "open" && ex.next_turn === sampleId && count.count === seq - 1 ? "due" : "not_due";
 }
 
 /** Everything after the reader's claim: the limits, the material, the reply. */

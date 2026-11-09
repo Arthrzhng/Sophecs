@@ -6557,11 +6557,15 @@ new run.
     proportions, no study, survey, poll or research, and no words in
     quotation marks or attributed to a philosopher, a book or anyone
     else, unless they are in the material below". Behind it, a reply is
-    written again if it has a figure, a percentage or a proportion, a
-    cited study, survey, poll or research, or four or more words in
-    quotation marks, that the material (`sampleReplyMaterial`: the
-    motion, the school, both arguments and the replies, without the
-    prompt's own numbering) does not have;
+    written again if it has a figure, a percentage (however either side
+    writes its per cent), a proportion or a share in words ("a third
+    of", "millions of"), a cited study, survey, poll, paper or research
+    ("research has found", "a Stanford study"), or four or more words in
+    quotation marks, double or single, curly or straight, that the
+    material (`sampleReplyMaterial`: the motion, the school, both
+    arguments and the replies, without the prompt's own numbering) does
+    not have. These are a backstop: a study cited without one of those
+    words, or a figure in other words, rests on the prompt;
   - the school's own terms: "Argue in the school's own terms: its own
     concepts and its own way of reasoning, as its one line and the
     judge's criteria for it give them, not another school's vocabulary
@@ -6573,11 +6577,16 @@ new run.
     sexual, no graphic violence, nothing a school would not put in front
     of its students." Behind it, a reply with a swear word is written
     again, and every reply still passes the screen a reader's reply
-    gets;
+    gets. "Nothing sexual, no graphic violence" rests on the prompt and
+    on that screen (harassment, personal information, off topic, spam):
+    no check of its own;
   - never claim or imply to be a person: "Never claim or imply that you
     are a person, or that a person wrote the reply", with "we", "us" and
     "our" ruled out as well as "I", "me" and "my". Behind it, a reply
-    with any of them outside quotation marks is written again.
+    with any of them, or a sentence opening "As someone who", is written
+    again, unless they are inside quotation marks round words the
+    material has: the other side's, quoted back. "US" the country and
+    the numeral in "World War I" pass.
   The eval (`docs/sample-activity/sample-reply-eval-4.json`, $0.2299 on
   the eval key): the twelve, the two injection cases and three that bait
   these rules (a reader asking for percentages and the study behind
@@ -6586,8 +6595,11 @@ new run.
   1,143 characters, none in the first person, none with a figure, study,
   quotation or swear word; the three baited replies answered the
   argument and did none of it. Run against the 38 replies of runs 1 to
-  3, the new checks would have written one again: a "we" that v2
-  allowed. Run 4's report marks one non-injection reply as naming the
+  3, and the 17 of run 4, the new checks would have written one again:
+  a "we" that v2 allowed. (Review pass 1 found the first version of the
+  checks missing straight single quotation marks and a reader's own
+  percentage, and flagging "the US"; all fixed, and the 55 replies
+  scanned again: the same one.) Run 4's report marks one non-injection reply as naming the
   injection's words: "nurse", from the reader's own argument; the check
   now runs on the injection cases only.
 - **23.** `KILL_SWITCH_JUDGE` stops sample replies and pairing with a
@@ -6600,13 +6612,19 @@ new run.
   frozen), which follows `KILL_SWITCH_SCREEN`. Making the turn route
   follow the judge's switch too needs that route unfrozen: his.
 - **24.** Migration 0030 (`supabase/migrations/0030_sample_reply_claims.sql`,
-  additive, no DROP, applied by me and read back before this merged):
+  additive, no DROP, applied by me and read back before this merged; an
+  addition to the frozen `supabase/` on his authority: the list said "a
+  claim per reader would need a migration", and he chose it, to be
+  carried out without stopping for him):
   one claim per reader in `sample_reply_claims`, taken in one statement
   by `claim_sample_reply`, timed by the database's clock, given back
   only with its own token by `release_sample_reply`, running out after
   two minutes if its request died. The reader's claim is taken before
   the budget, the ceiling or the model is reached, so a second request
-  for the same reader, for any exchange, makes no call. It replaces the
+  for the same reader, for any exchange, makes no call; and under the
+  claim the exchange is read again, so a request that read it before
+  another delivered finds the reply written and makes none either
+  (review pass 1, B2). It replaces the
   per-exchange lease on `last_turn_at`, which no longer moves. Server
   role only; tested on a throwaway database with two sessions racing
   (`scripts/test-0030-sample-reply-claims.sh`, 28 checks); its rollback
@@ -6643,3 +6661,14 @@ For his list, from carrying these out:
 - **Words a reply may not use** (`UNSUITABLE` in
   `src/lib/sample-reply-prompt.ts`): a short list of swear words, mine.
 - **The turn route's screen** under `KILL_SWITCH_JUDGE` (item 23, above).
+- **"Tested", for item 17's second condition** (the school's own terms):
+  there is no automated check; the prompt says it, the material carries
+  the school's one line and the judge's criteria, and the eval's replies
+  are there to read (`docs/sample-activity/sample-reply-eval-4.json`).
+  Likewise "nothing sexual, no graphic violence" rests on the prompt and
+  the screen.
+- **Item 27, held wider than its words** (`exchangeLapsed`): option (a)
+  read "while it is a sample's turn and samples are stopped"; it is held
+  for the whole of the sample's turn, for the reason above. So an
+  exchange whose reader never comes back, or one waiting on a sample
+  while `SAMPLE_REPLIES` is off, stays open on the reader's `/me`.

@@ -574,6 +574,58 @@ describe("one sample reply in progress per reader (Arthur, 2026-11-09, item 24)"
     expect(claims.get(READER)?.expires).toBe(dbClock + 120_000);
   });
 
+  it("reads the exchange again under the claim: a request that read it before another delivered makes no call (review pass 1, B2)", async () => {
+    create.mockResolvedValue(answer(QUOTE));
+    let first: Promise<unknown> | null = null;
+    // Between R2's reads and its claim, R1 runs whole: claims, writes,
+    // screens, delivers and gives the claim back.
+    const racing = {
+      from,
+      rpc: async (name: string, args: unknown) => {
+        if (name === "claim_sample_reply" && !first) {
+          first = replyAsSample(admin, "x1", READER, NOW);
+          await first;
+        }
+        return fakeRpc(name, args);
+      },
+    } as never;
+    const r2 = await replyAsSample(racing, "x1", READER, NOW);
+    expect(await first).toEqual(DELIVERED);
+    expect(r2).toEqual({ ok: false, reason: "not_due" });
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(screenTurn).toHaveBeenCalledTimes(1);
+    expect(tables.turns.filter((t) => t.seq === 2)).toHaveLength(1);
+    expect(claims.size).toBe(0);
+    // And fails closed when that second read fails.
+    world();
+    create.mockReset();
+    const blind = { rpc: fakeRpc, from: (t: string) => (t === "turns" && rpcCalls.some((c) => c.name === "claim_sample_reply") ? (failReadOf = "turns", from(t)) : from(t)) } as never;
+    rpcCalls.length = 0;
+    expect(await replyAsSample(blind, "x1", READER, NOW)).toEqual({ ok: false, reason: "unread" });
+    failReadOf = null;
+    expect(create).not.toHaveBeenCalled();
+    expect(claims.size).toBe(0);
+  });
+
+  it("takes no claim while a kill switch is on (review pass 1, O7)", async () => {
+    for (const name of ["KILL_SWITCH_JUDGE", "KILL_SWITCH_SCREEN"]) {
+      vi.stubEnv("KILL_SWITCH_JUDGE", "");
+      vi.stubEnv("KILL_SWITCH_SCREEN", "");
+      vi.stubEnv(name, "true");
+      rpcCalls.length = 0;
+      expect(await replyAsSample(admin, "x1", READER, NOW), name).toEqual({ ok: false, reason: "paused" });
+      expect(rpcCalls, name).toEqual([]);
+    }
+  });
+
+  it("is waited for by the page for longer than a claim can last", () => {
+    const page = readFileSync("src/components/counterpart/SampleReplyRequest.tsx", "utf8");
+    const wait = Number(page.match(/const WRITING_WAIT_MS = ([\d_]+);/)![1].replace(/_/g, ""));
+    const tries = Number(page.match(/const WRITING_TRIES = (\d+);/)![1]);
+    const claim = Number(readFileSync("src/lib/sample-reply.ts", "utf8").match(/const CLAIM_SECONDS = (\d+);/)![1]);
+    expect(wait * tries).toBeGreaterThan(claim * 1000);
+  });
+
   it("hands over only while the turn is still the sample's", async () => {
     create.mockResolvedValue(answer(QUOTE));
     // While the reply is screened, the turn is moved on by something else.
@@ -810,10 +862,15 @@ describe("item 17: what the AI is told, each rule tested (Arthur, 2026-11-09)", 
   });
 
   it("writes a reply again that gives a figure the material does not have", () => {
-    expect(inventedFigures("Some 40 per cent of refusals are never explained. " + BODY, material)).toEqual(["40", "per cent"]);
+    expect(inventedFigures("Some 40 per cent of refusals are never explained. " + BODY, material)).toEqual(["40 percent"]);
     expect(inventedFigures("Nine out of ten applicants never ask. " + BODY, material)).toEqual(["Nine out of ten"]);
     expect(inventedFigures("Since 2019 the banks have hidden it. " + BODY, material)).toEqual(["2019"]);
-    expect(inventedFigures("Half the refusals are 75% automated. " + BODY, material)).toEqual(["75%", "%"]);
+    expect(inventedFigures("The refusals are 75% automated. " + BODY, material)).toEqual(["75 percent"]);
+    // Shares and multitudes in words (review pass 1, O3).
+    expect(inventedFigures("A third of applicants never ask, and millions of them are refused. " + BODY, material)).toEqual(["A third of", "millions of"]);
+    expect(inventedFigures("Refused applicants are twice as likely to appeal. " + BODY, material)).toEqual(["twice as likely"]);
+    // A figure of speech passes (eval run 3).
+    expect(inventedFigures("A life furnishes thousands of chances to answer with care. " + BODY, material)).toEqual([]);
     // The reader's own figure may be answered.
     expect(inventedFigures("Even if 3 in 10 are refused, the reason is not owed. " + BODY, material)).toEqual([]);
     expect(inventedFigures(BODY, material)).toEqual([]);
@@ -822,15 +879,40 @@ describe("item 17: what the AI is told, each rule tested (Arthur, 2026-11-09)", 
     expect(inventedFigures("There are 4 replies in all. " + BODY, material)).toEqual(["4"]);
     expect(parseSampleReply(reply("Some 40 per cent of refusals are never explained. " + BODY), READER_ARGUMENT, material)).toMatchObject({
       ok: false,
-      problem: expect.stringMatching(/figures the material does not have \(40, per cent\); invent no statistics/),
+      problem: expect.stringMatching(/figures the material does not have \(40 percent\); invent no statistics/),
     });
   });
 
+  it("lets a reply answer the reader's own percentage, however either side writes it (review pass 1, B3)", () => {
+    const pct = sampleReplyMaterial({ ...input, readerArgument: READER_ARGUMENT + " About 40% of applicants are refused." });
+    expect(inventedFigures("Even if 40% are refused, the reason is not owed. " + BODY, pct)).toEqual([]);
+    expect(inventedFigures("Even if 40 per cent are refused, the reason is not owed. " + BODY, pct)).toEqual([]);
+    expect(inventedFigures("Even if 40 percent are refused, the reason is not owed. " + BODY, pct)).toEqual([]);
+    // Another figure, or a number as a percentage it never was, is new.
+    expect(inventedFigures("Even if 45% are refused, the reason is not owed. " + BODY, pct)).toEqual(["45 percent"]);
+    expect(inventedFigures("Some 3% are refused twice. " + BODY, material)).toEqual(["3 percent"]);
+    expect(parseSampleReply(reply("Even if 40% are refused, the reason is not owed. " + BODY), READER_ARGUMENT, pct).ok).toBe(true);
+  });
+
   it("writes a reply again that cites a study, survey or research the material does not have", () => {
-    for (const cite of ["A recent study found that applicants rarely read reasons.", "Research shows that people want explanations.", "According to a survey, most applicants ask why.", "Studies suggest the reasons are ignored.", "Several polls agree."]) {
+    for (const cite of [
+      "A recent study found that applicants rarely read reasons.",
+      "Research shows that people want explanations.",
+      "According to a survey, most applicants ask why.",
+      "Studies suggest the reasons are ignored.",
+      "Several polls agree.",
+      // Review pass 1, O3.
+      "A Stanford study of loan refusals points the other way.",
+      "The MIT survey is clear on this.",
+      "Research has found that reasons are ignored.",
+      "Psychologists have found that explanations soothe.",
+      "A paper published by economists says otherwise.",
+    ]) {
       expect(inventedStudies(cite + " " + BODY, material), cite).not.toEqual([]);
       expect(parseSampleReply(reply(cite + " " + BODY), READER_ARGUMENT, material), cite).toMatchObject({ ok: false, problem: expect.stringMatching(/invent no studies/) });
     }
+    // The study of a thing is not a study cited.
+    expect(inventedStudies("The Stoic's careful study of the passions is the point. " + BODY, material)).toEqual([]);
     // The material's own study may be answered; "evidence" and "data" in an argument pass.
     expect(inventedStudies("A study by the regulator found as much, but a reason is not owed for that. " + BODY, material)).toEqual([]);
     expect(inventedStudies("The data a model is trained on is not evidence of what is owed. " + BODY, material)).toEqual([]);
@@ -852,6 +934,24 @@ describe("item 17: what the AI is told, each rule tested (Arthur, 2026-11-09)", 
     expect(inventedQuotations("“A machine that decides who gets a loan … owes nothing to anybody at all” " + BODY, material)).toEqual(["owes nothing to anybody at all"]);
     // An apostrophe opens no quotation.
     expect(inventedQuotations("The applicant’s judgement of the refusal is theirs, and the bank’s is not. " + BODY, material)).toEqual([]);
+
+    expect(inventedQuotations("The applicant's judgement of the refusal is theirs, and the bank's is not. " + BODY, material)).toEqual([]);
+  });
+
+  it("reads straight single quotation marks as quotation marks, both ways (review pass 1, B4)", () => {
+    const kant = "As Kant put it, 'act only on that maxim which you can will as a universal law'. " + BODY;
+    expect(inventedQuotations(kant, material)).toEqual(["act only on that maxim which you can will as a universal law"]);
+    expect(parseSampleReply(reply(kant), READER_ARGUMENT, material)).toMatchObject({ ok: false, problem: expect.stringMatching(/invent no quotations/) });
+    // An apostrophe inside one is part of it.
+    expect(inventedQuotations("The words 'nobody can contest a reason they're never shown' are close, but not the argument's. " + BODY, material)).toEqual([
+      "nobody can contest a reason they're never shown",
+    ]);
+    // The reader's words quoted back that way are theirs, first person and all.
+    const own = sampleReplyMaterial({ ...input, readerArgument: READER_ARGUMENT + " I am owed a reason." });
+    const back = "The claim 'I am owed a reason' needs more than it says. " + BODY;
+    expect(speaksAsPerson(back, own)).toBe(false);
+    expect(inventedQuotations(back, own)).toEqual([]);
+    expect(parseSampleReply(reply(back), READER_ARGUMENT, own).ok).toBe(true);
   });
 
   it("writes a reply again with a word unsuitable for readers of 15 to 18", () => {
@@ -875,6 +975,26 @@ describe("item 17: what the AI is told, each rule tested (Arthur, 2026-11-09)", 
     expect(speaksAsPerson("The claim that “we are owed a reason” needs more. " + BODY)).toBe(false);
     // Words that only contain the letters are not first person.
     expect(speaksAsPerson("Usually the outcome, used as a measure, is your concern. " + BODY)).toBe(false);
+
+    // "as someone who" is a person's (review pass 1, O3).
+    expect(speaksAsPerson("Speaking as someone who has taught for years, the reasons help. " + BODY)).toBe(true);
+    expect(speaksAsPerson("As someone who reads refusals, the applicant is owed little. " + BODY)).toBe(true);
+    // Said of someone else, it passes (eval runs 2 and 3).
+    expect(speaksAsPerson("A builder who tried and failed comes out the same as one who never tried. " + BODY)).toBe(false);
+    expect(speaksAsPerson("The bank treats the applicant as someone who cannot judge. " + BODY)).toBe(false);
+  });
+
+  it("is not fooled by the US, a numeral, or a first person of its own in quotation marks (review pass 1, O1 and O2)", () => {
+    expect(speaksAsPerson("In the US the banks explain nothing. " + BODY)).toBe(false);
+    expect(speaksAsPerson("Since World War I the rules have changed. " + BODY)).toBe(false);
+    expect(speaksAsPerson("Let us look at what the argument owes. " + BODY)).toBe(true);
+    // Quoted, but not the material's: the reply's own first person.
+    expect(speaksAsPerson("\u201CI think\u201D is not a reason. " + BODY, material)).toBe(true);
+    expect(speaksAsPerson("'We' is not a reason. " + BODY, material)).toBe(true);
+    // Quoted from the material: the other side's.
+    const own = sampleReplyMaterial({ ...input, readerArgument: READER_ARGUMENT + " We are owed a reason." });
+    expect(speaksAsPerson("\u201CWe are owed a reason\u201D needs more. " + BODY, own)).toBe(false);
+    expect(parseSampleReply(reply("\u201CI think\u201D is not a reason. " + BODY), READER_ARGUMENT, material)).toMatchObject({ ok: false, problem: expect.stringMatching(/spoke as a person/) });
   });
 
   it("is written again in production: the retry is told the rule, and only a clean reply is delivered", async () => {
@@ -884,7 +1004,7 @@ describe("item 17: what the AI is told, each rule tested (Arthur, 2026-11-09)", 
     expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual(DELIVERED);
     expect(create).toHaveBeenCalledTimes(2);
     expect(create.mock.calls[1][0].messages.at(-1).content).toBe(
-      retryNote("reply gave figures the material does not have (62, per cent); invent no statistics")
+      retryNote("reply gave figures the material does not have (62 percent); invent no statistics")
     );
     expect(tables.turns.find((t) => t.seq === 2)!.body).toBe(BODY);
     expect(tables.ai_calls.map((c) => c.prompt_version)).toEqual(["sample-reply.v3", "sample-reply.v3"]);
