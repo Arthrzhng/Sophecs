@@ -6199,8 +6199,8 @@ review." That instruction is what lets migration 0029 add to the frozen
 `supabase/`.
 
 What each sample reply will log to `ai_calls` (migration 0029; the code
-is on the branch `sample-replies`), both under the reader's `user_id`
-and marked `for_sample`:
+will come with #117, branch `sample-replies`), both under the reader's
+`user_id` and marked `for_sample`:
 - **The call that writes it**, kind `sample_reply`, the one new kind.
 - **Its screen**, kind `screen`, as a reader's reply's screen is. So it
   counts toward the reader's daily cap wherever that cap is counted: the
@@ -6219,9 +6219,13 @@ and marked `for_sample`:
   key has no delete action. A check holds the mark to its two kinds, and
   a writing call to the mark. The replies code is to make the mark a
   required argument of the screen logger, so no caller logs a sample's
-  screen without deciding (pass 2, O2).
+  screen without deciding (pass 2, O2), and to write the column only on
+  a marked call, as `validation_error` is written only when there is
+  one. So a reader's screen and a judge call insert exactly as before,
+  whether 0029 has run or been rolled back, and the replies PR may merge
+  before Arthur runs it (pass 3, B1).
 - **No judge call is made on a sample's side.** Challenges with a sample
-  are not built (`sample-replies` says why), so the judge never scores
+  are not built (#117 says why), so the judge never scores
   an argument the AI wrote for a sample; were it ever to, whether that
   counts toward the $15 would be Arthur's under (d) (pass 2, O6).
 

@@ -15,7 +15,12 @@
 #   nothing;
 # - a second apply stopping with nothing changed;
 # - the rollback refusing while marked calls exist and deleting nothing,
-#   and with none restoring the table exactly as it was; and 0029 again.
+#   and with none restoring the table exactly as it was; and 0029 again;
+# - no row rewritten (relfilenode), and an insert that names no mark
+#   reading the same before 0029, after it and after the rollback.
+#
+# The session runs in Pacific/Kiritimati (UTC+14), so a month counted in
+# the session's time zone rather than UTC fails the month checks.
 #
 #   scripts/test-0029-sample-replies.sh [port]
 set -euo pipefail
@@ -23,7 +28,7 @@ set -euo pipefail
 PORT="${1:-55432}"
 DB="sophecs_0029_test_$$"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-export PGHOST=127.0.0.1 PGPORT="$PORT" PGUSER=postgres
+export PGHOST=127.0.0.1 PGPORT="$PORT" PGUSER=postgres PGTZ=Pacific/Kiritimati
 
 FAILED=0
 CHECKS=0
@@ -94,7 +99,9 @@ expect "gives up at lock_timeout" "gave up" "$(printf '%s' "$LOCKED" | grep -q '
 expect "and changes nothing" "$BEFORE" "$(table_def)"
 
 say "0029"
+NODE_BEFORE="$(q "select relfilenode from pg_class where oid = 'public.ai_calls'::regclass")"
 apply "$REPO/supabase/migrations/0029_sample_replies.sql"
+expect "no row rewritten" "$NODE_BEFORE" "$(q "select relfilenode from pg_class where oid = 'public.ai_calls'::regclass")"
 expect "existing rows kept, unmarked" "30 0" "$(q "select count(*) || ' ' || count(*) filter (where for_sample) from ai_calls")"
 expect "a writing call, marked, accepted" accepted "$(insert_call r0 sample_reply true)"
 expect "a writing call unmarked refused" "refused (mark)" "$(insert_call r1 sample_reply)"
@@ -130,7 +137,7 @@ expect "it takes no argument" 0 "$(q "select pronargs from pg_proc where proname
 
 say "0029 a second time"
 SECOND="$(try_apply "$REPO/supabase/migrations/0029_sample_replies.sql")"
-expect "stops" stopped "$(printf '%s' "$SECOND" | grep -q 'already exists' && echo stopped || echo "went through: $SECOND")"
+expect "stops at the column" stopped "$(printf '%s' "$SECOND" | grep -q 'column "for_sample" of relation "ai_calls" already exists' && echo stopped || echo "went through: $SECOND")"
 expect "nothing changed" 2535 "$(q "select count(*) from ai_calls")"
 expect "the function still answers" 9.5000 "$(as_role service_role "$SPEND")"
 
