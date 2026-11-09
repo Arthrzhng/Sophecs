@@ -3,7 +3,7 @@
 // years: roughly 200 active accounts in any week, varying naturally week to
 // week (e.g. 183, 207, 196), never a round number; total accounts about
 // 700-800 now, growing by about 25 a week. Every school still gets at least
-// 20 judged originals a week so all six stay ranked." And the six-hourly
+// 20 judged originals a week so all six stay ranked." And the hourly
 // extension: a later `to` only appends.
 import { describe, expect, it } from "vitest";
 import { DEFAULTS, RUN_WEEKLY, generate, type Dataset } from "../../scripts/seed/generate";

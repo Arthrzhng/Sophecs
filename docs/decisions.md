@@ -6441,3 +6441,62 @@ file:
   The claim holds one per exchange, so the ceiling and the reader's day
   can be passed by those, about $0.045 each at most. A claim per reader would
   need a migration; left as it is unless he wants one.
+
+### The sample job runs hourly (2026-11-09)
+
+Arthur, 2026-11-09: "Schedule: change the sample job to run hourly at an
+odd minute (e.g. :17), not six-hourly. Each run extends to now, so
+skipped or late runs don't matter. No Vercel cron. Keep your manual run
+only as a fallback if nothing has run for 6 hours."
+
+Why: GitHub runs scheduled workflows late, or drops them, when it is
+busy, and never early. The six-hourly slots at minute 41 ran up to about
+six hours late, or not at all (review pass 2, from the Actions list): on
+2026-11-07 the 00:41 slot started at 06:34 (Actions 42347652604); on
+2026-11-08 the 12:41 slot started at 18:04 (42508082830) and the 18:41
+at 22:28 (42530384949); on 2026-11-09 one of the 00:41 and 06:41 slots
+never ran, and the other started at 07:10 (42577605226, 38 of 38
+checks), nine minutes after the extension run by hand at 07:01
+(42576672605, 38 of 38).
+
+`.github/workflows/sample-activity.yml` now runs at `17 * * * *`, and
+`tests/seed/isolation.test.ts` holds it to that one line. What the job
+writes does not change: an extend always runs the activity up to now
+(`scripts/seed/ci.ts`), with no minimum gap, and a run's rows depend
+only on its end, not on how often it was extended (review pass 1 ran 54
+hourly extends, back-to-back and empty windows among them, in memory:
+all passed, and the tables matched a single extend to the same end). The
+concurrency group runs one job at a time; a lock left by a dead job is
+taken after 15 minutes (`STALE_LOCK_MINUTES`), and the plan is made
+before the lock is taken, so a long plan cannot let that rule fire. Plan
+time, measured in review on the job's own path on the review machine:
+about 2 seconds now, 75 seconds after a year, about 10 minutes after
+three years (`describe` runs twice and grows with the square of the
+arguments). A GitHub runner is about twice as slow (production's log:
+"plan made in 2.6 s" at 07:01 and "3.4 s" at 07:10, against 1.3 s on
+the review machine), so after three years about 20 to 25 minutes:
+inside the hour and the 90-minute timeout. The repository is public, so the Actions minutes
+cost nothing.
+
+**What it costs in database egress** (review pass 1, B1). Every run reads
+the whole run back to check it, whatever its window: the registry, every
+sample argument and every sample profile. Measured in review at
+production volumes, as uncompressed JSON (what reaches the network may
+be smaller if responses are compressed): about 3 MB a run now, about
+16 to 18 MB after a year, about 45 MB after three. Hourly, that is about
+2 to 2.4 GB a month now and 12 to 13 GB a month after a year; six-hourly
+it was a sixth of that. The project is on Supabase's Free plan, whose 5
+GB a month of egress is shared with the site's own traffic; past it,
+after a grace period, Supabase may restrict the project (requests
+refused, or read-only). At this growth the job alone passes 5 GB a month
+between about day 87 and day 110, so around February 2027. The real
+figure is on the organisation's usage page (Database Egress), to be read
+after the first full day of hourly runs.
+
+For Arthur's list, (d): (a) keep hourly and cut what each run reads
+(check the window's new rows and the run's counts, read the registry
+once), a change to the seed job's checks, reviewed as any other, which
+keeps the job far under the quota; (b) keep hourly as it is and decide
+before February from the usage page; (c) the Pro plan (250 GB of egress
+included); (d) a slower schedule. Recommended: (a). Until he rules the
+job runs hourly as he asked.

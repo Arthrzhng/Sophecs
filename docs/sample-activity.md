@@ -3,8 +3,9 @@
 Sample accounts (about 740 at a run's start, about 25 more each week),
 with quiz results, arguments, revisions,
 challenges, counterpart exchanges, reading answers and classes from
-2026-09-18 on, rendered through the ordinary pages, and new arguments every
-six hours for as long as the run lasts. Nothing here is a demo page: the
+2026-09-18 on, rendered through the ordinary pages, and each hour's
+activity added every hour for as long as the run lasts (about two
+arguments an hour on average; some hours none). Nothing here is a demo page: the
 rows sit in the real tables, marked, and every page that can show one says
 what it is.
 
@@ -48,7 +49,7 @@ messaging, so a sample account is seen in fewer places than the word
 
 No page links to a sample's verdict, result or challenge, and none is in
 the sitemap. The table and Today count the current ISO week, and the
-workflow adds the activity since its last run every six hours, so samples
+workflow adds the activity since its last run every hour, so samples
 are part of every week's table, not only the first.
 
 Arthur, 2026-11-08: readers see "sample" as little as possible. What
@@ -313,7 +314,7 @@ Two layers, both from one secret seed:
   111 counterpart exchanges, 3 classes, reading answers, and the
   accounts' arguments (`DEFAULTS`). Fixed for the life of the run.
 - **The weeks after it** (`weekly`, `RUN_WEEKLY` in
-  `scripts/seed/generate.ts`), written by the extensions every six hours.
+  `scripts/seed/generate.ts`), written by the hourly extensions.
   Arthur, 2026-11-08: "a site on course for about 4,000 users over three
   years: roughly 200 active accounts in any week, varying naturally week
   to week (e.g. 183, 207, 196), never a round number; total accounts about
@@ -481,15 +482,26 @@ check on the result's shape among them, and teardown left nothing.
 ## How it runs
 
 `.github/workflows/sample-activity.yml` runs `npm run seed:ci` on main,
-every six hours at minute 41, and by hand from the Actions tab. It never
+every hour at minute 17, and by hand from the Actions tab. It never
 runs on a push or a pull request, and its secrets belong to the GitHub
 environment `sample-activity`, which only main may use, so no fork, branch
 or other workflow can reach them (`tests/seed/isolation.test.ts` checks the
 triggers and the environment).
 
-Every six hours rather than weekly: a sample row is never dated in the
-future, and the table shows only the current week, so a weekly run would
-leave each week's table without samples until its next run.
+Every hour, at an odd minute (Arthur, 2026-11-09). GitHub runs a
+scheduled job late, or not at all, when it is busy; from 2026-11-07 to
+09 the six-hourly slots at minute 41 ran up to about six hours late, or
+never (`docs/decisions.md`, "The sample job runs hourly").
+Each run extends to now, so a skipped or late run only means the next
+one adds more. A sample row is never dated in the future, and the table
+shows only the current week, so the more often it runs the closer the
+week's table is to now. The fallback, and only that: if nothing has run
+for six hours, run `extend` by hand from the Actions tab.
+
+A `full` or `teardown` run by hand while a job is running waits behind
+it, and GitHub cancels a waiting run when the next scheduled one
+arrives. After starting one by hand, check that it ran, and start it
+again if it shows as cancelled.
 
 The modes (`scripts/seed/ci.ts`):
 
@@ -624,7 +636,7 @@ Each step only after the one before has passed:
    `seed_runs.last_report`; fetch a sample verdict, result and challenge
    page and their images.
 5. The same with `full`.
-6. From then on the schedule runs `extend` every six hours.
+6. From then on the schedule runs `extend` every hour.
 
 ## At launch
 
@@ -740,12 +752,17 @@ again. An `extend` also refuses a run halted by another process in the
 minutes between its own check and taking the lock. `tests/seed/ci.test.ts` and
 `tests/seed/engine.test.ts` cover each case. A run that keeps failing
 shows as failed runs in the Actions tab, and GitHub emails the account
-that set the schedule.
+that set the schedule: with the job hourly, every hour while it stays
+halted, until `full` is run by hand.
 
 The workflow's log is public, so an error from the writes, which can
 name a row, is logged as a line of its own ("the run stopped on a
 refusal" or "the run failed while writing"), and the detail goes to
-`seed_runs.last_error`, or the line says it could not be recorded.
+`seed_runs.last_error`, or the line says it could not be recorded. A
+failure that does not halt the run is resumed by the next scheduled run,
+which clears `last_error` and writes a new `last_report` (a failed dry
+run's detail is only in `last_report`): with the job hourly, read both
+within the hour.
 
 ## Limits
 

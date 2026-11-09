@@ -13,10 +13,16 @@
 # public: scripts/seed-ci.ts prints counts and check names only, and keeps
 # the full report in seed_runs.last_report.
 #
-# Every six hours rather than weekly: a sample row is never dated in the
-# future, and the school table shows only the current week, so a weekly
-# run would leave the week's table without sample activity until the next
-# run. Each run adds the activity since the last one.
+# Every hour, at 17 minutes past (Arthur, 2026-11-09: "run hourly at an
+# odd minute (e.g. :17), not six-hourly. Each run extends to now, so
+# skipped or late runs don't matter."). GitHub runs scheduled jobs late,
+# or drops them, when it is busy: from 2026-11-07 to 09 the six-hourly
+# slots ran up to about six hours late, or not at all. Each run adds the
+# activity since the last one, up to now, so a run that is skipped only
+# means the next one adds more. A sample row is never dated in the
+# future, and the school table shows only the current week, so the more
+# often it runs, the closer the week's table is to now. If nothing has run
+# for six hours, run extend by hand from the Actions tab.
 #
 # Modes, by hand: canary (starts the run, first 40 accounts), full (the
 # rest), extend (what the schedule runs; it does nothing until a full
@@ -26,7 +32,7 @@ name: Sample activity
 
 on:
   schedule:
-    - cron: "41 */6 * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
       mode:
@@ -45,6 +51,13 @@ permissions:
   contents: read
 
 # One at a time, and a queued run waits rather than cancelling a live one.
+# GitHub keeps one waiting run per group and cancels an older waiting one
+# when another arrives. For a scheduled extend nothing is lost, since the
+# next run extends to now; but a `full` or `teardown` started by hand while
+# a job is running waits, and is cancelled if the next scheduled run
+# arrives while it waits. So after
+# starting one by hand, check that it ran, and start it again if it shows
+# as cancelled.
 concurrency:
   group: sample-activity
   cancel-in-progress: false

@@ -18,7 +18,7 @@ import { SHOWN_SCHOOL_IDS } from "@/lib/types";
 // motion's own page, where a reader writes theirs.
 //
 // Built on first request and then at most hourly (the sample run adds
-// arguments every six hours). generateStaticParams returning nothing is
+// arguments every hour). generateStaticParams returning nothing is
 // what makes a dynamic segment cacheable; `revalidate` alone left the
 // route rendered on every request.
 export const revalidate = 3600;
