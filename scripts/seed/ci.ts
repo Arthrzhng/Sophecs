@@ -4,7 +4,7 @@
 
 import type { Adapter } from "./adapter";
 import { buildPlan, describe } from "./plan";
-import { DEFAULTS, RUN_QUIZ, type GenConfig } from "./generate";
+import { DEFAULTS, RUN_QUIZ, RUN_WEEKLY, type GenConfig } from "./generate";
 import { contentTopics } from "./topics";
 import { execute, finishValidation, HaltedError, isHalted, LockLostError, recordedOnRun, releaseHeld, StopError, thrownWhileWriting, VALIDATING } from "./engine";
 import { validate } from "./validate";
@@ -97,9 +97,13 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
     exchanges: DEFAULTS.exchanges,
     classes: DEFAULTS.classes,
     ...(RUN_QUIZ ? { quiz: RUN_QUIZ } : {}),
+    ...(RUN_WEEKLY ? { weekly: RUN_WEEKLY } : {}),
     ...o.config,
     topics: contentTopics(),
   };
+  // The weekly shape is a quiz v2 run's; a run that names no quiz is drawn
+  // as every run before it was.
+  if (gen.quiz !== 2) delete gen.weekly;
   const started = Date.now();
   const { plan, dataset } = buildPlan({ target: { kind: "production", projectRef: o.projectRef }, gen, planPath: "(in memory)" });
   log(`${o.mode}: run ${plan.runId}, activity to ${plan.window.to}; plan made in ${((Date.now() - started) / 1000).toFixed(1)} s`);

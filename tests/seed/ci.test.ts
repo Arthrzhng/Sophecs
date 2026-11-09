@@ -76,7 +76,10 @@ describe("the scheduled workflow's path", () => {
 
     const ext = await step(db, "extend", 24 * 7);
     expect(ext.out.ok).toBe(true);
-    expect(samples(db, "profiles")).toBe(SMALL.users);
+    // A week on, the run has grown by its newcomers (RUN_WEEKLY: about 25 a
+    // week; Arthur, 2026-11-08).
+    expect(samples(db, "profiles")).toBeGreaterThan(SMALL.users + 10);
+    expect(samples(db, "profiles")).toBeLessThan(SMALL.users + 50);
     expect(samples(db, "debates")).toBeGreaterThan(debatesAfterFull);
     expect(Date.parse((await db.listRuns())[0].window_to)).toBe(Date.parse(at(24 * 7)));
     // The full report is kept in the run's row, with the genuine figures.
