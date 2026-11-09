@@ -1,7 +1,8 @@
 // Template verdicts for sample arguments. No judge is called: every verdict
 // here is written from the argument's own passages, says so through
 // `prompt_version` and `debates.verdict_is_template`, and is shown on the
-// verdict page as a sample assessment (src/components/debate/Verdict.tsx).
+// verdict page under the AI tag, which says the judge did not read it
+// (src/components/debate/Verdict.tsx).
 //
 // Each one has the shape the real judge returns (src/lib/judge/schema.ts),
 // within its word limits, so the verdict page renders it as it renders any

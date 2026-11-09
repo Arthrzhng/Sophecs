@@ -16,13 +16,14 @@ import { verdictShareLine } from "@/lib/verdict-share";
 import { verdictForViewer } from "@/lib/verdict-privacy";
 import { scoresComparable } from "@/lib/verdict-versions";
 
-// A sample account's verdict says so in the title too, which is what a
-// link preview shows first.
+// A sample account's verdict has the same title as anyone's (Arthur,
+// 2026-11-08); it passes no referrer on, and its preview image carries the
+// sample mark.
 export async function generateMetadata({ params }: { params: Promise<{ debateId: string }> }) {
   const { debateId } = await params;
   if (!isAdminConfigured()) return { title: "Verdict · Sophecs" };
   const { data } = await createAdminClient().from("debates_public").select("is_sample").eq("id", debateId).maybeSingle();
-  return data?.is_sample ? sampleMetadata("Sample verdict · Sophecs") : { title: "Verdict · Sophecs" };
+  return data?.is_sample ? sampleMetadata("Verdict · Sophecs") : { title: "Verdict · Sophecs" };
 }
 
 // Public — anyone with the link can view a verdict. Argument text is

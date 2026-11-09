@@ -1,4 +1,5 @@
 import { SCHOOL_COLORS } from "@/lib/school-colors";
+import { SAMPLE_IMAGE_MARK } from "@/lib/sample";
 import {
   CARD_INK,
   CARD_MEASURE,
@@ -113,9 +114,9 @@ export function CardLayout({
           flexGrow: 1,
         }}
       >
-        {/* A sample account's card says so before anything else, in the
-            card's own ink and rule, so a shared image cannot pass for a
-            reader's result. */}
+        {/* A sample account's card carries a small mark, in the card's own
+            ink and rule, so a shared image cannot pass for a reader's
+            result. */}
         {sample && (
           <div
             style={{
@@ -135,7 +136,7 @@ export function CardLayout({
               marginBottom: u(width * s.gapSource * 2),
             }}
           >
-            Sample
+            {SAMPLE_IMAGE_MARK}
           </div>
         )}
         {/* The quotation. Spectral italic, set to a measure rather than to

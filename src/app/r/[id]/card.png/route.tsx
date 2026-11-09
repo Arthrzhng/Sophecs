@@ -21,7 +21,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   // Stoicism, unmarked. With one, a result the lookup does not return (a
   // wrong id, a sample removed by teardown, a failed read) gets no image
   // and is not cached, rather than a default card that could be the wrong
-  // school, or a sample's without its Sample mark, cached for a year.
+  // school, or a sample's without its sample mark, cached for a year.
   let school: SchoolId = "stoicism";
   let sample = false;
 

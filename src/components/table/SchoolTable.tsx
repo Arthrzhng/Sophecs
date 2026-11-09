@@ -26,8 +26,10 @@ export interface SchoolTableProps {
   /** True when the kill switch is on for this reader. */
   paused: boolean;
   /**
-   * Said when the week's rows count a sample account's argument
-   * (migration 0023). Null in a week with none.
+   * The one line on /schools in a week whose rows count a sample account's
+   * argument (migration 0023; Arthur, 2026-11-08: "Includes sample
+   * accounts, run by AI."), linked to the explanation. Null in a week with
+   * none.
    */
   sampleNote?: string | null;
 }
@@ -91,6 +93,14 @@ export function SchoolTable({
             for arguing the way the school reasons, averaged across every judged
             original argument.
           </p>
+          {/* Right under what the table counts, so its subject is the
+              table's arguments and marks, and not the "Joined and left"
+              note, whose subject is people (review pass 3). */}
+          {sampleNote && (
+            <p className="mt-2 max-w-[60ch] text-sm leading-relaxed text-ink-mid">
+              <TextLink href={SAMPLES_HREF}>{sampleNote}</TextLink>
+            </p>
+          )}
         </div>
         <span className="rounded-card border-2 border-rule bg-surface px-4 py-2 text-sm font-extrabold text-ink">
           Week <span className="font-mono tabular">{week}</span> &middot; closes Sunday,
@@ -201,12 +211,6 @@ export function SchoolTable({
             Joined and left count people who retook the quiz and changed school. No
             names are shown, here or anywhere else.
           </p>
-          {sampleNote && (
-            <p className="mt-2 text-sm leading-relaxed text-ink-mid">
-              {sampleNote}{" "}
-              <TextLink href={SAMPLES_HREF}>What a sample account is</TextLink>
-            </p>
-          )}
         </section>
       </div>
     </div>

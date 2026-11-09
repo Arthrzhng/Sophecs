@@ -233,7 +233,7 @@ describe("a build without SIX_SCHOOLS", () => {
       "src/components/debate/Verdict.tsx": ["RUBRIC_HREF", "TABLE_HREF", "RUBRIC_HREF", "uses 3"],
       "src/components/nav/SiteFooter.tsx": ["RUBRIC_HREF", "uses 1"],
       "src/components/table/SchoolTable.tsx": ["SAMPLES_HREF", "uses 1"],
-      "src/components/today/TodayCards.tsx": ["SAMPLES_HREF", "TABLE_HREF", "uses 2"],
+      "src/components/today/TodayCards.tsx": ["TABLE_HREF", "uses 1"],
       "src/components/today/TodayClient.tsx": ["METHOD_HREF", "uses 1"],
     });
   });

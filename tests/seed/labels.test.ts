@@ -1,8 +1,9 @@
-// The Sample label, the sample assessment wording, the table note, and the
-// view events a sample page does not send.
+// The AI tag and the rest of the minimum a reader sees of a sample account,
+// and the view events a sample page does not send.
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import { readFileSync } from "node:fs";
 
 const tracked: { name: string }[] = [];
 vi.mock("@/lib/analytics/client", () => ({ track: (e: { name: string }) => tracked.push(e) }));
@@ -17,7 +18,7 @@ const { SampleLabel } = await import("../../src/components/sample/SampleLabel");
 const { Verdict } = await import("../../src/components/debate/Verdict");
 const { ChallengeInvite } = await import("../../src/components/share/ChallengeInvite");
 const { SchoolTable } = await import("../../src/components/table/SchoolTable");
-const { SAMPLE_EXPLANATION, TABLE_SAMPLE_NOTE } = await import("../../src/lib/sample");
+const { SAMPLE_EXPLANATION, SAMPLE_JUDGE_NOTE, SCHOOLS_SAMPLE_LINE, SAMPLE_IMAGE_MARK } = await import("../../src/lib/sample");
 
 const verdict = {
   rejected: false, score: 72, fidelity: 7.5, rigor: 7, engagement: 6.5,
@@ -34,26 +35,39 @@ const html = (el: Parameters<typeof renderToStaticMarkup>[0]) => renderToStaticM
 beforeEach(() => void (tracked.length = 0));
 
 describe("labels", () => {
-  it("SampleLabel says Sample and opens to the explanation, verbatim", () => {
+  // Arthur, 2026-11-08: readers see "sample" as little as possible. The
+  // minimum: a small AI tag beside a sample's work, the line before writing
+  // to one (with the replies), a mark on its images, one line on /schools,
+  // the explanation on /how-it-works.
+  it("the tag says AI and opens to the explanation, Arthur's words", () => {
     const out = html(createElement(SampleLabel));
-    expect(out).toContain(">Sample<");
-    expect(out).toContain(SAMPLE_EXPLANATION);
-    expect(SAMPLE_EXPLANATION).toBe("An illustrative account with generated activity, not an active member. It does not respond to messages or challenges.");
     expect(out).toMatch(/^<details/);
+    expect(out).toContain(">AI<");
+    expect(SAMPLE_EXPLANATION).toBe("Sample accounts are run by AI. They show what arguing here looks like.");
+    expect(out).toContain(SAMPLE_EXPLANATION);
+    expect(out).not.toMatch(/Sample</);
   });
 
-  it("a template verdict is a sample assessment and never claims the judge read it", () => {
+  it("a template verdict carries the tag, says inside it the judge did not read it, and never claims the judge did", () => {
     const out = html(createElement(Verdict, { ...props, sample: { template: true } }));
-    expect(out).toContain(SAMPLE_EXPLANATION);
-    expect(out).toContain("Sample assessment");
+    expect(out).toContain(">AI<");
+    expect(out).toContain(`${SAMPLE_EXPLANATION} ${SAMPLE_JUDGE_NOTE}`);
+    expect(SAMPLE_JUDGE_NOTE).toBe("The judge did not read this argument.");
     for (const claim of ["How the judge scored you", "The judge's note", "verdict is in", "How this was judged"]) expect(out).not.toContain(claim);
+    for (const gone of ["Sample assessment", "sample assessment", "Written from a template", ">Sample<"]) expect(out).not.toContain(gone);
+    expect(out.match(/<details/g)?.length).toBe(1);
     expect(out).not.toContain("Share");
+    // The rejected view too.
+    const rejected = html(createElement(Verdict, { ...props, verdict: { ...verdict, rejected: true }, sample: { template: true } }));
+    expect(rejected).toContain(">AI<");
+    expect(rejected).not.toContain("Sample assessment");
   });
 
   it("a genuine verdict is unchanged", () => {
     const out = html(createElement(Verdict, props));
     expect(out).toContain("How the judge scored you");
     expect(out).not.toContain(SAMPLE_EXPLANATION);
+    expect(out).not.toContain(">AI<");
   });
 
   it("offers the motion's exemplars on a reader's own genuine verdict only", () => {
@@ -63,24 +77,127 @@ describe("labels", () => {
     expect(html(createElement(Verdict, props))).not.toContain(link);
   });
 
-  it("a sample challenge is labelled and does not accept on the reader's behalf", () => {
+  it("a sample challenge is tagged, never someone's, and does not accept on the reader's behalf", () => {
     const content = { one_line: "x", name: "Stoicism" } as never;
     const out = html(createElement(ChallengeInvite, { challengeId: "c1", school: "stoicism", content, isSample: true }));
-    expect(out).toContain(SAMPLE_EXPLANATION);
+    expect(out).toContain(">AI<");
+    expect(out).not.toContain("Someone challenged you");
+    expect(out).not.toContain("A sample account's challenge");
     expect(out).toContain('href="/quiz"');
     expect(out).not.toContain("/quiz?c=c1");
     expect(html(createElement(ChallengeInvite, { challengeId: "c1", school: "stoicism", content }))).toContain("/quiz?c=c1");
   });
 
-  it("the school table says when sample accounts are in the week", () => {
-    const base = { week: 44, rows: [], yourSchool: null, yourLine: null, emptyWeek: false, paused: false };
-    expect(html(createElement(SchoolTable, { ...base, sampleNote: TABLE_SAMPLE_NOTE }))).toContain(TABLE_SAMPLE_NOTE);
-    expect(html(createElement(SchoolTable, { ...base, sampleNote: TABLE_SAMPLE_NOTE }))).toContain('href="/method#samples"');
-    expect(html(createElement(SchoolTable, base))).not.toContain(TABLE_SAMPLE_NOTE);
-  });
-});
 
-describe("metrics", () => {
+  it("the school table has the one line on /schools, linked to the explanation, only in a week with samples", () => {
+    expect(SCHOOLS_SAMPLE_LINE).toBe("Includes sample accounts, run by AI.");
+    const base = { week: 44, rows: [], yourSchool: null, yourLine: null, emptyWeek: false, paused: false };
+    const out = html(createElement(SchoolTable, { ...base, sampleNote: SCHOOLS_SAMPLE_LINE }));
+    expect(out).toContain(SCHOOLS_SAMPLE_LINE);
+    expect(out).toMatch(/href="\/(method|how-it-works)#samples"/);
+    expect(out).not.toContain("What a sample account is");
+    // Under the table's description, whose subject is its arguments and
+    // marks; not in the note about people who changed school (review pass 3).
+    const joined = out.slice(out.indexOf("Joined and left"));
+    expect(joined).not.toContain(SCHOOLS_SAMPLE_LINE);
+    expect(out.indexOf(SCHOOLS_SAMPLE_LINE)).toBeGreaterThan(out.indexOf("original argument."));
+    expect(html(createElement(SchoolTable, base))).not.toContain(SCHOOLS_SAMPLE_LINE);
+  });
+
+  // Each surface a sample's work is shown on, rendered: outside its one tag
+  // the page says nothing of samples or AI, speaks of no person, and the tag
+  // sits only where flow content may.
+  it("each sample surface carries exactly one tag, in a valid place, and says nothing else of samples or of a person", async () => {
+    const { SharePage } = await import("../../src/components/share/SharePage");
+    const { SchoolCard } = await import("../../src/components/today/TodayCards");
+    const { SchoolMap } = await import("../../src/components/phase3/SchoolMap");
+    const { resultMapWords } = await import("../../src/lib/sample");
+    const content = { one_line: "x", name: "Stoicism" } as never;
+    const result = {
+      resultId: "r1", school: "stoicism" as const, oneLine: "A line.", oneLineAttribution: "Epictetus", vector: null, otherVector: null,
+      isOwner: false, isSavedToProfile: false, showDebateThem: false, challengeId: null, isSignedIn: false, shareLine: "s", shareLineIndex: 0,
+    };
+    const words = resultMapWords(true);
+    const map = createElement(SchoolMap, {
+      title: words.title, whose: words.whose, caption: "Where these answers landed",
+      schools: [{ id: "stoicism", name: "Stoicism", angle: 0 }, { id: "ubuntu", name: "Ubuntu", angle: 180 }],
+      axes: { x: ["Each person on their own", "People through each other"], y: ["a", "b"] }, reader: { x: 0.2, y: 0.1 },
+    } as never);
+    const comparison = { parentDebateId: "p1", comparable: true, first: { score: 60, fidelity: 6, rigor: 6, engagement: 5 } };
+    const surfaces: Record<string, string> = {
+      "template verdict": html(createElement(Verdict, { ...props, sample: { template: true } })),
+      "template verdict, private": html(createElement(Verdict, { ...props, argument: null, argumentPublic: false, textWithheld: true, sample: { template: true } } as never)),
+      "rejected template verdict": html(createElement(Verdict, { ...props, verdict: { ...verdict, rejected: true }, sample: { template: true } })),
+      "rejected template verdict, private": html(createElement(Verdict, { ...props, verdict: { ...verdict, rejected: true }, argument: null, argumentPublic: false, textWithheld: true, sample: { template: true } } as never)),
+      "template revision": html(createElement(Verdict, { ...props, comparison, sample: { template: true } } as never)),
+      "sample result": html(createElement(SharePage, { ...result, isSample: true, figure: map } as never)),
+      "sample challenge": html(createElement(ChallengeInvite, { challengeId: "c1", school: "stoicism", content, isSample: true })),
+    };
+    const PERSON = /\b(someone|their|them|author|person|who wrote)\b|\bthey (came|argue|stand|wrote)\b|\byou left\b|\byour first\b/i;
+    for (const [name, out] of Object.entries(surfaces)) {
+      expect(out.match(/<details/g)?.length ?? 0, name).toBe(1);
+      // No <details> inside an element that may hold phrasing content only.
+      expect(out, name).not.toMatch(/<(p|h[1-6]|span|a|button|label)\b[^>]*>(?:(?!<\/\1>)[\s\S])*<details/);
+      const outside = out.replace(/<details[\s\S]*?<\/details>/g, "");
+      expect(outside, name).not.toMatch(/sample/i);
+      expect(outside, name).not.toMatch(/\bAI\b/);
+      // The one place a person is spoken of is a school's own words, the
+      // axis labels of the map ("Each person on their own").
+      expect(outside.replace(/Each person on their own/g, ""), name).not.toMatch(PERSON);
+      // The tag's tap target is 44 by 44.
+      expect(out, name).toMatch(/<summary class="[^"]*\bmin-h-11\b[^"]*\bmin-w-11\b/);
+      // A reader's own wording, which addresses them as the author or
+      // credits the judge, is never on a sample's page (review pass 3).
+      for (const own of ["Write it again", "How the judge scored you", "verdict is in", "Someone challenged you", "Someone shared their result", "put them"])
+        expect(outside, `${name}: ${own}`).not.toContain(own);
+    }
+    for (const name of ["template verdict", "template verdict, private", "rejected template verdict", "rejected template verdict, private", "template revision"])
+      expect(surfaces[name], name).toContain(`${SAMPLE_EXPLANATION} ${SAMPLE_JUDGE_NOTE}`);
+    expect(surfaces["sample result"]).toContain("A filled dot marks where these answers landed.");
+    // The result page hands the map both its words from resultMapWords.
+    const resultPage = readFileSync("src/app/r/[id]/page.tsx", "utf8");
+    const mapJsx = resultPage.match(/<SchoolMap[\s\S]*?\/>/g) ?? [];
+    expect(mapJsx).toHaveLength(1);
+    expect(mapJsx[0]).toContain("title={resultMapWords(Boolean(result.is_sample)).title}");
+    expect(mapJsx[0]).toContain("whose={resultMapWords(Boolean(result.is_sample)).whose}");
+    // Today's rank card takes no sample prop, so it can say nothing of samples.
+    const card = readFileSync("src/components/today/TodayCards.tsx", "utf8");
+    expect(card).not.toMatch(/includesSamples|RANK_SAMPLE_NOTE|sample/i);
+    expect(html(createElement(SchoolCard, { school: "stoicism", oneLine: "x", elo: 1200, rank: 2 } as never))).not.toMatch(/sample/i);
+    // The page titles and the images' marks.
+    for (const f of ["src/app/r/[id]/page.tsx", "src/app/c/[id]/page.tsx", "src/app/debate/[slug]/[debateId]/page.tsx"]) {
+      const code = readFileSync(f, "utf8").replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
+      expect(code, f).not.toMatch(/"[^"]*\bSample\b[^"]*"|`[^`]*\bSample\b[^`]*`/);
+    }
+    expect(readFileSync("src/components/card/CardLayout.tsx", "utf8")).toContain("{SAMPLE_IMAGE_MARK}");
+    expect(readFileSync("src/components/debate/VerdictCard.tsx", "utf8")).toContain("{SAMPLE_IMAGE_MARK}");
+    expect(SAMPLE_IMAGE_MARK).toBe("AI sample");
+  });
+
+  // The other side of the guard: a reader's own pages carry no tag and keep
+  // their own wording (review pass 3).
+  it("a reader's verdict, result and challenge carry no tag and keep their wording", async () => {
+    const { SharePage } = await import("../../src/components/share/SharePage");
+    const content = { one_line: "x", name: "Stoicism" } as never;
+    const result = {
+      resultId: "r1", school: "stoicism" as const, oneLine: "A line.", oneLineAttribution: "Epictetus", vector: null, otherVector: null,
+      isOwner: false, isSavedToProfile: false, showDebateThem: false, challengeId: null, isSignedIn: false, shareLine: "s", shareLineIndex: 0,
+    };
+    const comparison = { parentDebateId: "p1", comparable: true, first: { score: 60, fidelity: 6, rigor: 6, engagement: 5 } };
+    const genuine: Record<string, [string, string[]]> = {
+      verdict: [html(createElement(Verdict, props)), ["How the judge scored you", "verdict is in", "The objection you left standing"]],
+      "rejected verdict": [html(createElement(Verdict, { ...props, isOwner: true, verdict: { ...verdict, rejected: true } })), ["Write it again"]],
+      revision: [html(createElement(Verdict, { ...props, comparison } as never)), ["Compared with your first attempt"]],
+      result: [html(createElement(SharePage, result as never)), ["Someone shared their result"]],
+      challenge: [html(createElement(ChallengeInvite, { challengeId: "c1", school: "stoicism", content })), ["Someone challenged you"]],
+    };
+    for (const [name, [out, own]] of Object.entries(genuine)) {
+      expect(out, name).not.toContain("<details");
+      expect(out, name).not.toMatch(/sample/i);
+      for (const words of own) expect(out, `${name}: ${words}`).toContain(words);
+    }
+  });
+
   it("a sample verdict sends no view events; a genuine one does", () => {
     html(createElement(Verdict, { ...props, sample: { template: true } }));
     expect(tracked).toEqual([]);
@@ -89,7 +206,7 @@ describe("metrics", () => {
   });
 
   it("the result, challenge and verdict pages mark a sample page instead of tracking it", async () => {
-    const { readFileSync } = await import("node:fs");
+
     expect(readFileSync("src/app/r/[id]/page.tsx", "utf8")).toMatch(/\{result\.is_sample \? \(\s*<SamplePageMarker \/>\s*\) : \(\s*<CardViewTracker/);
     expect(readFileSync("src/app/c/[id]/page.tsx", "utf8")).toMatch(/\{challenge\.isSample \? <SamplePageMarker \/> : <ChallengeViewTracker/);
     expect(readFileSync("src/app/debate/[slug]/[debateId]/page.tsx", "utf8")).toMatch(/\{publicRow\.is_sample && <SamplePageMarker \/>\}/);
@@ -101,7 +218,7 @@ describe("metrics", () => {
   it("nothing reaches PostHog from a page that carries the sample marker", async () => {
     // The real module: this file mocks it for the trackers above.
     const { onSamplePage, SAMPLE_PAGE_ATTRIBUTE } = await vi.importActual<typeof import("../../src/lib/analytics/client")>("../../src/lib/analytics/client");
-    const { readFileSync } = await import("node:fs");
+
     // The marker component writes the attribute the client looks for.
     expect(readFileSync("src/components/sample/SamplePageMarker.tsx", "utf8")).toContain(`${SAMPLE_PAGE_ATTRIBUTE}=""`);
     // track() returns before loading PostHog when the marker is present.

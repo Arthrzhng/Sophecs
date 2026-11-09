@@ -9,13 +9,14 @@ import { exchangeLapsed, LAPSE_DAYS, type LapseExchange, type LapseTurn } from "
 import { closeIfLapsed, exchangeForLapse, meExchangeRows, readExchangeTurns, type OpenExchangeRow, type TurnState } from "../src/lib/counterpart-lapse";
 import { OpenExchanges } from "../src/components/me/OpenExchanges";
 import { SchoolMap } from "../src/components/phase3/SchoolMap";
+import { resultMapWords } from "../src/lib/sample";
 
 vi.mock("server-only", () => ({}));
 
 const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
 describe("item 8: the two fixes to the v2 copy", () => {
-  const map = (whose?: "your" | "their") =>
+  const map = (whose?: "your" | "their" | "these answers") =>
     renderToStaticMarkup(
       <SchoolMap
         title="Where these answers put them, on the map of the schools"
@@ -37,7 +38,13 @@ describe("item 8: the two fixes to the v2 copy", () => {
     const page = read("src/app/r/[id]/page.tsx");
     const maps = page.match(/<SchoolMap[\s\S]*?\/>/g) ?? [];
     expect(maps).toHaveLength(1);
-    expect(maps[0]).toContain('whose="their"');
+    // A reader's shared result says "their"; a sample's, which is no
+    // person's (docs/decisions.md, "Sample labels at the minimum"), says
+    // "these answers".
+    expect(maps[0]).toContain("whose={resultMapWords(Boolean(result.is_sample)).whose}");
+    expect(resultMapWords(false).whose).toBe("their");
+    expect(map(resultMapWords(false).whose)).toContain("A filled dot marks where they stand.");
+    expect(resultMapWords(true).whose).toBe("these answers");
   });
 
   it("rewrites Utilitarianism's share line [1] so it no longer cites v1's self-driving-car question", () => {

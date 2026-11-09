@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { TABLE_SAMPLE_NOTE } from "@/lib/sample";
+import { SCHOOLS_SAMPLE_LINE } from "@/lib/sample";
 import { Page } from "@/components/layout/Page";
 import { TopicList } from "@/components/debate/TopicList";
 import { JudgingPausedNotice } from "@/components/debate/JudgingPausedNotice";
@@ -844,8 +844,8 @@ export default function ArenaPreviewPage() {
       </Section>
 
       {/* Sample accounts (docs/sample-activity.md): the same components,
-          with the Sample label and, on a template verdict, the sample
-          assessment wording. Nothing else about them changes. */}
+          with the AI tag, which on a template verdict also says the judge
+          did not read it. Nothing else about them changes. */}
       <Section title="37. Sample: a template verdict, seen by a visitor">
         <Verdict
           debateId="preview-sample"
@@ -895,7 +895,7 @@ export default function ArenaPreviewPage() {
         />
       </Section>
 
-      <Section title="40. Sample: the school table in a week with sample accounts">
+      <Section title="40. The school table in a week with sample accounts">
         <SchoolTable
           week={FIXTURE_WEEK}
           rows={FIXTURE_TABLE_ROWS}
@@ -903,7 +903,7 @@ export default function ArenaPreviewPage() {
           yourLine={yourTableLine(3, "Stoicism")}
           emptyWeek={false}
           paused={false}
-          sampleNote={TABLE_SAMPLE_NOTE}
+          sampleNote={SCHOOLS_SAMPLE_LINE}
         />
       </Section>
 

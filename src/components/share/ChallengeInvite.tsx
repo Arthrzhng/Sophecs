@@ -38,12 +38,15 @@ export function ChallengeInvite({
 
   return (
     <>
-      {isSample && <SampleLabel />}
-      <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
-        {isSample ? "A sample account's challenge" : "Someone challenged you"}
-      </p>
+      <div className="flex flex-wrap items-center gap-x-3">
+        <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
+          {isSample ? "A challenge" : "Someone challenged you"}
+        </p>
+        {isSample && <SampleLabel />}
+      </div>
       <h1 className="mt-2 max-w-[24ch] text-xl font-extrabold leading-tight tracking-tight text-ink">
-        They came out {SCHOOL_ARTICLE[school]} {adherent}. Find out what you are.
+        {/* A sample is never presented as a person (Arthur, 2026-11-08). */}
+        {isSample ? "This account" : "They"} came out {SCHOOL_ARTICLE[school]} {adherent}. Find out what you are.
       </h1>
 
       {/* Quiz v2 on a SIX_SCHOOLS build places a reader in one of six and
@@ -81,7 +84,7 @@ export function ChallengeInvite({
           what the site does. */}
       <section className="mt-12 border-t-2 border-rule pt-10">
         <h2 className="text-lg font-extrabold tracking-tight text-ink">
-          What they argue from
+          {isSample ? "What this account argues from" : "What they argue from"}
         </h2>
         <div
           className="mt-5 rounded-card border-2 border-l-4 border-rule bg-surface p-5"
