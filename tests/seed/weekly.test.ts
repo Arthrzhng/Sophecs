@@ -135,7 +135,8 @@ describe("a sample run made with the weekly settings", () => {
       for (let t = Date.parse(BASE_TO); t <= Date.parse(end); t += 10 * 60_000)
         for (const school of SCHOOLS) {
           const n = judged.get(school)!.filter((x) => x > t - WEEK && x <= t).length;
-          if (n < RUN_WEEKLY!.minPerSchool) expect(n, `${school}, seven days to ${new Date(t).toISOString()}`).toBeGreaterThanOrEqual(RUN_WEEKLY!.minPerSchool);
+          // 20 for the table, and the two to spare (review pass 2, O3).
+          if (n < RUN_WEEKLY!.minPerSchool + 2) expect(n, `${school}, seven days to ${new Date(t).toISOString()}`).toBeGreaterThanOrEqual(RUN_WEEKLY!.minPerSchool + 2);
         }
     });
 
@@ -167,6 +168,8 @@ describe("a sample run made with the weekly settings", () => {
         const n = act.get(w)?.size ?? 0;
         expect(n, new Date(w).toISOString().slice(0, 10)).toBeGreaterThanOrEqual(160);
         expect(n, new Date(w).toISOString().slice(0, 10)).toBeLessThanOrEqual(240);
+        // Never a round number, the taper's weeks included (review pass 2, O2).
+        expect(n % 10, `${new Date(w).toISOString().slice(0, 10)}: ${n}`).not.toBe(0);
       }
     });
   }
@@ -269,6 +272,6 @@ describe("a weekly run made before WEEKLY_RULES_FROM", () => {
     expect(anon(before)).toEqual([]);
     expect(anon(after).every((t) => t >= F)).toBe(true);
     expect(anon(after).length).toBeGreaterThan(40);
-    expect(lowestSevenDays(after, F + 12 * 3_600_000, Date.parse(end))!.n).toBeGreaterThanOrEqual(RUN_WEEKLY!.minPerSchool);
+    expect(lowestSevenDays(after, F + 12 * 3_600_000, Date.parse(end))!.n).toBeGreaterThanOrEqual(RUN_WEEKLY!.minPerSchool + 2);
   });
 });

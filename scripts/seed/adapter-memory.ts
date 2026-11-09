@@ -129,7 +129,7 @@ export class MemoryAdapter implements Adapter {
     return run ? this.counted([{ ...run }])[0] : null;
   }
   async listRuns(): Promise<RunListing[]> {
-    return this.counted([...this.runs.values()].map(({ last_report: _, ...run }) => run));
+    return this.counted([...this.runs.values()].map((run) => Object.fromEntries(Object.entries(run).filter(([k]) => k !== "last_report")) as RunListing));
   }
   async insertRun(run: SeedRun) {
     if (this.runs.has(run.id)) throw new Error("duplicate run");

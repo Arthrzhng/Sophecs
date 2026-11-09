@@ -413,23 +413,31 @@ Two layers, both from one secret seed:
   burst into what is left of it and no lull until the next Monday; its
   count is the base window's accounts and the drawn ones together, so it
   is not drawn exactly. Challenges, exchanges, reading answers and
-  classes stay the base window's: none are drawn after it.
+  classes stay the base window's: none are drawn after it. Anonymous
+  quiz results are the base window's (about 180 to 210 a week in its last
+  weeks) and, with `anonymous`, about 37 a week after it; in the live
+  run, made before `WEEKLY_RULES_FROM`, none or one a week from its base
+  window's end to 16 November, then about 37 (review pass 2, O5).
 
   Measured on 2026-11-09 for Arthur's items 9, 11 and 13, at the
   scheduled job's volumes, on four seeds over six weeks, the base window
   ending at 06:00 on a Monday: every school 22 or more judged originals
   in every seven days, checked every ten minutes; 33 to 40 anonymous quiz
-  takers a week on average; sign-ups a week over the base window's last six weeks
-  108, 120, 96, 79, 51, 28 on one seed and 114, 107, 104, 71, 42, 23 on
-  another, then the weeks' 16 to 38. Active accounts a week, from six
+  takers a week on average. Sign-ups a week over the base window's last
+  six weeks, on the seeds `weekly-check` and `another`, the base window
+  ending at 06:00 on Monday 16 November (as in
+  `tests/seed/weekly.test.ts`): 96, 95, 102, 58, 39, 35 and 105, 84, 86,
+  72, 47, 33, then 11 to 40 a week after it. Active accounts a week, from six
   weeks before the base window's end to four after, ended late on a
   Sunday, early on a Monday, at 06:00 on a Monday and on a Wednesday
   afternoon: 181 to 222. After review pass 1 (O2), the week the base
-  window ends in, started Tuesday to Friday on six seeds: 171 to 209
-  active, each exactly its week's own number (162 to 181 before). On the
-  live run's shape, for a run made before `WEEKLY_RULES_FROM`: on three
-  seeds, the same rows as before up to 16 November, and from 12 hours
-  after it every school 22 or more in every seven days.
+  window ends in, started Tuesday to Friday on six seeds (`probe-a`,
+  `-b`, `-d` to `-g`): 171 to 209 active, each its week's own number
+  (162 to 181 before). On the live run's shape, for a run made before
+  `WEEKLY_RULES_FROM`: on three seeds, the same rows as before up to 16
+  November, and from 12 hours after it every school 22 or more in every
+  seven days (review pass 2 found 22 to 31 from the 16th itself, on six
+  seeds).
 
   The figures below were measured before those three items:
 
@@ -665,7 +673,8 @@ memory, as JSON, every read counted (review pass 1 of the run's
 decisions, O3): about 85 to 100 KB an extension, plus the 20 auth users
 it reads one by one from the Auth API, which sends each whole user
 record, an estimated 1 KB each; so about 105 to 120 KB, against about
-3.8 MB for a whole read now and about 18 MB after a year. So about 0.2
+3.8 MB for a whole read of a new run now (about 3.1 to 3.3 MB of the
+live one) and about 18 MB after a year. So about 0.2
 GB a month now and about 0.6 GB after a year, of the free plan's 5 GB,
 against 2 to 2.4 GB and 12 to 13 GB reading the run whole every hour.
 `tests/seed/reads.test.ts` holds extensions to under a fifth of a
@@ -891,7 +900,7 @@ within the hour.
   from Monday 16 November (`WEEKLY_RULES_WEEK`) and for any run made
   since. Until then the live run gives every school 22 in each ISO week,
   and the seven days the table counts can hold fewer for some hours: on
-  six seeds of its shape, a school was under 20 for 0 to 60 of the 215
+  six seeds of its shape, a school was under 20 for 0 to 60 of the 167
   hours from the base window's end to the 16th. On production at 15:30
   on the 9th, every school had 27 or more.
 - Exemplar pages start thinner than the old run's: at the start, five or

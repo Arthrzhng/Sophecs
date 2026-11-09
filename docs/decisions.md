@@ -6756,7 +6756,7 @@ WEEKLY_RULES_FROM"). This only holds if the code is on `main` before the
   every seven days, checked every ten minutes over six weeks on four
   seeds. Until the 16th the live run's weeks give 22 a school in each ISO
   week, and the seven days can hold fewer for some hours: on six seeds
-  of its shape, a school was under 20 for 0 to 60 of the 215 hours to
+  of its shape, a school was under 20 for 0 to 60 of the 167 hours to
   the 16th. On production at 15:30 on the 9th, every school had 27 or
   more.
 - **11.** `RUN_WEEKLY.anonymous: 37`: about 37 anonymous quiz takers a
@@ -6772,9 +6772,10 @@ WEEKLY_RULES_FROM"). This only holds if the code is on `main` before the
   accounts, and the week the base window ends in is brought up to its
   own number as a whole week (review pass 1, O2: it had dipped to 162 for
   a mid-week start). Measured, sign-ups by week over the base window's
-  last six weeks, then after it: 108, 120, 96, 79, 51, 28, then 23, 29,
-  26, 33, 19, 30 (one seed); 114, 107, 104, 71, 42, 23, then 19, 19, 23,
-  25, 18, 25 (another). A base window is written once, so this reaches
+  last six weeks, then after it, the base window ending at 06:00 on
+  Monday 16 November: 96, 95, 102, 58, 39, 35, then 11, 23, 23, 26, 20,
+  26 (seed `weekly-check`); 105, 84, 86, 72, 47, 33, then 26, 40, 31, 25,
+  29, 20 (seed `another`). A base window is written once, so this reaches
   only a run made after this merge: not the live one, until he orders a
   teardown and a new run.
 - **28.** An extension of a complete run:
@@ -6790,7 +6791,8 @@ WEEKLY_RULES_FROM"). This only holds if the code is on `main` before the
   the hour (review pass 1, B2: the docs said every stored score was
   compared every hour, and now say what runs).
   Measured with every read counted (O3): about 105 to 120 KB an
-  extension against about 3.8 MB for a whole read. That is about 0.2 GB
+  extension against about 3.8 MB for a whole read of a new run (3.1 to
+  3.3 MB of the live one). That is about 0.2 GB
   a month now and 0.6 GB after a year, of the free plan's 5 GB, against
   2 to 2.4 GB and 12 to 13 GB before. The live run gets this at the
   merge. `docs/sample-activity.md`, "How a run writes", has the detail.
@@ -6800,7 +6802,15 @@ For his list, from carrying these out:
   this merge. Making one takes a teardown of `sample-202611090107`
   (which stops if a reader has an exchange with a sample, #117; there
   were none at 15:11 on the 9th), then a canary and a full stage. It is
-  his to order, and the live run carries on until he does.
+  his to order, and the live run carries on until he does. Until the
+  16th the live run also has no anonymous quiz takers after its base
+  window's end, which had about 180 to 210 a week in its last weeks:
+  none or one a week, then about 37 from the 16th (review pass 2, O5).
+- **The merge must land before 16 November.** After it, main's code would
+  have written the live run's weeks under the older rule, and this code's
+  plan would differ from those rows: the run would halt within hours
+  (review pass 2, O1). If it slips, `WEEKLY_RULES_WEEK` moves to a Monday
+  no run has reached.
 - **The figures are mine**: 22 a school in every seven days (two over
   the table's 20), 37 anonymous takers a week (the base window's ratio),
   a six-week cosine taper (`RUN_WEEKLY`). The item 13 test holds each

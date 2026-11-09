@@ -73,9 +73,9 @@ describe("determinism", () => {
     expect(manifestHash(small({ ...weekly, to: "2026-11-21T12:00:00.000Z" }))).toBe("7e38fb77bfb4573a58d21e3ab10cccc09be05bc5e1b050a239968a2260807175");
     const made = { ...weekly, baseTo: "2026-11-16T12:00:00.000Z" };
     expect(baseHash({ ...SMALL, ...made, topics: contentTopics() })).toBe("869cb29bf6febf0dc93f20e98a63b2a168acb7b75bb0f65d98e0ce5bb5359203");
-    expect(manifestHash(small({ ...made, to: made.baseTo }))).toBe("1d28431e5fdef3a530a0282dac93c59dad5edbb4830b81d6eed4a6ff2ad25657");
-    expect(manifestHash(small({ ...made, to: "2026-11-19T12:00:00.000Z" }))).toBe("75b9c054d2ade2e00f3c415b60f22da49d581e6559ec0233b6f3e44e89af0685");
-    expect(manifestHash(small({ ...made, to: "2026-12-03T12:00:00.000Z" }))).toBe("817428c3ac4c54b1b5fb769db75b28b93ddf93d5804c231beb734929e73a16f0");
+    expect(manifestHash(small({ ...made, to: made.baseTo }))).toBe("5b68f0b1654550c76d3c221d5efd698716464d07093a6ab6ec2a7af5963df013");
+    expect(manifestHash(small({ ...made, to: "2026-11-19T12:00:00.000Z" }))).toBe("d4c725a6d35239e40519a42d9d5671f457fd2b8b55213dbce3fa8bd552cda55d");
+    expect(manifestHash(small({ ...made, to: "2026-12-03T12:00:00.000Z" }))).toBe("ab4c7de436a326044359ed3db0692e71ee6cf2cbbb730789b0f7dd862a75332f");
   });
 
   it("names runs and addresses as documented", () => {

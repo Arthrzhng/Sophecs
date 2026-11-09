@@ -1050,13 +1050,18 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     // The week the base window ends in is brought up in the weeks' loop,
     // below, once its kept part is drawn: its accounts are the base
     // window's part and the kept part's together (review pass 1 of the
-    // run's decisions, O2). Every count is kept off a multiple of ten, as
-    // the weeks' are (O5).
+    // run's decisions, O2). Each is kept off a multiple of ten, as the
+    // weeks' are (O5), counting an account active by a revision alone
+    // (review pass 2, O2); one that runs out of accounts to bring back can
+    // still land on one.
     const resultsBy = new Map<string, number[]>();
     if (taperDays > 0) for (const it of quizResults) if (it.row.user_id) (resultsBy.get(it.row.user_id) ?? resultsBy.set(it.row.user_id, []).get(it.row.user_id)!).push(Date.parse(it.row.created_at));
-    /** Returning accounts in the base window's part [a, b) of the week from `ws`, until `active` holds `target`. */
+    /** Returning accounts in the base window's part [a, b) of the week from `ws`, until `active` holds `target`, and not a multiple of ten. */
     const bringUp = (br: Rng, ws: number, a: number, b: number, target: number, active: Set<User>) => {
-      for (const sl of slots) if (sl.t >= a && sl.t < b) active.add(sl.u);
+      for (const sl of slots) {
+        if (sl.t >= a && sl.t < b) active.add(sl.u);
+        if (sl.revise && sl.t + sl.revise.delay >= a && sl.t + sl.revise.delay < b) active.add(sl.u);
+      }
       for (const u of users) if ((resultsBy.get(u.id) ?? []).some((t) => t >= a && t < b)) active.add(u);
       const keyed = users
         .filter((u) => u.cls !== "quiz" && u.signup < a && !active.has(u))
@@ -1066,8 +1071,12 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
           return { u, key: Math.log(Math.max(1e-12, br.float(0, 1))) / w };
         })
         .sort((x, y) => y.key - x.key || x.u.n - y.u.n);
+      let goal = target;
       for (const { u } of keyed) {
-        if (active.size >= target) break;
+        if (active.size >= goal) {
+          if (active.size % 10 !== 0) break;
+          goal = active.size + 1;
+        }
         if (schoolOf(u, a) !== schoolOf(u, b)) continue;
         const ar = br.fork(`active/${u.n}`);
         const n = u.cls === "heavy" ? ar.int(2, 6) : u.cls === "regular" ? ar.int(1, 3) : ar.weighted([[1, 0.7], [2, 0.3]] as const);
