@@ -24,8 +24,8 @@ import type { SchoolId } from "@/lib/types";
 
 // COST: model=claude-sonnet-5 (the judge's, src/lib/anthropic.ts) | trigger=a reader's delivered reply
 // in an exchange with a sample account | measured in=about 3,500 (the judge's v3 criteria) out=about 300 |
-// est_usd_per_reply=0.012 with its screen (tests/sample-reply/run-eval.ts, 12 replies, 2026-11-09), so
-// the ceiling holds about 1,250 replies a month | cap=the reader's SCREEN_DAILY_CAP: a sample's reply is one of the reader's 8
+// est_usd_per_reply=0.0135 with its screen under sample-reply.v3 (tests/sample-reply/run-eval.ts, run 4, 17 replies,
+// 2026-11-09; 0.012 under v1 and v2), so the ceiling holds about 1,100 replies a month | cap=the reader's SCREEN_DAILY_CAP: a sample's reply is one of the reader's 8
 // screened replies a day, and the reader may cause at most 16 writing calls a day, retries included |
 // ceiling=SAMPLE_REPLY_CEILING_USD a month, both kinds, inside AI_MONTHLY_BUDGET_USD |
 // flag=SAMPLE_REPLIES (build time, next.config.ts) | kill_switch=KILL_SWITCH_JUDGE, which stops all AI
@@ -43,8 +43,11 @@ import type { SchoolId } from "@/lib/types";
 // flight, whatever their exchanges (Arthur, 2026-11-09, item 24): the
 // reader's claim (claimReader, migration 0030) is taken before the
 // ceiling is read. So the ceiling can be passed only by replies for
-// different readers at the same moment, and the reader's daily room not
-// at all.
+// different readers at the same moment, and the reader's 16 writing calls
+// a day not at all. Their 8 screens a day can be passed by one: the turn
+// route and the re-screening job count the same screens without the
+// claim, so a reply of the reader's own screened in another exchange while
+// a sample's is written can make it 9, about $0.0006 (review pass 2, O5).
 //
 // Arthur, 2026-11-08, item 1. docs/sample-activity.md, "Sample replies", has the design.
 

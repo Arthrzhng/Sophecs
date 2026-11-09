@@ -40,6 +40,7 @@ let rpc: { data: unknown; error: unknown } = { data: 0, error: null };
 const rpcCalls: { name: string; args: unknown }[] = [];
 let failInsertInto: string | null = null;
 let failReadOf: string | null = null;
+let failUpdateOf: string | null = null;
 
 // Enough of supabase-js for this module.
 function from(table: string) {
@@ -70,6 +71,7 @@ function from(table: string) {
     }
     const rows = (tables[table] ?? []).filter((r) => filters.every((f) => f(r)));
     if (patch) {
+      if (failUpdateOf === table) return resolve({ data: null, error: { message: "update failed" } });
       for (const r of rows) Object.assign(r, patch);
       return resolve({ data: rows.map((r) => ({ id: r.id })), error: null });
     }
@@ -124,6 +126,7 @@ const {
   inventedFigures,
   inventedQuotations,
   inventedStudies,
+  attributedWords,
   parseSampleReply,
   retryNote,
   sampleReplyMaterial,
@@ -191,6 +194,7 @@ beforeEach(() => {
   screenLogOk = true;
   failInsertInto = null;
   failReadOf = null;
+  failUpdateOf = null;
   create.mockReset();
   screenTurn.mockReset();
   screenTurn.mockResolvedValue({ result: "ok", reason: "", latencyMs: 5, costUsd: 0.0006 });
@@ -607,6 +611,65 @@ describe("one sample reply in progress per reader (Arthur, 2026-11-09, item 24)"
     expect(claims.size).toBe(0);
   });
 
+  it("makes no call under the claim if, since it read, a reply was written, the turn moved or the exchange closed (review pass 2, O1)", async () => {
+    // Between this request's reads and its claim, something changes.
+    const changes: [string, () => void | Promise<unknown>][] = [
+      // Another request delivered, but its hand-over failed: the turn is
+      // still the sample's, only the count of turns tells.
+      ["a reply written, its hand-over failed", async () => {
+        failUpdateOf = "exchanges";
+        await replyAsSample(admin, "x1", READER, NOW);
+        failUpdateOf = null;
+      }],
+      ["the turn moved", () => void (tables.exchanges[0].next_turn = READER)],
+      ["the exchange closed", () => void (tables.exchanges[0].status = "lapsed")],
+    ];
+    for (const [what, change] of changes) {
+      world();
+      create.mockReset();
+      create.mockResolvedValue(answer(QUOTE));
+      screenTurn.mockReset();
+      screenTurn.mockResolvedValue(SCREEN_OK);
+      let changed = false;
+      const racing = {
+        from,
+        rpc: async (name: string, args: unknown) => {
+          if (name === "claim_sample_reply" && !changed) {
+            changed = true;
+            await change();
+          }
+          return fakeRpc(name, args);
+        },
+      } as never;
+      const calls = create.mock.calls.length;
+      const before = create.mock.calls.length;
+      expect(await replyAsSample(racing, "x1", READER, NOW), what).toEqual({ ok: false, reason: "not_due" });
+      // Only the other request's own call, if any: none for this one.
+      expect(create.mock.calls.length - before, what).toBe(what.startsWith("a reply") ? create.mock.calls.length - calls : 0);
+      expect(tables.turns.filter((t) => t.seq === 2).length, what).toBeLessThanOrEqual(1);
+      expect(claims.size, what).toBe(0);
+    }
+    // The first case once more, counting: one writing call, the other request's.
+    world();
+    create.mockReset();
+    create.mockResolvedValue(answer(QUOTE));
+    let done = false;
+    const racing = {
+      from,
+      rpc: async (name: string, args: unknown) => {
+        if (name === "claim_sample_reply" && !done) {
+          done = true;
+          failUpdateOf = "exchanges";
+          await replyAsSample(admin, "x1", READER, NOW);
+          failUpdateOf = null;
+        }
+        return fakeRpc(name, args);
+      },
+    } as never;
+    expect(await replyAsSample(racing, "x1", READER, NOW)).toEqual({ ok: false, reason: "not_due" });
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
   it("takes no claim while a kill switch is on (review pass 1, O7)", async () => {
     for (const name of ["KILL_SWITCH_JUDGE", "KILL_SWITCH_SCREEN"]) {
       vi.stubEnv("KILL_SWITCH_JUDGE", "");
@@ -938,6 +1001,54 @@ describe("item 17: what the AI is told, each rule tested (Arthur, 2026-11-09)", 
     expect(inventedQuotations("The applicant's judgement of the refusal is theirs, and the bank's is not. " + BODY, material)).toEqual([]);
   });
 
+  it("reads curly single quotation marks with an apostrophe inside as one quotation (review pass 2, B1)", () => {
+    const nurse = "As a nurse would say, ‘I’ve seen this on the wards, and the reasons never helped anyone’. " + BODY;
+    expect(speaksAsPerson(nurse, material)).toBe(true);
+    expect(inventedQuotations(nurse, material)).toEqual(["I’ve seen this on the wards, and the reasons never helped anyone"]);
+    expect(parseSampleReply(reply(nurse), READER_ARGUMENT, material).ok).toBe(false);
+    expect(inventedQuotations("‘It’s not things that trouble people but their judgements about things’, the line goes. " + BODY, material)).toHaveLength(1);
+    expect(inventedQuotations("‘Aristotle’s point is that virtue is a mean’ is not the claim. " + BODY, material)).toHaveLength(1);
+    // A closing mark followed by a letter is an apostrophe; one before a space closes.
+    expect(inventedQuotations("The words ‘the reason’ carry the claim, and the bank’s do not. " + BODY, material)).toEqual([]);
+  });
+
+  it("passes the prose of an argument that the first checks caught (review pass 2, O2)", () => {
+    for (const ok of [
+      "Character is a study of what one does again and again. ",
+      "The Confucian study of ritual is a training of the heart. ",
+      "The evidence suggests nothing about what is owed. ",
+      "Thought experiments show where the rule bends. ",
+      "The system’s report shows a refusal and nothing more. ",
+    ])
+      expect(inventedStudies(ok + BODY, material), ok).toEqual([]);
+    expect(inventedFigures("The question is older than the 21st century. " + BODY, material)).toEqual([]);
+    expect(inventedFigures("One hundred per cent certainty is not on offer. " + BODY, material)).toEqual([]);
+    expect(speaksAsPerson("The worry is a type I error. " + BODY)).toBe(false);
+    expect(speaksAsPerson("Speaking as a Stoic would, the refusal is indifferent. " + BODY)).toBe(false);
+    // The reader's American spelling quoted back in British spelling is still the reader's.
+    const us = sampleReplyMaterial({ ...input, readerArgument: READER_ARGUMENT + " Banks must organize their reasons for every applicant." });
+    expect(inventedQuotations("The claim that banks \u201Cmust organise their reasons for every applicant\u201D asks a lot. " + BODY, us)).toEqual([]);
+  });
+
+  it("catches let's, and words given to a named writer without quotation marks (review pass 2, O3)", () => {
+    expect(speaksAsPerson("Let’s look at what the argument owes. " + BODY)).toBe(true);
+    expect(speaksAsPerson("Let's look at what the argument owes. " + BODY)).toBe(true);
+    expect(attributedWords("As Aristotle wrote in the Ethics, virtue is a mean between two vices. " + BODY, material)).toEqual(["Aristotle wrote"]);
+    expect(attributedWords("Kant once said that a person is never a means. " + BODY, material)).toEqual(["Kant once said"]);
+    expect(parseSampleReply(reply("As Aristotle wrote in the Ethics, virtue is a mean. " + BODY), READER_ARGUMENT, material)).toMatchObject({
+      ok: false,
+      problem: expect.stringMatching(/gave words to someone the material does not \(Aristotle wrote\)/),
+    });
+    // A view put to a school's founder is argument.
+    expect(attributedWords("As Aristotle argued, virtue is a mean between two vices. " + BODY, material)).toEqual([]);
+    expect(attributedWords("The argument said as much. " + BODY, material)).toEqual([]);
+  });
+
+  it("takes four words in quotation marks as a quotation, and three as a phrase (review pass 2, O4)", () => {
+    expect(inventedQuotations("The \u201Creasons heal every refusal\u201D view fails. " + BODY, material)).toEqual(["reasons heal every refusal"]);
+    expect(inventedQuotations("The \u201Creasons heal refusals\u201D view fails. " + BODY, material)).toEqual([]);
+  });
+
   it("reads straight single quotation marks as quotation marks, both ways (review pass 1, B4)", () => {
     const kant = "As Kant put it, 'act only on that maxim which you can will as a universal law'. " + BODY;
     expect(inventedQuotations(kant, material)).toEqual(["act only on that maxim which you can will as a universal law"]);
@@ -1004,7 +1115,10 @@ describe("item 17: what the AI is told, each rule tested (Arthur, 2026-11-09)", 
     expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual(DELIVERED);
     expect(create).toHaveBeenCalledTimes(2);
     expect(create.mock.calls[1][0].messages.at(-1).content).toBe(
-      retryNote("reply gave figures the material does not have (62 percent); invent no statistics")
+      // Every rule it broke, in one note (review pass 2, O2).
+      retryNote(
+        "reply gave figures the material does not have (62 percent); invent no statistics; and reply cited studies or research the material does not have (According to a survey); invent no studies"
+      )
     );
     expect(tables.turns.find((t) => t.seq === 2)!.body).toBe(BODY);
     expect(tables.ai_calls.map((c) => c.prompt_version)).toEqual(["sample-reply.v3", "sample-reply.v3"]);

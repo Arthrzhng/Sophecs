@@ -6564,8 +6564,12 @@ new run.
     quotation marks, double or single, curly or straight, that the
     material (`sampleReplyMaterial`: the motion, the school, both
     arguments and the replies, without the prompt's own numbering) does
-    not have. These are a backstop: a study cited without one of those
-    words, or a figure in other words, rests on the prompt;
+    not have, or gives words to someone named without quotation marks
+    ("As Aristotle wrote", "Kant once said"). These are a backstop:
+    what rests on the prompt alone is a study cited without one of those
+    words, a figure in other words, and a view put to a philosopher
+    ("as Aristotle argued"), which the check passes as argument
+    (review pass 2, O3);
   - the school's own terms: "Argue in the school's own terms: its own
     concepts and its own way of reasoning, as its one line and the
     judge's criteria for it give them, not another school's vocabulary
@@ -6583,8 +6587,8 @@ new run.
   - never claim or imply to be a person: "Never claim or imply that you
     are a person, or that a person wrote the reply", with "we", "us" and
     "our" ruled out as well as "I", "me" and "my". Behind it, a reply
-    with any of them, or a sentence opening "As someone who", is written
-    again, unless they are inside quotation marks round words the
+    with any of them, "let's", or a sentence opening "As someone who",
+    is written again, unless they are inside quotation marks round words the
     material has: the other side's, quoted back. "US" the country and
     the numeral in "World War I" pass.
   The eval (`docs/sample-activity/sample-reply-eval-4.json`, $0.2299 on
@@ -6598,8 +6602,13 @@ new run.
   3, and the 17 of run 4, the new checks would have written one again:
   a "we" that v2 allowed. (Review pass 1 found the first version of the
   checks missing straight single quotation marks and a reader's own
-  percentage, and flagging "the US"; all fixed, and the 55 replies
-  scanned again: the same one.) Run 4's report marks one non-injection reply as naming the
+  percentage, and flagging "the US"; pass 2, curly single quotation
+  marks with an apostrophe inside, and false alarms on an argument's
+  own prose ("a study of character", "thought experiments show", "the
+  21st century"); all fixed, every problem now told to the retry in one
+  note, and the 55 replies run through the parse again: the same one.
+  None of the 55 uses a quotation mark, so the quotation checks rest on
+  their tests.) Run 4's report marks one non-injection reply as naming the
   injection's words: "nurse", from the reader's own argument; the check
   now runs on the injection cases only.
 - **23.** `KILL_SWITCH_JUDGE` stops sample replies and pairing with a
@@ -6627,17 +6636,21 @@ new run.
   (review pass 1, B2). It replaces the
   per-exchange lease on `last_turn_at`, which no longer moves. Server
   role only; tested on a throwaway database with two sessions racing
-  (`scripts/test-0030-sample-reply-claims.sh`, 28 checks); its rollback
+  (`scripts/test-0030-sample-reply-claims.sh`, 29 checks); its rollback
   has DROPs and is his to run in the SQL Editor if it is ever needed.
 - **27.** While it is a sample's turn, the exchange does not lapse
   (`exchangeLapsed`, `src/lib/counterpart.ts`). Held for the whole of
   the sample's turn, not only while samples are stopped: nothing records
   when they stopped, and a clock that ran again once they started would
   close the exchange on the view that asks for the sample's reply, the
-  one the reader was told would come. With samples running the hold
-  changes nothing, since the sample replies when the reader opens the
-  exchange. If `SAMPLE_REPLIES` were turned off for good, exchanges
-  waiting on a sample would stay open.
+  one the reader was told would come. With samples running it changes
+  one thing (review pass 2, B3): a reader who does not open the exchange
+  within 14 days of the turn passing to the sample (their reply was
+  delivered later by the re-screening job, say) used to find it lapsed,
+  and off `/me`, after 14 days; now it stays on `/me` as "Counterpart's
+  turn", and the sample replies whenever they come back. If
+  `SAMPLE_REPLIES` were turned off for good, exchanges waiting on a
+  sample would stay open.
 
 **The schedule.** No hourly slot has started since #118 merged at 08:04
 UTC: none of 08:17 to 13:17. Checked: the workflow is active, on `main`
@@ -6661,6 +6674,18 @@ For his list, from carrying these out:
 - **Words a reply may not use** (`UNSUITABLE` in
   `src/lib/sample-reply-prompt.ts`): a short list of swear words, mine.
 - **The turn route's screen** under `KILL_SWITCH_JUDGE` (item 23, above).
+- **The school's own terms against "never imply to be a person"**
+  (`SAMPLE_REPLY_SYSTEM` and `speaksAsPerson` in
+  `src/lib/sample-reply-prompt.ts`; review pass 2, O8): Stoicism's own
+  phrase "what is up to us", which the judge's v3 criteria quote, and
+  Ubuntu's communal "we" are written again outside quotation marks, so
+  the replies say "up to the agent" or "up to them". His to rule which
+  wins.
+- **"The sample account is writing its reply."** shows on an exchange
+  while the reader's claim is held for another of their exchanges, where
+  nothing is yet being written for this one
+  (`src/components/counterpart/SampleReplyRequest.tsx`; review pass 2,
+  O7). Any other words are his.
 - **"Tested", for item 17's second condition** (the school's own terms):
   there is no automated check; the prompt says it, the material carries
   the school's one line and the judge's criteria, and the eval's replies

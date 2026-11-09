@@ -16,9 +16,9 @@
 // are read under the judge's v3 prompt only.
 //
 // Billed to the eval key (SOPHECS_EVAL_KEY, tests/judge/eval-key.ts),
-// never to production's. About $0.21 for the seventeen (the twelve came to
-// $0.14 and $0.16 on 2026-11-09, the fourteen to $0.17); a dry run sends
-// nothing and needs no key.
+// never to production's. About $0.23 for the seventeen (run 4, $0.2299; the
+// twelve came to $0.14 and $0.16 on 2026-11-09, the fourteen to $0.17); a
+// dry run sends nothing and needs no key.
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
