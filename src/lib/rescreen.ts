@@ -16,7 +16,8 @@ import { screenAndLog, SCREEN_DAILY_CAP, type ScreenCallResult } from "@/lib/scr
  * it again. /api/cron/rescreen runs this once a day (vercel.json).
  *
  * Under the same rules as the route, so nothing here is more permissive:
- * - nothing runs while KILL_SWITCH_SCREEN is on, or while the month's
+ * - nothing runs while KILL_SWITCH_SCREEN is on, or KILL_SWITCH_JUDGE
+ *   (Arthur, 2026-11-09, item 23: "one switch stops all AI"), or while the month's
  *   budget is spent or cannot be read (budgetState fails closed; it is
  *   checked again before each call, though it caches for a minute);
  * - an author over SCREEN_DAILY_CAP screen calls in the last 24 hours, or
@@ -45,7 +46,7 @@ import { screenAndLog, SCREEN_DAILY_CAP, type ScreenCallResult } from "@/lib/scr
  * One screen call is about $0.0006 (src/lib/screen.ts), so a run costs at
  * most about a cent.
  *
- * COST: model=claude-haiku-4-5 (src/lib/screen.ts) | trigger=daily cron | est_usd_per_call=0.0006 | at most RESCREEN_BATCH calls a run | budget=AI_MONTHLY_BUDGET_USD, checked before each call | kill_switch=KILL_SWITCH_SCREEN | logged_to=ai_calls kind=screen
+ * COST: model=claude-haiku-4-5 (src/lib/screen.ts) | trigger=daily cron | est_usd_per_call=0.0006 | at most RESCREEN_BATCH calls a run | budget=AI_MONTHLY_BUDGET_USD, checked before each call | kill_switch=KILL_SWITCH_SCREEN, and KILL_SWITCH_JUDGE, which stops all AI | logged_to=ai_calls kind=screen
  */
 
 export const RESCREEN_BATCH = 20;
@@ -72,7 +73,9 @@ export interface RescreenDeps {
 const DEFAULT_DEPS: RescreenDeps = {
   screen: (params) => screenAndLog(params, { timeout: RESCREEN_CALL_TIMEOUT_MS, maxRetries: 0 }),
   budget: budgetState,
-  killed: () => process.env.KILL_SWITCH_SCREEN === "true",
+  // The judge's switch is read as the judge route reads it, with no
+  // allowlist: the job screens for no one in particular.
+  killed: () => process.env.KILL_SWITCH_SCREEN === "true" || process.env.KILL_SWITCH_JUDGE === "true",
   now: () => new Date(),
   clock: () => Date.now(),
 };

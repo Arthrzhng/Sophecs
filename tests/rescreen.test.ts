@@ -130,6 +130,31 @@ describe("rescreenPending", () => {
     expect(tables.turns[0].screen_result).toBe("pending");
   });
 
+  it("stops for either kill switch, the judge's included: one switch stops all AI (Arthur, 2026-11-09, item 23)", async () => {
+    const screen = vi.fn(ok);
+    // The job's own reading of the switches: no `killed` passed.
+    const { killed: _killed, ...rest } = deps({ screen });
+    void _killed;
+    try {
+      for (const [name, value, stopped] of [
+        ["KILL_SWITCH_JUDGE", "true", true],
+        ["KILL_SWITCH_SCREEN", "true", true],
+        ["KILL_SWITCH_JUDGE", "1", false],
+      ] as const) {
+        vi.stubEnv("KILL_SWITCH_JUDGE", "");
+        vi.stubEnv("KILL_SWITCH_SCREEN", "");
+        vi.stubEnv(name, value);
+        const r = await rescreenPending(admin, rest);
+        expect(r.stoppedBy, `${name}=${value}`).toBe(stopped ? "kill_switch" : null);
+        tables.turns = [turn("t1")];
+        tables.exchanges = [exchange("x1")];
+      }
+    } finally {
+      vi.unstubAllEnvs();
+    }
+    expect(screen).toHaveBeenCalledTimes(1);
+  });
+
   it("stops mid-run when the budget runs out, leaving the rest for the next run", async () => {
     tables.turns = [turn("t1", { created_at: ago(300) }), turn("t2", { exchange_id: "x2", created_at: ago(200) })];
     tables.exchanges.push(exchange("x2"));

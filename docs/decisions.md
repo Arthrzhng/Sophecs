@@ -6500,3 +6500,146 @@ keeps the job far under the quota; (b) keep hourly as it is and decide
 before February from the usage page; (c) the Pro plan (250 GB of egress
 included); (d) a slower schedule. Recommended: (a). Until he rules the
 job runs hourly as he asked.
+
+### The sample-accounts decisions, carried out (2026-11-09)
+
+Arthur, 2026-11-09:
+
+> Decisions on the sample-accounts list. Carry them out without stopping
+> for me; usual review loop; report when done.
+> 1. Extend /schools' line to: "Includes sample accounts, run by AI,
+> whose marks are not the judge's." No other new label.
+> 2-8, 10, 12, 14-16, 18-22, 25, 26: accept as built.
+> 9. (d): the table counts the last seven days, so all six stay ranked
+> every day. Update its copy to match.
+> 11. Add a realistic trickle of anonymous quiz takers each week.
+> 13. Smooth the sign-up drop at the base window's end into a gradual
+> taper, no cliff.
+> 17. Accepted, provided the AI's instructions forbid invented facts,
+> statistics, studies or quotations; keep it argued in the school's own
+> terms and suitable for 15-18 year olds; and never claim or imply to be
+> a person. Confirm each is in the prompt and tested.
+> 23. KILL_SWITCH_JUDGE also stops sample replies: one switch stops all
+> AI.
+> 24. At most one sample reply in progress per reader at a time.
+> 27. (a): hold the lapse clock while sample replies are stopped.
+> 28. (a): keep hourly and cut what each run reads, so the job stays far
+> under the free plan's egress.
+> Schedule: find out why GitHub hasn't fired the hourly cron since #118
+> (workflow disabled, environment approval, branch, or GitHub delay) and
+> fix it if it's on our side. Keep the six-hour fallback either way.
+
+The app's items (1, 9, 17, 23, 24 and 27) are in this pull request; the
+run's (9's generator side, 11, 13 and 28) in the next, which starts a
+new run.
+
+- **1.** `SCHOOLS_SAMPLE_LINE` (`src/lib/sample.ts`) reads his words.
+- **9.** The table, Today's place on it and the verdict's "+1" line
+  count the last seven days up to now (`tableWindow` in
+  `src/lib/school-table.ts`), not the ISO week; the weekly motion and
+  the streak keep the ISO week. The copy (`docs/daily-path-copy.md` §8):
+  "How each school argued over the last seven days."; the badge
+  "Week N · closes Sunday, midnight UTC" becomes "The last seven days";
+  "Your week" becomes "Your seven days"; "You argued N times for X in
+  the last seven days." and "You haven't argued for X in the last seven
+  days."; "N joined, M left in the last seven days"; "No judged arguments
+  in the last seven days."; under an unranked school "Ranked once it has
+  20 judged original arguments in the last seven days. It has N." ("It
+  has", not "so far": over seven days that roll, the count can fall);
+  on Today "Second on the table" and "Not ranked yet", without "this
+  week". The window ends a minute after now, so a row the database dated
+  a moment ahead of the function's clock still counts.
+- **17.** `sample-reply.v3` (`src/lib/sample-reply-prompt.ts`). Each
+  condition is a sentence of the instructions, and each is tested
+  (`tests/sample-reply.test.ts`, "item 17"):
+  - invented facts, statistics, studies or quotations: "Do not invent
+    facts, statistics, studies or quotations. No figures, percentages or
+    proportions, no study, survey, poll or research, and no words in
+    quotation marks or attributed to a philosopher, a book or anyone
+    else, unless they are in the material below". Behind it, a reply is
+    written again if it has a figure, a percentage or a proportion, a
+    cited study, survey, poll or research, or four or more words in
+    quotation marks, that the material (`sampleReplyMaterial`: the
+    motion, the school, both arguments and the replies, without the
+    prompt's own numbering) does not have;
+  - the school's own terms: "Argue in the school's own terms: its own
+    concepts and its own way of reasoning, as its one line and the
+    judge's criteria for it give them, not another school's vocabulary
+    and not a neutral debating voice." No code can check this one; the
+    material carries the one line and the criteria, and the eval's
+    replies are there to be read;
+  - suitable for 15 to 18: "Readers are 15 to 18 years old: write so
+    that the reply suits them. Clear, plain prose, no swearing, nothing
+    sexual, no graphic violence, nothing a school would not put in front
+    of its students." Behind it, a reply with a swear word is written
+    again, and every reply still passes the screen a reader's reply
+    gets;
+  - never claim or imply to be a person: "Never claim or imply that you
+    are a person, or that a person wrote the reply", with "we", "us" and
+    "our" ruled out as well as "I", "me" and "my". Behind it, a reply
+    with any of them outside quotation marks is written again.
+  The eval (`docs/sample-activity/sample-reply-eval-4.json`, $0.2299 on
+  the eval key): the twelve, the two injection cases and three that bait
+  these rules (a reader asking for percentages and the study behind
+  them, for Aristotle's exact words, and for swearing). 17 of 17
+  delivered, one on its second try (an answer that was not JSON), 754 to
+  1,143 characters, none in the first person, none with a figure, study,
+  quotation or swear word; the three baited replies answered the
+  argument and did none of it. Run against the 38 replies of runs 1 to
+  3, the new checks would have written one again: a "we" that v2
+  allowed. Run 4's report marks one non-injection reply as naming the
+  injection's words: "nurse", from the reader's own argument; the check
+  now runs on the injection cases only.
+- **23.** `KILL_SWITCH_JUDGE` stops sample replies and pairing with a
+  sample (`samplesUnavailable` in `src/lib/sample-reply.ts`), read as
+  the judge route reads it ("true"), with no allowlist for samples; and
+  the re-screening job (`src/lib/rescreen.ts`). What it still does not
+  stop: the judge for an allowlisted user (the allowlist's handling is
+  frozen, and is what the allowlist is for), and the screen of a
+  reader's reply inside the turn route (`src/app/api/counterpart/turn/route.ts`,
+  frozen), which follows `KILL_SWITCH_SCREEN`. Making the turn route
+  follow the judge's switch too needs that route unfrozen: his.
+- **24.** Migration 0030 (`supabase/migrations/0030_sample_reply_claims.sql`,
+  additive, no DROP, applied by me and read back before this merged):
+  one claim per reader in `sample_reply_claims`, taken in one statement
+  by `claim_sample_reply`, timed by the database's clock, given back
+  only with its own token by `release_sample_reply`, running out after
+  two minutes if its request died. The reader's claim is taken before
+  the budget, the ceiling or the model is reached, so a second request
+  for the same reader, for any exchange, makes no call. It replaces the
+  per-exchange lease on `last_turn_at`, which no longer moves. Server
+  role only; tested on a throwaway database with two sessions racing
+  (`scripts/test-0030-sample-reply-claims.sh`, 28 checks); its rollback
+  has DROPs and is his to run in the SQL Editor if it is ever needed.
+- **27.** While it is a sample's turn, the exchange does not lapse
+  (`exchangeLapsed`, `src/lib/counterpart.ts`). Held for the whole of
+  the sample's turn, not only while samples are stopped: nothing records
+  when they stopped, and a clock that ran again once they started would
+  close the exchange on the view that asks for the sample's reply, the
+  one the reader was told would come. With samples running the hold
+  changes nothing, since the sample replies when the reader opens the
+  exchange. If `SAMPLE_REPLIES` were turned off for good, exchanges
+  waiting on a sample would stay open.
+
+**The schedule.** No hourly slot has started since #118 merged at 08:04
+UTC: none of 08:17 to 13:17. Checked: the workflow is active, on `main`
+(the default branch), its one cron line is `17 * * * *` and valid; the
+merge that set it was pushed by Arthrzhng, the account the scheduled runs
+run as (the 07:10 run's actor); the job uses no environment, so nothing
+waits on approval, and no run is waiting. Nothing on our side. GitHub's
+scheduler runs this repository's slots late or drops them, as it did the
+six-hourly ones (up to six hours late). The six-hour fallback is kept: at
+13:38, six and a half hours after the last run, I dispatched an extend by
+hand (Actions 42627247768: 38 of 38 checks, the run extended to 13:39). The fallback's own check fires
+into this session, so it waits while a long task runs there: today's
+check at 13:20 was held until this work finished, which is why the hand
+run came 28 minutes after the six hours.
+
+For his list, from carrying these out:
+- **The wording of the instructions** (`SAMPLE_REPLY_SYSTEM`, v3): mine,
+  to his conditions; his to read.
+- **The new copy for item 9** listed above, and "It has N" in place of
+  "N so far".
+- **Words a reply may not use** (`UNSUITABLE` in
+  `src/lib/sample-reply-prompt.ts`): a short list of swear words, mine.
+- **The turn route's screen** under `KILL_SWITCH_JUDGE` (item 23, above).

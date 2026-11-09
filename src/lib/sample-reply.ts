@@ -12,9 +12,11 @@ import { logScreenCall, screenTurn, ScreenError, SCREEN_DAILY_CAP } from "@/lib/
 import {
   parseSampleReply,
   retryNote,
+  sampleReplyMaterial,
   sampleReplyUserTurn,
   SAMPLE_REPLY_PROMPT_VERSION,
   SAMPLE_REPLY_SYSTEM,
+  type SampleReplyInput,
   type SampleReplyTurn,
 } from "@/lib/sample-reply-prompt";
 import { motionForDebate } from "@/lib/motion-text";
@@ -349,7 +351,7 @@ async function replyClaimed(
   const readerSchool = (readerIsA ? exchange.school_a : exchange.school_b) as SchoolId;
   const source = quoteSourceForSeq(seq) === "argument" ? readerArgument : last.body;
   const school = getSchool(sampleSchool);
-  const userTurn = sampleReplyUserTurn({
+  const input: SampleReplyInput = {
     motion,
     // The criteria the judge holds the school to, under the judge's own
     // prompt version: on a six-school build the three newer schools have
@@ -368,17 +370,26 @@ async function replyClaimed(
     })),
     seq,
     source,
-  });
+  };
 
-  return writeAndDeliver(admin, { exchange, sampleId, readerId, seq, source, userTurn, now });
+  return writeAndDeliver(admin, {
+    exchange,
+    sampleId,
+    readerId,
+    seq,
+    source,
+    userTurn: sampleReplyUserTurn(input),
+    material: sampleReplyMaterial(input),
+    now,
+  });
 }
 
 /** The writing call, the screen and delivery, once the reader's claim is held. */
 async function writeAndDeliver(
   admin: SupabaseClient,
-  ctx: { exchange: ExchangeRow; sampleId: string; readerId: string; seq: number; source: string; userTurn: string; now: Date }
+  ctx: { exchange: ExchangeRow; sampleId: string; readerId: string; seq: number; source: string; userTurn: string; material: string; now: Date }
 ): Promise<SampleReplyResult> {
-  const { exchange, sampleId, readerId, seq, source, userTurn, now } = ctx;
+  const { exchange, sampleId, readerId, seq, source, userTurn, material, now } = ctx;
   // Write it: one call, and one more if the answer breaks a rule.
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: userTurn }];
   let reply: { quotedClaim: string; body: string } | null = null;
@@ -410,7 +421,7 @@ async function writeAndDeliver(
     const costUsd = response.usage.input_tokens * INPUT_COST_PER_TOKEN + response.usage.output_tokens * OUTPUT_COST_PER_TOKEN;
     const textBlock = response.content.find((b) => b.type === "text");
     const raw = textBlock && "text" in textBlock ? textBlock.text : "";
-    const parsed = parseSampleReply(raw, source);
+    const parsed = parseSampleReply(raw, source, material);
     const logged = await logCall(admin, {
       userId: readerId,
       costUsd,
