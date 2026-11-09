@@ -5,7 +5,7 @@ import { loadSchoolTable } from "@/lib/school-table-page";
 export const metadata = {
   title: "School table · Sophecs",
   description:
-    "How each school argued this week, by the judge's fidelity mark. No names.",
+    "How each school argued over the last seven days, by the judge's fidelity mark. No names.",
 };
 
 /*

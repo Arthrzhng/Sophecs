@@ -14,7 +14,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Page } from "@/components/layout/Page";
 import { getAllModules } from "@/lib/modules";
 import { splitModule } from "@/lib/module-readings";
-import { isoWeekRange, rankSchools, type JudgedArgument } from "@/lib/school-table";
+import { rankSchools, tableWindow, type JudgedArgument } from "@/lib/school-table";
 import { todayUTC } from "@/lib/streak";
 import { readAll } from "@/lib/read-all";
 import { SHOWN_SCHOOL_IDS, type SchoolId } from "@/lib/types";
@@ -85,7 +85,7 @@ export default async function TodayPage() {
   }
 
   const admin = createAdminClient();
-  const { start, end } = isoWeekRange(new Date());
+  const { start, end } = tableWindow(new Date());
 
   const [topicRows, judgedRows] = await Promise.all([
     admin
@@ -93,10 +93,10 @@ export default async function TodayPage() {
       .select("slug, title, motion, micro_before, sort, active")
       .eq("active", true),
     // The same rows the school table counts: originals, not rejected,
-    // judged, inside this ISO week. Kept in step by reading the same
-    // columns through the same rankSchools, not by a second tally, and
-    // through readAll, as the table does, so a week of more than 1,000
-    // arguments is counted whole (src/lib/read-all.ts).
+    // judged, inside its last seven days (tableWindow). Kept in step by
+    // reading the same columns through the same rankSchools, not by a
+    // second tally, and through readAll, as the table does, so seven days
+    // of more than 1,000 arguments are counted whole (src/lib/read-all.ts).
     readAll<{ school: SchoolId; fidelity: unknown }>((from, to) =>
       admin
         .from("debates")
@@ -111,7 +111,7 @@ export default async function TodayPage() {
     ),
   ]);
   const topics = topicRows.data;
-  if (judgedRows.error) console.error("[today] week of debates:", judgedRows.error);
+  if (judgedRows.error) console.error("[today] seven days of debates:", judgedRows.error);
 
   const judged: JudgedArgument[] = (judgedRows.rows ?? []).map((row) => ({
     school: row.school,

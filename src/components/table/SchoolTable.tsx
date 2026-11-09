@@ -11,25 +11,24 @@ import type { SchoolId } from "@/lib/types";
 import { TextLink } from "@/components/ui/TextLink";
 import { SAMPLES_HREF } from "@/lib/nav-routes";
 
-/** A value the week has not produced. Same marker the verdict uses. */
+/** A value the seven days have not produced. Same marker the verdict uses. */
 const NOTHING = "–";
 
 export interface SchoolTableProps {
-  week: number;
   rows: SchoolTableRow[];
   /** The reader's school, so their row is marked. Null when signed out. */
   yourSchool: SchoolId | null;
   /** §8's "Your line". Null when there is no school to write it about. */
   yourLine: string | null;
-  /** True when no argument has been judged this week. */
+  /** True when no argument has been judged in the last seven days. */
   emptyWeek: boolean;
   /** True when the kill switch is on for this reader. */
   paused: boolean;
   /**
-   * The one line on /schools in a week whose rows count a sample account's
-   * argument (migration 0023; Arthur, 2026-11-08: "Includes sample
-   * accounts, run by AI."), linked to the explanation. Null in a week with
-   * none.
+   * The one line on /schools while the rows count a sample account's
+   * argument or school change (migration 0023; Arthur, 2026-11-09, item
+   * 1: SCHOOLS_SAMPLE_LINE in src/lib/sample.ts), linked to the
+   * explanation. Null when they count none.
    */
   sampleNote?: string | null;
 }
@@ -46,21 +45,21 @@ function Cell({ label, children }: { label: string; children: React.ReactNode })
 }
 
 /**
- * How each school argued this week.
+ * How each school argued over the last seven days (tableWindow in
+ * src/lib/school-table.ts; Arthur, 2026-11-09, item 9).
  *
  * Read-only and entirely derived: the averages are computed from the
- * week's judged arguments and the joined/left counts from school_history,
+ * seven days' judged arguments and the joined/left counts from school_history,
  * so there is no standings table to keep in step and nothing to migrate.
  *
  * Rows are cards with a label on every value rather than a grid under one
  * header. Three rows and five values do not need table semantics to be
  * read, and labelling each value is what lets the row survive a phone.
  *
- * No names, here or anywhere: a school's row is the sum of a week, and the
+ * No names, here or anywhere: a school's row is the sum of seven days, and the
  * only person it ever identifies is the reader, to the reader.
  */
 export function SchoolTable({
-  week,
   rows,
   yourSchool,
   yourLine,
@@ -89,7 +88,7 @@ export function SchoolTable({
             School table
           </Heading>
           <p className="mt-2 max-w-[60ch] text-base leading-relaxed text-ink-mid">
-            How each school argued this week. Fidelity is the judge&apos;s 0&ndash;10 mark
+            How each school argued over the last seven days. Fidelity is the judge&apos;s 0&ndash;10 mark
             for arguing the way the school reasons, averaged across every judged
             original argument.
           </p>
@@ -103,14 +102,13 @@ export function SchoolTable({
           )}
         </div>
         <span className="rounded-card border-2 border-rule bg-surface px-4 py-2 text-sm font-extrabold text-ink">
-          Week <span className="font-mono tabular">{week}</span> &middot; closes Sunday,
-          midnight UTC
+          The last seven days
         </span>
       </div>
 
       {emptyWeek && (
         <p className="mt-6 rounded-card border-2 border-rule bg-surface px-5 py-4 text-sm leading-relaxed text-ink-mid">
-          No judged arguments yet this week. The table fills in as they arrive.
+          No judged arguments in the last seven days. The table fills in as they arrive.
           {paused && (
             <>
               {" "}
@@ -198,7 +196,7 @@ export function SchoolTable({
         {yourLine && (
           <section className="rounded-card border-2 border-rule bg-surface px-5 py-4">
             <Note className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
-              Your week
+              Your seven days
             </Note>
             <p className="mt-2 text-base leading-relaxed text-ink">{yourLine}</p>
           </section>

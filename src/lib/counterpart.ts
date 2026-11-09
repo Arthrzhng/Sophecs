@@ -80,6 +80,8 @@ export interface LapseExchange {
   user_b: string | null;
   next_turn: string | null;
   last_turn_at: string | Date;
+  /** Whether `next_turn` is a sample account's (profiles.is_sample). */
+  nextTurnIsSample?: boolean;
 }
 
 export interface LapseTurn {
@@ -114,12 +116,23 @@ export interface LapseTurn {
  * that read the turns before the route saved a reply leaves that reply
  * pending in a lapsed exchange (docs/decisions.md, "Gate 4: items 8, 10,
  * 11 and 12").
+ *
+ * A sample account's turn holds the clock too (Arthur, 2026-11-09, item
+ * 27: "hold the lapse clock while sample replies are stopped"). A sample
+ * replies when the reader opens the exchange, so its turn outlasts that
+ * only while samples are stopped (the ceiling, the budget, a kill switch,
+ * the reader's day), and the reader has been told they reply again. Held
+ * for the whole of the sample's turn rather than only while samples are
+ * stopped: nothing records when they stopped, and a clock that ran again
+ * once they started would close the exchange on the view that asks for
+ * the sample's reply, before it could be written.
  */
 export function exchangeLapsed(
   exchange: LapseExchange,
   turns: readonly LapseTurn[],
   now: Date = new Date()
 ): boolean {
+  if (exchange.nextTurnIsSample) return false;
   const last = turns.reduce<LapseTurn | undefined>((a, t) => (a && a.seq > t.seq ? a : t), undefined);
   const { user_a, user_b, next_turn } = exchange;
   const deliverable =

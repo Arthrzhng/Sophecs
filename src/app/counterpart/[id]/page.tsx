@@ -85,8 +85,14 @@ export default async function CounterpartPage({
   // closed is whoever opens it. A reply waiting to be screened holds the
   // clock (src/lib/counterpart.ts, exchangeLapsed), and the close takes only
   // while the exchange is as it was read (src/lib/counterpart-lapse.ts).
-  // A turns read that failed closes nothing.
-  const status = await closeIfLapsed(admin, exchangeForLapse(exchange), turnsError ? null : turns);
+  // A sample's turn holds it as well (Arthur, 2026-11-09, item 27), so an
+  // exchange waiting on a sample while samples are stopped is still open
+  // when they reply again. A turns read that failed closes nothing.
+  const status = await closeIfLapsed(
+    admin,
+    exchangeForLapse(exchange, theirIsSample ? ((theirUserId as string | null) ?? null) : null),
+    turnsError ? null : turns
+  );
 
   const argumentById = new Map((debates ?? []).map((d) => [d.id as string, d.argument as string]));
 

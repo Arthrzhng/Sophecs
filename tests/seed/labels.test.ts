@@ -89,19 +89,22 @@ describe("labels", () => {
   });
 
 
-  it("the school table has the one line on /schools, linked to the explanation, only in a week with samples", () => {
-    expect(SCHOOLS_SAMPLE_LINE).toBe("Includes sample accounts, run by AI.");
-    const base = { week: 44, rows: [], yourSchool: null, yourLine: null, emptyWeek: false, paused: false };
+  it("the school table has the one line on /schools, linked to the explanation, only while it counts samples", () => {
+    // Arthur, 2026-11-09, item 1, word for word.
+    expect(SCHOOLS_SAMPLE_LINE).toBe("Includes sample accounts, run by AI, whose marks are not the judge's.");
+    // html() reads the text back unescaped.
+    const line = SCHOOLS_SAMPLE_LINE;
+    const base = { rows: [], yourSchool: null, yourLine: null, emptyWeek: false, paused: false };
     const out = html(createElement(SchoolTable, { ...base, sampleNote: SCHOOLS_SAMPLE_LINE }));
-    expect(out).toContain(SCHOOLS_SAMPLE_LINE);
+    expect(out).toContain(line);
     expect(out).toMatch(/href="\/(method|how-it-works)#samples"/);
     expect(out).not.toContain("What a sample account is");
     // Under the table's description, whose subject is its arguments and
     // marks; not in the note about people who changed school (review pass 3).
     const joined = out.slice(out.indexOf("Joined and left"));
-    expect(joined).not.toContain(SCHOOLS_SAMPLE_LINE);
-    expect(out.indexOf(SCHOOLS_SAMPLE_LINE)).toBeGreaterThan(out.indexOf("original argument."));
-    expect(html(createElement(SchoolTable, base))).not.toContain(SCHOOLS_SAMPLE_LINE);
+    expect(joined).not.toContain(line);
+    expect(out.indexOf(line)).toBeGreaterThan(out.indexOf("original argument."));
+    expect(html(createElement(SchoolTable, base))).not.toContain("Includes sample accounts");
   });
 
   // Each surface a sample's work is shown on, rendered: outside its one tag

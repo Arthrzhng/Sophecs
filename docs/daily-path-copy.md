@@ -202,7 +202,8 @@ Rows 2 to 4 are the existing `StreakBlock` wording; reuse it, do not copy it.
 #### The week strip
 
 Seven circles under the number, Monday to Sunday of the current ISO week in
-UTC, the same week the school table and the weekly motion use. Lit is a
+UTC, the same week the weekly motion uses. (The school table counts the
+last seven days instead, since Arthur's item 9 of 2026-11-09.) Lit is a
 filled disc, unlit an open ring, so the two differ in shape before they
 differ in colour.
 
@@ -238,8 +239,8 @@ is given in full to a screen reader rather than the letter.
 
 | State | Copy |
 |---|---|
-| ranked | `{First\|Second\|...\|Sixth} on the table this week` |
-| the school is not ranked: none of its arguments has a fidelity mark this week, or, on a SIX_SCHOOLS build, fewer than 20 judged original arguments | `Not ranked yet this week` |
+| ranked | `{First\|Second\|...\|Sixth} on the table` |
+| the school is not ranked: none of its arguments in the table's seven days has a fidelity mark, or, on a SIX_SCHOOLS build, fewer than 20 judged original arguments | `Not ranked yet` |
 
 The place is a word, not `1st`: the rating on the line above is a numeral
 set in mono, and two numerals one under the other saying different kinds of
@@ -377,28 +378,36 @@ template rules are not two versions of the judge.
 |---|---|
 | Nav label | `School table` |
 | Heading | `School table` |
-| Week line | `Week {N} · closes Sunday, midnight UTC` |
-| Intro | `How each school argued this week. Fidelity is the judge's 0–10 mark for arguing the way the school reasons, averaged across every judged original argument.` |
+| Span | `The last seven days` |
+| Intro | `How each school argued over the last seven days. Fidelity is the judge's 0–10 mark for arguing the way the school reasons, averaged across every judged original argument.` |
 | Columns | `Rank` · `School` · `Avg fidelity` · `Arguments` · `Joined / left` |
-| Joined / left cell | `+{in} / −{out}`; screen reader: `{in} joined, {out} left this week` |
-| Your line, has argued | `You argued {n} times for {school} this week.` (`once` when 1) |
-| Your line, has not | `You haven't argued for {school} this week yet.` |
+| Joined / left cell | `+{in} / −{out}`; screen reader: `{in} joined, {out} left in the last seven days` |
+| Your line heading | `Your seven days` |
+| Your line, has argued | `You argued {n} times for {school} in the last seven days.` (`once` when 1) |
+| Your line, has not | `You haven't argued for {school} in the last seven days.` |
 | Footnote | `Joined and left count people who retook the quiz and changed school. No names are shown, here or anywhere else.` |
-| Empty week | `No judged arguments yet this week. The table fills in as they arrive.` |
-| Judging paused | the empty-week line, then `Judging is paused while we check the quality of the verdicts.` |
+| Nothing judged | `No judged arguments in the last seven days. The table fills in as they arrive.` |
+| Judging paused | the nothing-judged line, then `Judging is paused while we check the quality of the verdicts.` |
+| Sample accounts counted | `Includes sample accounts, run by AI, whose marks are not the judge's.`, linked to the explanation (Arthur, 2026-11-09, item 1) |
 
 Ties share a rank. Rank is by average fidelity, then by number of arguments.
 A school with no average has no rank. On a SIX_SCHOOLS build, neither has
-one with fewer than 20 judged original arguments in the week, and its row
-says how many it has, except in an empty week, whose own line says it
-(`School table, a school not yet ranked`, below). Week is the ISO week,
-the same one the weekly motion uses.
+one with fewer than 20 judged original arguments in the seven days, and its
+row says how many it has, except when nothing was judged, whose own line
+says it (`School table, a school not yet ranked`, below).
+
+The table counts the last seven days up to now, not the ISO week (Arthur,
+2026-11-09, item 9: "the table counts the last seven days, so all six stay
+ranked every day. Update its copy to match."). A week from Monday held too
+few arguments early in each week for any school to be ranked; seven days
+that roll always hold seven days' worth. The weekly motion and the streak
+still run on the ISO week.
 
 Originals only. A revision is a second attempt at the same motion after
 feedback and does not move the reader's rating, so it does not move their
 school's row either. The verdict says `+1 for the {school} on the table`
 only where the same three things hold: original, judged, and inside the
-week the table is showing.
+seven days the table counts.
 
 ## 9. Profile chart
 
@@ -498,10 +507,12 @@ The axis names are `docs/quiz-v2.md`'s, and change if that draft does.
 |---|---|
 | In place of the rank, on screen | the live table's null glyph, `NOTHING` in `src/components/table/SchoolTable.tsx` |
 | In place of the rank, read aloud | `Not ranked yet` (the live table's words) |
-| Under the name | `Ranked once it has {N} judged original arguments. {n} so far.` |
+| Under the name | `Ranked once it has {N} judged original arguments in the last seven days. It has {n}.` |
 
 {N} is 20, Arthur's ruling (e)5 of 2026-11-05: a school is ranked once it
-has 20 judged original arguments in the week. It is `RANK_MIN_ARGUMENTS`
+has 20 judged original arguments in the week, which since his item 9 of
+2026-11-09 is the last seven days. `It has`, not `so far`: over seven
+days that roll, the count can fall as well as rise. It is `RANK_MIN_ARGUMENTS`
 in `src/lib/school-table.ts`, and holds on SIX_SCHOOLS builds, the
 question Checkpoint B asked. Whether the live table takes it is Arthur's
 to say.
@@ -590,10 +601,10 @@ that `Sign in` fits beside the button wherever the bar is shown.)
 | Element | Copy |
 |---|---|
 | Page title | `Schools · Sophecs` |
-| Description (new) | `Each school's page, and how each argued this week.` |
+| Description (new) | `Each school's page, and how each argued over the last seven days.` |
 | Heading | `Schools` |
 | Cards | one per school shown on the build, as the landing page draws them: the school's name, linking to `/s/{school}`, its `one_line` and attribution |
-| Below the cards | this week's school table, with its own copy (section 8), its heading set as a second-level heading |
+| Below the cards | the school table, with its own copy (section 8), its heading set as a second-level heading |
 
 `/table` redirects here.
 

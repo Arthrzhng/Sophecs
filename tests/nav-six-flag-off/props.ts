@@ -3,6 +3,11 @@
 // change. tests/nav-six.test.tsx renders today's components with the same
 // inputs, without the flag, and requires the same bytes: production's
 // pages may not change.
+//
+// school-table.html was rendered again on 2026-11-09 for Arthur's items 1
+// and 9 of that day (the sample line, and the table over the last seven
+// days): the only change to it is that copy (docs/decisions.md, "The
+// sample-accounts decisions, carried out").
 import { rankSchools } from "../../src/lib/school-table";
 
 export const FIXTURE_PROPS = {
@@ -14,7 +19,6 @@ export const FIXTURE_PROPS = {
     school: "stoicism",
   },
   table: {
-    week: 45,
     rows: rankSchools(
       [
         { school: "stoicism", fidelity: 7 },
@@ -23,9 +27,9 @@ export const FIXTURE_PROPS = {
       {}
     ),
     yourSchool: "stoicism",
-    yourLine: "You argued once for Stoicism this week.",
+    yourLine: "You argued once for Stoicism in the last seven days.",
     emptyWeek: false,
     paused: false,
-    sampleNote: "Includes sample accounts, run by AI.",
+    sampleNote: "Includes sample accounts, run by AI, whose marks are not the judge's.",
   },
 };

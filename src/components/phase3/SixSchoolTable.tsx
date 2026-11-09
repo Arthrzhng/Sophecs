@@ -5,7 +5,8 @@ import { RANK_MIN_ARGUMENTS, unrankedNote } from "@/lib/school-table";
  * brief of 2026-11-03), from fixture averages.
  *
  * A school is ranked once it has RANK_MIN_ARGUMENTS judged original
- * arguments in the week (Arthur's ruling (e)5 of 2026-11-05), the live
+ * arguments in the last seven days (Arthur's ruling (e)5 of 2026-11-05,
+ * and item 9 of 2026-11-09), the live
  * table's threshold; until then its row says so instead of showing a
  * rank. Unlike the live table it does not share tied ranks or order the
  * unranked rows: the live table on a SIX_SCHOOLS build
@@ -18,7 +19,7 @@ export interface SixSchoolRow {
   name: string;
   /** A CSS colour: a token reference for a live school, a candidate for a draft. */
   colour: string;
-  /** Judged original arguments this week. */
+  /** Judged original arguments in the last seven days. */
   arguments: number;
   /** Mean fidelity, 0 to 10; null when there is nothing to average. */
   fidelity: number | null;

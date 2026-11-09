@@ -8,9 +8,10 @@ import { isoWeekRange } from "./school-table";
  * touched here: this reads `streak` and `streak_updated_on` exactly as the
  * judge left them and says which squares to fill.
  *
- * The week is the ISO week, UTC, taken from the same `isoWeekRange` the
- * school table uses, so "this week" cannot come to mean two different spans
- * on two screens.
+ * The week is the ISO week, UTC, from `isoWeekRange`, the weekly motion's
+ * week. The school table counts the last seven days instead (tableWindow;
+ * Arthur, 2026-11-09, item 9), and says so in its own words rather than
+ * "this week", so the two are not read as one span.
  */
 export interface StreakWeekDay {
   /** YYYY-MM-DD, UTC. */
