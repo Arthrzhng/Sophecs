@@ -18,6 +18,7 @@ import type { Adapter } from "./adapter";
 import type { Dataset } from "./generate";
 import type { BaselineCheck } from "./baseline";
 import { TEMPLATE_PROMPT_VERSION, TEMPLATE_PROMPT_VERSION_2 } from "./verdicts";
+import { Rng } from "./rng";
 
 /** A run fails if more than this share of its rule-2 scores, of any one kind, is a multiple of 5. */
 export const MAX_ROUND_SCORE_PCT = 20;
@@ -86,22 +87,29 @@ export function roundScoreCheck(
  * The spot checks read 50 rows a table, and so would miss a few rows that
  * differ: what a merge made after the rule-2 cutover, with old code
  * writing rule-1 scores past it, would leave behind. This reads them all
- * (three short columns), so a run whose stored scores and plan disagree is
- * refused before it writes and fails validation after. Rows the plan does
+ * (three short columns) at a canary, a full stage and the daily whole
+ * read, so a run whose stored scores and plan disagree is refused before
+ * it writes and fails validation after. An extension between whole reads
+ * passes `ids`: its new rows and a sample of the rest (spotDebates; item
+ * 28), so a few older rows that differ are found within a day, not the
+ * hour (review pass 1 of the run's decisions, B2). Rows the plan does
  * not hold in scope (another run's, a canary's later cohorts) are left to
  * the registry checks. The detail names no row: the schedule's log is
  * public.
  */
 export async function storedScoreCheck(
-  adapter: Pick<Adapter, "scan">,
+  adapter: Pick<Adapter, "scan" | "selectByIds">,
   ds: Pick<Dataset, "debates">,
-  opts: { cohortLimit?: number } = {}
+  opts: { cohortLimit?: number; ids?: string[] } = {}
 ): Promise<BaselineCheck> {
   const limit = opts.cohortLimit ?? Infinity;
   const planned = new Map(
     ds.debates.filter((d) => d.cohort < limit).map((d) => [d.rowId, { score: d.row.score, version: d.row.prompt_version }])
   );
-  const stored = await adapter.scan("debates", ["id", "score", "prompt_version", "created_at"], { sample: true });
+  // With `ids`, those debates only: an extension's new ones and a spot of
+  // the rest (spotDebates), rather than every sample debate every hour.
+  const columns = ["id", "score", "prompt_version", "created_at"];
+  const stored = opts.ids ? await adapter.selectByIds("debates", opts.ids, columns) : await adapter.scan("debates", columns, { sample: true });
   let compared = 0;
   let differ = 0;
   let earliest = "";
@@ -117,15 +125,33 @@ export async function storedScoreCheck(
     }
   }
   // Stored sample debates of which the plan holds none means the plan is
-  // not this run's (another seed, say): that is no pass.
+  // not this run's (another seed, say): that is no pass. So, with `ids`, is
+  // finding none of the planned debates asked for, the spot of the older
+  // ones included, which a run that has written them must hold (review
+  // pass 3, O6).
   const unmatched = compared === 0 && stored.length > 0 && planned.size > 0;
+  const absent = opts.ids !== undefined && compared === 0 && opts.ids.some((id) => planned.has(id)) && stored.length === 0;
   return {
     name: "stored sample scores match the plan",
-    ok: differ === 0 && !unmatched,
+    ok: differ === 0 && !unmatched && !absent,
     detail: differ
       ? `${differ} of ${compared} stored sample debates differ from the plan in score or prompt_version, the earliest dated ${earliest}`
       : unmatched
         ? `none of ${stored.length} stored sample debates is in the plan`
-        : `${compared} stored sample debates compared`,
+        : absent
+          ? `none of the ${opts.ids!.length} planned debates asked for is stored`
+          : `${compared} stored sample debates compared${opts.ids ? " (the new ones and a spot of the rest)" : ""}`,
   };
+}
+
+/**
+ * The debates an extension's score check reads (item 28): every one new
+ * since `since`, and `spot` of the rest, picked by the run and the end, so
+ * each hour looks at another few.
+ */
+export function spotDebates(ds: Pick<Dataset, "debates" | "runId">, since: string, at: string, spot = 200): string[] {
+  const t = Date.parse(since);
+  const fresh = ds.debates.filter((d) => Date.parse(d.row.created_at) > t).map((d) => d.rowId);
+  const rest = ds.debates.filter((d) => Date.parse(d.row.created_at) <= t).map((d) => d.rowId);
+  return [...fresh, ...new Rng(`spot/${ds.runId}/${at}`).shuffle(rest).slice(0, spot)];
 }

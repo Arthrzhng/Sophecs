@@ -267,9 +267,14 @@ Behind `SAMPLE_REPLIES=1` (Vercel, read when the build starts:
   after then. Rows the run begun on 2026-11-05 wrote before then keep
   rule 1 (half-point criteria; 23.3% of composites on a multiple of 5),
   since the engine cannot rewrite a row it has written; they go at
-  launch. Every scheduled run compares every stored sample score with its
-  plan before it writes, and refuses on any difference; every validation,
-  a run by hand's included, does the same after the write. A scheduled
+  launch. Before it writes, a scheduled run compares the stored sample
+  scores with its plan and refuses on any difference, and every
+  validation, a run by hand's included, does the same after the write:
+  every stored score at a canary, a full stage and the daily whole read;
+  in the extensions between, the new rows and a sample of the rest (200
+  before the write, 100 after), so a difference in an older row is found
+  within a day, not within the hour (Arthur, 2026-11-09, item 28; "What
+  an extension reads", below). A scheduled
   run whose rule-2 scores land on a multiple of 5 more than 20% of the
   time, for the composite or any criterion, is refused before it writes,
   and any run fails validation after (`scripts/seed/round-scores.ts`),
@@ -361,8 +366,53 @@ Two layers, both from one secret seed:
     weight halves every 70, 16, 5 and 3 weeks), and argue or retake the
     quiz as their class has it; a revision stays inside its week, so the
     count holds;
-  - then, for any school short of 22 judged originals (20 and two to
-    spare), more originals from its members already active that week.
+  - about 37 anonymous quiz takers (a normal draw, sd 20%), at the hours
+    the base window's take the quiz (Arthur, 2026-11-09, item 11: "a
+    realistic trickle of anonymous quiz takers each week"): the base
+    window's 1,107 to 738 accounts, at 25 newcomers a week;
+  - then every school at least 22 judged originals (20 and two to spare)
+    in every seven days from the base window's end, not only in every
+    ISO week (item 9: the table counts the last seven days). Checked hour
+    by hour: where seven days would fall short, an original is added in
+    the half day before, from an account of that school already active
+    that week, by the rules the streams keep (five in any 24 hours, seven
+    days between two on one motion), checked against all of the account's
+    originals. The base window's last six days are filled first, so the
+    seven days ending at its end hold enough too.
+  The base window's sign-ups ease down over its last six weeks to the
+  weeks' 25 (a cosine ease to the level that puts 25 in its last week),
+  rather than drop to it at its end (item 13: "a gradual taper, no
+  cliff"); the total stays 738, the earlier weeks carrying more. Fewer
+  sign-ups at its end would mean fewer active accounts there, so each of
+  those weeks, the part of it in the base window, is brought up to the
+  weeks' number of active accounts, in proportion, with returning
+  accounts drawn as the weeks draw them, and the week the base window
+  ends in is brought up to its week's number as a whole, its base part
+  and its kept part together (review pass 1 of the run's decisions, O2).
+  The first week of the taper, early in the base window, can run short
+  of accounts to bring back: in review pass 3's sweep, 16 of 252 taper
+  weeks fell short, all of them the first, the worst 178 against 202.
+  **The run that was live when these came.** `sample-202611090107`, made
+  at 01:07 on 2026-11-09 with the shape before them, keeps extending every
+  hour. A run whose base window ends before `WEEKLY_RULES_FROM` (12:00
+  that day) keeps its base window exactly as it was written, so no taper
+  and nothing added to its last six days, and hashes as it was made; its
+  weeks follow the seven-day rule and the anonymous takers from
+  `WEEKLY_RULES_WEEK`, Monday 16 November, which no run had written when
+  they shipped, and every week before it is drawn exactly as before
+  (`weeklyRules` in `scripts/seed/generate.ts`; `tests/seed/weekly.test.ts`,
+  "a weekly run made before WEEKLY_RULES_FROM"). The taper (item 13)
+  reaches only a run made since, which takes a teardown first, Arthur's
+  to order (see Teardown). Score rule 2 reached a live run the same way
+  (`SCORE_RULE_2_FROM`). This holds on three conditions. The code
+  reaches `main` before the 16th: a run that had written rows after it
+  under the older code would not match. No canary is made before it
+  merges: one made with the older code after 12:00 on the 9th would count
+  as made since, hash differently here, and every extend after the merge
+  would be refused (review pass 3, O4). And it is not reverted after the
+  16th: the older plan has none of the anonymous takers and gives the
+  ids of originals the seven-day rule added to other arguments, so the
+  run would halt; the way on then is a fix forward or a teardown (O5).
   The base window's own streams stop at its end, and a base revision
   lands before the first whole week. A week is drawn whole from its own stream
   and the weeks before it, and only what falls by the run's end so far is
@@ -371,11 +421,42 @@ Two layers, both from one secret seed:
   window holds the rest. So that week runs at one rate throughout, with no
   burst into what is left of it and no lull until the next Monday; its
   count is the base window's accounts and the drawn ones together, so it
-  is not drawn exactly, and the base window's own weeks are not drawn to
-  a count at all (about 110 to 180 active, from 60 to 130 sign-ups a
-  week). Challenges, exchanges, reading answers, classes and anonymous
-  quiz results (about 180 to 210 a week in the base window's last weeks)
-  stay the base window's: none are drawn after it.
+  is not drawn exactly. Challenges, exchanges, reading answers and
+  classes stay the base window's: none are drawn after it. Anonymous
+  quiz results are the base window's and, with `anonymous`, about 37 a
+  week after it. The base window's are placed by its arrival weights, so
+  in a run made since they ease down with its sign-ups, to 25 to 40 in
+  its last week (review pass 3); in the live run, about 180 to 210 a week
+  in its base window's last weeks, then, made before `WEEKLY_RULES_FROM`,
+  none or one a week from its base window's end to 16 November, then
+  about 37 (review pass 2, O5).
+
+  Measured on 2026-11-09 for Arthur's items 9, 11 and 13, at the
+  scheduled job's volumes. These are samples, not bounds; what a test
+  holds is said. Every school 22 or more judged originals in every seven
+  days, checked every ten minutes over six weeks, on 42 runs made since
+  the cutover in review pass 3 (`tests/seed/weekly.test.ts` holds two,
+  `weekly-check` and `another`, to 22). Anonymous quiz takers: means of
+  33 to 42 a week over those runs (the test holds each week to 15 to
+  60). Sign-ups a week over the base window's last
+  six weeks, on the seeds `weekly-check` and `another`, the base window
+  ending at 06:00 on Monday 16 November (as in
+  `tests/seed/weekly.test.ts`): 96, 95, 102, 58, 39, 35 and 105, 84, 86,
+  72, 47, 33, then 11 to 40 a week after it. Active accounts a week, from
+  six weeks before the base window's end to four after: 173 to 229 in
+  review pass 3's sweep (the test holds 160 to 240, and the whole weeks
+  after to 170 to 230). After review pass 1 (O2), the week the base
+  window ends in, started Tuesday to Friday on six seeds (`probe-a`,
+  `-b`, `-d` to `-g`): 171 to 209 active, each its week's own number
+  (162 to 181 before). On the live run's shape, for a run made before
+  `WEEKLY_RULES_FROM`, against main's generator: on three seeds of mine
+  (`live-like`, `s2`, `s3`) and six in review pass 3, the same base hash
+  and the same rows as before up to 16 November; from 12 hours after it,
+  every school 22 or more in every seven days (22 to 35 from the 16th
+  itself, pass 3). The test holds one seed, `live-like`, against the
+  older shape.
+
+  The figures below were measured before those three items:
 
   Measured on 2026-11-09 at the scheduled job's volumes, on 30 seeds in
   the two reviews and here, twelve whole weeks each, the base window
@@ -584,7 +665,37 @@ check it is marked or owned by the run's users (a row that exists and is
 not the run's stops the run rather than be adopted); mark the intents
 created. Then the profiles already written are read back and compared with
 the plan, and the ones whose rating, streak or school has moved are
-updated, scoped to sample rows. A run whose plan has another seed, base
+updated, scoped to sample rows.
+
+What an extension reads (Arthur, 2026-11-09, item 28: "keep hourly and
+cut what each run reads, so the job stays far under the free plan's
+egress"). An extension of a complete run reads from the registry only
+the rows new since the run's end, and counts the rest (every row the
+run held then is created, since it ended complete, and a later plan
+holds every row of an earlier one: `scripts/seed/window.ts`,
+`tests/seed/window.test.ts`); a count that does not add up reads the
+registry whole. It brings up to date only the profiles with a new
+argument, revision or quiz result, the only ones whose rating, streak
+or school can have moved. Its stored-score check reads the new rows and
+200 of the rest before the write, and the new rows and 100 of the rest
+after it; its spot checks read up to 50 of the new rows and 10 of the
+rest; all by their columns, and the seeking check is a count. Once a day, the first extension more than
+24 hours after the run was last read whole (`READ_WHOLE_EVERY_MS` in
+`scripts/seed/ci.ts`, `read_whole_at` in `seed_runs.counts`) reads it
+whole, as a canary and a full stage always do, so a change to an older
+row is found within a day rather than within the hour. The registry's
+runs are listed without their reports (`RUN_LISTING_COLUMNS`), which no
+caller of the list reads. Measured with `runCi` at production size, in
+memory, as JSON, every read counted (review pass 1 of the run's
+decisions, O3): about 85 to 100 KB an extension, plus the 20 auth users
+it reads one by one from the Auth API, which sends each whole user
+record, an estimated 1 KB each; so about 105 to 120 KB, against about
+3.8 MB for a whole read of a new run now (about 3.1 to 3.3 MB of the
+live one) and about 18 MB after a year. So about 0.2
+GB a month now and about 0.6 GB after a year, of the free plan's 5 GB,
+against 2 to 2.4 GB and 12 to 13 GB reading the run whole every hour.
+`tests/seed/reads.test.ts` holds extensions to under a fifth of a
+whole read's rows, at a test's size. A run whose plan has another seed, base
 window or config is refused, and so is a plan that ends before the run
 already does.
 
@@ -730,7 +841,9 @@ Stop and report, without retrying past the engine's own retries, if:
   criterion, would land on a multiple of 5 (the schedule refuses it with
   its dry-run checks; any run fails validation after a write);
 - any stored sample debate's score or `prompt_version` differs from the
-  plan (the same two places). This is what code with another score rule
+  plan (the same two places; in an extension between whole reads, among
+  the rows it compares: the new ones and a sample of the rest, so within
+  a day for an older row). This is what code with another score rule
   writing past the cutover leaves; the way on is to move
   `SCORE_RULE_2_FROM` past the run's `window_to`, not to revert to code
   without the check;
@@ -743,6 +856,12 @@ Stop and report, without retrying past the engine's own retries, if:
   scheduled run is refused the same way until it is put right);
 - the canary's rate puts the full run beyond an hour (a judgement made by
   hand at the canary).
+
+After 16 November, code from before Arthur's decisions of 2026-11-09 is
+not put back on `main` for the live run: its plan lacks the anonymous
+takers and gives other arguments the ids of originals the seven-day rule
+added, so the run would halt. The way on is a fix forward or a teardown
+(review pass 3 of the run's decisions, O5).
 
 A halted run has `seed_runs.status` `failed` and a `last_error`
 starting "halted:", and from then on each scheduled run writes nothing
@@ -799,9 +918,18 @@ within the hour.
   in each week: measured in review on 3 seeds and 8 whole weeks, no
   school ranked on Monday or Tuesday, and all six only from 82 to 157
   hours into each week. Arthur ruled (d) on 2026-11-09 (item 9): the
-  table counts the last seven days. The run's side, every school 20 in
-  every seven days rather than in every ISO week, comes with the next
-  run.
+  table counts the last seven days. The run's side, every school 22 in
+  every seven days rather than in every ISO week, holds for the live run
+  from Monday 16 November (`WEEKLY_RULES_WEEK`) and for any run made
+  since. Until then the live run gives every school 22 in each ISO week,
+  and the seven days the table counts can hold fewer for some hours, when
+  a school shows as not ranked. On six seeds of its shape (`live-like`,
+  `s2` to `s6`) a school was under 20 for 0 to 60 of the 167 hours from
+  the base window's end to the 16th, and on review pass 3's six
+  (`weekly-check` among them) for 18 to 82, the lowest count 9: samples,
+  not bounds. On production at 15:30 on the 9th (judged originals per
+  school in the seven days to then, read from `debates`), every school
+  had 27 or more.
 - Exemplar pages start thinner than the old run's: at the start, five or
   six of the six motions have a school with fewer than four cards, all
   above the floor; at three weeks none to four, at six to eight weeks

@@ -32,8 +32,9 @@
 // SCORE_RULE_2_FROM, and every row of a run begun after it, follow rule 2.
 // The run begun on 2026-11-05 wrote its rows under rule 1 up to then, and
 // those rows regenerate exactly as written; scripts/seed/ci.ts compares
-// every stored sample score with the plan before each run writes. They go
-// at launch, with the run.
+// the stored sample scores with the plan before each run writes (all of
+// them once a day, the new ones and a sample of the rest in the hourly
+// extensions between: storedScoreCheck). They go at launch, with the run.
 //
 // Rule 2 makes every draw rule 1 makes, in the same order, and takes its
 // numbers from a stream of its own, so a rule-2 verdict differs from the
