@@ -3,8 +3,9 @@
 Sample accounts (about 740 at a run's start, about 25 more each week),
 with quiz results, arguments, revisions,
 challenges, counterpart exchanges, reading answers and classes from
-2026-09-18 on, rendered through the ordinary pages, and new arguments every
-hour for as long as the run lasts. Nothing here is a demo page: the
+2026-09-18 on, rendered through the ordinary pages, and each hour's
+activity added every hour for as long as the run lasts (about two
+arguments an hour on average; some hours none). Nothing here is a demo page: the
 rows sit in the real tables, marked, and every page that can show one says
 what it is.
 
@@ -496,6 +497,11 @@ shows only the current week, so the more often it runs the closer the
 week's table is to now. The fallback, and only that: if nothing has run
 for six hours, run `extend` by hand from the Actions tab.
 
+A `full` or `teardown` run by hand while a job is running waits behind
+it, and GitHub cancels a waiting run when the next scheduled one
+arrives. After starting one by hand, check that it ran, and start it
+again if it shows as cancelled.
+
 The modes (`scripts/seed/ci.ts`):
 
 - `canary`, by hand: starts a run, base window to now, the first 40
@@ -750,7 +756,9 @@ that set the schedule.
 The workflow's log is public, so an error from the writes, which can
 name a row, is logged as a line of its own ("the run stopped on a
 refusal" or "the run failed while writing"), and the detail goes to
-`seed_runs.last_error`, or the line says it could not be recorded.
+`seed_runs.last_error`, or the line says it could not be recorded. A
+failure that does not halt the run is resumed by the next scheduled run,
+which clears `last_error`: with the job hourly, read it within the hour.
 
 ## Limits
 

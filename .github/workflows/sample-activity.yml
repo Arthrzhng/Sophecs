@@ -52,7 +52,11 @@ permissions:
 
 # One at a time, and a queued run waits rather than cancelling a live one.
 # GitHub keeps one waiting run per group and cancels an older waiting one
-# when another arrives; nothing is lost, since each run extends to now.
+# when another arrives. For a scheduled extend nothing is lost, since the
+# next run extends to now; but a `full` or `teardown` started by hand while
+# a job is running waits, and the next scheduled run cancels it. So after
+# starting one by hand, check that it ran, and start it again if it shows
+# as cancelled.
 concurrency:
   group: sample-activity
   cancel-in-progress: false

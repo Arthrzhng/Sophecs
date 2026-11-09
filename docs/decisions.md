@@ -6451,17 +6451,45 @@ only as a fallback if nothing has run for 6 hours."
 
 Why: GitHub runs scheduled workflows late, or drops them, when it is
 busy. The six-hourly slots at minute 41 ran up to four hours late or not
-at all: on 2026-11-08 the 18:41 slot started at 22:28; on 2026-11-09 the
-00:41 and 06:41 slots never started, and the 06:41 extension was run by
-hand at 07:01.
+at all. On 2026-11-08 the 18:41 slot's run started at 22:28 (Actions
+42530384949, the last scheduled run). On 2026-11-09 the 00:41 and 06:41
+slots have no run at all in the Actions list, and the 06:41 extension
+was run by hand at 07:01 (Actions 42576672605, 38 of 38 checks).
 
-`.github/workflows/sample-activity.yml` now runs at `17 * * * *`. Nothing
-else changes: an extend always runs the activity up to now
-(`scripts/seed/ci.ts`), with no minimum gap; the workflow's concurrency
-group runs one at a time, and GitHub's one waiting run per group loses
-nothing, since the next run extends to now; a lock left by a dead job is
-taken after 15 minutes (`STALE_LOCK_MINUTES`). Each run re-plans the run
-from its start: about two minutes now, under five after three years
-(`docs/sample-activity.md`, Limits), inside the 90-minute timeout. The
-repository is public, so the extra Actions minutes cost nothing.
+`.github/workflows/sample-activity.yml` now runs at `17 * * * *`, and
+`tests/seed/isolation.test.ts` holds it to that one line. What the job
+writes does not change: an extend always runs the activity up to now
+(`scripts/seed/ci.ts`), with no minimum gap, and a run's rows depend
+only on its end, not on how often it was extended (review pass 1 ran 54
+hourly extends, back-to-back and empty windows among them, in memory:
+all passed, and the tables matched a single extend to the same end). The
+concurrency group runs one job at a time; a lock left by a dead job is
+taken after 15 minutes (`STALE_LOCK_MINUTES`). Plan time, measured in
+review on the job's own path: about 2 seconds now, 75 seconds after a
+year, about 10 minutes after three years (`describe` runs twice and
+grows with the square of the arguments), inside the hour and the
+90-minute timeout. The repository is public, so the Actions minutes
+cost nothing.
 
+**What it costs in database egress** (review pass 1, B1). Every run reads
+the whole run back to check it, whatever its window: the registry, every
+sample argument and every sample profile. Measured in review at
+production volumes, as uncompressed JSON (what reaches the network may
+be smaller if responses are compressed): about 3 MB a run now, about
+16 to 18 MB after a year, about 45 MB after three. Hourly, that is about
+2 to 2.4 GB a month now and 12 to 13 GB a month after a year; six-hourly
+it was a sixth of that. The project is on Supabase's Free plan, whose 5
+GB a month of egress is shared with the site's own traffic; past it,
+after a grace period, Supabase may restrict the project (requests
+refused, or read-only). At this growth the job alone passes 5 GB a month
+between about day 87 and day 110, so around February 2027. The real
+figure is on the organisation's usage page (Database Egress), to be read
+after the first full day of hourly runs.
+
+For Arthur's list, (d): (a) keep hourly and cut what each run reads
+(check the window's new rows and the run's counts, read the registry
+once), a change to the seed job's checks, reviewed as any other, which
+keeps the job far under the quota; (b) keep hourly as it is and decide
+before February from the usage page; (c) the Pro plan (250 GB of egress
+included); (d) a slower schedule. Recommended: (a). Until he rules the
+job runs hourly as he asked.
