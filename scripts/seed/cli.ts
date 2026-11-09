@@ -88,8 +88,11 @@ export function checkPlanQuiz(f: Flags, planQuiz: GenConfig["quiz"], target: "lo
  * And a plan's weekly shape (`weekly`) must be the scheduled job's
  * (RUN_WEEKLY), for the same reason: it is part of the base hash.
  */
-export function checkPlanWeekly(planWeekly: GenConfig["weekly"], target: "local" | "production"): void {
-  if (target === "production" && JSON.stringify(planWeekly ?? null) !== JSON.stringify(RUN_WEEKLY ?? null))
+export function checkPlanWeekly(planWeekly: GenConfig["weekly"], planQuiz: GenConfig["quiz"], target: "local" | "production"): void {
+  // The shape the scheduled job gives a plan of this quiz: RUN_WEEKLY for
+  // quiz v2, none for a plan that names no quiz (ci.ts, weeklyFor).
+  const expected = weeklyFor(planQuiz).weekly;
+  if (target === "production" && JSON.stringify(planWeekly ?? null) !== JSON.stringify(expected ?? null))
     throw new GuardError("the plan's weekly shape is not the scheduled job's (RUN_WEEKLY in scripts/seed/generate.ts), so every scheduled extension would refuse this run");
 }
 

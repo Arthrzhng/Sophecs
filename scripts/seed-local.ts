@@ -82,7 +82,7 @@ main(async () => {
         exchanges: int(f, "exchanges", DEFAULTS.exchanges, 0, 5000),
         classes: int(f, "classes", DEFAULTS.classes, 0, 100),
         ...(quizFlag(f) ? { quiz: quizFlag(f) } : {}),
-      ...weeklyFor(quizFlag(f)),
+        ...weeklyFor(quizFlag(f)),
         topics: contentTopics(),
       },
     });

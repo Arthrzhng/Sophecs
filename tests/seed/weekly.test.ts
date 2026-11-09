@@ -17,10 +17,10 @@ const WEEK = 7 * DAY;
 const SCHOOLS = ["stoicism", "utilitarianism", "virtue-ethics", "confucian", "ubuntu", "buddhist"];
 const later = (days: number) => new Date(Date.parse(BASE_TO) + days * DAY).toISOString();
 
-function run(to: string, seed = "weekly-check"): Dataset {
+function run(to: string, seed = "weekly-check", baseTo = BASE_TO): Dataset {
   return generate(
     {
-      seed, from: DEFAULTS.from, baseTo: BASE_TO, to,
+      seed, from: DEFAULTS.from, baseTo, to,
       users: DEFAULTS.users, anonResults: DEFAULTS.anonResults, challenges: DEFAULTS.challenges,
       exchanges: DEFAULTS.exchanges, classes: DEFAULTS.classes, quiz: 2, weekly: RUN_WEEKLY, topics: contentTopics(),
     },
@@ -76,6 +76,44 @@ describe("a sample run made with the weekly settings", () => {
       expect(mean).toBeLessThan(30);
       // The weeks are not all alike.
       expect(new Set(full.map(([, w]) => w.active.size)).size).toBeGreaterThan(full.length / 2);
+    });
+  }
+
+  // The week the base window ends in is drawn whole and kept from the base
+  // window's end (review of #115, B1): no burst of the week's draw into what
+  // is left of it, and no lull until the next Monday. Started late on a
+  // Sunday, as the scheduled job's first run after a teardown can be; on a
+  // Wednesday afternoon; early on a Monday.
+  for (const [label, baseTo] of [
+    ["late on a Sunday", "2026-11-08T23:41:00.000Z"],
+    ["on a Wednesday afternoon", "2026-11-11T14:41:00.000Z"],
+    ["early on a Monday", "2026-11-09T03:17:00.000Z"],
+  ] as const) {
+    it(`started ${label}, its first week runs at the rate of the weeks after it`, () => {
+      const start = Date.parse(baseTo);
+      const firstMonday = mondayOf(start);
+      const end = firstMonday + 3 * WEEK;
+      const ds = run(new Date(end).toISOString(), "first-week", baseTo);
+      const perHour = new Map<number, number>();
+      let after = 0;
+      for (const { row } of ds.debates) {
+        const t = Date.parse(row.created_at);
+        if (t <= start) continue;
+        after++;
+        perHour.set(Math.floor(t / 3_600_000), (perHour.get(Math.floor(t / 3_600_000)) ?? 0) + 1);
+      }
+      const mean = after / ((end - start) / 3_600_000);
+      // The busiest hour after the base window's end is a busy hour, not a burst.
+      expect(Math.max(...perHour.values())).toBeLessThanOrEqual(Math.max(15, 8 * mean));
+      const byWeek = weeks(ds);
+      const first = byWeek.get(firstMonday)!;
+      const next = byWeek.get(firstMonday + WEEK)!;
+      // The first week is neither swollen nor empty beside the next.
+      expect(first.active.size).toBeGreaterThan(0.6 * next.active.size);
+      expect(first.active.size).toBeLessThan(1.25 * next.active.size);
+      // Started with a day or more of the week left, every school is ranked in it.
+      if (firstMonday + WEEK - start >= DAY)
+        for (const school of SCHOOLS) expect(first.originals.get(school) ?? 0, school).toBeGreaterThanOrEqual(RUN_WEEKLY!.minPerSchool);
     });
   }
 

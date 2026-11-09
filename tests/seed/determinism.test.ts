@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { baseHash, manifestHash } from "../../scripts/seed/plan";
 import { contentTopics } from "../../scripts/seed/topics";
 import { SMALL, small } from "./fixture";
+import { RUN_WEEKLY } from "../../scripts/seed/generate";
 
 describe("determinism", () => {
   it("the same seed and window give the same rows, ids and hash", () => {
@@ -44,6 +45,17 @@ describe("determinism", () => {
       "646df8add6bdce16bcd2f33fbbec017918996fa8324d5b7cb81d7a759e8bd9f2"
     );
     expect(baseHash({ ...SMALL, quiz: 2, topics: contentTopics() })).toBe("5cdeac90c6bfadb49435f35b4688ee717ed990b7b3d409dd8ef3c600e1255824");
+  });
+
+  // The weekly run (Arthur, 2026-11-08) regenerates its rows from this code
+  // every six hours; a change that rewrote an earlier week would halt it at
+  // its next spot check. Its datasets as this code made them, at the base
+  // window's end, into its first week, and two weeks on.
+  it("gives a weekly run exactly the rows it gave when it was written", () => {
+    const weekly = { quiz: 2 as const, weekly: RUN_WEEKLY };
+    expect(manifestHash(small(weekly))).toBe("5cdf8ee58810e73b4d06d4eec51e168b3ab8107c3be35ea1f855cefb4c86f146");
+    expect(manifestHash(small({ ...weekly, to: "2026-11-07T12:00:00.000Z" }))).toBe("4044712326b4a6d49f3023e27d0a4de117f8e14308a597b3d6fd25885ea2c0d4");
+    expect(manifestHash(small({ ...weekly, to: "2026-11-21T12:00:00.000Z" }))).toBe("e5486ca45ac5fd417cc3e2976c40cc791c8c3d5d0c9a9b0afa24d2e3ef7042b3");
   });
 
   it("names runs and addresses as documented", () => {

@@ -243,21 +243,43 @@ Two layers, both from one secret seed:
     accounts (an argument, a revision or a quiz result that week): about
     200 (sd 9), moved by one when it lands on a multiple of ten. They are
     drawn by how engaged each account is (heavy 7, regular 3, light 1,
-    quiz only 0.3) and how long ago it joined (half of that weight fades
-    over 70, 16, 5 and 3 weeks), and argue or retake the quiz as their
-    class has it; a revision stays inside its week, so the count holds;
+    quiz only 0.3) and how long ago it joined (three quarters of that
+    weight halves every 70, 16, 5 and 3 weeks), and argue or retake the
+    quiz as their class has it; a revision stays inside its week, so the
+    count holds;
   - then, for any school short of 22 judged originals (20 and two to
     spare), more originals from its members already active that week.
-  The base window's own streams stop at its end. A week is drawn whole
-  from its own stream and the weeks before it, and only what falls by the
-  run's end so far is written. Challenges, exchanges, reading answers and
-  classes stay the base window's.
+  The base window's own streams stop at its end, and a base revision
+  stays in its original's week. A week is drawn whole from its own stream
+  and the weeks before it, and only what falls by the run's end so far is
+  written. The week the base window ends in is drawn whole too, from its
+  Monday, and keeps only what falls after the base window's end: the base
+  window holds the rest. So that week runs at one rate throughout, with no
+  burst into what is left of it and no lull until the next Monday; its
+  count is the base window's accounts and the drawn ones together, so it
+  is not drawn exactly, and the base window's own weeks are not drawn to
+  a count at all (about 110 to 180 active, from 60 to 130 sign-ups a
+  week). Challenges, exchanges, reading answers and classes stay the base
+  window's.
 
-Each debater's arguments come from their own random stream and stop at
-their own lifetime, never at the window's end, so moving the end later
-only appends: every row up to the old end comes out the same, ids
-included (`tests/seed/extension.test.ts`). What changes in an earlier row
-is a profile's rating, streak and school, which the engine updates.
+  Measured on 2026-11-09 at the scheduled job's volumes, 15 seeds, twelve
+  whole weeks each, the base window ending on a Monday just after
+  midnight and on a Wednesday afternoon: 174 to 228 active accounts a
+  week, none a multiple of ten, and no account active in a whole week
+  that its draw did not count; 12 to 40 newcomers a week, 24.6 to 25.6 on
+  average; every school at least 22 judged originals every week. The
+  week the base window ends in: 182 to 216 active, every school at least
+  24, when the base window ends with a day or more of it left. No hour
+  holds more than about 13 arguments, at a mean of about 2, and there is
+  no burst after the base window's end.
+
+In a run without the weekly shape, each debater's arguments come from
+their own random stream and stop at their own lifetime, never at the
+window's end. Either way, moving the end later only appends: every row up
+to the old end comes out the same, ids included
+(`tests/seed/extension.test.ts`, `tests/seed/weekly.test.ts`). What
+changes in an earlier row is a profile's rating, streak and school, which
+the engine updates.
 
 What the generator reuses from the app rather than reimplementing: the
 quiz bank and `scoreQuiz` (answers are biased by a leaning; the school
@@ -347,9 +369,12 @@ ways only:
 
 A run that names no quiz is exactly as before: `tests/seed/determinism.test.ts`
 pins its datasets as `main` gave them before any of this, and a quiz v2
-run's as this code first made them. Measured on a plan at production
-volume, seed `six-check`, base window to 2026-11-10 09:00 UTC, two weeks
-on, counting the weeks as seven-day windows from the base window's end:
+run's as this code first made them, and a weekly run's as its code first
+made them. Measured on 2026-11-06, before the weekly shape, on
+a plan at the 3,278-account run's volume, seed `six-check`, base window
+to 2026-11-10 09:00 UTC, two weeks on, counting the weeks as seven-day
+windows from the base window's end (the weekly shape's figures are under
+"The dataset"):
 
 | | Target | Measured |
 | --- | --- | --- |
@@ -653,8 +678,12 @@ refusal" or "the run failed while writing"), and the detail goes to
   (`closings-by-motion.json`) and verdict lines: a change to
   any of them changes rows it has written. A run made with quiz v1 holds
   fixed v1's question bank and scorer, which the generator still imports.
-- Exact duplicates rise once a composition list runs out. Measured in
-  review on 2026-11-04 at production volumes: 0.02% at the start, 0.28%
+- Exact duplicates rise once a composition list runs out. The weekly
+  run, measured in review on 2026-11-08 (seed `long1`): 0.2% after a
+  year, 1.3% after two and 3.7% after three, so the 5% check is not
+  reached in three years, and making the plan stays well inside the
+  job's 90 minutes. The 3,278-account run, measured in review on
+  2026-11-04: 0.02% at the start, 0.28%
   after 90 days, 3.29% after a year and 9.85% after two, so the 5% check
   refuses every extension from about 16 months on, before writing
   anything, unless the passages grow. Making

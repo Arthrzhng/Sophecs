@@ -6103,18 +6103,26 @@ window held about 23 active accounts and some schools none. So:
     and moved by one off a multiple of ten;
   - more originals for any school short of 22 judged ones.
 
-  A later end only appends, so the six-hourly extension carries on.
+  A later end only appends, so the six-hourly extension carries on. The
+  week the base window ends in is drawn whole as well, from its Monday,
+  keeping only what falls after the base window's end (review pass 1,
+  B1: drawn from the end alone, a run started late on a Sunday put a
+  whole week's draw into its last twenty minutes). That week's count is
+  the base window's and the draw's together, so it is the one week not
+  drawn exactly.
 - **Challenges, exchanges, reading answers and classes** stay the base
   window's.
 - **A run that names no quiz** is drawn exactly as before, every pin
   unchanged.
 
-Measured on three seeds over twelve weeks:
-- active accounts in each full week were 181 to 217, none a multiple of
-  ten;
-- 16 to 41 newcomers a week, about 28 on average;
-- 28 or more judged originals per school per week;
-- exact duplicate arguments at 0.05%;
+Measured on 15 seeds over twelve whole weeks each (review pass 1
+measured 720 weeks of the first version, and its figures were close):
+- active accounts in each whole week were 174 to 228, none a multiple of
+  ten; the week the base window ends in, 182 to 216;
+- 12 to 40 newcomers a week, 24.6 to 25.6 on average;
+- 22 or more judged originals per school every week;
+- exact duplicate arguments at 0.05% at the start, 3.7% after three
+  years (review pass 1);
 - no two exemplar cards on a page sharing their first three words.
 
 For Arthur's list:
@@ -6124,3 +6132,17 @@ For Arthur's list:
 - **Visible newcomers.** About 25 newcomers a week sit beside about 200
   active, so new accounts are a visible part of each week. "Joined /
   left" on the table counts school changes, not sign-ups, as before.
+- **A step in sign-ups** (review pass 1, O7). The base window, from
+  18 September, holds the 738 accounts, so it signs up 60 to 130 a week;
+  from its end, about 25. Its own weeks are not drawn to a count either:
+  about 110 to 180 active. Making the history match (about 30 weeks of
+  history at 25 a week) means starting the base window in April, before
+  the site had any activity; nothing on the site shows a past week's
+  sign-ups or active count. Left as it is unless Arthur wants otherwise.
+- **School changes** (review pass 1, O7). A returning account that
+  writes nothing that week retakes the quiz and always lands in another
+  school, so the table shows 15 to 29 school changes a week, and about
+  35% of accounts have changed school within a year, some up to five
+  times; the base window's model has about 8% change once. The
+  alternatives: a retake that may land in the same school (no change
+  recorded), or fewer retakes.

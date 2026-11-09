@@ -4,13 +4,16 @@
 //
 // Two layers. The base window, from `from` to `baseTo`, holds the accounts,
 // their quiz results, challenges, counterpart exchanges, reading answers and
-// classes, and is fixed for the life of a run. Arguments run on past it, to
-// `to`, which moves forward each time the run is extended: every debater's
-// arguments come from their own random stream and stop at their own
-// lifetime, never at `to`, so moving `to` later only appends. Rows up to
-// the old `to` come out the same (tests/seed/extension.test.ts); what a
-// later `to` changes in them is the profiles' rating, streak and school,
-// which the engine updates.
+// classes, and is fixed for the life of a run. Past it, to `to`, which moves
+// forward each time the run is extended, either every debater's arguments
+// run on from their own random stream and stop at their own lifetime, never
+// at `to`; or, in a run with the weekly shape (`weekly`), the base window's
+// streams stop at its end and each week from the one it ends in is drawn
+// whole, with its newcomers, its returning accounts and their arguments
+// and quiz results. Either way moving `to` later only appends. Rows up to
+// the old `to` come out the same (tests/seed/extension.test.ts,
+// tests/seed/weekly.test.ts); what a later `to` changes in them is the
+// profiles' rating, streak and school, which the engine updates.
 //
 // What it reuses from the app rather than reimplementing:
 // - the quiz bank and scoreQuiz, so a sample's school comes out of answers
@@ -90,9 +93,10 @@ export interface GenConfig {
   /**
    * A run shaped as a site on course for about 4,000 accounts over three
    * years (Arthur, 2026-11-08): from the base window's end on, each week
-   * brings about `newcomers` new accounts and exactly its own number of
-   * active accounts, about `active` and never a multiple of ten, and every
-   * school at least `minPerSchool` judged originals. Each week is drawn from
+   * brings about `newcomers` new accounts, and each whole week after the
+   * one the base window ends in exactly its own number of active
+   * accounts, about `active` and never a multiple of ten, and every school
+   * at least `minPerSchool` judged originals. Each week is drawn from
    * its own stream and from the weeks before it, so a later `to` only
    * appends. Quiz v2 runs only. Absent, as in every run before it: the base
    * window's own streams carry on past it, every row exactly as before.
@@ -112,8 +116,6 @@ export interface GenConfig {
  */
 export const RUN_QUIZ: GenConfig["quiz"] = 2;
 
-// 3,278 accounts, Arthur's ruling of 2026-11-04, and the other volumes
-// scaled from the brief's 4,000 by the same factor.
 // The run's size at its start (Arthur, 2026-11-08: "total accounts about
 // 700-800 now"), the rest in proportion to the run before it (3,278
 // accounts, 4,917 anonymous results, 328 challenges, 492 exchanges, 10
@@ -679,7 +681,10 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
 
   const slots: Slot[] = [];
   // A weekly run's own streams stop at the base window's end; the weeks
-  // after it are drawn whole, below.
+  // from the one it ends in are drawn whole, below (5w). `firstFull` is the
+  // first of them the base window has no part of.
+  const mondayOf = (t: number) => startOfUtcDay(t) - ((new Date(startOfUtcDay(t)).getUTCDay() + 6) % 7) * DAY;
+  const firstFull = mondayOf(to) === to ? to : mondayOf(to) + 7 * DAY;
   const streamEnd = cfg.weekly ? to : horizon;
   for (const u of users) {
     if (u.cls === "quiz") continue;
@@ -727,10 +732,16 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
       const tier = pickTier(r, Math.min(1, u.skill + (u.cls === "heavy" ? 0.15 * progress : 0)));
       const rejected = r.chance(tier === "weak" ? 0.06 : tier === "mid" ? 0.024 : 0.01);
       const argumentPublic = r.chance(0.1) ? !u.defaultPublic : u.defaultPublic;
-      const revise =
+      let revise =
         !rejected && r.chance(reviseChance)
           ? { delay: Math.max(10 * MINUTE, Math.min(6 * DAY, r.exponential(DAY))), answered: r.chance(0.85) }
           : null;
+      // In a weekly run a revision stays in the week its original is in, as
+      // a weekly one stays in its own: a whole week's active accounts are
+      // then exactly the ones drawn for it (review of #115, B1). One that
+      // would land later is not made (drawn all the same, so nothing after
+      // it moves).
+      if (cfg.weekly && revise && t + revise.delay > firstFull - 10 * MINUTE) revise = null;
       slots.push({ u, k, t, topic, school, tier, rejected, argumentPublic, revise });
       k++;
       lockedUntil.set(topic, t + 7 * DAY + MINUTE);
@@ -816,7 +827,9 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     // One original at or after `t`, inside the week, by the rules the base
     // window's streams keep: five within any 24 hours, seven days between
     // two on one motion. Returns its time, or null if none fits.
-    const original = (u: User, t: number, latest: number, r: Rng, out: Slot[], forceKept = false): number | null => {
+    // An original before `keepFrom` is drawn and not kept: the base window
+    // holds that part of the week (see the loop below).
+    const original = (u: User, t: number, latest: number, r: Rng, out: Slot[], forceKept = false, keepFrom = -Infinity): number | null => {
       const c = carryOf(u);
       for (let guard = 0; guard < 40; guard++) {
         if (t > latest) return null;
@@ -837,12 +850,16 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         const rejected = !forceKept && r.chance(tier === "weak" ? 0.06 : tier === "mid" ? 0.024 : 0.01);
         const argumentPublic = r.chance(0.1) ? !u.defaultPublic : u.defaultPublic;
         // A revision lands in the same week, so a week's active accounts are
-        // exactly the ones drawn for it.
+        // exactly the ones drawn for it. One that would land after the week
+        // is not made, rather than moved to its last minute, where every
+        // such revision would land at once.
         let revise: Slot["revise"] = null;
         if (!rejected && r.chance(c.reviseChance)) {
-          const delay = Math.min(Math.max(10 * MINUTE, Math.min(6 * DAY, r.exponential(DAY))), latest - t);
-          if (delay >= 10 * MINUTE) revise = { delay, answered: r.chance(0.85) };
+          const delay = Math.max(10 * MINUTE, Math.min(6 * DAY, r.exponential(DAY)));
+          const answered = r.chance(0.85);
+          if (t + delay <= latest) revise = { delay, answered };
         }
+        if (t < keepFrom) return t;
         out.push({ u, k: c.k++, t, topic, school, tier, rejected, argumentPublic, revise });
         c.locked.set(topic, t + 7 * DAY + MINUTE);
         c.recent.push(t);
@@ -855,20 +872,27 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
       for (let d = startOfUtcDay(from); d < until; d += DAY) days.push([d, dayWeight(d)] as const);
       return days.length ? r.weighted(days) : null;
     };
-    const timeIn = (r: Rng, u: User, from: number, until: number): number | null => {
+    const timeIn = (r: Rng, tz: string, from: number, until: number): number | null => {
       for (let tries = 0; tries < 8; tries++) {
         const day = dayOf(r, from, until);
         if (day === null) return null;
-        const t = activeTimeOn(r, u.tz, day, from, until);
+        const t = activeTimeOn(r, tz, day, from, until);
         if (t !== null) return t;
       }
       return null;
     };
-    const monday = (t: number) => startOfUtcDay(t) - ((new Date(startOfUtcDay(t)).getUTCDay() + 6) % 7) * DAY;
+    // The week the base window ends in is drawn whole too, from its Monday,
+    // and only what falls after the base window's end is kept: the base
+    // window's own streams hold the part before it. So that week runs at
+    // one rate throughout, with no burst after the base window's end and
+    // no lull before the next Monday (review of #115, B1). Its count of
+    // active accounts is the base window's and the kept draw's together,
+    // so it is not drawn exactly, as every whole week after it is.
     const weekSlots: Slot[] = [];
-    for (let ws = monday(to); ws <= horizon; ws += WEEK) {
+    for (let ws = mondayOf(to); ws <= horizon; ws += WEEK) {
       const we = ws + WEEK;
-      const start = Math.max(ws, to);
+      const start = ws;
+      const keepFrom = Math.max(ws, to);
       const latest = we - 10 * MINUTE;
       const r = wkRng.fork(iso(ws).slice(0, 10));
       const thisWeek: Slot[] = [];
@@ -880,12 +904,15 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         const ar = r.fork(`newcomer/${i}`);
         const tz = ar.weighted(TIMEZONES);
         // Far enough in that the quiz they take first falls in this week too.
-        const t = timeIn(ar, { tz } as User, start + 45 * MINUTE, latest);
+        const t = timeIn(ar, tz, start + 45 * MINUTE, latest);
         if (t !== null) arrivals.push({ r: ar, tz, t });
       }
       arrivals.sort((a, b) => a.t - b.t);
       const actives = new Set<User>();
+      // How many accounts a whole week's draw has made active, kept or not.
+      let drawn = arrivals.length;
       for (const a of arrivals) {
+        if (a.t < keepFrom + 45 * MINUTE) continue;
         const u = makeUser(users.length + weeklyUsers.length, a.r.fork("user"), a.t, a.tz, a.r.weighted(NEW_CLASS));
         weeklyUsers.push(u);
         const qr = u.rng.fork("quiz");
@@ -897,7 +924,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
           logicalId: `result:user:${u.n}:0`,
           rowId: rid,
           cohort: u.n,
-          row: { id: rid, anon_id: qr.uuid(), user_id: u.id, ...quiz, challenge_from: null, referrer: null, created_at: iso(Math.max(start, u.signup - qr.int(2, 40) * MINUTE)), is_sample: true },
+          row: { id: rid, anon_id: qr.uuid(), user_id: u.id, ...quiz, challenge_from: null, referrer: null, created_at: iso(Math.max(keepFrom, u.signup - qr.int(2, 40) * MINUTE)), is_sample: true },
         });
         actives.add(u);
         const nr = r.fork(`newcomer-activity/${u.n}`);
@@ -923,22 +950,28 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         })
         .sort((a, b) => b.key - a.key || a.u.n - b.u.n);
       for (const { u } of keyed) {
-        if (actives.size >= target) break;
+        if (drawn >= target) break;
         const ar = r.fork(`active/${u.n}`);
         const n = u.cls === "heavy" ? ar.int(2, 6) : u.cls === "regular" ? ar.int(1, 3) : u.cls === "light" ? ar.weighted([[1, 0.7], [2, 0.3]] as const) : ar.chance(0.5) ? 1 : 0;
-        let t = timeIn(ar, u, start, latest);
+        let t = timeIn(ar, u.tz, start, latest);
         if (t === null) continue;
         let did = false;
+        let kept = false;
         // A returning account that writes nothing retakes the quiz; a few
         // others do too, as a reader might.
-        if (n === 0 || ar.chance(0.03)) did = retake(u, t, ar) || did;
+        if (n === 0 || ar.chance(0.03)) {
+          if (t < keepFrom) did = true;
+          else if (retake(u, t, ar)) did = kept = true;
+        }
         for (let k = 0; k < n; k++) {
-          const made = original(u, t + (did ? ar.int(5, 30) * MINUTE : 0), latest, ar, thisWeek);
+          const made = original(u, t + (did ? ar.int(5, 30) * MINUTE : 0), latest, ar, thisWeek, false, keepFrom);
           if (made === null) break;
           did = true;
-          t = ar.chance(0.45) ? made + ar.int(4, 30) * MINUTE : (timeIn(ar, u, made + 2 * HOUR, latest) ?? made + ar.int(4, 30) * MINUTE);
+          if (made >= keepFrom) kept = true;
+          t = ar.chance(0.45) ? made + ar.int(4, 30) * MINUTE : (timeIn(ar, u.tz, made + 2 * HOUR, latest) ?? made + ar.int(4, 30) * MINUTE);
         }
-        if (did) actives.add(u);
+        if (did) drawn++;
+        if (kept) actives.add(u);
       }
 
       // Every school at least `minPerSchool` judged originals, with two to
@@ -947,10 +980,13 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
       for (const sl of [...slots, ...thisWeek]) if (sl.t >= ws && sl.t < we && !sl.rejected) counted.set(sl.school, (counted.get(sl.school) ?? 0) + 1);
       for (const school of schools) {
         const tr = r.fork(`top-up/${school}`);
-        const members = [...actives].filter((u) => schoolOf(u, start) === schoolOf(u, latest) && schoolOf(u, latest) === school).sort((a, b) => a.n - b.n);
+        const members = [...actives].filter((u) => schoolOf(u, keepFrom) === schoolOf(u, latest) && schoolOf(u, latest) === school).sort((a, b) => a.n - b.n);
         for (let guard = 0; (counted.get(school) ?? 0) < W.minPerSchool + 2 && members.length && guard < 400; guard++) {
           const u = tr.pick(members);
-          const t = timeIn(tr, u, Math.max(start, u.signup + 5 * MINUTE), latest);
+          // After the account's latest original, since original() keeps its
+          // five-in-24-hours count by times that only increase.
+          const after = Math.max(keepFrom, u.signup + 5 * MINUTE, (carryOf(u).recent.at(-1) ?? 0) + 10 * MINUTE);
+          const t = timeIn(tr, u.tz, after, latest);
           if (t !== null && original(u, t, latest, tr, thisWeek, true) !== null) counted.set(school, (counted.get(school) ?? 0) + 1);
         }
       }

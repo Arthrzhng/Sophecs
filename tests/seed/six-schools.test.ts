@@ -5,7 +5,7 @@
 // six-school build, and a run that names no quiz is untouched.
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { createHmac } from "node:crypto";
-import { emailTag, generate, RUN_QUIZ, type Dataset } from "../../scripts/seed/generate";
+import { DEFAULTS, emailTag, generate, RUN_QUIZ, RUN_WEEKLY, type Dataset } from "../../scripts/seed/generate";
 import { BANK_SCHOOLS, TOPICS, freshFragments, loadBanks, loadClosings, loadFragments, loadMotionClosings } from "../../scripts/seed/banks";
 import { contentTopics } from "../../scripts/seed/topics";
 import { baseHash, datasetForPlan, manifestHash } from "../../scripts/seed/plan";
@@ -19,8 +19,10 @@ import { EXEMPLAR_FLOOR, SAMPLE_TYPO, endingOf, openingOf, selectExemplars, with
 import type { SchoolId } from "../../src/lib/types";
 import { SMALL, smallPlan } from "./fixture";
 
-// Production's volumes, a base window ending on a Monday, and the week
-// after it: what the launch week of a fresh run looks like.
+// The 3,278-account run's volumes, without the weekly shape, a base window
+// ending on a Monday, and the week after it: what the launch week of that
+// run looked like. The weekly shape the scheduled job now runs is in
+// weekly.test.ts, and its exemplar pages below.
 const LAUNCH_WEEK = { from: "2026-11-09T00:00:00.000Z", to: "2026-11-16T00:00:00.000Z" };
 // The sentences that state only a stance, written out here rather than
 // read from the generator's pattern, so that one the pattern missed fails
@@ -77,6 +79,44 @@ const share = (xs: string[]) => {
   for (const x of xs) m[x] = (m[x] ?? 0) + 1;
   return Object.fromEntries(Object.entries(m).map(([k, v]) => [k, v / xs.length]));
 };
+
+/** Every motion's exemplar page, as getExemplars and selectExemplars make it, holds the realism rules. */
+function exemplarPagesHold(ds: Dataset): void {
+    const rows = ds.debates
+      .map((d) => d.row)
+      .filter((d) => d.argument_public && d.kind === "original" && !d.rejected && d.verdict && d.argument && (d.score ?? 0) >= EXEMPLAR_FLOOR);
+    for (const topic of TOPICS) {
+      const bySchool = new Map<SchoolId, ExemplarCandidate[]>(
+        BANK_SCHOOLS.map((school) => [
+          school as SchoolId,
+          rows
+            .filter((r) => r.topic_slug === topic && r.school === school)
+            .sort((a, b) => b.score! - a.score! || (a.created_at < b.created_at ? 1 : -1))
+            .map((r) => ({ id: r.id, school: r.school as SchoolId, argument: r.argument!, is_sample: true, score: r.score })),
+        ])
+      );
+      const chosen = [...selectExemplars(bySchool, [...BANK_SCHOOLS] as SchoolId[]).values()].flat();
+      const endings = chosen.map((e) => endingOf(e.argument).toLowerCase());
+      expect(new Set(endings).size, topic).toBe(endings.length);
+      // Nor do two cards on the page open on the same three words, now that
+      // no position opens on a sentence that states only its stance
+      // (Arthur, 2026-11-08: "repeated sentence openings ... across sample
+      // arguments and exemplars").
+      const openings = chosen.map((e) => firstWords(e.opening, 3));
+      expect(new Set(openings).size, `${topic}: ${openings.join(" | ")}`).toBe(openings.length);
+      for (const school of BANK_SCHOOLS) {
+        // The openings it could show: those of arguments without one of the
+        // run's deliberate misspellings, which the selection never takes.
+        const openings = new Set(
+          bySchool
+            .get(school as SchoolId)!
+            .filter((c) => !SAMPLE_TYPO.test(c.argument))
+            .map((c) => openingOf(withoutFrame(c.argument)).trim().replace(/\s+/g, " ").toLowerCase())
+        );
+        expect(chosen.filter((e) => e.school === school), `${topic}.${school}`).toHaveLength(openings.size);
+      }
+    }
+}
 
 describe("a sample run made with quiz v2", () => {
   // Production's volumes take a few seconds to generate, once for the file.
@@ -179,42 +219,22 @@ describe("a sample run made with quiz v2", () => {
   it("gives exemplar pages that never show the same ending twice, and still one argument under each opening", () => {
     // As getExemplars reads them: published, judged originals at the floor
     // or above, strongest first; then the app's own selection.
-    const ds = six();
-    const rows = ds.debates
-      .map((d) => d.row)
-      .filter((d) => d.argument_public && d.kind === "original" && !d.rejected && d.verdict && d.argument && (d.score ?? 0) >= EXEMPLAR_FLOOR);
-    for (const topic of TOPICS) {
-      const bySchool = new Map<SchoolId, ExemplarCandidate[]>(
-        BANK_SCHOOLS.map((school) => [
-          school as SchoolId,
-          rows
-            .filter((r) => r.topic_slug === topic && r.school === school)
-            .sort((a, b) => b.score! - a.score! || (a.created_at < b.created_at ? 1 : -1))
-            .map((r) => ({ id: r.id, school: r.school as SchoolId, argument: r.argument!, is_sample: true, score: r.score })),
-        ])
-      );
-      const chosen = [...selectExemplars(bySchool, [...BANK_SCHOOLS] as SchoolId[]).values()].flat();
-      const endings = chosen.map((e) => endingOf(e.argument).toLowerCase());
-      expect(new Set(endings).size, topic).toBe(endings.length);
-      // Nor do two cards on the page open on the same three words, now that
-      // no position opens on a sentence that states only its stance
-      // (Arthur, 2026-11-08: "repeated sentence openings ... across sample
-      // arguments and exemplars").
-      const openings = chosen.map((e) => firstWords(e.opening, 3));
-      expect(new Set(openings).size, `${topic}: ${openings.join(" | ")}`).toBe(openings.length);
-      for (const school of BANK_SCHOOLS) {
-        // The openings it could show: those of arguments without one of the
-        // run's deliberate misspellings, which the selection never takes.
-        const openings = new Set(
-          bySchool
-            .get(school as SchoolId)!
-            .filter((c) => !SAMPLE_TYPO.test(c.argument))
-            .map((c) => openingOf(withoutFrame(c.argument)).trim().replace(/\s+/g, " ").toLowerCase())
-        );
-        expect(chosen.filter((e) => e.school === school), `${topic}.${school}`).toHaveLength(openings.size);
-      }
-    }
+    exemplarPagesHold(six());
   });
+
+  it("does the same on the weekly shape the scheduled job runs, twelve weeks on (review of #115, O5)", () => {
+    // At the start a few pages have a school with fewer cards than
+    // openings (on Arthur's list); by twelve weeks they have filled.
+    const weekly = generate(
+      {
+        seed: "six-schools-weekly", from: DEFAULTS.from, baseTo: "2026-11-09T00:43:00.000Z", to: "2027-02-01T00:00:00.000Z",
+        users: DEFAULTS.users, anonResults: DEFAULTS.anonResults, challenges: DEFAULTS.challenges, exchanges: DEFAULTS.exchanges,
+        classes: DEFAULTS.classes, quiz: 2, weekly: RUN_WEEKLY, topics: contentTopics(),
+      },
+      loadBanks()
+    );
+    exemplarPagesHold(weekly);
+  }, 60_000);
 
   it("opens no argument, revision or reply on a sentence that states only its stance", () => {
     // 50 of the 144 positions open on one as written, and none as the fresh

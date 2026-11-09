@@ -89,7 +89,7 @@ main(async () => {
     throw new GuardError(`the plan is for ${plan.target.kind === "production" ? plan.target.projectRef : "a local target"}, not ${ref}`);
   if (plan.runId !== runId) throw new GuardError(`--run-id ${runId} is not the plan's run ${plan.runId}`);
   checkPlanQuiz(f, plan.config.quiz, "production");
-  checkPlanWeekly(plan.config.weekly, "production");
+  checkPlanWeekly(plan.config.weekly, plan.config.quiz, "production");
   if (f.execute && f.validate) throw new GuardError("--execute and --validate are separate steps");
 
   log(`offline: regenerating ${plan.runId} from the plan`);
