@@ -641,11 +641,11 @@ describe("one sample reply in progress per reader (Arthur, 2026-11-09, item 24)"
           return fakeRpc(name, args);
         },
       } as never;
-      const calls = create.mock.calls.length;
       const before = create.mock.calls.length;
       expect(await replyAsSample(racing, "x1", READER, NOW), what).toEqual({ ok: false, reason: "not_due" });
-      // Only the other request's own call, if any: none for this one.
-      expect(create.mock.calls.length - before, what).toBe(what.startsWith("a reply") ? create.mock.calls.length - calls : 0);
+      // None for this one; where the other request wrote a reply, its own
+      // call is counted below (review pass 3, O5).
+      if (!what.startsWith("a reply")) expect(create.mock.calls.length - before, what).toBe(0);
       expect(tables.turns.filter((t) => t.seq === 2).length, what).toBeLessThanOrEqual(1);
       expect(claims.size, what).toBe(0);
     }
@@ -1047,6 +1047,71 @@ describe("item 17: what the AI is told, each rule tested (Arthur, 2026-11-09)", 
   it("takes four words in quotation marks as a quotation, and three as a phrase (review pass 2, O4)", () => {
     expect(inventedQuotations("The \u201Creasons heal every refusal\u201D view fails. " + BODY, material)).toEqual(["reasons heal every refusal"]);
     expect(inventedQuotations("The \u201Creasons heal refusals\u201D view fails. " + BODY, material)).toEqual([]);
+  });
+
+  it("catches words given to a named writer with other verbs, and the Master's, and passes a view put to one (review pass 3, B1)", () => {
+    expect(attributedWords("As Kant writes, a person is never only a means. " + BODY, material)).toEqual(["Kant writes"]);
+    expect(attributedWords("Aristotle says that virtue is a mean. " + BODY, material)).toEqual(["Aristotle says"]);
+    expect(attributedWords("As Mill puts it, the greatest number counts. " + BODY, material)).toEqual(["Mill puts it"]);
+    expect(attributedWords("Mencius said that the heart of compassion is in everyone. " + BODY, material)).toEqual(["Mencius said"]);
+    expect(attributedWords("The Master said that the gentleman is not a vessel. " + BODY, material)).toEqual(["The Master said"]);
+    expect(parseSampleReply(reply("The Master said that the gentleman is not a vessel. " + BODY), READER_ARGUMENT, material).ok).toBe(false);
+    for (const view of ["Epictetus would say that the refusal is not in the applicant's power. ", "As Aristotle argued, virtue is a mean. ", "Kant holds that a reason is owed. "])
+      expect(attributedWords(view + BODY, material), view).toEqual([]);
+  });
+
+  it("gives no one words when the subject is not a name (review pass 3, O1)", () => {
+    for (const ok of [
+      "Whoever wrote the code answers for it. ",
+      "You wrote that the bank owes reasons. ",
+      "Nobody said the rule was easy. ",
+      "Someone said the rule was easy, and was wrong. ",
+      "Engineers wrote the model, and developers said little. ",
+      "Critics said the bank was wrong. ",
+      "History says little about a refusal. ",
+    ]) {
+      expect(attributedWords(ok + BODY, material), ok).toEqual([]);
+      expect(parseSampleReply(reply(ok + BODY), READER_ARGUMENT, material).ok, ok).toBe(true);
+    }
+  });
+
+  it("reads a plural possessive inside single quotation marks as inside the quotation, curly or straight (review pass 3, B1)", () => {
+    expect(inventedQuotations("The rule ‘the applicants’ interests come first in every case’ settles nothing. " + BODY, material)).toEqual([
+      "the applicants’ interests come first in every case",
+    ]);
+    expect(inventedQuotations("The rule 'the applicants' interests come first in every case' settles nothing. " + BODY, material)).toEqual([
+      "the applicants' interests come first in every case",
+    ]);
+    // Two short quotations, the first ending in a plural: each its own.
+    expect(inventedQuotations("The words ‘the applicants’ and ‘the bank’ name the parties. " + BODY, material)).toEqual([]);
+    expect(inventedQuotations("The words 'the applicants' and 'the bank' name the parties. " + BODY, material)).toEqual([]);
+  });
+
+  it("looks up a per cent in words with its figure, not any percentage of the reader's (review pass 3, B1)", () => {
+    const pct = sampleReplyMaterial({ ...input, readerArgument: READER_ARGUMENT + " Forty per cent of refusals are never explained." });
+    expect(inventedFigures("Ninety per cent of refusals are never explained. " + BODY, pct)).toEqual(["Ninety percent"]);
+    expect(inventedFigures("If forty per cent go unexplained, the duty is plain. " + BODY, pct)).toEqual([]);
+    expect(inventedFigures("If 40% go unexplained, the duty is plain. " + BODY, sampleReplyMaterial({ ...input, readerArgument: READER_ARGUMENT + " 40% of refusals are never explained." }))).toEqual([]);
+  });
+
+  it("passes more of an argument's own prose (review pass 3, O2)", () => {
+    expect(inventedStudies("A refusal according to the data it was given is still a refusal. " + BODY, material)).toEqual([]);
+    expect(inventedFigures("The majority of applicants never ask. " + BODY, material)).toEqual([]);
+    expect(inventedFigures("Since the 1990s the question has changed form. " + BODY, material)).toEqual([]);
+    expect(inventedFigures("In 1748 the question was asked. " + BODY, material)).toEqual(["1748"]);
+    expect(speaksAsPerson("The A.I. decides, i.e. the bank does. " + BODY)).toBe(false);
+    expect(speaksAsPerson("I.e. the bank decides. " + BODY)).toBe(false);
+    expect(speaksAsPerson("No one owes more than I. " + BODY)).toBe(true);
+    // The reader's American spelling quoted back in British spelling.
+    const us = sampleReplyMaterial({ ...input, readerArgument: READER_ARGUMENT + " A model can analyze a file but its judgment, its defense and the labeled data stay the bank's." });
+    expect(
+      inventedQuotations("The claim \u201Ca model can analyse a file but its judgement, its defence and the labelled data stay the bank's\u201D asks a lot. " + BODY, us)
+    ).toEqual([]);
+  });
+
+  it("tells the retry every problem at once, a misquoted sentence with the rest (review pass 3, O3)", () => {
+    const r = parseSampleReply(JSON.stringify({ quoted_claim: "a sentence the reader never wrote at all", reply: "We should look again. " + BODY }), READER_ARGUMENT, material);
+    expect(r).toMatchObject({ ok: false, problem: expect.stringMatching(/quoted_claim was not copied word for word.*; and reply spoke as a person/) });
   });
 
   it("reads straight single quotation marks as quotation marks, both ways (review pass 1, B4)", () => {

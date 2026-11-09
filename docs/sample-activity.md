@@ -134,13 +134,19 @@ Behind `SAMPLE_REPLIES=1` (Vercel, read when the build starts:
   material that reads as an instruction as the other side's writing. A
   reader's angle brackets reach it as full-width ones, so no reader text
   can close a tag. A reply is written again if it has "I", "me", "my",
-  "we", "us" or "our" outside quotation marks; a figure, a percentage or
-  a proportion, a study, survey, poll or research, or four or more words
-  in quotation marks that the material does not have; or a swear word.
-  The school's own terms rest on the prompt and the eval: the material
-  carries its one line and the judge's criteria for it.
-- **What it costs, and the limits.** About $0.012 a reply with its
-  screen (the eval runs, `docs/sample-activity/sample-reply-eval-*.json`). Both calls are logged
+  "we", "us", "our" or "let's" outside quotation marks; a figure, a
+  percentage, a proportion or one of a short list of shares in words, a
+  study, survey, poll or research, four or more words in quotation
+  marks, or words given to someone named ("As Aristotle wrote"), that
+  the material does not have; or a swear word. These checks are a
+  backstop and do not catch everything; what they miss rests on the
+  prompt (`docs/decisions.md`, "The sample-accounts decisions, carried
+  out", item 17). The school's own terms rest on the prompt and the
+  eval: the material carries its one line and the judge's criteria for
+  it.
+- **What it costs, and the limits.** About $0.0135 a reply with its
+  screen under `sample-reply.v3` (eval run 4,
+  `docs/sample-activity/sample-reply-eval-4.json`). Both calls are logged
   under the reader and marked `for_sample` (migration 0029): the screen
   as a `screen`, so it is one of the reader's 8 screened replies a day
   wherever that is counted; the writing as `sample_reply`, at most 16 a

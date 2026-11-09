@@ -6557,19 +6557,27 @@ new run.
     proportions, no study, survey, poll or research, and no words in
     quotation marks or attributed to a philosopher, a book or anyone
     else, unless they are in the material below". Behind it, a reply is
-    written again if it has a figure, a percentage (however either side
-    writes its per cent), a proportion or a share in words ("a third
-    of", "millions of"), a cited study, survey, poll, paper or research
-    ("research has found", "a Stanford study"), or four or more words in
-    quotation marks, double or single, curly or straight, that the
-    material (`sampleReplyMaterial`: the motion, the school, both
-    arguments and the replies, without the prompt's own numbering) does
-    not have, or gives words to someone named without quotation marks
-    ("As Aristotle wrote", "Kant once said"). These are a backstop:
-    what rests on the prompt alone is a study cited without one of those
-    words, a figure in other words, and a view put to a philosopher
-    ("as Aristotle argued"), which the check passes as argument
-    (review pass 2, O3);
+    written again if it has a figure in digits, a percentage (however
+    either side writes its per cent, and in words with its figure:
+    "ninety per cent"), a proportion ("one in three"), one of a short
+    list of shares in words ("a third of", "a quarter of", "millions
+    of", "twice as likely"), a cited study, survey, poll, paper or
+    research ("research has found", "a Stanford study"), or four or
+    more words in quotation marks, double or single, curly or straight,
+    that the material (`sampleReplyMaterial`: the motion, the school,
+    both arguments and the replies, without the prompt's own numbering)
+    does not have, or gives words to someone named without quotation
+    marks ("As Aristotle wrote", "Kant once said", "As Mill puts it",
+    "Aristotle says that", "The Master said"). These are a backstop,
+    and they do not catch everything. What rests on the prompt alone:
+    a study cited without one of those words; a figure in other words;
+    a vague share ("most", "the majority of", "nearly all", "half of the"),
+    which an argument about who is better off uses of its own; words
+    given with another verb ("Kant holds", "Mill thought") and a view
+    put to a philosopher ("as Aristotle argued", "Epictetus would
+    say"), which the check passes as argument; and a quotation it
+    cannot read as one, such as a single mark that opens straight after
+    a letter (review passes 2, O3, and 3, B1);
   - the school's own terms: "Argue in the school's own terms: its own
     concepts and its own way of reasoning, as its one line and the
     judge's criteria for it give them, not another school's vocabulary
@@ -6605,8 +6613,14 @@ new run.
   percentage, and flagging "the US"; pass 2, curly single quotation
   marks with an apostrophe inside, and false alarms on an argument's
   own prose ("a study of character", "thought experiments show", "the
-  21st century"); all fixed, every problem now told to the retry in one
-  note, and the 55 replies run through the parse again: the same one.
+  21st century"); pass 3, other verbs and "The Master said", a plural
+  possessive inside single quotation marks, a per cent in words passed
+  by another of the reader's, and false alarms on "Whoever wrote the
+  code", "Critics said", "according to the data", "the majority of",
+  "the 1990s", "A.I." and British spellings beyond -ise and -our; all
+  fixed, every problem, a misquoted sentence's with the rest, now told
+  to the retry in one note, and the 55 replies run through the parse
+  again: the same one.
   None of the 55 uses a quotation mark, so the quotation checks rest on
   their tests.) Run 4's report marks one non-injection reply as naming the
   injection's words: "nurse", from the reader's own argument; the check
@@ -6696,4 +6710,8 @@ For his list, from carrying these out:
   read "while it is a sample's turn and samples are stopped"; it is held
   for the whole of the sample's turn, for the reason above. So an
   exchange whose reader never comes back, or one waiting on a sample
-  while `SAMPLE_REPLIES` is off, stays open on the reader's `/me`.
+  while `SAMPLE_REPLIES` is off, stays open on the reader's `/me`. One
+  more, unlikely (review pass 3, O6): if a moderator removes a reader's
+  delivered reply in an exchange with a sample, the sample is never due
+  (it answers only a delivered reply) and the exchange never lapses.
+  Only a removal by hand does this; a sample cannot report a reply.
