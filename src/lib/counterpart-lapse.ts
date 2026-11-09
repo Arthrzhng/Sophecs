@@ -52,8 +52,10 @@ export function meExchangeRows(
 ): ExchangeRow[] {
   const bySeq = [...(turns ?? [])].sort((a, b) => a.seq - b.seq);
   const turnsOf = (id: string) => bySeq.filter((t) => t.exchange_id === id);
+  // A sample's turn holds the clock (exchangeLapsed; Arthur, 2026-11-09, item 27).
+  const nextTurnIsSample = (row: OpenExchangeRow) => row.next_turn !== null && sampleIds.has(row.next_turn);
   return exchanges
-    .filter((row) => turns === null || !exchangeLapsed(row, turnsOf(row.id), now))
+    .filter((row) => turns === null || !exchangeLapsed({ ...row, nextTurnIsSample: nextTurnIsSample(row) }, turnsOf(row.id), now))
     .map((row) => ({
       id: row.id,
       topicTitle: titleOf(row.topic_slug),
@@ -64,15 +66,24 @@ export function meExchangeRows(
     }));
 }
 
-/** The exchange row's fields the lapse rule reads, as the page has them. */
-export function exchangeForLapse(row: Record<string, unknown>): LapseExchange & { id: string; status: string } {
+/**
+ * The exchange row's fields the lapse rule reads, as the page has them.
+ * `sampleId`: the counterpart, when it is a sample account; its turn holds
+ * the clock (exchangeLapsed; Arthur, 2026-11-09, item 27).
+ */
+export function exchangeForLapse(
+  row: Record<string, unknown>,
+  sampleId: string | null = null
+): LapseExchange & { id: string; status: string } {
+  const nextTurn = (row.next_turn as string | null) ?? null;
   return {
     id: row.id as string,
     status: row.status as string,
     user_a: (row.user_a as string | null) ?? null,
     user_b: (row.user_b as string | null) ?? null,
-    next_turn: (row.next_turn as string | null) ?? null,
+    next_turn: nextTurn,
     last_turn_at: row.last_turn_at as string,
+    ...(sampleId !== null && nextTurn === sampleId ? { nextTurnIsSample: true } : {}),
   };
 }
 

@@ -191,7 +191,7 @@ export default function Phase3Page() {
       <Section title="School table, six rows">
         <p className="mb-4 max-w-[62ch] text-sm text-ink-mid">
           Fixture rows. A school is ranked once it has {RANK_MIN_ARGUMENTS} judged original arguments
-          in the week (Arthur&apos;s ruling of 2026-11-05), as on the live table.
+          in the last seven days (Arthur&apos;s rulings of 2026-11-05 and 2026-11-09), as on the live table.
         </p>
         <SixSchoolTable
           rows={ALL.map((id, i) => ({

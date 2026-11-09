@@ -304,10 +304,58 @@ describe("item 12: the exchange page's close on view", () => {
     expect(exchangeForLapse({ id: "y", status: "open", user_a: "a", user_b: "b", next_turn: "b", last_turn_at: old })).toMatchObject({ user_b: "b", next_turn: "b" });
   });
 
-  it("is what the exchange page decides its status with", () => {
+  it("is what the exchange page decides its status with, the counterpart passed when it is a sample", () => {
     const page = read("src/app/counterpart/[id]/page.tsx");
-    expect(page).toContain("const status = await closeIfLapsed(admin, exchangeForLapse(exchange), turnsError ? null : turns);");
+    expect(page.replace(/\s+/g, " ")).toContain(
+      "const status = await closeIfLapsed( admin, exchangeForLapse(exchange, theirIsSample ? ((theirUserId as string | null) ?? null) : null), turnsError ? null : turns );"
+    );
+    // Read before the close, from profiles.is_sample.
+    expect(page.indexOf("const theirIsSample = await counterpartIsSample(")).toBeGreaterThan(-1);
+    expect(page.indexOf("const theirIsSample = await counterpartIsSample(")).toBeLessThan(page.indexOf("const status = await closeIfLapsed("));
     expect(page).not.toMatch(/\bisLapsed\(|\bexchangeLapsed\(/);
+  });
+});
+
+describe("item 27: a sample's turn holds the lapse clock (Arthur, 2026-11-09)", () => {
+  const now = new Date("2026-10-01T12:00:00Z");
+  const old = new Date(now.getTime() - (LAPSE_DAYS + 20) * 24 * 60 * 60 * 1000).toISOString();
+  const t = (seq: number, author_id: string, screen_result = "ok"): LapseTurn => ({ seq, author_id, screen_result });
+  // The reader "r" opened; the sample "s" is to reply.
+  const ex = (extra: Partial<LapseExchange> = {}): LapseExchange => ({ user_a: "r", user_b: "s", next_turn: "s", last_turn_at: old, ...extra });
+
+  it("while it is the sample's turn, however long, and only then", () => {
+    expect(exchangeLapsed(ex({ nextTurnIsSample: true }), [t(1, "r")], now)).toBe(false);
+    expect(exchangeLapsed(ex(), [t(1, "r")], now)).toBe(true);
+    // The reader's own turn with a sample lapses as any exchange does.
+    expect(exchangeLapsed(ex({ next_turn: "r", nextTurnIsSample: false }), [t(1, "r"), t(2, "s")], now)).toBe(true);
+  });
+
+  it("on the exchange page: only for a counterpart that is a sample, and only on its turn", async () => {
+    const row = { id: "x", status: "open", user_a: "r", user_b: "s", next_turn: "s", last_turn_at: old };
+    expect(exchangeForLapse(row, "s")).toMatchObject({ nextTurnIsSample: true });
+    expect(exchangeForLapse(row, null)).not.toHaveProperty("nextTurnIsSample");
+    expect(exchangeForLapse({ ...row, next_turn: "r" }, "s")).not.toHaveProperty("nextTurnIsSample");
+    // Nothing is closed: no call reaches the database.
+    const calls: string[] = [];
+    const admin = { from: (table: string) => (calls.push(table), {}) } as never;
+    expect(await closeIfLapsed(admin, exchangeForLapse(row, "s"), [t(1, "r")], now)).toBe("open");
+    expect(calls).toEqual([]);
+  });
+
+  it("on /me: an exchange waiting on a sample stays listed, one waiting on the reader does not", () => {
+    const base = { topic_slug: "careful-builder", school_a: "stoicism", school_b: "utilitarianism", user_a: "me", user_b: "them", last_turn_at: old } as const;
+    const exchanges: OpenExchangeRow[] = [
+      { ...base, id: "x1", next_turn: "them" },
+      { ...base, id: "x2", next_turn: "me" },
+    ];
+    const turns: TurnState[] = [
+      { exchange_id: "x1", seq: 1, author_id: "me", screen_result: "ok" },
+      { exchange_id: "x2", seq: 1, author_id: "me", screen_result: "ok" },
+      { exchange_id: "x2", seq: 2, author_id: "them", screen_result: "ok" },
+    ];
+    const listed = (sampleIds: Set<string>) => meExchangeRows(exchanges, turns, "me", (slug) => slug, now, sampleIds).map((e) => e.id);
+    expect(listed(new Set(["them"]))).toEqual(["x1"]);
+    expect(listed(new Set())).toEqual([]);
   });
 });
 

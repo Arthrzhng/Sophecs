@@ -6,6 +6,8 @@ import {
   rankSchools,
   RANK_MIN_ARGUMENTS,
   schoolChanges,
+  tableWindow,
+  TABLE_DAYS,
   unrankedNote,
   yourTableLine,
   type JudgedArgument,
@@ -28,6 +30,33 @@ describe("isoWeekRange", () => {
   it("treats Sunday as the last day of its week, not the first of the next", () => {
     const { start } = isoWeekRange(new Date("2026-10-11T23:59:00Z"));
     expect(start.toISOString()).toBe("2026-10-05T00:00:00.000Z");
+  });
+});
+
+describe("tableWindow (Arthur, 2026-11-09, item 9)", () => {
+  it("is the last seven days up to now, whatever the day of the week", () => {
+    expect(TABLE_DAYS).toBe(7);
+    // A Tuesday morning: an ISO week would hold one day and nine hours.
+    const now = new Date("2026-11-10T09:00:00Z");
+    const { start, end } = tableWindow(now);
+    expect(start.toISOString()).toBe("2026-11-03T09:00:00.000Z");
+    // A minute past now: a row dated by the database's clock, a little
+    // ahead of the function's, still counts.
+    expect(end.toISOString()).toBe("2026-11-10T09:01:00.000Z");
+    for (const day of ["2026-11-09T00:00:00Z", "2026-11-12T15:30:00Z", "2026-11-15T23:59:00Z"]) {
+      const w = tableWindow(new Date(day));
+      expect(w.end.getTime() - w.start.getTime(), day).toBe(7 * 86_400_000 + 60_000);
+    }
+  });
+
+  it("is what the table, Today and the verdict's line count, so they agree", async () => {
+    const { readFileSync } = await import("node:fs");
+    for (const file of ["src/lib/school-table-page.ts", "src/app/today/page.tsx"]) {
+      const src = readFileSync(file, "utf8");
+      expect(src, file).toContain("const { start, end } = tableWindow(new Date());");
+      expect(src, file).not.toContain("isoWeekRange");
+    }
+    expect(readFileSync("src/lib/school-table.ts", "utf8")).toContain("const { start, end } = tableWindow(now);");
   });
 });
 
@@ -167,27 +196,27 @@ describe("rankSchools", () => {
 });
 
 describe("unrankedNote", () => {
-  it("is the copy doc's line, with the threshold and the count", () => {
-    expect(unrankedNote(4)).toBe("Ranked once it has 20 judged original arguments. 4 so far.");
-    expect(unrankedNote(0)).toBe("Ranked once it has 20 judged original arguments. 0 so far.");
+  it("is the copy doc's line, with the threshold, the seven days and the count", () => {
+    expect(unrankedNote(4)).toBe("Ranked once it has 20 judged original arguments in the last seven days. It has 4.");
+    expect(unrankedNote(0)).toBe("Ranked once it has 20 judged original arguments in the last seven days. It has 0.");
   });
 });
 
 describe("yourTableLine", () => {
   it("says 'once' rather than '1 times'", () => {
-    expect(yourTableLine(1, "Stoicism")).toBe("You argued once for Stoicism this week.");
+    expect(yourTableLine(1, "Stoicism")).toBe("You argued once for Stoicism in the last seven days.");
   });
 
   it("counts above one, and says so when there is nothing yet", () => {
-    expect(yourTableLine(3, "Stoicism")).toBe("You argued 3 times for Stoicism this week.");
+    expect(yourTableLine(3, "Stoicism")).toBe("You argued 3 times for Stoicism in the last seven days.");
     expect(yourTableLine(0, "Stoicism")).toBe(
-      "You haven't argued for Stoicism this week yet."
+      "You haven't argued for Stoicism in the last seven days."
     );
   });
 });
 
 describe("countsOnTable", () => {
-  // Friday of the ISO week that opens Monday 2026-10-05.
+  // Friday 2026-10-09: the table counts from Friday 2026-10-02, 12:00.
   const now = new Date("2026-10-09T12:00:00Z");
   const original = {
     kind: "original",
@@ -195,8 +224,12 @@ describe("countsOnTable", () => {
     createdAt: "2026-10-07T10:00:00Z",
   };
 
-  it("counts a judged original from this week", () => {
+  it("counts a judged original from the last seven days, the week before Monday included", () => {
     expect(countsOnTable(original, now)).toBe(true);
+    expect(countsOnTable({ ...original, createdAt: "2026-10-04T23:59:59Z" }, now)).toBe(true);
+    expect(countsOnTable({ ...original, createdAt: "2026-10-02T12:00:00Z" }, now)).toBe(true);
+    // Judged a moment ago, by a database clock a little ahead.
+    expect(countsOnTable({ ...original, createdAt: "2026-10-09T12:00:30Z" }, now)).toBe(true);
   });
 
   it("does not count a revision", () => {
@@ -207,12 +240,12 @@ describe("countsOnTable", () => {
     expect(countsOnTable({ ...original, rejected: true }, now)).toBe(false);
   });
 
-  it("does not count an older week, or the week after", () => {
-    expect(countsOnTable({ ...original, createdAt: "2026-10-04T23:59:59Z" }, now)).toBe(false);
+  it("does not count one older than seven days, or one dated after now", () => {
+    expect(countsOnTable({ ...original, createdAt: "2026-10-02T11:59:59Z" }, now)).toBe(false);
     expect(countsOnTable({ ...original, createdAt: "2026-10-12T00:00:00Z" }, now)).toBe(false);
   });
 
-  it("does not count the same week number in a different year", () => {
+  it("does not count the same days in a different year", () => {
     expect(countsOnTable({ ...original, createdAt: "2025-10-07T10:00:00Z" }, now)).toBe(false);
   });
 
@@ -225,6 +258,32 @@ describe("countsOnTable", () => {
 
 describe("joinedLeftLabel", () => {
   it("spells out what the +/- cell means", () => {
-    expect(joinedLeftLabel(2, 1)).toBe("2 joined, 1 left this week");
+    expect(joinedLeftLabel(2, 1)).toBe("2 joined, 1 left in the last seven days");
+  });
+});
+
+describe("the copy that says what the table counts (Arthur, 2026-11-09, item 9)", () => {
+  it("says the last seven days wherever it said this week", async () => {
+    const { createElement } = await import("react");
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const { SchoolCard } = await import("../src/components/today/TodayCards");
+    const { SchoolTable } = await import("../src/components/table/SchoolTable");
+    const card = (rank: number | null) =>
+      renderToStaticMarkup(createElement(SchoolCard, { school: "stoicism", oneLine: "A line.", elo: 1200, rank }));
+    expect(card(2)).toContain("Second on the table<");
+    expect(card(null)).toContain("Not ranked yet<");
+    const empty = renderToStaticMarkup(
+      createElement(SchoolTable, { rows: rankSchools([], {}), yourSchool: "stoicism", yourLine: yourTableLine(0, "Stoicism"), emptyWeek: true, paused: false })
+    );
+    for (const text of [
+      "How each school argued over the last seven days.",
+      "The last seven days",
+      "No judged arguments in the last seven days. The table fills in as they arrive.",
+      "Your seven days",
+      "You haven&#x27;t argued for Stoicism in the last seven days.",
+      "0 joined, 0 left in the last seven days",
+    ])
+      expect(empty, text).toContain(text);
+    for (const html of [card(1), card(null), empty]) expect(html).not.toMatch(/this week|closes Sunday|Week <span/i);
   });
 });

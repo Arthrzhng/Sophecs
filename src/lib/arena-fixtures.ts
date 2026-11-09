@@ -144,7 +144,6 @@ export const FIXTURE_REJECTED_VERDICT: VerdictData = {
 
 const FIXTURE_WEEK_START = new Date("2026-10-05T00:00:00Z");
 const FIXTURE_WEEK_END = new Date("2026-10-12T00:00:00Z");
-export const FIXTURE_WEEK = 41;
 
 /**
  * `marks` repeated `times` over, so a fixture school clears
@@ -170,7 +169,7 @@ const FIXTURE_CHANGES: SchoolChange[] = [
 const CHANGES = schoolChanges(FIXTURE_CHANGES, FIXTURE_WEEK_START, FIXTURE_WEEK_END);
 const NO_CHANGES = schoolChanges([], FIXTURE_WEEK_START, FIXTURE_WEEK_END);
 
-/** A week with a clear order and no ties. */
+/** Seven days with a clear order and no ties. */
 export const FIXTURE_TABLE_ROWS = rankSchools(
   [
     ...judged("stoicism", [7.5, 8.0, 6.5], 8),
@@ -210,7 +209,7 @@ export const FIXTURE_RATINGS_MANY = ratingByWeek([
 
 /**
  * Eight weeks before now, so the verdict's table line is gated off by the
- * week check rather than by a date that goes stale in the repository.
+ * seven-day check rather than by a date that goes stale in the repository.
  */
 export const FIXTURE_OLD_VERDICT_AT = new Date(
   Date.now() - 56 * 86_400_000

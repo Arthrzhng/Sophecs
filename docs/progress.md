@@ -982,3 +982,30 @@ deploy below was read from Vercel as Ready.
   the branch `sample-replies` (#117). Eval key spend is now
   **$12.7142 of $15.00**.
 - #117, the AI behind sample accounts, is filled in by the next entry.
+
+## 2026-11-09: sample replies live, the job hourly, and Arthur's sample-account decisions
+
+- Merged since the last entry, each with its production deploy, all
+  Ready (read from Vercel on 2026-11-09):
+  - #117 `5913b73`, `dpl_2Mr8PvkxZDfUktq8HpPujetrunYw`, with
+    `SAMPLE_REPLIES` off; Arthur ran migration 0029 in the SQL Editor
+    and it was read back at 06:57 UTC; `SAMPLE_REPLIES=1` set for
+    Production and redeployed, `dpl_BRVqRxvqSpEqnmrzcJYmtHU2wsHa`, with
+    the explanation's third sentence read back on `/how-it-works`;
+  - #118 `4a0ddfa`, `dpl_BKvvfuXb4hPNMBWPCnTBY2L1ZrvN`: the sample job
+    hourly at minute 17.
+- The hourly schedule had started no slot by 13:38 UTC (docs/decisions.md,
+  "The sample-accounts decisions, carried out", says what was checked);
+  the six-hour fallback dispatched an extend by hand at 13:38 (Actions
+  42627247768): success, 38 of 38 checks, `sample-202611090107` extended
+  to 13:39, nothing dated after now, the genuine rows unchanged (2
+  profiles, 1 debate), and no reader's exchange with a sample.
+- Eval key: run 4 of the sample-reply eval (`sample-reply.v3`, 17
+  replies), $0.2299. Eval key spend is now **$12.9441 of $15.00**.
+- Arthur's decisions of 2026-11-09 on the sample-accounts list: the
+  app's (1, 9, 17, 23, 24, 27) in the pull request carrying this entry,
+  with migration 0030, applied by me at 15:11 UTC before the merge
+  (20261109151155 `sample_reply_claims`; read back: no rows, row level
+  security on, server role only, `anon` and `authenticated` refused;
+  the advisor adds the one INFO expected); the run's (9, 11, 13, 28) in
+  the next.

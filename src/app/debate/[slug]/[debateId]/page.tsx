@@ -244,8 +244,8 @@ export default async function VerdictPage({
         streak={streak}
         weekNumber={weekNumber}
         // One, where this argument actually moved its school's row:
-        // original, judged, and inside the week the table is showing. A
-        // revision, a rejected argument and an older week each get no
+        // original, judged, and inside the seven days the table counts. A
+        // revision, a rejected argument and an older one each get no
         // line rather than a number the table will not corroborate.
         tableContribution={countsOnTable({
           kind: publicRow.kind as string | null,

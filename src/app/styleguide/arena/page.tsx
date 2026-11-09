@@ -48,7 +48,6 @@ import {
   FIXTURE_OTHER_VECTOR,
   FIXTURE_RESULT_ID,
   FIXTURE_VECTOR,
-  FIXTURE_WEEK,
   FIXTURE_CHALLENGES,
   FIXTURE_CLASSES_JOINED,
   FIXTURE_CLASSES_OWNED,
@@ -325,7 +324,7 @@ export default function ArenaPreviewPage() {
       )}
 
       {/* The table line is gated on countsOnTable: original, judged, and
-          inside the week the table is showing. Sections 5 and 6 cover a
+          inside the seven days the table counts. Sections 5 and 6 cover a
           qualifying original and a rejected one; these two cover the other
           two ways to miss. */}
       <Section title="7b. Verdict: a revision, which does not move the table">
@@ -357,7 +356,7 @@ export default function ArenaPreviewPage() {
         />
       </Section>
 
-      <Section title="7c. Verdict: an older week, whose table has closed">
+      <Section title="7c. Verdict: older than the seven days the table counts">
         <Verdict
           debateId="preview-old"
           topicSlug="opaque-benefit"
@@ -386,9 +385,8 @@ export default function ArenaPreviewPage() {
         />
       </Section>
 
-      <Section title="8. School table: a week with a clear order, your line argued">
+      <Section title="8. School table: seven days with a clear order, your line argued">
         <SchoolTable
-          week={FIXTURE_WEEK}
           rows={FIXTURE_TABLE_ROWS}
           yourSchool="stoicism"
           yourLine={yourTableLine(3, "Stoicism")}
@@ -399,7 +397,6 @@ export default function ArenaPreviewPage() {
 
       <Section title="9. School table: two schools tied, your line not argued yet">
         <SchoolTable
-          week={FIXTURE_WEEK}
           rows={FIXTURE_TABLE_TIED}
           yourSchool="virtue-ethics"
           yourLine={yourTableLine(0, "Virtue Ethics")}
@@ -408,9 +405,8 @@ export default function ArenaPreviewPage() {
         />
       </Section>
 
-      <Section title="10. School table: nothing judged yet this week">
+      <Section title="10. School table: nothing judged in the last seven days">
         <SchoolTable
-          week={FIXTURE_WEEK}
           rows={FIXTURE_TABLE_EMPTY}
           yourSchool="utilitarianism"
           yourLine={yourTableLine(0, "Utilitarianism")}
@@ -421,7 +417,6 @@ export default function ArenaPreviewPage() {
 
       <Section title="11. School table: judging paused">
         <SchoolTable
-          week={FIXTURE_WEEK}
           rows={FIXTURE_TABLE_EMPTY}
           yourSchool="stoicism"
           yourLine={yourTableLine(0, "Stoicism")}
@@ -433,7 +428,6 @@ export default function ArenaPreviewPage() {
       {/* Signed out: the table is public, the line about you is not. */}
       <Section title="12. School table: signed out, no line about you">
         <SchoolTable
-          week={FIXTURE_WEEK}
           rows={FIXTURE_TABLE_ROWS}
           yourSchool={null}
           yourLine={null}
@@ -623,7 +617,7 @@ export default function ArenaPreviewPage() {
         </TodayCards>
       </Section>
 
-      <Section title="25. School card: ranked, and nothing judged yet this week">
+      <Section title="25. School card: ranked, and not ranked yet">
         <TodayCards>
           <SchoolCard
             school="stoicism"
@@ -895,9 +889,8 @@ export default function ArenaPreviewPage() {
         />
       </Section>
 
-      <Section title="40. The school table in a week with sample accounts">
+      <Section title="40. The school table when it counts sample accounts">
         <SchoolTable
-          week={FIXTURE_WEEK}
           rows={FIXTURE_TABLE_ROWS}
           yourSchool="stoicism"
           yourLine={yourTableLine(3, "Stoicism")}

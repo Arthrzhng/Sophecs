@@ -41,9 +41,11 @@ export const SAMPLE_OFFER_ACTION = "Argue now";
 // and the page must not let them pass for the judge's.
 export const SAMPLE_JUDGE_NOTE = "The judge did not read this argument.";
 
-// The one line on /schools, under the table, in a week sample accounts
-// count in.
-export const SCHOOLS_SAMPLE_LINE = "Includes sample accounts, run by AI.";
+// The one line on /schools, under the table, when sample accounts count in
+// it. Arthur, 2026-11-09, item 1: "Extend /schools' line to: 'Includes
+// sample accounts, run by AI, whose marks are not the judge's.' No other
+// new label."
+export const SCHOOLS_SAMPLE_LINE = "Includes sample accounts, run by AI, whose marks are not the judge's.";
 
 // The small mark on a sample page's share and preview images, which travel
 // without the tag beside them.

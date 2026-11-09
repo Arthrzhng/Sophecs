@@ -14,7 +14,7 @@ export interface JudgedArgument {
 }
 
 /**
- * Joiners and leavers per school over a week.
+ * Joiners and leavers per school over the table's seven days.
  *
  * Sparse over `SchoolId`: a school with no movement has no entry, which
  * reads the same as a zero. That is what lets a caller with no interest in
@@ -33,7 +33,8 @@ export interface SchoolChange {
 
 /**
  * A school is ranked once it has this many judged original arguments in
- * the week (Arthur's ruling (e)5 of 2026-11-05). Below it, an average of
+ * the table's seven days (Arthur's ruling (e)5 of 2026-11-05, for a week;
+ * the seven days are his of 2026-11-09, item 9). Below it, an average of
  * a handful reads as a standing it has not earned, so the row has no rank
  * and says how many it has (docs/daily-path-copy.md, "School table, a
  * school not yet ranked").
@@ -51,17 +52,20 @@ export function rankThresholdApplies(): boolean {
   return process.env.SIX_SCHOOLS === "1";
 }
 
-/** The line under a school not ranked for want of arguments. */
+/**
+ * The line under a school not ranked for want of arguments. "It has", not
+ * "so far": over seven days that roll, the count can fall as well as rise.
+ */
 export function unrankedNote(argumentCount: number): string {
-  return `Ranked once it has ${RANK_MIN_ARGUMENTS} judged original arguments. ${argumentCount} so far.`;
+  return `Ranked once it has ${RANK_MIN_ARGUMENTS} judged original arguments in the last seven days. It has ${argumentCount}.`;
 }
 
 export interface SchoolTableRow {
   /**
    * Null for a school not yet ranked: one with no average to be ranked
    * on, or, where rankThresholdApplies(), with fewer than
-   * RANK_MIN_ARGUMENTS judged original arguments this week. Rank is by average fidelity, so a school that
-   * has none has no place in the order: with nothing judged all week,
+   * RANK_MIN_ARGUMENTS judged original arguments in the table's seven days. Rank is by average fidelity, so a school that
+   * has none has no place in the order: with nothing judged in seven days,
    * "1, 1, 1" reads as a fault rather than as nothing having happened yet.
    */
   rank: number | null;
@@ -75,10 +79,9 @@ export interface SchoolTableRow {
 
 /**
  * The ISO week containing `now`: Monday 00:00 UTC up to, but not
- * including, the following Monday.
- *
- * The same week the weekly motion runs on, so "this week" on the table and
- * "this week's motion" on Today can never mean different spans.
+ * including, the following Monday. The week the weekly motion and the
+ * streak's week run on (src/lib/streak-week.ts). The table no longer
+ * counts it: it counts the last seven days (tableWindow).
  */
 export function isoWeekRange(now: Date): { start: Date; end: Date; week: number } {
   const day = now.getUTCDay() === 0 ? 7 : now.getUTCDay();
@@ -87,6 +90,29 @@ export function isoWeekRange(now: Date): { start: Date; end: Date; week: number 
   );
   const end = new Date(start.getTime() + 7 * 86_400_000);
   return { start, end, week: isoWeekNumber(now) };
+}
+
+/** How many days the table counts, up to now. */
+export const TABLE_DAYS = 7;
+// A row is dated by the database's clock, which may run a little ahead of
+// the function's; the window's end allows for that.
+const CLOCK_ALLOWANCE_MS = 60_000;
+
+/**
+ * The span the school table counts: the last seven days, up to now
+ * (Arthur, 2026-11-09, item 9: "the table counts the last seven days, so
+ * all six stay ranked every day"). A week from Monday holds two days' or
+ * fewer arguments on a Tuesday, so no school is ranked early in the week;
+ * seven days that roll always hold seven.
+ *
+ * Shared by the table, Today's place on it and the verdict's line, so the
+ * three cannot count different spans.
+ */
+export function tableWindow(now: Date): { start: Date; end: Date } {
+  return {
+    start: new Date(now.getTime() - TABLE_DAYS * 86_400_000),
+    end: new Date(now.getTime() + CLOCK_ALLOWANCE_MS),
+  };
 }
 
 /**
@@ -141,7 +167,7 @@ export function rankSchools(
       school,
       avgFidelity: marks.length > 0 ? marks.reduce((a, b) => a + b, 0) / marks.length : null,
       // Every judged argument counts, including one the judge gave no
-      // fidelity mark: it was still argued for that school this week.
+      // fidelity mark: it was still argued for that school in the window.
       arguments: judged.filter((a) => a.school === school).length,
       joined: changes[school]?.joined ?? 0,
       left: changes[school]?.left ?? 0,
@@ -175,7 +201,7 @@ export function rankSchools(
 /**
  * Whether one debate counts towards its school's row.
  *
- * Originals only, judged, and inside the week the table is showing. A
+ * Originals only, judged, and inside the seven days the table counts. A
  * revision is a second attempt at the same motion after feedback: it does
  * not move the reader's rating, so it does not move their school's row
  * either, and counting it would let one motion be argued twice.
@@ -190,18 +216,18 @@ export function countsOnTable(
   if (debate.kind !== "original" || debate.rejected || !debate.createdAt) return false;
   const at = new Date(debate.createdAt).getTime();
   if (!Number.isFinite(at)) return false;
-  const { start, end } = isoWeekRange(now);
+  const { start, end } = tableWindow(now);
   return at >= start.getTime() && at < end.getTime();
 }
 
 /** §8's "Your line". `once` rather than "1 times". */
 export function yourTableLine(count: number, schoolName: string): string {
-  if (count <= 0) return `You haven't argued for ${schoolName} this week yet.`;
+  if (count <= 0) return `You haven't argued for ${schoolName} in the last seven days.`;
   const times = count === 1 ? "once" : `${count} times`;
-  return `You argued ${times} for ${schoolName} this week.`;
+  return `You argued ${times} for ${schoolName} in the last seven days.`;
 }
 
 /** §8's joined/left cell, and the sentence a screen reader gets instead. */
 export function joinedLeftLabel(joined: number, left: number): string {
-  return `${joined} joined, ${left} left this week`;
+  return `${joined} joined, ${left} left in the last seven days`;
 }

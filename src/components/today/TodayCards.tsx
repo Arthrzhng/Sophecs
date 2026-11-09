@@ -136,8 +136,9 @@ export function SchoolCard({
   /** profiles.elo, the reader's own rating, not the school's. */
   elo: number;
   /**
-   * The school's place on this week's table, or null while it is not
-   * ranked: none of its arguments has a fidelity mark this week, or, on a
+   * The school's place on the table, which counts the last seven days, or
+   * null while it is not ranked: none of its arguments in them has a
+   * fidelity mark, or, on a
    * SIX_SCHOOLS build, it has fewer than RANK_MIN_ARGUMENTS
    * (src/lib/school-table.ts).
    */
@@ -164,7 +165,7 @@ export function SchoolCard({
         Rating <span className="font-mono tabular font-bold">{Math.round(elo)}</span>
       </p>
       <p className="mt-1 text-sm text-ink-mid">
-        {place ? `${place} on the table this week` : "Not ranked yet this week"}
+        {place ? `${place} on the table` : "Not ranked yet"}
       </p>
       <p className="mt-3">
         <Link

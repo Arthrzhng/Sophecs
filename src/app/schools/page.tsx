@@ -15,11 +15,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Schools · Sophecs",
     description:
-      "Each school's page, and how each argued this week.",
+      "Each school's page, and how each argued over the last seven days.",
   };
 }
 
-// The schools, a card each linking to its page, with this week's table
+// The schools, a card each linking to its page, with the school table
 // under them, on a SIX_SCHOOLS build (Arthur, 2026-11-06;
 // docs/daily-path-copy.md, section 13). The cards are the schools the
 // build shows, the list every public surface moved to in Stage 5's step 2,
