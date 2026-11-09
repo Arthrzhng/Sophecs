@@ -5,8 +5,8 @@ import { isJudgeAllowlisted } from "@/lib/judge-allowlist";
 import type { SchoolTableProps } from "@/components/table/SchoolTable";
 import { SCHOOL_COLORS } from "@/lib/school-colors";
 import {
-  isoWeekRange,
   rankSchools,
+  tableWindow,
   schoolChanges,
   yourTableLine,
   type JudgedArgument,
@@ -22,24 +22,25 @@ import { SCHOOLS_SAMPLE_LINE } from "@/lib/sample";
 const NO_CHANGES: SchoolChangeCounts = {};
 
 /**
- * What the school table shows this week, read for the page that shows it:
+ * What the school table shows, the last seven days (tableWindow), read for
+ * the page that shows it:
  * `/table`, and on a SIX_SCHOOLS build `/schools`, which shows it under the
  * schools' cards (Arthur, 2026-11-06). Moved here unchanged from
  * src/app/table/page.tsx so the two cannot drift apart.
  *
- * Entirely derived from rows that already exist: this week's judged
+ * Entirely derived from rows that already exist: the seven days' judged
  * debates and profiles.school_history. No new column, no standings to keep
  * in step, and nothing written. A page calling this reads cookies, so it is
  * dynamic; it says so itself (`export const dynamic`).
  */
 export async function loadSchoolTable(): Promise<SchoolTableProps> {
-  const { start, end, week } = isoWeekRange(new Date());
+  const { start, end } = tableWindow(new Date());
 
   let yourSchool: SchoolId | null = null;
   let userId: string | null = null;
   let judged: JudgedArgument[] = [];
   let changes = NO_CHANGES;
-  let yoursThisWeek = 0;
+  let yours = 0;
   let includesSamples = false;
 
   if (isSupabaseConfigured()) {
@@ -60,8 +61,8 @@ export async function loadSchoolTable(): Promise<SchoolTableProps> {
     //
     // Both reads go through readAll: a plain select stops at the Data
     // API's 1,000 rows without saying so (src/lib/read-all.ts). On a
-    // failed read the table shows the week as empty, as it did before.
-    const [week_, histories, profile] = await Promise.all([
+    // failed read the table shows the seven days as empty, as before.
+    const [window_, histories, profile] = await Promise.all([
       readAll<{ user_id: string; school: SchoolId; fidelity: unknown; is_sample: boolean }>(
         (from, to) =>
           admin
@@ -93,40 +94,39 @@ export async function loadSchoolTable(): Promise<SchoolTableProps> {
         : Promise.resolve({ data: null }),
     ]);
 
-    // A failed read shows the week as empty, as before, and says why in the log.
-    if (week_.error) console.error("[table] week of debates:", week_.error);
+    // A failed read shows the seven days as empty, as before, and says why in the log.
+    if (window_.error) console.error("[table] seven days of debates:", window_.error);
     if (histories.error) console.error("[table] school changes:", histories.error);
-    const rows = week_.rows ?? [];
+    const rows = window_.rows ?? [];
 
     judged = rows.map((row) => ({
       school: row.school,
       fidelity: typeof row.fidelity === "number" ? row.fidelity : null,
     }));
-    yoursThisWeek = userId ? rows.filter((row) => row.user_id === userId).length : 0;
+    yours = userId ? rows.filter((row) => row.user_id === userId).length : 0;
     const entries = (histories.rows ?? []).flatMap((p) =>
       Array.isArray(p.school_history) ? (p.school_history as SchoolChange[]) : []
     );
     // Sample accounts (migration 0023) are counted like anyone else, in
     // both the arguments and the joined and left columns, and the table
-    // says so in any week either includes one.
-    const inWeek = (at: string) => Date.parse(at) >= start.getTime() && Date.parse(at) < end.getTime();
+    // says so whenever either includes one.
+    const inWindow = (at: string) => Date.parse(at) >= start.getTime() && Date.parse(at) < end.getTime();
     includesSamples =
       rows.some((row) => row.is_sample) ||
       (histories.rows ?? []).some(
-        (p) => p.is_sample && Array.isArray(p.school_history) && (p.school_history as SchoolChange[]).some((e) => inWeek(e.at))
+        (p) => p.is_sample && Array.isArray(p.school_history) && (p.school_history as SchoolChange[]).some((e) => inWindow(e.at))
       );
     changes = schoolChanges(entries, start, end);
     yourSchool = ((profile.data as { school?: SchoolId } | null)?.school ?? null) as SchoolId | null;
   }
 
   return {
-    week,
     rows: rankSchools(judged, changes),
     yourSchool,
     // Only where there is a school to write it about. A signed-out
     // reader, or one who has not taken the quiz, gets the table
     // without a line claiming anything about them.
-    yourLine: yourSchool ? yourTableLine(yoursThisWeek, SCHOOL_COLORS[yourSchool].name) : null,
+    yourLine: yourSchool ? yourTableLine(yours, SCHOOL_COLORS[yourSchool].name) : null,
     emptyWeek: judged.length === 0,
     paused:
       process.env.KILL_SWITCH_JUDGE === "true" && !(userId && isJudgeAllowlisted(userId)),
