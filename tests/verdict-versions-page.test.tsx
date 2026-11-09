@@ -87,7 +87,8 @@ async function page(o: { first: string; revision: string; revisionPublic: boolea
   return {
     html,
     handed: verdictProps.comparison as { comparable: boolean; first: Record<string, unknown> } | null,
-    table: html.includes("Compared with your first attempt"),
+    // A sample's revision reads "the first attempt", a reader's "your".
+    table: /Compared with (your|the) first attempt/.test(html),
     line: html.includes("The first attempt was judged by an earlier version of the judge"),
     firstScore: /\b61\b/.test(html),
     share: db.shares.at(-1) ?? "",

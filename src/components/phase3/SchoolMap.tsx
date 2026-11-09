@@ -66,7 +66,7 @@ export function SchoolMap({
    * (/r/<id>), someone else's, where the description says "they" (Arthur,
    * 2026-11-07, Gate 4 item 8).
    */
-  whose?: "your" | "their";
+  whose?: "your" | "their" | "these answers";
 }) {
   const titleId = `map-${title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
   const descId = `${titleId}-desc`;
@@ -78,7 +78,7 @@ export function SchoolMap({
       .sort((a, b) => a.angle - b.angle)
       .map((s) => s.name)
       .join(", ")}.`,
-    reader ? `A filled dot marks where ${whose === "their" ? "they stand" : "you stand"}.` : "",
+    reader ? `A filled dot marks where ${whose === "their" ? "they stand" : whose === "these answers" ? "these answers landed" : "you stand"}.` : "",
     preview ? "A dashed ring marks where this answer would move you." : "",
     history && history.length > 1 ? "A line joins your earlier positions in order." : "",
   ]

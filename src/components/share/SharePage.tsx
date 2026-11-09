@@ -34,8 +34,9 @@ export interface SharePageProps {
   shareLine: string;
   shareLineIndex: number;
   /**
-   * A sample account's result (migration 0023). Labelled, and shown as to
-   * a stranger: a sample account takes up no challenge and debates no one.
+   * A sample account's result (migration 0023). Tagged, and shown as to a
+   * stranger: never as someone's (Arthur, 2026-11-08: never present a
+   * sample as a person).
    */
   isSample?: boolean;
   /**
@@ -87,15 +88,13 @@ export function SharePage({
   return (
     <main className="flex-1">
       <div className="mx-auto max-w-read px-6 py-10">
-        {isSample && <SampleLabel />}
-        <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
-          {isSample
-            ? "A sample account's result"
-            : isOwner
-              ? "Your school"
-              : "Someone shared their result"}
-          {!isSample && isSavedToProfile && " · saved to your profile"}
-        </p>
+        <div className="flex flex-wrap items-center gap-x-3">
+          <p className="text-xs font-extrabold tracking-widest uppercase text-ink-mid">
+            {isSample ? "A result" : isOwner ? "Your school" : "Someone shared their result"}
+            {!isSample && isSavedToProfile && " · saved to your profile"}
+          </p>
+          {isSample && <SampleLabel />}
+        </div>
 
         <div className="mt-4">
           <ResultCard

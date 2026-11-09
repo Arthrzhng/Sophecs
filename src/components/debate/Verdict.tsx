@@ -14,7 +14,7 @@ import { SCHOOL_ADHERENT_PLURAL, SCHOOL_ARTICLE, SCHOOL_COLORS } from "@/lib/sch
 import { SCHOOL_CHUNKY, shade } from "@/components/daily-path/chunky";
 import { JUDGE_AXES, AXIS_MAX } from "@/lib/judge-axes";
 import { SampleLabel } from "@/components/sample/SampleLabel";
-import { SAMPLE_ASSESSMENT, SAMPLE_ASSESSMENT_NOTE } from "@/lib/sample";
+import { SAMPLE_JUDGE_NOTE } from "@/lib/sample";
 import type { MicroLessonContent } from "@/lib/lesson-chunks";
 import type { SchoolId } from "@/lib/types";
 import { RUBRIC_HREF, TABLE_HREF } from "@/lib/nav-routes";
@@ -62,8 +62,9 @@ const WITHHELD_REJECTED_TEMPLATE =
 // The article is the adherent noun's: every school's name begins with the
 // same sound as its noun ("an Ubuntu objection", "an Ubuntu Ethicist"),
 // which tests/six-schools.test.ts checks for all six.
-function withheldObjection(school: SchoolId): string {
-  return `The argument left ${SCHOOL_ARTICLE[school]} ${SCHOOL_COLORS[school].name} objection standing. Its wording can quote the argument, so only the person who wrote it can read it.`;
+function withheldObjection(school: SchoolId, impersonal = false): string {
+  const tail = impersonal ? "so it is shown only while the argument is public." : "so only the person who wrote it can read it.";
+  return `The argument left ${SCHOOL_ARTICLE[school]} ${SCHOOL_COLORS[school].name} objection standing. Its wording can quote the argument, ${tail}`;
 }
 
 // The parent's four marks, so a revision can be read against its original.
@@ -191,9 +192,9 @@ export function Verdict({
   textWithheld?: boolean;
   /**
    * Set on an argument a sample account made (migration 0023). It gets the
-   * Sample label, no share row, and no view events. `template` is a
-   * verdict written from a template rather than by the judge: it says so,
-   * and nothing on the page claims the judge read it.
+   * AI tag, no share row, and no view events. `template` is a verdict
+   * written from a template rather than by the judge: the tag says so, and
+   * nothing on the page claims the judge read it.
    */
   sample?: { template: boolean } | null;
 }) {
@@ -235,8 +236,10 @@ export function Verdict({
   if (verdict.rejected) {
     return (
       <div>
-        {sample && <SampleLabel />}
-        <p className="text-sm text-ink-soft">{template ? SAMPLE_ASSESSMENT : "Verdict"}</p>
+        <div className="flex flex-wrap items-center gap-x-3">
+          <p className="text-sm text-ink-soft">Verdict</p>
+          {sample && <SampleLabel note={template ? SAMPLE_JUDGE_NOTE : undefined} />}
+        </div>
         <h1 className="mt-1 max-w-[60ch] font-serif text-lg font-medium leading-snug text-ink">
           {motion}
         </h1>
@@ -245,7 +248,7 @@ export function Verdict({
             title="This was not judged."
             body={
               textWithheld
-                ? template
+                ? sample
                   ? WITHHELD_REJECTED_TEMPLATE
                   : WITHHELD_REJECTED
                 : (verdict.rejection_reason ??
@@ -253,7 +256,7 @@ export function Verdict({
             }
             action={
               <div className="flex flex-wrap items-center gap-6 text-sm">
-                <TextLink href={`/debate/${topicSlug}`}>Write it again</TextLink>
+                <TextLink href={`/debate/${topicSlug}`}>{sample ? "Argue this motion" : "Write it again"}</TextLink>
                 <TextLink href={RUBRIC_HREF}>What the judge is looking for</TextLink>
               </div>
             }
@@ -265,7 +268,6 @@ export function Verdict({
 
   return (
     <div>
-      {sample && <SampleLabel className="mb-4" />}
       <div className="flex flex-wrap items-center gap-6">
         {/* The composite out of 100. It is not one of the three criteria,
             which is why it sits apart from them rather than as a fourth
@@ -283,10 +285,16 @@ export function Verdict({
         </div>
 
         <div className="min-w-0 flex-1">
-          {weekNumber != null && (
-            <p className="text-sm text-ink-mid">
-              Week {weekNumber} &middot; {template ? SAMPLE_ASSESSMENT.toLowerCase() : "verdict is in"}
-            </p>
+          {(weekNumber != null || sample) && (
+            <div className="flex flex-wrap items-center gap-x-3">
+              {weekNumber != null && (
+                <p className="text-sm text-ink-mid">
+                  Week {weekNumber}
+                  {!template && <> &middot; verdict is in</>}
+                </p>
+              )}
+              {sample && <SampleLabel note={template ? SAMPLE_JUDGE_NOTE : undefined} />}
+            </div>
           )}
           <h1 className="mt-1 max-w-[34ch] text-xl font-extrabold leading-tight tracking-tight text-ink">
             {textWithheld ? WITHHELD_HEADING : verdict.verdict_line}
@@ -330,11 +338,8 @@ export function Verdict({
           composite, and the composite is the circle above. */}
       <section className="mt-10 border-t-2 border-rule pt-8">
         <h2 className="text-lg font-extrabold tracking-tight text-ink">
-          {template ? SAMPLE_ASSESSMENT : "How the judge scored you"}
+          {template ? "Scores" : "How the judge scored you"}
         </h2>
-        {template && (
-          <p className="mt-2 max-w-[60ch] text-sm text-ink-mid">{SAMPLE_ASSESSMENT_NOTE}</p>
-        )}
         <ul className="mt-5 max-w-[40rem] space-y-4">
           {JUDGE_AXES.map((axis) => {
             const value = verdict[axis.key];
@@ -374,7 +379,7 @@ export function Verdict({
           {template ? "Notes on the argument" : <>The judge&apos;s note</>}
         </h2>
         {textWithheld ? (
-          <p className="prose-reading mt-6">{template ? WITHHELD_NOTE_TEMPLATE : WITHHELD_NOTE}</p>
+          <p className="prose-reading mt-6">{sample ? WITHHELD_NOTE_TEMPLATE : WITHHELD_NOTE}</p>
         ) : (
           <div className="mt-6 space-y-6">
             <Reading label="Strongest move" body={verdict.strongest_move} />
@@ -386,7 +391,7 @@ export function Verdict({
 
       {objection && (
         <div className="mt-10 max-w-[60ch] border-t border-rule pt-8">
-          <p className="text-sm text-ink-soft">The objection you left standing</p>
+          <p className="text-sm text-ink-soft">{sample ? "The objection left standing" : "The objection you left standing"}</p>
           {/* The rival school's colour, on the rival school's objection —
               the one place on this screen a tribal marker means something. */}
           <div
@@ -396,7 +401,7 @@ export function Verdict({
             <p className="text-sm text-ink-mid">{SCHOOL_COLORS[objection.school].name}</p>
             {textWithheld ? (
               <p className="mt-2 text-sm leading-relaxed text-ink-mid">
-                {withheldObjection(objection.school)}
+                {withheldObjection(objection.school, Boolean(sample))}
               </p>
             ) : (
               <>
@@ -468,7 +473,9 @@ export function Verdict({
             <p className="font-serif text-base leading-relaxed whitespace-pre-wrap">{argument}</p>
           </div>
         ) : (
-          <p className="text-sm text-ink-soft">The author has not published this argument.</p>
+          <p className="text-sm text-ink-soft">
+            {sample ? "This argument is not published." : "The author has not published this argument."}
+          </p>
         )}
       </div>
 
@@ -498,7 +505,7 @@ export function Verdict({
         <div className="mt-10 max-w-[34rem] border-t border-rule pt-8">
           {comparison.comparable ? (
             <>
-              <p className="text-sm text-ink-soft">Compared with your first attempt</p>
+              <p className="text-sm text-ink-soft">{sample ? "Compared with the first attempt" : "Compared with your first attempt"}</p>
 
               {/* The same four axes as the verdict above, read against the
                   original. Lost its rows in the Phase 3 rewrite and rendered an

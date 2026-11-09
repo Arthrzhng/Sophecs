@@ -9,9 +9,9 @@ import { getSchool } from "@/lib/schools";
 import { shownOnThisBuild } from "@/lib/quiz-result";
 import type { SchoolId } from "@/lib/types";
 
-// A sample account's challenge says so in the title too, which is what a
-// link preview shows first. Its preview image is the challenger's result
-// card, which draws the Sample mark for a sample result
+// A sample account's challenge has a plain title (Arthur, 2026-11-08: no
+// "Sample" in page titles). Its preview image is the challenger's result
+// card, which draws the sample mark for a sample result
 // (src/app/r/[id]/opengraph-image.tsx); a challenge whose challenger is
 // not a sample (the seed writes none) gets no image rather than an
 // unmarked one.
@@ -20,9 +20,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const challenge = await getChallenge(id);
   if (!challenge?.isSample) return { title: "You've been challenged · Sophecs" };
   return sampleMetadata(
-    "A sample account's challenge · Sophecs",
+    "A challenge · Sophecs",
     challenge.challengerIsSample
-      ? { url: `/r/${challenge.challengerResultId}/opengraph-image`, alt: "A sample account's result card" }
+      ? { url: `/r/${challenge.challengerResultId}/opengraph-image`, alt: "A result card, marked as an AI sample" }
       : undefined
   );
 }

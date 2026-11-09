@@ -26,6 +26,6 @@ export const FIXTURE_PROPS = {
     yourLine: "You argued once for Stoicism this week.",
     emptyWeek: false,
     paused: false,
-    sampleNote: "This week's table includes sample accounts.",
+    sampleNote: "Includes sample accounts, run by AI.",
   },
 };

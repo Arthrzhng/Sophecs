@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { SamplePageMarker } from "@/components/sample/SamplePageMarker";
-import { SAMPLE_PAGE_REFERRER } from "@/lib/sample";
+import { SAMPLE_PAGE_REFERRER, resultMapWords } from "@/lib/sample";
 import { cookies, headers } from "next/headers";
 import { CardViewTracker } from "@/components/card/CardViewTracker";
 import { SharePage } from "@/components/share/SharePage";
@@ -83,8 +83,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const result = await getResult(id);
   if (!result) return { title: "Sophecs" };
   const school = getSchool(result.school);
-  // A sample account's result says so in the title and the link preview.
-  const title = result.is_sample ? `${school.name} · Sample · Sophecs` : `${school.name} · Sophecs`;
+  // A sample's result has the same title as anyone's (Arthur, 2026-11-08);
+  // its preview image carries the sample mark.
+  const title = `${school.name} · Sophecs`;
   return {
     title,
     description: school.one_line,
@@ -161,12 +162,12 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
   const figure =
     QUIZ_V2_ON && quizVersionOf(result) === 2 && typeof result.map_x === "number" && typeof result.map_y === "number" ? (
       <SchoolMap
-        title="Where these answers put them, on the map of the schools"
+        title={resultMapWords(Boolean(result.is_sample)).title}
         schools={quizV2MapSchools()}
         axes={quizV2().axes}
         reader={{ x: result.map_x, y: result.map_y }}
         caption="Where these answers landed"
-        whose="their"
+        whose={resultMapWords(Boolean(result.is_sample)).whose}
       />
     ) : null;
 
