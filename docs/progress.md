@@ -1034,17 +1034,22 @@ deploy below was read from Vercel as Ready.
   production deploy `dpl_APhTH6rZdYztMFAuHvkkvHqpGtpH` Ready (read from
   Vercel), no runtime errors since.
 - The first extend on it was a scheduled run at 18:52 UTC (Actions
-  42677867761), the first scheduled slot since 07:10. It read back:
+  42677867761), the first scheduled run since 07:10: no hourly slot from
+  08:17 on had started. From its public log:
+
   - success, 38 of 38 checks;
-  - a whole read, as the first after the merge (`read_whole_at` 18:52);
   - `sample-202611090107` extended to 18:52, with 4 debates and 3 quiz
     results written and 6 profiles brought up to date;
-  - the seven-day line: "nothing to check before 2026-11-16";
+  - the seven-day line: "nothing to check before 2026-11-16".
+
+  Read from production after it (read only):
+
+  - a whole read, as the first after the merge (`read_whole_at` 18:52);
   - nothing dated after now, the genuine rows unchanged (2 profiles, 1
     debate), and no reader's exchange with a sample;
   - on the table, every school 25 or more in the seven days to then.
 - Arthur's rulings on the two sample lists are recorded
   (`docs/decisions.md`, "Arthur's rulings on the sample-accounts
-  lists"): no teardown, so the taper applies to runs made from now on;
-  the figures, the AI's instructions and item 27 accepted. On samples,
-  routine checks only from here.
+  lists"): no teardown, so the live run carries on without the taper,
+  which reaches the next run made; the figures, the AI's instructions
+  and item 27 accepted. On samples, routine checks only from here.
