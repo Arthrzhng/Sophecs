@@ -131,3 +131,22 @@ describe("the explanation", () => {
     }
   });
 });
+
+describe("asking for a sample's reply (review pass 1, B2 and O9)", () => {
+  it("asks again while another request is writing it, for longer than a claim lasts, then offers to try again", async () => {
+    const { afterAnswer } = await import("../src/components/counterpart/SampleReplyRequest");
+    const writing = { ok: true as const, delivered: false, writing: true as const };
+    const first = afterAnswer(writing, 0);
+    expect(first).toEqual({ state: { kind: "writing" }, askAgainInMs: 15_000, refresh: false });
+    // Ten asks 15 seconds apart: 150 seconds, past a claim's 130 at most.
+    expect(afterAnswer(writing, 9).askAgainInMs).toBe(15_000);
+    expect(afterAnswer(writing, 10)).toMatchObject({ state: { kind: "message", retry: true }, askAgainInMs: null });
+  });
+
+  it("leaves 'writing' once the reply is in, and asks once more in case the hand-over did not go through", async () => {
+    const { afterAnswer } = await import("../src/components/counterpart/SampleReplyRequest");
+    expect(afterAnswer({ ok: true, delivered: true }, 0)).toEqual({ state: { kind: "replied" }, askAgainInMs: 4_000, refresh: true });
+    expect(afterAnswer({ ok: true, delivered: false }, 0)).toEqual({ state: { kind: "waiting" }, askAgainInMs: null, refresh: true });
+    expect(afterAnswer({ ok: false, message: "m", retry: false }, 0)).toEqual({ state: { kind: "message", text: "m", retry: false }, askAgainInMs: null, refresh: false });
+  });
+});

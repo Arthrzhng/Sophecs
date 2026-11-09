@@ -196,9 +196,12 @@ export default async function MePage({
     const counterpartIds = openRows
       .map((row) => (row.user_a === user.id ? row.user_b : row.user_a))
       .filter((id): id is string => Boolean(id));
-    const { data: sampleRows } = counterpartIds.length
+    const { data: sampleRows, error: sampleError } = counterpartIds.length
       ? await admin.from("profiles").select("id").eq("is_sample", true).in("id", counterpartIds)
-      : { data: [] as { id: string }[] };
+      : { data: [] as { id: string }[], error: null };
+    // Unread, the page shows its error rather than a sample without its
+    // tag, presented as a person.
+    if (sampleError) throw new Error(`[me] which counterparts are sample accounts could not be read: ${sampleError.message}`);
     const sampleIds = new Set((sampleRows ?? []).map((r) => r.id as string));
     exchanges = meExchangeRows(openRows, openTurns, user.id, (slug) => titles.get(slug) ?? slug, new Date(), sampleIds);
 

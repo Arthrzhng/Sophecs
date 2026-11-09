@@ -9,7 +9,7 @@ import { latestReplyPending, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpar
 import { closeIfLapsed, exchangeForLapse } from "@/lib/counterpart-lapse";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate } from "@/lib/motion-text";
-import { counterpartIsSample, sampleRepliesOn } from "@/lib/sample-reply";
+import { counterpartIsSample, sampleReplyDue } from "@/lib/sample-reply";
 
 export const metadata = { title: "Counterpart · Sophecs" };
 
@@ -114,16 +114,14 @@ export default async function CounterpartPage({
   const nextSeq = turns.length + 1;
   const myTurn = status === "open" && exchange.next_turn === user.id && nextSeq <= MAX_SEQ && !myPending;
   // The sample's turn, after a reply of the reader's that was delivered:
-  // the page asks for the sample's reply. A sample's reply delivered whose
-  // hand-over did not go through is due too, so the request can hand the
-  // turn over (replyAsSample).
-  const lastTurn = turns[turns.length - 1];
-  const sampleReplyDue =
-    theirIsSample &&
-    sampleRepliesOn() &&
-    status === "open" &&
-    exchange.next_turn === theirUserId &&
-    Boolean(lastTurn && lastTurn.screen_result === "ok");
+  // the page asks for the sample's reply (src/lib/sample-reply.ts).
+  const replyDue = sampleReplyDue({
+    theirIsSample,
+    status,
+    nextTurn: (exchange.next_turn as string | null) ?? null,
+    theirUserId: (theirUserId as string | null) ?? null,
+    lastTurn: turns[turns.length - 1],
+  });
 
   // The text the next reply must quote from.
   let sourceText = "";
@@ -176,7 +174,7 @@ export default async function CounterpartPage({
         publishMine={Boolean(iAmA ? exchange.publish_a : exchange.publish_b)}
         publishTheirs={Boolean(iAmA ? exchange.publish_b : exchange.publish_a)}
         counterpartIsSample={theirIsSample}
-        sampleReplyDue={sampleReplyDue}
+        sampleReplyDue={replyDue}
       />
     </main>
   );

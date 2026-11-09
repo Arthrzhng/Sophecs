@@ -355,6 +355,18 @@ export async function blockCounterpart(exchangeId: string): Promise<ActionResult
   }
 
   const other = exchange.user_a === user.id ? exchange.user_b : exchange.user_a;
+  // A sample account is not blocked: the page offers no Block for one, and
+  // a block row pointing at a sample is a reference that stops its run's
+  // teardown (migration 0023). Refused too when it cannot be read.
+  if (other) {
+    const { data: profile, error: profileError } = await admin
+      .from("profiles")
+      .select("is_sample")
+      .eq("id", other)
+      .maybeSingle();
+    if (profileError) return { ok: false, error: "That could not be done just now. Try again in a minute." };
+    if (profile?.is_sample) return { ok: false, error: "A sample account cannot be blocked." };
+  }
   if (other) {
     await admin
       .from("blocks")

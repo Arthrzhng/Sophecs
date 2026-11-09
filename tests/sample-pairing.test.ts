@@ -29,6 +29,10 @@ function query(table: string) {
     (tables[table] ??= []).push(row);
     return { error: null };
   };
+  b.upsert = async (row: Row) => {
+    (tables[table] ??= []).push(row);
+    return { error: null };
+  };
   b.maybeSingle = async () => ({ data: rows()[0] ?? null });
   b.then = (resolve: (v: unknown) => unknown) => {
     if (patch) for (const r of rows()) Object.assign(r, patch);
@@ -47,7 +51,7 @@ vi.mock("@/lib/sample-reply", () => ({
   sampleReplyMessage: (r: string) => (r === "ceiling" ? "Sample accounts have stopped replying for this month." : "Sample accounts are not replying right now."),
 }));
 
-const { pairWithSample } = await import("../src/app/debate/actions");
+const { blockCounterpart, pairWithSample } = await import("../src/app/debate/actions");
 
 const judged = { kind: "original", rejected: false, verdict: { score: 60 }, topic_slug: "no-decision", argument: "words" };
 
@@ -104,5 +108,32 @@ describe("pairWithSample", () => {
   it("does not pair the reader with a sample already in an open exchange with them, and says so when none is left", async () => {
     tables.exchanges.push({ id: "x1", debate_a: "other", debate_b: "s-ok", user_a: "reader", user_b: "sample-5", status: "open" });
     expect(await pairWithSample("mine")).toEqual({ ok: false, error: "No sample account has argued this motion from another school yet." });
+  });
+});
+
+describe("blockCounterpart (review pass 1, O7)", () => {
+  beforeEach(() => {
+    tables.profiles = [
+      { id: "reader", is_sample: false },
+      { id: "sample-5", is_sample: true },
+      { id: "human", is_sample: false },
+    ];
+    tables.blocks = [];
+    tables.exchanges = [
+      { id: "with-sample", user_a: "reader", user_b: "sample-5", status: "open", next_turn: "sample-5" },
+      { id: "with-person", user_a: "reader", user_b: "human", status: "open", next_turn: "human" },
+    ];
+  });
+
+  it("refuses a sample account, writing no block, which would stop its run's teardown", async () => {
+    expect(await blockCounterpart("with-sample")).toEqual({ ok: false, error: "A sample account cannot be blocked." });
+    expect(tables.blocks).toEqual([]);
+    expect(tables.exchanges.find((e) => e.id === "with-sample")).toMatchObject({ status: "open", next_turn: "sample-5" });
+  });
+
+  it("blocks a person as before", async () => {
+    expect(await blockCounterpart("with-person")).toEqual({ ok: true });
+    expect(tables.blocks).toEqual([{ blocker_id: "reader", blocked_id: "human" }]);
+    expect(tables.exchanges.find((e) => e.id === "with-person")).toMatchObject({ status: "blocked", next_turn: null });
   });
 });

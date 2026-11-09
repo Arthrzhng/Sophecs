@@ -12,7 +12,7 @@ import { replyAsSample, sampleReplyMessage } from "@/lib/sample-reply";
  */
 export async function requestSampleReply(
   exchangeId: string
-): Promise<{ ok: true; delivered: boolean } | { ok: false; message: string; retry: boolean }> {
+): Promise<{ ok: true; delivered: boolean; writing?: true } | { ok: false; message: string; retry: boolean }> {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -22,6 +22,9 @@ export async function requestSampleReply(
   const admin = createAdminClient();
   const result = await replyAsSample(admin, exchangeId, user.id);
   if (result.ok) return { ok: true, delivered: true };
+  // Another request is writing it (a reload, a second tab): the page asks
+  // again shortly, at no cost.
+  if (result.reason === "writing") return { ok: true, delivered: false, writing: true };
   const message = sampleReplyMessage(result.reason);
   // Not due: nothing to say, and the page reads the exchange again.
   // Trying again helps only a reply that failed to be written or passed;

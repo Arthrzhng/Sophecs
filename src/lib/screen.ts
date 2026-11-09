@@ -139,7 +139,9 @@ export async function logScreenCall(params: {
     latency_ms: params.latencyMs,
     debate_id: null,
     prompt_version: SCREEN_PROMPT_VERSION,
-    for_sample: params.forSample,
+    // Only when true, so every other screen is the insert it was before
+    // 0029, and keeps working if this deploy reaches a database without it.
+    ...(params.forSample ? { for_sample: true } : {}),
   });
   if (error) {
     console.error("[ai_calls] failed to log screen call:", error.message);

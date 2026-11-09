@@ -33,7 +33,12 @@ import type { SchoolId } from "@/lib/types";
 //
 // The ceiling is read before each reply, never cached, and is not a
 // reservation: replies written at the same moment can each pass it, so it
-// can be overshot by the replies in flight, at most about $0.02 each.
+// can be overshot by the replies in flight, at most about $0.035 each (two
+// writing calls at MAX_TOKENS and a screen). An exchange has at most one
+// reply in flight, since the sample's turn is claimed before the writing
+// call (claimTurn); so a reader can have one in flight for each exchange
+// they have open with a sample, and the reader's daily room can be passed
+// by those too.
 //
 // Arthur, 2026-11-08, item 1. docs/sample-activity.md, "Sample replies", has the design.
 
@@ -49,6 +54,23 @@ const MAX_TOKENS = 900;
 // screen at their limits come to 54 seconds.
 const WRITE_TIMEOUT_MS = 22_000;
 const SCREEN_TIMEOUT_MS = 10_000;
+// A call that timed out or lost its connection may still have been billed:
+// it is logged at its most, so the ceiling and the budget never miss it.
+// The input is counted at three characters a token, more than English
+// takes, and the output at MAX_TOKENS. The screen's most: its prompt and a
+// reply at the longest, about 900 tokens in and 60 out, rounded up.
+const CHARS_PER_TOKEN_AT_MOST = 3;
+const SCREEN_COST_AT_MOST_USD = 0.002;
+// The sample's turn is claimed for this long before the writing call, by
+// moving the exchange's last_turn_at this far ahead (claimTurn). Longer
+// than the exchange page's 60-second function, so a claim outlives the
+// request that made it only when that request died, and then for a minute
+// at most.
+const CLAIM_MS = 120_000;
+// A claim is a last_turn_at in the future. This much leeway is left for
+// clocks on different functions, so an ordinary last_turn_at is never
+// taken for one.
+const CLAIM_SKEW_MS = 10_000;
 
 /**
  * The flag. Written into the build as a constant (next.config.ts), like
@@ -149,7 +171,7 @@ async function logCall(
 
 export type SampleReplyResult =
   | { ok: true; seq: number; complete: boolean }
-  | { ok: false; reason: Unavailable | "cap" | "not_due" | "failed" | "held" };
+  | { ok: false; reason: Unavailable | "cap" | "not_due" | "writing" | "failed" | "held" };
 
 interface ExchangeRow {
   id: string;
@@ -162,17 +184,45 @@ interface ExchangeRow {
   school_b: string;
   status: string;
   next_turn: string | null;
+  last_turn_at: string;
 }
 
 /**
  * Whether the other party of this exchange, seen from the reader, is a
  * sample account. Read from profiles.is_sample, which only the seed tooling
  * sets (migration 0023), never from anything a reader supplies.
+ *
+ * Throws when it cannot be read: the page then shows its error rather than
+ * a sample without its tag, presented as a person.
  */
 export async function counterpartIsSample(admin: SupabaseClient, counterpartId: string | null): Promise<boolean> {
   if (!counterpartId) return false;
-  const { data } = await admin.from("profiles").select("is_sample").eq("id", counterpartId).maybeSingle();
+  const { data, error } = await admin.from("profiles").select("is_sample").eq("id", counterpartId).maybeSingle();
+  if (error) throw new Error(`[sample-reply] whether the counterpart is a sample account could not be read: ${error.message}`);
   return Boolean(data?.is_sample);
+}
+
+/**
+ * Whether the exchange page asks for the sample's reply: the replies on,
+ * the counterpart a sample, the exchange open and the sample's turn, after
+ * a delivered reply. A sample's reply delivered whose hand-over did not go
+ * through is due too, so the request can hand the turn over (replyAsSample).
+ */
+export function sampleReplyDue(params: {
+  theirIsSample: boolean;
+  status: string;
+  nextTurn: string | null;
+  theirUserId: string | null;
+  lastTurn: { screen_result: string } | undefined;
+}): boolean {
+  return (
+    sampleRepliesOn() &&
+    params.theirIsSample &&
+    params.status === "open" &&
+    params.theirUserId !== null &&
+    params.nextTurn === params.theirUserId &&
+    params.lastTurn?.screen_result === "ok"
+  );
 }
 
 /**
@@ -182,13 +232,14 @@ export async function counterpartIsSample(admin: SupabaseClient, counterpartId: 
  * Order of checks: the exchange is the reader's, with a sample, open and
  * the sample's turn, the reader's last reply delivered; then the flag, the
  * kill switch, the budget, the ceiling and the reader's daily room; then
- * the writing call, its reply held to a reader's rules, the screen, and
- * delivery. Nothing is written to `turns` until the screen has passed, so a
- * reply that fails anywhere leaves the exchange as it was, the sample's
- * turn still due, and the next request tries again within the same caps.
+ * the turn claimed, the writing call, its reply held to a reader's rules,
+ * the screen, and delivery. Nothing is written to `turns` until the screen
+ * has passed, so a reply that fails anywhere leaves the exchange as it
+ * was, the claim given back and the sample's turn still due, and the next
+ * request tries again within the same caps.
  *
- * Two requests at once can both write a reply; the unique (exchange_id,
- * seq) index lets one in, and the other's calls are logged and counted.
+ * A second request while one is writing finds the turn claimed and makes
+ * no call ("writing"): a reload, or a second tab, costs nothing.
  */
 export async function replyAsSample(
   admin: SupabaseClient,
@@ -198,7 +249,7 @@ export async function replyAsSample(
 ): Promise<SampleReplyResult> {
   const { data: exchange } = await admin
     .from("exchanges")
-    .select("id, topic_slug, debate_a, debate_b, user_a, user_b, school_a, school_b, status, next_turn")
+    .select("id, topic_slug, debate_a, debate_b, user_a, user_b, school_a, school_b, status, next_turn, last_turn_at")
     .eq("id", exchangeId)
     .maybeSingle<ExchangeRow>();
   if (!exchange || (exchange.user_a !== readerId && exchange.user_b !== readerId)) return { ok: false, reason: "not_due" };
@@ -271,7 +322,9 @@ export async function replyAsSample(
     readerSchool: getSchool(readerSchool).name,
     sampleArgument,
     readerArgument,
-    turns: turns.map<SampleReplyTurn>((t) => ({
+    // Only what was delivered: a reply held by the screen or taken down is
+    // not part of the exchange.
+    turns: turns.filter((t) => t.screen_result === "ok").map<SampleReplyTurn>((t) => ({
       seq: t.seq,
       bySample: t.author_id === sampleId,
       quotedClaim: t.quoted_claim,
@@ -281,6 +334,27 @@ export async function replyAsSample(
     source,
   });
 
+  const handedOverAt = exchange.last_turn_at;
+  const lease = await claimTurn(admin, exchange.id, sampleId, now);
+  if (!lease) return { ok: false, reason: "writing" };
+  let delivered = false;
+  try {
+    const result = await writeAndDeliver(admin, { exchange, sampleId, readerId, seq, source, userTurn, now });
+    delivered = result.ok;
+    return result;
+  } finally {
+    // Given back on every way out but delivery, an exception included. The
+    // hand-over on delivery has already replaced it.
+    if (!delivered) await releaseTurn(admin, exchange.id, sampleId, lease, handedOverAt);
+  }
+}
+
+/** The writing call, the screen and delivery, once the turn is claimed. */
+async function writeAndDeliver(
+  admin: SupabaseClient,
+  ctx: { exchange: ExchangeRow; sampleId: string; readerId: string; seq: number; source: string; userTurn: string; now: Date }
+): Promise<SampleReplyResult> {
+  const { exchange, sampleId, readerId, seq, source, userTurn, now } = ctx;
   // Write it: one call, and one more if the answer breaks a rule.
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: userTurn }];
   let reply: { quotedClaim: string; body: string } | null = null;
@@ -293,8 +367,19 @@ export async function replyAsSample(
         { timeout: WRITE_TIMEOUT_MS, maxRetries: 0 }
       );
     } catch (err) {
-      // No tokens were billed for a call that did not answer.
       console.error("[sample-reply] the writing call failed:", err instanceof Error ? err.message : String(err));
+      // An answer with an HTTP status (a refusal, an overload) was not
+      // billed. One without (a timeout, a lost connection) may have been,
+      // so it is logged at its most.
+      if (!hasStatus(err)) {
+        const chars = SAMPLE_REPLY_SYSTEM.length + messages.reduce((n, m) => n + String(m.content).length, 0);
+        await logCall(admin, {
+          userId: readerId,
+          costUsd: Math.ceil(chars / CHARS_PER_TOKEN_AT_MOST) * INPUT_COST_PER_TOKEN + MAX_TOKENS * OUTPUT_COST_PER_TOKEN,
+          latencyMs: Date.now() - start,
+          validationError: "no answer (timed out or the connection was lost): logged at its most",
+        });
+      }
       return { ok: false, reason: "failed" };
     }
     const latencyMs = Date.now() - start;
@@ -324,6 +409,9 @@ export async function replyAsSample(
   } catch (err) {
     if (err instanceof ScreenError) {
       await logScreenCall({ userId: readerId, costUsd: err.costUsd, latencyMs: err.latencyMs, forSample: true });
+    } else if (!hasStatus(err)) {
+      // As with the writing call: no answer may still have been billed.
+      await logScreenCall({ userId: readerId, costUsd: SCREEN_COST_AT_MOST_USD, latencyMs: SCREEN_TIMEOUT_MS, forSample: true });
     }
     console.error("[sample-reply] the screen failed:", err instanceof Error ? err.message : String(err));
     return { ok: false, reason: "failed" };
@@ -350,6 +438,56 @@ export async function replyAsSample(
   if (insertError) return { ok: false, reason: "not_due" };
   const complete = await handOver(admin, exchange, sampleId, readerId, seq, now);
   return { ok: true, seq, complete };
+}
+
+/** Whether an error carries an HTTP status: the API answered, and did not bill. */
+function hasStatus(err: unknown): boolean {
+  return typeof err === "object" && err !== null && typeof (err as { status?: unknown }).status === "number";
+}
+
+/**
+ * Claims the sample's turn for one request, in one conditional update:
+ * last_turn_at moves CLAIM_MS ahead, only while the turn is still the
+ * sample's and not already claimed (a last_turn_at in the future). The
+ * claim, or null when another request holds it or the turn has moved on.
+ *
+ * last_turn_at, rather than a new column, so this needs no migration. Read
+ * elsewhere it only starts the lapse clock (src/lib/counterpart.ts), which
+ * a time ahead holds for the claim's length, and orders /me's list.
+ */
+async function claimTurn(admin: SupabaseClient, exchangeId: string, sampleId: string, now: Date): Promise<string | null> {
+  const lease = new Date(now.getTime() + CLAIM_MS).toISOString();
+  const { data, error } = await admin
+    .from("exchanges")
+    .update({ last_turn_at: lease })
+    .eq("id", exchangeId)
+    .eq("status", "open")
+    .eq("next_turn", sampleId)
+    .lte("last_turn_at", new Date(now.getTime() + CLAIM_SKEW_MS).toISOString())
+    .select("id");
+  if (error) {
+    console.error(`[sample-reply] the turn in ${exchangeId} could not be claimed:`, error.message);
+    return null;
+  }
+  return data && data.length > 0 ? lease : null;
+}
+
+/** Gives the claim back: last_turn_at as it was, only while the claim is still this one. */
+async function releaseTurn(
+  admin: SupabaseClient,
+  exchangeId: string,
+  sampleId: string,
+  lease: string,
+  handedOverAt: string
+): Promise<void> {
+  const { error } = await admin
+    .from("exchanges")
+    .update({ last_turn_at: handedOverAt })
+    .eq("id", exchangeId)
+    .eq("next_turn", sampleId)
+    .eq("last_turn_at", lease);
+  // Not given back, it lapses on its own CLAIM_MS after it was made.
+  if (error) console.error(`[sample-reply] the claim in ${exchangeId} could not be given back:`, error.message);
 }
 
 /** The turn passes to the reader, or the exchange completes. Only while it is still the sample's. */
@@ -397,6 +535,7 @@ export function sampleReplyMessage(reason: Exclude<SampleReplyResult, { ok: true
     case "failed":
       return "The sample account's reply could not be written this time. Try again in a minute.";
     case "not_due":
+    case "writing":
       return null;
   }
 }
