@@ -6179,3 +6179,41 @@ Each item names the file it lives in.
   the argument is a sample's, and the judge wording whether it was
   scored from a template. A sample's result map reads "Where these
   answers landed", not "Where these answers put them".
+
+### Sample replies: what is logged (2026-11-09)
+
+Arthur, 2026-11-08, item 1 of his instructions on sample accounts (items
+2 to 4 are the explanation, the scale-down and the labels, recorded
+above): "AI behind the samples. When a reader challenges, opens an
+exchange with, or replies to a sample account, one AI (the same model
+family as the judge) writes the sample's side, arguing in that sample's
+school using its approved criteria. Nothing per account beyond its
+school. Rules: - Never present a sample as a person (see labels in 4).
+- Same screening as human replies. Counts toward the reader's daily cap
+and the monthly budget. Its own spending ceiling of $15 a month inside
+the $50 budget; when reached, samples stop replying and the reader is
+told plainly. - Its own flag. Turn it on once built, reviewed and
+tested." And of the whole: "do all of this without stopping for my
+review." That instruction is what lets migration 0029 add to the frozen
+`supabase/`.
+
+What each sample reply logs to `ai_calls`, under the reader's `user_id`
+and with `debate_id` naming the sample's argument (migration 0029):
+- **The call that writes it**, kind `sample_reply`, the one new kind.
+- **Its screen**, kind `screen`, as a reader's reply's screen is. So it
+  counts toward the reader's daily cap wherever that cap is counted: the
+  counterpart turn route (frozen) and the re-screening job count
+  `screen` calls under the reader's id, and a sample's reply takes one of
+  the reader's 8 a day. Logged as its own kind, it would have counted
+  only where the new code counts it, and a reader's own replies would
+  have kept all 8 (review of #116, B2).
+- **Both** count toward the $50 through `ai_spend_since`, which totals
+  every kind. `ai_sample_spend_since` totals the month's `sample_reply`
+  calls and the screens on a sample's argument, for the $15 ceiling; it
+  has those written in and refuses a null start (review of #116, B1: a
+  function taking a list of kinds summed nothing for a misspelt or empty
+  list, so a ceiling could never trip).
+
+The migration widens the kind check with a DROP, so it is Arthur's to
+run in the SQL Editor; the replies stay off until it has run and been
+read back.
