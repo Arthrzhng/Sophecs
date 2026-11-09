@@ -1004,4 +1004,8 @@ deploy below was read from Vercel as Ready.
   replies), $0.2299. Eval key spend is now **$12.9441 of $15.00**.
 - Arthur's decisions of 2026-11-09 on the sample-accounts list: the
   app's (1, 9, 17, 23, 24, 27) in the pull request carrying this entry,
-  with migration 0030; the run's (9, 11, 13, 28) in the next.
+  with migration 0030, applied by me at 15:11 UTC before the merge
+  (20261109151155 `sample_reply_claims`; read back: no rows, row level
+  security on, server role only, `anon` and `authenticated` refused;
+  the advisor adds the one INFO expected); the run's (9, 11, 13, 28) in
+  the next.
