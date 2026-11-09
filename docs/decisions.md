@@ -6272,3 +6272,56 @@ the weekly section) unless named:
   times; the base window's model has about 8% change once. The
   alternatives: a retake that may land in the same school (no change
   recorded), or fewer retakes.
+
+### Sample replies: what is logged (2026-11-09)
+
+Arthur, 2026-11-08, item 1 of his instructions on sample accounts (item 2
+is the explanation and item 4 the labels, recorded above in "Sample
+labels at the minimum"; item 3, the scale-down, in "The sample run
+scaled down, and grown week by week"): "AI behind the samples. When a reader challenges,
+opens an exchange with, or replies to a sample account, one AI (the same
+model family as the judge) writes the sample's side, arguing in that
+sample's school using its approved criteria. Nothing per account beyond
+its school. Rules: - Never present a sample as a person (see labels in
+4). - Same screening as human replies. Counts toward the reader's daily
+cap and the monthly budget. Its own spending ceiling of $15 a month
+inside the $50 budget; when reached, samples stop replying and the
+reader is told plainly. - Its own flag. Turn it on once built, reviewed
+and tested." And of the whole: "do all of this without stopping for my
+review." That instruction is what lets migration 0029 add to the frozen
+`supabase/`.
+
+What each sample reply will log to `ai_calls` (migration 0029; the code
+will come with #117, branch `sample-replies`), both under the reader's
+`user_id` and marked `for_sample`:
+- **The call that writes it**, kind `sample_reply`, the one new kind.
+- **Its screen**, kind `screen`, as a reader's reply's screen is. So it
+  counts toward the reader's daily cap wherever that cap is counted: the
+  counterpart turn route (frozen) and the re-screening job count
+  `screen` calls under the reader's id, and a sample's reply takes one of
+  the reader's 8 a day. Logged as its own kind, it would have counted
+  only where the new code counts it (review of #116, pass 1, B2).
+- **Both** count toward the $50 through `ai_spend_since`, which totals
+  every kind. `ai_sample_spend_this_month` totals this UTC month's
+  `for_sample` calls for the $15 ceiling. It takes no argument, so no
+  caller can ask about a period that holds nothing (pass 1, B1, and pass
+  2, O1).
+- **The mark is on the row**, not reached through the sample's debate
+  (pass 2, B1). Through `debate_id`, a reader's calls would have come to
+  depend on a sample's debate, which a teardown deletes, and its foreign
+  key has no delete action. A check holds the mark to its two kinds, and
+  a writing call to the mark. The replies code is to make the mark a
+  required argument of the screen logger, so no caller logs a sample's
+  screen without deciding (pass 2, O2), and to write the column only on
+  a marked call, as `validation_error` is written only when there is
+  one. So a reader's screen and a judge call insert exactly as before,
+  whether 0029 has run or been rolled back, and the replies PR may merge
+  before Arthur runs it (pass 3, B1).
+- **No judge call is made on a sample's side.** Challenges with a sample
+  are not built (#117 says why), so the judge never scores
+  an argument the AI wrote for a sample; were it ever to, whether that
+  counts toward the $15 would be Arthur's under (d) (pass 2, O6).
+
+The migration widens the kind check with a DROP, so it is Arthur's to
+run in the SQL Editor; the replies stay off until it has run and been
+read back.
