@@ -151,14 +151,14 @@ describe("a sample's reply", () => {
     expect(create.mock.calls[0][0].model).toBe("claude-sonnet-5");
     expect(create.mock.calls[0][1]).toMatchObject({ maxRetries: 0 });
     expect(tables.ai_calls).toEqual([
-      expect.objectContaining({ kind: "sample_reply", user_id: READER, debate_id: "ds", prompt_version: "sample-reply.v1", cost_usd: 2000 * 2e-6 + 400 * 1e-5 }),
+      expect.objectContaining({ kind: "sample_reply", user_id: READER, for_sample: true, debate_id: null, prompt_version: "sample-reply.v1", cost_usd: 2000 * 2e-6 + 400 * 1e-5 }),
     ]);
-    // Its screen: the reader's reply's screen, on the sample's argument.
+    // Its screen: the reader's reply's screen, logged as the reader's, marked for the sample.
     expect(screenTurn).toHaveBeenCalledWith({ quotedClaim: QUOTE, body: BODY }, expect.objectContaining({ maxRetries: 0 }));
-    expect(screenLogs).toEqual([expect.objectContaining({ userId: READER, debateId: "ds" })]);
+    expect(screenLogs).toEqual([expect.objectContaining({ userId: READER, forSample: true })]);
     expect(tables.exchanges[0]).toMatchObject({ next_turn: READER, status: "open", last_turn_at: NOW.toISOString() });
-    // The ceiling read: the month so far, by the single-purpose function.
-    expect(rpcCalls).toEqual([{ name: "ai_sample_spend_since", args: { since: "2026-11-01T00:00:00.000Z" } }]);
+    // The ceiling read: this month's marked calls, by the function that takes no argument.
+    expect(rpcCalls).toEqual([{ name: "ai_sample_spend_this_month", args: undefined }]);
   });
 
   it("answers the reader's last reply at turn 4, and completes the exchange", async () => {
@@ -203,7 +203,7 @@ describe("a sample's reply", () => {
       [() => (budget = "unread"), "unread"],
       [() => (rpc = { data: SAMPLE_REPLY_CEILING_USD, error: null }), "ceiling"],
       [() => (rpc = { data: SAMPLE_REPLY_CEILING_USD + 2, error: null }), "ceiling"],
-      [() => (rpc = { data: null, error: { message: "function ai_sample_spend_since does not exist" } }), "unread"],
+      [() => (rpc = { data: null, error: { message: "function ai_sample_spend_this_month does not exist" } }), "unread"],
       [() => (rpc = { data: "not a number", error: null }), "unread"],
     ];
     for (const [arrange, reason] of cases) {
@@ -261,7 +261,7 @@ describe("a sample's reply", () => {
     expect(tables.turns).toHaveLength(1);
     expect(tables.exchanges[0].next_turn).toBe(SAMPLE);
     // The held screen still counts: logged against the reader.
-    expect(screenLogs.at(-1)).toMatchObject({ userId: READER, debateId: "ds" });
+    expect(screenLogs.at(-1)).toMatchObject({ userId: READER, forSample: true });
 
     world();
     screenTurn.mockRejectedValue(new Error("timeout"));
@@ -312,11 +312,11 @@ describe("a sample's reply", () => {
   });
 
   it("is available to pair with only while it could reply", async () => {
-    expect(await samplesUnavailable(admin, NOW)).toBeNull();
+    expect(await samplesUnavailable(admin)).toBeNull();
     rpc = { data: 15, error: null };
-    expect(await samplesUnavailable(admin, NOW)).toBe("ceiling");
+    expect(await samplesUnavailable(admin)).toBe("ceiling");
     vi.stubEnv("SAMPLE_REPLIES", "0");
-    expect(await samplesUnavailable(admin, NOW)).toBe("off");
+    expect(await samplesUnavailable(admin)).toBe("off");
   });
 });
 

@@ -98,20 +98,22 @@ Behind `SAMPLE_REPLIES=1` (Vercel, read when the build starts:
   figures.
 - **What it costs, and the limits.** About $0.012 a reply with its
   screen (12 replies on the eval key, 2026-11-09). Both calls are logged
-  under the reader (migration 0029): the screen as a `screen`, so it is
-  one of the reader's 8 screened replies a day wherever that is counted;
-  the writing as `sample_reply`, at most 16 a day per reader. Both count
-  toward the $50; `ai_sample_spend_since` counts them toward the $15,
+  under the reader and marked `for_sample` (migration 0029): the screen
+  as a `screen`, so it is one of the reader's 8 screened replies a day
+  wherever that is counted; the writing as `sample_reply`, at most 16 a
+  day per reader. Both count toward the $50;
+  `ai_sample_spend_this_month` counts the marked calls toward the $15,
   read fresh before each reply, so replies written at the same moment
   can pass it together, by about $0.02 each. When the ceiling, the
   budget or the reader's day is reached the reader is told so, plainly.
 - **Challenges** are not built: a genuine challenge cannot name a sample
   (migration 0023's reference guard) and a sample's challenge is never
   accepted (`src/app/actions.ts`), both frozen. On Arthur's list.
-- **Teardown.** A reader's AI calls on a sample's argument stay and stop
-  naming it. A reader's exchange with a sample cannot be kept without
-  the sample's argument, so teardown stops and lists it, deleting
-  nothing, as it does for any genuine row it could keep only by deleting.
+- **Teardown.** A reader's AI calls made for a sample point at nothing
+  of the run's, so they never stop a teardown and stay as spend that
+  happened. A reader's exchange with a sample cannot be kept without the
+  sample's argument, so teardown stops and lists it, deleting nothing,
+  as it does for any genuine row it could keep only by deleting.
 
 ## What a sample can never touch
 

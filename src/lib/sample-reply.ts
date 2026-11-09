@@ -28,7 +28,7 @@ import type { SchoolId } from "@/lib/types";
 // ceiling=SAMPLE_REPLY_CEILING_USD a month, both kinds, inside AI_MONTHLY_BUDGET_USD |
 // flag=SAMPLE_REPLIES (build time, next.config.ts) | kill_switch=KILL_SWITCH_SCREEN, since every reply is
 // screened | logged_to=ai_calls kind='sample_reply' for the writing and 'screen' for its screen, both
-// under the reader's user_id and the sample's debate_id (migration 0029) | retries=one more writing call
+// under the reader's user_id and marked for_sample (migration 0029) | retries=one more writing call
 // when an answer breaks the reply rules; none by the SDK.
 //
 // The ceiling is read before each reply, never cached, and is not a
@@ -65,14 +65,12 @@ function getClient(): Anthropic {
   return client;
 }
 
-function startOfMonth(now: Date): string {
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
-}
-
-/** This month's spend on sample replies, or null when it could not be read. */
-export async function sampleReplySpend(admin: SupabaseClient, now = new Date()): Promise<number | null> {
+/** This UTC month's spend on sample replies, or null when it could not be read. */
+export async function sampleReplySpend(admin: SupabaseClient): Promise<number | null> {
   try {
-    const { data, error } = await admin.rpc("ai_sample_spend_since", { since: startOfMonth(now) });
+    // This UTC month's calls marked for_sample, as the database counts the
+    // month (migration 0029), read fresh every time.
+    const { data, error } = await admin.rpc("ai_sample_spend_this_month");
     const total = Number(data);
     if (error || data === null || data === undefined || !Number.isFinite(total)) {
       console.error("[sample-reply] the month's spend could not be read:", error?.message ?? `got ${String(data)}`);
@@ -91,13 +89,13 @@ export async function sampleReplySpend(admin: SupabaseClient, now = new Date()):
  * cannot be read stops replies as one that is reached does.
  */
 export type Unavailable = "off" | "paused" | "budget" | "ceiling" | "unread";
-export async function samplesUnavailable(admin: SupabaseClient, now = new Date()): Promise<Unavailable | null> {
+export async function samplesUnavailable(admin: SupabaseClient): Promise<Unavailable | null> {
   if (!sampleRepliesOn()) return "off";
   if (process.env.KILL_SWITCH_SCREEN === "true") return "paused";
   const budget = await budgetState();
   if (budget === "over") return "budget";
   if (budget === "unread") return "unread";
-  const spent = await sampleReplySpend(admin, now);
+  const spent = await sampleReplySpend(admin);
   if (spent === null) return "unread";
   return spent >= SAMPLE_REPLY_CEILING_USD ? "ceiling" : null;
 }
@@ -131,7 +129,7 @@ async function readerHasRoom(admin: SupabaseClient, readerId: string, now: Date)
 
 async function logCall(
   admin: SupabaseClient,
-  params: { userId: string; debateId: string; costUsd: number; latencyMs: number; validationError?: string }
+  params: { userId: string; costUsd: number; latencyMs: number; validationError?: string }
 ): Promise<boolean> {
   const { error } = await admin.from("ai_calls").insert({
     id: newId(),
@@ -140,7 +138,8 @@ async function logCall(
     model: MODEL,
     cost_usd: params.costUsd,
     latency_ms: params.latencyMs,
-    debate_id: params.debateId,
+    debate_id: null,
+    for_sample: true,
     prompt_version: SAMPLE_REPLY_PROMPT_VERSION,
     validation_error: params.validationError ?? null,
   });
@@ -240,7 +239,7 @@ export async function replyAsSample(
     return { ok: false, reason: "not_due" };
   }
 
-  const unavailable = await samplesUnavailable(admin, now);
+  const unavailable = await samplesUnavailable(admin);
   if (unavailable) return { ok: false, reason: unavailable };
   const room = await readerHasRoom(admin, readerId, now);
   if (room === null) return { ok: false, reason: "unread" };
@@ -305,7 +304,6 @@ export async function replyAsSample(
     const parsed = parseSampleReply(raw, source);
     const logged = await logCall(admin, {
       userId: readerId,
-      debateId: sampleDebateId,
       costUsd,
       latencyMs,
       validationError: parsed.ok ? undefined : parsed.problem,
@@ -319,19 +317,19 @@ export async function replyAsSample(
   if (!reply) return { ok: false, reason: "failed" };
 
   // The screen a reader's reply gets, logged as one of the reader's
-  // screens, on the sample's argument (migration 0029).
+  // screens, marked as made for a sample (migration 0029).
   let screen;
   try {
     screen = await screenTurn(reply, { timeout: SCREEN_TIMEOUT_MS, maxRetries: 0 });
   } catch (err) {
     if (err instanceof ScreenError) {
-      await logScreenCall({ userId: readerId, costUsd: err.costUsd, latencyMs: err.latencyMs, debateId: sampleDebateId });
+      await logScreenCall({ userId: readerId, costUsd: err.costUsd, latencyMs: err.latencyMs, forSample: true });
     }
     console.error("[sample-reply] the screen failed:", err instanceof Error ? err.message : String(err));
     return { ok: false, reason: "failed" };
   }
   // As with the writing call: spend the ceiling cannot see stops here.
-  if (!(await logScreenCall({ userId: readerId, costUsd: screen.costUsd, latencyMs: screen.latencyMs, debateId: sampleDebateId }))) {
+  if (!(await logScreenCall({ userId: readerId, costUsd: screen.costUsd, latencyMs: screen.latencyMs, forSample: true }))) {
     return { ok: false, reason: "failed" };
   }
   if (screen.result !== "ok") {

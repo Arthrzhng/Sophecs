@@ -60,7 +60,7 @@ export function meExchangeRows(
       theirSchool: row.user_a === userId ? row.school_b : row.school_a,
       myTurn: row.next_turn === userId,
       myReplyPending: turns !== null && latestReplyPending(turnsOf(row.id), userId),
-      theirIsSample: sampleIds.has(((row.user_a === userId ? row.user_b : row.user_a) as string | null) ?? ""),
+      ...(sampleIds.has(((row.user_a === userId ? row.user_b : row.user_a) as string | null) ?? "") ? { theirIsSample: true } : {}),
     }));
 }
 

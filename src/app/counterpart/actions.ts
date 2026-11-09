@@ -19,7 +19,8 @@ export async function requestSampleReply(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, message: "Not signed in.", retry: false };
 
-  const result = await replyAsSample(createAdminClient(), exchangeId, user.id);
+  const admin = createAdminClient();
+  const result = await replyAsSample(admin, exchangeId, user.id);
   if (result.ok) return { ok: true, delivered: true };
   const message = sampleReplyMessage(result.reason);
   // Not due: nothing to say, and the page reads the exchange again.

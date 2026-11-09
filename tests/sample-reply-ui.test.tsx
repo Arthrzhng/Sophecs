@@ -5,6 +5,7 @@
 // nothing that speaks of a sample as a person.
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { readFileSync } from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/app/counterpart/actions", () => ({ requestSampleReply: async () => ({ ok: true, delivered: false }) }));
@@ -101,6 +102,17 @@ describe("/me", () => {
     expect(out.match(/<details/g)).toHaveLength(1);
     expect(out).toContain("Counterpart's turn");
     expect(out).toContain("Their turn");
+  });
+});
+
+describe("/me's rows", () => {
+  it("mark an exchange whose counterpart is a sample, and only that", async () => {
+    const { meExchangeRows } = await import("../src/lib/counterpart-lapse");
+    const now = new Date("2026-11-20T12:00:00Z");
+    const row = (id: string, other: string) => ({ id, topic_slug: "t", user_a: "reader", user_b: other, school_a: "stoicism" as const, school_b: "ubuntu" as const, next_turn: other, last_turn_at: "2026-11-20T10:00:00Z" });
+    const rows = meExchangeRows([row("a", "sample-1"), row("b", "human")], [], "reader", (s) => s, now, new Set(["sample-1"]));
+    expect(rows.map((r) => [r.id, r.theirIsSample ?? false])).toEqual([["a", true], ["b", false]]);
+    expect(readFileSync("src/app/me/page.tsx", "utf8")).toMatch(/\.eq\("is_sample", true\)\.in\("id", counterpartIds\)/);
   });
 });
 

@@ -117,17 +117,17 @@ export class ScreenError extends Error {
 }
 
 /**
- * `debateId` names the sample's argument when the reply screened is one a
- * sample account's AI wrote (src/lib/sample-reply.ts): it is still a
- * screen, counted toward the reader's daily cap as theirs, and
- * ai_sample_spend_since (migration 0029) counts it toward the samples'
- * ceiling by that argument. Every other caller logs none.
+ * `forSample` is true for the screen of a reply a sample account's AI
+ * wrote (src/lib/sample-reply.ts): it is still a screen, counted toward
+ * the reader's daily cap as theirs, and the mark counts it toward the
+ * samples' own ceiling (ai_sample_spend_this_month, migration 0029).
+ * Required, so no caller logs a screen without deciding.
  */
 export async function logScreenCall(params: {
   userId: string | null;
   costUsd: number;
   latencyMs: number;
-  debateId?: string;
+  forSample: boolean;
 }): Promise<boolean> {
   const admin = createAdminClient();
   const { error } = await admin.from("ai_calls").insert({
@@ -137,8 +137,9 @@ export async function logScreenCall(params: {
     model: SCREEN_MODEL,
     cost_usd: params.costUsd,
     latency_ms: params.latencyMs,
-    debate_id: params.debateId ?? null,
+    debate_id: null,
     prompt_version: SCREEN_PROMPT_VERSION,
+    for_sample: params.forSample,
   });
   if (error) {
     console.error("[ai_calls] failed to log screen call:", error.message);
@@ -159,11 +160,11 @@ export async function screenAndLog(
 ): Promise<ScreenCallResult> {
   try {
     const result = await screenTurn(params, request);
-    await logScreenCall({ userId: params.userId, costUsd: result.costUsd, latencyMs: result.latencyMs });
+    await logScreenCall({ userId: params.userId, costUsd: result.costUsd, latencyMs: result.latencyMs, forSample: false });
     return result;
   } catch (err) {
     if (err instanceof ScreenError) {
-      await logScreenCall({ userId: params.userId, costUsd: err.costUsd, latencyMs: err.latencyMs });
+      await logScreenCall({ userId: params.userId, costUsd: err.costUsd, latencyMs: err.latencyMs, forSample: false });
     }
     throw err;
   }

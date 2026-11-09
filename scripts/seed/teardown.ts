@@ -6,13 +6,11 @@
 // run's own users. Before anything goes, it looks for genuine rows that
 // point at the run's rows:
 // - a nullable reference (a genuine quiz result's challenge_from, a genuine
-//   debate's challenge_id, a reader's AI call's debate_id) is cleared, so
-//   the genuine row stays and stops pointing at something about to
-//   disappear;
+//   debate's challenge_id) is cleared, so the genuine row stays and stops
+//   pointing at something about to disappear;
 // - anything else (a genuine turn in a sample exchange, a genuine member of
-//   a sample class, a genuine report or block, a reader's exchange with a
-//   sample account) would be deleted with the sample row or cannot be
-//   cleared, so teardown stops and lists it instead.
+//   a sample class, a genuine report or block) would be deleted with the
+//   sample row, so teardown stops and lists it instead.
 //
 // It never restores anything: no old par, no old counts. The registry rows
 // stay, marked deleted, with the run marked torn_down, as the audit record.
@@ -155,13 +153,8 @@ export async function findEntanglements(adapter: Adapter, items: Record<Kind, Re
     if (users.has(blocked) && !users.has(blocker)) push("blocks", "blocked_id", `${blocker}:${blocked}`, blocked, false);
     if (users.has(blocker) && !users.has(blocked)) push("blocks", "blocker_id", `${blocker}:${blocked}`, blocker, false);
   }
-  for (const a of await adapter.scan("ai_calls", ["id", "user_id", "debate_id"])) {
+  for (const a of await adapter.scan("ai_calls", ["id", "user_id"])) {
     if (a.user_id && users.has(String(a.user_id))) push("ai_calls", "user_id", a.id, a.user_id, false);
-    // A reader's call made on a sample's argument: the AI that writes a
-    // sample's reply and its screen (src/lib/sample-reply.ts, migration
-    // 0029). The call stays, as spend that happened; it stops naming the
-    // argument.
-    if (a.debate_id && debates.has(String(a.debate_id))) push("ai_calls", "debate_id", a.id, a.debate_id, true);
   }
   return out;
 }

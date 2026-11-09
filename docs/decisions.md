@@ -6222,7 +6222,7 @@ file:
   cannot agree to publish, which an exchange needs from both sides.
   Report stays. A finished exchange with a sample says "Neither side has
   to concede." rather than "Neither of you".
-- **A reader's exchange with a sample stops a teardown** (`scripts/seed/teardown.ts`).
+- **A reader's exchange with a sample stops a teardown** (`scripts/seed/teardown.ts`, unchanged).
   Keeping it would need the sample's argument, so teardown lists it and
   deletes nothing. Deleting such exchanges at a teardown, or keeping the
   sample's argument, would be his call when a teardown comes.
