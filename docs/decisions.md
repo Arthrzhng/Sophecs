@@ -6219,17 +6219,42 @@ window held about 23 active accounts and some schools none. So:
 Measured on 15 seeds over twelve whole weeks each (review pass 1
 measured 720 weeks of the first version, and its figures were close):
 - active accounts in each whole week were 174 to 228, none a multiple of
-  ten; the week the base window ends in, 182 to 216;
-- 12 to 40 newcomers a week, 24.6 to 25.6 on average;
+  ten; the week the base window ends in, 182 to 221 (both reviews' seeds
+  too);
+- 11 to 40 newcomers a week, 24.6 to 25.6 on average;
 - 22 or more judged originals per school every week;
 - exact duplicate arguments at 0.05% at the start, 3.7% after three
   years (review pass 1);
 - no two exemplar cards on a page sharing their first three words.
 
-For Arthur's list:
-- **Thinner exemplar pages at the start.** At the start, four of the six
-  motions' exemplar pages have a school with two or three cards rather
-  than four, all above the floor. They fill within about three weeks.
+For Arthur's list, each in `scripts/seed/generate.ts` (`RUN_WEEKLY` and
+the weekly section) unless named:
+- **First: the table ranks late in each week** (review pass 2, B1;
+  `src/lib/school-table-page.ts` counts the current ISO week). "Every
+  school still gets at least 20 judged originals a week so all six stay
+  ranked": every school gets 22 or more, but spread across the week, so
+  a school reaches 20 late in it. Measured on 3 seeds and 8 whole weeks,
+  at 12:00 UTC: no school ranked on Monday or Tuesday, up to three on
+  Wednesday, one to six on Thursday and Friday, all six on Sunday; all
+  six from 82 to 157 hours into each week, the first week too. No
+  volume ranks a school on Monday morning under a weekly count, since
+  every count starts at nothing. Left as it is, since a site with 200
+  readers active a week would look the same; his options: (a) as
+  it is; (b) about 95 judged originals a school a week, which ranks all
+  six by Tuesday noon but is about 570 a week, well past "roughly 200
+  active"; (c) the top-ups drawn early in the week, which ranks them by
+  about Tuesday but gives every Monday a surge; (d) the table counting
+  the last seven days rather than the ISO week, a change to the table
+  for readers too. Any of (b) and (c) means a new run, and a teardown
+  stops once readers have argued with samples (#117).
+- **Thinner exemplar pages at the start** (review pass 2, B2). At the
+  start, five or six of the six motions' exemplar pages have a school
+  with fewer than four cards, all above the floor; at three weeks none
+  to four, at six to eight weeks none or one.
+- **No anonymous quiz takers after the base window** (review pass 2,
+  O3). About 180 to 210 a week in its last weeks, then none; no page
+  counts them by date. Left as it is unless Arthur wants them drawn
+  weekly too.
 - **Visible newcomers.** About 25 newcomers a week sit beside about 200
   active, so new accounts are a visible part of each week. "Joined /
   left" on the table counts school changes, not sign-ups, as before.
@@ -6242,7 +6267,7 @@ For Arthur's list:
   sign-ups or active count. Left as it is unless Arthur wants otherwise.
 - **School changes** (review pass 1, O7). A returning account that
   writes nothing that week retakes the quiz and always lands in another
-  school, so the table shows 15 to 29 school changes a week, and about
+  school, so the table shows 12 to 29 school changes a week, and about
   35% of accounts have changed school within a year, some up to five
   times; the base window's model has about 8% change once. The
   alternatives: a retake that may land in the same school (no change

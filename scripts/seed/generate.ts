@@ -736,11 +736,11 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         !rejected && r.chance(reviseChance)
           ? { delay: Math.max(10 * MINUTE, Math.min(6 * DAY, r.exponential(DAY))), answered: r.chance(0.85) }
           : null;
-      // In a weekly run a revision stays in the week its original is in, as
-      // a weekly one stays in its own: a whole week's active accounts are
-      // then exactly the ones drawn for it (review of #115, B1). One that
-      // would land later is not made (drawn all the same, so nothing after
-      // it moves).
+      // In a weekly run a base revision lands before the first whole week,
+      // as a weekly one stays in its own: a whole week's active accounts
+      // are then exactly the ones drawn for it (review of #115, B1). One
+      // that would land later is not made (drawn all the same, so nothing
+      // after it moves).
       if (cfg.weekly && revise && t + revise.delay > firstFull - 10 * MINUTE) revise = null;
       slots.push({ u, k, t, topic, school, tier, rejected, argumentPublic, revise });
       k++;

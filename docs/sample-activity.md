@@ -256,7 +256,7 @@ Two layers, both from one secret seed:
   - then, for any school short of 22 judged originals (20 and two to
     spare), more originals from its members already active that week.
   The base window's own streams stop at its end, and a base revision
-  stays in its original's week. A week is drawn whole from its own stream
+  lands before the first whole week. A week is drawn whole from its own stream
   and the weeks before it, and only what falls by the run's end so far is
   written. The week the base window ends in is drawn whole too, from its
   Monday, and keeps only what falls after the base window's end: the base
@@ -265,25 +265,30 @@ Two layers, both from one secret seed:
   count is the base window's accounts and the drawn ones together, so it
   is not drawn exactly, and the base window's own weeks are not drawn to
   a count at all (about 110 to 180 active, from 60 to 130 sign-ups a
-  week). Challenges, exchanges, reading answers and classes stay the base
-  window's.
+  week). Challenges, exchanges, reading answers, classes and anonymous
+  quiz results (about 180 to 210 a week in the base window's last weeks)
+  stay the base window's: none are drawn after it.
 
-  Measured on 2026-11-09 at the scheduled job's volumes, 15 seeds, twelve
-  whole weeks each, the base window ending on a Monday just after
-  midnight and on a Wednesday afternoon: 174 to 228 active accounts a
-  week, none a multiple of ten, and no account active in a whole week
-  that its draw did not count; 12 to 40 newcomers a week, 24.6 to 25.6 on
-  average; every school at least 22 judged originals every week. The
-  week the base window ends in: 182 to 216 active, every school at least
-  24, when the base window ends with a day or more of it left. No hour
+  Measured on 2026-11-09 at the scheduled job's volumes, on 30 seeds in
+  the two reviews and here, twelve whole weeks each, the base window
+  ending on a Monday just after midnight and on a Wednesday afternoon:
+  174 to 228 active accounts a week, none a multiple of ten, and no
+  account active in a whole week that its draw did not count; 11 to 40
+  newcomers a week, 24.6 to 25.6 on average; every school at least 22
+  judged originals every week. The week the base window ends in: 182 to
+  221 active, every school at least 24, when the base window ends with a
+  day or more of it left. No hour
   holds more than about 13 arguments, at a mean of about 2, and there is
   no burst after the base window's end.
 
 In a run without the weekly shape, each debater's arguments come from
 their own random stream and stop at their own lifetime, never at the
-window's end. Either way, moving the end later only appends: every row up
-to the old end comes out the same, ids included
-(`tests/seed/extension.test.ts`, `tests/seed/weekly.test.ts`). What
+window's end. Either way, moving the end later only appends: every row an
+earlier end wrote comes out the same, ids included
+(`tests/seed/extension.test.ts`, `tests/seed/weekly.test.ts`). In a
+weekly run a newcomer's first quiz result, dated a few minutes before
+they join, arrives with their account, so an extension can write a
+result dated just before the previous end. What
 changes in an earlier row is a profile's rating, streak and school, which
 the engine updates.
 
@@ -667,11 +672,16 @@ refusal" or "the run failed while writing"), and the detail goes to
 ## Limits
 
 - A week partly written is partly full: the table's counts for the
-  current week grow through it, so on a Monday a school can be short of
-  its 20 for a day or two.
-- Exemplar pages start thinner than the old run's: at the start, four of
-  the six motions have a school with two or three cards rather than four,
-  all above the floor; they fill within about three weeks.
+  current week grow through it, and at about 25 to 50 judged originals a
+  school a week, spread across it, a school reaches its 20 late in the
+  week. Measured in review on 3 seeds and 8 whole weeks, at 12:00 UTC:
+  no school ranked on Monday or Tuesday, up to three on Wednesday, one
+  to six on Thursday and Friday, all six on Sunday; all six from 82 to
+  157 hours into each week. On Arthur's list.
+- Exemplar pages start thinner than the old run's: at the start, five or
+  six of the six motions have a school with fewer than four cards, all
+  above the floor; at three weeks none to four, at six to eight weeks
+  none or one (13 starts, review pass 2).
 - GitHub turns off a public repository's scheduled workflows after 60 days
   with no commit; a commit, or re-enabling it in the Actions tab, turns
   it back on.
