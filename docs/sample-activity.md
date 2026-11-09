@@ -332,8 +332,27 @@ Two layers, both from one secret seed:
     weight halves every 70, 16, 5 and 3 weeks), and argue or retake the
     quiz as their class has it; a revision stays inside its week, so the
     count holds;
-  - then, for any school short of 22 judged originals (20 and two to
-    spare), more originals from its members already active that week.
+  - about 37 anonymous quiz takers (a normal draw, sd 20%), at the hours
+    the base window's take the quiz (Arthur, 2026-11-09, item 11: "a
+    realistic trickle of anonymous quiz takers each week"): the base
+    window's 1,107 to 738 accounts, at 25 newcomers a week;
+  - then every school at least 22 judged originals (20 and two to spare)
+    in every seven days from the base window's end, not only in every
+    ISO week (item 9: the table counts the last seven days). Checked hour
+    by hour: where seven days would fall short, an original is added in
+    the half day before, from an account of that school already active
+    that week, by the rules the streams keep (five in any 24 hours, seven
+    days between two on one motion), checked against all of the account's
+    originals. The base window's last six days are filled first, so the
+    seven days ending at its end hold enough too.
+  The base window's sign-ups ease down over its last six weeks to the
+  weeks' 25 (a cosine ease to the level that puts 25 in its last week),
+  rather than drop to it at its end (item 13: "a gradual taper, no
+  cliff"); the total stays 738, the earlier weeks carrying more. Fewer
+  sign-ups at its end would mean fewer active accounts there, so each of
+  those weeks, the part of it in the base window, is brought up to the
+  weeks' number of active accounts, in proportion, with returning
+  accounts drawn as the weeks draw them.
   The base window's own streams stop at its end, and a base revision
   lands before the first whole week. A week is drawn whole from its own stream
   and the weeks before it, and only what falls by the run's end so far is
@@ -342,11 +361,21 @@ Two layers, both from one secret seed:
   window holds the rest. So that week runs at one rate throughout, with no
   burst into what is left of it and no lull until the next Monday; its
   count is the base window's accounts and the drawn ones together, so it
-  is not drawn exactly, and the base window's own weeks are not drawn to
-  a count at all (about 110 to 180 active, from 60 to 130 sign-ups a
-  week). Challenges, exchanges, reading answers, classes and anonymous
-  quiz results (about 180 to 210 a week in the base window's last weeks)
-  stay the base window's: none are drawn after it.
+  is not drawn exactly. Challenges, exchanges, reading answers and
+  classes stay the base window's: none are drawn after it.
+
+  Measured on 2026-11-09 for Arthur's items 9, 11 and 13, at the
+  scheduled job's volumes, on four seeds over six weeks, the base window
+  ending at 06:00 on a Monday: every school 22 or more judged originals
+  in every seven days, checked every ten minutes; 33 to 40 anonymous quiz
+  takers a week on average; sign-ups a week over the base window's last six weeks
+  108, 120, 96, 79, 51, 28 on one seed and 114, 107, 104, 71, 42, 23 on
+  another, then the weeks' 16 to 38. Active accounts a week, from six
+  weeks before the base window's end to four after, ended late on a
+  Sunday, early on a Monday, at 06:00 on a Monday and on a Wednesday
+  afternoon: 181 to 222.
+
+  The figures below were measured before those three items:
 
   Measured on 2026-11-09 at the scheduled job's volumes, on 30 seeds in
   the two reviews and here, twelve whole weeks each, the base window
@@ -555,7 +584,29 @@ check it is marked or owned by the run's users (a row that exists and is
 not the run's stops the run rather than be adopted); mark the intents
 created. Then the profiles already written are read back and compared with
 the plan, and the ones whose rating, streak or school has moved are
-updated, scoped to sample rows. A run whose plan has another seed, base
+updated, scoped to sample rows.
+
+What an extension reads (Arthur, 2026-11-09, item 28: "keep hourly and
+cut what each run reads, so the job stays far under the free plan's
+egress"). An extension of a complete run reads from the registry only
+the rows new since the run's end, and counts the rest (every row the
+run held then is created, since it ended complete, and a later plan
+holds every row of an earlier one: `scripts/seed/window.ts`,
+`tests/seed/window.test.ts`); a count that does not add up reads the
+registry whole. It brings up to date only the profiles with a new
+argument, revision or quiz result, the only ones whose rating, streak
+or school can have moved. Its stored-score check and spot checks read
+the new rows and a few of the rest (200 and 10), by their columns, and
+the seeking check is a count. Once a day, the first extension more than
+24 hours after the run was last read whole (`READ_WHOLE_EVERY_MS` in
+`scripts/seed/ci.ts`, `read_whole_at` in `seed_runs.counts`) reads it
+whole, as a canary and a full stage always do, so a change to an older
+row is found within a day rather than within the hour. Measured in
+memory at production size, as JSON: about 65 to 110 KB an extension
+against about 3.6 MB for a whole read now, about 18 MB after a year; so
+about 0.2 GB a month now and about 0.6 GB after a year, against 2 to 2.4
+GB and 12 to 13 GB reading the run whole every hour
+(`tests/seed/reads.test.ts`). A run whose plan has another seed, base
 window or config is refused, and so is a plan that ends before the run
 already does.
 
