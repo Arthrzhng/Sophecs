@@ -4,17 +4,21 @@
 -- Once a sample reply has been written, this cannot finish without
 -- deleting spend that happened, and it refuses rather than delete it. So
 -- after go-live the rollback will be the code's: turn SAMPLE_REPLIES off
--- in Vercel and redeploy, or revert the replies PR (branch
+-- in Vercel and redeploy, or revert the replies PR (#117, branch
 -- `sample-replies`), and confirm that deploy is Ready. The wider check,
 -- the column and the function do nothing on their own. Before any such
 -- row exists (the flag never turned on), this drops the function, the
 -- column and its check, and narrows the kind check back to the four kinds
--- 0012 left. Without the function, the replies code's every ceiling check
--- will fail closed, so samples will not reply.
+-- 0012 left. The replies code writes the column only on a marked call,
+-- so with the flag off every other insert is as before; without the
+-- function, its every ceiling check will fail closed, so samples will
+-- not reply.
 set local lock_timeout = '5s';
 
--- Checked before the lock is taken; a row written in between is still
--- caught, by the narrower check refusing to be added.
+-- Taken before the check, so no call can be written between the check
+-- and the drops.
+lock table public.ai_calls in share row exclusive mode;
+
 do $$
 begin
   if exists (select 1 from public.ai_calls where kind = 'sample_reply' or for_sample) then

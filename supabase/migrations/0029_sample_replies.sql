@@ -8,10 +8,10 @@
 -- $15 a month inside the $50 budget."
 --
 -- The code that will make these calls is not on main when this is written:
--- it comes with the pull request that adds src/lib/sample-reply.ts (branch
--- `sample-replies`), behind its own flag, SAMPLE_REPLIES, off until it is
--- reviewed and tested. Each sample reply will make two calls, both logged
--- under the reader's user_id and marked `for_sample`:
+-- it comes with the pull request that adds src/lib/sample-reply.ts (#117,
+-- branch `sample-replies`), behind its own flag, SAMPLE_REPLIES, off until
+-- it is reviewed and tested. Each sample reply will make two calls, both
+-- logged under the reader's user_id and marked `for_sample`:
 -- - kind 'sample_reply', new here: the call that writes the reply;
 -- - kind 'screen': its screening, the screen a reader's reply gets, logged
 --   as one, so it counts toward the reader's daily cap wherever that cap
@@ -24,21 +24,25 @@
 -- The mark is on the row itself, not reached through a sample's debate,
 -- so no genuine row comes to depend on a sample row (migration 0023's
 -- rule) and a teardown changes no month's total. A check holds the mark
--- to its two kinds, and a writing call to the mark.
+-- to its two kinds, and a writing call to the mark. The code writes the
+-- column only on a marked call, as it writes validation_error only when
+-- there is one, so every other insert reads the same before this has run
+-- and after its rollback.
 --
 -- The kind list is a check constraint, and a check constraint is widened
 -- by dropping it and adding the wider one, in one transaction. Nothing
 -- else is dropped and no row is rewritten: the new column's default is a
--- constant, a catalogue change; adding the checks reads every row once
--- (one row in production on 2026-11-09). The DROP takes ACCESS EXCLUSIVE
--- on ai_calls and holds it until the file commits, a few milliseconds on
--- a local copy. While the lock is waited for, up to lock_timeout, every
+-- constant, a catalogue change; each of the two checks reads every row
+-- once (one row in production on 2026-11-09); the function, the revoke
+-- and the grant are catalogue changes. The DROP takes ACCESS EXCLUSIVE on
+-- ai_calls and holds it until the file commits, a few milliseconds on a
+-- local copy. While the lock is waited for, up to lock_timeout, every
 -- read and write of ai_calls queues behind it; past 5 s it gives up and
 -- changes nothing. No transaction of its own: the Supabase runner wraps
 -- the file, the SQL Editor runs it as one, and by hand it is
 -- `psql --single-transaction`. Run a second time, it stops at
--- `add column` and changes nothing: that error means it is already
--- applied. The rollback is supabase/rollback/0029_sample_replies.down.sql,
+-- `column "for_sample" of relation "ai_calls" already exists` and changes
+-- nothing: that error means it is already applied. The rollback is supabase/rollback/0029_sample_replies.down.sql,
 -- and scripts/test-0029-sample-replies.sh runs both on a throwaway
 -- database.
 set local lock_timeout = '5s';

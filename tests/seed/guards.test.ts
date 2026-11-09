@@ -3,7 +3,8 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { checkLocalUrl, checkProduction, localTarget, parseEnvFile, productionTarget, GuardError } from "../../scripts/seed/env";
-import { checkPlanQuiz, parseFlags, refuseUnsupported } from "../../scripts/seed/cli";
+import { checkPlanQuiz, checkPlanWeekly, parseFlags, refuseUnsupported } from "../../scripts/seed/cli";
+import { RUN_WEEKLY } from "../../scripts/seed/generate";
 
 const REF = "tekifezydjlgxgndkxul";
 const jwt = (payload: object) =>
@@ -117,6 +118,18 @@ describe("flags", () => {
     const before = await cliWith(undefined);
     expect(() => before.checkPlanQuiz({}, undefined, "production")).not.toThrow();
     expect(() => before.checkPlanQuiz({}, 2, "production")).toThrow(/places samples by quiz v2.*every scheduled extension would refuse/);
+  });
+  it("on production refuses a plan whose weekly shape is not the one the scheduled job would give it", () => {
+    // A quiz v2 plan grows by RUN_WEEKLY, as written or read back from JSON.
+    expect(() => checkPlanWeekly(RUN_WEEKLY, 2, "production")).not.toThrow();
+    expect(() => checkPlanWeekly(JSON.parse(JSON.stringify(RUN_WEEKLY)), 2, "production")).not.toThrow();
+    expect(() => checkPlanWeekly(undefined, 2, "production")).toThrow(/weekly shape is not the scheduled job's/);
+    expect(() => checkPlanWeekly({ ...RUN_WEEKLY!, active: 201 }, 2, "production")).toThrow(/weekly shape is not the scheduled job's/);
+    // A plan that names no quiz takes no weekly shape, as ci.ts gives it none.
+    expect(() => checkPlanWeekly(undefined, undefined, "production")).not.toThrow();
+    expect(() => checkPlanWeekly(RUN_WEEKLY, undefined, "production")).toThrow(/weekly shape is not the scheduled job's/);
+    // Locally, any shape.
+    expect(() => checkPlanWeekly({ ...RUN_WEEKLY!, active: 201 }, 2, "local")).not.toThrow();
   });
   it("after the launch merge sets RUN_QUIZ to 2: takes --six-schools on production, and there refuses a plan that names no quiz", async () => {
     const after = await cliWith(2);

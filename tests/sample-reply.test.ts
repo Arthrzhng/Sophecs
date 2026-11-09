@@ -3,6 +3,7 @@
 // as a reader's reply is, counted toward the reader's daily cap and the
 // monthly budget, within its own ceiling, behind its own flag.
 // src/lib/sample-reply.ts and src/lib/sample-reply-prompt.ts.
+import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
@@ -461,7 +462,7 @@ describe("who a sample replies to, and from what (review pass 1, O5 and O8)", ()
     expect(sampleReplyDue({ ...due, lastTurn: undefined })).toBe(false);
     vi.stubEnv("SAMPLE_REPLIES", "0");
     expect(sampleReplyDue(due)).toBe(false);
-    const page = (require("node:fs") as typeof import("node:fs")).readFileSync("src/app/counterpart/[id]/page.tsx", "utf8");
+    const page = readFileSync("src/app/counterpart/[id]/page.tsx", "utf8");
     expect(page).toContain("const replyDue = sampleReplyDue({");
     expect(page).toContain("sampleReplyDue={replyDue}");
   });
@@ -474,7 +475,7 @@ describe("whether a counterpart is a sample, when it cannot be read (review pass
     expect(await counterpartIsSample(admin, null)).toBe(false);
     failReadOf = "profiles";
     await expect(counterpartIsSample(admin, SAMPLE)).rejects.toThrow(/could not be read/);
-    const me = (require("node:fs") as typeof import("node:fs")).readFileSync("src/app/me/page.tsx", "utf8");
+    const me = readFileSync("src/app/me/page.tsx", "utf8");
     expect(me).toMatch(/if \(sampleError\) throw new Error/);
   });
 });

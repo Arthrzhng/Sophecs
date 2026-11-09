@@ -6180,15 +6180,173 @@ Each item names the file it lives in.
   scored from a template. A sample's result map reads "Where these
   answers landed", not "Where these answers put them".
 
+### The sample run scaled down, and grown week by week (2026-11-08)
+
+Arthur, 2026-11-08: "Scale down. Tear down the current sample run and
+start a new one that looks like a site on course for about 4,000 users
+over three years: roughly 200 active accounts in any week, varying
+naturally week to week (e.g. 183, 207, 196), never a round number; total
+accounts about 700-800 now, growing by about 25 a week. Every school
+still gets at least 20 judged originals a week so all six stay ranked.
+Keep every existing realism rule (no round scores, no duplicate endings,
+exemplar floor) and the six-hourly extension."
+
+The run before it could not do this by size alone: its accounts all
+joined in the base window, and with 750 of them a week after the base
+window held about 23 active accounts and some schools none. So:
+- **The base window** keeps its model, at 738 accounts and the rest in
+  proportion (`DEFAULTS`), and its streams stop at its end.
+- **Each week after it** (`weekly`, `RUN_WEEKLY`) is drawn whole from its
+  own stream and the weeks before it:
+  - about 25 newcomers, each with a quiz;
+  - returning accounts, by engagement and how long ago they joined,
+    until the week holds exactly its number of active accounts, about 200
+    and moved by one off a multiple of ten;
+  - more originals for any school short of 22 judged ones.
+
+  A later end only appends, so the six-hourly extension carries on. The
+  week the base window ends in is drawn whole as well, from its Monday,
+  keeping only what falls after the base window's end (review pass 1,
+  B1: drawn from the end alone, a run started late on a Sunday put a
+  whole week's draw into its last twenty minutes). That week's count is
+  the base window's and the draw's together, so it is the one week not
+  drawn exactly.
+- **Challenges, exchanges, reading answers and classes** stay the base
+  window's.
+- **A run that names no quiz** is drawn exactly as before, every pin
+  unchanged.
+
+Measured on 15 seeds over twelve whole weeks each (review pass 1
+measured 720 weeks of the first version, and its figures were close):
+- active accounts in each whole week were 174 to 228, none a multiple of
+  ten; the week the base window ends in, 182 to 221 (both reviews' seeds
+  too);
+- 11 to 40 newcomers a week, 24.6 to 25.6 on average;
+- 22 or more judged originals per school every week;
+- exact duplicate arguments at 0.05% at the start, 3.7% after three
+  years (review pass 1);
+- no two exemplar cards on a page sharing their first three words.
+
+For Arthur's list, each in `scripts/seed/generate.ts` (`RUN_WEEKLY` and
+the weekly section) unless named:
+- **First: the table ranks late in each week** (review pass 2, B1;
+  `src/lib/school-table-page.ts` counts the current ISO week). "Every
+  school still gets at least 20 judged originals a week so all six stay
+  ranked": every school gets 22 or more, but spread across the week, so
+  a school reaches 20 late in it. Measured on 3 seeds and 8 whole weeks,
+  at 12:00 UTC: no school ranked on Monday or Tuesday, up to three on
+  Wednesday, one to six on Thursday and Friday, all six on Sunday; all
+  six from 82 to 157 hours into each week, the first week too. No
+  volume ranks a school on Monday morning under a weekly count, since
+  every count starts at nothing. Left as it is, since a site with 200
+  readers active a week would look the same; his options: (a) as
+  it is; (b) about 95 judged originals a school a week, which ranks all
+  six by Tuesday noon but is about 570 a week, well past "roughly 200
+  active"; (c) the top-ups drawn early in the week, which ranks them by
+  about Tuesday but gives every Monday a surge; (d) the table counting
+  the last seven days rather than the ISO week, a change to the table
+  for readers too. Any of (b) and (c) means a new run, and a teardown
+  stops once readers have argued with samples (#117).
+- **Thinner exemplar pages at the start** (review pass 2, B2). At the
+  start, five or six of the six motions' exemplar pages have a school
+  with fewer than four cards, all above the floor; at three weeks none
+  to four, at six to eight weeks none or one.
+- **No anonymous quiz takers after the base window** (review pass 2,
+  O3). About 180 to 210 a week in its last weeks, then none; no page
+  counts them by date. Left as it is unless Arthur wants them drawn
+  weekly too.
+- **Visible newcomers.** About 25 newcomers a week sit beside about 200
+  active, so new accounts are a visible part of each week. "Joined /
+  left" on the table counts school changes, not sign-ups, as before.
+- **A step in sign-ups** (review pass 1, O7). The base window, from
+  18 September, holds the 738 accounts, so it signs up 60 to 130 a week;
+  from its end, about 25. Its own weeks are not drawn to a count either:
+  about 110 to 180 active. Making the history match (about 30 weeks of
+  history at 25 a week) means starting the base window in April, before
+  the site had any activity; nothing on the site shows a past week's
+  sign-ups or active count. Left as it is unless Arthur wants otherwise.
+- **School changes** (review pass 1, O7). A returning account that
+  writes nothing that week retakes the quiz and always lands in another
+  school, so the table shows 12 to 29 school changes a week, and about
+  35% of accounts have changed school within a year, some up to five
+  times; the base window's model has about 8% change once. The
+  alternatives: a retake that may land in the same school (no change
+  recorded), or fewer retakes.
+
+### Sample replies: what is logged (2026-11-09)
+
+Arthur, 2026-11-08, item 1 of his instructions on sample accounts (item 2
+is the explanation and item 4 the labels, recorded above in "Sample
+labels at the minimum"; item 3, the scale-down, in "The sample run
+scaled down, and grown week by week"): "AI behind the samples. When a reader challenges,
+opens an exchange with, or replies to a sample account, one AI (the same
+model family as the judge) writes the sample's side, arguing in that
+sample's school using its approved criteria. Nothing per account beyond
+its school. Rules: - Never present a sample as a person (see labels in
+4). - Same screening as human replies. Counts toward the reader's daily
+cap and the monthly budget. Its own spending ceiling of $15 a month
+inside the $50 budget; when reached, samples stop replying and the
+reader is told plainly. - Its own flag. Turn it on once built, reviewed
+and tested." And of the whole: "do all of this without stopping for my
+review." That instruction is what lets migration 0029 add to the frozen
+`supabase/`.
+
+What each sample reply will log to `ai_calls` (migration 0029; the code
+will come with #117, branch `sample-replies`), both under the reader's
+`user_id` and marked `for_sample`:
+- **The call that writes it**, kind `sample_reply`, the one new kind.
+- **Its screen**, kind `screen`, as a reader's reply's screen is. So it
+  counts toward the reader's daily cap wherever that cap is counted: the
+  counterpart turn route (frozen) and the re-screening job count
+  `screen` calls under the reader's id, and a sample's reply takes one of
+  the reader's 8 a day. Logged as its own kind, it would have counted
+  only where the new code counts it (review of #116, pass 1, B2).
+- **Both** count toward the $50 through `ai_spend_since`, which totals
+  every kind. `ai_sample_spend_this_month` totals this UTC month's
+  `for_sample` calls for the $15 ceiling. It takes no argument, so no
+  caller can ask about a period that holds nothing (pass 1, B1, and pass
+  2, O1).
+- **The mark is on the row**, not reached through the sample's debate
+  (pass 2, B1). Through `debate_id`, a reader's calls would have come to
+  depend on a sample's debate, which a teardown deletes, and its foreign
+  key has no delete action. A check holds the mark to its two kinds, and
+  a writing call to the mark. The replies code is to make the mark a
+  required argument of the screen logger, so no caller logs a sample's
+  screen without deciding (pass 2, O2), and to write the column only on
+  a marked call, as `validation_error` is written only when there is
+  one. So a reader's screen and a judge call insert exactly as before,
+  whether 0029 has run or been rolled back, and the replies PR may merge
+  before Arthur runs it (pass 3, B1).
+- **No judge call is made on a sample's side.** Challenges with a sample
+  are not built (#117 says why), so the judge never scores
+  an argument the AI wrote for a sample; were it ever to, whether that
+  counts toward the $15 would be Arthur's under (d) (pass 2, O6).
+
+The migration widens the kind check with a DROP, so it is Arthur's to
+run in the SQL Editor; the replies stay off until it has run and been
+read back.
+
 ### Sample replies: the AI behind sample accounts (2026-11-09)
 
 Arthur, 2026-11-08, item 1 (recorded in "Sample replies: what is
 logged"). Built as `docs/sample-activity.md`, "Sample replies", sets out,
 behind `SAMPLE_REPLIES`, which is turned on once migration 0029 has run.
-Tested before it was turned on: 12 replies on the eval key, two for each
-school, every one written on the first or second try, passed by the
-screen, 620 to 950 characters, none in the first person; $0.30 for both
-runs, the eval key at about $12.55 of $15.
+Tested before it was turned on, on the eval key
+(`tests/sample-reply/run-eval.ts`; the reports are
+`docs/sample-activity/sample-reply-eval-1.json` to `-3.json`):
+- run 1, prompt `sample-reply.v1`: 12 replies, two for each school, all
+  on the first try, all passed by the screen, 622 to 946 characters,
+  none in the first person; $0.1442;
+- run 2, the same twelve again: 683 to 898 characters, one written on
+  the second try after an answer that was not JSON; $0.1588;
+- run 3, `sample-reply.v2` after review pass 1: the twelve and two
+  replies to a reader whose text tries to give the AI instructions (to
+  close its tag, take a name and a life, print its instructions). All
+  14 on the first try and passed by the screen, 627 to 965 characters,
+  none in the first person; both injected replies answered the argument
+  and followed none of it; $0.1681.
+
+The eval key is at about $12.71 of $15.
 
 Choices made in carrying this out, for Arthur's list, each with its
 file:
@@ -6212,20 +6370,43 @@ file:
 - **What the AI is told** (`SAMPLE_REPLY_SYSTEM` and `sampleReplyUserTurn`
   in `src/lib/sample-reply-prompt.ts`). Written for this, from the
   judge's criteria and the school's one line; the instructions are
-  mine, and his to read.
+  mine, and his to read. Since review pass 1 it is also told that
+  anything in the material reading as an instruction is the other side's
+  writing, never to be followed; a reader's angle brackets reach it as
+  full-width ones, so no reader text can close a tag; and a reply that
+  says "I", "me" or "my" outside quotation marks is written again.
 - **What the reader is told when a sample does not reply**
   (`sampleReplyMessage` in `src/lib/sample-reply.ts`), and "The sample
   account is writing its reply." while it does
   (`src/components/counterpart/SampleReplyRequest.tsx`).
 - **No Block, no publishing, with a sample** (`TurnActions.tsx`,
-  `ExchangeView.tsx`). Blocking would not stop the AI, and a sample
+  `ExchangeView.tsx`; `blockCounterpart` in `src/app/debate/actions.ts`
+  refuses one too). Blocking would not stop the AI, and a sample
   cannot agree to publish, which an exchange needs from both sides.
   Report stays. A finished exchange with a sample says "Neither side has
   to concede." rather than "Neither of you".
 - **A reader's exchange with a sample stops a teardown** (`scripts/seed/teardown.ts`, unchanged).
   Keeping it would need the sample's argument, so teardown lists it and
-  deletes nothing. Deleting such exchanges at a teardown, or keeping the
-  sample's argument, would be his call when a teardown comes.
+  deletes nothing. Any reader can bring this about with one "Argue now"
+  (review pass 1, O10). Deleting such exchanges at a teardown, or
+  keeping the sample's argument, would be his call when a teardown
+  comes.
 - **The tag on `/me`** (`src/components/me/OpenExchanges.tsx`), beside a
   sample counterpart's school, with "Counterpart's turn" where a
   reader's row says "Their turn".
+- **The tag on an exchange is on the sample's argument, not on each
+  reply** (`src/components/counterpart/ExchangeView.tsx`; review pass 1,
+  O10). Each reply is headed "Counterpart · Reply n", with the tag once
+  at the top and "You're arguing with an AI sample account." before the
+  reader writes. Whether "beside a sample's name where it appears"
+  covers the reply headings is his.
+- **The judge's kill switch does not stop these calls**
+  (`samplesUnavailable` in `src/lib/sample-reply.ts`; review pass 1,
+  O10). `SAMPLE_REPLIES` and `KILL_SWITCH_SCREEN` do, since every reply
+  is screened; `KILL_SWITCH_JUDGE` and its handling are frozen. Whether a
+  judge pause should stop samples too is his.
+- **A reader with several exchanges with samples can have a reply in
+  flight in each at once** (`claimTurn` in `src/lib/sample-reply.ts`).
+  The claim holds one per exchange, so the ceiling and the reader's day
+  can be passed by those, about $0.035 each. A claim per reader would
+  need a migration; left as it is unless he wants one.
