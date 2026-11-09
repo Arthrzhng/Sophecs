@@ -6441,3 +6441,27 @@ file:
   The claim holds one per exchange, so the ceiling and the reader's day
   can be passed by those, about $0.045 each at most. A claim per reader would
   need a migration; left as it is unless he wants one.
+
+### The sample job runs hourly (2026-11-09)
+
+Arthur, 2026-11-09: "Schedule: change the sample job to run hourly at an
+odd minute (e.g. :17), not six-hourly. Each run extends to now, so
+skipped or late runs don't matter. No Vercel cron. Keep your manual run
+only as a fallback if nothing has run for 6 hours."
+
+Why: GitHub runs scheduled workflows late, or drops them, when it is
+busy. The six-hourly slots at minute 41 ran up to four hours late or not
+at all: on 2026-11-08 the 18:41 slot started at 22:28; on 2026-11-09 the
+00:41 and 06:41 slots never started, and the 06:41 extension was run by
+hand at 07:01.
+
+`.github/workflows/sample-activity.yml` now runs at `17 * * * *`. Nothing
+else changes: an extend always runs the activity up to now
+(`scripts/seed/ci.ts`), with no minimum gap; the workflow's concurrency
+group runs one at a time, and GitHub's one waiting run per group loses
+nothing, since the next run extends to now; a lock left by a dead job is
+taken after 15 minutes (`STALE_LOCK_MINUTES`). Each run re-plans the run
+from its start: about two minutes now, under five after three years
+(`docs/sample-activity.md`, Limits), inside the 90-minute timeout. The
+repository is public, so the extra Actions minutes cost nothing.
+

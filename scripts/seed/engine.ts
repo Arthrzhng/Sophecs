@@ -476,7 +476,7 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     // Only while still holding the lock: a process that lost it must not
     // write over the state of the one that took it.
     // A refusal (StopError) halts the run, so the schedule does not try
-    // again every six hours; anything else, a database error past the
+    // again every hour; anything else, a database error past the
     // retries, leaves it failed and resumable. A halt already in place is
     // kept in front.
     if (!(err instanceof LockLostError)) {

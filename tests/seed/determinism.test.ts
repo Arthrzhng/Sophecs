@@ -48,7 +48,7 @@ describe("determinism", () => {
   });
 
   // The weekly run (Arthur, 2026-11-08) regenerates its rows from this code
-  // every six hours; a change that rewrote an earlier week would halt it at
+  // every hour; a change that rewrote an earlier week would halt it at
   // its next spot check. Its datasets as this code made them, at the base
   // window's end, into its first week, and two weeks on.
   it("gives a weekly run exactly the rows it gave when it was written", () => {

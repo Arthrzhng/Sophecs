@@ -58,6 +58,11 @@ describe("the seed never runs by itself", () => {
     const wf = readFileSync(join(dir, "sample-activity.yml"), "utf8");
     const on = wf.slice(wf.indexOf("\non:"), wf.indexOf("\npermissions:"));
     expect(on).toMatch(/schedule:/);
+    // Arthur, 2026-11-09: "run hourly at an odd minute (e.g. :17), not
+    // six-hourly. Each run extends to now, so skipped or late runs don't
+    // matter." One cron line, every hour, off the top and the half hour.
+    const crons = [...on.matchAll(/cron: "([^"]+)"/g)].map((m) => m[1]);
+    expect(crons).toEqual(["17 * * * *"]);
     expect(on).toMatch(/workflow_dispatch:/);
     expect(on).not.toMatch(/\b(push|pull_request|pull_request_target|workflow_run|issue_comment|release)\b/);
     expect(wf).toMatch(/github\.ref == 'refs\/heads\/main'/);

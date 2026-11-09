@@ -186,7 +186,7 @@ describe("the scheduled workflow's path", () => {
     expect(samples(db, "debates")).toBe(before);
   });
 
-  it("halts the run on a refusal while writing, rather than trying again every six hours", async () => {
+  it("halts the run on a refusal while writing, rather than trying again every hour", async () => {
     const db = freshDb();
     await step(db, "canary", 0);
     await step(db, "full", 1);
