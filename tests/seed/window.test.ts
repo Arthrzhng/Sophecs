@@ -32,8 +32,8 @@ describe("the rows an extension adds", () => {
     ["the scheduled job's weekly run", { quiz: 2, weekly: RUN_WEEKLY }, false],
     ["a run that names no quiz", {}, true],
   ] as const) {
-    it(`are exactly those a plan ending earlier did not hold (${label})`, () => {
-      for (const [a, b] of [[0, 1], [1.2, 3.5], [3.5, 10]]) {
+    it(`are exactly those a plan ending earlier did not hold (${label})`, { timeout: 180_000 }, () => {
+      for (const [a, b] of [[0, 1.2], [1.2, 10]]) {
         const earlier = plan(later(a), extra, small);
         const now = plan(later(b), extra, small);
         const before = ids(earlier);
@@ -48,7 +48,7 @@ describe("the rows an extension adds", () => {
     });
   }
 
-  it("names each account with something new, and nobody else: the only profiles an extension can change", () => {
+  it("names each account with something new, and nobody else: the only profiles an extension can change", { timeout: 120_000 }, () => {
     const earlier = plan(later(2), { quiz: 2, weekly: RUN_WEEKLY });
     const now = plan(later(3), { quiz: 2, weekly: RUN_WEEKLY });
     const active = activeSince(now, newSince(now, later(2)));

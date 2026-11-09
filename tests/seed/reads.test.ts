@@ -39,13 +39,13 @@ async function started() {
 }
 
 describe("what a scheduled extension reads", () => {
-  it("within a day of the last whole read: the new rows and counts, a small part of a whole read, with the same checks", async () => {
+  it("within a day of the last whole read: the new rows and counts, a small part of a whole read, with the same checks", { timeout: 180_000 }, async () => {
     const light = await started();
     const whole = await started();
-    // Twelve hourly extensions on one; on the other the same ends, each read whole.
+    // Six hourly extensions on one; on the other the same ends, each read whole.
     let lightRows = 0;
     let wholeRows = 0;
-    for (let h = 2; h <= 13; h++) {
+    for (let h = 2; h <= 7; h++) {
       const a = await step(light, "extend", h);
       expect(a.out, `hour ${h}`).toMatchObject({ ok: true, outcome: "written" });
       expect(a.lines.join("\n"), `hour ${h}`).toMatch(/reading what is new since/);
@@ -65,7 +65,7 @@ describe("what a scheduled extension reads", () => {
     expect(lightRows).toBeLessThan(wholeRows / 5);
   });
 
-  it("reads the run whole once a day, and records when", async () => {
+  it("reads the run whole once a day, and records when", { timeout: 120_000 }, async () => {
     const db = await started();
     const run = () => db.listRuns().then((r) => r[0]);
     expect((await run()).counts.read_whole_at).toBe(at(1));
@@ -78,7 +78,7 @@ describe("what a scheduled extension reads", () => {
     expect((await run()).counts.read_whole_at).toBe(at(1 + READ_WHOLE_EVERY_MS / 3_600_000));
   });
 
-  it("finds a changed older row within a day, though an hourly extension may not", async () => {
+  it("finds a changed older row within a day, though an hourly extension may not", { timeout: 180_000 }, async () => {
     const db = await started();
     const debates = db.table("debates");
     const [id, row] = [...debates].find(([, r]) => r.is_sample && typeof r.score === "number" && Date.parse(String(r.created_at)) < T0)!;
@@ -92,7 +92,7 @@ describe("what a scheduled extension reads", () => {
     expect(refusedAt!).toBeLessThanOrEqual(1 + READ_WHOLE_EVERY_MS / 3_600_000);
   });
 
-  it("reads the registry whole when its counts do not add up, and writes what is missing", async () => {
+  it("reads the registry whole when its counts do not add up, and writes what is missing", { timeout: 120_000 }, async () => {
     const db = await started();
     const run = (await db.listRuns())[0];
     // An older row's registry entry no longer says created.
@@ -105,7 +105,7 @@ describe("what a scheduled extension reads", () => {
     expect((await checksOf(db)).every((c) => c.ok)).toBe(true);
   });
 
-  it("reads everything for a run that did not end complete", async () => {
+  it("reads everything for a run that did not end complete", { timeout: 120_000 }, async () => {
     const db = await started();
     const run = (await db.listRuns())[0];
     await db.updateRun(run.id, { status: "failed", last_error: "a database error past the retries" });

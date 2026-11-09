@@ -119,7 +119,7 @@ describe("a sample run made with the weekly settings", () => {
 
   // Arthur, 2026-11-09, items 9, 11 and 13.
   for (const seed of ["weekly-check", "another"]) {
-    it(`keeps every school ranked in every seven days from the start, not only every ISO week (item 9, seed ${seed})`, () => {
+    it(`keeps every school ranked in every seven days from the start, not only every ISO week (item 9, seed ${seed})`, { timeout: 120_000 }, () => {
       const end = later(7 * 6);
       const ds = run(end, seed);
       const judged = new Map(SCHOOLS.map((x) => [x, [] as number[]]));
@@ -132,7 +132,7 @@ describe("a sample run made with the weekly settings", () => {
         }
     });
 
-    it(`brings anonymous quiz takers every week, and eases its sign-ups into the weeks with no cliff (items 11 and 13, seed ${seed})`, () => {
+    it(`brings anonymous quiz takers every week, and eases its sign-ups into the weeks with no cliff (items 11 and 13, seed ${seed})`, { timeout: 120_000 }, () => {
       const ds = run(later(7 * 6), seed);
       const start = Date.parse(BASE_TO);
       const perWeek = (ts: number[], k: number) => ts.filter((t) => t > start + k * WEEK && t <= start + (k + 1) * WEEK).length;
