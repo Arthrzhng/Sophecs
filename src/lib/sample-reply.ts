@@ -149,7 +149,9 @@ async function readerHasRoom(admin: SupabaseClient, readerId: string, now: Date)
       .gte("created_at", since),
   ]);
   if (screens.error || writes.error || screens.count === null || writes.count === null) return null;
-  return screens.count < SCREEN_DAILY_CAP && writes.count < SAMPLE_REPLY_DAILY_CALLS;
+  // Room for a whole reply: its retry too, so the day's writing calls
+  // never pass SAMPLE_REPLY_DAILY_CALLS.
+  return screens.count < SCREEN_DAILY_CAP && writes.count + 2 <= SAMPLE_REPLY_DAILY_CALLS;
 }
 
 async function logCall(
@@ -232,9 +234,10 @@ export function sampleReplyDue(params: {
  * Writes, screens and delivers a sample account's next reply in an
  * exchange with a reader, when it is the sample's turn.
  *
- * Order of checks: the exchange is the reader's, with a sample, open and
- * the sample's turn, the reader's last reply delivered; then the flag, the
- * kill switch, the budget, the ceiling and the reader's daily room; then
+ * Order of checks: the flag; the exchange is the reader's, with a sample,
+ * open and the sample's turn, the reader's last reply delivered; no other
+ * request writing it; then the kill switch, the budget, the ceiling and
+ * the reader's daily room (room for a whole reply, retry included); then
  * the turn claimed, the writing call, its reply held to a reader's rules,
  * the screen, and delivery. Nothing is written to `turns` until the screen
  * has passed, so a reply that fails anywhere leaves the exchange as it

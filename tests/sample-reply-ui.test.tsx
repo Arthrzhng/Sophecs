@@ -150,3 +150,50 @@ describe("asking for a sample's reply (review pass 1, B2 and O9)", () => {
     expect(afterAnswer({ ok: false, message: "m", retry: false }, 0)).toEqual({ state: { kind: "message", text: "m", retry: false }, askAgainInMs: null, refresh: false });
   });
 });
+
+describe("one ask, when the reader leaves the page while it is out (review pass 3, O3)", () => {
+  const deps = (answer: unknown, alive: boolean) => {
+    const calls = { shown: [] as unknown[], later: [] as number[], refreshed: 0, again: 0 };
+    return {
+      calls,
+      deps: {
+        request: async () => answer as never,
+        alive: () => alive,
+        tries: { current: 0 },
+        show: (s: unknown) => void calls.shown.push(s),
+        later: (_again: () => void, ms: number) => void calls.later.push(ms),
+        refresh: () => void (calls.refreshed += 1),
+        again: () => void (calls.again += 1),
+      },
+    };
+  };
+
+  it("does nothing more once the page is gone: no answer shown, no next ask, no page read", async () => {
+    const { askOnce } = await import("../src/components/counterpart/SampleReplyRequest");
+    for (const answer of [{ ok: true, delivered: false, writing: true }, { ok: true, delivered: true }, { ok: false, message: "m", retry: true }]) {
+      const { calls, deps: d } = deps(answer, false);
+      await askOnce(d as never);
+      expect(calls.shown).toEqual([{ kind: "writing" }]);
+      expect(calls.later).toEqual([]);
+      expect(calls.refreshed).toBe(0);
+    }
+    // A request that throws after the page is gone shows nothing either.
+    const { calls, deps: d } = deps(null, false);
+    await askOnce({ ...(d as object), request: async () => Promise.reject(new Error("network")) } as never);
+    expect(calls.shown).toEqual([{ kind: "writing" }]);
+  });
+
+  it("while the page is there, asks again while another request writes, and reads the page once the reply is in", async () => {
+    const { askOnce } = await import("../src/components/counterpart/SampleReplyRequest");
+    const writing = deps({ ok: true, delivered: false, writing: true }, true);
+    await askOnce(writing.deps as never);
+    expect(writing.calls.later).toEqual([15_000]);
+    expect(writing.deps.tries.current).toBe(1);
+    expect(writing.calls.refreshed).toBe(0);
+    const delivered = deps({ ok: true, delivered: true }, true);
+    await askOnce(delivered.deps as never);
+    expect(delivered.calls.shown.at(-1)).toEqual({ kind: "replied" });
+    expect(delivered.calls.later).toEqual([4_000]);
+    expect(delivered.calls.refreshed).toBe(1);
+  });
+});

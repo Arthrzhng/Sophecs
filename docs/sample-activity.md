@@ -83,10 +83,12 @@ Behind `SAMPLE_REPLIES=1` (Vercel, read when the build starts:
 - **Replies.** The reader's turns go through the turn route as with a
   person. When the sample's turn is due, the exchange page asks for it
   (`SampleReplyRequest`, `requestSampleReply`), and `replyAsSample`
-  (`src/lib/sample-reply.ts`) checks the exchange is the reader's, with
-  a sample (`profiles.is_sample`), open and the sample's turn after a
-  delivered reply of the reader's; then the flag, `KILL_SWITCH_SCREEN`,
-  the $50 budget, the $15 ceiling and the reader's daily room; then
+  (`src/lib/sample-reply.ts`) checks the flag; then that the exchange is
+  the reader's, with a sample (`profiles.is_sample`), open and the
+  sample's turn after a delivered reply of the reader's, and that no
+  other request is writing it; then `KILL_SWITCH_SCREEN`, the $50
+  budget, the $15 ceiling and the reader's daily room, enough for a
+  whole reply with its retry; then
   writes the reply with the judge's model, holds it to a reader's rules
   (a sentence quoted word for word from what it answers, 150 to 1,200
   characters; one more try if not), screens it with the screen a

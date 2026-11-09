@@ -6427,6 +6427,15 @@ file:
   now and add the third when (1) is live." The full text ships word for
   word with the replies; his third is the clause after "looks like", so
   until then it ends "They show what arguing here looks like."
+- **An exchange still lapses while samples are stopped** (`sampleReplyMessage`
+  in `src/lib/sample-reply.ts`; `exchangeLapsed` in
+  `src/lib/counterpart.ts`; review pass 3, O2). When the ceiling or the
+  budget stops samples, the reader is told "Sample accounts reply again
+  from the 1st." The lapse clock still runs from the reader's delivered
+  reply, so an exchange left more than two weeks closes as lapsed before
+  the sample can reply. His options: (a) hold the lapse clock while it is
+  a sample's turn and samples are stopped; (b) say in the message that
+  the exchange closes after two weeks. Left as it is until he rules.
 - **A reader with several exchanges with samples can have a reply in
   flight in each at once** (`claimTurn` in `src/lib/sample-reply.ts`).
   The claim holds one per exchange, so the ceiling and the reader's day

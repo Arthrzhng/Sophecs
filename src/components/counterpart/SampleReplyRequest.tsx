@@ -42,6 +42,35 @@ export function afterAnswer(answer: Answer, tries: number): { state: State; askA
 }
 
 /**
+ * One ask, with its effects passed in so it can be tested without a
+ * browser: shows "writing", asks, and unless the reader has left the page
+ * meanwhile (`alive`), shows the answer, sets the next ask and reads the
+ * page again as `afterAnswer` says.
+ */
+export async function askOnce(deps: {
+  request: () => Promise<Answer>;
+  alive: () => boolean;
+  tries: { current: number };
+  show: (state: State) => void;
+  later: (again: () => void, ms: number) => void;
+  refresh: () => void;
+  again: () => void;
+}): Promise<void> {
+  deps.show({ kind: "writing" });
+  try {
+    const answer = await deps.request();
+    if (!deps.alive()) return;
+    const next = afterAnswer(answer, deps.tries.current);
+    deps.tries.current = answer.ok && answer.writing ? deps.tries.current + 1 : 0;
+    deps.show(next.state);
+    if (next.askAgainInMs !== null) deps.later(deps.again, next.askAgainInMs);
+    if (next.refresh) deps.refresh();
+  } catch {
+    if (deps.alive()) deps.show({ kind: "message", text: FAILED, retry: true });
+  }
+}
+
+/**
  * Where "Waiting for your counterpart" would be, when the counterpart is a
  * sample account and its reply is due: asks for the reply once, says it is
  * being written, and reads the page again when it is in. A limit is said
@@ -59,20 +88,21 @@ export function SampleReplyRequest({ exchangeId }: { exchangeId: string }) {
   // that starts no timer and reads no page again.
   const alive = useRef(true);
 
-  const ask = useCallback(async () => {
-    setState({ kind: "writing" });
-    try {
-      const answer = await requestSampleReply(exchangeId);
-      if (!alive.current) return;
-      const next = afterAnswer(answer, tries.current);
-      tries.current = answer.ok && answer.writing ? tries.current + 1 : 0;
-      setState(next.state);
-      if (next.askAgainInMs !== null) timer.current = setTimeout(() => void ask(), next.askAgainInMs);
-      if (next.refresh) router.refresh();
-    } catch {
-      if (alive.current) setState({ kind: "message", text: FAILED, retry: true });
-    }
-  }, [exchangeId, router]);
+  const ask = useCallback(
+    (): Promise<void> =>
+      askOnce({
+        request: () => requestSampleReply(exchangeId),
+        alive: () => alive.current,
+        tries,
+        show: setState,
+        later: (again, ms) => {
+          timer.current = setTimeout(again, ms);
+        },
+        refresh: () => router.refresh(),
+        again: () => void ask(),
+      }),
+    [exchangeId, router]
+  );
 
   useEffect(() => {
     alive.current = true;

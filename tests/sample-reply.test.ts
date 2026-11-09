@@ -254,6 +254,18 @@ describe("a sample's reply", () => {
     tables.ai_calls = Array.from({ length: SAMPLE_REPLY_DAILY_CALLS }, (_, i) => ({ id: `w${i}`, user_id: READER, kind: "sample_reply", created_at: recent }));
     expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual({ ok: false, reason: "cap" });
     expect(create).toHaveBeenCalledTimes(1);
+    // Room for a whole reply, its retry included (review pass 3, O1): at
+    // 15 a reply could take the day to 17, so none starts; at 14 one does,
+    // and even with its retry the day ends at 16.
+    world();
+    tables.ai_calls = Array.from({ length: SAMPLE_REPLY_DAILY_CALLS - 1 }, (_, i) => ({ id: `w${i}`, user_id: READER, kind: "sample_reply", created_at: recent }));
+    expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual({ ok: false, reason: "cap" });
+    world();
+    tables.ai_calls = Array.from({ length: SAMPLE_REPLY_DAILY_CALLS - 2 }, (_, i) => ({ id: `w${i}`, user_id: READER, kind: "sample_reply", created_at: recent }));
+    create.mockReset();
+    create.mockResolvedValueOnce(answer("A sentence the reader never wrote anywhere.")).mockResolvedValueOnce(answer(QUOTE));
+    expect((await replyAsSample(admin, "x1", READER, NOW)).ok).toBe(true);
+    expect(tables.ai_calls.filter((c) => c.kind === "sample_reply")).toHaveLength(SAMPLE_REPLY_DAILY_CALLS);
   });
 
   it("holds the answer to a reader's rules, tries once more, and logs both calls", async () => {
