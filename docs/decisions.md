@@ -6715,3 +6715,104 @@ For his list, from carrying these out:
   delivered reply in an exchange with a sample, the sample is never due
   (it answers only a delivered reply) and the exchange never lapses.
   Only a removal by hand does this; a sample cannot report a reply.
+
+### The sample-accounts decisions, carried out: the run (2026-11-09)
+
+His message is quoted in the entry above. This pull request has the
+run's items: 9's generator side, 11, 13 and 28.
+
+The live run, `sample-202611090107`, keeps extending. Its base window
+ends at 01:07 on the 9th and its rows are written to the hour, and
+items 11 and 13 as first built changed its plan's base hash, so every
+hourly job after the merge would have refused it (review pass 1, B1).
+Starting again takes a teardown, which is his to order. So the three
+new fields reach a run as score rule 2 did, only where nothing is
+written yet (`WEEKLY_RULES_FROM` and `weeklyRules` in
+`scripts/seed/generate.ts`):
+- a run whose base window ends before `WEEKLY_RULES_FROM` (12:00 on the
+  9th), the live one, keeps its base window and its base hash, and its
+  weeks take items 9 and 11 from `WEEKLY_RULES_WEEK`, Monday 16
+  November; every row before then is drawn exactly as before;
+- a run made since takes all three from its base window's end, and its
+  base hash holds them.
+
+Held on three seeds of the live run's shape: the same base hash, the same
+rows up to the 16th, no earlier row changed, anonymous takers only from
+the 16th, and from 12 hours after it every school 22 or more in every
+seven days (`tests/seed/weekly.test.ts`, "a weekly run made before
+WEEKLY_RULES_FROM"). This only holds if the code is on `main` before the
+16th.
+
+- **9, the run's side.** `RUN_WEEKLY.rolling`: every school has at
+  least 22 judged originals (20, with two to spare) in every seven days,
+  checked hour by hour, not only in every ISO week. Where seven days
+  would fall short, an original is added in the half day before, from an
+  account of that school already active that week, under the streams'
+  rules (five in any 24 hours, seven days between two on one motion),
+  checked against all of that account's originals. In a run made since,
+  the base window's last six days are filled first. Each run's dry run
+  now reports the fewest any school has in any seven days from where the
+  rule holds (review pass 1, O6). Measured: every school 22 or more in
+  every seven days, checked every ten minutes over six weeks on four
+  seeds. Until the 16th the live run's weeks give 22 a school in each ISO
+  week, and the seven days can hold fewer for some hours: on six seeds
+  of its shape, a school was under 20 for 0 to 60 of the 215 hours to
+  the 16th. On production at 15:30 on the 9th, every school had 27 or
+  more.
+- **11.** `RUN_WEEKLY.anonymous: 37`: about 37 anonymous quiz takers a
+  week (a normal draw, sd 20%), at the base window's hours. 37 is the
+  base window's ratio, 1,107 anonymous results to 738 accounts, at 25
+  newcomers a week. Measured: 33 to 40 a week on average. The live run
+  gets them from the 16th.
+- **13.** `RUN_WEEKLY.taperDays: 42`: the base window's sign-ups ease
+  down over its last six weeks to the weeks' 25, a cosine, rather than
+  dropping there. The total stays 738. Fewer sign-ups at its end would
+  mean fewer active accounts there, so each week of the taper is brought
+  up to the weeks' number of active accounts (200) with returning
+  accounts, and the week the base window ends in is brought up to its
+  own number as a whole week (review pass 1, O2: it had dipped to 162 for
+  a mid-week start). Measured, sign-ups by week over the base window's
+  last six weeks, then after it: 108, 120, 96, 79, 51, 28, then 23, 29,
+  26, 33, 19, 30 (one seed); 114, 107, 104, 71, 42, 23, then 19, 19, 23,
+  25, 18, 25 (another). A base window is written once, so this reaches
+  only a run made after this merge: not the live one, until he orders a
+  teardown and a new run.
+- **28.** An extension of a complete run:
+  - reads from the registry only the rows new since the run's end and
+    counts the rest, reading the registry whole when a count does not add
+    up;
+  - brings up to date only the profiles with something new;
+  - reads the new rows and a sample of the rest for its stored-score and
+    spot checks, and counts the seeking;
+  - lists the registry's runs without their reports.
+  Once a day, and at every canary and full stage, the run is read whole,
+  so a change to an older row is found within a day rather than within
+  the hour (review pass 1, B2: the docs said every stored score was
+  compared every hour, and now say what runs).
+  Measured with every read counted (O3): about 105 to 120 KB an
+  extension against about 3.8 MB for a whole read. That is about 0.2 GB
+  a month now and 0.6 GB after a year, of the free plan's 5 GB, against
+  2 to 2.4 GB and 12 to 13 GB before. The live run gets this at the
+  merge. `docs/sample-activity.md`, "How a run writes", has the detail.
+
+For his list, from carrying these out:
+- **A new run, for item 13.** The taper reaches only a run made after
+  this merge. Making one takes a teardown of `sample-202611090107`
+  (which stops if a reader has an exchange with a sample, #117; there
+  were none at 15:11 on the 9th), then a canary and a full stage. It is
+  his to order, and the live run carries on until he does.
+- **The figures are mine**: 22 a school in every seven days (two over
+  the table's 20), 37 anonymous takers a week (the base window's ratio),
+  a six-week cosine taper (`RUN_WEEKLY`). The item 13 test holds each
+  week of the taper to at least 0.4 of the one before on its two seeds;
+  on another seed with the base window ending on a Tuesday, the last
+  base week had 54 then 15 sign-ups (review pass 1, O8). Across 16 runs
+  the average shape is gradual: 107, 112, 99, 76, 44, 26.
+- **Activity brought up over the taper**: without it, active accounts
+  in the base window's last week fell to 79; with it, each week holds
+  the weeks' number. The accounts brought back are ones already signed
+  up, and arguments in the base window's last six weeks go up 35 to 40%.
+- **A change to an older row is found within a day, not the hour**
+  (item 28): the price of reading only what is new. The daily whole read
+  (`READ_WHOLE_EVERY_MS` in `scripts/seed/ci.ts`) is the backstop; any
+  other interval is his.

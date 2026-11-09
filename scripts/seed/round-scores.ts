@@ -87,8 +87,12 @@ export function roundScoreCheck(
  * The spot checks read 50 rows a table, and so would miss a few rows that
  * differ: what a merge made after the rule-2 cutover, with old code
  * writing rule-1 scores past it, would leave behind. This reads them all
- * (three short columns), so a run whose stored scores and plan disagree is
- * refused before it writes and fails validation after. Rows the plan does
+ * (three short columns) at a canary, a full stage and the daily whole
+ * read, so a run whose stored scores and plan disagree is refused before
+ * it writes and fails validation after. An extension between whole reads
+ * passes `ids`: its new rows and a sample of the rest (spotDebates; item
+ * 28), so a few older rows that differ are found within a day, not the
+ * hour (review pass 1 of the run's decisions, B2). Rows the plan does
  * not hold in scope (another run's, a canary's later cohorts) are left to
  * the registry checks. The detail names no row: the schedule's log is
  * public.

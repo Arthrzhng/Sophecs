@@ -1009,3 +1009,21 @@ deploy below was read from Vercel as Ready.
   security on, server role only, `anon` and `authenticated` refused;
   the advisor adds the one INFO expected); the run's (9, 11, 13, 28) in
   the next.
+
+## 2026-11-09: the run's side of Arthur's sample-account decisions
+
+- Merged since the last entry: #119 `64916cc`, its production deploy
+  `dpl_45S1SjtcSKcBEQRJHNG2naKvziF6` Ready (read from Vercel), with
+  migration 0030 applied and read back before it. Read back live on
+  `/schools`: Arthur's line exactly, the table's copy in the last seven
+  days, no "this week" or "closes Sunday" left; no runtime errors since.
+- The pull request carrying this entry has the run's items: 9's
+  generator side, 11, 13 and 28 (`docs/decisions.md`, "The
+  sample-accounts decisions, carried out: the run"). The live run,
+  `sample-202611090107`, keeps extending under it: the same base hash
+  and every row as before up to Monday 16 November, then every school 22
+  in every seven days and the anonymous takers. Item 13, the taper, waits
+  for a new run, which takes a teardown: Arthur's to order.
+- Each hourly extension now reads about 105 to 120 KB, against about 3.8
+  MB a whole read, which it does once a day: about 0.2 GB a month of the
+  free plan's 5 GB.
