@@ -22,6 +22,14 @@ import type { NextConfig } from "next";
 // constant at all.
 const SIX_SCHOOLS = process.env.SIX_SCHOOLS === "1" ? "1" : "0";
 
+// SAMPLE_REPLIES=1: the AI writes a sample account's side of an exchange
+// with a reader, and the samples' explanation says so (Arthur, 2026-11-08,
+// item 1: "Its own flag. Turn it on once built, reviewed and tested").
+// Handed over as SIX_SCHOOLS is, and for the same reason: the tag that
+// opens to the explanation is in a client component. Turning it on or off
+// is a change in Vercel and a redeploy.
+const SAMPLE_REPLIES = process.env.SAMPLE_REPLIES === "1" ? "1" : "0";
+
 // Until the launch a production build with the flag was refused here, so
 // a flag ticked for Production by mistake could not publish the three.
 // Arthur's decision (c) was taken on 2026-11-08 ("Launch: approved"), and
@@ -146,7 +154,7 @@ export function flagOffRewrites(sixSchools: string) {
 }
 
 const nextConfig: NextConfig = {
-  env: { SIX_SCHOOLS },
+  env: { SIX_SCHOOLS, SAMPLE_REPLIES },
   async redirects() {
     return [...canonicalRedirects(process.env), ...sixSchoolsRedirects(SIX_SCHOOLS)];
   },

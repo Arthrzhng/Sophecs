@@ -17,7 +17,18 @@ const REASONS = [
 // Report and Block on every reply, as text links rather than icons — an
 // unlabelled icon is exactly the thing a 15-year-old will not find when
 // they need it.
-export function TurnActions({ turnId, exchangeId }: { turnId: string; exchangeId: string }) {
+// A sample account cannot be blocked: blocking would not stop its AI, and
+// ending the exchange is not replying (it lapses). Report stays, for a
+// reply the screen let through.
+export function TurnActions({
+  turnId,
+  exchangeId,
+  canBlock = true,
+}: {
+  turnId: string;
+  exchangeId: string;
+  canBlock?: boolean;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState<(typeof REASONS)[number]["value"]>("harassment");
@@ -65,14 +76,16 @@ export function TurnActions({ turnId, exchangeId }: { turnId: string; exchangeId
         >
           Report
         </button>
-        <button
-          type="button"
-          onClick={block}
-          disabled={busy}
-          className="inline-flex min-h-11 items-center text-sm text-ink-mid underline underline-offset-4 hover:text-ink disabled:no-underline"
-        >
-          Block
-        </button>
+        {canBlock && (
+          <button
+            type="button"
+            onClick={block}
+            disabled={busy}
+            className="inline-flex min-h-11 items-center text-sm text-ink-mid underline underline-offset-4 hover:text-ink disabled:no-underline"
+          >
+            Block
+          </button>
+        )}
       </div>
 
       {open && (

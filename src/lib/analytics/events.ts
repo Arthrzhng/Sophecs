@@ -153,7 +153,9 @@ export type AnalyticsEvent =
 
   // --- Phase 3 Task 8: Counterpart ---
   | { name: "counterpart_sought"; props: { debate_id: string } }
-  | { name: "counterpart_paired"; props: { exchange_id: string; topic_slug: string } }
+  // with_sample: paired with a sample account, run by AI, at the reader's
+  // asking (src/app/debate/actions.ts, pairWithSample).
+  | { name: "counterpart_paired"; props: { exchange_id: string; topic_slug: string; with_sample?: boolean } }
   | { name: "turn_submitted"; props: { exchange_id: string; seq: number; chars: number } }
   | { name: "turn_held"; props: { exchange_id: string; reason: string } }
   | { name: "exchange_completed"; props: { exchange_id: string } }

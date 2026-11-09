@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { pickChallengeTopic, resolveChallengeSide } from "@/lib/challenge";
 import { MAX_RETRIEVAL_RESPONSE_CHARS } from "@/lib/micro-lessons";
 import { newId } from "@/lib/ids";
+import { sampleReplyMessage, samplesUnavailable } from "@/lib/sample-reply";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -246,6 +247,93 @@ export async function seekCounterpart(
     .update({ seeking_counterpart_at: null })
     .in("id", [mine.id, match.id as string]);
 
+  return { ok: true, exchangeId };
+}
+
+/**
+ * When no one else is free: an exchange with a sample account instead
+ * (Arthur, 2026-11-08, item 1, and the explanation on /how-it-works: "when
+ * no one else is free you can argue against one"). The reader asks for it;
+ * nothing pairs them with a sample on its own, so a reader waiting for a
+ * person is still there for the next person who asks.
+ *
+ * The sample's side is one of the samples' judged originals on the same
+ * motion from another school, and the reader opens, as the newer party
+ * does with a person. The AI writes the sample's replies
+ * (src/lib/sample-reply.ts). Nothing is paired while samples cannot reply,
+ * so no reader is left waiting on one that never answers.
+ */
+export async function pairWithSample(
+  debateId: string
+): Promise<{ ok: true; exchangeId: string } | { ok: false; error: string }> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const admin = createAdminClient();
+  const { data: mine } = await admin
+    .from("debates")
+    .select("id, user_id, topic_slug, school, kind, rejected, verdict, is_sample")
+    .eq("id", debateId)
+    .maybeSingle();
+  if (!mine || mine.user_id !== user.id || mine.kind !== "original" || mine.rejected || !mine.verdict || mine.is_sample) {
+    return { ok: false, error: "Unknown debate." };
+  }
+
+  const { data: existing } = await admin
+    .from("exchanges")
+    .select("id")
+    .or(`debate_a.eq.${mine.id},debate_b.eq.${mine.id}`)
+    .limit(1)
+    .maybeSingle();
+  if (existing) return { ok: true, exchangeId: existing.id as string };
+
+  const unavailable = await samplesUnavailable(admin);
+  if (unavailable) return { ok: false, error: sampleReplyMessage(unavailable) ?? "Sample accounts are not replying right now." };
+
+  const [{ data: candidates }, { data: openRows }] = await Promise.all([
+    admin
+      .from("debates")
+      .select("id, user_id, school")
+      .eq("is_sample", true)
+      .eq("topic_slug", mine.topic_slug)
+      .eq("kind", "original")
+      .eq("rejected", false)
+      .not("verdict", "is", null)
+      .not("argument", "is", null)
+      .neq("school", mine.school)
+      .order("created_at", { ascending: false })
+      .limit(50),
+    admin
+      .from("exchanges")
+      .select("user_a, user_b")
+      .eq("status", "open")
+      .or(`user_a.eq.${user.id},user_b.eq.${user.id}`),
+  ]);
+  // Not a sample already in an open exchange with this reader, as with a person.
+  const midExchange = new Set((openRows ?? []).map((r) => (r.user_a === user.id ? r.user_b : r.user_a) as string));
+  const pool = (candidates ?? []).filter((c) => c.user_id && !midExchange.has(c.user_id as string));
+  if (pool.length === 0) return { ok: false, error: "No sample account has argued this motion from another school yet." };
+  const match = pool[Math.floor(Math.random() * pool.length)];
+
+  const exchangeId = newId();
+  const { error: insertError } = await admin.from("exchanges").insert({
+    id: exchangeId,
+    topic_slug: mine.topic_slug,
+    debate_a: mine.id,
+    debate_b: match.id,
+    user_a: user.id,
+    user_b: match.user_id,
+    school_a: mine.school,
+    school_b: match.school,
+    next_turn: user.id,
+  });
+  if (insertError) return { ok: false, error: "Couldn't do that right now." };
+
+  // No longer waiting for a person: paired.
+  await admin.from("debates").update({ seeking_counterpart_at: null }).eq("id", mine.id);
   return { ok: true, exchangeId };
 }
 

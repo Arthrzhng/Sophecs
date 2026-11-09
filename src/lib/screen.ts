@@ -116,11 +116,19 @@ export class ScreenError extends Error {
   }
 }
 
+/**
+ * `debateId` names the sample's argument when the reply screened is one a
+ * sample account's AI wrote (src/lib/sample-reply.ts): it is still a
+ * screen, counted toward the reader's daily cap as theirs, and
+ * ai_sample_spend_since (migration 0029) counts it toward the samples'
+ * ceiling by that argument. Every other caller logs none.
+ */
 export async function logScreenCall(params: {
   userId: string | null;
   costUsd: number;
   latencyMs: number;
-}): Promise<void> {
+  debateId?: string;
+}): Promise<boolean> {
   const admin = createAdminClient();
   const { error } = await admin.from("ai_calls").insert({
     id: newId(),
@@ -129,12 +137,13 @@ export async function logScreenCall(params: {
     model: SCREEN_MODEL,
     cost_usd: params.costUsd,
     latency_ms: params.latencyMs,
-    debate_id: null,
+    debate_id: params.debateId ?? null,
     prompt_version: SCREEN_PROMPT_VERSION,
   });
   if (error) {
     console.error("[ai_calls] failed to log screen call:", error.message);
   }
+  return !error;
 }
 
 // Screens and logs in one step. The log happens whether or not the response

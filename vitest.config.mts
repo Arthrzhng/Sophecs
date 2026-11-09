@@ -27,7 +27,7 @@ export default defineConfig({
     // Every test sees a build without SIX_SCHOOLS unless it stubs the flag
     // itself (tests/six-schools.test.ts), so a SIX_SCHOOLS=1 left in the
     // shell cannot fail unrelated tests under misleading names.
-    env: { SIX_SCHOOLS: "0" },
+    env: { SIX_SCHOOLS: "0", SAMPLE_REPLIES: "0" },
     // The seed tests generate whole runs, several taking about 4 s alone.
     // Vitest's 5 s default failed them under load (a reviewer's build
     // running beside the suite), so each test has 30 s; one that hangs

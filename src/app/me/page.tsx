@@ -191,7 +191,16 @@ export default async function MePage({
     const openRows = (exchangeRows ?? []) as OpenExchangeRow[];
     const openTurns = await readExchangeTurns(admin, openRows.map((row) => row.id));
     const titles = titleBySlug;
-    exchanges = meExchangeRows(openRows, openTurns, user.id, (slug) => titles.get(slug) ?? slug);
+    // Which counterparts are sample accounts, run by AI: their rows carry
+    // the tag. profiles.is_sample, set only by the seed tooling.
+    const counterpartIds = openRows
+      .map((row) => (row.user_a === user.id ? row.user_b : row.user_a))
+      .filter((id): id is string => Boolean(id));
+    const { data: sampleRows } = counterpartIds.length
+      ? await admin.from("profiles").select("id").eq("is_sample", true).in("id", counterpartIds)
+      : { data: [] as { id: string }[] };
+    const sampleIds = new Set((sampleRows ?? []).map((r) => r.id as string));
+    exchanges = meExchangeRows(openRows, openTurns, user.id, (slug) => titles.get(slug) ?? slug, new Date(), sampleIds);
 
     caseStates = await getCaseStates(admin, user.id, activeRows);
     // Six of six closed is the only completion signal in the product: one

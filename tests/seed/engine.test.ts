@@ -281,6 +281,30 @@ describe("teardown", () => {
     expect([...db.registry.values()].every((i) => i.state === "deleted")).toBe(true);
   });
 
+  // A sample account's reply (src/lib/sample-reply.ts) logs a reader's
+  // AI calls naming the sample's argument; they stay, as spend that
+  // happened, and stop naming it. The reader's exchange with the sample
+  // cannot be kept without the argument, so it stops the teardown.
+  it("keeps a reader's AI calls on a sample's argument, and stops for a reader's exchange with a sample", async () => {
+    const db = await seeded();
+    const sampleDebate = dataset.debates[0].rowId;
+    const sampleUser = dataset.debates[0].row.user_id;
+    db.table("ai_calls").set("CALL000001", { id: "CALL000001", user_id: "g1", kind: "sample_reply", debate_id: sampleDebate });
+    db.table("ai_calls").set("CALL000002", { id: "CALL000002", user_id: "g1", kind: "screen", debate_id: sampleDebate });
+    const p = await preview(db, plan.runId);
+    expect(p.entanglements.filter((e) => e.table === "ai_calls").map((e) => `${e.column}:${e.nullable}`)).toEqual(["debate_id:true", "debate_id:true"]);
+    expect(p.blocking).toEqual([]);
+    db.table("exchanges").set("GENEXCH001", { id: "GENEXCH001", debate_a: "GEN000DEB9", debate_b: sampleDebate, user_a: "g1", user_b: sampleUser, is_sample: false });
+    const rowsBefore = sampleRows(db);
+    await expect(teardown(db, plan.runId)).rejects.toThrow(/genuine row/);
+    expect(sampleRows(db)).toBe(rowsBefore);
+    db.table("exchanges").delete("GENEXCH001");
+    await teardown(db, plan.runId);
+    expect(sampleRows(db)).toBe(0);
+    expect(db.table("ai_calls").get("CALL000001")).toMatchObject({ debate_id: null, kind: "sample_reply", user_id: "g1" });
+    expect(db.table("ai_calls").get("CALL000002")).toMatchObject({ debate_id: null, kind: "screen" });
+  });
+
   it("stops, deleting nothing, when a genuine row could only be kept by deleting it", async () => {
     const db = await seeded();
     const cls = dataset.classes[0].rowId;

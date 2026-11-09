@@ -46,7 +46,9 @@ export function meExchangeRows(
   turns: readonly TurnState[] | null,
   userId: string,
   titleOf: (slug: string) => string,
-  now: Date = new Date()
+  now: Date = new Date(),
+  /** Counterparts that are sample accounts (profiles.is_sample). */
+  sampleIds: ReadonlySet<string> = new Set()
 ): ExchangeRow[] {
   const bySeq = [...(turns ?? [])].sort((a, b) => a.seq - b.seq);
   const turnsOf = (id: string) => bySeq.filter((t) => t.exchange_id === id);
@@ -58,6 +60,7 @@ export function meExchangeRows(
       theirSchool: row.user_a === userId ? row.school_b : row.school_a,
       myTurn: row.next_turn === userId,
       myReplyPending: turns !== null && latestReplyPending(turnsOf(row.id), userId),
+      theirIsSample: sampleIds.has(((row.user_a === userId ? row.user_b : row.user_a) as string | null) ?? ""),
     }));
 }
 

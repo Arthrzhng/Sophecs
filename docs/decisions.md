@@ -6156,3 +6156,53 @@ Choices made in carrying this out, for Arthur's list:
   the argument is a sample's, and the judge wording whether it was
   scored from a template. A sample's result map reads "Where these
   answers landed", not "Where these answers put them".
+
+### Sample replies: the AI behind sample accounts (2026-11-09)
+
+Arthur, 2026-11-08, item 1 (recorded in "Sample replies: what is
+logged"). Built as `docs/sample-activity.md`, "Sample replies", sets out,
+behind `SAMPLE_REPLIES`, which is turned on once migration 0029 has run.
+Tested before it was turned on: 12 replies on the eval key, two for each
+school, every one written on the first or second try, passed by the
+screen, 620 to 950 characters, none in the first person; $0.30 for both
+runs, the eval key at about $12.55 of $15.
+
+Choices made in carrying this out, for Arthur's list, each with its
+file:
+- **Challenges are not built** (`supabase/migrations/0023_sample_activity.sql`,
+  `src/app/actions.ts`, `src/app/api/judge/route.ts`, all frozen). A
+  reader cannot challenge a particular account: a challenge is a link
+  anyone who takes it answers, and a genuine challenge naming a sample's
+  result or argument is refused by 0023's guard; a sample's challenge is
+  never accepted by the quiz's action. Building "a reader challenges a
+  sample" needs those three changed: the guard to allow a sample on a
+  challenge's other side, the action to accept a sample's challenge, and
+  the judge route to record the sample's AI-written argument and leave
+  ratings as they are. His to decide whether to unfreeze them. Today a
+  reader argues against a sample through an exchange only.
+- **Pairing is offered, not automatic** (`src/components/debate/FindCounterpartButton.tsx`,
+  `SAMPLE_OFFER` in `src/lib/sample.ts`). Pairing every reader with a
+  sample the moment no one was free would leave no reader waiting for
+  the next person, so no two readers would meet. The wording: "No one
+  else is free on this motion right now. You can wait for someone, or
+  argue now against an AI sample account." and "Argue now".
+- **What the AI is told** (`SAMPLE_REPLY_SYSTEM` and `sampleReplyUserTurn`
+  in `src/lib/sample-reply-prompt.ts`). Written for this, from the
+  judge's criteria and the school's one line; the instructions are
+  mine, and his to read.
+- **What the reader is told when a sample does not reply**
+  (`sampleReplyMessage` in `src/lib/sample-reply.ts`), and "The sample
+  account is writing its reply." while it does
+  (`src/components/counterpart/SampleReplyRequest.tsx`).
+- **No Block, no publishing, with a sample** (`TurnActions.tsx`,
+  `ExchangeView.tsx`). Blocking would not stop the AI, and a sample
+  cannot agree to publish, which an exchange needs from both sides.
+  Report stays. A finished exchange with a sample says "Neither side has
+  to concede." rather than "Neither of you".
+- **A reader's exchange with a sample stops a teardown** (`scripts/seed/teardown.ts`).
+  Keeping it would need the sample's argument, so teardown lists it and
+  deletes nothing. Deleting such exchanges at a teardown, or keeping the
+  sample's argument, would be his call when a teardown comes.
+- **The tag on `/me`** (`src/components/me/OpenExchanges.tsx`), beside a
+  sample counterpart's school, with "Counterpart's turn" where a
+  reader's row says "Their turn".
