@@ -125,16 +125,22 @@ export async function storedScoreCheck(
     }
   }
   // Stored sample debates of which the plan holds none means the plan is
-  // not this run's (another seed, say): that is no pass.
+  // not this run's (another seed, say): that is no pass. So, with `ids`, is
+  // finding none of the planned debates asked for, the spot of the older
+  // ones included, which a run that has written them must hold (review
+  // pass 3, O6).
   const unmatched = compared === 0 && stored.length > 0 && planned.size > 0;
+  const absent = opts.ids !== undefined && compared === 0 && opts.ids.some((id) => planned.has(id)) && stored.length === 0;
   return {
     name: "stored sample scores match the plan",
-    ok: differ === 0 && !unmatched,
+    ok: differ === 0 && !unmatched && !absent,
     detail: differ
       ? `${differ} of ${compared} stored sample debates differ from the plan in score or prompt_version, the earliest dated ${earliest}`
       : unmatched
         ? `none of ${stored.length} stored sample debates is in the plan`
-        : `${compared} stored sample debates compared${opts.ids ? " (the new ones and a spot of the rest)" : ""}`,
+        : absent
+          ? `none of the ${opts.ids!.length} planned debates asked for is stored`
+          : `${compared} stored sample debates compared${opts.ids ? " (the new ones and a spot of the rest)" : ""}`,
   };
 }
 

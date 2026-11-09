@@ -245,6 +245,10 @@ describe("a weekly run made before WEEKLY_RULES_FROM", () => {
 
   it("hashes as it was made, and draws exactly as before up to the Monday after", { timeout: 180_000 }, () => {
     expect(baseHash(config(MADE, "live-like", MADE))).toBe(baseHash(config(MADE, "live-like", MADE, OLD)));
+    // Only at the values the fields shipped with: a later change to one is
+    // a change to the run's config, refused before a write (review pass 3, O3).
+    for (const changed of [{ anonymous: 40 }, { rolling: false }, { taperDays: 28 }])
+      expect(baseHash(config(MADE, "live-like", MADE, { ...RUN_WEEKLY!, ...changed })), JSON.stringify(changed)).not.toBe(baseHash(config(MADE, "live-like", MADE, OLD)));
     const end = new Date(F - 60_000).toISOString();
     expect(manifestHash(run(end, "live-like", MADE))).toBe(manifestHash(run(end, "live-like", MADE, OLD)));
   });

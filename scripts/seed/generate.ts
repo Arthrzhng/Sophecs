@@ -171,6 +171,13 @@ export const RUN_WEEKLY: GenConfig["weekly"] = { newcomers: 25, active: 200, min
  */
 export const WEEKLY_RULES_FROM = "2026-11-09T12:00:00.000Z";
 export const WEEKLY_RULES_WEEK = "2026-11-16T00:00:00.000Z";
+/**
+ * The three fields as they shipped. A run made before WEEKLY_RULES_FROM
+ * hashes without them only at these values (or with none of them), so a
+ * later change to them changes its base hash and is refused before a
+ * write, as any other change to a run's config is (review pass 3, O3).
+ */
+export const WEEKLY_RULES_SHIPPED = { rolling: true, anonymous: 37, taperDays: 42 } as const;
 
 /** How Arthur's 2026-11-09 fields apply to a weekly run with this base window (WEEKLY_RULES_FROM). */
 export function weeklyRules(cfg: Pick<GenConfig, "baseTo" | "weekly">): { madeBefore: boolean; rolling: boolean; anonymous: number; taperDays: number; weeksFrom: number } {
@@ -1056,11 +1063,16 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     // still land on one.
     const resultsBy = new Map<string, number[]>();
     if (taperDays > 0) for (const it of quizResults) if (it.row.user_id) (resultsBy.get(it.row.user_id) ?? resultsBy.set(it.row.user_id, []).get(it.row.user_id)!).push(Date.parse(it.row.created_at));
-    /** Returning accounts in the base window's part [a, b) of the week from `ws`, until `active` holds `target`, and not a multiple of ten. */
+    /**
+     * Returning accounts in the base window's part [a, b) of the week from
+     * `ws`, until `active` holds `target`, and not a multiple of ten. A base
+     * revision counts wherever it lands in the week, after `b` included
+     * (review pass 3, O2).
+     */
     const bringUp = (br: Rng, ws: number, a: number, b: number, target: number, active: Set<User>) => {
       for (const sl of slots) {
         if (sl.t >= a && sl.t < b) active.add(sl.u);
-        if (sl.revise && sl.t + sl.revise.delay >= a && sl.t + sl.revise.delay < b) active.add(sl.u);
+        if (sl.revise && sl.t + sl.revise.delay >= a && sl.t + sl.revise.delay < ws + WEEK) active.add(sl.u);
       }
       for (const u of users) if ((resultsBy.get(u.id) ?? []).some((t) => t >= a && t < b)) active.add(u);
       const keyed = users
@@ -1088,17 +1100,6 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         if (made) active.add(u);
       }
     };
-    if (taperDays > 0) {
-      for (let ws = mondayOf(to - taperDays * DAY); ws < mondayOf(to); ws += WEEK) {
-        const a = Math.max(ws, from);
-        const b = ws + WEEK;
-        if (b - a < HOUR) continue;
-        const br = wkRng.fork(`base-week/${iso(ws).slice(0, 10)}`);
-        let target = Math.round(br.normal(W.active, W.active * 0.045) * ((b - a) / WEEK));
-        if (target % 10 === 0) target += br.chance(0.5) ? 1 : -1;
-        bringUp(br, ws, a, b, target, new Set<User>());
-      }
-    }
     // The base window's last six days first (`rolling`), in a run whose
     // base window is still to be written (WEEKLY_RULES_FROM).
     if (rules.rolling && !rules.madeBefore) {
@@ -1114,6 +1115,19 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
           const t = timeIn(tr, u.tz, tail, to - HOUR);
           if (t !== null) addOriginal(u, t, tr, slots);
         }
+      }
+    }
+    // Then the taper's weeks, so each counts what the six days added to it
+    // (review pass 3, O2).
+    if (taperDays > 0) {
+      for (let ws = mondayOf(to - taperDays * DAY); ws < mondayOf(to); ws += WEEK) {
+        const a = Math.max(ws, from);
+        const b = ws + WEEK;
+        if (b - a < HOUR) continue;
+        const br = wkRng.fork(`base-week/${iso(ws).slice(0, 10)}`);
+        let target = Math.round(br.normal(W.active, W.active * 0.045) * ((b - a) / WEEK));
+        if (target % 10 === 0) target += br.chance(0.5) ? 1 : -1;
+        bringUp(br, ws, a, b, target, new Set<User>());
       }
     }
     const weekSlots: Slot[] = [];

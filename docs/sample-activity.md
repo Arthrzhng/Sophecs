@@ -389,6 +389,9 @@ Two layers, both from one secret seed:
   accounts drawn as the weeks draw them, and the week the base window
   ends in is brought up to its week's number as a whole, its base part
   and its kept part together (review pass 1 of the run's decisions, O2).
+  The first week of the taper, early in the base window, can run short
+  of accounts to bring back: in review pass 3's sweep, 16 of 252 taper
+  weeks fell short, all of them the first, the worst 178 against 202.
   **The run that was live when these came.** `sample-202611090107`, made
   at 01:07 on 2026-11-09 with the shape before them, keeps extending every
   hour. A run whose base window ends before `WEEKLY_RULES_FROM` (12:00
@@ -401,9 +404,15 @@ Two layers, both from one secret seed:
   "a weekly run made before WEEKLY_RULES_FROM"). The taper (item 13)
   reaches only a run made since, which takes a teardown first, Arthur's
   to order (see Teardown). Score rule 2 reached a live run the same way
-  (`SCORE_RULE_2_FROM`). This only holds if the code reaches `main` before
-  the 16th: a run that had written rows after it under the older code would
-  not match.
+  (`SCORE_RULE_2_FROM`). This holds on three conditions. The code
+  reaches `main` before the 16th: a run that had written rows after it
+  under the older code would not match. No canary is made before it
+  merges: one made with the older code after 12:00 on the 9th would count
+  as made since, hash differently here, and every extend after the merge
+  would be refused (review pass 3, O4). And it is not reverted after the
+  16th: the older plan has none of the anonymous takers and gives the
+  ids of originals the seven-day rule added to other arguments, so the
+  run would halt; the way on then is a fix forward or a teardown (O5).
   The base window's own streams stop at its end, and a base revision
   lands before the first whole week. A week is drawn whole from its own stream
   and the weeks before it, and only what falls by the run's end so far is
@@ -414,30 +423,38 @@ Two layers, both from one secret seed:
   count is the base window's accounts and the drawn ones together, so it
   is not drawn exactly. Challenges, exchanges, reading answers and
   classes stay the base window's: none are drawn after it. Anonymous
-  quiz results are the base window's (about 180 to 210 a week in its last
-  weeks) and, with `anonymous`, about 37 a week after it; in the live
-  run, made before `WEEKLY_RULES_FROM`, none or one a week from its base
-  window's end to 16 November, then about 37 (review pass 2, O5).
+  quiz results are the base window's and, with `anonymous`, about 37 a
+  week after it. The base window's are placed by its arrival weights, so
+  in a run made since they ease down with its sign-ups, to 25 to 40 in
+  its last week (review pass 3); in the live run, about 180 to 210 a week
+  in its base window's last weeks, then, made before `WEEKLY_RULES_FROM`,
+  none or one a week from its base window's end to 16 November, then
+  about 37 (review pass 2, O5).
 
   Measured on 2026-11-09 for Arthur's items 9, 11 and 13, at the
-  scheduled job's volumes, on four seeds over six weeks, the base window
-  ending at 06:00 on a Monday: every school 22 or more judged originals
-  in every seven days, checked every ten minutes; 33 to 40 anonymous quiz
-  takers a week on average. Sign-ups a week over the base window's last
+  scheduled job's volumes. These are samples, not bounds; what a test
+  holds is said. Every school 22 or more judged originals in every seven
+  days, checked every ten minutes over six weeks, on 42 runs made since
+  the cutover in review pass 3 (`tests/seed/weekly.test.ts` holds two,
+  `weekly-check` and `another`, to 22). Anonymous quiz takers: means of
+  33 to 42 a week over those runs (the test holds each week to 15 to
+  60). Sign-ups a week over the base window's last
   six weeks, on the seeds `weekly-check` and `another`, the base window
   ending at 06:00 on Monday 16 November (as in
   `tests/seed/weekly.test.ts`): 96, 95, 102, 58, 39, 35 and 105, 84, 86,
-  72, 47, 33, then 11 to 40 a week after it. Active accounts a week, from six
-  weeks before the base window's end to four after, ended late on a
-  Sunday, early on a Monday, at 06:00 on a Monday and on a Wednesday
-  afternoon: 181 to 222. After review pass 1 (O2), the week the base
+  72, 47, 33, then 11 to 40 a week after it. Active accounts a week, from
+  six weeks before the base window's end to four after: 173 to 229 in
+  review pass 3's sweep (the test holds 160 to 240, and the whole weeks
+  after to 170 to 230). After review pass 1 (O2), the week the base
   window ends in, started Tuesday to Friday on six seeds (`probe-a`,
   `-b`, `-d` to `-g`): 171 to 209 active, each its week's own number
   (162 to 181 before). On the live run's shape, for a run made before
-  `WEEKLY_RULES_FROM`: on three seeds, the same rows as before up to 16
-  November, and from 12 hours after it every school 22 or more in every
-  seven days (review pass 2 found 22 to 31 from the 16th itself, on six
-  seeds).
+  `WEEKLY_RULES_FROM`, against main's generator: on three seeds of mine
+  (`live-like`, `s2`, `s3`) and six in review pass 3, the same base hash
+  and the same rows as before up to 16 November; from 12 hours after it,
+  every school 22 or more in every seven days (22 to 35 from the 16th
+  itself, pass 3). The test holds one seed, `live-like`, against the
+  older shape.
 
   The figures below were measured before those three items:
 
@@ -840,6 +857,12 @@ Stop and report, without retrying past the engine's own retries, if:
 - the canary's rate puts the full run beyond an hour (a judgement made by
   hand at the canary).
 
+After 16 November, code from before Arthur's decisions of 2026-11-09 is
+not put back on `main` for the live run: its plan lacks the anonymous
+takers and gives other arguments the ids of originals the seven-day rule
+added, so the run would halt. The way on is a fix forward or a teardown
+(review pass 3 of the run's decisions, O5).
+
 A halted run has `seed_runs.status` `failed` and a `last_error`
 starting "halted:", and from then on each scheduled run writes nothing
 and fails, until a `full` stage run by hand passes validation again.
@@ -899,10 +922,14 @@ within the hour.
   every seven days rather than in every ISO week, holds for the live run
   from Monday 16 November (`WEEKLY_RULES_WEEK`) and for any run made
   since. Until then the live run gives every school 22 in each ISO week,
-  and the seven days the table counts can hold fewer for some hours: on
-  six seeds of its shape, a school was under 20 for 0 to 60 of the 167
-  hours from the base window's end to the 16th. On production at 15:30
-  on the 9th, every school had 27 or more.
+  and the seven days the table counts can hold fewer for some hours, when
+  a school shows as not ranked. On six seeds of its shape (`live-like`,
+  `s2` to `s6`) a school was under 20 for 0 to 60 of the 167 hours from
+  the base window's end to the 16th, and on review pass 3's six
+  (`weekly-check` among them) for 18 to 82, the lowest count 9: samples,
+  not bounds. On production at 15:30 on the 9th (judged originals per
+  school in the seven days to then, read from `debates`), every school
+  had 27 or more.
 - Exemplar pages start thinner than the old run's: at the start, five or
   six of the six motions have a school with fewer than four cards, all
   above the floor; at three weeks none to four, at six to eight weeks

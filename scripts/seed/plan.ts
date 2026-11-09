@@ -7,7 +7,7 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { GENERATOR_VERSION, generate, weeklyRules, type Dataset, type GenConfig } from "./generate";
+import { GENERATOR_VERSION, WEEKLY_RULES_SHIPPED, generate, weeklyRules, type Dataset, type GenConfig } from "./generate";
 import { phases } from "./engine";
 import { loadBanks, wordCount, type Banks } from "./banks";
 
@@ -57,10 +57,14 @@ export function manifestHash(ds: Dataset): string {
 // shape it was made with, the three fields of Arthur's 2026-11-09
 // decisions left out: they reach its weeks from WEEKLY_RULES_WEEK by this
 // code, as score rule 2 reached rows from SCORE_RULE_2_FROM, and its base
-// window not at all.
+// window not at all. Only at the values they shipped with: any other
+// value is hashed, so it is refused before a write (review pass 3, O3).
 function hashedWeekly(gen: GenConfig): NonNullable<GenConfig["weekly"]> {
   const w = gen.weekly!;
   if (!weeklyRules(gen).madeBefore) return w;
+  const none = w.rolling === undefined && w.anonymous === undefined && w.taperDays === undefined;
+  const shipped = w.rolling === WEEKLY_RULES_SHIPPED.rolling && w.anonymous === WEEKLY_RULES_SHIPPED.anonymous && w.taperDays === WEEKLY_RULES_SHIPPED.taperDays;
+  if (!none && !shipped) return w;
   return { newcomers: w.newcomers, active: w.active, minPerSchool: w.minPerSchool };
 }
 

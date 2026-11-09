@@ -1024,6 +1024,6 @@ deploy below was read from Vercel as Ready.
   and every row as before up to Monday 16 November, then every school 22
   in every seven days and the anonymous takers. Item 13, the taper, waits
   for a new run, which takes a teardown: Arthur's to order.
-- Each hourly extension now reads about 105 to 120 KB, against about 3.8
-  MB a whole read, which it does once a day: about 0.2 GB a month of the
-  free plan's 5 GB.
+- Each hourly extension now reads about 105 to 120 KB, against about 3.2
+  MB a whole read of the live run, which it does once a day: about 0.2 GB
+  a month of the free plan's 5 GB.
