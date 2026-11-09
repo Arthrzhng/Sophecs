@@ -16,8 +16,8 @@
 # Every hour, at 17 minutes past (Arthur, 2026-11-09: "run hourly at an
 # odd minute (e.g. :17), not six-hourly. Each run extends to now, so
 # skipped or late runs don't matter."). GitHub runs scheduled jobs late,
-# or drops them, when it is busy: on 2026-11-08 and 09 the six-hourly
-# slots ran up to four hours late or not at all. Each run adds the
+# or drops them, when it is busy: from 2026-11-07 to 09 the six-hourly
+# slots ran up to about six hours late, or not at all. Each run adds the
 # activity since the last one, up to now, so a run that is skipped only
 # means the next one adds more. A sample row is never dated in the
 # future, and the school table shows only the current week, so the more
@@ -54,7 +54,8 @@ permissions:
 # GitHub keeps one waiting run per group and cancels an older waiting one
 # when another arrives. For a scheduled extend nothing is lost, since the
 # next run extends to now; but a `full` or `teardown` started by hand while
-# a job is running waits, and the next scheduled run cancels it. So after
+# a job is running waits, and is cancelled if the next scheduled run
+# arrives while it waits. So after
 # starting one by hand, check that it ran, and start it again if it shows
 # as cancelled.
 concurrency:

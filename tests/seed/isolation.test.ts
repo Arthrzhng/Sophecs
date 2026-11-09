@@ -61,10 +61,10 @@ describe("the seed never runs by itself", () => {
     // Arthur, 2026-11-09: "run hourly at an odd minute (e.g. :17), not
     // six-hourly. Each run extends to now, so skipped or late runs don't
     // matter." One cron line, every hour, off the top and the half hour.
-    // Every cron line, however its value is quoted.
-    const crons = on.match(/^\s*-\s*cron:.*$/gm) ?? [];
-    expect(crons).toHaveLength(1);
-    expect(crons[0]).toMatch(/cron:\s*(["']?)17 \* \* \* \*\1\s*$/);
+    // Every cron key, however it or its value is quoted, and in a flow
+    // mapping too.
+    expect(on.match(/\bcron["']?\s*:/g) ?? []).toHaveLength(1);
+    expect(on).toMatch(/^\s*-\s*cron:\s*(["']?)17 \* \* \* \*\1\s*$/m);
     expect(on).toMatch(/workflow_dispatch:/);
     expect(on).not.toMatch(/\b(push|pull_request|pull_request_target|workflow_run|issue_comment|release)\b/);
     expect(wf).toMatch(/github\.ref == 'refs\/heads\/main'/);

@@ -489,8 +489,9 @@ or other workflow can reach them (`tests/seed/isolation.test.ts` checks the
 triggers and the environment).
 
 Every hour, at an odd minute (Arthur, 2026-11-09). GitHub runs a
-scheduled job late, or not at all, when it is busy; on 2026-11-08 and 09
-the six-hourly slots at minute 41 ran up to four hours late or never.
+scheduled job late, or not at all, when it is busy; from 2026-11-07 to
+09 the six-hourly slots at minute 41 ran up to about six hours late, or
+never (`docs/decisions.md`, "The sample job runs hourly").
 Each run extends to now, so a skipped or late run only means the next
 one adds more. A sample row is never dated in the future, and the table
 shows only the current week, so the more often it runs the closer the
@@ -751,14 +752,17 @@ again. An `extend` also refuses a run halted by another process in the
 minutes between its own check and taking the lock. `tests/seed/ci.test.ts` and
 `tests/seed/engine.test.ts` cover each case. A run that keeps failing
 shows as failed runs in the Actions tab, and GitHub emails the account
-that set the schedule.
+that set the schedule: with the job hourly, every hour while it stays
+halted, until `full` is run by hand.
 
 The workflow's log is public, so an error from the writes, which can
 name a row, is logged as a line of its own ("the run stopped on a
 refusal" or "the run failed while writing"), and the detail goes to
 `seed_runs.last_error`, or the line says it could not be recorded. A
 failure that does not halt the run is resumed by the next scheduled run,
-which clears `last_error`: with the job hourly, read it within the hour.
+which clears `last_error` and writes a new `last_report` (a failed dry
+run's detail is only in `last_report`): with the job hourly, read both
+within the hour.
 
 ## Limits
 
