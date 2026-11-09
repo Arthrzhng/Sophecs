@@ -6852,3 +6852,55 @@ For his list, from carrying these out:
   (item 28): the price of reading only what is new. The daily whole read
   (`READ_WHOLE_EVERY_MS` in `scripts/seed/ci.ts`) is the backstop; any
   other interval is his.
+
+### Arthur's rulings on the sample-accounts lists (2026-11-09)
+
+Arthur, 2026-11-09, on the two lists above ("For his list", in the two
+entries before this one):
+
+> Decisions:
+> - Item 13: no teardown. Let the taper apply from now on.
+> - Numbers (22 a school, 37 anonymous takers a week, six-week taper):
+>   accepted.
+> - AI instructions, including the rewrites of Stoicism's "up to us" and
+>   Ubuntu's "we": accepted.
+> - Item 27, lapse clock held for the whole of a sample's turn: accepted.
+> Record them in docs/decisions.md. Nothing else needed from me on
+> samples; carry on with routine checks only.
+
+What each settles:
+- **Item 13.** `sample-202611090107` is not torn down, and extends as it
+  does. The taper applies to runs made from now on: a run whose base
+  window ends at or after `WEEKLY_RULES_FROM` takes it (`weeklyRules` in
+  `scripts/seed/generate.ts`), as #120 built it, so nothing changes in
+  code. The live run's base window, written once, keeps the drop in
+  sign-ups it has at 01:07 on the 9th; its weeks take the seven-day rule
+  and the anonymous takers from 16 November.
+- **The figures** (`RUN_WEEKLY`): 22 judged originals a school in every
+  seven days, about 37 anonymous quiz takers a week, a six-week taper.
+  Accepted as they are.
+- **The AI's instructions** (`SAMPLE_REPLY_SYSTEM`, `sample-reply.v3`,
+  in `src/lib/sample-reply-prompt.ts`): accepted as written, with the
+  person check as it stands. Stoicism's "what is up to us" and Ubuntu's
+  communal "we" are written again outside quotation marks, so the
+  replies say "up to the agent" or "up to them".
+- **Item 27.** The lapse clock is held for the whole of a sample's turn
+  (`exchangeLapsed` in `src/lib/counterpart.ts`), with what that brings,
+  as recorded in the first entry above.
+- **The rest of both lists.** He named no other item and needs nothing
+  else on samples, so these stand as built:
+  - the item 9 copy, and "It has N";
+  - the words a reply may not use (`UNSUITABLE`);
+  - the turn route's screen under `KILL_SWITCH_JUDGE`;
+  - "The sample account is writing its reply." while the reader's claim
+    is held for another exchange;
+  - "tested", for the school's own terms, meaning the prompt, the
+    material and the eval;
+  - the activity brought up over the taper, and the base window's
+    anonymous takers easing down with its sign-ups, in a run made from
+    now on;
+  - a change to an older row found within a day (`READ_WHOLE_EVERY_MS`).
+  The merge before 16 November is met: #120 merged on the 9th.
+
+From here, on samples: routine checks only. They are the six-hour
+fallback check on the hourly job and the read-back of each run it starts.

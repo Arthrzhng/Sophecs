@@ -402,8 +402,10 @@ Two layers, both from one secret seed:
   they shipped, and every week before it is drawn exactly as before
   (`weeklyRules` in `scripts/seed/generate.ts`; `tests/seed/weekly.test.ts`,
   "a weekly run made before WEEKLY_RULES_FROM"). The taper (item 13)
-  reaches only a run made since, which takes a teardown first, Arthur's
-  to order (see Teardown). Score rule 2 reached a live run the same way
+  reaches only a run made since. Arthur ruled on 2026-11-09: no
+  teardown, the taper applies to runs made from now on
+  (`docs/decisions.md`, "Arthur's rulings on the sample-accounts lists").
+  Score rule 2 reached a live run the same way
   (`SCORE_RULE_2_FROM`). This holds on three conditions. The code
   reaches `main` before the 16th: a run that had written rows after it
   under the older code would not match. No canary is made before it
