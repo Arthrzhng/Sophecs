@@ -33,12 +33,15 @@ import type { SchoolId } from "@/lib/types";
 //
 // The ceiling is read before each reply, never cached, and is not a
 // reservation: replies written at the same moment can each pass it, so it
-// can be overshot by the replies in flight, at most about $0.035 each (two
-// writing calls at MAX_TOKENS and a screen). An exchange has at most one
-// reply in flight, since the sample's turn is claimed before the writing
-// call (claimTurn); so a reader can have one in flight for each exchange
-// they have open with a sample, and the reader's daily room can be passed
-// by those too.
+// can be overshot by the replies in flight, at most about $0.045 each: two
+// writing calls at MAX_TOKENS on the longest inputs a turn-4 reply can
+// have (two 400-word arguments, three 1,200-character replies and the
+// criteria, about 4,300 tokens in at four characters a token, more on the
+// retry) and a screen at its most. An exchange has at most one reply in
+// flight, since the sample's turn is claimed before the writing call
+// (claimTurn); so a reader can have one in flight for each exchange they
+// have open with a sample, and the reader's daily room can be passed by
+// those too.
 //
 // Arthur, 2026-11-08, item 1. docs/sample-activity.md, "Sample replies", has the design.
 
@@ -247,6 +250,8 @@ export async function replyAsSample(
   readerId: string,
   now = new Date()
 ): Promise<SampleReplyResult> {
+  // With the flag off nothing here runs, not even a hand-over repair.
+  if (!sampleRepliesOn()) return { ok: false, reason: "off" };
   const { data: exchange } = await admin
     .from("exchanges")
     .select("id, topic_slug, debate_a, debate_b, user_a, user_b, school_a, school_b, status, next_turn, last_turn_at")
@@ -289,6 +294,10 @@ export async function replyAsSample(
   ) {
     return { ok: false, reason: "not_due" };
   }
+
+  // Already claimed by a request still writing: say so before reading
+  // anything that costs a round trip, and make no claim of this one's.
+  if (Date.parse(exchange.last_turn_at) > now.getTime() + CLAIM_SKEW_MS) return { ok: false, reason: "writing" };
 
   const unavailable = await samplesUnavailable(admin);
   if (unavailable) return { ok: false, reason: unavailable };
@@ -335,7 +344,7 @@ export async function replyAsSample(
   });
 
   const handedOverAt = exchange.last_turn_at;
-  const lease = await claimTurn(admin, exchange.id, sampleId, now);
+  const lease = await claimTurn(admin, exchange.id, sampleId, handedOverAt, now);
   if (!lease) return { ok: false, reason: "writing" };
   let delivered = false;
   try {
@@ -434,8 +443,14 @@ async function writeAndDeliver(
     body: reply.body,
     screen_result: "ok",
   });
-  // The unique (exchange_id, seq) index: another request delivered first.
-  if (insertError) return { ok: false, reason: "not_due" };
+  if (insertError) {
+    // The unique (exchange_id, seq) index: another request delivered first.
+    if (insertError.code === "23505") return { ok: false, reason: "not_due" };
+    // Anything else, after the calls were paid: said as a failure, so the
+    // reader is offered Try again rather than left waiting.
+    console.error(`[sample-reply] the reply in ${exchange.id} could not be written:`, insertError.message);
+    return { ok: false, reason: "failed" };
+  }
   const complete = await handOver(admin, exchange, sampleId, readerId, seq, now);
   return { ok: true, seq, complete };
 }
@@ -448,14 +463,25 @@ function hasStatus(err: unknown): boolean {
 /**
  * Claims the sample's turn for one request, in one conditional update:
  * last_turn_at moves CLAIM_MS ahead, only while the turn is still the
- * sample's and not already claimed (a last_turn_at in the future). The
- * claim, or null when another request holds it or the turn has moved on.
+ * sample's and last_turn_at is still the value this request read, which
+ * the caller has already found not to be a claim (not ahead of now). So
+ * two requests that read the same value cannot both claim, and what is
+ * given back is exactly what the claim replaced. The claim, or null when
+ * another request got there first or the turn has moved on.
  *
  * last_turn_at, rather than a new column, so this needs no migration. Read
  * elsewhere it only starts the lapse clock (src/lib/counterpart.ts), which
- * a time ahead holds for the claim's length, and orders /me's list.
+ * a time ahead holds for the claim's length, and orders /me's list. A claim
+ * whose request died is not given back: it runs out, and leaves
+ * last_turn_at up to CLAIM_MS later than the hand-over.
  */
-async function claimTurn(admin: SupabaseClient, exchangeId: string, sampleId: string, now: Date): Promise<string | null> {
+async function claimTurn(
+  admin: SupabaseClient,
+  exchangeId: string,
+  sampleId: string,
+  read: string,
+  now: Date
+): Promise<string | null> {
   const lease = new Date(now.getTime() + CLAIM_MS).toISOString();
   const { data, error } = await admin
     .from("exchanges")
@@ -463,6 +489,8 @@ async function claimTurn(admin: SupabaseClient, exchangeId: string, sampleId: st
     .eq("id", exchangeId)
     .eq("status", "open")
     .eq("next_turn", sampleId)
+    .eq("last_turn_at", read)
+    // And never a live claim, whatever the caller read.
     .lte("last_turn_at", new Date(now.getTime() + CLAIM_SKEW_MS).toISOString())
     .select("id");
   if (error) {

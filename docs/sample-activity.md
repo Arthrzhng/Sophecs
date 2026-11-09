@@ -94,12 +94,15 @@ Behind `SAMPLE_REPLIES=1` (Vercel, read when the build starts:
   A reply that fails anywhere leaves the exchange as it was.
 - **One reply at a time.** Before the writing call the sample's turn is
   claimed in one conditional update: the exchange's `last_turn_at` moves
-  two minutes ahead, only while the turn is the sample's and not already
-  claimed. A second request while one is writing (a reload, a second
-  tab) finds it claimed, makes no call, and the page asks again every
-  15 seconds; the claim is given back, `last_turn_at` as it was, on
-  every way out but delivery, and one whose request died runs out on
-  its own. A time ahead only holds the lapse clock while it lasts.
+  two minutes ahead, only while the turn is the sample's and
+  `last_turn_at` is still the value the request read, and that value is
+  not itself a claim. A second request while one is writing (a reload, a
+  second tab) sees the claim, says so before reading the budget or the
+  month's spend, makes no call, and the page asks again every 15
+  seconds. The claim is given back on every way out but delivery, as
+  exactly what it replaced. One whose request died runs out on its own
+  and is not given back, so `last_turn_at` ends up to two minutes later
+  than the hand-over: the lapse clock starts that much later.
 - **What it is told** (`src/lib/sample-reply-prompt.ts`): the motion, the
   sample's school (its name, its one line and the judge's criteria for
   it, under the judge's prompt version), the sample's own argument, the
@@ -118,9 +121,9 @@ Behind `SAMPLE_REPLIES=1` (Vercel, read when the build starts:
   day per reader. Both count toward the $50;
   `ai_sample_spend_this_month` counts the marked calls toward the $15,
   read fresh before each reply, so replies written at the same moment
-  can pass it together, by about $0.035 each at most (two writing calls
-  at their limit and a screen); one per exchange, since the turn is
-  claimed. A call that did not answer (a timeout, a lost connection) may
+  can pass it together, by about $0.045 each at most (two writing calls
+  at their limit on the longest inputs a reply can have, and a screen);
+  one per exchange, since the turn is claimed. A call that did not answer (a timeout, a lost connection) may
   still have been billed, so it is logged at its most. When the
   ceiling, the budget or the reader's day is reached the reader is told
   so, plainly.

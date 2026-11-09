@@ -6334,11 +6334,14 @@ behind `SAMPLE_REPLIES`, which is turned on once migration 0029 has run.
 Tested before it was turned on, on the eval key
 (`tests/sample-reply/run-eval.ts`; the reports are
 `docs/sample-activity/sample-reply-eval-1.json` to `-3.json`):
-- run 1, prompt `sample-reply.v1`: 12 replies, two for each school, all
-  on the first try, all passed by the screen, 622 to 946 characters,
-  none in the first person; $0.1442;
-- run 2, the same twelve again: 683 to 898 characters, one written on
-  the second try after an answer that was not JSON; $0.1588;
+- run 1: 12 replies, two for each school, all on the first try, all
+  passed by the screen, 622 to 946 characters, none in the first
+  person; but the utilitarian reply asserted what "many recipients
+  report", so the prompt was told not to invent facts, studies, surveys
+  or figures; $0.1442;
+- run 2, `sample-reply.v1` with that rule: 683 to 898 characters, one
+  written on the second try after an answer that was not JSON, no
+  invented figures; $0.1588;
 - run 3, `sample-reply.v2` after review pass 1: the twelve and two
   replies to a reader whose text tries to give the AI instructions (to
   close its tag, take a name and a life, print its instructions). All
@@ -6405,8 +6408,27 @@ file:
   O10). `SAMPLE_REPLIES` and `KILL_SWITCH_SCREEN` do, since every reply
   is screened; `KILL_SWITCH_JUDGE` and its handling are frozen. Whether a
   judge pause should stop samples too is his.
+- **New limits on the reader** (`SAMPLE_REPLY_DAILY_CALLS` and the one
+  retry in `src/lib/sample-reply.ts`; review pass 2, O8). A sample's
+  reply is one of the reader's 8 screened replies a day, as Arthur's
+  item says; on top of that, at most 16 writing calls a day per reader,
+  retries included, and one retry when an answer breaks the reply rules.
+  These are limits of the (d) kind, set by me; his to confirm or change.
+- **"Their" on the composer** (`src/app/counterpart/[id]/page.tsx`, the
+  labels "Select a sentence in their argument" and "their last reply";
+  review pass 2, O9). With a sample, the reader is asked to quote from
+  "their" argument. Whether that presents the sample as a person is his;
+  "its argument" or "the argument" are the alternatives.
+- **The explanation's third sentence** (`src/lib/sample.ts`). Arthur,
+  2026-11-08, item 2: "Samples explanation on /how-it-works: "Sample
+  accounts are run by AI. They show what arguing here looks like, and
+  when no one else is free you can argue against one, because
+  philosophy needs someone to argue with." Ship the first two sentences
+  now and add the third when (1) is live." The full text ships word for
+  word with the replies; his third is the clause after "looks like", so
+  until then it ends "They show what arguing here looks like."
 - **A reader with several exchanges with samples can have a reply in
   flight in each at once** (`claimTurn` in `src/lib/sample-reply.ts`).
   The claim holds one per exchange, so the ceiling and the reader's day
-  can be passed by those, about $0.035 each. A claim per reader would
+  can be passed by those, about $0.045 each at most. A claim per reader would
   need a migration; left as it is unless he wants one.

@@ -55,27 +55,33 @@ export function SampleReplyRequest({ exchangeId }: { exchangeId: string }) {
   const asked = useRef(false);
   const tries = useRef(0);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // False once the reader has left the page: an answer that arrives after
+  // that starts no timer and reads no page again.
+  const alive = useRef(true);
 
   const ask = useCallback(async () => {
     setState({ kind: "writing" });
     try {
       const answer = await requestSampleReply(exchangeId);
+      if (!alive.current) return;
       const next = afterAnswer(answer, tries.current);
       tries.current = answer.ok && answer.writing ? tries.current + 1 : 0;
       setState(next.state);
       if (next.askAgainInMs !== null) timer.current = setTimeout(() => void ask(), next.askAgainInMs);
       if (next.refresh) router.refresh();
     } catch {
-      setState({ kind: "message", text: FAILED, retry: true });
+      if (alive.current) setState({ kind: "message", text: FAILED, retry: true });
     }
   }, [exchangeId, router]);
 
   useEffect(() => {
+    alive.current = true;
     if (!asked.current) {
       asked.current = true;
       void ask();
     }
     return () => {
+      alive.current = false;
       if (timer.current) clearTimeout(timer.current);
     };
   }, [ask]);

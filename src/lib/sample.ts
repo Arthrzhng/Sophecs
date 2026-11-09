@@ -12,10 +12,15 @@
 // result, a challenge, an exchange. Small and quiet (SampleLabel).
 export const SAMPLE_TAG = "AI";
 
-// The explanation on /how-it-works#samples, Arthur's words, which the tag
-// also opens to. Its last clause comes with the replies: "Ship the first
-// two sentences now and add the third when (1) is live", (1) being the AI
-// that writes a sample's side of an exchange. SAMPLE_REPLIES is written
+// The explanation on /how-it-works#samples, which the tag also opens to.
+// Arthur, 2026-11-08, item 2, verbatim: "Samples explanation on
+// /how-it-works: "Sample accounts are run by AI. They show what arguing
+// here looks like, and when no one else is free you can argue against
+// one, because philosophy needs someone to argue with." Ship the first two
+// sentences now and add the third when (1) is live." (1) is the AI that
+// writes a sample's side of an exchange. The full form is his text word
+// for word; his third is the clause after "looks like", so the short form
+// ends there. SAMPLE_REPLIES is written
 // into the build as a constant (next.config.ts), so the server and a
 // client component that shows the tag read the same words.
 const SAMPLE_EXPLANATION_SHORT = "Sample accounts are run by AI. They show what arguing here looks like.";

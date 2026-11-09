@@ -7,6 +7,7 @@ import { pickChallengeTopic, resolveChallengeSide } from "@/lib/challenge";
 import { MAX_RETRIEVAL_RESPONSE_CHARS } from "@/lib/micro-lessons";
 import { newId } from "@/lib/ids";
 import { sampleReplyMessage, samplesUnavailable } from "@/lib/sample-reply";
+import { SHOWN_SCHOOL_IDS } from "@/lib/school-registry";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -304,6 +305,9 @@ export async function pairWithSample(
       .not("verdict", "is", null)
       .not("argument", "is", null)
       .neq("school", mine.school)
+      // Only schools this build shows: a draft school's sample on a
+      // three-school build would put its id on the reader's page.
+      .in("school", [...SHOWN_SCHOOL_IDS])
       .order("created_at", { ascending: false })
       .limit(50),
     admin

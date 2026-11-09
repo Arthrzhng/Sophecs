@@ -64,7 +64,7 @@ function from(table: string) {
       if (failInsertInto === table) return resolve({ error: { message: "insert failed" } });
       const row = inserting;
       if (table === "turns" && (tables.turns ?? []).some((t) => t.exchange_id === row.exchange_id && t.seq === row.seq))
-        return resolve({ error: { message: "duplicate key value violates unique constraint" } });
+        return resolve({ error: { code: "23505", message: "duplicate key value violates unique constraint" } });
       (tables[table] ??= []).push({ created_at: new Date().toISOString(), ...row });
       return resolve({ error: null });
     }
@@ -75,9 +75,10 @@ function from(table: string) {
     }
     if (failReadOf === table) return resolve({ data: null, error: { message: "read failed" } });
     if (head) return resolve({ count: rows.length, error: null });
-    if (single) return resolve({ data: rows[0] ?? null, error: null });
+    // Copies, as supabase-js returns: a read is not changed by a later write.
+    if (single) return resolve({ data: rows[0] ? { ...rows[0] } : null, error: null });
     const sorted = order ? [...rows].sort((x, y) => Number(x[order!]) - Number(y[order!])) : rows;
-    return resolve({ data: sorted, error: null });
+    return resolve({ data: sorted.map((r) => ({ ...r })), error: null });
   };
   return b;
 }
@@ -382,6 +383,56 @@ describe("the claim on the sample's turn (review pass 1, B2)", () => {
     expect(tables.exchanges[0].last_turn_at).toBe(HANDED);
   });
 
+  it("puts back exactly what it replaced when a second request comes while the first is writing (review pass 2, O1)", async () => {
+    // A claims and is screening when B arrives; B sees A's claim and makes
+    // no call; A then fails and gives its claim back.
+    create.mockResolvedValue(answer(QUOTE));
+    let second: Awaited<ReturnType<typeof replyAsSample>> | null = null;
+    screenTurn.mockImplementation(async () => {
+      second = await replyAsSample(admin, "x1", READER, new Date(NOW.getTime() + 5_000));
+      throw Object.assign(new Error("overloaded"), { status: 529 });
+    });
+    expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual({ ok: false, reason: "failed" });
+    expect(second).toEqual({ ok: false, reason: "writing" });
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(tables.exchanges[0].last_turn_at).toBe(HANDED);
+    // B said "writing" before reading the budget or the month's spend.
+    expect(rpcCalls).toHaveLength(1);
+  });
+
+  it("claims only if last_turn_at is still the value it read, so what it gives back is what it replaced", async () => {
+    // Between this request's read and its claim, last_turn_at moves to
+    // another time in the past: the claim must not take it.
+    const MOVED = new Date(NOW.getTime() - 30_000).toISOString();
+    const moving = {
+      from,
+      rpc: async (name: string, args: unknown) => {
+        tables.exchanges[0].last_turn_at = MOVED;
+        rpcCalls.push({ name, args });
+        return rpc;
+      },
+    } as never;
+    create.mockResolvedValue(answer(QUOTE));
+    expect(await replyAsSample(moving, "x1", READER, NOW)).toEqual({ ok: false, reason: "writing" });
+    expect(create).not.toHaveBeenCalled();
+    expect(tables.exchanges[0].last_turn_at).toBe(MOVED);
+  });
+
+  it("claims only from the value it read: two that read the same value cannot both claim", async () => {
+    create.mockResolvedValue(answer(QUOTE));
+    const [a, b] = await Promise.all([replyAsSample(admin, "x1", READER, NOW), replyAsSample(admin, "x1", READER, NOW)]);
+    expect([a.ok, b.ok].filter(Boolean)).toHaveLength(1);
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
+  it("says a reply that could not be written, for any reason but a duplicate, failed, so the reader can try again (review pass 2, O5)", async () => {
+    create.mockResolvedValue(answer(QUOTE));
+    failInsertInto = "turns";
+    expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual({ ok: false, reason: "failed" });
+    expect(tables.turns).toHaveLength(1);
+    expect(tables.exchanges[0]).toMatchObject({ last_turn_at: HANDED, next_turn: SAMPLE });
+  });
+
   it("is replaced by the hand-over on delivery, and the hand-over moves nothing once the turn is no longer the sample's", async () => {
     create.mockResolvedValue(answer(QUOTE));
     // While the reply is screened, the turn is moved on by something else.
@@ -427,6 +478,18 @@ describe("what a sample's calls cost when they do not answer (review pass 1, O2)
 });
 
 describe("who a sample replies to, and from what (review pass 1, O5 and O8)", () => {
+  it("with the flag off, does nothing at all, not even a hand-over repair (review pass 2, O11)", async () => {
+    world({
+      turns: [
+        { exchange_id: "x1", seq: 1, author_id: READER, quoted_claim: "q", body: "x".repeat(200), screen_result: "ok" },
+        { exchange_id: "x1", seq: 2, author_id: SAMPLE, quoted_claim: "q", body: "y".repeat(200), screen_result: "ok" },
+      ],
+    });
+    vi.stubEnv("SAMPLE_REPLIES", "0");
+    expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual({ ok: false, reason: "off" });
+    expect(tables.exchanges[0]).toMatchObject({ next_turn: SAMPLE, last_turn_at: HANDED });
+  });
+
   it("never replies to a sample: the reader must be a reader", async () => {
     world();
     tables.profiles.find((p) => p.id === READER)!.is_sample = true;

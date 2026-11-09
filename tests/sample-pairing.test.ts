@@ -62,10 +62,10 @@ beforeEach(() => {
   tables.debates = [
     { id: "mine", user_id: "reader", school: "stoicism", seeking_counterpart_at: "2026-11-09T01:00:00Z", is_sample: false, ...judged },
     { id: "s-same", user_id: "sample-1", school: "stoicism", is_sample: true, ...judged },
-    { id: "s-other-motion", user_id: "sample-2", school: "ubuntu", is_sample: true, ...judged, topic_slug: "opaque-benefit" },
-    { id: "s-rejected", user_id: "sample-3", school: "ubuntu", is_sample: true, ...judged, rejected: true },
-    { id: "s-unjudged", user_id: "sample-4", school: "ubuntu", is_sample: true, ...judged, verdict: null },
-    { id: "s-ok", user_id: "sample-5", school: "ubuntu", is_sample: true, ...judged },
+    { id: "s-other-motion", user_id: "sample-2", school: "utilitarianism", is_sample: true, ...judged, topic_slug: "opaque-benefit" },
+    { id: "s-rejected", user_id: "sample-3", school: "utilitarianism", is_sample: true, ...judged, rejected: true },
+    { id: "s-unjudged", user_id: "sample-4", school: "utilitarianism", is_sample: true, ...judged, verdict: null },
+    { id: "s-ok", user_id: "sample-5", school: "utilitarianism", is_sample: true, ...judged },
     { id: "h-waiting", user_id: "human", school: "buddhist", is_sample: false, seeking_counterpart_at: "2026-11-09T00:00:00Z", ...judged },
   ];
 });
@@ -75,7 +75,7 @@ describe("pairWithSample", () => {
     const out = await pairWithSample("mine");
     expect(out.ok).toBe(true);
     const ex = tables.exchanges[0];
-    expect(ex).toMatchObject({ debate_a: "mine", debate_b: "s-ok", user_a: "reader", user_b: "sample-5", school_a: "stoicism", school_b: "ubuntu", next_turn: "reader" });
+    expect(ex).toMatchObject({ debate_a: "mine", debate_b: "s-ok", user_a: "reader", user_b: "sample-5", school_a: "stoicism", school_b: "utilitarianism", next_turn: "reader" });
     // The reader takes turn 1, as the turn route requires.
     expect(authorForSeq(1, ex.user_a as string, ex.user_b as string)).toBe(ex.next_turn);
     // No longer waiting for a person; nobody else's seeking is touched.
@@ -108,6 +108,18 @@ describe("pairWithSample", () => {
   it("does not pair the reader with a sample already in an open exchange with them, and says so when none is left", async () => {
     tables.exchanges.push({ id: "x1", debate_a: "other", debate_b: "s-ok", user_a: "reader", user_b: "sample-5", status: "open" });
     expect(await pairWithSample("mine")).toEqual({ ok: false, error: "No sample account has argued this motion from another school yet." });
+  });
+});
+
+describe("pairWithSample on a build that shows three schools (review pass 2, O7)", () => {
+  it("never picks a sample of a school the build does not show", async () => {
+    tables.debates = [
+      { id: "mine", user_id: "reader", school: "stoicism", seeking_counterpart_at: "2026-11-09T01:00:00Z", is_sample: false, ...judged },
+      { id: "s-draft", user_id: "sample-9", school: "ubuntu", is_sample: true, ...judged },
+    ];
+    const out = await pairWithSample("mine");
+    expect(out.ok).toBe(false);
+    expect(tables.exchanges).toEqual([]);
   });
 });
 
