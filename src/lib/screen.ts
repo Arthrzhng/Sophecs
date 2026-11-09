@@ -116,11 +116,19 @@ export class ScreenError extends Error {
   }
 }
 
+/**
+ * `forSample` is true for the screen of a reply a sample account's AI
+ * wrote (src/lib/sample-reply.ts): it is still a screen, counted toward
+ * the reader's daily cap as theirs, and the mark counts it toward the
+ * samples' own ceiling (ai_sample_spend_this_month, migration 0029).
+ * Required, so no caller logs a screen without deciding.
+ */
 export async function logScreenCall(params: {
   userId: string | null;
   costUsd: number;
   latencyMs: number;
-}): Promise<void> {
+  forSample: boolean;
+}): Promise<boolean> {
   const admin = createAdminClient();
   const { error } = await admin.from("ai_calls").insert({
     id: newId(),
@@ -131,10 +139,14 @@ export async function logScreenCall(params: {
     latency_ms: params.latencyMs,
     debate_id: null,
     prompt_version: SCREEN_PROMPT_VERSION,
+    // Only when true, so every other screen is the insert it was before
+    // 0029, and keeps working if this deploy reaches a database without it.
+    ...(params.forSample ? { for_sample: true } : {}),
   });
   if (error) {
     console.error("[ai_calls] failed to log screen call:", error.message);
   }
+  return !error;
 }
 
 // Screens and logs in one step. The log happens whether or not the response
@@ -150,11 +162,11 @@ export async function screenAndLog(
 ): Promise<ScreenCallResult> {
   try {
     const result = await screenTurn(params, request);
-    await logScreenCall({ userId: params.userId, costUsd: result.costUsd, latencyMs: result.latencyMs });
+    await logScreenCall({ userId: params.userId, costUsd: result.costUsd, latencyMs: result.latencyMs, forSample: false });
     return result;
   } catch (err) {
     if (err instanceof ScreenError) {
-      await logScreenCall({ userId: params.userId, costUsd: err.costUsd, latencyMs: err.latencyMs });
+      await logScreenCall({ userId: params.userId, costUsd: err.costUsd, latencyMs: err.latencyMs, forSample: false });
     }
     throw err;
   }

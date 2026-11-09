@@ -19,8 +19,9 @@ B as "Cap $12.00 cumulative.", and to
 $15.00 by his reversal of ruling 12 the same day, "Eval cap raised to
 $15.00 cumulative" (`docs/decisions.md`, "Judge v3: the head comment sent
 again, by Arthur's reversal of ruling 12"). The total is the sum of
-`total_cost_usd` over every golden run file, including any on a branch
-not yet merged, which each entry names.
+`total_cost_usd` over every golden run file, and of `cost` over the
+sample-reply eval reports (`docs/sample-activity/sample-reply-eval-*.json`),
+including any on a branch not yet merged, which each entry names.
 
 ## 2026-11-03: 2F, Arthur's rulings on #47 and #48
 
@@ -947,3 +948,37 @@ deploy below was read from Vercel as Ready.
   before the fresh run, and the revision verdicts' "never meets an
   objection" fixed in it: the next pull request.
 - Waiting on Arthur: the word "launch" (item 15).
+
+## 2026-11-09: the launch, and sample accounts at the minimum
+
+- Merged since the last entry, each with its production deploy, all
+  Ready (read from Vercel on 2026-11-09):
+  - #107 `e65ab55`, `dpl_2shb8ZDY985qPDyia7o7EE86T9Nz`: the previous
+    entry, and the deploy that picked up `CRON_SECRET`;
+  - #109 `ee25e00`, `dpl_wxPbKJTLWqJFXKDano4SZrdw96qj`;
+  - #108 `8ac15cf`, `dpl_7esvvQGexeNbwwfR4DskATaamWno`;
+  - #110 `216cb86`, `dpl_9oaXVanJx4CKniA95L875L5vC3CG`;
+  - #111 `65c512c`, `dpl_Fx4vRLDPampmLcZ9Yproarwz3U5d`;
+  - #112 `157ebda`, `dpl_BNP8iLpRJnnoa7G1L6EW3kM3DWxD`: the launch, six
+    schools on production;
+  - #113 `816c647`, `dpl_GrxZxPPbWaMbRU8YpVoMBxbr49Zr`;
+  - #114 `9b168d7`, `dpl_8Y7DxdUkoayM3cMH5xJTTHUEFFSw`: sample labels at
+    the minimum; production's `/how-it-works` read back with the
+    explanation's first two sentences;
+  - #116 `b3ece18`, `dpl_3B61AqTTVD7WtiWpgw519g48QBQr`: migration 0029's
+    files, not yet run in production (Arthur's, in the SQL Editor);
+  - #115 `e676a43`, `dpl_CMzxcjpB3kK6wD8Uqj8zAWF847E1`: sample runs
+    scaled down and grown week by week.
+- Sample runs, on Arthur's instruction of 2026-11-08 ("Do the teardown
+  and new run (canary, then full) yourself"): `sample-202611082110`, the
+  launch run of 3,278 accounts, torn down (its `seed_runs` row at 23:54
+  UTC), read back with no sample rows left and the genuine rows
+  unchanged. `sample-202611090107` started from #115: canary (Actions
+  42543817644) 36 of 36 checks, 40 accounts; full (Actions 42544063800)
+  38 of 38, 738 accounts, 1,914 arguments, 111 exchanges; the genuine
+  rows unchanged. `/schools` reads "Includes sample accounts, run by AI."
+- Eval key: three billed runs of the sample-reply eval
+  (`tests/sample-reply/run-eval.ts`), $0.1442, $0.1588 and $0.1681, on
+  the branch `sample-replies` (#117). Eval key spend is now
+  **$12.7142 of $15.00**.
+- #117, the AI behind sample accounts, is filled in by the next entry.

@@ -9,8 +9,14 @@ import { latestReplyPending, quoteSourceForSeq, MAX_SEQ } from "@/lib/counterpar
 import { closeIfLapsed, exchangeForLapse } from "@/lib/counterpart-lapse";
 import type { SchoolId } from "@/lib/types";
 import { motionForDebate } from "@/lib/motion-text";
+import { counterpartIsSample, sampleReplyDue } from "@/lib/sample-reply";
 
 export const metadata = { title: "Counterpart · Sophecs" };
+
+// A sample account's reply is written by a server action this page calls
+// (SampleReplyRequest): two writing calls and a screen at their time
+// limits, src/lib/sample-reply.ts.
+export const maxDuration = 60;
 
 interface TurnRow {
   id: string;
@@ -55,6 +61,9 @@ export default async function CounterpartPage({
   const myDebateId = iAmA ? exchange.debate_a : exchange.debate_b;
   const theirDebateId = iAmA ? exchange.debate_b : exchange.debate_a;
   const theirUserId = iAmA ? exchange.user_b : exchange.user_a;
+  // profiles.is_sample, set only by the seed tooling: whether the
+  // counterpart is a sample account, run by AI.
+  const theirIsSample = await counterpartIsSample(admin, theirUserId as string | null);
 
   const [{ data: topic }, { data: debates }, { data: turnRows, error: turnsError }] = await Promise.all([
     admin.from("debate_topics").select("motion, title").eq("slug", exchange.topic_slug).maybeSingle(),
@@ -104,6 +113,15 @@ export default async function CounterpartPage({
 
   const nextSeq = turns.length + 1;
   const myTurn = status === "open" && exchange.next_turn === user.id && nextSeq <= MAX_SEQ && !myPending;
+  // The sample's turn, after a reply of the reader's that was delivered:
+  // the page asks for the sample's reply (src/lib/sample-reply.ts).
+  const replyDue = sampleReplyDue({
+    theirIsSample,
+    status,
+    nextTurn: (exchange.next_turn as string | null) ?? null,
+    theirUserId: (theirUserId as string | null) ?? null,
+    lastTurn: turns[turns.length - 1],
+  });
 
   // The text the next reply must quote from.
   let sourceText = "";
@@ -155,6 +173,8 @@ export default async function CounterpartPage({
         sourceText={sourceText}
         publishMine={Boolean(iAmA ? exchange.publish_a : exchange.publish_b)}
         publishTheirs={Boolean(iAmA ? exchange.publish_b : exchange.publish_a)}
+        counterpartIsSample={theirIsSample}
+        sampleReplyDue={replyDue}
       />
     </main>
   );

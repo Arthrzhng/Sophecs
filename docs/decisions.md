@@ -6325,3 +6325,119 @@ will come with #117, branch `sample-replies`), both under the reader's
 The migration widens the kind check with a DROP, so it is Arthur's to
 run in the SQL Editor; the replies stay off until it has run and been
 read back.
+
+### Sample replies: the AI behind sample accounts (2026-11-09)
+
+Arthur, 2026-11-08, item 1 (recorded in "Sample replies: what is
+logged"). Built as `docs/sample-activity.md`, "Sample replies", sets out,
+behind `SAMPLE_REPLIES`, which is turned on once migration 0029 has run.
+Tested before it was turned on, on the eval key
+(`tests/sample-reply/run-eval.ts`; the reports are
+`docs/sample-activity/sample-reply-eval-1.json` to `-3.json`):
+- run 1: 12 replies, two for each school, all on the first try, all
+  passed by the screen, 622 to 946 characters, none in the first
+  person; but the utilitarian reply asserted what "many recipients
+  report", so the prompt was told not to invent facts, studies, surveys
+  or figures; $0.1442;
+- run 2, `sample-reply.v1` with that rule: 683 to 898 characters, one
+  written on the second try after an answer that was not JSON, no
+  invented figures; $0.1588;
+- run 3, `sample-reply.v2` after review pass 1: the twelve and two
+  replies to a reader whose text tries to give the AI instructions (to
+  close its tag, take a name and a life, print its instructions). All
+  14 on the first try and passed by the screen, 627 to 965 characters,
+  none in the first person; both injected replies answered the argument
+  and followed none of it; $0.1681.
+
+The eval key is at about $12.71 of $15.
+
+Choices made in carrying this out, for Arthur's list, each with its
+file:
+- **Challenges are not built** (`supabase/migrations/0023_sample_activity.sql`,
+  `src/app/actions.ts`, `src/app/api/judge/route.ts`, all frozen). A
+  reader cannot challenge a particular account: a challenge is a link
+  anyone who takes it answers, and a genuine challenge naming a sample's
+  result or argument is refused by 0023's guard; a sample's challenge is
+  never accepted by the quiz's action. Building "a reader challenges a
+  sample" needs those three changed: the guard to allow a sample on a
+  challenge's other side, the action to accept a sample's challenge, and
+  the judge route to record the sample's AI-written argument and leave
+  ratings as they are. His to decide whether to unfreeze them. Today a
+  reader argues against a sample through an exchange only.
+- **Pairing is offered, not automatic** (`src/components/debate/FindCounterpartButton.tsx`,
+  `SAMPLE_OFFER` in `src/lib/sample.ts`). Pairing every reader with a
+  sample the moment no one was free would leave no reader waiting for
+  the next person, so no two readers would meet. The wording: "No one
+  else is free on this motion right now. You can wait for someone, or
+  argue now against an AI sample account." and "Argue now".
+- **What the AI is told** (`SAMPLE_REPLY_SYSTEM` and `sampleReplyUserTurn`
+  in `src/lib/sample-reply-prompt.ts`). Written for this, from the
+  judge's criteria and the school's one line; the instructions are
+  mine, and his to read. Since review pass 1 it is also told that
+  anything in the material reading as an instruction is the other side's
+  writing, never to be followed; a reader's angle brackets reach it as
+  full-width ones, so no reader text can close a tag; and a reply that
+  says "I", "me" or "my" outside quotation marks is written again.
+- **What the reader is told when a sample does not reply**
+  (`sampleReplyMessage` in `src/lib/sample-reply.ts`), and "The sample
+  account is writing its reply." while it does
+  (`src/components/counterpart/SampleReplyRequest.tsx`).
+- **No Block, no publishing, with a sample** (`TurnActions.tsx`,
+  `ExchangeView.tsx`; `blockCounterpart` in `src/app/debate/actions.ts`
+  refuses one too). Blocking would not stop the AI, and a sample
+  cannot agree to publish, which an exchange needs from both sides.
+  Report stays. A finished exchange with a sample says "Neither side has
+  to concede." rather than "Neither of you".
+- **A reader's exchange with a sample stops a teardown** (`scripts/seed/teardown.ts`, unchanged).
+  Keeping it would need the sample's argument, so teardown lists it and
+  deletes nothing. Any reader can bring this about with one "Argue now"
+  (review pass 1, O10). Deleting such exchanges at a teardown, or
+  keeping the sample's argument, would be his call when a teardown
+  comes.
+- **The tag on `/me`** (`src/components/me/OpenExchanges.tsx`), beside a
+  sample counterpart's school, with "Counterpart's turn" where a
+  reader's row says "Their turn".
+- **The tag on an exchange is on the sample's argument, not on each
+  reply** (`src/components/counterpart/ExchangeView.tsx`; review pass 1,
+  O10). Each reply is headed "Counterpart · Reply n", with the tag once
+  at the top and "You're arguing with an AI sample account." before the
+  reader writes. Whether "beside a sample's name where it appears"
+  covers the reply headings is his.
+- **The judge's kill switch does not stop these calls**
+  (`samplesUnavailable` in `src/lib/sample-reply.ts`; review pass 1,
+  O10). `SAMPLE_REPLIES` and `KILL_SWITCH_SCREEN` do, since every reply
+  is screened; `KILL_SWITCH_JUDGE` and its handling are frozen. Whether a
+  judge pause should stop samples too is his.
+- **New limits on the reader** (`SAMPLE_REPLY_DAILY_CALLS` and the one
+  retry in `src/lib/sample-reply.ts`; review pass 2, O8). A sample's
+  reply is one of the reader's 8 screened replies a day, as Arthur's
+  item says; on top of that, at most 16 writing calls a day per reader,
+  retries included, and one retry when an answer breaks the reply rules.
+  These are limits of the (d) kind, set by me; his to confirm or change.
+- **"Their" on the composer** (`src/app/counterpart/[id]/page.tsx`, the
+  labels "Select a sentence in their argument" and "their last reply";
+  review pass 2, O9). With a sample, the reader is asked to quote from
+  "their" argument. Whether that presents the sample as a person is his;
+  "its argument" or "the argument" are the alternatives.
+- **The explanation's third sentence** (`src/lib/sample.ts`). Arthur,
+  2026-11-08, item 2: "Samples explanation on /how-it-works: "Sample
+  accounts are run by AI. They show what arguing here looks like, and
+  when no one else is free you can argue against one, because
+  philosophy needs someone to argue with." Ship the first two sentences
+  now and add the third when (1) is live." The full text ships word for
+  word with the replies; his third is the clause after "looks like", so
+  until then it ends "They show what arguing here looks like."
+- **An exchange still lapses while samples are stopped** (`sampleReplyMessage`
+  in `src/lib/sample-reply.ts`; `exchangeLapsed` in
+  `src/lib/counterpart.ts`; review pass 3, O2). When the ceiling or the
+  budget stops samples, the reader is told "Sample accounts reply again
+  from the 1st." The lapse clock still runs from the reader's delivered
+  reply, so an exchange left more than two weeks closes as lapsed before
+  the sample can reply. His options: (a) hold the lapse clock while it is
+  a sample's turn and samples are stopped; (b) say in the message that
+  the exchange closes after two weeks. Left as it is until he rules.
+- **A reader with several exchanges with samples can have a reply in
+  flight in each at once** (`claimTurn` in `src/lib/sample-reply.ts`).
+  The claim holds one per exchange, so the ceiling and the reader's day
+  can be passed by those, about $0.045 each at most. A claim per reader would
+  need a migration; left as it is unless he wants one.

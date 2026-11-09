@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { TurnComposer } from "./TurnComposer";
 import { TurnActions } from "./TurnActions";
 import { REPLY_SAVED_COPY } from "@/lib/counterpart";
@@ -6,6 +7,9 @@ import { ExchangePublishToggle } from "./PublishToggle";
 import { SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
 import { COUNTERPART_RULES_HREF } from "@/lib/nav-routes";
+import { SampleLabel } from "@/components/sample/SampleLabel";
+import { SAMPLE_WRITING_LINE } from "@/lib/sample";
+import { SampleReplyRequest } from "./SampleReplyRequest";
 
 /** One reply, as the page shows it. `mine` replaces the author comparison. */
 export interface ViewTurn {
@@ -26,14 +30,20 @@ function Argument({
   eyebrow,
   school,
   text,
+  tag,
 }: {
   eyebrow: string;
   school: SchoolId;
   text: string;
+  /** The AI tag, on a sample account's argument: beside the eyebrow, never inside its <p>. */
+  tag?: ReactNode;
 }) {
   return (
     <div className="rounded-card border-2 border-rule bg-surface p-5">
-      <p className={`text-sm font-bold ${SCHOOL_TEXT_CLASS[school]}`}>{eyebrow}</p>
+      <div className="flex flex-wrap items-center gap-x-2">
+        <p className={`text-sm font-bold ${SCHOOL_TEXT_CLASS[school]}`}>{eyebrow}</p>
+        {tag}
+      </div>
       <p className="mt-3 whitespace-pre-wrap font-serif text-base leading-relaxed text-ink">
         {text || "This argument is no longer available."}
       </p>
@@ -75,6 +85,8 @@ export function ExchangeView({
   sourceText,
   publishMine,
   publishTheirs,
+  counterpartIsSample = false,
+  sampleReplyDue = false,
 }: {
   exchangeId: string;
   userId: string;
@@ -99,6 +111,14 @@ export function ExchangeView({
   sourceText: string;
   publishMine: boolean;
   publishTheirs: boolean;
+  /**
+   * The counterpart is a sample account, run by AI (src/lib/sample-reply.ts):
+   * its argument carries the tag, the reader is told before they write,
+   * and nothing here speaks of it as a person.
+   */
+  counterpartIsSample?: boolean;
+  /** The sample's reply is due: the page asks for it (SampleReplyRequest). */
+  sampleReplyDue?: boolean;
 }) {
   return (
     <div className="mx-auto max-w-read px-6 py-10">
@@ -129,6 +149,7 @@ export function ExchangeView({
           eyebrow={`Counterpart · ${SCHOOL_COLORS[theirSchool].name}`}
           school={theirSchool}
           text={theirArgument}
+          tag={counterpartIsSample ? <SampleLabel /> : undefined}
         />
       </div>
 
@@ -153,7 +174,9 @@ export function ExchangeView({
               <p className="mt-4 max-w-[60ch] whitespace-pre-wrap font-serif text-base leading-relaxed text-ink">
                 {turn.body}
               </p>
-              {!turn.mine && <TurnActions turnId={turn.id} exchangeId={exchangeId} />}
+              {!turn.mine && (
+                <TurnActions turnId={turn.id} exchangeId={exchangeId} canBlock={!counterpartIsSample} />
+              )}
             </div>
           ))}
         </div>
@@ -173,27 +196,39 @@ export function ExchangeView({
         ) : status === "complete" ? (
           <div>
             <p className="text-sm text-ink-mid">
-              Four replies, and it&apos;s finished. Neither of you has to concede.
+              {counterpartIsSample
+                ? "Four replies, and it's finished. Neither side has to concede."
+                : "Four replies, and it's finished. Neither of you has to concede."}
             </p>
-            <div className="mt-6">
-              <ExchangePublishToggle
-                exchangeId={exchangeId}
-                initial={publishMine}
-                otherAgreed={publishTheirs}
-              />
-            </div>
+            {/* An exchange with a sample is published by neither side: the
+                sample cannot agree to it, and only exchanges both sides
+                agreed to are ever shown. */}
+            {!counterpartIsSample && (
+              <div className="mt-6">
+                <ExchangePublishToggle
+                  exchangeId={exchangeId}
+                  initial={publishMine}
+                  otherAgreed={publishTheirs}
+                />
+              </div>
+            )}
           </div>
         ) : myTurn ? (
-          <TurnComposer
-            exchangeId={exchangeId}
-            seq={nextSeq}
-            userId={userId}
-            sourceLabel={sourceLabel}
-            sourceText={sourceText}
-            // Your school, because you are the one sending. Your
-            // counterpart's colour is on their words, not on your button.
-            school={mySchool}
-          />
+          <div>
+            {counterpartIsSample && <p className="mb-6 text-sm text-ink-mid">{SAMPLE_WRITING_LINE}</p>}
+            <TurnComposer
+              exchangeId={exchangeId}
+              seq={nextSeq}
+              userId={userId}
+              sourceLabel={sourceLabel}
+              sourceText={sourceText}
+              // Your school, because you are the one sending. Your
+              // counterpart's colour is on their words, not on your button.
+              school={mySchool}
+            />
+          </div>
+        ) : sampleReplyDue ? (
+          <SampleReplyRequest exchangeId={exchangeId} />
         ) : (
           <p className="text-sm text-ink-mid">Waiting for your counterpart.</p>
         )}

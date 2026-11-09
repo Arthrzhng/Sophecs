@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SCHOOL_COLORS, SCHOOL_TEXT_CLASS } from "@/lib/school-colors";
 import type { SchoolId } from "@/lib/types";
 import { ChunkyLink } from "@/components/daily-path/ChunkyButton";
+import { SampleLabel } from "@/components/sample/SampleLabel";
 
 export interface ExchangeRow {
   id: string;
@@ -15,6 +16,20 @@ export interface ExchangeRow {
    * 12), as the exchange page does.
    */
   myReplyPending?: boolean;
+  /** The counterpart is a sample account, run by AI: its school carries the tag. */
+  theirIsSample?: boolean;
+}
+
+/** The counterpart's school, and the AI tag beside it for a sample account. */
+function TheirSchool({ exchange }: { exchange: ExchangeRow }) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-2">
+      <p className={`text-sm font-bold ${SCHOOL_TEXT_CLASS[exchange.theirSchool]}`}>
+        {SCHOOL_COLORS[exchange.theirSchool].name}
+      </p>
+      {exchange.theirIsSample && <SampleLabel />}
+    </div>
+  );
 }
 
 // Two groups, and the one that needs something from you leads. Nothing is
@@ -49,9 +64,7 @@ export function OpenExchanges({
                 className="flex flex-wrap items-center justify-between gap-3 rounded-card border-2 border-rule bg-surface p-5"
               >
                 <div className="min-w-0">
-                  <p className={`text-sm font-bold ${SCHOOL_TEXT_CLASS[exchange.theirSchool]}`}>
-                    {SCHOOL_COLORS[exchange.theirSchool].name}
-                  </p>
+                  <TheirSchool exchange={exchange} />
                   {exchange.myReplyPending ? (
                     <Link
                       href={`/counterpart/${exchange.id}`}
@@ -91,9 +104,7 @@ export function OpenExchanges({
                 className="flex flex-wrap items-center justify-between gap-3 rounded-card border-2 border-rule bg-surface p-5"
               >
                 <div className="min-w-0">
-                  <p className={`text-sm font-bold ${SCHOOL_TEXT_CLASS[exchange.theirSchool]}`}>
-                    {SCHOOL_COLORS[exchange.theirSchool].name}
-                  </p>
+                  <TheirSchool exchange={exchange} />
                   <Link
                     href={`/counterpart/${exchange.id}`}
                     className="mt-1 block font-serif text-base text-ink-mid underline-offset-4 hover:text-ink hover:underline"
@@ -101,7 +112,9 @@ export function OpenExchanges({
                     {exchange.topicTitle}
                   </Link>
                 </div>
-                <span className="text-sm text-ink-soft">Their turn</span>
+                <span className="text-sm text-ink-soft">
+                  {exchange.theirIsSample ? "Counterpart's turn" : "Their turn"}
+                </span>
               </li>
             ))}
           </ul>

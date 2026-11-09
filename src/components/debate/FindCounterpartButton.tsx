@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { seekCounterpart } from "@/app/debate/actions";
+import { pairWithSample, seekCounterpart } from "@/app/debate/actions";
+import { SAMPLE_OFFER, SAMPLE_OFFER_ACTION } from "@/lib/sample";
 import { track } from "@/lib/analytics/client";
 import { ChunkyButton } from "@/components/daily-path/ChunkyButton";
 
@@ -24,6 +25,11 @@ export function FindCounterpartButton({
   const [state, setState] = useState<"idle" | "busy" | "waiting" | "error">(
     initialSeeking ? "waiting" : "idle"
   );
+  const [sampleBusy, setSampleBusy] = useState(false);
+  const [sampleError, setSampleError] = useState<string | null>(null);
+  // SAMPLE_REPLIES is written into the build (next.config.ts): with it on,
+  // a reader no one is free for may argue against a sample account now.
+  const samplesOn = process.env.SAMPLE_REPLIES === "1";
 
   async function seek() {
     setState("busy");
@@ -44,6 +50,22 @@ export function FindCounterpartButton({
     setState("waiting");
   }
 
+  async function argueWithSample() {
+    setSampleBusy(true);
+    setSampleError(null);
+    const result = await pairWithSample(debateId);
+    if (!result.ok) {
+      setSampleBusy(false);
+      setSampleError(result.error);
+      return;
+    }
+    track({
+      name: "counterpart_paired",
+      props: { exchange_id: result.exchangeId, topic_slug: topicSlug, with_sample: true },
+    });
+    router.push(`/counterpart/${result.exchangeId}`);
+  }
+
   if (existingExchangeId) {
     return (
       <a
@@ -58,7 +80,22 @@ export function FindCounterpartButton({
   if (state === "waiting") {
     // No count and no ETA: both would be a number that only ever looks
     // discouraging on a product this size.
-    return <span className="text-sm text-ink-soft">Waiting for a counterpart</span>;
+    if (!samplesOn) return <span className="text-sm text-ink-soft">Waiting for a counterpart</span>;
+    return (
+      <div>
+        <p className="text-sm text-ink-soft">Waiting for a counterpart</p>
+        <p className="mt-2 max-w-[52ch] font-sans text-sm text-ink-mid">{SAMPLE_OFFER}</p>
+        <ChunkyButton
+          tone="paper"
+          className="mt-3 border-2 border-rule-strong"
+          onClick={argueWithSample}
+          disabled={sampleBusy}
+        >
+          {sampleBusy ? "Pairing…" : SAMPLE_OFFER_ACTION}
+        </ChunkyButton>
+        {sampleError && <p className="mt-2 max-w-[52ch] text-sm text-ink-mid">{sampleError}</p>}
+      </div>
+    );
   }
 
   return (

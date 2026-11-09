@@ -12,9 +12,30 @@
 // result, a challenge, an exchange. Small and quiet (SampleLabel).
 export const SAMPLE_TAG = "AI";
 
-// The explanation on /how-it-works#samples, Arthur's words, which the tag
-// also opens to.
-export const SAMPLE_EXPLANATION = "Sample accounts are run by AI. They show what arguing here looks like.";
+// The explanation on /how-it-works#samples, which the tag also opens to.
+// Arthur, 2026-11-08, item 2, verbatim: "Samples explanation on
+// /how-it-works: "Sample accounts are run by AI. They show what arguing
+// here looks like, and when no one else is free you can argue against
+// one, because philosophy needs someone to argue with." Ship the first two
+// sentences now and add the third when (1) is live." (1) is the AI that
+// writes a sample's side of an exchange. The full form is his text word
+// for word; his third is the clause after "looks like", so the short form
+// ends there. SAMPLE_REPLIES is written
+// into the build as a constant (next.config.ts), so the server and a
+// client component that shows the tag read the same words.
+const SAMPLE_EXPLANATION_SHORT = "Sample accounts are run by AI. They show what arguing here looks like.";
+const SAMPLE_EXPLANATION_FULL =
+  "Sample accounts are run by AI. They show what arguing here looks like, and when no one else is free you can argue against one, because philosophy needs someone to argue with.";
+export const SAMPLE_EXPLANATION =
+  process.env.SAMPLE_REPLIES === "1" ? SAMPLE_EXPLANATION_FULL : SAMPLE_EXPLANATION_SHORT;
+
+// The one line on an exchange with a sample, before the reader writes
+// (Arthur, 2026-11-08).
+export const SAMPLE_WRITING_LINE = "You're arguing with an AI sample account.";
+
+// Offered when no one else is free on a motion (FindCounterpartButton).
+export const SAMPLE_OFFER = "No one else is free on this motion right now. You can wait for someone, or argue now against an AI sample account.";
+export const SAMPLE_OFFER_ACTION = "Argue now";
 
 // On a sample's verdict, inside the tag: its scores come from a template,
 // and the page must not let them pass for the judge's.
