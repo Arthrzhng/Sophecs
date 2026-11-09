@@ -53,6 +53,15 @@ export interface SeedRun {
   last_error: string | null;
 }
 
+/**
+ * A run as the registry lists it: every column but `last_report`, which
+ * no caller of the list reads and which is most of a row (a few KB, kept
+ * for every run, torn down ones included). An extension lists the runs
+ * several times (review pass 1 of the run's decisions, O3).
+ */
+export type RunListing = Omit<SeedRun, "last_report">;
+export const RUN_LISTING_COLUMNS = "id,status,plan_hash,generator_version,window_from,base_to,window_to,counts,lock_token,locked_at,last_error";
+
 /** Tables the engine writes, with how a row's ownership is proven. */
 export type Table =
   | "profiles"
@@ -121,7 +130,7 @@ export interface Adapter {
 
   // The registry.
   getRun(id: string): Promise<SeedRun | null>;
-  listRuns(): Promise<SeedRun[]>;
+  listRuns(): Promise<RunListing[]>;
   insertRun(run: SeedRun): Promise<void>;
   updateRun(id: string, patch: Partial<SeedRun>): Promise<void>;
   /** As updateRun, only while `token` holds the run's lock. False when it does not. */

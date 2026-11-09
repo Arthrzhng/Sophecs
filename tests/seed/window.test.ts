@@ -9,7 +9,9 @@ import { contentTopics } from "../../scripts/seed/topics";
 import { phases } from "../../scripts/seed/engine";
 import { activeSince, keptFrom, newSince } from "../../scripts/seed/window";
 
-const BASE_TO = "2026-11-09T06:00:00.000Z";
+// A run made since WEEKLY_RULES_FROM, so the weekly run here has every
+// rule of Arthur's 2026-11-09 decisions.
+const BASE_TO = "2026-11-16T06:00:00.000Z";
 const DAY = 86_400_000;
 const later = (days: number) => new Date(Date.parse(BASE_TO) + days * DAY).toISOString();
 const banks = loadBanks();
@@ -47,6 +49,32 @@ describe("the rows an extension adds", () => {
       }
     });
   }
+
+  // A newcomer's first quiz result is dated a few minutes before the
+  // sign-up and written with the account, so an end that falls between
+  // the two must not count it new until the sign-up (review pass 1 of the
+  // run's decisions, O1).
+  it("keeps a newcomer's first result with the account when an end falls between them", { timeout: 180_000 }, () => {
+    const ds = plan(later(10), { quiz: 2, weekly: RUN_WEEKLY });
+    const signups = new Map(ds.profiles.map((p) => [p.rowId, Date.parse(p.row.created_at)]));
+    const gap = ds.quizResults.find((r) => {
+      const s = r.row.user_id ? signups.get(r.row.user_id) : undefined;
+      const t = Date.parse(r.row.created_at);
+      return s !== undefined && t > Date.parse(BASE_TO) && s - t >= 10 * 60_000;
+    });
+    expect(gap, "a newcomer whose first result comes minutes before the sign-up").toBeDefined();
+    const t = Date.parse(gap!.row.created_at);
+    const since = new Date(Math.floor((t + signups.get(gap!.row.user_id!)!) / 2 / 60_000) * 60_000).toISOString();
+    const earlier = plan(since, { quiz: 2, weekly: RUN_WEEKLY });
+    const before = ids(earlier);
+    const fresh = newSince(ds, since);
+    expect(before.get("quiz_result")!.has(gap!.logicalId)).toBe(false);
+    expect(fresh.get("quiz_result")!.has(gap!.logicalId)).toBe(true);
+    for (const p of phases(ds)) {
+      const expected = [...p.items.map((i) => i.logicalId)].filter((id) => !before.get(p.kind)!.has(id)).sort();
+      expect([...fresh.get(p.kind)!].sort(), p.kind).toEqual(expected);
+    }
+  });
 
   it("names each account with something new, and nobody else: the only profiles an extension can change", { timeout: 120_000 }, () => {
     const earlier = plan(later(2), { quiz: 2, weekly: RUN_WEEKLY });

@@ -6,26 +6,28 @@
 // 20 judged originals a week so all six stay ranked." And the hourly
 // extension: a later `to` only appends.
 import { describe, expect, it } from "vitest";
-import { DEFAULTS, RUN_WEEKLY, generate, type Dataset } from "../../scripts/seed/generate";
+import { DEFAULTS, RUN_WEEKLY, WEEKLY_RULES_FROM, WEEKLY_RULES_WEEK, generate, type Dataset, type GenConfig } from "../../scripts/seed/generate";
+import { baseHash, manifestHash } from "../../scripts/seed/plan";
+import { lowestSevenDays } from "../../scripts/seed/window";
 import { loadBanks } from "../../scripts/seed/banks";
 import { contentTopics } from "../../scripts/seed/topics";
 import { PROFILE_MUTABLE, phases } from "../../scripts/seed/engine";
 
-const BASE_TO = "2026-11-09T06:00:00.000Z";
+// A run made since Arthur's decisions of 2026-11-09 (WEEKLY_RULES_FROM);
+// the run that was live then is tested below, at the end.
+const BASE_TO = "2026-11-16T06:00:00.000Z";
 const DAY = 86_400_000;
 const WEEK = 7 * DAY;
 const SCHOOLS = ["stoicism", "utilitarianism", "virtue-ethics", "confucian", "ubuntu", "buddhist"];
 const later = (days: number) => new Date(Date.parse(BASE_TO) + days * DAY).toISOString();
 
-function run(to: string, seed = "weekly-check", baseTo = BASE_TO): Dataset {
-  return generate(
-    {
-      seed, from: DEFAULTS.from, baseTo, to,
-      users: DEFAULTS.users, anonResults: DEFAULTS.anonResults, challenges: DEFAULTS.challenges,
-      exchanges: DEFAULTS.exchanges, classes: DEFAULTS.classes, quiz: 2, weekly: RUN_WEEKLY, topics: contentTopics(),
-    },
-    loadBanks()
-  );
+const config = (to: string, seed: string, baseTo: string, weekly: GenConfig["weekly"] = RUN_WEEKLY): GenConfig => ({
+  seed, from: DEFAULTS.from, baseTo, to,
+  users: DEFAULTS.users, anonResults: DEFAULTS.anonResults, challenges: DEFAULTS.challenges,
+  exchanges: DEFAULTS.exchanges, classes: DEFAULTS.classes, quiz: 2, weekly, topics: contentTopics(),
+});
+function run(to: string, seed = "weekly-check", baseTo = BASE_TO, weekly: GenConfig["weekly"] = RUN_WEEKLY): Dataset {
+  return generate(config(to, seed, baseTo, weekly), loadBanks());
 }
 
 const mondayOf = (t: number) => {
@@ -85,9 +87,10 @@ describe("a sample run made with the weekly settings", () => {
   // Sunday, as the scheduled job's first run after a teardown can be; on a
   // Wednesday afternoon; early on a Monday.
   for (const [label, baseTo] of [
-    ["late on a Sunday", "2026-11-08T23:41:00.000Z"],
+    ["late on a Sunday", "2026-11-15T23:41:00.000Z"],
     ["on a Wednesday afternoon", "2026-11-11T14:41:00.000Z"],
-    ["early on a Monday", "2026-11-09T03:17:00.000Z"],
+    ["on a Thursday afternoon", "2026-11-12T16:17:00.000Z"],
+    ["early on a Monday", "2026-11-16T03:17:00.000Z"],
   ] as const) {
     it(`started ${label}, its first week runs at the rate of the weeks after it`, () => {
       const start = Date.parse(baseTo);
@@ -108,9 +111,13 @@ describe("a sample run made with the weekly settings", () => {
       const byWeek = weeks(ds);
       const first = byWeek.get(firstMonday)!;
       const next = byWeek.get(firstMonday + WEEK)!;
-      // The first week is neither swollen nor empty beside the next.
-      expect(first.active.size).toBeGreaterThan(0.6 * next.active.size);
+      // The first week is neither swollen nor empty beside the next: its
+      // accounts, the base window's part and the kept part's together, are
+      // brought up to the week's number (review pass 1 of the run's
+      // decisions, O2).
+      expect(first.active.size).toBeGreaterThan(0.8 * next.active.size);
       expect(first.active.size).toBeLessThan(1.25 * next.active.size);
+      if (firstMonday < start) expect(first.active.size).toBeGreaterThanOrEqual(165);
       // Started with a day or more of the week left, every school is ranked in it.
       if (firstMonday + WEEK - start >= DAY)
         for (const school of SCHOOLS) expect(first.originals.get(school) ?? 0, school).toBeGreaterThanOrEqual(RUN_WEEKLY!.minPerSchool);
@@ -213,5 +220,55 @@ describe("a sample run made with the weekly settings", () => {
         loadBanks()
       )
     ).toThrow(/quiz v2/);
+  });
+});
+
+// The run that was live when Arthur's decisions of 2026-11-09 came,
+// `sample-202611090107`, base window ending at 01:07 that day: the hourly
+// job extends it with this code, and its rows are written to the hour.
+// It must hash as it was made, draw every row before WEEKLY_RULES_WEEK as
+// it did, and follow `rolling` and `anonymous` from then (review pass 1
+// of the run's decisions, B1).
+describe("a weekly run made before WEEKLY_RULES_FROM", () => {
+  const MADE = "2026-11-09T01:07:00.000Z";
+  const OLD = { newcomers: 25, active: 200, minPerSchool: 20 };
+  const F = Date.parse(WEEKLY_RULES_WEEK);
+  it("is the live run's case, and the Monday after the rules", () => {
+    expect(Date.parse(MADE)).toBeLessThan(Date.parse(WEEKLY_RULES_FROM));
+    expect(new Date(F).getUTCDay()).toBe(1);
+    expect(F - Date.parse(WEEKLY_RULES_FROM)).toBeLessThanOrEqual(WEEK);
+    expect(F).toBeGreaterThan(Date.parse(WEEKLY_RULES_FROM));
+  });
+
+  it("hashes as it was made, and draws exactly as before up to the Monday after", { timeout: 180_000 }, () => {
+    expect(baseHash(config(MADE, "live-like", MADE))).toBe(baseHash(config(MADE, "live-like", MADE, OLD)));
+    const end = new Date(F - 60_000).toISOString();
+    expect(manifestHash(run(end, "live-like", MADE))).toBe(manifestHash(run(end, "live-like", MADE, OLD)));
+  });
+
+  it("from the Monday after, changes no earlier row, brings anonymous quiz takers, and ranks every school in every seven days", { timeout: 180_000 }, () => {
+    const end = new Date(F + 2 * WEEK).toISOString();
+    const before = run(end, "live-like", MADE, OLD);
+    const after = run(end, "live-like", MADE);
+    const rows = (ds: Dataset) => new Map(phases(ds).flatMap((p) => p.items.map((i) => [`${p.kind}/${i.logicalId}`, i] as const)));
+    const was = rows(before);
+    const now = rows(after);
+    let compared = 0;
+    for (const [k, i] of was) {
+      if (k.startsWith("profile/")) continue;
+      const t = Date.parse((i.row as { created_at?: string }).created_at ?? "1970-01-01T00:00:00.000Z");
+      if (k.startsWith("auth_user/") || t >= F) continue;
+      expect(now.get(k)?.row, k).toEqual(i.row);
+      compared++;
+    }
+    expect(compared).toBeGreaterThan(5000);
+    for (const [k, i] of now)
+      if (!was.has(k) && !k.startsWith("profile/") && !k.startsWith("auth_user/"))
+        expect(Date.parse((i.row as { created_at?: string }).created_at!), k).toBeGreaterThanOrEqual(F);
+    const anon = (ds: Dataset) => ds.quizResults.filter((q) => !q.row.user_id && Date.parse(q.row.created_at) > Date.parse(MADE)).map((q) => Date.parse(q.row.created_at));
+    expect(anon(before)).toEqual([]);
+    expect(anon(after).every((t) => t >= F)).toBe(true);
+    expect(anon(after).length).toBeGreaterThan(40);
+    expect(lowestSevenDays(after, F + 12 * 3_600_000, Date.parse(end))!.n).toBeGreaterThanOrEqual(RUN_WEEKLY!.minPerSchool);
   });
 });

@@ -10,6 +10,7 @@ import {
   type ItemState,
   type Kind,
   type RegistryItem,
+  type RunListing,
   type ScanTable,
   type SeedRun,
   type Table,
@@ -70,15 +71,19 @@ export class MemoryAdapter implements Adapter {
 
   /**
    * Rows and registry items returned by reads that return rows (scan,
-   * items, selectByIds), not by counts: what a run reads, for the tests
-   * that hold an extend to the window's own rows (Arthur, 2026-11-09,
-   * item 28).
+   * items, selectByIds, the run registry, auth users, the par window),
+   * not by counts: what a run reads, for the tests that hold an extend to
+   * the window's own rows (Arthur, 2026-11-09, item 28). An auth user
+   * here is the four fields the adapter returns; the Auth API sends its
+   * whole user record, which `authUsersRead` counts.
    */
   rowsRead = 0;
   /** Cells returned by those reads: rows times their columns. */
   cellsRead = 0;
   /** Those rows as JSON, in characters: about what the Data API would send. */
   bytesRead = 0;
+  /** Auth users read one by one (getAuthUser). */
+  authUsersRead = 0;
   private counted<T extends Record<string, unknown>>(rows: T[]): T[] {
     this.rowsRead += rows.length;
     for (const r of rows) {
@@ -104,11 +109,13 @@ export class MemoryAdapter implements Adapter {
   }
 
   async parWindow(topic: string, n: number) {
-    return [...this.table("debates").values()]
-      .filter((d) => d.topic_slug === topic && d.kind === "original" && !d.is_sample && d.elo_before !== null && d.elo_before !== undefined)
-      .sort((a, b) => Date.parse(String(b.created_at)) - Date.parse(String(a.created_at)))
-      .slice(0, n)
-      .map((d) => Number(d.elo_before));
+    return this.counted(
+      [...this.table("debates").values()]
+        .filter((d) => d.topic_slug === topic && d.kind === "original" && !d.is_sample && d.elo_before !== null && d.elo_before !== undefined)
+        .sort((a, b) => Date.parse(String(b.created_at)) - Date.parse(String(a.created_at)))
+        .slice(0, n)
+        .map((d) => ({ elo_before: d.elo_before }))
+    ).map((d) => Number(d.elo_before));
   }
 
   async percentile(elo: number) {
@@ -118,10 +125,11 @@ export class MemoryAdapter implements Adapter {
   }
 
   async getRun(id: string) {
-    return this.runs.get(id) ?? null;
+    const run = this.runs.get(id);
+    return run ? this.counted([{ ...run }])[0] : null;
   }
-  async listRuns() {
-    return [...this.runs.values()];
+  async listRuns(): Promise<RunListing[]> {
+    return this.counted([...this.runs.values()].map(({ last_report: _, ...run }) => run));
   }
   async insertRun(run: SeedRun) {
     if (this.runs.has(run.id)) throw new Error("duplicate run");
@@ -201,7 +209,10 @@ export class MemoryAdapter implements Adapter {
     });
   }
   async getAuthUser(id: string) {
-    return this.authUsers.get(id) ?? null;
+    const u = this.authUsers.get(id);
+    if (!u) return null;
+    this.authUsersRead++;
+    return this.counted([{ ...u }])[0];
   }
   async deleteAuthUser(id: string) {
     this.authUsers.delete(id);

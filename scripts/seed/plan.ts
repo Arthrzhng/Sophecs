@@ -7,7 +7,7 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { GENERATOR_VERSION, generate, type Dataset, type GenConfig } from "./generate";
+import { GENERATOR_VERSION, generate, weeklyRules, type Dataset, type GenConfig } from "./generate";
 import { phases } from "./engine";
 import { loadBanks, wordCount, type Banks } from "./banks";
 
@@ -53,6 +53,17 @@ export function manifestHash(ds: Dataset): string {
  * is never printed, since with the public generator it would let a seed
  * be checked by guessing.
  */
+// A run made before WEEKLY_RULES_FROM (generate.ts) hashes the weekly
+// shape it was made with, the three fields of Arthur's 2026-11-09
+// decisions left out: they reach its weeks from WEEKLY_RULES_WEEK by this
+// code, as score rule 2 reached rows from SCORE_RULE_2_FROM, and its base
+// window not at all.
+function hashedWeekly(gen: GenConfig): NonNullable<GenConfig["weekly"]> {
+  const w = gen.weekly!;
+  if (!weeklyRules(gen).madeBefore) return w;
+  return { newcomers: w.newcomers, active: w.active, minPerSchool: w.minPerSchool };
+}
+
 export function baseHash(gen: GenConfig): string {
   const fixed = {
     generator: GENERATOR_VERSION,
@@ -68,7 +79,7 @@ export function baseHash(gen: GenConfig): string {
       exchanges: gen.exchanges,
       classes: gen.classes,
       ...(gen.quiz ? { quiz: gen.quiz } : {}),
-      ...(gen.weekly ? { weekly: gen.weekly } : {}),
+      ...(gen.weekly ? { weekly: hashedWeekly(gen) } : {}),
     },
     topics: gen.topics.map((t) => [t.slug, t.motion]),
   };

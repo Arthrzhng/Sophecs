@@ -27,7 +27,7 @@ async function step(db: MemoryAdapter, mode: Mode, hours: number) {
   const out = await runCi({ mode, adapter: db, seed: SEED, projectRef: "tekifezydjlgxgndkxul", now: () => at(hours), log: (l) => lines.push(l), config: SMALL, batchSize: 100 });
   return { out, lines, rows: db.rowsRead - before.rows, cells: db.cellsRead - before.cells };
 }
-const checksOf = async (db: MemoryAdapter) => ((await db.listRuns())[0].last_report as { checks: { name: string; ok: boolean }[] }).checks;
+const checksOf = async (db: MemoryAdapter) => ((await db.getRun((await db.listRuns())[0].id))!.last_report as { checks: { name: string; ok: boolean }[] }).checks;
 const sampleRows = (db: MemoryAdapter) =>
   Object.fromEntries(["profiles", "quiz_results", "debates", "exchanges", "turns"].map((t) => [t, [...db.table(t).values()].filter((r) => r.is_sample !== false).map((r) => JSON.stringify(r)).sort()]));
 

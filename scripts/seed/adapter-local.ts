@@ -12,11 +12,13 @@ import type { LocalTarget } from "./env";
 import {
   MARKED,
   OWNER_COLUMN,
+  RUN_LISTING_COLUMNS,
   type Adapter,
   type Entanglement,
   type ItemState,
   type Kind,
   type RegistryItem,
+  type RunListing,
   type ScanTable,
   type SeedRun,
   type Table,
@@ -106,7 +108,7 @@ export class LocalAdapter implements Adapter {
     return this.query<SeedRun>(`select * from public.seed_runs where id = ${json(id)}::json #>> '{}'`)[0] ?? null;
   }
   async listRuns() {
-    return this.query<SeedRun>(`select * from public.seed_runs order by created_at`);
+    return this.query<RunListing>(`select ${RUN_LISTING_COLUMNS} from public.seed_runs order by created_at`);
   }
   async insertRun(run: SeedRun) {
     this.sql(`insert into public.seed_runs select * from json_populate_record(null::public.seed_runs, ${json({ ...run, created_at: new Date().toISOString(), updated_at: new Date().toISOString() })});`);

@@ -50,19 +50,32 @@ describe("determinism", () => {
   // The weekly run (Arthur, 2026-11-08) regenerates its rows from this code
   // every hour; a change that rewrote an earlier week would halt it at
   // its next spot check. Its datasets as this code made them, at the base
-  // window's end, into its first week, and two weeks on: the shape before
-  // Arthur's decisions of 2026-11-09, which still draws exactly as it did,
-  // and the scheduled job's since (RUN_WEEKLY: `rolling`, `anonymous`,
-  // `taperDays`).
+  // window's end, into its first week, and two weeks on, in the shape
+  // before Arthur's decisions of 2026-11-09, which still draws exactly as
+  // it did.
   it("gives a weekly run exactly the rows it gave when it was written", () => {
     const before = { quiz: 2 as const, weekly: { newcomers: 25, active: 200, minPerSchool: 20 } };
     expect(manifestHash(small(before))).toBe("5cdf8ee58810e73b4d06d4eec51e168b3ab8107c3be35ea1f855cefb4c86f146");
     expect(manifestHash(small({ ...before, to: "2026-11-07T12:00:00.000Z" }))).toBe("4044712326b4a6d49f3023e27d0a4de117f8e14308a597b3d6fd25885ea2c0d4");
     expect(manifestHash(small({ ...before, to: "2026-11-21T12:00:00.000Z" }))).toBe("e5486ca45ac5fd417cc3e2976c40cc791c8c3d5d0c9a9b0afa24d2e3ef7042b3");
+  });
+
+  // The scheduled job's shape since (RUN_WEEKLY: `rolling`, `anonymous`,
+  // `taperDays`). A run made before WEEKLY_RULES_FROM, as the fixture's
+  // is, hashes and draws as the shape before up to WEEKLY_RULES_WEEK, and
+  // takes the new rules after it; a run made since takes them all.
+  it("gives a weekly run made before the 2026-11-09 decisions its rows as they were, and one made since its own", () => {
     const weekly = { quiz: 2 as const, weekly: RUN_WEEKLY };
-    expect(manifestHash(small(weekly))).toBe("6678bfe0759acd5b1178317bea2aea4404107d06d3829919bf37ffdd62ed6f89");
-    expect(manifestHash(small({ ...weekly, to: "2026-11-07T12:00:00.000Z" }))).toBe("8605408f3f07d6396438d420bd4922f1bc20f47ed9ff7549ed579f569e89bcc2");
-    expect(manifestHash(small({ ...weekly, to: "2026-11-21T12:00:00.000Z" }))).toBe("6c045a378dec468214ec19713db35fdb5b1c948f628b1b7c7153d2ec8e5415c0");
+    const before = { quiz: 2 as const, weekly: { newcomers: 25, active: 200, minPerSchool: 20 } };
+    expect(baseHash({ ...SMALL, ...weekly, topics: contentTopics() })).toBe(baseHash({ ...SMALL, ...before, topics: contentTopics() }));
+    expect(manifestHash(small(weekly))).toBe("5cdf8ee58810e73b4d06d4eec51e168b3ab8107c3be35ea1f855cefb4c86f146");
+    expect(manifestHash(small({ ...weekly, to: "2026-11-07T12:00:00.000Z" }))).toBe("4044712326b4a6d49f3023e27d0a4de117f8e14308a597b3d6fd25885ea2c0d4");
+    expect(manifestHash(small({ ...weekly, to: "2026-11-21T12:00:00.000Z" }))).toBe("7e38fb77bfb4573a58d21e3ab10cccc09be05bc5e1b050a239968a2260807175");
+    const made = { ...weekly, baseTo: "2026-11-16T12:00:00.000Z" };
+    expect(baseHash({ ...SMALL, ...made, topics: contentTopics() })).toBe("869cb29bf6febf0dc93f20e98a63b2a168acb7b75bb0f65d98e0ce5bb5359203");
+    expect(manifestHash(small({ ...made, to: made.baseTo }))).toBe("1d28431e5fdef3a530a0282dac93c59dad5edbb4830b81d6eed4a6ff2ad25657");
+    expect(manifestHash(small({ ...made, to: "2026-11-19T12:00:00.000Z" }))).toBe("75b9c054d2ade2e00f3c415b60f22da49d581e6559ec0233b6f3e44e89af0685");
+    expect(manifestHash(small({ ...made, to: "2026-12-03T12:00:00.000Z" }))).toBe("817428c3ac4c54b1b5fb769db75b28b93ddf93d5804c231beb734929e73a16f0");
   });
 
   it("names runs and addresses as documented", () => {

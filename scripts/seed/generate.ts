@@ -102,7 +102,8 @@ export interface GenConfig {
    * window's own streams carry on past it, every row exactly as before.
    *
    * Arthur's decisions of 2026-11-09 add three, each absent in a shape made
-   * before them, which then draws exactly as it did:
+   * before them, which then draws exactly as it did (and see
+   * WEEKLY_RULES_FROM for the run that was live when they came):
    * - `rolling` (item 9: "the table counts the last seven days, so all six
    *   stay ranked every day"): every school `minPerSchool` judged originals
    *   in every seven days from the base window's end on, not only in every
@@ -149,6 +150,40 @@ export const DEFAULTS = {
 // accounts, at 25 newcomers a week) and its sign-ups tapering to that rate
 // over its last six weeks (item 13).
 export const RUN_WEEKLY: GenConfig["weekly"] = { newcomers: 25, active: 200, minPerSchool: 20, rolling: true, anonymous: 37, taperDays: 42 };
+
+/**
+ * Arthur's decisions of 2026-11-09 came while a weekly run was live,
+ * `sample-202611090107`, its base window ending at 01:07 that day, its
+ * rows written to the hour. Teardown is his to order, so that run
+ * carries on, and the new fields reach it as score rule 2 did
+ * (verdicts.ts): only where it has written nothing.
+ * - A run whose base window ends before WEEKLY_RULES_FROM keeps its base
+ *   window exactly as it was written: no taper (`taperDays`, which can
+ *   only shape a base window still to be written) and nothing added to
+ *   its last six days. Its weeks follow `rolling` and `anonymous` from
+ *   WEEKLY_RULES_WEEK, the Monday after, which no run had written when
+ *   they shipped; every week before it is drawn exactly as before. Its
+ *   base hash is the one it was made with (plan.ts), the three fields
+ *   left out, so it extends as it did.
+ * - A run whose base window ends at or after it, any run made since,
+ *   follows all three from its base window's end, and its base hash
+ *   holds them.
+ */
+export const WEEKLY_RULES_FROM = "2026-11-09T12:00:00.000Z";
+export const WEEKLY_RULES_WEEK = "2026-11-16T00:00:00.000Z";
+
+/** How Arthur's 2026-11-09 fields apply to a weekly run with this base window (WEEKLY_RULES_FROM). */
+export function weeklyRules(cfg: Pick<GenConfig, "baseTo" | "weekly">): { madeBefore: boolean; rolling: boolean; anonymous: number; taperDays: number; weeksFrom: number } {
+  const W = cfg.weekly;
+  const madeBefore = Date.parse(cfg.baseTo) < Date.parse(WEEKLY_RULES_FROM);
+  return {
+    madeBefore,
+    rolling: Boolean(W?.rolling),
+    anonymous: W?.anonymous ?? 0,
+    taperDays: W && !madeBefore ? (W.taperDays ?? 0) : 0,
+    weeksFrom: madeBefore ? Date.parse(WEEKLY_RULES_WEEK) : -Infinity,
+  };
+}
 
 // ---- rows, in the database's own column names ----
 
@@ -416,7 +451,8 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
   // ease, flat at both ends, to the level that puts `newcomers` in the
   // base window's last seven days, found by bisection. The total is still
   // `users`; the days before the taper carry what it takes from the end.
-  const taperDays = Math.min(cfg.weekly?.taperDays ?? 0, days - 7);
+  const rules = weeklyRules(cfg);
+  const taperDays = Math.min(rules.taperDays, days - 7);
   if (cfg.weekly && taperDays > 0) {
     const eased = (floor: number) =>
       shape.map((w, d) => {
@@ -888,7 +924,7 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
       if (!mine) byUser.set(sl.u, (mine = []));
       sortedInsert(mine, { t: sl.t, topic: sl.topic }, (v) => v.t);
     };
-    if (W.rolling || taperDays > 0) for (const sl of slots) index(sl);
+    if (rules.rolling || taperDays > 0) for (const sl of slots) index(sl);
     /** An original for `u` at `t`, judged, if the rules allow one there; true when made. */
     const addOriginal = (u: User, t: number, r: Rng, out: Slot[]): boolean => {
       const mine = byUser.get(u) ?? [];
@@ -1011,42 +1047,52 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
     // number of active accounts, in proportion, with returning accounts
     // drawn as the weeks draw them, by the rules the streams keep (item 13:
     // "no cliff").
+    // The week the base window ends in is brought up in the weeks' loop,
+    // below, once its kept part is drawn: its accounts are the base
+    // window's part and the kept part's together (review pass 1 of the
+    // run's decisions, O2). Every count is kept off a multiple of ten, as
+    // the weeks' are (O5).
+    const resultsBy = new Map<string, number[]>();
+    if (taperDays > 0) for (const it of quizResults) if (it.row.user_id) (resultsBy.get(it.row.user_id) ?? resultsBy.set(it.row.user_id, []).get(it.row.user_id)!).push(Date.parse(it.row.created_at));
+    /** Returning accounts in the base window's part [a, b) of the week from `ws`, until `active` holds `target`. */
+    const bringUp = (br: Rng, ws: number, a: number, b: number, target: number, active: Set<User>) => {
+      for (const sl of slots) if (sl.t >= a && sl.t < b) active.add(sl.u);
+      for (const u of users) if ((resultsBy.get(u.id) ?? []).some((t) => t >= a && t < b)) active.add(u);
+      const keyed = users
+        .filter((u) => u.cls !== "quiz" && u.signup < a && !active.has(u))
+        .map((u) => {
+          const age = Math.max(0, (ws - u.signup) / WEEK);
+          const w = CLASS_WEIGHT[u.cls] * (0.25 + 0.75 * 2 ** (-age / HALF_LIFE_WEEKS[u.cls]));
+          return { u, key: Math.log(Math.max(1e-12, br.float(0, 1))) / w };
+        })
+        .sort((x, y) => y.key - x.key || x.u.n - y.u.n);
+      for (const { u } of keyed) {
+        if (active.size >= target) break;
+        if (schoolOf(u, a) !== schoolOf(u, b)) continue;
+        const ar = br.fork(`active/${u.n}`);
+        const n = u.cls === "heavy" ? ar.int(2, 6) : u.cls === "regular" ? ar.int(1, 3) : ar.weighted([[1, 0.7], [2, 0.3]] as const);
+        let made = false;
+        for (let k = 0; k < n; k++) {
+          const t = timeIn(ar, u.tz, a, b - HOUR);
+          if (t !== null && addOriginal(u, t, ar, slots)) made = true;
+        }
+        if (made) active.add(u);
+      }
+    };
     if (taperDays > 0) {
-      const resultsBy = new Map<string, number[]>();
-      for (const it of quizResults) if (it.row.user_id) (resultsBy.get(it.row.user_id) ?? resultsBy.set(it.row.user_id, []).get(it.row.user_id)!).push(Date.parse(it.row.created_at));
-      for (let ws = mondayOf(to - taperDays * DAY); ws < to; ws += WEEK) {
+      for (let ws = mondayOf(to - taperDays * DAY); ws < mondayOf(to); ws += WEEK) {
         const a = Math.max(ws, from);
-        const b = Math.min(ws + WEEK, to);
+        const b = ws + WEEK;
         if (b - a < HOUR) continue;
         const br = wkRng.fork(`base-week/${iso(ws).slice(0, 10)}`);
-        const target = Math.round(br.normal(W.active, W.active * 0.045) * ((b - a) / WEEK));
-        const active = new Set<User>();
-        for (const sl of slots) if (sl.t >= a && sl.t < b) active.add(sl.u);
-        for (const u of users) if ((resultsBy.get(u.id) ?? []).some((t) => t >= a && t < b)) active.add(u);
-        const keyed = users
-          .filter((u) => u.cls !== "quiz" && u.signup < a && !active.has(u))
-          .map((u) => {
-            const age = Math.max(0, (ws - u.signup) / WEEK);
-            const w = CLASS_WEIGHT[u.cls] * (0.25 + 0.75 * 2 ** (-age / HALF_LIFE_WEEKS[u.cls]));
-            return { u, key: Math.log(Math.max(1e-12, br.float(0, 1))) / w };
-          })
-          .sort((x, y) => y.key - x.key || x.u.n - y.u.n);
-        for (const { u } of keyed) {
-          if (active.size >= target) break;
-          if (schoolOf(u, a) !== schoolOf(u, b)) continue;
-          const ar = br.fork(`active/${u.n}`);
-          const n = u.cls === "heavy" ? ar.int(2, 6) : u.cls === "regular" ? ar.int(1, 3) : ar.weighted([[1, 0.7], [2, 0.3]] as const);
-          let made = false;
-          for (let k = 0; k < n; k++) {
-            const t = timeIn(ar, u.tz, a, b - HOUR);
-            if (t !== null && addOriginal(u, t, ar, slots)) made = true;
-          }
-          if (made) active.add(u);
-        }
+        let target = Math.round(br.normal(W.active, W.active * 0.045) * ((b - a) / WEEK));
+        if (target % 10 === 0) target += br.chance(0.5) ? 1 : -1;
+        bringUp(br, ws, a, b, target, new Set<User>());
       }
     }
-    // The base window's last six days first (`rolling`).
-    if (W.rolling) {
+    // The base window's last six days first (`rolling`), in a run whose
+    // base window is still to be written (WEEKLY_RULES_FROM).
+    if (rules.rolling && !rules.madeBefore) {
       const tail = to - 6 * DAY;
       const recently = new Set(slots.filter((sl) => sl.t >= to - 14 * DAY).map((sl) => sl.u));
       for (const school of schools) {
@@ -1149,9 +1195,9 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
 
       // Anonymous quiz takers, from their own stream (`anonymous`; Arthur,
       // 2026-11-09, item 11), at the weeks' hours, as the base window's are.
-      if (W.anonymous) {
+      if (rules.anonymous && ws >= rules.weeksFrom) {
         const ar0 = r.fork("anonymous");
-        const n = Math.max(0, Math.round(ar0.normal(W.anonymous, W.anonymous * 0.2)));
+        const n = Math.max(0, Math.round(ar0.normal(rules.anonymous, rules.anonymous * 0.2)));
         for (let i = 0; i < n; i++) {
           const ar = ar0.fork(String(i));
           const tz = ar.weighted(TIMEZONES);
@@ -1168,9 +1214,18 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
         }
       }
 
-      if (W.rolling) {
+      // The week the base window ends in, over a taper: brought up to the
+      // week's number as a whole, in the base window's part of it.
+      if (taperDays > 0 && ws < to && to - Math.max(ws, from) >= HOUR) {
+        const active = new Set<User>(actives);
+        for (const sl of thisWeek) active.add(sl.u);
+        bringUp(wkRng.fork(`base-week/${iso(ws).slice(0, 10)}`), ws, Math.max(ws, from), to, target, active);
+      }
+
+      if (rules.rolling && ws >= rules.weeksFrom) {
         // Every seven days, hour by hour, from the base window's end on
-        // (`rolling`, above), from the school's members active this week.
+        // (`rolling`, above), or from WEEKLY_RULES_WEEK in a run made
+        // before it, from the school's members active this week.
         // The checks run an hour past the week's end, so the next week
         // starts from seven days that already hold enough.
         for (const sl of thisWeek) index(sl);
@@ -1208,6 +1263,9 @@ export function generate(cfg: GenConfig, banks: Banks): Dataset {
           if (t !== null && original(u, t, latest, tr, thisWeek, true) !== null) counted.set(school, (counted.get(school) ?? 0) + 1);
         }
       }
+      // A run made before WEEKLY_RULES_FROM: its weeks before
+      // WEEKLY_RULES_WEEK, held for the seven-day checks after it.
+      if (rules.rolling) for (const sl of thisWeek) index(sl);
       weekSlots.push(...thisWeek);
     }
     // Only what has happened by `to`.

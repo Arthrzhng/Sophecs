@@ -56,3 +56,35 @@ export function activeSince(ds: Dataset, fresh: Map<Kind, Set<string>>): Set<str
   for (const p of ds.profiles) if (profiles.has(p.logicalId)) users.add(p.rowId);
   return users;
 }
+
+/**
+ * The fewest judged originals any school has in the seven days ending at
+ * each hour from `from` to `to`: item 9's floor (`rolling`), which the
+ * dry run reports so a plan that missed it is seen, not only tested
+ * (review pass 1 of the run's decisions, O6). Null with no hour to check.
+ */
+export function lowestSevenDays(ds: Dataset, from: number, to: number): { n: number; school: string; at: string } | null {
+  if (!(to >= from)) return null;
+  const bySchool = new Map<string, number[]>();
+  for (const { row } of ds.debates)
+    if (row.kind === "original" && !row.rejected && row.verdict) (bySchool.get(row.school) ?? bySchool.set(row.school, []).get(row.school)!).push(Date.parse(row.created_at));
+  const upTo = (xs: number[], t: number) => {
+    let lo = 0;
+    let hi = xs.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (xs[mid] <= t) lo = mid + 1;
+      else hi = mid;
+    }
+    return lo;
+  };
+  let low: { n: number; school: string; at: string } | null = null;
+  for (const [school, xs] of bySchool) {
+    xs.sort((a, b) => a - b);
+    for (let t = from; t <= to; t += 3_600_000) {
+      const n = upTo(xs, t) - upTo(xs, t - 7 * 86_400_000);
+      if (!low || n < low.n) low = { n, school, at: new Date(t).toISOString() };
+    }
+  }
+  return low;
+}

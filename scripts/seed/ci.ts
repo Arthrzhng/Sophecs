@@ -4,13 +4,14 @@
 
 import type { Adapter } from "./adapter";
 import { buildPlan, describe } from "./plan";
-import { DEFAULTS, RUN_QUIZ, RUN_WEEKLY, type GenConfig } from "./generate";
+import { DEFAULTS, RUN_QUIZ, RUN_WEEKLY, weeklyRules, type GenConfig } from "./generate";
 import { contentTopics } from "./topics";
 import { execute, finishValidation, HaltedError, isHalted, LockLostError, recordedOnRun, releaseHeld, StopError, thrownWhileWriting, VALIDATING } from "./engine";
 import { validate } from "./validate";
 import { dryRun } from "./dryrun";
 import { roundScoreCheck, spotDebates, storedScoreCheck } from "./round-scores";
 import { GuardError } from "./env";
+import { lowestSevenDays } from "./window";
 import { preview, teardown } from "./teardown";
 
 export const CANARY_ACCOUNTS = 40;
@@ -141,6 +142,20 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
   const dry = await dryRun(adapter, plan);
   const planChecks = [dupCheck, roundCheck, storedCheck];
   const dryLines = [...dry.lines, ...planChecks.map((c) => `${c.ok ? "ok" : "FAIL"}: ${c.name}: ${c.detail}`)];
+  // Item 9's floor, from where `rolling` holds to the plan's end: reported,
+  // not a check, so a plan that missed it is seen in the report (review
+  // pass 1 of the run's decisions, O6).
+  const rules = weeklyRules(gen);
+  if (gen.weekly && rules.rolling) {
+    const from = Math.max(Date.parse(gen.baseTo), rules.weeksFrom);
+    const low = lowestSevenDays(dataset, from, Date.parse(plan.window.to));
+    const line = low
+      ? `seven days: the fewest judged originals of any school, hour by hour from ${new Date(from).toISOString()}: ${low.n} (${low.school}, the seven days to ${low.at}; the table ranks from ${gen.weekly.minPerSchool})`
+      : `seven days: nothing to check before ${new Date(from).toISOString()}`;
+    dryLines.push(line);
+    report.sevenDays = line;
+    log(line);
+  }
   const failedPlanChecks = planChecks.filter((c) => !c.ok);
   if (!dry.ok || failedPlanChecks.length) {
     await record({ dryRun: dryLines, ok: false });

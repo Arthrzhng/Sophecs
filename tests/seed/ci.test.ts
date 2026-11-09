@@ -83,7 +83,7 @@ describe("the scheduled workflow's path", () => {
     expect(samples(db, "debates")).toBeGreaterThan(debatesAfterFull);
     expect(Date.parse((await db.listRuns())[0].window_to)).toBe(Date.parse(at(24 * 7)));
     // The full report is kept in the run's row, with the genuine figures.
-    expect((await db.listRuns())[0].last_report).toMatchObject({ mode: "extend", ok: true });
+    expect((await db.getRun((await db.listRuns())[0].id))!.last_report).toMatchObject({ mode: "extend", ok: true });
 
     // A second canary is refused while the run exists.
     await expect(step(db, "canary", 24 * 8)).rejects.toThrow(/exists/);

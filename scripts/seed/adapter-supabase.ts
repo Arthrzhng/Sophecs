@@ -23,11 +23,13 @@ import { readAll } from "../../src/lib/read-all";
 import {
   MARKED,
   OWNER_COLUMN,
+  RUN_LISTING_COLUMNS,
   type Adapter,
   type Entanglement,
   type ItemState,
   type Kind,
   type RegistryItem,
+  type RunListing,
   type ScanTable,
   type SeedRun,
   type Table,
@@ -147,9 +149,9 @@ export class SupabaseAdapter implements Adapter {
     return (data as SeedRun | null) ?? null;
   }
   async listRuns() {
-    const { data, error } = await this.db.from("seed_runs").select("*").order("created_at");
+    const { data, error } = await this.db.from("seed_runs").select(RUN_LISTING_COLUMNS).order("created_at");
     fail("seed_runs list", error);
-    return (data ?? []) as SeedRun[];
+    return (data ?? []) as unknown as RunListing[];
   }
   async insertRun(run: SeedRun) {
     const { error } = await this.db.from("seed_runs").insert(run);
