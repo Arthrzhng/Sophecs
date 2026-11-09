@@ -20,8 +20,8 @@
 # slots ran up to about six hours late, or not at all. Each run adds the
 # activity since the last one, up to now, so a run that is skipped only
 # means the next one adds more. A sample row is never dated in the
-# future, and the school table shows only the current week, so the more
-# often it runs, the closer the week's table is to now. If nothing has run
+# future, and the school table counts the last seven days up to now, so
+# the more often it runs, the closer the table is to now. If nothing has run
 # for six hours, run extend by hand from the Actions tab.
 #
 # Modes, by hand: canary (starts the run, first 40 accounts), full (the

@@ -6525,6 +6525,7 @@ Arthur, 2026-11-09:
 > 27. (a): hold the lapse clock while sample replies are stopped.
 > 28. (a): keep hourly and cut what each run reads, so the job stays far
 > under the free plan's egress.
+>
 > Schedule: find out why GitHub hasn't fired the hourly cron since #118
 > (workflow disabled, environment approval, branch, or GitHub delay) and
 > fix it if it's on our side. Keep the six-hour fallback either way.
@@ -6670,8 +6671,9 @@ new run.
 UTC: none of 08:17 to 13:17. Checked: the workflow is active, on `main`
 (the default branch), its one cron line is `17 * * * *` and valid; the
 merge that set it was pushed by Arthrzhng, the account the scheduled runs
-run as (the 07:10 run's actor); the job uses no environment, so nothing
-waits on approval, and no run is waiting. Nothing on our side. GitHub's
+run as (the 07:10 run's actor); the job's environment,
+`sample-activity`, holds its secrets and asks for no approval (the 18:52
+run's deployment was queued within a second), and no run is waiting. Nothing on our side. GitHub's
 scheduler runs this repository's slots late or drops them, as it did the
 six-hourly ones (up to six hours late). The six-hour fallback is kept: at
 13:38, six and a half hours after the last run, I dispatched an extend by
@@ -6682,7 +6684,7 @@ run came 28 minutes after the six hours.
 
 For his list, from carrying these out:
 - **The wording of the instructions** (`SAMPLE_REPLY_SYSTEM`, v3): mine,
-  to his conditions; his to read.
+  to his conditions; his to read. (Ruled 2026-11-09: accepted, below.)
 - **The new copy for item 9** listed above, and "It has N" in place of
   "N so far".
 - **Words a reply may not use** (`UNSUITABLE` in
@@ -6694,7 +6696,7 @@ For his list, from carrying these out:
   phrase "what is up to us", which the judge's v3 criteria quote, and
   Ubuntu's communal "we" are written again outside quotation marks, so
   the replies say "up to the agent" or "up to them". His to rule which
-  wins.
+  wins. (Ruled 2026-11-09: the rewrites accepted, below.)
 - **"The sample account is writing its reply."** shows on an exchange
   while the reader's claim is held for another of their exchanges, where
   nothing is yet being written for this one
@@ -6793,7 +6795,8 @@ instead (pass 3, O5; `docs/sample-activity.md`, Stop conditions).
   26 (seed `weekly-check`); 105, 84, 86, 72, 47, 33, then 26, 40, 31, 25,
   29, 20 (seed `another`). A base window is written once, so this reaches
   only a run made after this merge: not the live one, until he orders a
-  teardown and a new run.
+  teardown and a new run. (Ruled 2026-11-09: no teardown; "Arthur's
+  rulings on the sample-accounts lists" below.)
 - **28.** An extension of a complete run:
   - reads from the registry only the rows new since the run's end and
     counts the rest, reading the registry whole when a count does not add
@@ -6818,7 +6821,9 @@ For his list, from carrying these out:
   this merge. Making one takes a teardown of `sample-202611090107`
   (which stops if a reader has an exchange with a sample, #117; there
   were none at 15:11 on the 9th), then a canary and a full stage. It is
-  his to order, and the live run carries on until he does. Until the
+  his to order, and the live run carries on until he does. (Ruled
+  2026-11-09: no teardown; "Arthur's rulings on the sample-accounts
+  lists" below.) Until the
   16th the live run also has no anonymous quiz takers after its base
   window's end, which had about 180 to 210 a week in its last weeks:
   none or one a week, then about 37 from the 16th (review pass 2, O5).
@@ -6852,3 +6857,75 @@ For his list, from carrying these out:
   (item 28): the price of reading only what is new. The daily whole read
   (`READ_WHOLE_EVERY_MS` in `scripts/seed/ci.ts`) is the backstop; any
   other interval is his.
+
+### Arthur's rulings on the sample-accounts lists (2026-11-09)
+
+Arthur, 2026-11-09, on the two lists above ("For his list", in the two
+entries before this one):
+
+> Decisions:
+> - Item 13: no teardown. Let the taper apply from now on.
+> - Numbers (22 a school, 37 anonymous takers a week, six-week taper):
+>   accepted.
+> - AI instructions, including the rewrites of Stoicism's "up to us" and
+>   Ubuntu's "we": accepted.
+> - Item 27, lapse clock held for the whole of a sample's turn: accepted.
+>
+> Record them in docs/decisions.md. Nothing else needed from me on
+> samples; carry on with routine checks only.
+
+What each settles:
+- **Item 13.** `sample-202611090107` is not torn down, and extends as it
+  does. I read "Let the taper apply from now on" as: the taper applies
+  to runs made from now on. A run whose base window ends at or after
+  `WEEKLY_RULES_FROM` takes it (`weeklyRules` in
+  `scripts/seed/generate.ts`), as #120 built it, so nothing changes in
+  code. Applied to the live run it could not work: its base window,
+  written once, keeps the drop in sign-ups it has at 01:07 on the 9th,
+  and its first week not yet written, from 16 November, already runs at
+  the weeks' 25 sign-ups, so a taper there would be a rise. What follows
+  (review of this record, B1): no run has the taper today, and none will
+  while the live run lasts. A new run starts with a canary, which
+  `runCi` refuses while a run is active, so the first run to take the
+  taper is the one made after the next teardown, whatever calls for one.
+  The live run's weeks take the seven-day rule and the anonymous takers
+  from 16 November.
+- **The figures**: 22 judged originals a school in every seven days
+  (`minPerSchool`, 20, and two to spare), about 37 anonymous quiz takers
+  a week, a six-week taper (`RUN_WEEKLY`). Accepted as they are.
+- **The AI's instructions** (`SAMPLE_REPLY_SYSTEM`, `sample-reply.v3`,
+  in `src/lib/sample-reply-prompt.ts`): accepted as written, with the
+  person check as it stands. Stoicism's "what is up to us" and Ubuntu's
+  communal "we" are written again outside quotation marks, so the
+  replies say "up to the agent" or "up to them".
+- **Item 27.** The lapse clock is held for the whole of a sample's turn
+  (`exchangeLapsed` in `src/lib/counterpart.ts`), with what that brings,
+  as recorded in "The sample-accounts decisions, carried out" above.
+- **The rest of both lists.** He named no other item and needs nothing
+  else on samples, so these stand as built:
+  - the item 9 copy, and "It has N";
+  - the words a reply may not use (`UNSUITABLE`);
+  - `KILL_SWITCH_JUDGE` does not stop the AI screen of a reader's reply
+    in the turn route (`src/app/api/counterpart/turn/route.ts`, frozen;
+    it follows `KILL_SWITCH_SCREEN`), which screens every exchange, not
+    only those with samples, nor the judge for an allowlisted user; so
+    item 23's "one switch stops all AI" holds for samples and the
+    re-screening job, and not for those two, which stay as they are;
+  - "The sample account is writing its reply." while the reader's claim
+    is held for another exchange;
+  - "tested", for the school's own terms, meaning the prompt, the
+    material and the eval; and "nothing sexual, no graphic violence"
+    resting on the prompt and the screen;
+  - the activity brought up over the taper, and the base window's
+    anonymous takers easing down with its sign-ups, in a run made from
+    now on;
+  - a change to an older row found within a day (`READ_WHOLE_EVERY_MS`).
+- **The conditions #120 set** are met: it merged at 17:02 UTC on the
+  9th, before 16 November, and no canary was made between 12:00 and the
+  merge (the only run then, Actions 42627247768 at 13:38, was an
+  extend).
+
+What I take "routine checks" to be: the six-hour fallback check on the
+hourly job, and the read-back after each extend it starts; and a closer
+read-back of the first extend after 2026-11-16T00:00Z, when the
+seven-day rule and the anonymous takers first write rows on production.

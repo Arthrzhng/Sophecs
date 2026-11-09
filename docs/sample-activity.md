@@ -402,9 +402,10 @@ Two layers, both from one secret seed:
   they shipped, and every week before it is drawn exactly as before
   (`weeklyRules` in `scripts/seed/generate.ts`; `tests/seed/weekly.test.ts`,
   "a weekly run made before WEEKLY_RULES_FROM"). The taper (item 13)
-  reaches only a run made since, which takes a teardown first, Arthur's
-  to order (see Teardown). Score rule 2 reached a live run the same way
-  (`SCORE_RULE_2_FROM`). This holds on three conditions. The code
+  reaches only a run made since. Score rule 2 reached a live run the same
+  way (`SCORE_RULE_2_FROM`). This holds on three conditions, the first
+  two met (#120 merged at 17:02 UTC on 2026-11-09, and no canary was
+  made between 12:00 and then). The code
   reaches `main` before the 16th: a run that had written rows after it
   under the older code would not match. No canary is made before it
   merges: one made with the older code after 12:00 on the 9th would count
@@ -413,6 +414,12 @@ Two layers, both from one secret seed:
   16th: the older plan has none of the anonymous takers and gives the
   ids of originals the seven-day rule added to other arguments, so the
   run would halt; the way on then is a fix forward or a teardown (O5).
+  Arthur, 2026-11-09: "Item 13: no teardown. Let the taper apply from now
+  on." Read as: the taper applies to runs made from now on. So no run has
+  it today, and none will while the live run lasts, since a canary is
+  refused while a run is active: the first run to take it is the one
+  made after the next teardown (`docs/decisions.md`, "Arthur's rulings on
+  the sample-accounts lists").
   The base window's own streams stop at its end, and a base revision
   lands before the first whole week. A week is drawn whole from its own stream
   and the weeks before it, and only what falls by the run's end so far is
