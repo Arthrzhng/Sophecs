@@ -6,7 +6,8 @@ import type { Dataset } from "./generate";
 import { phases } from "./engine";
 import { settledChecks, compareBaselines, isolationChecks, type Baseline, type BaselineCheck } from "./baseline";
 import { Rng } from "./rng";
-import { roundScoreCheck, storedScoreCheck } from "./round-scores";
+import { roundScoreCheck, spotDebates, storedScoreCheck } from "./round-scores";
+import { newSince } from "./window";
 
 export interface ValidationReport {
   ok: boolean;
@@ -48,15 +49,37 @@ export async function validate(
   adapter: Adapter,
   ds: Dataset,
   before: Baseline | null,
-  opts: { cohortLimit?: number; spot?: number; authSpot?: number; rereadMs?: number } = {}
+  opts: {
+    cohortLimit?: number;
+    spot?: number;
+    authSpot?: number;
+    rereadMs?: number;
+    /**
+     * An extension's validation (execute's lightSince): the registry by
+     * counts, the spot checks and the stored scores on the rows new since
+     * this and a few of the rest, and the seeking check by a count, rather
+     * than every row of the run every hour (Arthur, 2026-11-09, item 28).
+     * The same checks, by name; a canary or a full stage reads everything.
+     */
+    since?: string | null;
+  } = {}
 ): Promise<ValidationReport> {
   const limit = opts.cohortLimit ?? Infinity;
   const checks: BaselineCheck[] = [];
   const rng = new Rng(`validate/${ds.runId}`);
+  const since = opts.since && !Number.isFinite(limit) ? opts.since : null;
+  const fresh = since ? newSince(ds, since) : null;
 
-  // 1. The registry: everything in scope is created.
+  // 1. The registry: everything in scope is created. After an extension,
+  // by a count: the registry holds this run's plans' rows only, and a
+  // later plan holds every row of an earlier one (window.ts).
   for (const p of phases(ds)) {
     const wanted = p.items.filter((i) => i.cohort < limit);
+    if (fresh) {
+      const created = await adapter.registryCount(ds.runId, p.kind as Kind, "created");
+      checks.push({ name: `registry: ${p.kind} created`, ok: created === wanted.length, detail: `${Math.min(created, wanted.length)} of ${wanted.length}${created > wanted.length ? ` (${created} counted)` : ""}` });
+      continue;
+    }
     const items = await adapter.items(ds.runId, p.kind as Kind);
     const created = new Set(items.filter((i) => i.state === "created").map((i) => i.logical_id));
     const missing = wanted.filter((w) => !created.has(w.logicalId)).length;
@@ -68,18 +91,27 @@ export async function validate(
   const kindOf: Record<string, Kind> = { profiles: "profile", quiz_results: "quiz_result", challenges: "challenge", debates: "debate", exchanges: "exchange" };
   for (const [table, kind] of Object.entries(kindOf)) {
     let registered = 0;
-    for (const r of runs) if (r.status !== "torn_down") registered += (await adapter.items(r.id, kind)).filter((i) => i.state === "created").length;
+    for (const r of runs)
+      if (r.status !== "torn_down")
+        registered += fresh ? await adapter.registryCount(r.id, kind, "created") : (await adapter.items(r.id, kind)).filter((i) => i.state === "created").length;
     const marked = await adapter.count(table as Table, { sample: true });
     checks.push({ name: `${table}: sample rows match the registry`, ok: marked === registered, detail: `${marked} marked, ${registered} registered` });
   }
 
-  // 3. Spot checks: rows read back equal the plan's.
+  // 3. Spot checks: rows read back equal the plan's. After an extension,
+  // the new rows (up to the spot) and ten of the rest, by their columns.
   for (const p of phases(ds)) {
     if (!p.table) continue;
     const pool = p.items.filter((i) => i.cohort < limit);
-    const sample = rng.shuffle(pool).slice(0, opts.spot ?? 50);
+    const isNew = fresh?.get(p.kind);
+    const sample = isNew
+      ? [...rng.shuffle(pool.filter((i) => isNew.has(i.logicalId))).slice(0, opts.spot ?? 50), ...rng.shuffle(pool.filter((i) => !isNew.has(i.logicalId))).slice(0, 10)]
+      : rng.shuffle(pool).slice(0, opts.spot ?? 50);
     if (!sample.length) continue;
-    const back = await adapter.selectByIds(p.table, sample.map((s) => s.rowId));
+    const columns = isNew
+      ? [...new Set([...(p.table === "class_members" ? ["class_id", "user_id"] : ["id"]), ...(SPOT_COLUMNS[p.table] ?? []), ...(p.table === "quiz_results" ? ["quiz_version", "map_x", "map_y", "vector"] : [])])]
+      : undefined;
+    const back = await adapter.selectByIds(p.table, sample.map((s) => s.rowId), columns);
     const byId = new Map(back.map((r) => [p.table === "class_members" ? `${r.class_id}:${r.user_id}` : String(r.id), r]));
     let bad = 0;
     let firstBad = "";
@@ -110,11 +142,11 @@ export async function validate(
   // 4. Every stored sample score is the plan's, and the plan's scores do
   // not cluster on multiples of 5; with the first, the second holds of what
   // was written.
-  checks.push(await storedScoreCheck(adapter, ds, { cohortLimit: limit }));
+  checks.push(await storedScoreCheck(adapter, ds, { cohortLimit: limit, ...(since ? { ids: spotDebates(ds, since, `validate/${since}`, 100) } : {}) }));
   checks.push(roundScoreCheck(ds, { cohortLimit: limit }));
 
   // 5. No sample argument is waiting for a counterpart.
-  const seeking = (await adapter.scan("debates", ["id", "seeking_counterpart_at"], { sample: true })).filter((d) => d.seeking_counterpart_at !== null).length;
+  const seeking = await adapter.count("debates", { sample: true, seeking: true });
   checks.push({ name: "no sample debate seeks a counterpart", ok: seeking === 0, detail: `${seeking} seeking` });
 
   // 6. Auth: a sample of users is blocked from signing in and is this run's.

@@ -9,7 +9,7 @@ import { contentTopics } from "./topics";
 import { execute, finishValidation, HaltedError, isHalted, LockLostError, recordedOnRun, releaseHeld, StopError, thrownWhileWriting, VALIDATING } from "./engine";
 import { validate } from "./validate";
 import { dryRun } from "./dryrun";
-import { roundScoreCheck, storedScoreCheck } from "./round-scores";
+import { roundScoreCheck, spotDebates, storedScoreCheck } from "./round-scores";
 import { GuardError } from "./env";
 import { preview, teardown } from "./teardown";
 
@@ -54,6 +54,9 @@ export interface CiOutcome {
   runId?: string;
 }
 
+/** How often an extension reads the whole run back rather than only its new rows (item 28). */
+export const READ_WHOLE_EVERY_MS = 24 * 3_600_000;
+
 export async function runCi(o: CiOptions): Promise<CiOutcome> {
   const { adapter, log } = o;
   if (!MODES.includes(o.mode)) throw new GuardError(`--mode must be one of ${MODES.join(", ")}`);
@@ -63,6 +66,13 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
   if (o.mode === "teardown") return tearDown(o, active);
   let baseTo: string;
   let cohortLimit: number | undefined;
+  // An extension of a complete run reads only what is new since its end
+  // (Arthur, 2026-11-09, item 28: "keep hourly and cut what each run
+  // reads"), except once a day: the first extension more than
+  // READ_WHOLE_EVERY_MS after the run was last read whole reads it whole
+  // again, so a change to an older row is found within a day. A canary, a
+  // full stage, or a run that is not complete reads everything, as before.
+  let since: string | undefined;
   if (o.mode === "canary") {
     if (active.length) throw new GuardError(`run ${active[0].id} exists; a canary starts a new run`);
     baseTo = o.now();
@@ -84,6 +94,9 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
       return { ok: true, outcome: "idle", runId: run.id };
     }
     baseTo = new Date(run.base_to).toISOString();
+    const wholeAt = Date.parse(String(run.counts?.read_whole_at ?? ""));
+    if (o.mode === "extend" && run.status === "complete" && Number.isFinite(wholeAt) && Date.parse(o.now()) - wholeAt < READ_WHOLE_EVERY_MS)
+      since = new Date(run.window_to).toISOString();
   }
 
   const gen: GenConfig = {
@@ -124,7 +137,7 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
   // scores must already be the plan's; validate repeats both after the
   // writes.
   const roundCheck = roundScoreCheck(dataset, { cohortLimit, max: o.maxRoundScorePct, min: o.minRoundScoreSample });
-  const storedCheck = await storedScoreCheck(adapter, dataset, { cohortLimit });
+  const storedCheck = await storedScoreCheck(adapter, dataset, { cohortLimit, ...(since ? { ids: spotDebates(dataset, since, plan.window.to) } : {}) });
   const dry = await dryRun(adapter, plan);
   const planChecks = [dupCheck, roundCheck, storedCheck];
   const dryLines = [...dry.lines, ...planChecks.map((c) => `${c.ok ? "ok" : "FAIL"}: ${c.name}: ${c.detail}`)];
@@ -158,6 +171,7 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
       endHalted: VALIDATING,
       // The schedule checked for a halt before its plan, minutes ago.
       refuseHalted: o.mode === "extend",
+      since,
     });
   } catch (err) {
     if (err instanceof HaltedError) {
@@ -186,7 +200,7 @@ export async function runCi(o: CiOptions): Promise<CiOutcome> {
   let ok: boolean;
   let recorded: boolean;
   try {
-    const v = await validate(adapter, dataset, result.before, { cohortLimit });
+    const v = await validate(adapter, dataset, result.before, { cohortLimit, since: result.lightSince });
     const checks = [...v.checks, dupCheck];
     ok = checks.every((c) => c.ok);
     for (const c of checks) log(`${c.ok ? "ok  " : "FAIL"}  ${c.name}`);

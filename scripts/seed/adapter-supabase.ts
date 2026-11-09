@@ -37,6 +37,9 @@ export const BAN_DURATION = "876000h"; // one hundred years
 const REQUEST_TIMEOUT_MS = 30_000;
 const CHUNK = 100; // ids per filter, to keep request URLs short
 
+// A read whose columns are chosen at run time, typed as the rows it returns.
+type Rows = { data: Record<string, unknown>[] | null; error: { message: string } | null };
+
 function chunks<T>(xs: T[], n = CHUNK): T[][] {
   const out: T[][] = [];
   for (let i = 0; i < xs.length; i += n) out.push(xs.slice(i, i + n));
@@ -107,10 +110,11 @@ export class SupabaseAdapter implements Adapter {
     return res.rows;
   }
 
-  async count(table: ScanTable, where?: { sample?: boolean; eloBelow?: number }) {
+  async count(table: ScanTable, where?: { sample?: boolean; eloBelow?: number; seeking?: boolean }) {
     let q = this.db.from(table).select("*", { count: "exact", head: true });
     if (where?.sample !== undefined) q = q.eq("is_sample", where.sample);
     if (where?.eloBelow !== undefined) q = q.lt("elo", where.eloBelow);
+    if (where?.seeking) q = q.not("seeking_counterpart_at", "is", null);
     const { count, error } = await q;
     fail(`count ${table}`, error);
     return count ?? 0;
@@ -217,7 +221,21 @@ export class SupabaseAdapter implements Adapter {
       fail("seed_run_items state", error);
     }
   }
-  async items(runId: string, kind: Kind) {
+  async items(runId: string, kind: Kind, logicalIds?: string[]) {
+    if (logicalIds) {
+      const out: RegistryItem[] = [];
+      for (const c of chunks(logicalIds, 100)) {
+        const { data, error } = await this.db
+          .from("seed_run_items")
+          .select("run_id,kind,logical_id,row_id,state")
+          .eq("run_id", runId)
+          .eq("kind", kind)
+          .in("logical_id", c);
+        fail("seed_run_items read", error);
+        out.push(...((data ?? []) as RegistryItem[]));
+      }
+      return out;
+    }
     const res = await readAll<RegistryItem>((from, to) =>
       this.db
         .from("seed_run_items")
@@ -229,6 +247,17 @@ export class SupabaseAdapter implements Adapter {
     );
     if (res.error !== null) throw new Error(`seed_run_items read: ${res.error}`);
     return res.rows;
+  }
+
+  async registryCount(runId: string, kind: Kind, state: ItemState) {
+    const { count, error } = await this.db
+      .from("seed_run_items")
+      .select("*", { count: "exact", head: true })
+      .eq("run_id", runId)
+      .eq("kind", kind)
+      .eq("state", state);
+    fail("seed_run_items count", error);
+    return count ?? 0;
   }
 
   async createAuthUser(u: { id: string; email: string; runId: string; n: number }) {
@@ -268,7 +297,8 @@ export class SupabaseAdapter implements Adapter {
       fail(`${table} insert`, error);
     }
   }
-  async selectByIds(table: Table, ids: string[]) {
+  async selectByIds(table: Table, ids: string[], columns?: string[]) {
+    const cols = columns ? columns.join(",") : "*";
     const out: Record<string, unknown>[] = [];
     if (table === "class_members") {
       const want = new Set(ids);
@@ -279,14 +309,14 @@ export class SupabaseAdapter implements Adapter {
       }
       for (const [cid, uids] of byClass)
         for (const c of chunks(uids)) {
-          const { data, error } = await this.db.from(table).select("*").eq("class_id", cid).in("user_id", c);
+          const { data, error } = await (this.db.from(table).select(cols).eq("class_id", cid).in("user_id", c) as unknown as PromiseLike<Rows>);
           fail(`${table} read`, error);
           out.push(...(data ?? []).filter((r) => want.has(`${r.class_id}:${r.user_id}`)));
         }
       return out;
     }
     for (const c of chunks(ids)) {
-      const { data, error } = await this.db.from(table).select("*").in("id", c);
+      const { data, error } = await (this.db.from(table).select(cols).in("id", c) as unknown as PromiseLike<Rows>);
       fail(`${table} read`, error);
       out.push(...(data ?? []));
     }

@@ -18,6 +18,7 @@ import type { Adapter } from "./adapter";
 import type { Dataset } from "./generate";
 import type { BaselineCheck } from "./baseline";
 import { TEMPLATE_PROMPT_VERSION, TEMPLATE_PROMPT_VERSION_2 } from "./verdicts";
+import { Rng } from "./rng";
 
 /** A run fails if more than this share of its rule-2 scores, of any one kind, is a multiple of 5. */
 export const MAX_ROUND_SCORE_PCT = 20;
@@ -93,15 +94,18 @@ export function roundScoreCheck(
  * public.
  */
 export async function storedScoreCheck(
-  adapter: Pick<Adapter, "scan">,
+  adapter: Pick<Adapter, "scan" | "selectByIds">,
   ds: Pick<Dataset, "debates">,
-  opts: { cohortLimit?: number } = {}
+  opts: { cohortLimit?: number; ids?: string[] } = {}
 ): Promise<BaselineCheck> {
   const limit = opts.cohortLimit ?? Infinity;
   const planned = new Map(
     ds.debates.filter((d) => d.cohort < limit).map((d) => [d.rowId, { score: d.row.score, version: d.row.prompt_version }])
   );
-  const stored = await adapter.scan("debates", ["id", "score", "prompt_version", "created_at"], { sample: true });
+  // With `ids`, those debates only: an extension's new ones and a spot of
+  // the rest (spotDebates), rather than every sample debate every hour.
+  const columns = ["id", "score", "prompt_version", "created_at"];
+  const stored = opts.ids ? await adapter.selectByIds("debates", opts.ids, columns) : await adapter.scan("debates", columns, { sample: true });
   let compared = 0;
   let differ = 0;
   let earliest = "";
@@ -126,6 +130,18 @@ export async function storedScoreCheck(
       ? `${differ} of ${compared} stored sample debates differ from the plan in score or prompt_version, the earliest dated ${earliest}`
       : unmatched
         ? `none of ${stored.length} stored sample debates is in the plan`
-        : `${compared} stored sample debates compared`,
+        : `${compared} stored sample debates compared${opts.ids ? " (the new ones and a spot of the rest)" : ""}`,
   };
+}
+
+/**
+ * The debates an extension's score check reads (item 28): every one new
+ * since `since`, and `spot` of the rest, picked by the run and the end, so
+ * each hour looks at another few.
+ */
+export function spotDebates(ds: Pick<Dataset, "debates" | "runId">, since: string, at: string, spot = 200): string[] {
+  const t = Date.parse(since);
+  const fresh = ds.debates.filter((d) => Date.parse(d.row.created_at) > t).map((d) => d.rowId);
+  const rest = ds.debates.filter((d) => Date.parse(d.row.created_at) <= t).map((d) => d.rowId);
+  return [...fresh, ...new Rng(`spot/${ds.runId}/${at}`).shuffle(rest).slice(0, spot)];
 }

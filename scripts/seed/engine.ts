@@ -19,6 +19,7 @@ import type { Adapter, Kind, RegistryItem, SeedRun, Table } from "./adapter";
 import type { Dataset, Item } from "./generate";
 import type { Plan } from "./plan";
 import { snapshot, compareBaselines, type Baseline } from "./baseline";
+import { activeSince, newSince } from "./window";
 
 export class StopError extends Error {}
 /** This process no longer holds the run's lock: it must not touch the run row again. */
@@ -84,6 +85,15 @@ export interface ExecuteOptions {
    * plan, minutes before it takes the lock.
    */
   refuseHalted?: boolean;
+  /**
+   * The run's end before this extension (seed_runs.window_to). With it, an
+   * extension of a complete run reads from the registry only the rows new
+   * since then, and counts the rest, and brings up to date only the
+   * profiles with something new (Arthur, 2026-11-09, item 28: "cut what
+   * each run reads"). Ignored, and everything read, for a canary, or a run
+   * that is not complete after a full stage at exactly this end.
+   */
+  since?: string;
 }
 
 /**
@@ -196,6 +206,8 @@ export interface ExecuteReport {
   heldWith: string | null;
   /** With endHalted: the run's lock, kept for finishValidation, which releases it. */
   lockToken: string | null;
+  /** The end the extension read from (ExecuteOptions.since), or null when it read everything. */
+  lightSince: string | null;
 }
 
 async function retry<T>(fn: () => Promise<T>, attempts: number, baseMs: number, log: (s: string) => void, what: string): Promise<T> {
@@ -327,6 +339,7 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
   // Everything from here to the writes is under the lock: a throw releases
   // it, so it is not left to go stale.
   let keep: string | null;
+  let light: string | null = null;
   try {
     const racing = (await adapter.listRuns()).filter((r) => r.id !== run!.id && r.lock_token);
     if (racing.length) throw new StopError(`run ${racing[0].id} took a lock at the same time; stopping`);
@@ -347,6 +360,16 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     // A halted run stays halted while it is written to, whatever happens
     // here: only a validation that passes afterwards lifts it.
     keep = isHalted(run) ? run.last_error! : null;
+    // Read only what is new, for an extension of a run that is complete
+    // after a full stage at the end it was planned from.
+    if (
+      opts.since &&
+      !Number.isFinite(limit) &&
+      run.status === "complete" &&
+      String(run.counts?.stage ?? "") === "full" &&
+      Date.parse(run.window_to) === Date.parse(opts.since)
+    )
+      light = run.window_to;
     if (!(await adapter.updateRunLocked(run.id, token, keep ? { status: "failed", last_error: keep } : { status: "running", last_error: null })))
       throw new LockLostError(`run ${run.id}'s lock was taken before the run began`);
   } catch (err) {
@@ -365,11 +388,33 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
   let hold: string | null = null;
   let keepLock = false;
 
+  const fresh = light ? newSince(ds, light) : null;
+  if (light) log(`reading what is new since ${light}, and counting the rest`);
   try {
     for (const phase of phases(ds)) {
       const wanted = phase.items.filter((i) => i.cohort < limit);
-      const known = new Map<string, RegistryItem>((await adapter.items(run.id, phase.kind)).map((i) => [i.logical_id, i]));
-      const pending = wanted.filter((i) => known.get(i.logicalId)?.state !== "created");
+      const whole = async () => new Map<string, RegistryItem>((await adapter.items(run!.id, phase.kind)).map((i) => [i.logical_id, i]));
+      let known: Map<string, RegistryItem>;
+      let pending: typeof wanted;
+      if (fresh) {
+        // Every row the run held at its last end is created (it ended
+        // complete), so a count says so; only the new rows are looked up.
+        // A count that does not add up reads the registry whole.
+        const ids = fresh.get(phase.kind)!;
+        const wantedNew = wanted.filter((i) => ids.has(i.logicalId));
+        known = new Map((await adapter.items(run.id, phase.kind, wantedNew.map((i) => i.logicalId))).map((i) => [i.logical_id, i]));
+        const createdNew = wantedNew.filter((i) => known.get(i.logicalId)?.state === "created").length;
+        const created = await adapter.registryCount(run.id, phase.kind, "created");
+        if (created === wanted.length - wantedNew.length + createdNew) pending = wantedNew.filter((i) => known.get(i.logicalId)?.state !== "created");
+        else {
+          log(`${phase.kind}: ${created} created where ${wanted.length - wantedNew.length + createdNew} were expected; reading the registry whole`);
+          known = await whole();
+          pending = wanted.filter((i) => known.get(i.logicalId)?.state !== "created");
+        }
+      } else {
+        known = await whole();
+        pending = wanted.filter((i) => known.get(i.logicalId)?.state !== "created");
+      }
       skipped[phase.kind] = wanted.length - pending.length;
       written[phase.kind] = 0;
       log(`${phase.kind}: ${wanted.length} in scope, ${skipped[phase.kind]} already created, ${pending.length} to write`);
@@ -426,7 +471,9 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     // plan's. Read back and compared first, so only a changed profile is
     // written, and every update is scoped to sample rows by the adapter.
     if (!cancelled) {
-      const profilesNow = ds.profiles.filter((p) => p.cohort < limit);
+      // An extension changes only the profiles with something new (window.ts).
+      const active = fresh ? activeSince(ds, fresh) : null;
+      const profilesNow = ds.profiles.filter((p) => p.cohort < limit && (!active || active.has(p.rowId)));
       let updated = 0;
       for (let i = 0; i < profilesNow.length; i += batchSize) {
         if (opts.signal?.aborted) {
@@ -435,7 +482,10 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
         }
         const batch = profilesNow.slice(i, i + batchSize);
         await heartbeat(adapter, run.id, token);
-        const back = await retry(() => adapter.selectByIds("profiles", batch.map((b) => b.rowId)), attempts, baseMs, log, "profiles read back");
+        const back = await retry(
+          () => adapter.selectByIds("profiles", batch.map((b) => b.rowId), ["id", "is_sample", ...PROFILE_MUTABLE]),
+          attempts, baseMs, log, "profiles read back"
+        );
         const byId = new Map(back.map((r) => [String(r.id), r]));
         const changes = batch
           .map((b) => ({ id: b.rowId, patch: changedFields(byId.get(b.rowId), b.row as unknown as Record<string, unknown>) }))
@@ -463,6 +513,9 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
         manifest_hash: plan.manifestHash,
         stage: complete ? "full" : String(run.counts?.stage ?? "") === "full" ? "full" : "canary",
         cohortLimit: Number.isFinite(limit) ? limit : null,
+        // The end at which the run was last read whole (ci.ts reads it
+        // whole again once a day): a light extension keeps the last one.
+        read_whole_at: light ? (run.counts?.read_whole_at ?? null) : complete ? plan.window.to : (run.counts?.read_whole_at ?? null),
       },
     });
     if (!ended) throw new LockLostError(`run ${run.id}'s lock was taken before the run could record its end`);
@@ -501,6 +554,7 @@ export async function execute(opts: ExecuteOptions): Promise<ExecuteReport> {
     endStatus,
     heldWith: hold,
     lockToken: keepLock ? token : null,
+    lightSince: light,
     before,
     cancelled,
   };

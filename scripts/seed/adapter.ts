@@ -105,8 +105,11 @@ export interface Adapter {
   checkSchema(): Promise<void>;
   /** Every row of a table, paginated by the adapter, optionally only genuine or only sample rows. */
   scan(table: ScanTable, columns: string[], where?: { sample?: boolean }): Promise<Record<string, unknown>[]>;
-  /** `eloBelow` counts profiles whose rating is under it (profiles only). */
-  count(table: ScanTable, where?: { sample?: boolean; eloBelow?: number }): Promise<number>;
+  /**
+   * `eloBelow` counts profiles whose rating is under it (profiles only);
+   * `seeking` debates with seeking_counterpart_at set (debates only).
+   */
+  count(table: ScanTable, where?: { sample?: boolean; eloBelow?: number; seeking?: boolean }): Promise<number>;
   /**
    * The ratings /api/judge averages into a topic's par: elo_before of the
    * topic's genuine originals, newest first, at most `n`. Numbers only, so
@@ -136,7 +139,10 @@ export interface Adapter {
   /** Inserts intents; an existing (run, kind, logical id) is left alone, and a row another run owns is refused. */
   recordIntents(items: Omit<RegistryItem, "state">[]): Promise<void>;
   setState(runId: string, kind: Kind, logicalIds: string[], state: ItemState): Promise<void>;
-  items(runId: string, kind: Kind): Promise<RegistryItem[]>;
+  /** The run's items of a kind; with `logicalIds`, only those (an extend's new rows). */
+  items(runId: string, kind: Kind, logicalIds?: string[]): Promise<RegistryItem[]>;
+  /** How many of the run's items of a kind are in `state`: a count, no rows read. */
+  registryCount(runId: string, kind: Kind, state: ItemState): Promise<number>;
 
   // Auth users.
   createAuthUser(u: { id: string; email: string; runId: string; n: number }): Promise<void>;
@@ -146,8 +152,11 @@ export interface Adapter {
 
   // Rows. Every write is scoped by ownership as well as id.
   insertIgnore(table: Table, rows: Record<string, unknown>[], conflict: string[]): Promise<void>;
-  /** Rows with these ids (or, for class_members, these "class:user" keys). */
-  selectByIds(table: Table, ids: string[]): Promise<Record<string, unknown>[]>;
+  /**
+   * Rows with these ids (or, for class_members, these "class:user" keys);
+   * with `columns`, only those columns, which must include the key ones.
+   */
+  selectByIds(table: Table, ids: string[], columns?: string[]): Promise<Record<string, unknown>[]>;
   /** Updates sample rows by id, only where is_sample is true. */
   updateSampleRows(table: "profiles", rows: { id: string; patch: Record<string, unknown> }[]): Promise<void>;
   /** Sets a sample challenge's two debate ids. */

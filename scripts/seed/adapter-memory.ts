@@ -68,14 +68,38 @@ export class MemoryAdapter implements Adapter {
 
   async checkSchema() {}
 
-  async scan(table: ScanTable, columns: string[], where?: { sample?: boolean }) {
+  /**
+   * Rows and registry items returned by reads that return rows (scan,
+   * items, selectByIds), not by counts: what a run reads, for the tests
+   * that hold an extend to the window's own rows (Arthur, 2026-11-09,
+   * item 28).
+   */
+  rowsRead = 0;
+  /** Cells returned by those reads: rows times their columns. */
+  cellsRead = 0;
+  /** Those rows as JSON, in characters: about what the Data API would send. */
+  bytesRead = 0;
+  private counted<T extends Record<string, unknown>>(rows: T[]): T[] {
+    this.rowsRead += rows.length;
+    for (const r of rows) {
+      this.cellsRead += Object.keys(r).length;
+      this.bytesRead += JSON.stringify(r).length;
+    }
+    return rows;
+  }
+
+  private rows(table: ScanTable, columns: string[], where?: { sample?: boolean }) {
     return [...this.table(table).values()]
       .filter((r) => where?.sample === undefined || Boolean(r.is_sample) === where.sample)
       .map((r) => (columns[0] === "*" ? { ...r } : Object.fromEntries(columns.map((c) => [c, r[c] ?? null]))));
   }
 
-  async count(table: ScanTable, where?: { sample?: boolean; eloBelow?: number }) {
-    const rows = await this.scan(table, ["id", "elo"], where);
+  async scan(table: ScanTable, columns: string[], where?: { sample?: boolean }) {
+    return this.counted(this.rows(table, columns, where));
+  }
+
+  async count(table: ScanTable, where?: { sample?: boolean; eloBelow?: number; seeking?: boolean }) {
+    const rows = this.rows(table, ["id", "elo", "seeking_counterpart_at"], where).filter((r) => !where?.seeking || r.seeking_counterpart_at !== null);
     return where?.eloBelow === undefined ? rows.length : rows.filter((r) => Number(r.elo) < where.eloBelow!).length;
   }
 
@@ -158,8 +182,16 @@ export class MemoryAdapter implements Adapter {
       if (it) it.state = state;
     }
   }
-  async items(runId: string, kind: Kind) {
-    return [...this.registry.values()].filter((i) => i.run_id === runId && i.kind === kind);
+  async items(runId: string, kind: Kind, logicalIds?: string[]) {
+    const only = logicalIds ? new Set(logicalIds) : null;
+    return this.counted(
+      [...this.registry.values()]
+        .filter((i) => i.run_id === runId && i.kind === kind && (!only || only.has(i.logical_id)))
+        .map((i) => ({ ...i })) as unknown as Record<string, unknown>[]
+    ) as unknown as RegistryItem[];
+  }
+  async registryCount(runId: string, kind: Kind, state: ItemState) {
+    return [...this.registry.values()].filter((i) => i.run_id === runId && i.kind === kind && i.state === state).length;
   }
 
   async createAuthUser(u: { id: string; email: string; runId: string; n: number }) {
@@ -189,8 +221,13 @@ export class MemoryAdapter implements Adapter {
       }
     });
   }
-  async selectByIds(table: Table, ids: string[]) {
-    return ids.map((id) => this.table(table).get(id)).filter((r): r is Row => Boolean(r)).map((r) => ({ ...r }));
+  async selectByIds(table: Table, ids: string[], columns?: string[]) {
+    return this.counted(
+      ids
+        .map((id) => this.table(table).get(id))
+        .filter((r): r is Row => Boolean(r))
+        .map((r) => (columns ? Object.fromEntries(columns.map((c) => [c, r[c] ?? null])) : { ...r }))
+    );
   }
   async updateSampleRows(table: "profiles", rows: { id: string; patch: Record<string, unknown> }[]) {
     for (const { id, patch } of rows) {

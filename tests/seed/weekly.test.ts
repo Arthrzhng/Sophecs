@@ -117,6 +117,53 @@ describe("a sample run made with the weekly settings", () => {
     });
   }
 
+  // Arthur, 2026-11-09, items 9, 11 and 13.
+  for (const seed of ["weekly-check", "another"]) {
+    it(`keeps every school ranked in every seven days from the start, not only every ISO week (item 9, seed ${seed})`, () => {
+      const end = later(7 * 6);
+      const ds = run(end, seed);
+      const judged = new Map(SCHOOLS.map((x) => [x, [] as number[]]));
+      for (const { row } of ds.debates) if (row.kind === "original" && !row.rejected && row.verdict) judged.get(row.school)!.push(Date.parse(row.created_at));
+      // Every seven days ending in the run, checked every ten minutes.
+      for (let t = Date.parse(BASE_TO); t <= Date.parse(end); t += 10 * 60_000)
+        for (const school of SCHOOLS) {
+          const n = judged.get(school)!.filter((x) => x > t - WEEK && x <= t).length;
+          if (n < RUN_WEEKLY!.minPerSchool) expect(n, `${school}, seven days to ${new Date(t).toISOString()}`).toBeGreaterThanOrEqual(RUN_WEEKLY!.minPerSchool);
+        }
+    });
+
+    it(`brings anonymous quiz takers every week, and eases its sign-ups into the weeks with no cliff (items 11 and 13, seed ${seed})`, () => {
+      const ds = run(later(7 * 6), seed);
+      const start = Date.parse(BASE_TO);
+      const perWeek = (ts: number[], k: number) => ts.filter((t) => t > start + k * WEEK && t <= start + (k + 1) * WEEK).length;
+      const anon = ds.quizResults.filter((q) => !q.row.user_id).map((q) => Date.parse(q.row.created_at));
+      for (let k = 0; k < 6; k++) {
+        expect(perWeek(anon, k), `anonymous, week ${k}`).toBeGreaterThanOrEqual(15);
+        expect(perWeek(anon, k), `anonymous, week ${k}`).toBeLessThanOrEqual(60);
+      }
+      // Sign-ups: the base window's last six weeks ease down to the weeks' rate.
+      const signups = ds.profiles.map((p) => Date.parse(p.row.created_at));
+      const weeks = Array.from({ length: 12 }, (_, i) => perWeek(signups, i - 6));
+      expect(weeks[5], "the base window's last week").toBeLessThanOrEqual(45);
+      expect(weeks[5], "the base window's last week").toBeGreaterThanOrEqual(10);
+      for (let i = 1; i < 6; i++) expect(weeks[i], `week ${i - 6}: ${weeks.join(", ")}`).toBeGreaterThanOrEqual(0.4 * weeks[i - 1]);
+      // And active accounts run on at the weeks' level through the base window's end.
+      const act = new Map<number, Set<string>>();
+      const add = (iso: string, u: string) => {
+        const w = mondayOf(Date.parse(iso));
+        if (!act.has(w)) act.set(w, new Set());
+        act.get(w)!.add(u);
+      };
+      for (const { row } of ds.debates) add(row.created_at, row.user_id);
+      for (const { row } of ds.quizResults) if (row.user_id) add(row.created_at, row.user_id);
+      for (let w = mondayOf(start) - 5 * WEEK; w <= mondayOf(start) + 4 * WEEK; w += WEEK) {
+        const n = act.get(w)?.size ?? 0;
+        expect(n, new Date(w).toISOString().slice(0, 10)).toBeGreaterThanOrEqual(160);
+        expect(n, new Date(w).toISOString().slice(0, 10)).toBeLessThanOrEqual(240);
+      }
+    });
+  }
+
   it("a later end only appends: every row written by an earlier end is the same, profiles aside from what they keep up to date", () => {
     const a = run(later(10));
     const b = run(later(24));

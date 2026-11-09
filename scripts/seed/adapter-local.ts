@@ -81,10 +81,11 @@ export class LocalAdapter implements Adapter {
     return this.query(`select ${cols} from public.${ident(table)}${filter}`);
   }
 
-  async count(table: ScanTable, where?: { sample?: boolean; eloBelow?: number }) {
+  async count(table: ScanTable, where?: { sample?: boolean; eloBelow?: number; seeking?: boolean }) {
     const conds = [
       ...(where?.sample === undefined ? [] : [`is_sample = ${where.sample ? "true" : "false"}`]),
       ...(where?.eloBelow === undefined ? [] : [`elo < ${Number(where.eloBelow)}`]),
+      ...(where?.seeking ? ["seeking_counterpart_at is not null"] : []),
     ];
     const filter = conds.length ? ` where ${conds.join(" and ")}` : "";
     return Number(this.sql(`select count(*) from public.${ident(table)}${filter};`).trim());
@@ -159,9 +160,18 @@ export class LocalAdapter implements Adapter {
        where run_id = ${json(runId)}::json #>> '{}' and kind = ${json(kind)}::json #>> '{}' and logical_id = any(${textArray(logicalIds)});`
     );
   }
-  async items(runId: string, kind: Kind) {
+  async items(runId: string, kind: Kind, logicalIds?: string[]) {
+    if (logicalIds && !logicalIds.length) return [];
+    const only = logicalIds ? ` and logical_id = any(${textArray(logicalIds)})` : "";
     return this.query<RegistryItem>(
-      `select run_id, kind, logical_id, row_id, state from public.seed_run_items where run_id = ${json(runId)}::json #>> '{}' and kind = ${json(kind)}::json #>> '{}'`
+      `select run_id, kind, logical_id, row_id, state from public.seed_run_items where run_id = ${json(runId)}::json #>> '{}' and kind = ${json(kind)}::json #>> '{}'${only}`
+    );
+  }
+  async registryCount(runId: string, kind: Kind, state: ItemState) {
+    return Number(
+      this.sql(
+        `select count(*) from public.seed_run_items where run_id = ${json(runId)}::json #>> '{}' and kind = ${json(kind)}::json #>> '{}' and state = ${json(state)}::json #>> '{}';`
+      ).trim()
     );
   }
 
@@ -188,10 +198,11 @@ export class LocalAdapter implements Adapter {
        on conflict (${conflict.map(ident).join(", ")}) do nothing;`
     );
   }
-  async selectByIds(table: Table, ids: string[]) {
+  async selectByIds(table: Table, ids: string[], columns?: string[]) {
     if (!ids.length) return [];
     const key = table === "class_members" ? `(class_id || ':' || user_id::text)` : "id::text";
-    return this.query(`select * from public.${ident(table)} where ${key} = any(${textArray(ids)})`);
+    const cols = columns ? columns.map(ident).join(", ") : "*";
+    return this.query(`select ${cols} from public.${ident(table)} where ${key} = any(${textArray(ids)})`);
   }
   async updateSampleRows(table: "profiles", rows: { id: string; patch: Record<string, unknown> }[]) {
     // One statement per row, each scoped to is_sample; the values go
