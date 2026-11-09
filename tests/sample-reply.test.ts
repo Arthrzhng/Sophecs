@@ -82,7 +82,34 @@ function from(table: string) {
   };
   return b;
 }
-const admin = { from, rpc: async (name: string, args: unknown) => (rpcCalls.push({ name, args }), rpc) } as never;
+// The reader's claims (migration 0030), as claim_sample_reply and
+// release_sample_reply keep them: one row per reader, taken over only once
+// expired, timed by the database's clock (dbClock), given back only with
+// its token. scripts/test-0030-sample-reply-claims.sh tests the SQL itself.
+let claims = new Map<string, { exchange: string; token: string; expires: number }>();
+let dbClock = 0;
+let claimFails: { data: unknown; error: unknown } | null = null;
+let releaseFails = false;
+async function fakeRpc(name: string, args: unknown) {
+  rpcCalls.push({ name, args });
+  if (name === "claim_sample_reply") {
+    if (claimFails) return claimFails;
+    const a = args as { p_reader: string; p_exchange: string; p_token: string; p_seconds: number };
+    const held = claims.get(a.p_reader);
+    if (held && held.expires > dbClock) return { data: false, error: null };
+    claims.set(a.p_reader, { exchange: a.p_exchange, token: a.p_token, expires: dbClock + a.p_seconds * 1000 });
+    return { data: true, error: null };
+  }
+  if (name === "release_sample_reply") {
+    if (releaseFails) return { data: null, error: { message: "connection reset" } };
+    const a = args as { p_reader: string; p_token: string };
+    if (claims.get(a.p_reader)?.token === a.p_token) claims.delete(a.p_reader);
+    return { data: null, error: null };
+  }
+  return rpc;
+}
+const admin = { from, rpc: fakeRpc } as never;
+const spendReads = () => rpcCalls.filter((c) => c.name === "ai_sample_spend_this_month").length;
 
 const {
   counterpartIsSample,
@@ -142,9 +169,14 @@ function world(over: { counterpart?: string; turns?: Row[]; nextTurn?: string | 
 beforeEach(() => {
   vi.stubEnv("SAMPLE_REPLIES", "1");
   vi.stubEnv("KILL_SWITCH_SCREEN", "");
+  vi.stubEnv("KILL_SWITCH_JUDGE", "");
   budget = "ok";
   rpc = { data: 3.2, error: null };
   rpcCalls.length = 0;
+  claims = new Map();
+  dbClock = 0;
+  claimFails = null;
+  releaseFails = false;
   screenLogs.length = 0;
   screenLogOk = true;
   failInsertInto = null;
@@ -174,8 +206,15 @@ describe("a sample's reply", () => {
     expect(screenTurn).toHaveBeenCalledWith({ quotedClaim: QUOTE, body: BODY }, expect.objectContaining({ maxRetries: 0 }));
     expect(screenLogs).toEqual([expect.objectContaining({ userId: READER, forSample: true })]);
     expect(tables.exchanges[0]).toMatchObject({ next_turn: READER, status: "open", last_turn_at: NOW.toISOString() });
-    // The ceiling read: this month's marked calls, by the function that takes no argument.
-    expect(rpcCalls).toEqual([{ name: "ai_sample_spend_this_month", args: undefined }]);
+    // The reader's claim first, then the ceiling read (this month's marked
+    // calls, by the function that takes no argument), then the claim given
+    // back with its own token.
+    expect(rpcCalls.map((c) => c.name)).toEqual(["claim_sample_reply", "ai_sample_spend_this_month", "release_sample_reply"]);
+    const claimArgs = rpcCalls[0].args as { p_reader: string; p_exchange: string; p_token: string; p_seconds: number };
+    expect(claimArgs).toMatchObject({ p_reader: READER, p_exchange: "x1" });
+    expect(rpcCalls[1].args).toBeUndefined();
+    expect(rpcCalls[2].args).toEqual({ p_reader: READER, p_token: claimArgs.p_token });
+    expect(claims.size).toBe(0);
   });
 
   it("answers the reader's last reply at turn 4, and completes the exchange", async () => {
@@ -212,9 +251,11 @@ describe("a sample's reply", () => {
     expect(create).not.toHaveBeenCalled();
   });
 
-  it("stops before any call for the flag, the kill switch, the budget and the ceiling, failing closed", async () => {
+  it("stops before any call for the flag, the kill switches, the budget and the ceiling, failing closed", async () => {
     const cases: [() => void, string][] = [
       [() => vi.stubEnv("SAMPLE_REPLIES", "0"), "off"],
+      // One switch stops all AI (Arthur, 2026-11-09, item 23).
+      [() => vi.stubEnv("KILL_SWITCH_JUDGE", "true"), "paused"],
       [() => vi.stubEnv("KILL_SWITCH_SCREEN", "true"), "paused"],
       [() => (budget = "over"), "budget"],
       [() => (budget = "unread"), "unread"],
@@ -226,14 +267,33 @@ describe("a sample's reply", () => {
     for (const [arrange, reason] of cases) {
       vi.stubEnv("SAMPLE_REPLIES", "1");
       vi.stubEnv("KILL_SWITCH_SCREEN", "");
+      vi.stubEnv("KILL_SWITCH_JUDGE", "");
       budget = "ok";
       rpc = { data: 3.2, error: null };
       world();
       arrange();
       expect(await replyAsSample(admin, "x1", READER, NOW), reason).toEqual({ ok: false, reason });
+      // And the reader's claim given back each time.
+      expect(claims.size, reason).toBe(0);
     }
     expect(create).not.toHaveBeenCalled();
+    expect(screenTurn).not.toHaveBeenCalled();
     expect(SAMPLE_REPLY_CEILING_USD).toBe(15);
+  });
+
+  it("stops for the judge's kill switch whatever the judge's allowlist, and stops pairing too (item 23)", async () => {
+    vi.stubEnv("KILL_SWITCH_JUDGE", "true");
+    vi.stubEnv("JUDGE_ALLOWLIST_USER_IDS", READER);
+    create.mockResolvedValue(answer(QUOTE));
+    expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual({ ok: false, reason: "paused" });
+    // samplesUnavailable is what pairing with a sample reads (src/app/debate/actions.ts).
+    expect(await samplesUnavailable(admin)).toBe("paused");
+    // Only "true" stops it, as the judge route reads the switch.
+    vi.stubEnv("KILL_SWITCH_JUDGE", "1");
+    expect(await samplesUnavailable(admin)).toBeNull();
+    expect(create).not.toHaveBeenCalled();
+    const src = readFileSync("src/app/api/judge/route.ts", "utf8");
+    expect(src).toMatch(/process\.env\.KILL_SWITCH_JUDGE === "true"/);
   });
 
   it("counts toward the reader's daily cap: a screen of the reader's within 24 hours, and the writing calls", async () => {
@@ -354,103 +414,162 @@ describe("a sample's reply", () => {
   });
 });
 
-describe("the claim on the sample's turn (review pass 1, B2)", () => {
-  it("is held by one request: another while it is writing makes no call, and a claim that outlived its request is taken", async () => {
-    // A request in flight: last_turn_at a minute ahead.
-    tables.exchanges[0].last_turn_at = new Date(NOW.getTime() + 60_000).toISOString();
-    expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual({ ok: false, reason: "writing" });
-    expect(create).not.toHaveBeenCalled();
-    expect(screenTurn).not.toHaveBeenCalled();
-    // Two minutes later that request is long dead (the page's function runs
-    // 60 seconds at most), and the claim is taken.
+const READER2 = "44444444-4444-4444-4444-444444444444";
+// Two more exchanges with samples: x2 the same reader's, x3 another reader's.
+function moreExchanges() {
+  const x1 = tables.exchanges[0];
+  tables.exchanges.push(
+    { ...x1, id: "x2", debate_a: "dr2", debate_b: "ds2" },
+    { ...x1, id: "x3", user_a: READER2, debate_a: "dr3", debate_b: "ds3" }
+  );
+  tables.profiles.push({ id: READER2, is_sample: false });
+  for (const [r, s] of [["dr2", "ds2"], ["dr3", "ds3"]])
+    tables.debates.push({ id: r, argument: READER_ARGUMENT, motion_text: null }, { id: s, argument: SAMPLE_ARGUMENT, motion_text: null });
+  for (const [x, by] of [["x2", READER], ["x3", READER2]])
+    tables.turns.push({ exchange_id: x, seq: 1, author_id: by, quoted_claim: "q", body: "x".repeat(200), screen_result: "ok" });
+}
+const SCREEN_OK = { result: "ok", reason: "", latencyMs: 5, costUsd: 0.0006 };
+const DELIVERED = { ok: true, seq: 2, complete: false };
+
+describe("one sample reply in progress per reader (Arthur, 2026-11-09, item 24)", () => {
+  it("is held by one request: another for the same exchange or another of the reader's makes no call, another reader's goes ahead", async () => {
+    moreExchanges();
     create.mockResolvedValue(answer(QUOTE));
-    const later = new Date(NOW.getTime() + 55_000);
-    expect(await replyAsSample(admin, "x1", READER, later)).toEqual({ ok: true, seq: 2, complete: false });
-    expect(create).toHaveBeenCalledTimes(1);
+    const during: Record<string, unknown> = {};
+    let nested = false;
+    // While the first is being screened, three more requests arrive.
+    screenTurn.mockImplementation(async () => {
+      if (!nested) {
+        nested = true;
+        during.sameExchange = await replyAsSample(admin, "x1", READER, NOW);
+        during.otherExchange = await replyAsSample(admin, "x2", READER, NOW);
+        during.otherReader = await replyAsSample(admin, "x3", READER2, NOW);
+      }
+      return SCREEN_OK;
+    });
+    expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual(DELIVERED);
+    expect(during).toEqual({
+      sameExchange: { ok: false, reason: "writing" },
+      otherExchange: { ok: false, reason: "writing" },
+      otherReader: DELIVERED,
+    });
+    // Two writing calls: the first reader's and the other reader's.
+    expect(create).toHaveBeenCalledTimes(2);
+    // The two refused said "writing" before reading the ceiling.
+    expect(spendReads()).toBe(2);
+    // Once the first is delivered, the reader's other exchange goes ahead.
+    expect(await replyAsSample(admin, "x2", READER, NOW)).toEqual(DELIVERED);
+    expect(claims.size).toBe(0);
   });
 
-  it("is given back, last_turn_at as it was, on every way out but delivery", async () => {
+  it("lets one of two at once through, for one exchange or for two of the reader's", async () => {
+    for (const [first, second] of [["x1", "x1"], ["x1", "x2"]]) {
+      world();
+      moreExchanges();
+      create.mockReset();
+      create.mockResolvedValue(answer(QUOTE));
+      screenTurn.mockReset();
+      screenTurn.mockResolvedValue(SCREEN_OK);
+      const both = await Promise.all([replyAsSample(admin, first, READER, NOW), replyAsSample(admin, second, READER, NOW)]);
+      expect(both, `${first} and ${second}`).toContainEqual({ ok: false, reason: "writing" });
+      expect(both, `${first} and ${second}`).toContainEqual(DELIVERED);
+      expect(create).toHaveBeenCalledTimes(1);
+      expect(screenTurn).toHaveBeenCalledTimes(1);
+      expect(tables.turns.filter((t) => t.seq === 2)).toHaveLength(1);
+    }
+  });
+
+  it("runs out by the database's clock when its request died, and is then taken", async () => {
+    claims.set(READER, { exchange: "x9", token: "dead", expires: dbClock + 120_000 });
+    expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual({ ok: false, reason: "writing" });
+    // The request's own clock does not move it; the database's does.
+    expect(await replyAsSample(admin, "x1", READER, new Date(NOW.getTime() + 3600_000))).toEqual({ ok: false, reason: "writing" });
+    expect(create).not.toHaveBeenCalled();
+    expect(spendReads()).toBe(0);
+    dbClock += 120_000;
+    create.mockResolvedValue(answer(QUOTE));
+    expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual(DELIVERED);
+    // Held for longer than the page's function may run, so only a request
+    // that died outlives its claim.
+    const page = readFileSync("src/app/counterpart/[id]/page.tsx", "utf8");
+    const maxDuration = Number(page.match(/export const maxDuration = (\d+);/)![1]);
+    const seconds = (rpcCalls.find((c) => c.name === "claim_sample_reply")!.args as { p_seconds: number }).p_seconds;
+    expect(seconds).toBe(120);
+    expect(seconds).toBeGreaterThan(maxDuration);
+    expect(readFileSync("src/app/counterpart/actions.ts", "utf8")).toContain("replyAsSample(admin, exchangeId, user.id)");
+  });
+
+  it("is given back on every way out, an exception included, and never touches the lapse clock", async () => {
     const outcomes: [() => void, string][] = [
       [() => create.mockResolvedValue(answer(QUOTE, "Too short.")), "failed"],
-      [() => (create.mockResolvedValue(answer(QUOTE)), screenTurn.mockResolvedValue({ result: "spam", reason: "", latencyMs: 1, costUsd: 0.0006 })), "held"],
+      [() => (create.mockResolvedValue(answer(QUOTE)), screenTurn.mockResolvedValue({ ...SCREEN_OK, result: "spam" })), "held"],
       [() => (create.mockResolvedValue(answer(QUOTE)), screenTurn.mockRejectedValue(new Error("socket hang up"))), "failed"],
       [() => create.mockRejectedValue(Object.assign(new Error("overloaded"), { status: 529 })), "failed"],
+      [() => (failInsertInto = "turns", create.mockResolvedValue(answer(QUOTE))), "failed"],
+      [() => (budget = "over"), "budget"],
+      [() => (tables.ai_calls = Array.from({ length: 8 }, (_, i) => ({ id: `s${i}`, user_id: READER, kind: "screen", created_at: NOW.toISOString() }))), "cap"],
     ];
     for (const [arrange, reason] of outcomes) {
       world();
+      budget = "ok";
+      failInsertInto = null;
       create.mockReset();
       screenTurn.mockReset();
-      screenTurn.mockResolvedValue({ result: "ok", reason: "", latencyMs: 5, costUsd: 0.0006 });
+      screenTurn.mockResolvedValue(SCREEN_OK);
       arrange();
       expect(await replyAsSample(admin, "x1", READER, NOW), reason).toEqual({ ok: false, reason });
+      expect(claims.size, reason).toBe(0);
+      // The claim lives in its own table: the exchange is as it was.
       expect(tables.exchanges[0], reason).toMatchObject({ last_turn_at: HANDED, next_turn: SAMPLE, status: "open" });
     }
     // An exception, not a result: given back all the same.
     world();
-    create.mockResolvedValue(answer(QUOTE));
-    screenTurn.mockResolvedValue({ result: "ok", reason: "", latencyMs: 5, costUsd: 0.0006 });
     failInsertInto = null;
-    const throwing = { ...admin as object, from: (t: string) => (t === "turns" && tables.ai_calls.length > 0 && screenLogs.length > 0 ? (() => { throw new Error("connection reset"); })() : from(t)) } as never;
+    create.mockResolvedValue(answer(QUOTE));
+    const throwing = { rpc: fakeRpc, from: (t: string) => (t === "turns" && screenLogs.length > 0 ? (() => { throw new Error("connection reset"); })() : from(t)) } as never;
     await expect(replyAsSample(throwing, "x1", READER, NOW)).rejects.toThrow("connection reset");
+    expect(claims.size).toBe(0);
     expect(tables.exchanges[0].last_turn_at).toBe(HANDED);
   });
 
-  it("puts back exactly what it replaced when a second request comes while the first is writing (review pass 2, O1)", async () => {
-    // A claims and is screening when B arrives; B sees A's claim and makes
-    // no call; A then fails and gives its claim back.
+  it("gives back only its own claim: one another request took after it ran out stays", async () => {
     create.mockResolvedValue(answer(QUOTE));
-    let second: Awaited<ReturnType<typeof replyAsSample>> | null = null;
     screenTurn.mockImplementation(async () => {
-      second = await replyAsSample(admin, "x1", READER, new Date(NOW.getTime() + 5_000));
-      throw Object.assign(new Error("overloaded"), { status: 529 });
+      claims.set(READER, { exchange: "x2", token: "theirs", expires: dbClock + 120_000 });
+      return SCREEN_OK;
     });
-    expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual({ ok: false, reason: "failed" });
-    expect(second).toEqual({ ok: false, reason: "writing" });
-    expect(create).toHaveBeenCalledTimes(1);
-    expect(tables.exchanges[0].last_turn_at).toBe(HANDED);
-    // B said "writing" before reading the budget or the month's spend.
-    expect(rpcCalls).toHaveLength(1);
+    expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual(DELIVERED);
+    expect(claims.get(READER)?.token).toBe("theirs");
   });
 
-  it("claims only if last_turn_at is still the value it read, so what it gives back is what it replaced", async () => {
-    // Between this request's read and its claim, last_turn_at moves to
-    // another time in the past: the claim must not take it.
-    const MOVED = new Date(NOW.getTime() - 30_000).toISOString();
-    const moving = {
-      from,
-      rpc: async (name: string, args: unknown) => {
-        tables.exchanges[0].last_turn_at = MOVED;
-        rpcCalls.push({ name, args });
-        return rpc;
-      },
-    } as never;
-    create.mockResolvedValue(answer(QUOTE));
-    expect(await replyAsSample(moving, "x1", READER, NOW)).toEqual({ ok: false, reason: "writing" });
+  it("fails closed when the claim cannot be taken, and one not given back only runs out", async () => {
+    for (const fails of [
+      { data: null, error: { message: "function public.claim_sample_reply does not exist" } },
+      { data: null, error: null },
+      { data: "t", error: null },
+    ]) {
+      claimFails = fails;
+      expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual({ ok: false, reason: "unread" });
+    }
+    const unreachable = { from, rpc: async () => { throw new Error("fetch failed"); } } as never;
+    expect(await replyAsSample(unreachable, "x1", READER, NOW)).toEqual({ ok: false, reason: "unread" });
     expect(create).not.toHaveBeenCalled();
-    expect(tables.exchanges[0].last_turn_at).toBe(MOVED);
-  });
+    expect(spendReads()).toBe(0);
+    expect(sampleReplyMessage("unread")).toMatch(/not replying right now/);
 
-  it("claims only from the value it read: two that read the same value cannot both claim", async () => {
+    claimFails = null;
+    releaseFails = true;
     create.mockResolvedValue(answer(QUOTE));
-    const [a, b] = await Promise.all([replyAsSample(admin, "x1", READER, NOW), replyAsSample(admin, "x1", READER, NOW)]);
-    expect([a.ok, b.ok].filter(Boolean)).toHaveLength(1);
-    expect(create).toHaveBeenCalledTimes(1);
+    expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual(DELIVERED);
+    expect(claims.get(READER)?.expires).toBe(dbClock + 120_000);
   });
 
-  it("says a reply that could not be written, for any reason but a duplicate, failed, so the reader can try again (review pass 2, O5)", async () => {
-    create.mockResolvedValue(answer(QUOTE));
-    failInsertInto = "turns";
-    expect(await replyAsSample(admin, "x1", READER, NOW)).toEqual({ ok: false, reason: "failed" });
-    expect(tables.turns).toHaveLength(1);
-    expect(tables.exchanges[0]).toMatchObject({ last_turn_at: HANDED, next_turn: SAMPLE });
-  });
-
-  it("is replaced by the hand-over on delivery, and the hand-over moves nothing once the turn is no longer the sample's", async () => {
+  it("hands over only while the turn is still the sample's", async () => {
     create.mockResolvedValue(answer(QUOTE));
     // While the reply is screened, the turn is moved on by something else.
     screenTurn.mockImplementation(async () => {
       tables.exchanges[0].next_turn = HUMAN;
-      return { result: "ok", reason: "", latencyMs: 5, costUsd: 0.0006 };
+      return SCREEN_OK;
     });
     const out = await replyAsSample(admin, "x1", READER, NOW);
     expect(out.ok).toBe(true);

@@ -26,8 +26,8 @@ import type { SchoolId } from "@/lib/types";
 // the ceiling holds about 1,250 replies a month | cap=the reader's SCREEN_DAILY_CAP: a sample's reply is one of the reader's 8
 // screened replies a day, and the reader may cause at most 16 writing calls a day, retries included |
 // ceiling=SAMPLE_REPLY_CEILING_USD a month, both kinds, inside AI_MONTHLY_BUDGET_USD |
-// flag=SAMPLE_REPLIES (build time, next.config.ts) | kill_switch=KILL_SWITCH_SCREEN, since every reply is
-// screened | logged_to=ai_calls kind='sample_reply' for the writing and 'screen' for its screen, both
+// flag=SAMPLE_REPLIES (build time, next.config.ts) | kill_switch=KILL_SWITCH_JUDGE, which stops all AI
+// (Arthur, 2026-11-09, item 23), and KILL_SWITCH_SCREEN, since every reply is screened | logged_to=ai_calls kind='sample_reply' for the writing and 'screen' for its screen, both
 // under the reader's user_id and marked for_sample (migration 0029) | retries=one more writing call
 // when an answer breaks the reply rules; none by the SDK.
 //
@@ -37,11 +37,12 @@ import type { SchoolId } from "@/lib/types";
 // writing calls at MAX_TOKENS on the longest inputs a turn-4 reply can
 // have (two 400-word arguments, three 1,200-character replies and the
 // criteria, about 4,300 tokens in at four characters a token, more on the
-// retry) and a screen at its most. An exchange has at most one reply in
-// flight, since the sample's turn is claimed before the writing call
-// (claimTurn); so a reader can have one in flight for each exchange they
-// have open with a sample, and the reader's daily room can be passed by
-// those too.
+// retry) and a screen at its most. A reader has at most one reply in
+// flight, whatever their exchanges (Arthur, 2026-11-09, item 24): the
+// reader's claim (claimReader, migration 0030) is taken before the
+// ceiling is read. So the ceiling can be passed only by replies for
+// different readers at the same moment, and the reader's daily room not
+// at all.
 //
 // Arthur, 2026-11-08, item 1. docs/sample-activity.md, "Sample replies", has the design.
 
@@ -64,16 +65,11 @@ const SCREEN_TIMEOUT_MS = 10_000;
 // reply at the longest, about 900 tokens in and 60 out, rounded up.
 const CHARS_PER_TOKEN_AT_MOST = 3;
 const SCREEN_COST_AT_MOST_USD = 0.002;
-// The sample's turn is claimed for this long before the writing call, by
-// moving the exchange's last_turn_at this far ahead (claimTurn). Longer
-// than the exchange page's 60-second function, so a claim outlives the
-// request that made it only when that request died, and then for a minute
-// at most.
-const CLAIM_MS = 120_000;
-// A claim is a last_turn_at in the future. This much leeway is left for
-// clocks on different functions, so an ordinary last_turn_at is never
-// taken for one.
-const CLAIM_SKEW_MS = 10_000;
+// The reader's claim is held for this long (claimReader). Longer than the
+// exchange page's 60-second function, so a claim outlives the request that
+// made it only when that request died, and then for a minute at most.
+// Timed by the database's clock (migration 0030).
+const CLAIM_SECONDS = 120;
 
 /**
  * The flag. Written into the build as a constant (next.config.ts), like
@@ -116,6 +112,9 @@ export async function sampleReplySpend(admin: SupabaseClient): Promise<number | 
 export type Unavailable = "off" | "paused" | "budget" | "ceiling" | "unread";
 export async function samplesUnavailable(admin: SupabaseClient): Promise<Unavailable | null> {
   if (!sampleRepliesOn()) return "off";
+  // One switch stops all AI (Arthur, 2026-11-09, item 23): the judge's,
+  // read as the judge route reads it, with no allowlist for samples.
+  if (process.env.KILL_SWITCH_JUDGE === "true") return "paused";
   if (process.env.KILL_SWITCH_SCREEN === "true") return "paused";
   const budget = await budgetState();
   if (budget === "over") return "budget";
@@ -189,7 +188,6 @@ interface ExchangeRow {
   school_b: string;
   status: string;
   next_turn: string | null;
-  last_turn_at: string;
 }
 
 /**
@@ -235,17 +233,19 @@ export function sampleReplyDue(params: {
  * exchange with a reader, when it is the sample's turn.
  *
  * Order of checks: the flag; the exchange is the reader's, with a sample,
- * open and the sample's turn, the reader's last reply delivered; no other
- * request writing it; then the kill switch, the budget, the ceiling and
- * the reader's daily room (room for a whole reply, retry included); then
- * the turn claimed, the writing call, its reply held to a reader's rules,
- * the screen, and delivery. Nothing is written to `turns` until the screen
- * has passed, so a reply that fails anywhere leaves the exchange as it
- * was, the claim given back and the sample's turn still due, and the next
- * request tries again within the same caps.
+ * open and the sample's turn, the reader's last reply delivered; then the
+ * reader's claim, one reply in progress per reader; then the kill
+ * switches, the budget, the ceiling and the reader's daily room (room for
+ * a whole reply, retry included); then the writing call, its reply held to
+ * a reader's rules, the screen, and delivery. Nothing is written to
+ * `turns` until the screen has passed, so a reply that fails anywhere
+ * leaves the exchange as it was and the sample's turn still due, and the
+ * next request tries again within the same caps. The claim is given back
+ * on every way out, delivery included.
  *
- * A second request while one is writing finds the turn claimed and makes
- * no call ("writing"): a reload, or a second tab, costs nothing.
+ * A second request while one is writing, for this exchange or another of
+ * the reader's, finds the claim held and makes no call ("writing"): a
+ * reload, a second tab or a second exchange costs nothing.
  */
 export async function replyAsSample(
   admin: SupabaseClient,
@@ -257,7 +257,7 @@ export async function replyAsSample(
   if (!sampleRepliesOn()) return { ok: false, reason: "off" };
   const { data: exchange } = await admin
     .from("exchanges")
-    .select("id, topic_slug, debate_a, debate_b, user_a, user_b, school_a, school_b, status, next_turn, last_turn_at")
+    .select("id, topic_slug, debate_a, debate_b, user_a, user_b, school_a, school_b, status, next_turn")
     .eq("id", exchangeId)
     .maybeSingle<ExchangeRow>();
   if (!exchange || (exchange.user_a !== readerId && exchange.user_b !== readerId)) return { ok: false, reason: "not_due" };
@@ -298,10 +298,34 @@ export async function replyAsSample(
     return { ok: false, reason: "not_due" };
   }
 
-  // Already claimed by a request still writing: say so before reading
-  // anything that costs a round trip, and make no claim of this one's.
-  if (Date.parse(exchange.last_turn_at) > now.getTime() + CLAIM_SKEW_MS) return { ok: false, reason: "writing" };
+  // One sample reply in progress per reader (Arthur, 2026-11-09, item 24),
+  // claimed before the budget, the ceiling or the model is reached.
+  const claim = await claimReader(admin, readerId, exchange.id);
+  if (claim === "unread") return { ok: false, reason: "unread" };
+  if (claim === null) return { ok: false, reason: "writing" };
+  try {
+    return await replyClaimed(admin, { exchange, sampleId, readerId, readerIsA, seq, last, turns, now });
+  } finally {
+    // Given back on every way out, delivery and an exception included.
+    await releaseReader(admin, readerId, claim);
+  }
+}
 
+/** Everything after the reader's claim: the limits, the material, the reply. */
+async function replyClaimed(
+  admin: SupabaseClient,
+  ctx: {
+    exchange: ExchangeRow;
+    sampleId: string;
+    readerId: string;
+    readerIsA: boolean;
+    seq: number;
+    last: { body: string };
+    turns: { seq: number; author_id: string | null; quoted_claim: string; body: string; screen_result: string }[];
+    now: Date;
+  }
+): Promise<SampleReplyResult> {
+  const { exchange, sampleId, readerId, readerIsA, seq, last, turns, now } = ctx;
   const unavailable = await samplesUnavailable(admin);
   if (unavailable) return { ok: false, reason: unavailable };
   const room = await readerHasRoom(admin, readerId, now);
@@ -346,22 +370,10 @@ export async function replyAsSample(
     source,
   });
 
-  const handedOverAt = exchange.last_turn_at;
-  const lease = await claimTurn(admin, exchange.id, sampleId, handedOverAt, now);
-  if (!lease) return { ok: false, reason: "writing" };
-  let delivered = false;
-  try {
-    const result = await writeAndDeliver(admin, { exchange, sampleId, readerId, seq, source, userTurn, now });
-    delivered = result.ok;
-    return result;
-  } finally {
-    // Given back on every way out but delivery, an exception included. The
-    // hand-over on delivery has already replaced it.
-    if (!delivered) await releaseTurn(admin, exchange.id, sampleId, lease, handedOverAt);
-  }
+  return writeAndDeliver(admin, { exchange, sampleId, readerId, seq, source, userTurn, now });
 }
 
-/** The writing call, the screen and delivery, once the turn is claimed. */
+/** The writing call, the screen and delivery, once the reader's claim is held. */
 async function writeAndDeliver(
   admin: SupabaseClient,
   ctx: { exchange: ExchangeRow; sampleId: string; readerId: string; seq: number; source: string; userTurn: string; now: Date }
@@ -464,61 +476,41 @@ function hasStatus(err: unknown): boolean {
 }
 
 /**
- * Claims the sample's turn for one request, in one conditional update:
- * last_turn_at moves CLAIM_MS ahead, only while the turn is still the
- * sample's and last_turn_at is still the value this request read, which
- * the caller has already found not to be a claim (not ahead of now). So
- * two requests that read the same value cannot both claim, and what is
- * given back is exactly what the claim replaced. The claim, or null when
- * another request got there first or the turn has moved on.
- *
- * last_turn_at, rather than a new column, so this needs no migration. Read
- * elsewhere it only starts the lapse clock (src/lib/counterpart.ts), which
- * a time ahead holds for the claim's length, and orders /me's list. A claim
- * whose request died is not given back: it runs out, and leaves
- * last_turn_at up to CLAIM_MS later than the hand-over.
+ * The reader's claim: at most one sample reply in progress per reader
+ * (Arthur, 2026-11-09, item 24), for whichever exchange. Taken in one
+ * statement by `claim_sample_reply` (migration 0030), timed by the
+ * database's clock, so two requests for the same reader cannot both hold
+ * it. The claim's token, null when another request holds the reader's
+ * claim, or "unread" when it could not be asked (fail closed: no reply).
  */
-async function claimTurn(
-  admin: SupabaseClient,
-  exchangeId: string,
-  sampleId: string,
-  read: string,
-  now: Date
-): Promise<string | null> {
-  const lease = new Date(now.getTime() + CLAIM_MS).toISOString();
-  const { data, error } = await admin
-    .from("exchanges")
-    .update({ last_turn_at: lease })
-    .eq("id", exchangeId)
-    .eq("status", "open")
-    .eq("next_turn", sampleId)
-    .eq("last_turn_at", read)
-    // And never a live claim, whatever the caller read.
-    .lte("last_turn_at", new Date(now.getTime() + CLAIM_SKEW_MS).toISOString())
-    .select("id");
-  if (error) {
-    console.error(`[sample-reply] the turn in ${exchangeId} could not be claimed:`, error.message);
-    return null;
+async function claimReader(admin: SupabaseClient, readerId: string, exchangeId: string): Promise<string | null | "unread"> {
+  const token = newId();
+  try {
+    const { data, error } = await admin.rpc("claim_sample_reply", {
+      p_reader: readerId,
+      p_exchange: exchangeId,
+      p_token: token,
+      p_seconds: CLAIM_SECONDS,
+    });
+    if (error || typeof data !== "boolean") {
+      console.error("[sample-reply] the reader's claim could not be taken:", error?.message ?? `got ${String(data)}`);
+      return "unread";
+    }
+    return data ? token : null;
+  } catch (err) {
+    console.error("[sample-reply] the reader's claim could not be taken:", err instanceof Error ? err.message : String(err));
+    return "unread";
   }
-  return data && data.length > 0 ? lease : null;
 }
 
-/** Gives the claim back: last_turn_at as it was, only while the claim is still this one. */
-async function releaseTurn(
-  admin: SupabaseClient,
-  exchangeId: string,
-  sampleId: string,
-  lease: string,
-  handedOverAt: string
-): Promise<void> {
-  const { error } = await admin
-    .from("exchanges")
-    .update({ last_turn_at: handedOverAt })
-    .eq("id", exchangeId)
-    .eq("next_turn", sampleId)
-    .eq("last_turn_at", lease);
-  // Not given back, it lapses on its own CLAIM_MS after it was made.
-  if (error) console.error(`[sample-reply] the claim in ${exchangeId} could not be given back:`, error.message);
+/** Gives the reader's claim back, only with its own token. Not given back, it runs out after CLAIM_SECONDS. */
+async function releaseReader(admin: SupabaseClient, readerId: string, token: string): Promise<void> {
+  try {
+    const { error } = await admin.rpc("release_sample_reply", { p_reader: readerId, p_token: token });
+    if (error) console.error("[sample-reply] the reader's claim could not be given back:", error.message);
+  } catch (err) {
+    console.error("[sample-reply] the reader's claim could not be given back:", err instanceof Error ? err.message : String(err));
+  }
 }
 
 /** The turn passes to the reader, or the exchange completes. Only while it is still the sample's. */
